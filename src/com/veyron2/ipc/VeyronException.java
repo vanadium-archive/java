@@ -18,6 +18,11 @@ package com.veyron2.ipc;
 public class VeyronException extends Exception {
 	private final String id;  // always non-null (can be empty)
 
+	public VeyronException() {
+		super("");
+		this.id = "";
+	}
+
 	public VeyronException(String msg) {
 		super(msg == null ? "" : msg);
 		this.id = "";

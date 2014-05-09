@@ -16,10 +16,11 @@ public interface Client {
 	 * @param  name            a name of the server
 	 * @param  method          a name of the server's method to be invoked
 	 * @param  args            an array of arguments to the server's method
+	 * @param  opts            call options
 	 * @return Call            a call object that manages streaming args and results
 	 * @throws VeyronException if the call cannot be started
 	 */
-	public Call startCall(String name, String method, Object[] args) throws VeyronException;
+	public Call startCall(String name, String method, Object[] args, CallOption... opts) throws VeyronException;
 
 	/**
 	 * Discards all state associated with this Client.  In-flight calls may
@@ -59,4 +60,9 @@ public interface Client {
 		 */
 		public void cancel();
 	}
+
+	/**
+	 * CallOption represents an option that can be passed to Client's {@link #startCall} method.
+	 */
+	public interface CallOption {}
 }
