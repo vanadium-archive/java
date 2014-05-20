@@ -37,7 +37,7 @@ public class Runtime implements com.veyron2.ipc.Runtime {
 		return new Server();
 	}
 	@Override
-	public com.veyron2.ipc.Client client() {
+	public com.veyron2.ipc.Client getClient() {
 		return client;
 	}
 

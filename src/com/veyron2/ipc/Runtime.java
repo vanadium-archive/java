@@ -6,7 +6,7 @@ package com.veyron2.ipc;
  */
 public interface Runtime {
 	/**
-	 * NewClient creates a new Client instance.
+	 * Creates a new Client instance.
 	 * TODO(spetrovic): type-restrict the passed-in options.
 	 *
 	 * @param  opts            client-creation options
@@ -16,7 +16,7 @@ public interface Runtime {
 	public Client newClient(Object... opts) throws VeyronException;
 
 	/**
-	 * NewServer creates a new Server instance.
+	 * Creates a new Server instance.
 	 * TODO(spetrovic): type-restrict the passed-in options.
 	 *
 	 * @param  opts            server-creation options
@@ -26,10 +26,10 @@ public interface Runtime {
 	public Server newServer(Object... opts) throws VeyronException;
 
 	/**
-	 * Client returns the pre-configured Client that is created when the
+	 * Returns the pre-configured Client that is created when the
 	 * Runtime is initialized.
 	 *
 	 * @return Client the pre-configured client instance.
 	 */
-	public Client client();
+	public Client getClient();
 }

@@ -1,5 +1,6 @@
 package com.veyron2.ipc;
 
+import com.google.common.reflect.TypeToken;
 import com.veyron2.ipc.Stream;
 
 /**
@@ -47,11 +48,11 @@ public interface Client {
 		 * Blocks until the server has finished the call and returns
 		 * the positional output arguments (of any arity).
 		 *
-		 * @param  types           class definitions for all the output arguments
+		 * @param  types           types for all the output arguments
 		 * @return Object[]        an array of output arguments
 		 * @throws VeyronException if there was an error executing the call
 		 */
-		public Object[] finish(Class<?>[] types) throws VeyronException;
+		public Object[] finish(TypeToken<?>[] types) throws VeyronException;
 
 		/**
 		 * Cancels the call.  The server will stop processing, if possible.  Calls to
@@ -65,4 +66,9 @@ public interface Client {
 	 * CallOption represents an option that can be passed to Client's {@link #startCall} method.
 	 */
 	public interface CallOption {}
+
+	/**
+	 * BindOption represents an option that can be passed to IDL Client's Bind* methods.
+	 */
+	public interface BindOption() {}
 }
