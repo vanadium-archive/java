@@ -9,6 +9,6 @@ import com.veyron2.idl.build.test_base.Args;
  * Args will be reordered to show up before NestedArgs in the generated output.
 **/
 public class Args { 
-	public int A;
-	public int B;
+	public int a;
+	public int b;
 }

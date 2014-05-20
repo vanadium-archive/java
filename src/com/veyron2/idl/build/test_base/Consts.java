@@ -5,7 +5,7 @@ package com.veyron2.idl.build.test_base;
 public class Consts { 
 	/* The following constants originate from file: base.idl. */
 	// One demonstrates using a simple untyped constant.
-	public static final boolean True = true;
+	public static final boolean TRUE = true;
 	// Five demonstrates using a simple typed constant.
-	public static final int Five = 5;
+	public static final int FIVE = 5;
 }

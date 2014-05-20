@@ -12,5 +12,5 @@ import com.veyron2.idl.build.test_base.NestedArgs;
  * code generation in other languages.
 **/
 public class NestedArgs { 
-	public Args Args;
+	public Args args;
 }
