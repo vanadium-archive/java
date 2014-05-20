@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import com.veyron2.idl.Stream;
 import com.veyron2.idl.build.test_base.MyInterfaceA;
 import com.veyron2.idl.build.test_base.MyInterfaceB;
-import com.veyron2.ipc.VeyronException;
 import java.util.HashMap;
+import com.veyron2.ipc.Client;
+import com.veyron2.ipc.VeyronException;
 
 /**
  * MyInterfaceB is an interface that embeds MyInterfaceA and adds another
@@ -18,11 +19,11 @@ public interface MyInterfaceB extends MyInterfaceA {
 	// TODO(spetrovic): should this be the same type for the service and the client?  If so, it needs
 	// to be defined outside of the class and in its own file (ugh!!).
 	public class COut { 
-		public int Val1;
-		public HashMap<Float, VeyronException> Val2;
+		public int val1;
+		public HashMap<Float, VeyronException> val2;
 	}
 	// C takes in one argument and returns two named arguments and an error.
-	public COut C(int[] C) throws VeyronException;
+	public COut c(int[] c, Client.CallOption... opts) throws VeyronException;
 	// D blah blah
-	public Stream<Integer, ArrayList<String>> D(HashMap<Float, VeyronException> D) throws VeyronException;
+	public Stream<Integer, ArrayList<String>> d(HashMap<Float, VeyronException> d, Client.CallOption... opts) throws VeyronException;
 }

@@ -3,12 +3,12 @@
 package com.veyron2.idl.build.test_base;
 
 import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import com.veyron2.idl.Stream;
 import com.veyron2.idl.build.test_base.MyInterfaceAService;
 import com.veyron2.idl.build.test_base.MyInterfaceBService;
-import com.veyron2.idl.Stream;
+import com.veyron2.ipc.VeyronException;
 
 /**
  * MyInterfaceB is an interface that embeds MyInterfaceA and adds another
@@ -19,11 +19,11 @@ public interface MyInterfaceBService extends MyInterfaceAService {
 	// TODO(spetrovic): should this be the same type for the service and the client?  If so, it needs
 	// to be defined outside of the class and in its own file (ugh!!).
 	public class COut { 
-		public int Val1;
-		public HashMap<Float, VeyronException> Val2;
+		public int val1;
+		public HashMap<Float, VeyronException> val2;
 	}
 	// C takes in one argument and returns two named arguments and an error.
-	public COut C(Context context, int[] C) throws VeyronException;
+	public COut c(Context context, int[] c) throws VeyronException;
 	// D blah blah
-	public void D(Context context, HashMap<Float, VeyronException> D, Stream<Integer, ArrayList<String>> stream) throws VeyronException;
+	public void d(Context context, HashMap<Float, VeyronException> d, Stream<Integer, ArrayList<String>> stream) throws VeyronException;
 }

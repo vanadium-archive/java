@@ -2,17 +2,18 @@
 // Source: base.idl
 package com.veyron2.idl.build.test_base;
 
-import com.veyron2.ipc.VeyronException;
 import java.util.ArrayList;
 import com.veyron2.idl.build.test_base.Args;
 import com.veyron2.idl.build.test_base.MyInterfaceA;
+import com.veyron2.ipc.Client;
+import com.veyron2.ipc.VeyronException;
 
 /**
  * MyInterfaceA is an interface that defines two methods.
 **/
 public interface MyInterfaceA  { 
 	// A takes in two arguments and returns an unnamed argument and an error.
-	public ArrayList<String> A(Args A, int[] B) throws VeyronException;
+	public ArrayList<String> a(Args a, int[] b, Client.CallOption... opts) throws VeyronException;
 	// B takes in no arguments and returns an error.
-	public void B() throws VeyronException;
+	public void b(Client.CallOption... opts) throws VeyronException;
 }
