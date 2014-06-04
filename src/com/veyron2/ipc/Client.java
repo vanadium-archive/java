@@ -21,7 +21,7 @@ public interface Client {
 	 * @return Call            a call object that manages streaming args and results
 	 * @throws VeyronException if the call cannot be started
 	 */
-	public Call startCall(String name, String method, Object[] args, CallOption... opts) throws VeyronException;
+	public Call startCall(Context context, String name, String method, Object[] args, CallOption... opts) throws VeyronException;
 
 	/**
 	 * Discards all state associated with this Client.  In-flight calls may
@@ -70,5 +70,5 @@ public interface Client {
 	/**
 	 * BindOption represents an option that can be passed to IDL Client's Bind* methods.
 	 */
-	public interface BindOption() {}
+	public interface BindOption {}
 }

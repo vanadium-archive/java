@@ -32,4 +32,11 @@ public interface Runtime {
 	 * @return Client the pre-configured client instance.
 	 */
 	public Client getClient();
+
+	/**
+	 * Returns a new Context instance.
+	 *
+	 * @return Context the new (client) context.
+	 */
+	public Context newContext();
 }

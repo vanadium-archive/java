@@ -1,6 +1,7 @@
 package com.veyron2.runtime;
 
 import com.veyron2.ipc.Runtime;
+import com.veyron2.ipc.VeyronException;
 
 /**
  * RuntimeFactory creates new Runtimes.  It represents an entry point into the Veyron environment.
@@ -16,7 +17,6 @@ import com.veyron2.ipc.Runtime;
  */
 public class RuntimeFactory {
   private static Runtime runtime;
-  private static boolean initialized;
 
   /**
    * Initialize the runtime factory, creating a pre-initialized instance of a Runtime.
@@ -27,30 +27,25 @@ public class RuntimeFactory {
    * @return Runtime a pre-initialized runtime instance.
    */
   public static synchronized Runtime init() {
-    if (!initialized) {
-      initialized = true;
-      runtime = new com.veyron.runtimes.google.ipc.Runtime();
-    }
-    return runtime;
+    return com.veyron.runtimes.google.ipc.Runtime.global();
   }
+
   /**
    * Returns the pre-initialized instance of a Runtime.
    *
    * @return Runtime a pre-initialized runtime instance.
    */
   public static synchronized Runtime getRuntime() {
-    init();
-    return runtime;
+    return com.veyron.runtimes.google.ipc.Runtime.global();
   }
 
   /**
    * Creates and returns a new Runtime instance.
    *
    * @return Runtime a new Runtime instance.
+   * @throws VeyronException if the new runtime cannot be created.
    */
-  public static Runtime newRuntime() {
-    init();
+  public static Runtime newRuntime() throws VeyronException {
     return new com.veyron.runtimes.google.ipc.Runtime();
   }
-
 }

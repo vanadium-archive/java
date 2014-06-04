@@ -62,7 +62,7 @@ public class IDLInvoker {
      * @return String name of the IDL interface implemented by the object
      */
     public String getInterfacePath() {
-        return this.classInfo.idlInterface.getCanonicalName();
+        return this.classInfo.idlInterfacePath;
     }
 
     /**
@@ -96,14 +96,15 @@ public class IDLInvoker {
                 "Couldn't find method %s of length %d in class %s",
                 method, inArgs.length, this.classInfo.c.getCanonicalName()));
         }
+
         // Decode JSON arguments.
-        final Object[] args = this.jsonDecodeArgs(mInfo, call, inArgs);
+        final Object[] args = this.prepareArgs(mInfo, call, inArgs);
 
         // Invoke the method and process results.
         final InvokeReply reply = new InvokeReply();
         try {
             final Object result = mInfo.method.invoke(this.obj, args);
-            reply.results = this.jsonEncodeResult(mInfo, result);
+            reply.results = this.prepareResults(mInfo, result);
         } catch (InvocationTargetException e) { // underlying method threw an exception.
             if (!(e.getCause() instanceof VeyronException)) {  // not an application error.
                 throw new IllegalAccessException(String.format(
@@ -117,12 +118,15 @@ public class IDLInvoker {
         return reply;
     }
 
-    private Object[] jsonDecodeArgs(MethodInfo method, ServerCall call, String[] inArgs) throws JsonSyntaxException {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private Object[] prepareArgs(MethodInfo method, ServerCall call, String[] inArgs)
+        throws JsonSyntaxException {
         final Class<?>[] inTypes = method.getInTypes();
         assert inArgs.length == inTypes.length;
 
-        // The first argument is always context, so we add it here.
-        final Object[] ret = new Object[inArgs.length + 1];
+        // The first argument is always context, so we add it.
+        final int argsLength = inArgs.length + 1;
+        final Object[] ret = new Object[argsLength];
         ret[0] = call;
         for (int i = 0; i < inArgs.length; i++) {
             ret[i + 1] = this.gson.fromJson(inArgs[i], inTypes[i]);
@@ -130,13 +134,12 @@ public class IDLInvoker {
         return ret;
     }
 
-    private String[] jsonEncodeResult(MethodInfo method, Object result)
+    private String[] prepareResults(MethodInfo method, Object result)
         throws IllegalArgumentException, IllegalAccessException {
         // See if the result packs multiple return values for the IDL method.
         try {
             final Class<?> c = Class.forName(String.format("%s$%sOut",
-                this.classInfo.idlInterface.getCanonicalName(),
-                unCamelCase(method.getName())));
+                this.classInfo.idlInterfacePath, unCamelCase(method.getName())));
             // ClassNotFoundException not triggered - there are multiple return values.
             if (!result.getClass().equals(c)) {
                 throw new IllegalArgumentException(String.format(
@@ -162,18 +165,21 @@ public class IDLInvoker {
 
     private static class ClassInfo {
         final Class<?> c; // non-null
-        final Class<?> idlInterface;  // non-null
+        final String idlInterfacePath;  // non-null
         final HashMultimap<String, MethodInfo> methods;  // non-null
 
         ClassInfo(Class<?> c) throws IllegalArgumentException {
             this.c = c;
-            // Make sure that the class implements exactly one interface - the IDL interface.
-            final Class<?>[] interfaces = c.getInterfaces();
-            if (interfaces.length != 1) {
+            try {
+                // NOTE(spetrovic): this is extremely hacky, but is needed until we remove our
+                // dependence on knowing the exact IDL interface path.
+                this.idlInterfacePath =
+                    c.getDeclaredField("service").getType().getName();
+            } catch (NoSuchFieldException e) {
                 throw new IllegalArgumentException(
-                    String.format("Class %s must implement exactly one (IDL) interface"));
+                    String.format("Class %s must have a field \"service\" that stores the " +
+                        "VDL service implementation", c.getName()));
             }
-            this.idlInterface = interfaces[0];
 
             this.methods = HashMultimap.create();
             final Method[] methodList = c.getMethods();
@@ -208,21 +214,23 @@ public class IDLInvoker {
             final Class<?>[] inTypes = method.getParameterTypes();
             if (inTypes.length == 0) {
                 throw new IllegalArgumentException(String.format(
-                    "Method %s must have at least one argument (i.e., Context)", method.getName()));
+                    "Method %s must have at least one argument (i.e., ServerCall)", method.getName()));
             }
-            if (!inTypes[0].getName().equals("com.veyron2.ipc.Context")) {
+            if (!inTypes[0].getName().equals("com.veyron2.ipc.ServerCall")) {
                 throw new IllegalArgumentException(String.format(
-                    "Method %s's first argument must of type Context, got: %s",
+                    "Method %s's first argument must of type ServerCall, got: %s",
                     method.getName(), inTypes[0].getName()));
             }
-            this.inTypes = new Class<?>[inTypes.length - 1];
-            System.arraycopy(inTypes, 1, this.inTypes, 0, inTypes.length - 1);
+            final int inLength = inTypes.length - 1;
+            this.inTypes = new Class<?>[inLength];
+            System.arraycopy(inTypes, 1, this.inTypes, 0, inLength);
         }
 
         String getName() { return this.method.getName(); }
 
         Class<?>[] getInTypes() { return this.inTypes; }
 
+        @SuppressWarnings("unused")
         Class<?> getOutType() { return this.outType; }
     }
 }

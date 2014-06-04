@@ -1,5 +1,6 @@
 package com.veyron2.ipc;
 
+import com.google.common.reflect.TypeToken;
 import java.io.EOFException;
 
 /**
@@ -24,5 +25,5 @@ public interface Stream {
 	 * @throws EOFException    if a graceful end of input has been reached
 	 * @throws VeyronException if there was an error receving an item
 	 */
-	public Object recv(Class<?> type) throws EOFException, VeyronException;
+	public Object recv(TypeToken<?> type) throws EOFException, VeyronException;
 }
