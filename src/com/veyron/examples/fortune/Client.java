@@ -50,7 +50,6 @@ public class Client {
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{  };
 			call.finish(resultTypes);
-
 		}
 	}
 }

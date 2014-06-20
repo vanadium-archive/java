@@ -1,4 +1,4 @@
-package com.veyron.runtimes.google.ipc;
+package com.veyron.runtimes.google;
 
 import com.google.common.collect.HashMultimap;
 import com.google.gson.Gson;
@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * IDLInvoker is a helper class that uses reflection to invoke IDL interface methods for objects
+ * VDLInvoker is a helper class that uses reflection to invoke VDL interface methods for objects
  * that implements those interfaces.  It is required that the provided objects implement exactly one
- * IDL interface.
+ * VDL interface.
  */
-public class IDLInvoker {
+public class VDLInvoker {
     // A cache of ClassInfo objects, aiming to reduce the cost of expensive reflection operations.
     private static HashMap<Class<?>, ClassInfo> classes = new HashMap<Class<?>, ClassInfo>();
 
@@ -30,25 +30,25 @@ public class IDLInvoker {
      * Creates a new invoker for the given object.
      *
      * @param   obj                      object we're invoking methods on
-     * @returns Invoker                  new IDL invoker instance
+     * @returns Invoker                  new VDL invoker instance
      * @throws  IllegalArgumentException if the provided object is invalid (either null or doesn't
-     *                                  implement exactly one IDL interface)
+     *                                   implement exactly one VDL interface)
      */
-    public IDLInvoker(Object obj) throws IllegalArgumentException {
+    public VDLInvoker(Object obj) throws IllegalArgumentException {
         if (obj == null) {
-            throw new IllegalArgumentException("Can't create IDLInvoker with a null object.");
+            throw new IllegalArgumentException("Can't create VDLInvoker with a null object.");
         }
         final Class<?> c = obj.getClass();
         ClassInfo cInfo;
-        synchronized (IDLInvoker.this) {
-            cInfo = IDLInvoker.classes.get(c);
+        synchronized (VDLInvoker.this) {
+            cInfo = VDLInvoker.classes.get(c);
         }
         if (cInfo == null) {
             cInfo = new ClassInfo(c);
             // Note that multiple threads might decide to create a new ClassInfo and insert it
             // into the cache, but that's just wasted work and not a race condition.
-            synchronized (IDLInvoker.this) {
-                IDLInvoker.classes.put(c, cInfo);
+            synchronized (VDLInvoker.this) {
+                VDLInvoker.classes.put(c, cInfo);
             }
         }
         this.obj = obj;
@@ -57,12 +57,12 @@ public class IDLInvoker {
     }
 
     /**
-     * Retrieves the pathname of the IDL interface that the object implements.
+     * Retrieves the pathname of the VDL interface that the object implements.
      *
-     * @return String name of the IDL interface implemented by the object
+     * @return String name of the VDL interface implemented by the object
      */
     public String getInterfacePath() {
-        return this.classInfo.idlInterfacePath;
+        return this.classInfo.vdlInterfacePath;
     }
 
     /**
@@ -136,10 +136,10 @@ public class IDLInvoker {
 
     private String[] prepareResults(MethodInfo method, Object result)
         throws IllegalArgumentException, IllegalAccessException {
-        // See if the result packs multiple return values for the IDL method.
+        // See if the result packs multiple return values for the VDL method.
         try {
             final Class<?> c = Class.forName(String.format("%s$%sOut",
-                this.classInfo.idlInterfacePath, unCamelCase(method.getName())));
+                this.classInfo.vdlInterfacePath, unCamelCase(method.getName())));
             // ClassNotFoundException not triggered - there are multiple return values.
             if (!result.getClass().equals(c)) {
                 throw new IllegalArgumentException(String.format(
@@ -165,15 +165,15 @@ public class IDLInvoker {
 
     private static class ClassInfo {
         final Class<?> c; // non-null
-        final String idlInterfacePath;  // non-null
+        final String vdlInterfacePath;  // non-null
         final HashMultimap<String, MethodInfo> methods;  // non-null
 
         ClassInfo(Class<?> c) throws IllegalArgumentException {
             this.c = c;
             try {
                 // NOTE(spetrovic): this is extremely hacky, but is needed until we remove our
-                // dependence on knowing the exact IDL interface path.
-                this.idlInterfacePath =
+                // dependence on knowing the exact VDL interface path.
+                this.vdlInterfacePath =
                     c.getDeclaredField("service").getType().getName();
             } catch (NoSuchFieldException e) {
                 throw new IllegalArgumentException(
@@ -187,7 +187,7 @@ public class IDLInvoker {
                 final Method method = methodList[i];
                 try {
                     this.methods.put(method.getName(), new MethodInfo(method));
-                } catch (IllegalArgumentException e) {}  // method not an IDL method.
+                } catch (IllegalArgumentException e) {}  // method not an VDL method.
             }
         }
 

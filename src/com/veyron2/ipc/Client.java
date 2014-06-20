@@ -1,27 +1,47 @@
 package com.veyron2.ipc;
 
 import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.Stream;
+
+import java.util.Map;
 
 /**
  * Client represents the interface for making RPC calls.  There may be multiple
  * outstanding Client.Calls associated with a single Client, and a Client may be
- * used by multiple goroutines concurrently.
+ * used by multiple threads concurrently.
  */
 public interface Client {
 	/**
 	 * Starts an asynchronous call of the method on the server instance
 	 * identified by name, with the given input args (of any arity).  The returned
-	 * Call object manages streaming args and results, and finishes the call.
+	 * Call object manages streaming args and results and finishes the call.
 	 *
 	 * @param  name            a name of the server
 	 * @param  method          a name of the server's method to be invoked
 	 * @param  args            an array of arguments to the server's method
-	 * @param  opts            call options
-	 * @return Call            a call object that manages streaming args and results
+	 * @return                 a call object that manages streaming args and results
 	 * @throws VeyronException if the call cannot be started
 	 */
-	public Call startCall(Context context, String name, String method, Object[] args, CallOption... opts) throws VeyronException;
+	public Call startCall(Context context, String name, String method, Object[] args)
+		throws VeyronException;
+
+	/**
+	 * Starts an asynchronous call of the method on the server instance
+	 * identified by name, with the given input args (of any arity) and provided options
+	 * specified as (key,value) pairs.
+	 * The returned Call object manages streaming args and results and finishes the call.
+	 * A particular implementation of this interface chooses which options to support,
+	 * but at the minimum it must handle the following pre-defined options:
+	 * {@link com.veyron2.Options#CALL_TIMEOUT}
+	 *
+	 * @param  name            a name of the server
+	 * @param  method          a name of the server's method to be invoked
+	 * @param  args            an array of arguments to the server's method
+	 * @param  options         call options
+	 * @return                 a call object that manages streaming args and results
+	 * @throws VeyronException if the call cannot be started
+	 */
+	public Call startCall(Context context, String name, String method, Object[] args,
+		Map<String, Object> options) throws VeyronException;
 
 	/**
 	 * Discards all state associated with this Client.  In-flight calls may
@@ -61,14 +81,4 @@ public interface Client {
 		 */
 		public void cancel();
 	}
-
-	/**
-	 * CallOption represents an option that can be passed to Client's {@link #startCall} method.
-	 */
-	public interface CallOption {}
-
-	/**
-	 * BindOption represents an option that can be passed to IDL Client's Bind* methods.
-	 */
-	public interface BindOption {}
 }

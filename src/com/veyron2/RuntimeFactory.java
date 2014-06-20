@@ -1,6 +1,6 @@
-package com.veyron2.runtime;
+package com.veyron2;
 
-import com.veyron2.ipc.Runtime;
+import com.veyron2.Runtime;
 import com.veyron2.ipc.VeyronException;
 
 /**
@@ -16,8 +16,6 @@ import com.veyron2.ipc.VeyronException;
  *    ...
  */
 public class RuntimeFactory {
-  private static Runtime runtime;
-
   /**
    * Initialize the runtime factory, creating a pre-initialized instance of a Runtime.
    * Invoking this operation is optional (Runtime creation methods below ensure that it will
@@ -27,7 +25,7 @@ public class RuntimeFactory {
    * @return Runtime a pre-initialized runtime instance.
    */
   public static synchronized Runtime init() {
-    return com.veyron.runtimes.google.ipc.Runtime.global();
+    return com.veyron.runtimes.google.Runtime.global();
   }
 
   /**
@@ -36,7 +34,7 @@ public class RuntimeFactory {
    * @return Runtime a pre-initialized runtime instance.
    */
   public static synchronized Runtime getRuntime() {
-    return com.veyron.runtimes.google.ipc.Runtime.global();
+    return com.veyron.runtimes.google.Runtime.global();
   }
 
   /**
@@ -46,6 +44,6 @@ public class RuntimeFactory {
    * @throws VeyronException if the new runtime cannot be created.
    */
   public static Runtime newRuntime() throws VeyronException {
-    return new com.veyron.runtimes.google.ipc.Runtime();
+    return new com.veyron.runtimes.google.Runtime();
   }
 }
