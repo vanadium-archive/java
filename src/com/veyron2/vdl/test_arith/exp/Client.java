@@ -3,21 +3,32 @@
 package com.veyron2.vdl.test_arith.exp;
 
 import com.google.common.reflect.TypeToken;
+import com.veyron2.OptionDefs;
+import com.veyron2.Options;
+import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.runtime.RuntimeFactory;
 
 public class Client { 
 	/* Bind methods for interfaces in file: exp.vdl. */
-	@SuppressWarnings("unused")
-	public static Exp bindExp(String name, com.veyron2.ipc.Client.BindOption... opts) {
-		// TODO(spetrovic): check bind options.
-		final com.veyron2.ipc.Client client = RuntimeFactory.getRuntime().getClient();
+	public static Exp bindExp(String name) throws VeyronException {
+		return bindExp(name, null);
+	}
+	public static Exp bindExp(String name, Options opts) throws VeyronException {
+		com.veyron2.ipc.Client client = null;
+		if (opts.get(OptionDefs.CLIENT) != null) {
+			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+		} else {
+			client = RuntimeFactory.getRuntime().getClient();
+		}
 		return new ExpStub(client, name);
 	}
-	
+
 	/* Client stubs for interfaces in file: exp.vdl. */
 	private static class ExpStub implements Exp {
+		private static final String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.Exp";
 		private final com.veyron2.ipc.Client client;
 		private final String name;
 
@@ -27,13 +38,25 @@ public class Client {
 		}
 		// Methods from interface Exp.
 		@Override
-		public double exp(Context context, double x, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public double exp(Context context, double x) throws VeyronException {
+			return exp(context, x, null);
+		}
+		@Override
+		public double exp(Context context, double x, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ x };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ExpStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Exp", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{ new TypeToken<Double>() {} };
 			return (double)call.finish(resultTypes)[0];

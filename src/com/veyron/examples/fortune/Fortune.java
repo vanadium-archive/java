@@ -2,7 +2,7 @@
 // Source: fortune.vdl
 package com.veyron.examples.fortune;
 
-import com.veyron2.ipc.Client;
+import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 
@@ -11,7 +11,9 @@ import com.veyron2.ipc.VeyronException;
 **/
 public interface Fortune { 
 	// Get returns a random fortune.
-	public String get(Context context, Client.CallOption... opts) throws VeyronException;
+	public String get(Context context) throws VeyronException;
+	public String get(Context context, Options opts) throws VeyronException;
 	// Add stores a fortune in the set used by Get.
-	public void add(Context context, String fortune, Client.CallOption... opts) throws VeyronException;
+	public void add(Context context, String fortune) throws VeyronException;
+	public void add(Context context, String fortune, Options opts) throws VeyronException;
 }

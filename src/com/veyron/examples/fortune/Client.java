@@ -3,21 +3,32 @@
 package com.veyron.examples.fortune;
 
 import com.google.common.reflect.TypeToken;
+import com.veyron2.OptionDefs;
+import com.veyron2.Options;
+import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.runtime.RuntimeFactory;
 
 public class Client { 
 	/* Bind methods for interfaces in file: fortune.vdl. */
-	@SuppressWarnings("unused")
-	public static Fortune bindFortune(String name, com.veyron2.ipc.Client.BindOption... opts) {
-		// TODO(spetrovic): check bind options.
-		final com.veyron2.ipc.Client client = RuntimeFactory.getRuntime().getClient();
+	public static Fortune bindFortune(String name) throws VeyronException {
+		return bindFortune(name, null);
+	}
+	public static Fortune bindFortune(String name, Options opts) throws VeyronException {
+		com.veyron2.ipc.Client client = null;
+		if (opts.get(OptionDefs.CLIENT) != null) {
+			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+		} else {
+			client = RuntimeFactory.getRuntime().getClient();
+		}
 		return new FortuneStub(client, name);
 	}
-	
+
 	/* Client stubs for interfaces in file: fortune.vdl. */
 	private static class FortuneStub implements Fortune {
+		private static final String vdlIfacePathOpt = "com.veyron.examples.fortune.Fortune";
 		private final com.veyron2.ipc.Client client;
 		private final String name;
 
@@ -27,29 +38,54 @@ public class Client {
 		}
 		// Methods from interface Fortune.
 		@Override
-		public String get(Context context, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public String get(Context context) throws VeyronException {
+			return get(context, null);
+		}
+		@Override
+		public String get(Context context, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{  };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Get", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{ new TypeToken<String>() {} };
 			return (String)call.finish(resultTypes)[0];
 
 		}
 		@Override
-		public void add(Context context, String Fortune, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public void add(Context context, String Fortune) throws VeyronException {
+			add(context, Fortune, null);
+		}
+		@Override
+		public void add(Context context, String Fortune, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ Fortune };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Add", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{  };
 			call.finish(resultTypes);
+
 		}
 	}
 }

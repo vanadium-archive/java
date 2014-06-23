@@ -13,6 +13,17 @@ public class Options {
     private Map<String, Object> options = new HashMap<String, Object>();
 
     /**
+     * Returns true iff the option with the provided key exists.  (Note that if the option exists
+     * but its value is null, this method will return true.)
+     *
+     * @param  key key of the option whose existance is checked.
+     * @return     true iff the option with the above key exists.
+     */
+    public boolean has(String key) {
+        return this.options.containsKey(key);
+    }
+
+    /**
      * Returns the option with the provided key.
      *
      * @param  key key of the option we want to get.
@@ -40,12 +51,22 @@ public class Options {
     }
 
     /**
-     * Generic method that associates an option value with a provided key.
+     * Associates option value with the provided key.  If an option with the
+     * same key already exist, its value will be overwritten.
      *
      * @param key     key of the option we are setting.
      * @param value   an option we are setting.
      */
     public void set(String key, Object value) {
         this.options.put(key, value);
+    }
+
+    /**
+     * Removes the option with a given key.  A no-op if the option doesn't exist.
+     *
+     * @param key a key of an option to be removed.
+     */
+    public void remove(String key) {
+        this.options.remove(key);
     }
 }

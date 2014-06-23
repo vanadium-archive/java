@@ -2,7 +2,7 @@
 // Source: advanced.vdl
 package com.veyron2.vdl.test_arith;
 
-import com.veyron2.ipc.Client;
+import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 
@@ -10,6 +10,8 @@ import com.veyron2.ipc.VeyronException;
  * Trigonometry is an interface that specifies a couple trigonometric functions.
 **/
 public interface Trigonometry { 
-		public double sine(Context context, double angle, Client.CallOption... opts) throws VeyronException;
-		public double cosine(Context context, double angle, Client.CallOption... opts) throws VeyronException;
+		public double sine(Context context, double angle) throws VeyronException;
+	public double sine(Context context, double angle, Options opts) throws VeyronException;
+		public double cosine(Context context, double angle) throws VeyronException;
+	public double cosine(Context context, double angle, Options opts) throws VeyronException;
 }

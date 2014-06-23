@@ -2,11 +2,13 @@
 // Source: arith.vdl
 package com.veyron2.vdl.test_arith;
 
-import com.veyron2.ipc.Client;
+import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 
 public interface Calculator extends Arith, AdvancedMath { 
-		public void on(Context context, Client.CallOption... opts) throws VeyronException; // On turns the calculator on.
-		public void off(Context context, Client.CallOption... opts) throws VeyronException; // Off turns the calculator off.
+		public void on(Context context) throws VeyronException; // On turns the calculator on.
+	public void on(Context context, Options opts) throws VeyronException;
+		public void off(Context context) throws VeyronException; // Off turns the calculator off.
+	public void off(Context context, Options opts) throws VeyronException;
 }

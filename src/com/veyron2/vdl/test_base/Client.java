@@ -3,29 +3,48 @@
 package com.veyron2.vdl.test_base;
 
 import com.google.common.reflect.TypeToken;
+import com.veyron2.OptionDefs;
+import com.veyron2.Options;
+import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.runtime.RuntimeFactory;
 import com.veyron2.vdl.ClientStream;
 
 public class Client { 
 	/* Bind methods for interfaces in file: base.vdl. */
-	@SuppressWarnings("unused")
-	public static ServiceA bindServiceA(String name, com.veyron2.ipc.Client.BindOption... opts) {
-		// TODO(spetrovic): check bind options.
-		final com.veyron2.ipc.Client client = RuntimeFactory.getRuntime().getClient();
+	public static ServiceA bindServiceA(String name) throws VeyronException {
+		return bindServiceA(name, null);
+	}
+	public static ServiceA bindServiceA(String name, Options opts) throws VeyronException {
+		com.veyron2.ipc.Client client = null;
+		if (opts.get(OptionDefs.CLIENT) != null) {
+			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+		} else {
+			client = RuntimeFactory.getRuntime().getClient();
+		}
 		return new ServiceAStub(client, name);
 	}
-	@SuppressWarnings("unused")
-	public static ServiceB bindServiceB(String name, com.veyron2.ipc.Client.BindOption... opts) {
-		// TODO(spetrovic): check bind options.
+	public static ServiceB bindServiceB(String name) throws VeyronException {
+		return bindServiceB(name, null);
+	}
+	public static ServiceB bindServiceB(String name, Options opts) throws VeyronException {
+		com.veyron2.ipc.Client client = null;
+		if (opts.get(OptionDefs.CLIENT) != null) {
+			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+		} else {
+			client = RuntimeFactory.getRuntime().getClient();
+		}
 		final ServiceA serviceA = Client.bindServiceA(name, opts);
-		final com.veyron2.ipc.Client client = RuntimeFactory.getRuntime().getClient();
 		return new ServiceBStub(client, name, serviceA);
 	}
-	
+
 	/* Client stubs for interfaces in file: base.vdl. */
 	private static class ServiceAStub implements ServiceA {
+		private static final String vdlIfacePathOpt = "com.veyron2.vdl.test_base.ServiceA";
 		private final com.veyron2.ipc.Client client;
 		private final String name;
 
@@ -35,39 +54,75 @@ public class Client {
 		}
 		// Methods from interface ServiceA.
 		@Override
-		public void methodA1(Context context, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public void methodA1(Context context) throws VeyronException {
+			methodA1(context, null);
+		}
+		@Override
+		public void methodA1(Context context, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{  };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceAStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "MethodA1", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{  };
 			call.finish(resultTypes);
 
 		}
 		@Override
-		public String methodA2(Context context, int a, String b, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public String methodA2(Context context, int a, String b) throws VeyronException {
+			return methodA2(context, a, b, null);
+		}
+		@Override
+		public String methodA2(Context context, int a, String b, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ a, b };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceAStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "MethodA2", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{ new TypeToken<String>() {} };
 			return (String)call.finish(resultTypes)[0];
 
 		}
 		@Override
-		public ClientStream<Void,Scalars,String> methodA3(Context context, int a, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public ClientStream<Void,Scalars,String> methodA3(Context context, int a) throws VeyronException {
+			return methodA3(context, a, null);
+		}
+		@Override
+		public ClientStream<Void,Scalars,String> methodA3(Context context, int a, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ a };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceAStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "MethodA3", inArgs, opts);
-			
+
 			return new ClientStream<Void, Scalars, String>() {
 				@Override
 				public void send(Void item) throws VeyronException {
@@ -93,13 +148,25 @@ public class Client {
 			};
 		}
 		@Override
-		public ClientStream<Integer,String,Void> methodA4(Context context, int a, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public ClientStream<Integer,String,Void> methodA4(Context context, int a) throws VeyronException {
+			return methodA4(context, a, null);
+		}
+		@Override
+		public ClientStream<Integer,String,Void> methodA4(Context context, int a, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ a };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceAStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "MethodA4", inArgs, opts);
-			
+
 			return new ClientStream<Integer, String, Void>() {
 				@Override
 				public void send(Integer item) throws VeyronException {
@@ -127,6 +194,7 @@ public class Client {
 		}
 	}
 	private static class ServiceBStub implements ServiceB {
+		private static final String vdlIfacePathOpt = "com.veyron2.vdl.test_base.ServiceB";
 		private final com.veyron2.ipc.Client client;
 		private final String name;
 		private final ServiceA serviceA;
@@ -138,13 +206,25 @@ public class Client {
 		}
 		// Methods from interface ServiceB.
 		@Override
-		public CompComp methodB1(Context context, Scalars a, Composites b, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public CompComp methodB1(Context context, Scalars a, Composites b) throws VeyronException {
+			return methodB1(context, a, b, null);
+		}
+		@Override
+		public CompComp methodB1(Context context, Scalars a, Composites b, Options opts) throws VeyronException {
 			// Prepare input arguments.
 			final Object[] inArgs = new Object[]{ a, b };
 
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+			// Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceBStub.vdlIfacePathOpt);
+			}
+
 			// Start the call.
 			final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "MethodB1", inArgs, opts);
-			
+
 			// Prepare output argument and finish the call.
 			final TypeToken<?>[] resultTypes = new TypeToken<?>[]{ new TypeToken<CompComp>() {} };
 			return (CompComp)call.finish(resultTypes)[0];
@@ -152,19 +232,63 @@ public class Client {
 		}
 		// Methods from sub-interface ServiceA.
 		@Override
-		public void methodA1(Context context, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public void methodA1(Context context) throws VeyronException {
+			methodA1(context, null);
+		}
+		@Override
+		public void methodA1(Context context, Options opts) throws VeyronException {
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+		    // Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceBStub.vdlIfacePathOpt);
+			}
 			this.serviceA.methodA1(context, opts);
 		}
 		@Override
-		public String methodA2(Context context, int a, String b, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public String methodA2(Context context, int a, String b) throws VeyronException {
+			return methodA2(context, a, b, null);
+		}
+		@Override
+		public String methodA2(Context context, int a, String b, Options opts) throws VeyronException {
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+		    // Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceBStub.vdlIfacePathOpt);
+			}
 			return this.serviceA.methodA2(context, a, b, opts);
 		}
 		@Override
-		public ClientStream<Void,Scalars,String> methodA3(Context context, int a, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public ClientStream<Void,Scalars,String> methodA3(Context context, int a) throws VeyronException {
+			return methodA3(context, a, null);
+		}
+		@Override
+		public ClientStream<Void,Scalars,String> methodA3(Context context, int a, Options opts) throws VeyronException {
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+		    // Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceBStub.vdlIfacePathOpt);
+			}
 			return this.serviceA.methodA3(context, a, opts);
 		}
 		@Override
-		public ClientStream<Integer,String,Void> methodA4(Context context, int a, com.veyron2.ipc.Client.CallOption... opts) throws VeyronException {
+		public ClientStream<Integer,String,Void> methodA4(Context context, int a) throws VeyronException {
+			return methodA4(context, a, null);
+		}
+		@Override
+		public ClientStream<Integer,String,Void> methodA4(Context context, int a, Options opts) throws VeyronException {
+			// Add VDL path option.
+			// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+		    // Java to encoding/decoding from vom.Value objects.
+			if (opts == null) opts = new Options();
+			if (!opts.has(OptionDefs.VDL_INTERFACE_PATH)) {
+				opts.set(OptionDefs.VDL_INTERFACE_PATH, ServiceBStub.vdlIfacePathOpt);
+			}
 			return this.serviceA.methodA4(context, a, opts);
 		}
 	}

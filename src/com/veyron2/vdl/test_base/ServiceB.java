@@ -2,10 +2,11 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
-import com.veyron2.ipc.Client;
+import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 
 public interface ServiceB extends ServiceA { 
-		public CompComp methodB1(Context context, Scalars a, Composites b, Client.CallOption... opts) throws VeyronException;
+		public CompComp methodB1(Context context, Scalars a, Composites b) throws VeyronException;
+	public CompComp methodB1(Context context, Scalars a, Composites b, Options opts) throws VeyronException;
 }
