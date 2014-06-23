@@ -2,7 +2,7 @@ package com.veyron2.ipc;
 
 import com.google.common.reflect.TypeToken;
 
-import java.util.Map;
+import com.veyron2.Options;
 
 /**
  * Client represents the interface for making RPC calls.  There may be multiple
@@ -26,12 +26,11 @@ public interface Client {
 
 	/**
 	 * Starts an asynchronous call of the method on the server instance
-	 * identified by name, with the given input args (of any arity) and provided options
-	 * specified as (key,value) pairs.
+	 * identified by name, with the given input args (of any arity) and provided options.
 	 * The returned Call object manages streaming args and results and finishes the call.
 	 * A particular implementation of this interface chooses which options to support,
 	 * but at the minimum it must handle the following pre-defined options:
-	 * {@link com.veyron2.Options#CALL_TIMEOUT}
+	 * {@link com.veyron2.OptionDefs#CALL_TIMEOUT}
 	 *
 	 * @param  name            a name of the server
 	 * @param  method          a name of the server's method to be invoked
@@ -41,7 +40,7 @@ public interface Client {
 	 * @throws VeyronException if the call cannot be started
 	 */
 	public Call startCall(Context context, String name, String method, Object[] args,
-		Map<String, Object> options) throws VeyronException;
+		Options opts) throws VeyronException;
 
 	/**
 	 * Discards all state associated with this Client.  In-flight calls may

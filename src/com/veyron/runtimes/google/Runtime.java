@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import com.veyron2.Options;
+import com.veyron2.OptionDefs;
 import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.VeyronException;
 
@@ -12,7 +13,6 @@ import org.joda.time.Duration;
 
 import java.io.EOFException;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Runtime is the Veyron runtime that calls to native implementations for most of
@@ -66,8 +66,8 @@ public class Runtime implements com.veyron2.Runtime {
 		return newClient(null);
 	}
 	@Override
-	public com.veyron2.ipc.Client newClient(Map<String, Object> options) throws VeyronException {
-		final Duration timeout = Options.getCallTimeout(options);
+	public com.veyron2.ipc.Client newClient(Options opts) throws VeyronException {
+		final Duration timeout = opts.get(OptionDefs.CALL_TIMEOUT, Duration.class);
 		final long nativeClientPtr =
 			nativeNewClient(this.nativePtr, timeout != null ? timeout.getMillis() : -1);
 		return new Client(nativeClientPtr);
@@ -77,7 +77,7 @@ public class Runtime implements com.veyron2.Runtime {
 		return newServer(null);
 	}
 	@Override
-	public com.veyron2.ipc.Server newServer(Map<String, Object> options) throws VeyronException {
+	public com.veyron2.ipc.Server newServer(Options opts) throws VeyronException {
 		final long nativeServerPtr = nativeNewServer(this.nativePtr);
 		return new Server(nativeServerPtr);
 	}
@@ -166,10 +166,10 @@ public class Runtime implements com.veyron2.Runtime {
 		}
 		@Override
 		public Call startCall(com.veyron2.ipc.Context context, String name, String method,
-			Object[] args, Map<String, Object> options) throws VeyronException {
+			Object[] args, Options opts) throws VeyronException {
 			// Read options.
-			final Duration timeout = Options.getCallTimeout(options);
-			final String vdlPath = Options.getVDLInterfacePath(options);
+			final Duration timeout = opts.get(OptionDefs.CALL_TIMEOUT, Duration.class);
+			final String vdlPath = opts.get(OptionDefs.VDL_INTERFACE_PATH, String.class);
 			if (vdlPath == null) {
  				throw new VeyronException(String.format(
 					"Must provide VDL interface path option for remote method %s on object %s",

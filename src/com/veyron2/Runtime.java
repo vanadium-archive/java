@@ -5,8 +5,6 @@ import com.veyron2.ipc.Context;
 import com.veyron2.ipc.Server;
 import com.veyron2.ipc.VeyronException;
 
-import java.util.Map;
-
 /**
  * Runtime represents the local environment allowing clients and servers to communicate
  * with one another.
@@ -21,16 +19,16 @@ public interface Runtime {
 	public Client newClient() throws VeyronException;
 
     /**
-	 * Creates a new Client instance with the provided options specified as (key, value) pairs.
-	 * A particular implementation of this interface chooses which options to support,
-	 * but at the minimum it must handle the following options:
-	 * {@link com.veyron2.Options#CALL_TIMEOUT}
+	 * Creates a new Client instance with the provided options.  A particular implementation of this
+	 * interface chooses which options to support, but at the minimum it must handle the following
+	 * options:
+	 * {@link com.veyron2.OptionDefs#CALL_TIMEOUT}
 	 *
-	 * @param  options         client options
+	 * @param  opts            client options
 	 * @return Client          the new client instance
 	 * @throws VeyronException if a new client cannot be created
 	 */
-	public Client newClient(Map<String, Object> options) throws VeyronException;
+	public Client newClient(Options opts) throws VeyronException;
 
 	/**
 	 * Creates a new Server instance.
@@ -41,14 +39,14 @@ public interface Runtime {
 	public Server newServer() throws VeyronException;
 
 	/**
-	 * Creates a new Server instance with the provided options, specified as (key, value) pairs.
-	 * A particular implementation of this interface chooses which options to support.
+	 * Creates a new Server instance with the provided options.  A particular implementation of this
+	 * interface chooses which options to support.
 	 *
-	 * @param  options         server options
+	 * @param  opts            server options
 	 * @return Server          the new server instance
 	 * @throws VeyronException if a new server cannot be created
 	 */
-	public Server newServer(Map<String, Object> options) throws VeyronException;
+	public Server newServer(Options opts) throws VeyronException;
 
 	/**
 	 * Returns the pre-configured Client that is created when the Runtime is initialized.
