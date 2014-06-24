@@ -17,9 +17,9 @@ public class Client {
 	}
 	public static ServiceA bindServiceA(String name, Options opts) throws VeyronException {
 		com.veyron2.ipc.Client client = null;
-		if (opts.get(OptionDefs.CLIENT) != null) {
+		if (opts != null && opts.get(OptionDefs.CLIENT) != null) {
 			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
-		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+		} else if (opts != null && opts.get(OptionDefs.RUNTIME) != null) {
 			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
 		} else {
 			client = RuntimeFactory.getRuntime().getClient();
@@ -31,9 +31,9 @@ public class Client {
 	}
 	public static ServiceB bindServiceB(String name, Options opts) throws VeyronException {
 		com.veyron2.ipc.Client client = null;
-		if (opts.get(OptionDefs.CLIENT) != null) {
+		if (opts != null && opts.get(OptionDefs.CLIENT) != null) {
 			client = opts.get(OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
-		} else if (opts.get(OptionDefs.RUNTIME) != null) {
+		} else if (opts != null && opts.get(OptionDefs.RUNTIME) != null) {
 			client = opts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
 		} else {
 			client = RuntimeFactory.getRuntime().getClient();
