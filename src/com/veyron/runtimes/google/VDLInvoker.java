@@ -1,17 +1,16 @@
 package com.veyron.runtimes.google;
 
-import com.google.common.collect.HashMultimap;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import com.google.common.collect.HashMultimap;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.veyron2.ipc.ServerCall;
+import com.veyron2.ipc.VeyronException;
 
 /**
  * VDLInvoker is a helper class that uses reflection to invoke VDL interface methods for objects
@@ -78,23 +77,25 @@ public class VDLInvoker {
 
     /**
      * Converts the provided arguments from JSON and invokes the given method
-     * using reflection. JSON-encodes the reply.  Application errors are returned along with the
-     * reply, while any other encountered errors are thrown as exceptions.
-     *
+     * using reflection. JSON-encodes the reply. Application errors are returned
+     * along with the reply, while any other encountered errors are thrown as
+     * exceptions.
+     * 
      * @param method                    name of the method to be invoked
      * @param call                      in-flight call information
      * @param inArgs                    JSON encoded arguments to the method
      * @return InvokeReply              JSON-encoded invocation reply and application errors
      * @throws IllegalArgumentException if invalid arguments are passed
      * @throws IllegalAccessException   if a runtime access error occurs
+     * @throws InvocationTargetException
      */
     public InvokeReply invoke(String method, ServerCall call, String[] inArgs) throws
-        IllegalArgumentException, IllegalAccessException {
+    IllegalArgumentException, IllegalAccessException {
         final MethodInfo mInfo = this.classInfo.findMethod(method, inArgs.length);
         if (mInfo == null) {
             throw new IllegalArgumentException(String.format(
                 "Couldn't find method %s of length %d in class %s",
-                method, inArgs.length, this.classInfo.c.getCanonicalName()));
+                    method, inArgs.length, this.classInfo.c.getCanonicalName()));
         }
 
         // Decode JSON arguments.
@@ -105,22 +106,28 @@ public class VDLInvoker {
         try {
             final Object result = mInfo.method.invoke(this.obj, args);
             reply.results = this.prepareResults(mInfo, result);
-        } catch (InvocationTargetException e) { // underlying method threw an exception.
-            if (!(e.getCause() instanceof VeyronException)) {  // not an application error.
-                throw new IllegalAccessException(String.format(
-                "Method %s may only throw VeyronException, got %s",
-                method, e.getClass().getCanonicalName()));
+        } catch (InvocationTargetException e) { // The underlying method threw an exception.
+            VeyronException ve;
+            if ((e.getCause() instanceof VeyronException)) {
+                ve = (VeyronException)e.getTargetException();
+            } else {
+                // Dump the stack trace locally.
+                e.getTargetException().printStackTrace();
+
+                ve = new VeyronException(String.format(
+                        "Remote invocations of java methods may only throw VeyronException, but call to %s threw %s",
+                        method, e.getTargetException().getClass()));
             }
             reply.hasApplicationError = true;
-            reply.errorID = ((VeyronException)e.getCause()).getID();
-            reply.errorMsg = ((VeyronException)e.getCause()).getMessage();
+            reply.errorID = ve.getID();
+            reply.errorMsg = ve.getMessage();
         }
+
         return reply;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private Object[] prepareArgs(MethodInfo method, ServerCall call, String[] inArgs)
-        throws JsonSyntaxException {
+            throws JsonSyntaxException {
         final Class<?>[] inTypes = method.getInTypes();
         assert inArgs.length == inTypes.length;
 
@@ -135,16 +142,16 @@ public class VDLInvoker {
     }
 
     private String[] prepareResults(MethodInfo method, Object result)
-        throws IllegalArgumentException, IllegalAccessException {
+            throws IllegalArgumentException, IllegalAccessException {
         // See if the result packs multiple return values for the VDL method.
         try {
             final Class<?> c = Class.forName(String.format("%s$%sOut",
-                this.classInfo.vdlInterfacePath, unCamelCase(method.getName())));
+                    this.classInfo.vdlInterfacePath, unCamelCase(method.getName())));
             // ClassNotFoundException not triggered - there are multiple return values.
             if (!result.getClass().equals(c)) {
                 throw new IllegalArgumentException(String.format(
-                    "Type mismatch for method %s return value, want %s got %s",
-                    method.getName(), c.getName(), result.getClass().getName()));
+                        "Type mismatch for method %s return value, want %s got %s",
+                        method.getName(), c.getName(), result.getClass().getName()));
             }
             final Field[] fields = c.getFields();
             final String[] reply = new String[fields.length];
@@ -174,11 +181,11 @@ public class VDLInvoker {
                 // NOTE(spetrovic): this is extremely hacky, but is needed until we remove our
                 // dependence on knowing the exact VDL interface path.
                 this.vdlInterfacePath =
-                    c.getDeclaredField("service").getType().getName();
+                        c.getDeclaredField("service").getType().getName();
             } catch (NoSuchFieldException e) {
                 throw new IllegalArgumentException(
-                    String.format("Class %s must have a field \"service\" that stores the " +
-                        "VDL service implementation", c.getName()));
+                        String.format("Class %s must have a field \"service\" that stores the " +
+                                "VDL service implementation", c.getName()));
             }
 
             this.methods = HashMultimap.create();
@@ -187,7 +194,8 @@ public class VDLInvoker {
                 final Method method = methodList[i];
                 try {
                     this.methods.put(method.getName(), new MethodInfo(method));
-                } catch (IllegalArgumentException e) {}  // method not an VDL method.
+                } catch (IllegalArgumentException e) {
+                }  // method not an VDL method.
             }
         }
 
@@ -214,12 +222,12 @@ public class VDLInvoker {
             final Class<?>[] inTypes = method.getParameterTypes();
             if (inTypes.length == 0) {
                 throw new IllegalArgumentException(String.format(
-                    "Method %s must have at least one argument (i.e., ServerCall)", method.getName()));
+                        "Method %s must have at least one argument (i.e., ServerCall)", method.getName()));
             }
             if (!inTypes[0].getName().equals("com.veyron2.ipc.ServerCall")) {
                 throw new IllegalArgumentException(String.format(
-                    "Method %s's first argument must of type ServerCall, got: %s",
-                    method.getName(), inTypes[0].getName()));
+                        "Method %s's first argument must of type ServerCall, got: %s",
+                        method.getName(), inTypes[0].getName()));
             }
             final int inLength = inTypes.length - 1;
             this.inTypes = new Class<?>[inLength];
