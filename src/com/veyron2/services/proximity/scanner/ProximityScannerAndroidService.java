@@ -9,7 +9,7 @@ import android.os.IBinder;
 import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.proximity.vdlgen.Server;
+import com.veyron2.services.proximity.Server;
 
 public class ProximityScannerAndroidService extends Service {
     private ProximityScannerVeyronService proxService;
