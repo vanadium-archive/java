@@ -18,11 +18,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.veryron.examples.proximitytest.R;
 import com.veyron2.PauseHandler;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.proximity.Client;
 import com.veyron2.services.proximity.Device;
+import com.veyron2.services.proximity.ProximityFactory;
 import com.veyron2.services.proximity.ProximityScanner;
 import com.veyron2.services.proximity.scanner.ProximityScannerAndroidService;
 
@@ -34,7 +33,7 @@ public class ProximityTestActivity extends Activity {
     private static final int REFRESH_PERIOD = 150; // ms
 
     private ProximityScannerAndroidService serv;
-    private PauseHandler handler = new PauseHandler();
+    private final PauseHandler handler = new PauseHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,7 @@ public class ProximityTestActivity extends Activity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             ProximityScannerAndroidService.BluetoothTestBinder binder =
-            (ProximityScannerAndroidService.BluetoothTestBinder) service;
+                    (ProximityScannerAndroidService.BluetoothTestBinder) service;
             serv = binder.getService();
             handler = new PauseHandler();
             handler.postDelayed(new Runnable() {
@@ -90,7 +89,7 @@ public class ProximityTestActivity extends Activity {
         ProximityScanner ps;
         String endpoint = "/" + serv.endpoint;
         try {
-            ps = Client.bindProximityScanner(endpoint);
+            ps = ProximityFactory.bind(endpoint);
         } catch (VeyronException e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT);
             return new ArrayList<Device>();

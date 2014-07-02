@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * Device represents one neighborhood device.  It contains that device's
  * MAC address, observed names, and the average distance to the device.
+ * TODO(bprosnitz) This is bluetooth specific. We need a more generate service as well.
 **/
 public class Device { 
 	// MAC is remote device's MAC address, in one of the following formats
@@ -23,5 +24,6 @@ public String mAC;
 public ArrayList<String> names;
 	// Distance represents the (estimated) distance to the neighborhood
 // device.  It can be parsed using distance.Parse method.
+// TODO(bprosnitz) Change from string.
 public String distance;
 }

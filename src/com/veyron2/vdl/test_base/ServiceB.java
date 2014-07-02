@@ -8,5 +8,5 @@ import com.veyron2.ipc.VeyronException;
 
 public interface ServiceB extends ServiceA { 
 		public CompComp methodB1(Context context, Scalars a, Composites b) throws VeyronException;
-	public CompComp methodB1(Context context, Scalars a, Composites b, Options opts) throws VeyronException;
+	public CompComp methodB1(Context context, Scalars a, Composites b, Options veyronOpts) throws VeyronException;
 }

@@ -17,11 +17,11 @@ public interface ProximityAnnouncer {
 // a remote device will see all the unique names currently registered
 // with this device (see Names field in Device).
 	public void registerName(Context context, String name) throws VeyronException;
-	public void registerName(Context context, String name, Options opts) throws VeyronException;
+	public void registerName(Context context, String name, Options veyronOpts) throws VeyronException;
 	// UnregisterName removes a name previously associated with this device.
 // If the name doesn't exist, this method will return an error.
 // If the name has been registered multiple times, this method will
 // remove only one instance of that registration.
 	public void unregisterName(Context context, String name) throws VeyronException;
-	public void unregisterName(Context context, String name, Options opts) throws VeyronException;
+	public void unregisterName(Context context, String name, Options veyronOpts) throws VeyronException;
 }

@@ -9,11 +9,11 @@ import com.veyron2.vdl.ClientStream;
 
 public interface ServiceA { 
 		public void methodA1(Context context) throws VeyronException;
-	public void methodA1(Context context, Options opts) throws VeyronException;
+	public void methodA1(Context context, Options veyronOpts) throws VeyronException;
 		public String methodA2(Context context, int a, String b) throws VeyronException;
-	public String methodA2(Context context, int a, String b, Options opts) throws VeyronException;
+	public String methodA2(Context context, int a, String b, Options veyronOpts) throws VeyronException;
 		public ClientStream<Void,Scalars,String> methodA3(Context context, int a) throws VeyronException;
-	public ClientStream<Void,Scalars,String> methodA3(Context context, int a, Options opts) throws VeyronException;
+	public ClientStream<Void,Scalars,String> methodA3(Context context, int a, Options veyronOpts) throws VeyronException;
 		public ClientStream<Integer,String,Void> methodA4(Context context, int a) throws VeyronException;
-	public ClientStream<Integer,String,Void> methodA4(Context context, int a, Options opts) throws VeyronException;
+	public ClientStream<Integer,String,Void> methodA4(Context context, int a, Options veyronOpts) throws VeyronException;
 }

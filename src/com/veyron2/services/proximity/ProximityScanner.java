@@ -11,5 +11,5 @@ public interface ProximityScanner {
 	// NearbyDevices returns the most up-to-date list of nearby devices,
 // sorted in increasing distance order.
 	public ArrayList<Device> nearbyDevices(Context context) throws VeyronException;
-	public ArrayList<Device> nearbyDevices(Context context, Options opts) throws VeyronException;
+	public ArrayList<Device> nearbyDevices(Context context, Options veyronOpts) throws VeyronException;
 }

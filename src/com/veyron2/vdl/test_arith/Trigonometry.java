@@ -11,7 +11,7 @@ import com.veyron2.ipc.VeyronException;
 **/
 public interface Trigonometry { 
 		public double sine(Context context, double angle) throws VeyronException;
-	public double sine(Context context, double angle, Options opts) throws VeyronException;
+	public double sine(Context context, double angle, Options veyronOpts) throws VeyronException;
 		public double cosine(Context context, double angle) throws VeyronException;
-	public double cosine(Context context, double angle, Options opts) throws VeyronException;
+	public double cosine(Context context, double angle, Options veyronOpts) throws VeyronException;
 }

@@ -9,7 +9,6 @@ import android.os.IBinder;
 import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.proximity.Server;
 
 public class ProximityScannerAndroidService extends Service {
     private ProximityScannerVeyronService proxService;
@@ -28,11 +27,10 @@ public class ProximityScannerAndroidService extends Service {
             s = RuntimeFactory.getRuntime().newServer();
             proxService = ProximityScannerVeyronService
                     .create((BluetoothManager) getSystemService(BLUETOOTH_SERVICE));
-            final Object stub = Server.newProximityScanner(proxService);
             s.register("", new Dispatcher() {
                 @Override
                 public Object lookup(String suffix) throws VeyronException {
-                    return stub;
+                    return proxService;
                 }
             });
             endpoint = s.listen("tcp", "127.0.0.1:8100");

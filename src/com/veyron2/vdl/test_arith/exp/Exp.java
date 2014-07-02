@@ -8,5 +8,5 @@ import com.veyron2.ipc.VeyronException;
 
 public interface Exp { 
 		public double exp(Context context, double x) throws VeyronException;
-	public double exp(Context context, double x, Options opts) throws VeyronException;
+	public double exp(Context context, double x, Options veyronOpts) throws VeyronException;
 }

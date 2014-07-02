@@ -12,8 +12,8 @@ import com.veyron2.ipc.VeyronException;
 public interface Fortune { 
 	// Get returns a random fortune.
 	public String get(Context context) throws VeyronException;
-	public String get(Context context, Options opts) throws VeyronException;
+	public String get(Context context, Options veyronOpts) throws VeyronException;
 	// Add stores a fortune in the set used by Get.
 	public void add(Context context, String fortune) throws VeyronException;
-	public void add(Context context, String fortune, Options opts) throws VeyronException;
+	public void add(Context context, String fortune, Options veyronOpts) throws VeyronException;
 }

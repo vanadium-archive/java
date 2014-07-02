@@ -4,6 +4,8 @@ package com.veyron2.services.proximity;
 
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.services.proximity.gen_impl.ProximityAnnouncerServiceWrapper;
+import com.veyron2.vdl.VeyronService;
 
 /**
  * Proximity maintains a list of devices in our close proximity, using scan
@@ -11,6 +13,7 @@ import com.veyron2.ipc.VeyronException;
  * provided names, which will be visible at nearby devices and associated
  * with this device.
 **/
+@VeyronService(stubWrapper=ProximityAnnouncerServiceWrapper.class)
 public interface ProximityAnnouncerService { 
 	// RegisterName adds a name that this device will be associated with;
 // a remote device will see all the unique names currently registered

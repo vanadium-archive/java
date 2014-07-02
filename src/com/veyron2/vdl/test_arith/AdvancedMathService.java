@@ -3,7 +3,9 @@
 package com.veyron2.vdl.test_arith;
 
 import com.veyron2.ipc.ServerContext;
+import com.veyron2.vdl.VeyronService;
 import com.veyron2.vdl.test_arith.exp.ExpService;
+import com.veyron2.vdl.test_arith.gen_impl.AdvancedMathServiceWrapper;
 
 /**
  * AdvancedMath is an interface for more advanced math than arith.  It embeds
@@ -11,5 +13,6 @@ import com.veyron2.vdl.test_arith.exp.ExpService;
  * turn it is embedded by arith.Calculator (which is in the same package but
  * different file) to verify that embedding works in all these scenarios.
 **/
+@VeyronService(stubWrapper=AdvancedMathServiceWrapper.class)
 public interface AdvancedMathService extends TrigonometryService, ExpService { 
 }

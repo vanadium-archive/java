@@ -5,7 +5,10 @@ package com.veyron2.vdl.test_base;
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.Stream;
+import com.veyron2.vdl.VeyronService;
+import com.veyron2.vdl.test_base.gen_impl.ServiceAServiceWrapper;
 
+@VeyronService(stubWrapper=ServiceAServiceWrapper.class)
 public interface ServiceAService { 
 		public void methodA1(ServerContext context) throws VeyronException;
 		public String methodA2(ServerContext context, int a, String b) throws VeyronException;
