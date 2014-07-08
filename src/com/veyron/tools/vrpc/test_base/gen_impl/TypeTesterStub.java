@@ -9,7 +9,7 @@ import com.veyron.tools.vrpc.test_base.TypeTesterService;
 
 /* Client stub for interface: TypeTester. */
 public final class TypeTesterStub implements TypeTester {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.tools.vrpc.test_base.gen_impl.TypeTester";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.tools.vrpc.test_base.TypeTester";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 
@@ -40,7 +40,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Boolean>() {} };
-			return (boolean)call.finish(resultTypes)[0];
+			return (java.lang.Boolean)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -65,7 +65,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Float>() {} };
-			return (float)call.finish(resultTypes)[0];
+			return (java.lang.Float)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -90,7 +90,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Double>() {} };
-			return (double)call.finish(resultTypes)[0];
+			return (java.lang.Double)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -115,7 +115,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Integer>() {} };
-			return (int)call.finish(resultTypes)[0];
+			return (java.lang.Integer)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -140,7 +140,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-			return (long)call.finish(resultTypes)[0];
+			return (java.lang.Long)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -190,7 +190,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Byte>() {} };
-			return (byte)call.finish(resultTypes)[0];
+			return (java.lang.Byte)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -215,7 +215,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Integer>() {} };
-			return (int)call.finish(resultTypes)[0];
+			return (java.lang.Integer)call.finish(resultTypes)[0];
 
 	}
 	@Override
@@ -240,7 +240,7 @@ public final class TypeTesterStub implements TypeTester {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-			return (long)call.finish(resultTypes)[0];
+			return (java.lang.Long)call.finish(resultTypes)[0];
 
 	}
 	@Override

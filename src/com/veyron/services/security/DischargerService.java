@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * DischargeIssuer service issues caveat discharges when requested.
 **/
-@VeyronService(stubWrapper=DischargerServiceWrapper.class)
+@VeyronService(serviceWrapper=DischargerServiceWrapper.class)
 public interface DischargerService { 
 	// Discharge is called by a principal that holds a blessing with a third
 // party caveat and seeks to get a discharge that proves the fulfillment of

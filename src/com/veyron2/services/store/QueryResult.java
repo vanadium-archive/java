@@ -96,7 +96,7 @@ public class QueryResult {
 	// NestedResult, if non-zero, specifies which previous result contains
 // this result.
 public long nestedResult;
-	// Name is the Veyron name of this value.  It is relative to the query
+	// Name is the Object name of this value.  It is relative to the query
 // root or, if NestedResult is non-zero, to the parent result.
 public String name;
 	// Fields will be non-nil if this query result is of a dynamic type

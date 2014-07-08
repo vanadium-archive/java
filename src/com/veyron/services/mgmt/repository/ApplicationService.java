@@ -14,14 +14,14 @@ import java.util.ArrayList;
  * the public Application interface, it allows to add and remove
  * application envelopes.
 **/
-@VeyronService(stubWrapper=ApplicationServiceWrapper.class)
+@VeyronService(serviceWrapper=ApplicationServiceWrapper.class)
 public interface ApplicationService extends com.veyron2.services.mgmt.repository.ApplicationService { 
 	// Put adds the given tuple of application version (specified
-// through the veyron name suffix) and application envelope to all
+// through the object name suffix) and application envelope to all
 // of the given application profiles.
 	public void put(ServerContext context, ArrayList<String> profiles, Envelope envelope) throws VeyronException;
 	// Remove removes the application envelope for the given profile
-// name and application version (specified through the veyron name
+// name and application version (specified through the object name
 // suffix). If no version is specified as part of the suffix, the
 // method removes all versions for the given profile.
 //

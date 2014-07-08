@@ -9,7 +9,7 @@ import com.veyron2.vdl.Stream;
 import com.veyron2.vdl.VeyronService;
 import java.util.ArrayList;
 
-@VeyronService(stubWrapper=TunnelServiceWrapper.class)
+@VeyronService(serviceWrapper=TunnelServiceWrapper.class)
 public interface TunnelService { 
 	// The Forward method is used for network forwarding. All the data sent over
 // the byte stream is forwarded to the requested network address and all the

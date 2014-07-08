@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Change is the new value for a watched entity.
 **/
 public class Change { 
-	// Name is the Veyron name of the entity that changed.  This name is relative
+	// Name is the Object name of the entity that changed.  This name is relative
 // to the root entity (i.e. the name of the Watcher service).
 public String name;
 	// State must be one of Exists, DoesNotExist, or InitialStateSkipped.

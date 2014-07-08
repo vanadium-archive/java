@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * Application can be used to manage applications on a device. The
- * idea is that this interace will be invoked using a veyron name that
+ * idea is that this interace will be invoked using an object name that
  * identifies the application and its installations and instances
  * where applicable.
  *
@@ -82,8 +82,8 @@ import java.util.ArrayList;
 **/
 public interface Application { 
 	// Install installs the latest version of the application and
-// returns a veyron name that identifies the new
-// installation. Optionally, veyron name suffix can be used to
+// returns an object name that identifies the new
+// installation. Optionally, object name suffix can be used to
 // specify the application version to be installed. If no version is
 // specified, the latest version is installed.
 	public String install(Context context) throws VeyronException;
@@ -105,7 +105,7 @@ public interface Application {
 	public void revert(Context context) throws VeyronException;
 	public void revert(Context context, Options veyronOpts) throws VeyronException;
 	// Start starts an instance of application installation(s) and
-// returns the veyron name(s) that identifies/identify the new
+// returns the object name(s) that identifies/identify the new
 // instance(s).
 	public ArrayList<String> start(Context context) throws VeyronException;
 	public ArrayList<String> start(Context context, Options veyronOpts) throws VeyronException;
@@ -126,7 +126,7 @@ public interface Application {
 	public void uninstall(Context context) throws VeyronException;
 	public void uninstall(Context context, Options veyronOpts) throws VeyronException;
 	// Update updates application installation(s) version. Optionally,
-// veyron name suffix can be used to specify the application version
+// object name suffix can be used to specify the application version
 // to which the installation(s) should be updated. If no version is
 // specified, the installation(s) are updated to the latest version.
 	public void update(Context context) throws VeyronException;

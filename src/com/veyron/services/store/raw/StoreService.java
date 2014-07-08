@@ -13,7 +13,7 @@ import com.veyron2.vdl.VeyronService;
  * Store defines a raw interface for the Veyron store. Mutations can be received
  * via the Watcher interface, and committed via PutMutation.
 **/
-@VeyronService(stubWrapper=StoreServiceWrapper.class)
+@VeyronService(serviceWrapper=StoreServiceWrapper.class)
 public interface StoreService { 
 	// Watch returns a stream of all changes.
 	public void watch(ServerContext context, Request req, Stream<ChangeBatch,Void> stream) throws VeyronException;

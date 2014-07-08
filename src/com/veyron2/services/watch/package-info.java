@@ -18,7 +18,7 @@
  *
  * Root Entity
  *
- * The Veyron name that receives the Watch RPC is called the root
+ * The Object name that receives the Watch RPC is called the root
  * entity.  The root entity is the parent of all entities that the
  * client cares about.  Therefore, the query is confined to children
  * of the root entity, and the names in the Change messages are all

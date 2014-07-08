@@ -16,7 +16,7 @@ import com.veyron2.services.store.VeyronConsts;
 
 /* Client stub for interface: Object. */
 public final class ObjectStub implements Object {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.gen_impl.Object";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.Object";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 	private final com.veyron2.services.mounttable.Globable globable;
@@ -53,7 +53,7 @@ public final class ObjectStub implements Object {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Boolean>() {} };
-			return (boolean)call.finish(resultTypes)[0];
+			return (java.lang.Boolean)call.finish(resultTypes)[0];
 
 	}
 	@Override

@@ -105,11 +105,11 @@ public final class VDLInvoker {
         for (Class<?> iface : klass.getInterfaces()) {
             VeyronService vs = iface.getAnnotation(VeyronService.class);
             // There should only be one constructor.
-            if (vs.stubWrapper().getConstructors().length > 0) {
+            if (vs.serviceWrapper().getConstructors().length != 1) {
                 throw new RuntimeException(
                         "Expected ServiceWrapper to only have a single constructor");
             }
-            Constructor<?> constructor = vs.stubWrapper().getConstructors()[0];
+            Constructor<?> constructor = vs.serviceWrapper().getConstructors()[0];
 
             try {
                 stubs.add(constructor.newInstance(srv));
@@ -226,11 +226,10 @@ public final class VDLInvoker {
     }
 
     private static class ClassInfo {
-        final Map<String, Method> methods; // non-null
+        final Map<String, Method> methods = new HashMap<String, Method>();
 
         ClassInfo(Class<?> c) throws IllegalArgumentException {
-            this.methods = new HashMap<String, Method>();
-            final Method[] methodList = c.getMethods();
+            final Method[] methodList = c.getDeclaredMethods();
             for (int i = 0; i < methodList.length; i++) {
                 final Method method = methodList[i];
                 Method oldval = null;
@@ -239,7 +238,7 @@ public final class VDLInvoker {
                 } catch (IllegalArgumentException e) {
                 } // method not an VDL method.
                 if (oldval != null) {
-                    throw new IllegalArgumentException("Overloading of " + method.getName()
+                    throw new IllegalArgumentException("Overloading of method " + method.getName()
                             + " not allowed on service wrapper");
                 }
             }

@@ -16,7 +16,7 @@ import com.veyron2.services.store.VeyronConsts;
 
 /* Client stub for interface: Store. */
 public final class StoreStub implements Store {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.gen_impl.Store";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.Store";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

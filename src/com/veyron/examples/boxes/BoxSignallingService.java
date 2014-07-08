@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * BoxSignalling allows peers to rendezvous with each other
 **/
-@VeyronService(stubWrapper=BoxSignallingServiceWrapper.class)
+@VeyronService(serviceWrapper=BoxSignallingServiceWrapper.class)
 public interface BoxSignallingService { 
 	// Add endpoint information to the signalling server.
 	public void add(ServerContext context, String endpoint) throws VeyronException;

@@ -13,7 +13,7 @@ import java.util.HashMap;
 /**
  * A Cache service mimics the memcache interface.
 **/
-@VeyronService(stubWrapper=CacheServiceWrapper.class)
+@VeyronService(serviceWrapper=CacheServiceWrapper.class)
 public interface CacheService { 
 	// Set sets a value for a key.
 	public void set(ServerContext context, String key, Object value) throws VeyronException;

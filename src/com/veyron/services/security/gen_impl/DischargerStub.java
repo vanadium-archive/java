@@ -8,7 +8,7 @@ import com.veyron.services.security.DischargerService;
 
 /* Client stub for interface: Discharger. */
 public final class DischargerStub implements Discharger {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.security.gen_impl.Discharger";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.security.Discharger";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

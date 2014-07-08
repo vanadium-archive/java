@@ -14,7 +14,7 @@ import com.veyron2.services.mgmt.repository.ProfileService;
 
 /* Client stub for interface: Profile. */
 public final class ProfileStub implements Profile {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.gen_impl.Profile";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.Profile";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

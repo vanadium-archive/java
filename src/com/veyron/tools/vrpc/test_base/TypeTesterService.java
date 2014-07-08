@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@VeyronService(stubWrapper=TypeTesterServiceWrapper.class)
+@VeyronService(serviceWrapper=TypeTesterServiceWrapper.class)
 public interface TypeTesterService { 
 	// Methods to test support for generic types.
 	public boolean echoBool(ServerContext context, boolean i1) throws VeyronException;

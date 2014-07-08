@@ -13,7 +13,7 @@ import com.veyron2.vdl.VeyronService;
  * the set of installed libraries. Profiles describe binaries and
  * devices, and are used to match them.
 **/
-@VeyronService(stubWrapper=ProfileServiceWrapper.class)
+@VeyronService(serviceWrapper=ProfileServiceWrapper.class)
 public interface ProfileService { 
 	// Label is the human-readable profile key for the profile,
 // e.g. "linux-media". The label can be used to uniquely identify

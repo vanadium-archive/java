@@ -16,7 +16,7 @@ import com.veyron2.services.watch.VeyronConsts;
 
 /* Client stub for interface: QueryWatcher. */
 public final class QueryWatcherStub implements QueryWatcher {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.gen_impl.QueryWatcher";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.QueryWatcher";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

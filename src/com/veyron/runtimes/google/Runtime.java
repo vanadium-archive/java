@@ -111,11 +111,10 @@ public class Runtime implements com.veyron2.Runtime {
     private static class Server implements com.veyron2.ipc.Server {
         private final long nativePtr;
 
-        private native void nativeRegister(long nativePtr, String prefix, Dispatcher dispatcher)
+        private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
                 throws VeyronException;
         private native String nativeListen(long nativePtr, String protocol, String address)
                 throws VeyronException;
-        private native void nativePublish(long nativePtr, String name) throws VeyronException;
         private native void nativeStop(long nativePtr) throws VeyronException;
         private native void nativeFinalize(long nativePtr);
 
@@ -124,17 +123,12 @@ public class Runtime implements com.veyron2.Runtime {
         }
 
         @Override
-        public void register(String prefix, com.veyron2.ipc.Dispatcher dispatcher)
-                throws VeyronException {
-            nativeRegister(this.nativePtr, prefix, dispatcher);
-        }
-        @Override
         public String listen(String protocol, String address) throws VeyronException {
             return nativeListen(this.nativePtr, protocol, address);
         }
         @Override
-        public void publish(String name) throws VeyronException {
-            nativePublish(this.nativePtr, name);
+        public void serve(String name, com.veyron2.ipc.Dispatcher dispatcher) throws VeyronException {
+            nativeServe(this.nativePtr, name, dispatcher);
         }
         @Override
         public void stop() throws VeyronException {

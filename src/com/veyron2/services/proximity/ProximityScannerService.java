@@ -8,7 +8,7 @@ import com.veyron2.services.proximity.gen_impl.ProximityScannerServiceWrapper;
 import com.veyron2.vdl.VeyronService;
 import java.util.ArrayList;
 
-@VeyronService(stubWrapper=ProximityScannerServiceWrapper.class)
+@VeyronService(serviceWrapper=ProximityScannerServiceWrapper.class)
 public interface ProximityScannerService { 
 	// NearbyDevices returns the most up-to-date list of nearby devices,
 // sorted in increasing distance order.

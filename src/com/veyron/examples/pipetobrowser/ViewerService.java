@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Viewer allows clients to stream data to it and to request a particular viewer to format and display the data.
 **/
-@VeyronService(stubWrapper=ViewerServiceWrapper.class)
+@VeyronService(serviceWrapper=ViewerServiceWrapper.class)
 public interface ViewerService { 
 	// Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
 	public long pipe(ServerContext context, Stream<Void,ArrayList<Byte>> stream) throws VeyronException;

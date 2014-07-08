@@ -7,7 +7,7 @@ import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=EchoServiceWrapper.class)
+@VeyronService(serviceWrapper=EchoServiceWrapper.class)
 public interface EchoService { 
 	// Echo simply returns its argument as its result
 	public String echo(ServerContext context, String msg) throws VeyronException;

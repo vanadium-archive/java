@@ -13,15 +13,15 @@ import com.veyron2.ipc.VeyronException;
 **/
 public interface Profile extends com.veyron2.services.mgmt.repository.Profile { 
 	// Specification returns the profile specification for the profile
-// identified through the veyron name suffix.
+// identified through the object name suffix.
 	public Specification specification(Context context) throws VeyronException;
 	public Specification specification(Context context, Options veyronOpts) throws VeyronException;
 	// Put sets the profile specification for the profile identified
-// through the veyron name suffix.
+// through the object name suffix.
 	public void put(Context context, Specification specification) throws VeyronException;
 	public void put(Context context, Specification specification, Options veyronOpts) throws VeyronException;
 	// Remove removes the profile specification for the profile
-// identified through the veyron name suffix.
+// identified through the object name suffix.
 	public void remove(Context context) throws VeyronException;
 	public void remove(Context context, Options veyronOpts) throws VeyronException;
 }

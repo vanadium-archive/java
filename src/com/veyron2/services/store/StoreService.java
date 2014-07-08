@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Store is the client interface to the storage system.
 **/
-@VeyronService(stubWrapper=StoreServiceWrapper.class)
+@VeyronService(serviceWrapper=StoreServiceWrapper.class)
 public interface StoreService { 
 	// CreateTransaction creates the transaction and sets the options for it.
 	public void createTransaction(ServerContext context, long tID, ArrayList<java.lang.Object> options) throws VeyronException;

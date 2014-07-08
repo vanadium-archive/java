@@ -9,7 +9,7 @@ import com.veyron.examples.inspector.InspectorService;
 
 /* Client stub for interface: Inspector. */
 public final class InspectorStub implements Inspector {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.inspector.gen_impl.Inspector";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.inspector.Inspector";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

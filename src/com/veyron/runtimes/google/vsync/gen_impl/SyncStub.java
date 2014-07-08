@@ -11,7 +11,7 @@ import com.veyron.runtimes.google.vsync.VeyronConsts;
 
 /* Client stub for interface: Sync. */
 public final class SyncStub implements Sync {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.runtimes.google.vsync.gen_impl.Sync";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.runtimes.google.vsync.Sync";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

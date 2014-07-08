@@ -12,7 +12,7 @@ import com.veyron.examples.boxes.DrawInterfaceService;
 
 /* Client stub for interface: BoxSignalling. */
 public final class BoxSignallingStub implements BoxSignalling {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.gen_impl.BoxSignalling";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.BoxSignalling";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

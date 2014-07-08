@@ -16,7 +16,7 @@ import com.veyron2.services.watch.VeyronConsts;
 
 /* Client stub for interface: GlobWatcher. */
 public final class GlobWatcherStub implements GlobWatcher {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.gen_impl.GlobWatcher";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.GlobWatcher";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

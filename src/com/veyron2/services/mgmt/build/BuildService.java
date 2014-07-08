@@ -10,9 +10,9 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Build describes an interface for building binaries from source.
 **/
-@VeyronService(stubWrapper=BuildServiceWrapper.class)
+@VeyronService(serviceWrapper=BuildServiceWrapper.class)
 public interface BuildService { 
 	// Describe generates a BinaryDescription for a binary identified by
-// the given Veyron name.
+// the given Object name.
 	public BinaryDescription describe(ServerContext context, String name) throws VeyronException;
 }

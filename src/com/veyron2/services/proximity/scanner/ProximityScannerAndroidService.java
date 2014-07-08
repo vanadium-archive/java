@@ -27,14 +27,13 @@ public class ProximityScannerAndroidService extends Service {
             s = RuntimeFactory.getRuntime().newServer();
             proxService = ProximityScannerVeyronService
                     .create((BluetoothManager) getSystemService(BLUETOOTH_SERVICE));
-            s.register("", new Dispatcher() {
+            endpoint = s.listen("tcp", "127.0.0.1:8100");
+            s.serve("fortune", new Dispatcher() {
                 @Override
                 public Object lookup(String suffix) throws VeyronException {
                     return proxService;
                 }
             });
-            endpoint = s.listen("tcp", "127.0.0.1:8100");
-            s.publish("fortune");
         } catch (VeyronException e) {
             throw new RuntimeException(
                     "Exception during ProximityScannerAndroidService onCreate()", e);

@@ -11,7 +11,7 @@ import com.veyron2.services.security.access.ObjectService;
 
 /* Client stub for interface: Object. */
 public final class ObjectStub implements Object {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.security.access.gen_impl.Object";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.security.access.Object";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

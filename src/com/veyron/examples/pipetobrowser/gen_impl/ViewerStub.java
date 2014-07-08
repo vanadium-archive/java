@@ -8,7 +8,7 @@ import com.veyron.examples.pipetobrowser.ViewerService;
 
 /* Client stub for interface: Viewer. */
 public final class ViewerStub implements Viewer {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.pipetobrowser.gen_impl.Viewer";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.pipetobrowser.Viewer";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

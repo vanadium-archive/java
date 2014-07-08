@@ -14,7 +14,7 @@ import com.veyron2.services.mgmt.repository.ProfileService;
 
 /* Client stub for interface: Binary. */
 public final class BinaryStub implements Binary {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.gen_impl.Binary";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.Binary";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

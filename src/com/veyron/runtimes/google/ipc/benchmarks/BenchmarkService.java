@@ -9,7 +9,7 @@ import com.veyron2.vdl.Stream;
 import com.veyron2.vdl.VeyronService;
 import java.util.ArrayList;
 
-@VeyronService(stubWrapper=BenchmarkServiceWrapper.class)
+@VeyronService(serviceWrapper=BenchmarkServiceWrapper.class)
 public interface BenchmarkService { 
 	// Echo returns the payload that it receives.
 	public ArrayList<Byte> echo(ServerContext context, ArrayList<Byte> payload) throws VeyronException;

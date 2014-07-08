@@ -8,7 +8,7 @@ import com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper;
 import com.veyron2.vdl.Stream;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=GlobableServiceWrapper.class)
+@VeyronService(serviceWrapper=GlobableServiceWrapper.class)
 public interface GlobableService { 
 	// Glob returns all matching entries at the given server.
 	public void glob(ServerContext context, String pattern, Stream<MountEntry,Void> stream) throws VeyronException;

@@ -12,7 +12,7 @@ import com.veyron2.services.mgmt.node.NodeService;
 
 /* Client stub for interface: Node. */
 public final class NodeStub implements Node {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.gen_impl.Node";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.Node";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 	private final Application application;
@@ -70,7 +70,7 @@ public final class NodeStub implements Node {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Boolean>() {} };
-			return (boolean)call.finish(resultTypes)[0];
+			return (java.lang.Boolean)call.finish(resultTypes)[0];
 
 	}
 	@Override

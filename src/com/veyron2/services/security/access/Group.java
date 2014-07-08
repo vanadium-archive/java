@@ -9,7 +9,7 @@ package com.veyron2.services.security.access;
  * just a placeholder for now.
 **/
 public class Group { 
-	// Name is the Veyron name of the group.  This name must
+	// Name is the Object name of the group.  This name must
 // implement the TBD Group API.
 public String name;
 }

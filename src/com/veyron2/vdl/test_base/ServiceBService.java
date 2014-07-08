@@ -7,7 +7,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 import com.veyron2.vdl.test_base.gen_impl.ServiceBServiceWrapper;
 
-@VeyronService(stubWrapper=ServiceBServiceWrapper.class)
+@VeyronService(serviceWrapper=ServiceBServiceWrapper.class)
 public interface ServiceBService extends ServiceAService { 
 		public CompComp methodB1(ServerContext context, Scalars a, Composites b) throws VeyronException;
 }

@@ -13,6 +13,6 @@ import com.veyron2.vdl.test_arith.gen_impl.AdvancedMathServiceWrapper;
  * turn it is embedded by arith.Calculator (which is in the same package but
  * different file) to verify that embedding works in all these scenarios.
 **/
-@VeyronService(stubWrapper=AdvancedMathServiceWrapper.class)
+@VeyronService(serviceWrapper=AdvancedMathServiceWrapper.class)
 public interface AdvancedMathService extends TrigonometryService, ExpService { 
 }

@@ -8,7 +8,7 @@ import com.veyron.services.mounttable.lib.CollectionService;
 
 /* Client stub for interface: Collection. */
 public final class CollectionStub implements Collection {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mounttable.lib.gen_impl.Collection";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mounttable.lib.Collection";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

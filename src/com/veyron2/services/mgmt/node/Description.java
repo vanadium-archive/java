@@ -10,7 +10,7 @@ import java.util.HashSet;
 **/
 public class Description { 
 	// Profiles is a set of names of supported profiles.	Each name can
-// either be a veyron name that resolves to a Profile, or can be the
+// either be an object name that resolves to a Profile, or can be the
 // profile's label, e.g.:
 //   "profiles/google/cluster/diskfull"
 //   "linux-media"

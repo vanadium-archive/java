@@ -11,7 +11,7 @@ import com.veyron.examples.bank.BankService;
 
 /* Client stub for interface: BankAccount. */
 public final class BankAccountStub implements BankAccount {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.gen_impl.BankAccount";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.BankAccount";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 
@@ -117,7 +117,7 @@ public final class BankAccountStub implements BankAccount {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-			return (long)call.finish(resultTypes)[0];
+			return (java.lang.Long)call.finish(resultTypes)[0];
 
 	}
 }

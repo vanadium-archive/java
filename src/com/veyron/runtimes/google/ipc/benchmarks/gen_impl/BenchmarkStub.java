@@ -8,7 +8,7 @@ import com.veyron.runtimes.google.ipc.benchmarks.BenchmarkService;
 
 /* Client stub for interface: Benchmark. */
 public final class BenchmarkStub implements Benchmark {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.runtimes.google.ipc.benchmarks.gen_impl.Benchmark";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.runtimes.google.ipc.benchmarks.Benchmark";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

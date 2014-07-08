@@ -11,11 +11,11 @@ import java.util.HashMap;
  * specified and left to the implementation of the Build interface.
 **/
 public class BinaryDescription { 
-	// Name is the Veyron name of the application binary that can be
+	// Name is the Object name of the application binary that can be
 // used to fetch the actual binary from a content server.
 public String name;
 	// Profiles is a set of names of compatible profiles.  Each name can either
-// be a Veyron name that resolves to a Profile, or can be the profile's
+// be an Object name that resolves to a Profile, or can be the profile's
 // label, e.g.:
 //   "profiles/google/cluster/diskfull"
 //   "linux-media"

@@ -8,7 +8,7 @@ import com.veyron2.vdl.test_arith.exp.ExpService;
 
 /* Client stub for interface: Exp. */
 public final class ExpStub implements Exp {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.gen_impl.Exp";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.Exp";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 
@@ -39,7 +39,7 @@ public final class ExpStub implements Exp {
 
 		// Prepare output argument and finish the call.
 			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Double>() {} };
-			return (double)call.finish(resultTypes)[0];
+			return (java.lang.Double)call.finish(resultTypes)[0];
 
 	}
 }

@@ -11,7 +11,7 @@ import com.veyron.lib.testutil.modules.EchoService;
 
 /* Client stub for interface: Echo. */
 public final class EchoStub implements Echo {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.gen_impl.Echo";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.Echo";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

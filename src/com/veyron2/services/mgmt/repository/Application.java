@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Application provides access to application envelopes. An
  * application envelope is identified by an application name and an
- * application version, which are specified through the veyron name,
+ * application version, which are specified through the object name,
  * and a profile name, which is specified using a method argument.
  *
  * Example:
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public interface Application { 
 	// Match checks if any of the given profiles contains an application
 // envelope for the given application version (specified through the
-// veyron name suffix) and if so, returns this envelope. If multiple
+// object name suffix) and if so, returns this envelope. If multiple
 // profile matches are possible, the method returns the first
 // matching profile, respecting the order of the input argument.
 	public Envelope match(Context context, ArrayList<String> profiles) throws VeyronException;

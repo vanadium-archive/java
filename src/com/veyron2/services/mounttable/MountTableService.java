@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * MountTable defines the interface to talk to a mounttable.
 **/
-@VeyronService(stubWrapper=MountTableServiceWrapper.class)
+@VeyronService(serviceWrapper=MountTableServiceWrapper.class)
 public interface MountTableService extends GlobableService { 
 	// Mount Server (a global name) onto the receiver.
 // Subsequent mounts add to the servers mounted there.  The multiple

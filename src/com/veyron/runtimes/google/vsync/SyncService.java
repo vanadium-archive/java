@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Sync allows a device to GetDeltas from another device.
 **/
-@VeyronService(stubWrapper=SyncServiceWrapper.class)
+@VeyronService(serviceWrapper=SyncServiceWrapper.class)
 public interface SyncService { 
 	// GetDeltas returns a device's current generation vector and all the missing log records
 // when compared to the incoming generation vector.

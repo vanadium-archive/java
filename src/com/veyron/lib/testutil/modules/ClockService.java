@@ -7,7 +7,7 @@ import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=ClockServiceWrapper.class)
+@VeyronService(serviceWrapper=ClockServiceWrapper.class)
 public interface ClockService { 
 	// Time returns a string of the form "(current time) msg"
 	public String time(ServerContext context, String msg) throws VeyronException;

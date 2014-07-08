@@ -18,7 +18,7 @@ import com.veyron2.vdl.test_base.VeyronConsts;
 
 /* Client stub for interface: ServiceB. */
 public final class ServiceBStub implements ServiceB {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_base.gen_impl.ServiceB";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_base.ServiceB";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 	private final ServiceA serviceA;

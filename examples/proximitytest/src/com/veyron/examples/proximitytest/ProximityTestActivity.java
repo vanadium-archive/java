@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.veryron.examples.proximitytest.R;
 import com.veyron2.PauseHandler;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.services.proximity.Device;
@@ -33,7 +34,7 @@ public class ProximityTestActivity extends Activity {
     private static final int REFRESH_PERIOD = 150; // ms
 
     private ProximityScannerAndroidService serv;
-    private final PauseHandler handler = new PauseHandler();
+    private PauseHandler handler = new PauseHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

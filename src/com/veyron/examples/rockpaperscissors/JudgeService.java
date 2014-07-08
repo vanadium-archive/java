@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.Stream;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=JudgeServiceWrapper.class)
+@VeyronService(serviceWrapper=JudgeServiceWrapper.class)
 public interface JudgeService { 
 	// CreateGame creates a new game with the given game options and returns a game
 // identifier that can be used by the players to join the game.

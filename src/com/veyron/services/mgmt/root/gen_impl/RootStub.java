@@ -8,7 +8,7 @@ import com.veyron.services.mgmt.root.RootService;
 
 /* Client stub for interface: Root. */
 public final class RootStub implements Root {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.root.gen_impl.Root";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.root.Root";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

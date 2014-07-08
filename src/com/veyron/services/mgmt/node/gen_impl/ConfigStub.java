@@ -11,7 +11,7 @@ import com.veyron.services.mgmt.node.NodeService;
 
 /* Client stub for interface: Config. */
 public final class ConfigStub implements Config {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.node.gen_impl.Config";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.node.Config";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

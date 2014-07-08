@@ -5,8 +5,8 @@ package com.veyron2.services.store;
 
 public class VeyronConsts { 
 	/* The following constants originate in file: service.vdl. */
-	// The Store has Veyron name "<mount>/.store", where <mount> is the
-// Veyron name of the mount point.
-// An Object with path <path> has Veyron name "<mount>/<path>".
+	// The Store has Object name "<mount>/.store", where <mount> is the
+// Object name of the mount point.
+// An Object with path <path> has Object name "<mount>/<path>".
 public static final String STORE_SUFFIX = ".store";
 }

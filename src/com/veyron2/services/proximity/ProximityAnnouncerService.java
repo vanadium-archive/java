@@ -13,7 +13,7 @@ import com.veyron2.vdl.VeyronService;
  * provided names, which will be visible at nearby devices and associated
  * with this device.
 **/
-@VeyronService(stubWrapper=ProximityAnnouncerServiceWrapper.class)
+@VeyronService(serviceWrapper=ProximityAnnouncerServiceWrapper.class)
 public interface ProximityAnnouncerService { 
 	// RegisterName adds a name that this device will be associated with;
 // a remote device will see all the unique names currently registered

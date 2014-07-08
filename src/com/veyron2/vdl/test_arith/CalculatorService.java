@@ -7,7 +7,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 import com.veyron2.vdl.test_arith.gen_impl.CalculatorServiceWrapper;
 
-@VeyronService(stubWrapper=CalculatorServiceWrapper.class)
+@VeyronService(serviceWrapper=CalculatorServiceWrapper.class)
 public interface CalculatorService extends ArithService, AdvancedMathService { 
 		public void on(ServerContext context) throws VeyronException; // On turns the calculator on.
 		public void off(ServerContext context) throws VeyronException; // Off turns the calculator off.

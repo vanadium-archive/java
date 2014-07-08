@@ -12,7 +12,7 @@ import com.veyron.examples.boxes.DrawInterfaceService;
 
 /* Client stub for interface: DrawInterface. */
 public final class DrawInterfaceStub implements DrawInterface {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.gen_impl.DrawInterface";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.DrawInterface";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

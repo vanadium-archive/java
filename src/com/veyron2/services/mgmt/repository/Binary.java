@@ -32,18 +32,18 @@ import java.util.ArrayList;
 **/
 public interface Binary { 
 	// Create expresses the intent to create a binary identified by the
-// veyron name suffix consisting of the given number of parts. If
+// object name suffix consisting of the given number of parts. If
 // the suffix identifies a binary that has already been created, the
 // method returns an error.
 	public void create(Context context, int nparts) throws VeyronException;
 	public void create(Context context, int nparts, Options veyronOpts) throws VeyronException;
-	// Delete deletes the binary identified by the veyron name
+	// Delete deletes the binary identified by the object name
 // suffix. If the binary that has not been created, the method
 // returns an error.
 	public void delete(Context context) throws VeyronException;
 	public void delete(Context context, Options veyronOpts) throws VeyronException;
 	// Download opens a stream that can used for downloading the given
-// part of the binary identified by the veyron name suffix. If the
+// part of the binary identified by the object name suffix. If the
 // binary part has not been uploaded, the method returns an
 // error. If the Delete() method is invoked when the Download()
 // method is in progress, the outcome the Download() method is
@@ -56,18 +56,18 @@ public interface Binary {
 		public long tTL;
 	}
 	// DownloadURL returns a transient URL from which the binary
-// identified by the veyron name suffix can be downloaded using the
+// identified by the object name suffix can be downloaded using the
 // HTTP protocol. If not all parts of the binary have been uploaded,
 // the method returns an error.
 	public Binary.DownloadURLOut downloadURL(Context context) throws VeyronException;
 	public Binary.DownloadURLOut downloadURL(Context context, Options veyronOpts) throws VeyronException;
 	// Stat returns information describing the parts of the binary
-// identified by the veyron name suffix. If the binary has not been
+// identified by the object name suffix. If the binary has not been
 // created, the method returns an error.
 	public ArrayList<PartInfo> stat(Context context) throws VeyronException;
 	public ArrayList<PartInfo> stat(Context context, Options veyronOpts) throws VeyronException;
 	// Upload opens a stream that can be used for uploading the given
-// part of the binary identified by the veyron name suffix. If the
+// part of the binary identified by the object name suffix. If the
 // binary has not been created, the method returns an error. If the
 // binary part has been uploaded, the method returns an error. If
 // the same binary part is being uploaded by another caller, the

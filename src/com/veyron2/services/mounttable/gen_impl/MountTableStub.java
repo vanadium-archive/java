@@ -13,7 +13,7 @@ import com.veyron2.services.mounttable.MountedServer;
 
 /* Client stub for interface: MountTable. */
 public final class MountTableStub implements MountTable {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.gen_impl.MountTable";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.MountTable";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 	private final Globable globable;

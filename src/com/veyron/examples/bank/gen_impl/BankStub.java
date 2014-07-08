@@ -11,7 +11,7 @@ import com.veyron.examples.bank.BankService;
 
 /* Client stub for interface: Bank. */
 public final class BankStub implements Bank {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.gen_impl.Bank";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.Bank";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

@@ -11,7 +11,7 @@ import com.veyron2.ipc.VeyronException;
 **/
 public interface Build { 
 	// Describe generates a BinaryDescription for a binary identified by
-// the given Veyron name.
+// the given Object name.
 	public BinaryDescription describe(Context context, String name) throws VeyronException;
 	public BinaryDescription describe(Context context, String name, Options veyronOpts) throws VeyronException;
 }

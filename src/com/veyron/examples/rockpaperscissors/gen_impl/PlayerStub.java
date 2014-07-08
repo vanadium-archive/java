@@ -25,7 +25,7 @@ import com.veyron.examples.rockpaperscissors.VeyronConsts;
 
 /* Client stub for interface: Player. */
 public final class PlayerStub implements Player {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.gen_impl.Player";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.Player";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

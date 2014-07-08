@@ -6,6 +6,6 @@ import com.veyron.examples.rockpaperscissors.gen_impl.RockPaperScissorsServiceWr
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=RockPaperScissorsServiceWrapper.class)
+@VeyronService(serviceWrapper=RockPaperScissorsServiceWrapper.class)
 public interface RockPaperScissorsService extends JudgeService, PlayerService, ScoreKeeperService { 
 }

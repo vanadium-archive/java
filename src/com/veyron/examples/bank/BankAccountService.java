@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * The BankAccount can only be accessed by blessed users
 **/
-@VeyronService(stubWrapper=BankAccountServiceWrapper.class)
+@VeyronService(serviceWrapper=BankAccountServiceWrapper.class)
 public interface BankAccountService { 
 	// Deposit adds the amount given to this account.
 	public void deposit(ServerContext context, long amount) throws VeyronException;

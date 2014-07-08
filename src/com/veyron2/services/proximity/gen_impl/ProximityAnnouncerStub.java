@@ -15,7 +15,7 @@ import com.veyron2.services.proximity.ProximityService;
 
 /* Client stub for interface: ProximityAnnouncer. */
 public final class ProximityAnnouncerStub implements ProximityAnnouncer {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.gen_impl.ProximityAnnouncer";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.ProximityAnnouncer";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

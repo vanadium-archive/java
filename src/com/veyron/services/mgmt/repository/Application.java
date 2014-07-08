@@ -15,12 +15,12 @@ import java.util.ArrayList;
 **/
 public interface Application extends com.veyron2.services.mgmt.repository.Application { 
 	// Put adds the given tuple of application version (specified
-// through the veyron name suffix) and application envelope to all
+// through the object name suffix) and application envelope to all
 // of the given application profiles.
 	public void put(Context context, ArrayList<String> profiles, Envelope envelope) throws VeyronException;
 	public void put(Context context, ArrayList<String> profiles, Envelope envelope, Options veyronOpts) throws VeyronException;
 	// Remove removes the application envelope for the given profile
-// name and application version (specified through the veyron name
+// name and application version (specified through the object name
 // suffix). If no version is specified as part of the suffix, the
 // method removes all versions for the given profile.
 //

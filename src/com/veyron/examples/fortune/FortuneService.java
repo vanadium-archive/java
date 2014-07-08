@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Fortune allows clients to Get and Add fortune strings.
 **/
-@VeyronService(stubWrapper=FortuneServiceWrapper.class)
+@VeyronService(serviceWrapper=FortuneServiceWrapper.class)
 public interface FortuneService { 
 	// Get returns a random fortune.
 	public String get(ServerContext context) throws VeyronException;

@@ -11,7 +11,7 @@ import com.veyron.lib.testutil.modules.EchoService;
 
 /* Client stub for interface: Clock. */
 public final class ClockStub implements Clock {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.gen_impl.Clock";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.Clock";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

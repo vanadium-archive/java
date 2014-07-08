@@ -11,7 +11,7 @@ import com.veyron.examples.tunnel.TunnelService;
 
 /* Client stub for interface: Tunnel. */
 public final class TunnelStub implements Tunnel {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.tunnel.gen_impl.Tunnel";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.tunnel.Tunnel";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

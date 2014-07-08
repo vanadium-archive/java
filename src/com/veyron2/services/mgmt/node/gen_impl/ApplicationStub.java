@@ -12,7 +12,7 @@ import com.veyron2.services.mgmt.node.NodeService;
 
 /* Client stub for interface: Application. */
 public final class ApplicationStub implements Application {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.gen_impl.Application";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.Application";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

@@ -9,7 +9,7 @@ import com.veyron2.services.mgmt.build.BuildService;
 
 /* Client stub for interface: Build. */
 public final class BuildStub implements Build {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.build.gen_impl.Build";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.build.Build";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

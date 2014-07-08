@@ -8,7 +8,7 @@ import com.veyron.examples.fortune.FortuneService;
 
 /* Client stub for interface: Fortune. */
 public final class FortuneStub implements Fortune {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.fortune.gen_impl.Fortune";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.fortune.Fortune";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

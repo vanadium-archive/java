@@ -7,7 +7,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 import com.veyron2.vdl.test_arith.exp.gen_impl.ExpServiceWrapper;
 
-@VeyronService(stubWrapper=ExpServiceWrapper.class)
+@VeyronService(serviceWrapper=ExpServiceWrapper.class)
 public interface ExpService { 
 		public double exp(ServerContext context, double x) throws VeyronException;
 }

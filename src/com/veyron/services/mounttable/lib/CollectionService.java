@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
 import java.util.ArrayList;
 
-@VeyronService(stubWrapper=CollectionServiceWrapper.class)
+@VeyronService(serviceWrapper=CollectionServiceWrapper.class)
 public interface CollectionService { 
 	// Export sets the value for a name.  Overwrite controls the behavior when
 // an entry exists, if Overwrite is true, then the binding is replaced,

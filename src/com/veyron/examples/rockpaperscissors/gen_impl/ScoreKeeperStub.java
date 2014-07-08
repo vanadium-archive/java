@@ -25,7 +25,7 @@ import com.veyron.examples.rockpaperscissors.VeyronConsts;
 
 /* Client stub for interface: ScoreKeeper. */
 public final class ScoreKeeperStub implements ScoreKeeper {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeper";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.ScoreKeeper";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 

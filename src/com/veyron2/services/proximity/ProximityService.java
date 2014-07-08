@@ -6,6 +6,6 @@ import com.veyron2.ipc.ServerContext;
 import com.veyron2.services.proximity.gen_impl.ProximityServiceWrapper;
 import com.veyron2.vdl.VeyronService;
 
-@VeyronService(stubWrapper=ProximityServiceWrapper.class)
+@VeyronService(serviceWrapper=ProximityServiceWrapper.class)
 public interface ProximityService extends ProximityAnnouncerService, ProximityScannerService { 
 }

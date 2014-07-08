@@ -13,7 +13,7 @@ import com.veyron2.services.mounttable.MountedServer;
 
 /* Client stub for interface: Globable. */
 public final class GlobableStub implements Globable {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.gen_impl.Globable";
+	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.Globable";
 	private final com.veyron2.ipc.Client client;
 	private final java.lang.String name;
 
