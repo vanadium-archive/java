@@ -47,12 +47,19 @@ public final class VDLInvoker {
 
     private final Gson gson = new Gson();
     private final Class<?> serviceClass; // Only used to make exception messages
-
     // more clear.
+    private String[] implementedServices;
+
+    // getImplementedServices gets a list of the services that are implmented by
+    // the service object represented by the invoker.
+    // e.g. ["veyron2/service/proximity/ProximityScanner"]
+    public String[] getImplementedServices() {
+    	return implementedServices;
+    }
 
     /**
      * Creates a new invoker for the given object.
-     * 
+     *
      * @param obj service object we're invoking methods on
      * @returns Invoker new VDL invoker instance
      * @throws IllegalArgumentException if the provided object is invalid
@@ -91,10 +98,19 @@ public final class VDLInvoker {
         }
     }
 
+    private String serviceName(Class<?> serviceClass) {
+    	String name = serviceClass.getName();
+    	if (name.length() < 4 || !"com.".equals(name.substring(0, 4))) {
+    		// TODO(bprosnitz) Should we change this with an annotation of the service path?
+    		throw new RuntimeException("Class name expected to start with 'com.'");
+    	}
+    	return name.substring(4).replace('.', '/');
+    }
+
     /**
      * Iterate through the veyron services an object implements and generates
      * service wrappers for each.
-     * 
+     *
      * @param srv The service object
      * @return A list of service wrappers
      * @throws IllegalArgumentException If the input service is invalid.
@@ -102,8 +118,13 @@ public final class VDLInvoker {
     private List<Object> wrapService(Object srv) throws IllegalArgumentException {
         Class<?> klass = srv.getClass();
         List<Object> stubs = new ArrayList<Object>();
+        List<String> implementedServiceList = new ArrayList<String>();
         for (Class<?> iface : klass.getInterfaces()) {
             VeyronService vs = iface.getAnnotation(VeyronService.class);
+            if (vs == null) {
+            	continue;
+            }
+            implementedServiceList.add(serviceName(iface));
             // There should only be one constructor.
             if (vs.serviceWrapper().getConstructors().length != 1) {
                 throw new RuntimeException(
@@ -125,6 +146,8 @@ public final class VDLInvoker {
             throw new IllegalArgumentException(
                     "Object does not implement a valid generated service interface.");
         }
+        implementedServices = new String[implementedServiceList.size()];
+        implementedServiceList.toArray(implementedServices);
         return stubs;
     }
 
@@ -145,7 +168,7 @@ public final class VDLInvoker {
      * using reflection. JSON-encodes the reply. Application errors are returned
      * along with the reply, while any other encountered errors are thrown as
      * exceptions.
-     * 
+     *
      * @param method name of the method to be invoked
      * @param call in-flight call information
      * @param inArgs JSON encoded arguments to the method
