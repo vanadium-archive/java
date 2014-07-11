@@ -28,7 +28,7 @@ public class ProximityScannerAndroidService extends Service {
             proxService = ProximityScannerVeyronService
                     .create((BluetoothManager) getSystemService(BLUETOOTH_SERVICE));
             endpoint = s.listen("tcp", "127.0.0.1:8100");
-            s.serve("fortune", new Dispatcher() {
+            s.serve("proximity", new Dispatcher() {
                 @Override
                 public Object lookup(String suffix) throws VeyronException {
                     return proxService;

@@ -175,7 +175,6 @@ public final class VDLInvoker {
      * @return InvokeReply JSON-encoded invocation reply and application errors
      * @throws IllegalArgumentException if invalid arguments are passed
      * @throws IllegalAccessException if a runtime access error occurs
-     * @throws InvocationTargetException
      */
     public InvokeReply invoke(String method, ServerCall call, String[] inArgs) throws
     IllegalArgumentException, IllegalAccessException {
