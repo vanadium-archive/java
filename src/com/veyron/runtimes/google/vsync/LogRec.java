@@ -3,6 +3,8 @@
 // Source: vsync.vdl
 package com.veyron.runtimes.google.vsync;
 
+import com.veyron2.storage.ID;
+import com.veyron2.storage.Version;
 import java.util.ArrayList;
 
 /**
@@ -22,15 +24,58 @@ import java.util.ArrayList;
  * current version is derived from, and Value is the actual value of
  * the object mutation.
 **/
-public class LogRec { 
+public final class LogRec { 
 	// Log related information.
-public String devID;
-	public long gNum;
-	public long lSN;
-	public byte recType;
+	private DeviceID devID;
+		private GenID gNum;
+		private LSN lSN;
+		private byte recType;
 	// Object related information.
-public byte[] objID;
-	public long curVers;
-	public ArrayList<Long> parents;
-	public LogValue value;
+	private ID objID;
+		private Version curVers;
+		private ArrayList<Version> parents;
+		private LogValue value;
+
+	public LogRec(DeviceID devID, GenID gNum, LSN lSN, byte recType, ID objID, Version curVers, ArrayList<Version> parents, LogValue value) { 
+		this.devID = devID;
+		this.gNum = gNum;
+		this.lSN = lSN;
+		this.recType = recType;
+		this.objID = objID;
+		this.curVers = curVers;
+		this.parents = parents;
+		this.value = value;
+	}
+	public DeviceID getDevID() { return this.devID; }
+	public GenID getGNum() { return this.gNum; }
+	public LSN getLSN() { return this.lSN; }
+	public byte getRecType() { return this.recType; }
+	public ID getObjID() { return this.objID; }
+	public Version getCurVers() { return this.curVers; }
+	public ArrayList<Version> getParents() { return this.parents; }
+	public LogValue getValue() { return this.value; }
+
+	public void setDevID(DeviceID devID) { this.devID = devID; }
+	public void setGNum(GenID gNum) { this.gNum = gNum; }
+	public void setLSN(LSN lSN) { this.lSN = lSN; }
+	public void setRecType(byte recType) { this.recType = recType; }
+	public void setObjID(ID objID) { this.objID = objID; }
+	public void setCurVers(Version curVers) { this.curVers = curVers; }
+	public void setParents(ArrayList<Version> parents) { this.parents = parents; }
+	public void setValue(LogValue value) { this.value = value; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof LogRec)) return false;
+		final LogRec other = (LogRec)obj;
+		if (!(this.devID.equals(other.devID))) return false;
+		if (!(this.gNum.equals(other.gNum))) return false;
+		if (!(this.lSN.equals(other.lSN))) return false;
+		if (this.recType != other.recType) return false;
+		if (!(this.objID.equals(other.objID))) return false;
+		if (!(this.curVers.equals(other.curVers))) return false;
+		if (!(this.parents.equals(other.parents))) return false;
+		if (!(this.value.equals(other.value))) return false;
+		return true;
+	}
 }

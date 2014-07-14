@@ -3,11 +3,31 @@
 // Source: schema.vdl
 package com.veyron.examples.stfortune.schema;
 
+import com.veyron2.storage.ID;
 
 /**
  * FortuneData contains the information regarding a fortune.
 **/
-public class FortuneData { 
-	public String fortune;
-	public byte[] userName;
+public final class FortuneData { 
+		private String fortune;
+		private ID userName;
+
+	public FortuneData(String fortune, ID userName) { 
+		this.fortune = fortune;
+		this.userName = userName;
+	}
+	public String getFortune() { return this.fortune; }
+	public ID getUserName() { return this.userName; }
+
+	public void setFortune(String fortune) { this.fortune = fortune; }
+	public void setUserName(ID userName) { this.userName = userName; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof FortuneData)) return false;
+		final FortuneData other = (FortuneData)obj;
+		if (!(this.fortune.equals(other.fortune))) return false;
+		if (!(this.userName.equals(other.userName))) return false;
+		return true;
+	}
 }

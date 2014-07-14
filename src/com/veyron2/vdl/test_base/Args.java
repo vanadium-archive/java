@@ -7,7 +7,26 @@ package com.veyron2.vdl.test_base;
 /**
  * Args will be reordered to show up before NestedArgs in the generated output.
 **/
-public class Args { 
-	public int a;
-	public int b;
+public final class Args { 
+		private int a;
+		private int b;
+
+	public Args(int a, int b) { 
+		this.a = a;
+		this.b = b;
+	}
+	public int getA() { return this.a; }
+	public int getB() { return this.b; }
+
+	public void setA(int a) { this.a = a; }
+	public void setB(int b) { this.b = b; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Args)) return false;
+		final Args other = (Args)obj;
+		if (this.a != other.a) return false;
+		if (this.b != other.b) return false;
+		return true;
+	}
 }

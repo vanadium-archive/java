@@ -8,6 +8,21 @@ import java.util.ArrayList;
 /**
  * ChangeBatch is a batch of Change messages.
 **/
-public class ChangeBatch { 
-	public ArrayList<Change> changes;
+public final class ChangeBatch { 
+		private ArrayList<Change> changes;
+
+	public ChangeBatch(ArrayList<Change> changes) { 
+		this.changes = changes;
+	}
+	public ArrayList<Change> getChanges() { return this.changes; }
+
+	public void setChanges(ArrayList<Change> changes) { this.changes = changes; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ChangeBatch)) return false;
+		final ChangeBatch other = (ChangeBatch)obj;
+		if (!(this.changes.equals(other.changes))) return false;
+		return true;
+	}
 }

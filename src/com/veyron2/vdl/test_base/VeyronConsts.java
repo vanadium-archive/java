@@ -6,24 +6,24 @@ import org.apache.commons.math3.complex.Complex;
 
 public class VeyronConsts { 
 	/* The following constants originate in file: base.vdl. */
-	public static final boolean CBOOL = true;
-	public static final byte CBYTE = 1;
-	public static final int CINT32 = 2;
-	public static final long CINT64 = 3L;
-	public static final int CUINT32 = 4;
-	public static final long CUINT64 = 5L;
-	public static final float CFLOAT32 = 6.0f;
-	public static final double CFLOAT64 = 7.0;
-	public static final Complex CCOMPLEX64 = new Complex(8, 9);
-	public static final Complex CCOMPLEX128 = new Complex(10, 11);
-	public static final String CSTRING = "foo";
-	public static final boolean CANY = true;
-	public static final boolean TRUE = true;
-	public static final String FOO = "foo";
-	public static final int FIVE = 5;
-	public static final long SIX = 6L;
-	public static final long SIX_SQUARED = 36L;
-	public static final int FIVE_SQUARED = 25;
-	public static final String ERRID_FOO = new String("veyron2/vdl/test_base.ErrIDFoo");
-	public static final String ERRID_BAR = new String("some/path.ErrIdOther");
+		public static final boolean CBOOL = true;
+		public static final byte CBYTE = (byte)1;
+		public static final int CINT32 = 2;
+		public static final long CINT64 = 3L;
+		public static final int CUINT32 = 4;
+		public static final long CUINT64 = 5L;
+		public static final float CFLOAT32 = 6.0f;
+		public static final double CFLOAT64 = 7.0;
+		public static final Complex CCOMPLEX64 = new Complex(8, 9);
+		public static final Complex CCOMPLEX128 = new Complex(10, 11);
+		public static final String CSTRING = "foo";
+		public static final boolean CANY = true;
+		public static final boolean TRUE = true;
+		public static final String FOO = "foo";
+		public static final int FIVE = 5;
+		public static final long SIX = 6L;
+		public static final long SIX_SQUARED = 36L;
+		public static final int FIVE_SQUARED = 25;
+		public static final String ERRID_FOO = new String("veyron2/vdl/test_base.ErrIDFoo");
+		public static final String ERRID_BAR = new String("some/path.ErrIdOther");
 }

@@ -4,17 +4,35 @@
 package com.veyron2.services.watch;
 
 import com.veyron2.query.Query;
-import java.util.ArrayList;
 
 /**
  * QueryRequest specifies which entities should be watched and, optionally,
  * how to resume from a previous Watch call.
 **/
-public class QueryRequest { 
+public final class QueryRequest { 
 	// Query specifies the subset of the children of the root entity
 // for which the client wants updates.
-public Query query;
+	private Query query;
 	// ResumeMarker specifies how to resume from a previous Watch call.
 // See the ResumeMarker type for detailed comments.
-public ArrayList<Byte> resumeMarker;
+	private ResumeMarker resumeMarker;
+
+	public QueryRequest(Query query, ResumeMarker resumeMarker) { 
+		this.query = query;
+		this.resumeMarker = resumeMarker;
+	}
+	public Query getQuery() { return this.query; }
+	public ResumeMarker getResumeMarker() { return this.resumeMarker; }
+
+	public void setQuery(Query query) { this.query = query; }
+	public void setResumeMarker(ResumeMarker resumeMarker) { this.resumeMarker = resumeMarker; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof QueryRequest)) return false;
+		final QueryRequest other = (QueryRequest)obj;
+		if (!(this.query.equals(other.query))) return false;
+		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
+		return true;
+	}
 }

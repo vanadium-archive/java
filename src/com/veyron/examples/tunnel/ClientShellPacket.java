@@ -5,10 +5,33 @@ package com.veyron.examples.tunnel;
 
 import java.util.ArrayList;
 
-public class ClientShellPacket { 
+public final class ClientShellPacket { 
 	// Bytes going to the shell's stdin.
-public ArrayList<Byte> stdin;
+	private ArrayList<Byte> stdin;
 	// A dynamic update of the window size. The default value of 0 means no-change.
-public int rows;
-	public int cols;
+	private int rows;
+		private int cols;
+
+	public ClientShellPacket(ArrayList<Byte> stdin, int rows, int cols) { 
+		this.stdin = stdin;
+		this.rows = rows;
+		this.cols = cols;
+	}
+	public ArrayList<Byte> getStdin() { return this.stdin; }
+	public int getRows() { return this.rows; }
+	public int getCols() { return this.cols; }
+
+	public void setStdin(ArrayList<Byte> stdin) { this.stdin = stdin; }
+	public void setRows(int rows) { this.rows = rows; }
+	public void setCols(int cols) { this.cols = cols; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ClientShellPacket)) return false;
+		final ClientShellPacket other = (ClientShellPacket)obj;
+		if (!(this.stdin.equals(other.stdin))) return false;
+		if (this.rows != other.rows) return false;
+		if (this.cols != other.cols) return false;
+		return true;
+	}
 }

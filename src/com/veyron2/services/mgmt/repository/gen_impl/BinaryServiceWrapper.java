@@ -31,22 +31,22 @@ public class BinaryServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "Create") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		if (method == "Delete") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		if (method == "Download") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		if (method == "DownloadURL") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		if (method == "Stat") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		if (method == "Upload") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;
 	}

@@ -7,6 +7,21 @@ package com.veyron.examples.stfortune.schema;
 /**
  * User contains the information corresponding to a particular UserName in the store.
 **/
-public class User { 
-	public String name;
+public final class User { 
+		private String name;
+
+	public User(String name) { 
+		this.name = name;
+	}
+	public String getName() { return this.name; }
+
+	public void setName(String name) { this.name = name; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof User)) return false;
+		final User other = (User)obj;
+		if (!(this.name.equals(other.name))) return false;
+		return true;
+	}
 }

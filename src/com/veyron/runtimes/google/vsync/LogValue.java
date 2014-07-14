@@ -8,16 +8,43 @@ import com.veyron.services.store.raw.Mutation;
 /**
  * LogValue represents an object mutation within a transaction.
 **/
-public class LogValue { 
+public final class LogValue { 
 	// Mutation is the store mutation representing the change in the object.
-public Mutation mutation;
+	private Mutation mutation;
 	// SyncTime is the timestamp of the mutation when it arrives at the Sync server.
-public long syncTime;
+	private long syncTime;
 	// Delete indicates whether the mutation resulted in the object being
 // deleted from the store.
-public boolean delete;
+	private boolean delete;
 	// Continued tracks the transaction boundaries in a range of mutations.
 // It is set to true in all transaction mutations except the last one
 // in which it is set to false to mark the end of the transaction.
-public boolean continued;
+	private boolean continued;
+
+	public LogValue(Mutation mutation, long syncTime, boolean delete, boolean continued) { 
+		this.mutation = mutation;
+		this.syncTime = syncTime;
+		this.delete = delete;
+		this.continued = continued;
+	}
+	public Mutation getMutation() { return this.mutation; }
+	public long getSyncTime() { return this.syncTime; }
+	public boolean getDelete() { return this.delete; }
+	public boolean getContinued() { return this.continued; }
+
+	public void setMutation(Mutation mutation) { this.mutation = mutation; }
+	public void setSyncTime(long syncTime) { this.syncTime = syncTime; }
+	public void setDelete(boolean delete) { this.delete = delete; }
+	public void setContinued(boolean continued) { this.continued = continued; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof LogValue)) return false;
+		final LogValue other = (LogValue)obj;
+		if (!(this.mutation.equals(other.mutation))) return false;
+		if (this.syncTime != other.syncTime) return false;
+		if (this.delete != other.delete) return false;
+		if (this.continued != other.continued) return false;
+		return true;
+	}
 }

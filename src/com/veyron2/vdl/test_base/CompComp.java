@@ -6,10 +6,41 @@ package com.veyron2.vdl.test_base;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CompComp { 
-	public Composites a0;
-	public Composites[] a1;
-	public ArrayList<Composites> a2;
-	public HashMap<String, Composites> a3;
-	public HashMap<Scalars, ArrayList<HashMap<String, Composites>>> a4;
+public final class CompComp { 
+		private Composites a0;
+		private Composites[] a1;
+		private ArrayList<Composites> a2;
+		private HashMap<String, Composites> a3;
+		private HashMap<Scalars, ArrayList<HashMap<String, Composites>>> a4;
+
+	public CompComp(Composites a0, Composites[] a1, ArrayList<Composites> a2, HashMap<String, Composites> a3, HashMap<Scalars, ArrayList<HashMap<String, Composites>>> a4) { 
+		this.a0 = a0;
+		this.a1 = a1;
+		this.a2 = a2;
+		this.a3 = a3;
+		this.a4 = a4;
+	}
+	public Composites getA0() { return this.a0; }
+	public Composites[] getA1() { return this.a1; }
+	public ArrayList<Composites> getA2() { return this.a2; }
+	public HashMap<String, Composites> getA3() { return this.a3; }
+	public HashMap<Scalars, ArrayList<HashMap<String, Composites>>> getA4() { return this.a4; }
+
+	public void setA0(Composites a0) { this.a0 = a0; }
+	public void setA1(Composites[] a1) { this.a1 = a1; }
+	public void setA2(ArrayList<Composites> a2) { this.a2 = a2; }
+	public void setA3(HashMap<String, Composites> a3) { this.a3 = a3; }
+	public void setA4(HashMap<Scalars, ArrayList<HashMap<String, Composites>>> a4) { this.a4 = a4; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof CompComp)) return false;
+		final CompComp other = (CompComp)obj;
+		if (!(this.a0.equals(other.a0))) return false;
+		if (!(this.a1.equals(other.a1))) return false;
+		if (!(this.a2.equals(other.a2))) return false;
+		if (!(this.a3.equals(other.a3))) return false;
+		if (!(this.a4.equals(other.a4))) return false;
+		return true;
+	}
 }

@@ -8,8 +8,31 @@ import java.util.ArrayList;
 /**
  * Item is a single task to be done.
 **/
-public class Item { 
-	public String text;
-	public boolean done;
-	public ArrayList<String> tags;
+public final class Item { 
+		private String text;
+		private boolean done;
+		private ArrayList<String> tags;
+
+	public Item(String text, boolean done, ArrayList<String> tags) { 
+		this.text = text;
+		this.done = done;
+		this.tags = tags;
+	}
+	public String getText() { return this.text; }
+	public boolean getDone() { return this.done; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setText(String text) { this.text = text; }
+	public void setDone(boolean done) { this.done = done; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Item)) return false;
+		final Item other = (Item)obj;
+		if (!(this.text.equals(other.text))) return false;
+		if (this.done != other.done) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

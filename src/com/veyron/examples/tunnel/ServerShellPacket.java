@@ -5,9 +5,28 @@ package com.veyron.examples.tunnel;
 
 import java.util.ArrayList;
 
-public class ServerShellPacket { 
+public final class ServerShellPacket { 
 	// Bytes coming from the shell's stdout.
-public ArrayList<Byte> stdout;
+	private ArrayList<Byte> stdout;
 	// Bytes coming from the shell's stderr.
-public ArrayList<Byte> stderr;
+	private ArrayList<Byte> stderr;
+
+	public ServerShellPacket(ArrayList<Byte> stdout, ArrayList<Byte> stderr) { 
+		this.stdout = stdout;
+		this.stderr = stderr;
+	}
+	public ArrayList<Byte> getStdout() { return this.stdout; }
+	public ArrayList<Byte> getStderr() { return this.stderr; }
+
+	public void setStdout(ArrayList<Byte> stdout) { this.stdout = stdout; }
+	public void setStderr(ArrayList<Byte> stderr) { this.stderr = stderr; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ServerShellPacket)) return false;
+		final ServerShellPacket other = (ServerShellPacket)obj;
+		if (!(this.stdout.equals(other.stdout))) return false;
+		if (!(this.stderr.equals(other.stderr))) return false;
+		return true;
+	}
 }

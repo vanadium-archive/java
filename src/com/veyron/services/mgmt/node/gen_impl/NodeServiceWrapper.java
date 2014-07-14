@@ -51,8 +51,8 @@ public class NodeServiceWrapper {
 	public void reset(ServerCall call, long Deadline) throws VeyronException {
 		this.node.reset(call, Deadline);
 	}
-	public String install(ServerCall call) throws VeyronException {
-		return this.node.install(call);
+	public String install(ServerCall call, String Name) throws VeyronException {
+		return this.node.install(call, Name);
 	}
 	public void refresh(ServerCall call) throws VeyronException {
 		this.node.refresh(call);
@@ -80,6 +80,9 @@ public class NodeServiceWrapper {
 	}
 	public void update(ServerCall call) throws VeyronException {
 		this.node.update(call);
+	}
+	public void updateTo(ServerCall call, String Name) throws VeyronException {
+		this.node.updateTo(call, Name);
 	}
 	// Methods from sub-interface Config.
 	public void set(ServerCall call, String key, String value) throws VeyronException {

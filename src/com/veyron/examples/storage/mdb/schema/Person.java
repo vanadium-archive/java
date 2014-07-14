@@ -8,8 +8,31 @@ package com.veyron.examples.storage.mdb.schema;
  * Person represents a person, in any role, including producers, director,
  * actor, etc.
 **/
-public class Person { 
-	public String image; // URL
-	public String name;
-	public long birthDate; // ns since the Unix epoch.
+public final class Person { 
+		private String image; // URL
+		private String name;
+		private long birthDate; // ns since the Unix epoch.
+
+	public Person(String image, String name, long birthDate) { 
+		this.image = image;
+		this.name = name;
+		this.birthDate = birthDate;
+	}
+	public String getImage() { return this.image; }
+	public String getName() { return this.name; }
+	public long getBirthDate() { return this.birthDate; }
+
+	public void setImage(String image) { this.image = image; }
+	public void setName(String name) { this.name = name; }
+	public void setBirthDate(long birthDate) { this.birthDate = birthDate; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Person)) return false;
+		final Person other = (Person)obj;
+		if (!(this.image.equals(other.image))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (this.birthDate != other.birthDate) return false;
+		return true;
+	}
 }

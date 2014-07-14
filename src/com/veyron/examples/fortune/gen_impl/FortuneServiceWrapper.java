@@ -21,10 +21,10 @@ public class FortuneServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "Get") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		if (method == "Add") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;
 	}

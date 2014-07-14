@@ -54,8 +54,8 @@ public class NodeServiceWrapper {
 		this.service.reset(call, Deadline);
 	}
 	// Methods from sub-interface Application.
-	public String install(ServerCall call) throws VeyronException {
-		return this.application.install(call);
+	public String install(ServerCall call, String Name) throws VeyronException {
+		return this.application.install(call, Name);
 	}
 	public void refresh(ServerCall call) throws VeyronException {
 		this.application.refresh(call);
@@ -83,5 +83,8 @@ public class NodeServiceWrapper {
 	}
 	public void update(ServerCall call) throws VeyronException {
 		this.application.update(call);
+	}
+	public void updateTo(ServerCall call, String Name) throws VeyronException {
+		this.application.updateTo(call, Name);
 	}
 }

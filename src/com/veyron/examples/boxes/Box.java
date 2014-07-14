@@ -8,11 +8,34 @@ package com.veyron.examples.boxes;
  * Box describes the name and co-ordinates of a given box that
  * is displayed in the View of a peer device.
 **/
-public class Box { 
+public final class Box { 
 	// DeviceID that generated the box
-public String deviceId;
+	private String deviceId;
 	// BoxId is a unique name for a box
-public String boxId;
+	private String boxId;
 	// Points are the co-ordinates of a given box
-public float[] points;
+	private float[] points;
+
+	public Box(String deviceId, String boxId, float[] points) { 
+		this.deviceId = deviceId;
+		this.boxId = boxId;
+		this.points = points;
+	}
+	public String getDeviceId() { return this.deviceId; }
+	public String getBoxId() { return this.boxId; }
+	public float[] getPoints() { return this.points; }
+
+	public void setDeviceId(String deviceId) { this.deviceId = deviceId; }
+	public void setBoxId(String boxId) { this.boxId = boxId; }
+	public void setPoints(float[] points) { this.points = points; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Box)) return false;
+		final Box other = (Box)obj;
+		if (!(this.deviceId.equals(other.deviceId))) return false;
+		if (!(this.boxId.equals(other.boxId))) return false;
+		if (!(this.points.equals(other.points))) return false;
+		return true;
+	}
 }

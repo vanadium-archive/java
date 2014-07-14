@@ -23,10 +23,10 @@ public class ObjectServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "SetACL") {
-			return new Object[]{ 4 };
+			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
 		if (method == "GetACL") {
-			return new Object[]{ 4 };
+			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
 		return null;
 	}

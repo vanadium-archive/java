@@ -7,9 +7,28 @@ package com.veyron2.services.store;
 /**
  * Entry represents a value at some point in time in the store.
 **/
-public class Entry { 
+public final class Entry { 
 	// Stat is the entry's metadata.
-public Stat stat;
+	private Stat stat;
 	// Value is the value of the entry.
-public java.lang.Object value;
+	private java.lang.Object value;
+
+	public Entry(Stat stat, java.lang.Object value) { 
+		this.stat = stat;
+		this.value = value;
+	}
+	public Stat getStat() { return this.stat; }
+	public java.lang.Object getValue() { return this.value; }
+
+	public void setStat(Stat stat) { this.stat = stat; }
+	public void setValue(java.lang.Object value) { this.value = value; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Entry)) return false;
+		final Entry other = (Entry)obj;
+		if (!(this.stat.equals(other.stat))) return false;
+		if (!(this.value.equals(other.value))) return false;
+		return true;
+	}
 }

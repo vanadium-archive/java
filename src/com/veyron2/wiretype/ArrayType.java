@@ -8,9 +8,36 @@ import java.util.ArrayList;
 /**
  * ArrayType represents a fixed-length sequence of Elem values.
 **/
-public class ArrayType { 
-	public long elem;
-	public long len;
-	public String name;
-	public ArrayList<String> tags;
+public final class ArrayType { 
+		private TypeID elem;
+		private long len;
+		private String name;
+		private ArrayList<String> tags;
+
+	public ArrayType(TypeID elem, long len, String name, ArrayList<String> tags) { 
+		this.elem = elem;
+		this.len = len;
+		this.name = name;
+		this.tags = tags;
+	}
+	public TypeID getElem() { return this.elem; }
+	public long getLen() { return this.len; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setElem(TypeID elem) { this.elem = elem; }
+	public void setLen(long len) { this.len = len; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ArrayType)) return false;
+		final ArrayType other = (ArrayType)obj;
+		if (!(this.elem.equals(other.elem))) return false;
+		if (this.len != other.len) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

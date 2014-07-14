@@ -19,24 +19,24 @@ import java.util.ArrayList;
 @VeyronService(serviceWrapper=ObjectServiceWrapper.class)
 public interface ObjectService extends GlobableService, GlobWatcherService, QueryWatcherService { 
 	// Exists returns true iff the Entry has a value.
-	public boolean exists(ServerContext context, long tID) throws VeyronException;
+	public boolean exists(ServerContext context, TransactionID tID) throws VeyronException;
 	// Get returns the value for the Object.  The value returned is from the
 // most recent mutation of the entry in the Transaction, or from the
 // Transaction's snapshot if there is no mutation.
-	public Entry get(ServerContext context, long tID) throws VeyronException;
+	public Entry get(ServerContext context, TransactionID tID) throws VeyronException;
 	// Put modifies the value of the Object.
-	public Stat put(ServerContext context, long tID, java.lang.Object v) throws VeyronException;
+	public Stat put(ServerContext context, TransactionID tID, java.lang.Object v) throws VeyronException;
 	// Remove removes the Object.
-	public void remove(ServerContext context, long tID) throws VeyronException;
+	public void remove(ServerContext context, TransactionID tID) throws VeyronException;
 	// SetAttr changes the attributes of the entry, such as permissions and
 // replication groups.  Attributes are associated with the value, not the
 // path.
-	public void setAttr(ServerContext context, long tID, ArrayList<java.lang.Object> attrs) throws VeyronException;
+	public void setAttr(ServerContext context, TransactionID tID, ArrayList<java.lang.Object> attrs) throws VeyronException;
 	// Stat returns entry info.
-	public Stat stat(ServerContext context, long tID) throws VeyronException;
+	public Stat stat(ServerContext context, TransactionID tID) throws VeyronException;
 	// Query returns the sequence of elements that satisfy the query.
-	public void query(ServerContext context, long tID, Query q, Stream<QueryResult,Void> stream) throws VeyronException;
+	public void query(ServerContext context, TransactionID tID, Query q, Stream<QueryResult,Void> stream) throws VeyronException;
 	// GlobT finds objects beneath this value that match the given pattern.
 // This is the same as Glob, but operates within a transaction.
-	public void globT(ServerContext context, long tID, String pattern, Stream<String,Void> stream) throws VeyronException;
+	public void globT(ServerContext context, TransactionID tID, String pattern, Stream<String,Void> stream) throws VeyronException;
 }

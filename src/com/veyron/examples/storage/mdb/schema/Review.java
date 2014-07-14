@@ -7,7 +7,26 @@ package com.veyron.examples.storage.mdb.schema;
 /**
  * Review is a movie review.
 **/
-public class Review { 
-	public byte rating; // 1-10.
-	public String text;
+public final class Review { 
+		private byte rating; // 1-10.
+		private String text;
+
+	public Review(byte rating, String text) { 
+		this.rating = rating;
+		this.text = text;
+	}
+	public byte getRating() { return this.rating; }
+	public String getText() { return this.text; }
+
+	public void setRating(byte rating) { this.rating = rating; }
+	public void setText(String text) { this.text = text; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Review)) return false;
+		final Review other = (Review)obj;
+		if (this.rating != other.rating) return false;
+		if (!(this.text.equals(other.text))) return false;
+		return true;
+	}
 }

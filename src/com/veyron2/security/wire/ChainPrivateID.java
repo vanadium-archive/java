@@ -8,10 +8,29 @@ import java.util.ArrayList;
 /**
  * ChainPrivateID represents the chain implementation of PrivateIDs from veyron/runtimes/google/security.
 **/
-public class ChainPrivateID { 
+public final class ChainPrivateID { 
 	// PublicID associated with the PrivateID.
-public ChainPublicID publicID;
+	private ChainPublicID publicID;
 	// Secret represents the secret integer that together with an ECDSA public key makes up the
 // corresponding private key.
-public ArrayList<Byte> secret;
+	private ArrayList<Byte> secret;
+
+	public ChainPrivateID(ChainPublicID publicID, ArrayList<Byte> secret) { 
+		this.publicID = publicID;
+		this.secret = secret;
+	}
+	public ChainPublicID getPublicID() { return this.publicID; }
+	public ArrayList<Byte> getSecret() { return this.secret; }
+
+	public void setPublicID(ChainPublicID publicID) { this.publicID = publicID; }
+	public void setSecret(ArrayList<Byte> secret) { this.secret = secret; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ChainPrivateID)) return false;
+		final ChainPrivateID other = (ChainPrivateID)obj;
+		if (!(this.publicID.equals(other.publicID))) return false;
+		if (!(this.secret.equals(other.secret))) return false;
+		return true;
+	}
 }

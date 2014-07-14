@@ -7,6 +7,21 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * A GameID is used to uniquely identify a game within one Judge.
 **/
-public class GameID { 
-	public String iD;
+public final class GameID { 
+		private String iD;
+
+	public GameID(String iD) { 
+		this.iD = iD;
+	}
+	public String getID() { return this.iD; }
+
+	public void setID(String iD) { this.iD = iD; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof GameID)) return false;
+		final GameID other = (GameID)obj;
+		if (!(this.iD.equals(other.iD))) return false;
+		return true;
+	}
 }

@@ -7,7 +7,26 @@ package com.veyron2.wiretype;
 /**
  * FieldType represents a single possibly-named field in a struct.
 **/
-public class FieldType { 
-	public long type;
-	public String name;
+public final class FieldType { 
+		private TypeID type;
+		private String name;
+
+	public FieldType(TypeID type, String name) { 
+		this.type = type;
+		this.name = name;
+	}
+	public TypeID getType() { return this.type; }
+	public String getName() { return this.name; }
+
+	public void setType(TypeID type) { this.type = type; }
+	public void setName(String name) { this.name = name; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof FieldType)) return false;
+		final FieldType other = (FieldType)obj;
+		if (!(this.type.equals(other.type))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		return true;
+	}
 }

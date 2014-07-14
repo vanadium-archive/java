@@ -8,7 +8,22 @@ package com.veyron2.query;
  * Query is the Veyron query language.  The specification of this
  * language is at <placeholder>.
 **/
-public class Query { 
+public final class Query { 
 	// Stmt is the human-readable representation of the query.
-public String stmt;
+	private String stmt;
+
+	public Query(String stmt) { 
+		this.stmt = stmt;
+	}
+	public String getStmt() { return this.stmt; }
+
+	public void setStmt(String stmt) { this.stmt = stmt; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Query)) return false;
+		final Query other = (Query)obj;
+		if (!(this.stmt.equals(other.stmt))) return false;
+		return true;
+	}
 }

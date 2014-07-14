@@ -8,8 +8,31 @@ import java.util.ArrayList;
 /**
  * NamedPrimitiveType adds name and tag meta-information to a primitive type.
 **/
-public class NamedPrimitiveType { 
-	public long type;
-	public String name;
-	public ArrayList<String> tags;
+public final class NamedPrimitiveType { 
+		private TypeID type;
+		private String name;
+		private ArrayList<String> tags;
+
+	public NamedPrimitiveType(TypeID type, String name, ArrayList<String> tags) { 
+		this.type = type;
+		this.name = name;
+		this.tags = tags;
+	}
+	public TypeID getType() { return this.type; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setType(TypeID type) { this.type = type; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof NamedPrimitiveType)) return false;
+		final NamedPrimitiveType other = (NamedPrimitiveType)obj;
+		if (!(this.type.equals(other.type))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

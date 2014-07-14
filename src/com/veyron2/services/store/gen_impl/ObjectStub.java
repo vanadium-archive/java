@@ -32,13 +32,13 @@ public final class ObjectStub implements Object {
 	}
 	// Methods from interface Object.
 	@Override
-	public boolean exists(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public boolean exists(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		return exists(context, TID, null);
 	}
 	@Override
-	public boolean exists(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public boolean exists(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -57,13 +57,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public Entry get(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public Entry get(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		return get(context, TID, null);
 	}
 	@Override
-	public Entry get(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public Entry get(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -82,13 +82,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public Stat put(com.veyron2.ipc.Context context, long TID, java.lang.Object V) throws com.veyron2.ipc.VeyronException {
+	public Stat put(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.lang.Object V) throws com.veyron2.ipc.VeyronException {
 		return put(context, TID, V, null);
 	}
 	@Override
-	public Stat put(com.veyron2.ipc.Context context, long TID, java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public Stat put(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID), V };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID, V };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -107,13 +107,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public void remove(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public void remove(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		remove(context, TID, null);
 	}
 	@Override
-	public void remove(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public void remove(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -132,13 +132,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public void setAttr(com.veyron2.ipc.Context context, long TID, java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException {
+	public void setAttr(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException {
 		setAttr(context, TID, Attrs, null);
 	}
 	@Override
-	public void setAttr(com.veyron2.ipc.Context context, long TID, java.util.ArrayList<java.lang.Object> Attrs, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public void setAttr(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.util.ArrayList<java.lang.Object> Attrs, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID), Attrs };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID, Attrs };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -157,13 +157,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public Stat stat(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public Stat stat(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		return stat(context, TID, null);
 	}
 	@Override
-	public Stat stat(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public Stat stat(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -182,13 +182,13 @@ public final class ObjectStub implements Object {
 
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,QueryResult,java.lang.Void> query(com.veyron2.ipc.Context context, long TID, com.veyron2.query.Query Q) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,QueryResult,java.lang.Void> query(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.query.Query Q) throws com.veyron2.ipc.VeyronException {
 		return query(context, TID, Q, null);
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,QueryResult,java.lang.Void> query(com.veyron2.ipc.Context context, long TID, com.veyron2.query.Query Q, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,QueryResult,java.lang.Void> query(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.query.Query Q, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID), Q };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID, Q };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -227,13 +227,13 @@ public final class ObjectStub implements Object {
 		};
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String,java.lang.Void> globT(com.veyron2.ipc.Context context, long TID, java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String,java.lang.Void> globT(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
 		return globT(context, TID, pattern, null);
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String,java.lang.Void> globT(com.veyron2.ipc.Context context, long TID, java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String,java.lang.Void> globT(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID), pattern };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID, pattern };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch

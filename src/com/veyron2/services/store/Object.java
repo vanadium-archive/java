@@ -17,32 +17,32 @@ import java.util.ArrayList;
 **/
 public interface Object extends Globable, GlobWatcher, QueryWatcher { 
 	// Exists returns true iff the Entry has a value.
-	public boolean exists(Context context, long tID) throws VeyronException;
-	public boolean exists(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public boolean exists(Context context, TransactionID tID) throws VeyronException;
+	public boolean exists(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// Get returns the value for the Object.  The value returned is from the
 // most recent mutation of the entry in the Transaction, or from the
 // Transaction's snapshot if there is no mutation.
-	public Entry get(Context context, long tID) throws VeyronException;
-	public Entry get(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public Entry get(Context context, TransactionID tID) throws VeyronException;
+	public Entry get(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// Put modifies the value of the Object.
-	public Stat put(Context context, long tID, java.lang.Object v) throws VeyronException;
-	public Stat put(Context context, long tID, java.lang.Object v, Options veyronOpts) throws VeyronException;
+	public Stat put(Context context, TransactionID tID, java.lang.Object v) throws VeyronException;
+	public Stat put(Context context, TransactionID tID, java.lang.Object v, Options veyronOpts) throws VeyronException;
 	// Remove removes the Object.
-	public void remove(Context context, long tID) throws VeyronException;
-	public void remove(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public void remove(Context context, TransactionID tID) throws VeyronException;
+	public void remove(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// SetAttr changes the attributes of the entry, such as permissions and
 // replication groups.  Attributes are associated with the value, not the
 // path.
-	public void setAttr(Context context, long tID, ArrayList<java.lang.Object> attrs) throws VeyronException;
-	public void setAttr(Context context, long tID, ArrayList<java.lang.Object> attrs, Options veyronOpts) throws VeyronException;
+	public void setAttr(Context context, TransactionID tID, ArrayList<java.lang.Object> attrs) throws VeyronException;
+	public void setAttr(Context context, TransactionID tID, ArrayList<java.lang.Object> attrs, Options veyronOpts) throws VeyronException;
 	// Stat returns entry info.
-	public Stat stat(Context context, long tID) throws VeyronException;
-	public Stat stat(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public Stat stat(Context context, TransactionID tID) throws VeyronException;
+	public Stat stat(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// Query returns the sequence of elements that satisfy the query.
-	public ClientStream<Void,QueryResult,Void> query(Context context, long tID, Query q) throws VeyronException;
-	public ClientStream<Void,QueryResult,Void> query(Context context, long tID, Query q, Options veyronOpts) throws VeyronException;
+	public ClientStream<Void,QueryResult,Void> query(Context context, TransactionID tID, Query q) throws VeyronException;
+	public ClientStream<Void,QueryResult,Void> query(Context context, TransactionID tID, Query q, Options veyronOpts) throws VeyronException;
 	// GlobT finds objects beneath this value that match the given pattern.
 // This is the same as Glob, but operates within a transaction.
-	public ClientStream<Void,String,Void> globT(Context context, long tID, String pattern) throws VeyronException;
-	public ClientStream<Void,String,Void> globT(Context context, long tID, String pattern, Options veyronOpts) throws VeyronException;
+	public ClientStream<Void,String,Void> globT(Context context, TransactionID tID, String pattern) throws VeyronException;
+	public ClientStream<Void,String,Void> globT(Context context, TransactionID tID, String pattern, Options veyronOpts) throws VeyronException;
 }

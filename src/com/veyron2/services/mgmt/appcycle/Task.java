@@ -16,7 +16,26 @@ package com.veyron2.services.mgmt.appcycle;
  *   e.g. new shutdown tasks are triggered that were not forseen at the outset
  *   of the shutdown.
 **/
-public class Task { 
-	public int progress;
-	public int goal;
+public final class Task { 
+		private int progress;
+		private int goal;
+
+	public Task(int progress, int goal) { 
+		this.progress = progress;
+		this.goal = goal;
+	}
+	public int getProgress() { return this.progress; }
+	public int getGoal() { return this.goal; }
+
+	public void setProgress(int progress) { this.progress = progress; }
+	public void setGoal(int goal) { this.goal = goal; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Task)) return false;
+		final Task other = (Task)obj;
+		if (this.progress != other.progress) return false;
+		if (this.goal != other.goal) return false;
+		return true;
+	}
 }

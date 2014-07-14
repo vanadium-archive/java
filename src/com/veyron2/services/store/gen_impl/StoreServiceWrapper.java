@@ -14,6 +14,7 @@ import com.veyron2.services.store.Stat;
 import com.veyron2.services.store.Store;
 import com.veyron2.services.store.StoreFactory;
 import com.veyron2.services.store.StoreService;
+import com.veyron2.services.store.TransactionID;
 import com.veyron2.services.store.VeyronConsts;
 import com.veyron2.vdl.Stream;
 import java.util.ArrayList;
@@ -45,13 +46,13 @@ public class StoreServiceWrapper {
 		return null;
 	}
 	// Methods from interface Store.
-	public void createTransaction(ServerCall call, long TID, ArrayList<Object> Options) throws VeyronException { 
+	public void createTransaction(ServerCall call, TransactionID TID, ArrayList<Object> Options) throws VeyronException { 
 		this.service.createTransaction(call, TID, Options);
 	}
-	public void commit(ServerCall call, long TID) throws VeyronException { 
+	public void commit(ServerCall call, TransactionID TID) throws VeyronException { 
 		this.service.commit(call, TID);
 	}
-	public void abort(ServerCall call, long TID) throws VeyronException { 
+	public void abort(ServerCall call, TransactionID TID) throws VeyronException { 
 		this.service.abort(call, TID);
 	}
 	public void readConflicts(ServerCall call) throws VeyronException { 

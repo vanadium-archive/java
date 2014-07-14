@@ -3,6 +3,7 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
+import com.veyron2.storage.ID;
 import java.util.ArrayList;
 
 /**
@@ -10,13 +11,36 @@ import java.util.ArrayList;
  *
  * TODO(jyh): Specify versioning more precisely.
 **/
-public class Stat { 
+public final class Stat { 
 	// ID is the unique identifier of the entry.
-public byte[] iD;
+	private ID iD;
 	// MTimeNS is the last modification time in Unix nanoseconds (see time.UnixNano).
 //
 // TODO(jyh): Use Veyron Time when it gets implemented.
-public long mTimeNS;
+	private long mTimeNS;
 	// Attrs are the attributes associated with the entry.
-public ArrayList<java.lang.Object> attrs;
+	private ArrayList<java.lang.Object> attrs;
+
+	public Stat(ID iD, long mTimeNS, ArrayList<java.lang.Object> attrs) { 
+		this.iD = iD;
+		this.mTimeNS = mTimeNS;
+		this.attrs = attrs;
+	}
+	public ID getID() { return this.iD; }
+	public long getMTimeNS() { return this.mTimeNS; }
+	public ArrayList<java.lang.Object> getAttrs() { return this.attrs; }
+
+	public void setID(ID iD) { this.iD = iD; }
+	public void setMTimeNS(long mTimeNS) { this.mTimeNS = mTimeNS; }
+	public void setAttrs(ArrayList<java.lang.Object> attrs) { this.attrs = attrs; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Stat)) return false;
+		final Stat other = (Stat)obj;
+		if (!(this.iD.equals(other.iD))) return false;
+		if (this.mTimeNS != other.mTimeNS) return false;
+		if (!(this.attrs.equals(other.attrs))) return false;
+		return true;
+	}
 }

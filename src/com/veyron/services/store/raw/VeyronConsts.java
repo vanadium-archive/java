@@ -7,5 +7,5 @@ public class VeyronConsts {
 	/* The following constants originate in file: service.vdl. */
 	// The raw Store has Object name "<mount>/.store.raw", where <mount> is the
 // Object name of the mount point.
-public static final String RAW_STORE_SUFFIX = ".store.raw";
+	public static final String RAW_STORE_SUFFIX = ".store.raw";
 }

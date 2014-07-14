@@ -7,6 +7,21 @@ package com.veyron.examples.todos.schema;
 /**
  * List is a list of items.
 **/
-public class List { 
-	public String name;
+public final class List { 
+		private String name;
+
+	public List(String name) { 
+		this.name = name;
+	}
+	public String getName() { return this.name; }
+
+	public void setName(String name) { this.name = name; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof List)) return false;
+		final List other = (List)obj;
+		if (!(this.name.equals(other.name))) return false;
+		return true;
+	}
 }

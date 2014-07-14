@@ -7,10 +7,41 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * Round represents the state of a round.
 **/
-public class Round { 
-	public String[] moves; // Each player's move.
-	public String comment; // A text comment from judge about the round.
-	public byte winner; // Who won the round.
-	public long startTimeNS; // The time at which the round started.
-	public long endTimeNS; // The time at which the round ended.
+public final class Round { 
+		private String[] moves; // Each player's move.
+		private String comment; // A text comment from judge about the round.
+		private WinnerTag winner; // Who won the round.
+		private long startTimeNS; // The time at which the round started.
+		private long endTimeNS; // The time at which the round ended.
+
+	public Round(String[] moves, String comment, WinnerTag winner, long startTimeNS, long endTimeNS) { 
+		this.moves = moves;
+		this.comment = comment;
+		this.winner = winner;
+		this.startTimeNS = startTimeNS;
+		this.endTimeNS = endTimeNS;
+	}
+	public String[] getMoves() { return this.moves; }
+	public String getComment() { return this.comment; }
+	public WinnerTag getWinner() { return this.winner; }
+	public long getStartTimeNS() { return this.startTimeNS; }
+	public long getEndTimeNS() { return this.endTimeNS; }
+
+	public void setMoves(String[] moves) { this.moves = moves; }
+	public void setComment(String comment) { this.comment = comment; }
+	public void setWinner(WinnerTag winner) { this.winner = winner; }
+	public void setStartTimeNS(long startTimeNS) { this.startTimeNS = startTimeNS; }
+	public void setEndTimeNS(long endTimeNS) { this.endTimeNS = endTimeNS; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Round)) return false;
+		final Round other = (Round)obj;
+		if (!(this.moves.equals(other.moves))) return false;
+		if (!(this.comment.equals(other.comment))) return false;
+		if (!(this.winner.equals(other.winner))) return false;
+		if (this.startTimeNS != other.startTimeNS) return false;
+		if (this.endTimeNS != other.endTimeNS) return false;
+		return true;
+	}
 }

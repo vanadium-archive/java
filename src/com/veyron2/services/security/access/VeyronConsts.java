@@ -8,7 +8,7 @@ public class VeyronConsts {
 	// The etag passed to SetACL is invalid.  Likely, another client set
 // the ACL already and invalidated the etag.  Use GetACL to fetch a
 // fresh etag.
-public static final String ERR_BAD_ETAG = new String("veyron2/services/security/access.ErrBadEtag");
+	public static final String ERR_BAD_ETAG = new String("veyron2/services/security/access.ErrBadEtag");
 	// The ACL is too big.  Use groups to represent large sets of principals.
-public static final String ERR_TOO_BIG = new String("veyron2/services/security/access.ErrTooBig");
+	public static final String ERR_TOO_BIG = new String("veyron2/services/security/access.ErrTooBig");
 }

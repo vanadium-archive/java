@@ -11,9 +11,36 @@ import java.util.ArrayList;
  * tag to indicate the representation; e.g. C++ may use tags "rbtree" and
  * "hashmap" to indicate std::map and std::unordered_map respectively.
 **/
-public class MapType { 
-	public long key;
-	public long elem;
-	public String name;
-	public ArrayList<String> tags;
+public final class MapType { 
+		private TypeID key;
+		private TypeID elem;
+		private String name;
+		private ArrayList<String> tags;
+
+	public MapType(TypeID key, TypeID elem, String name, ArrayList<String> tags) { 
+		this.key = key;
+		this.elem = elem;
+		this.name = name;
+		this.tags = tags;
+	}
+	public TypeID getKey() { return this.key; }
+	public TypeID getElem() { return this.elem; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setKey(TypeID key) { this.key = key; }
+	public void setElem(TypeID elem) { this.elem = elem; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof MapType)) return false;
+		final MapType other = (MapType)obj;
+		if (!(this.key.equals(other.key))) return false;
+		if (!(this.elem.equals(other.elem))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

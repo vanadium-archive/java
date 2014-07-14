@@ -6,34 +6,161 @@ package com.veyron2.vdl.test_base;
 import com.veyron2.ipc.VeyronException;
 import org.apache.commons.math3.complex.Complex;
 
-public class Scalars { 
-	public boolean a0;
-	public byte a1;
-	public short a2;
-	public int a3;
-	public long a4;
-	public short a5;
-	public int a6;
-	public long a7;
-	public float a8;
-	public double a9;
-	public Complex a10;
-	public Complex a11;
-	public String a12;
-	public VeyronException a13;
-	public Object a14;
-	public Object a15;
-	public boolean b0;
-	public byte b1;
-	public short b2;
-	public int b3;
-	public long b4;
-	public short b5;
-	public int b6;
-	public long b7;
-	public float b8;
-	public double b9;
-	public Complex b10;
-	public Complex b11;
-	public String b12;
+public final class Scalars { 
+		private boolean a0;
+		private byte a1;
+		private short a2;
+		private int a3;
+		private long a4;
+		private short a5;
+		private int a6;
+		private long a7;
+		private float a8;
+		private double a9;
+		private Complex a10;
+		private Complex a11;
+		private String a12;
+		private VeyronException a13;
+		private Object a14;
+		private Object a15;
+		private NamedBool b0;
+		private NamedByte b1;
+		private NamedUint16 b2;
+		private NamedUint32 b3;
+		private NamedUint64 b4;
+		private NamedInt16 b5;
+		private NamedInt32 b6;
+		private NamedInt64 b7;
+		private NamedFloat32 b8;
+		private NamedFloat64 b9;
+		private NamedComplex64 b10;
+		private NamedComplex128 b11;
+		private NamedString b12;
+
+	public Scalars(boolean a0, byte a1, short a2, int a3, long a4, short a5, int a6, long a7, float a8, double a9, Complex a10, Complex a11, String a12, VeyronException a13, Object a14, Object a15, NamedBool b0, NamedByte b1, NamedUint16 b2, NamedUint32 b3, NamedUint64 b4, NamedInt16 b5, NamedInt32 b6, NamedInt64 b7, NamedFloat32 b8, NamedFloat64 b9, NamedComplex64 b10, NamedComplex128 b11, NamedString b12) { 
+		this.a0 = a0;
+		this.a1 = a1;
+		this.a2 = a2;
+		this.a3 = a3;
+		this.a4 = a4;
+		this.a5 = a5;
+		this.a6 = a6;
+		this.a7 = a7;
+		this.a8 = a8;
+		this.a9 = a9;
+		this.a10 = a10;
+		this.a11 = a11;
+		this.a12 = a12;
+		this.a13 = a13;
+		this.a14 = a14;
+		this.a15 = a15;
+		this.b0 = b0;
+		this.b1 = b1;
+		this.b2 = b2;
+		this.b3 = b3;
+		this.b4 = b4;
+		this.b5 = b5;
+		this.b6 = b6;
+		this.b7 = b7;
+		this.b8 = b8;
+		this.b9 = b9;
+		this.b10 = b10;
+		this.b11 = b11;
+		this.b12 = b12;
+	}
+	public boolean getA0() { return this.a0; }
+	public byte getA1() { return this.a1; }
+	public short getA2() { return this.a2; }
+	public int getA3() { return this.a3; }
+	public long getA4() { return this.a4; }
+	public short getA5() { return this.a5; }
+	public int getA6() { return this.a6; }
+	public long getA7() { return this.a7; }
+	public float getA8() { return this.a8; }
+	public double getA9() { return this.a9; }
+	public Complex getA10() { return this.a10; }
+	public Complex getA11() { return this.a11; }
+	public String getA12() { return this.a12; }
+	public VeyronException getA13() { return this.a13; }
+	public Object getA14() { return this.a14; }
+	public Object getA15() { return this.a15; }
+	public NamedBool getB0() { return this.b0; }
+	public NamedByte getB1() { return this.b1; }
+	public NamedUint16 getB2() { return this.b2; }
+	public NamedUint32 getB3() { return this.b3; }
+	public NamedUint64 getB4() { return this.b4; }
+	public NamedInt16 getB5() { return this.b5; }
+	public NamedInt32 getB6() { return this.b6; }
+	public NamedInt64 getB7() { return this.b7; }
+	public NamedFloat32 getB8() { return this.b8; }
+	public NamedFloat64 getB9() { return this.b9; }
+	public NamedComplex64 getB10() { return this.b10; }
+	public NamedComplex128 getB11() { return this.b11; }
+	public NamedString getB12() { return this.b12; }
+
+	public void setA0(boolean a0) { this.a0 = a0; }
+	public void setA1(byte a1) { this.a1 = a1; }
+	public void setA2(short a2) { this.a2 = a2; }
+	public void setA3(int a3) { this.a3 = a3; }
+	public void setA4(long a4) { this.a4 = a4; }
+	public void setA5(short a5) { this.a5 = a5; }
+	public void setA6(int a6) { this.a6 = a6; }
+	public void setA7(long a7) { this.a7 = a7; }
+	public void setA8(float a8) { this.a8 = a8; }
+	public void setA9(double a9) { this.a9 = a9; }
+	public void setA10(Complex a10) { this.a10 = a10; }
+	public void setA11(Complex a11) { this.a11 = a11; }
+	public void setA12(String a12) { this.a12 = a12; }
+	public void setA13(VeyronException a13) { this.a13 = a13; }
+	public void setA14(Object a14) { this.a14 = a14; }
+	public void setA15(Object a15) { this.a15 = a15; }
+	public void setB0(NamedBool b0) { this.b0 = b0; }
+	public void setB1(NamedByte b1) { this.b1 = b1; }
+	public void setB2(NamedUint16 b2) { this.b2 = b2; }
+	public void setB3(NamedUint32 b3) { this.b3 = b3; }
+	public void setB4(NamedUint64 b4) { this.b4 = b4; }
+	public void setB5(NamedInt16 b5) { this.b5 = b5; }
+	public void setB6(NamedInt32 b6) { this.b6 = b6; }
+	public void setB7(NamedInt64 b7) { this.b7 = b7; }
+	public void setB8(NamedFloat32 b8) { this.b8 = b8; }
+	public void setB9(NamedFloat64 b9) { this.b9 = b9; }
+	public void setB10(NamedComplex64 b10) { this.b10 = b10; }
+	public void setB11(NamedComplex128 b11) { this.b11 = b11; }
+	public void setB12(NamedString b12) { this.b12 = b12; }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Scalars)) return false;
+		final Scalars other = (Scalars)obj;
+		if (this.a0 != other.a0) return false;
+		if (this.a1 != other.a1) return false;
+		if (this.a2 != other.a2) return false;
+		if (this.a3 != other.a3) return false;
+		if (this.a4 != other.a4) return false;
+		if (this.a5 != other.a5) return false;
+		if (this.a6 != other.a6) return false;
+		if (this.a7 != other.a7) return false;
+		if (this.a8 != other.a8) return false;
+		if (this.a9 != other.a9) return false;
+		if (!(this.a10.equals(other.a10))) return false;
+		if (!(this.a11.equals(other.a11))) return false;
+		if (!(this.a12.equals(other.a12))) return false;
+		if (!(this.a13.equals(other.a13))) return false;
+		if (!(this.a14.equals(other.a14))) return false;
+		if (!(this.a15.equals(other.a15))) return false;
+		if (!(this.b0.equals(other.b0))) return false;
+		if (!(this.b1.equals(other.b1))) return false;
+		if (!(this.b2.equals(other.b2))) return false;
+		if (!(this.b3.equals(other.b3))) return false;
+		if (!(this.b4.equals(other.b4))) return false;
+		if (!(this.b5.equals(other.b5))) return false;
+		if (!(this.b6.equals(other.b6))) return false;
+		if (!(this.b7.equals(other.b7))) return false;
+		if (!(this.b8.equals(other.b8))) return false;
+		if (!(this.b9.equals(other.b9))) return false;
+		if (!(this.b10.equals(other.b10))) return false;
+		if (!(this.b11.equals(other.b11))) return false;
+		if (!(this.b12.equals(other.b12))) return false;
+		return true;
+	}
 }

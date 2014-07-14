@@ -18,6 +18,7 @@ import com.veyron2.services.store.Stat;
 import com.veyron2.services.store.Store;
 import com.veyron2.services.store.StoreFactory;
 import com.veyron2.services.store.StoreService;
+import com.veyron2.services.store.TransactionID;
 import com.veyron2.services.store.VeyronConsts;
 import com.veyron2.services.watch.ChangeBatch;
 import com.veyron2.services.watch.GlobRequest;
@@ -86,25 +87,25 @@ public class ObjectServiceWrapper {
 		return null;
 	}
 	// Methods from interface Object.
-	public boolean exists(ServerCall call, long TID) throws VeyronException { 
+	public boolean exists(ServerCall call, TransactionID TID) throws VeyronException { 
 		return this.service.exists(call, TID);
 	}
-	public Entry get(ServerCall call, long TID) throws VeyronException { 
+	public Entry get(ServerCall call, TransactionID TID) throws VeyronException { 
 		return this.service.get(call, TID);
 	}
-	public Stat put(ServerCall call, long TID, Object V) throws VeyronException { 
+	public Stat put(ServerCall call, TransactionID TID, Object V) throws VeyronException { 
 		return this.service.put(call, TID, V);
 	}
-	public void remove(ServerCall call, long TID) throws VeyronException { 
+	public void remove(ServerCall call, TransactionID TID) throws VeyronException { 
 		this.service.remove(call, TID);
 	}
-	public void setAttr(ServerCall call, long TID, ArrayList<Object> Attrs) throws VeyronException { 
+	public void setAttr(ServerCall call, TransactionID TID, ArrayList<Object> Attrs) throws VeyronException { 
 		this.service.setAttr(call, TID, Attrs);
 	}
-	public Stat stat(ServerCall call, long TID) throws VeyronException { 
+	public Stat stat(ServerCall call, TransactionID TID) throws VeyronException { 
 		return this.service.stat(call, TID);
 	}
-	public void query(ServerCall call, long TID, Query Q) throws VeyronException { 
+	public void query(ServerCall call, TransactionID TID, Query Q) throws VeyronException { 
 		final ServerCall serverCall = call;
 		final Stream<QueryResult,Void> stream = new Stream<QueryResult,Void>() {
 			@Override
@@ -124,7 +125,7 @@ public class ObjectServiceWrapper {
 		};
 		this.service.query(call, TID, Q, stream);
 	}
-	public void globT(ServerCall call, long TID, String pattern) throws VeyronException { 
+	public void globT(ServerCall call, TransactionID TID, String pattern) throws VeyronException { 
 		final ServerCall serverCall = call;
 		final Stream<String,Void> stream = new Stream<String,Void>() {
 			@Override

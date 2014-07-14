@@ -38,23 +38,40 @@ import java.util.ArrayList;
  * scope of the suffix.
  *
  * Examples:
+ * # Install Google Maps on the node.
+ * device/apps.Install("/google.com/appstore/maps") --> "google maps/0"
  *
- * device/apps/maps.Start() starts an instance of all maps application
- * installations.
+ * # Start an instance of the previously installed maps application installation.
+ * device/apps/google maps/0.Start() --> { "0" }
  *
- * device/apps/maps/installation.Start() starts an instance of the
- * maps application installation identified by the given suffix.
+ * # Start a second instance of the previously installed maps application installation.
+ * device/apps/google maps/0.Start() --> { "1" }
  *
- * device/apps/maps.Refresh() refreshes the state of all instances of
- * all maps application installations.
+ * # Stop the first instance previously started.
+ * device/apps/google maps/0/0.Stop()
  *
- * device/apps/maps/installation.Refresh() refreshes the state of all
- * instances of the maps application installation identified by the
- * given suffix.
+ * # Install a second Google Maps installation.
+ * device/apps.Install("/google.com/appstore/maps") --> "google maps/1"
  *
- * device/apps/maps/installation/instance.Refresh() refreshes the
- * state of the maps application installation instance identified by
+ * # Start an instance for all maps application installations.
+ * device/apps/google maps.Start() --> {"0/2", "1/0"}
+ *
+ * # Refresh the state of all instances of all maps application installations.
+ * device/apps/google maps.Refresh()
+ *
+ * # Refresh the state of all instances of the maps application installation
+ * identified by the given suffix.
+ * device/apps/google maps/0.Refresh()
+ *
+ * # Refresh the state of the maps application installation instance identified by
  * the given suffix.
+ * device/apps/google maps/0/2.Refresh()
+ *
+ * # Update the second maps installation to the latest version available.
+ * device/apps/google maps/1.Update()
+ *
+ * # Update the first maps installation to a specific version.
+ * device/apps/google maps/0.UpdateTo("/google.com/appstore/beta/maps")
  *
  * Further, the following methods complement one another:
  * -- Install() and Uninstall()
@@ -83,12 +100,20 @@ import java.util.ArrayList;
 **/
 @VeyronService(serviceWrapper=ApplicationServiceWrapper.class)
 public interface ApplicationService { 
-	// Install installs the latest version of the application and
-// returns an object name that identifies the new
-// installation. Optionally, object name suffix can be used to
-// specify the application version to be installed. If no version is
-// specified, the latest version is installed.
-	public String install(ServerContext context) throws VeyronException;
+	// Install installs the application identified by the argument and
+// returns an object name suffix that identifies the new installation.
+//
+// The argument should be an object name. The service it identifies must
+// implement repository.Application, and is expected to return either
+// the requested version (if the object name encodes a specific
+// version), or otherwise the latest available version, as appropriate.
+//
+// The returned suffix, when appended to the name used to reach the
+// receiver for Install, can be used to control the installation object.
+// The suffix will contain the title of the application as a prefix,
+// which can then be used to control all the installations of the given
+// application.
+	public String install(ServerContext context, String name) throws VeyronException;
 	// Refresh refreshes the state of application installation(s)
 // instance(s).
 	public void refresh(ServerContext context) throws VeyronException;
@@ -118,9 +143,14 @@ public interface ApplicationService {
 	public void suspend(ServerContext context) throws VeyronException;
 	// Uninstall uninstalls application installation(s).
 	public void uninstall(ServerContext context) throws VeyronException;
-	// Update updates application installation(s) version. Optionally,
-// object name suffix can be used to specify the application version
-// to which the installation(s) should be updated. If no version is
-// specified, the installation(s) are updated to the latest version.
+	// Update updates the application installation(s) from the object name
+// provided during Install.  If the new application envelope contains a
+// different application title, the update does not occur, and an error
+// is returned.
 	public void update(ServerContext context) throws VeyronException;
+	// UpdateTo updates the application installation(s) to the application
+// specified by the object name argument.  If the new application
+// envelope contains a different application title, the update does not
+// occur, and an error is returned.
+	public void updateTo(ServerContext context, String name) throws VeyronException;
 }

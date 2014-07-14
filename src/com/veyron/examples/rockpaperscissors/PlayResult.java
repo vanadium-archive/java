@@ -7,6 +7,21 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * PlayResult is the value returned by the Play method. It indicates the outcome of the game.
 **/
-public class PlayResult { 
-	public boolean youWon; // True if the player receiving the result won the game.
+public final class PlayResult { 
+		private boolean youWon; // True if the player receiving the result won the game.
+
+	public PlayResult(boolean youWon) { 
+		this.youWon = youWon;
+	}
+	public boolean getYouWon() { return this.youWon; }
+
+	public void setYouWon(boolean youWon) { this.youWon = youWon; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof PlayResult)) return false;
+		final PlayResult other = (PlayResult)obj;
+		if (this.youWon != other.youWon) return false;
+		return true;
+	}
 }

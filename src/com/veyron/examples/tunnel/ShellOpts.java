@@ -5,9 +5,36 @@ package com.veyron.examples.tunnel;
 
 import java.util.ArrayList;
 
-public class ShellOpts { 
-	public boolean usePty; // Whether to open a pseudo-terminal
-	public ArrayList<String> environment; // Environment variables to pass to the remote shell.
-	public int rows; // Window size.
-	public int cols;
+public final class ShellOpts { 
+		private boolean usePty; // Whether to open a pseudo-terminal
+		private ArrayList<String> environment; // Environment variables to pass to the remote shell.
+		private int rows; // Window size.
+		private int cols;
+
+	public ShellOpts(boolean usePty, ArrayList<String> environment, int rows, int cols) { 
+		this.usePty = usePty;
+		this.environment = environment;
+		this.rows = rows;
+		this.cols = cols;
+	}
+	public boolean getUsePty() { return this.usePty; }
+	public ArrayList<String> getEnvironment() { return this.environment; }
+	public int getRows() { return this.rows; }
+	public int getCols() { return this.cols; }
+
+	public void setUsePty(boolean usePty) { this.usePty = usePty; }
+	public void setEnvironment(ArrayList<String> environment) { this.environment = environment; }
+	public void setRows(int rows) { this.rows = rows; }
+	public void setCols(int cols) { this.cols = cols; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ShellOpts)) return false;
+		final ShellOpts other = (ShellOpts)obj;
+		if (this.usePty != other.usePty) return false;
+		if (!(this.environment.equals(other.environment))) return false;
+		if (this.rows != other.rows) return false;
+		if (this.cols != other.cols) return false;
+		return true;
+	}
 }

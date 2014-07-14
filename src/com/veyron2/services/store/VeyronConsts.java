@@ -8,5 +8,5 @@ public class VeyronConsts {
 	// The Store has Object name "<mount>/.store", where <mount> is the
 // Object name of the mount point.
 // An Object with path <path> has Object name "<mount>/<path>".
-public static final String STORE_SUFFIX = ".store";
+	public static final String STORE_SUFFIX = ".store";
 }

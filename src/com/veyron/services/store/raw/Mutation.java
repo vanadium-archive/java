@@ -4,31 +4,72 @@
 package com.veyron.services.store.raw;
 
 import com.veyron2.storage.DEntry;
-import com.veyron2.storage.Tag;
+import com.veyron2.storage.ID;
+import com.veyron2.storage.TagList;
+import com.veyron2.storage.Version;
 import java.util.ArrayList;
 
 /**
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
 **/
-public class Mutation { 
+public final class Mutation { 
 	// ID is the key that identifies the entry.
-public byte[] iD;
+	private ID iD;
 	// The version of the entry immediately before the update. For new entries,
 // the PriorVersion is NoVersion.
-public long priorVersion;
+	private Version priorVersion;
 	// The version of the entry immediately after the update. For deleted entries,
 // the Version is NoVersion.
-public long version;
+	private Version version;
 	// IsRoot is true if
 // 1) The entry was the store root immediately before being deleted, or
 // 2) The entry is the store root immediately after the update.
-public boolean isRoot;
+	private boolean isRoot;
 	// Value is value stored at this entry.
-public Object value;
+	private Object value;
 	// Tags specify permissions on this entry.
-public ArrayList<Tag> tags;
+	private TagList tags;
 	// Dir is the implicit directory of this entry, and may contain references
 // to other entries in the store.
-public ArrayList<DEntry> dir;
+	private ArrayList<DEntry> dir;
+
+	public Mutation(ID iD, Version priorVersion, Version version, boolean isRoot, Object value, TagList tags, ArrayList<DEntry> dir) { 
+		this.iD = iD;
+		this.priorVersion = priorVersion;
+		this.version = version;
+		this.isRoot = isRoot;
+		this.value = value;
+		this.tags = tags;
+		this.dir = dir;
+	}
+	public ID getID() { return this.iD; }
+	public Version getPriorVersion() { return this.priorVersion; }
+	public Version getVersion() { return this.version; }
+	public boolean getIsRoot() { return this.isRoot; }
+	public Object getValue() { return this.value; }
+	public TagList getTags() { return this.tags; }
+	public ArrayList<DEntry> getDir() { return this.dir; }
+
+	public void setID(ID iD) { this.iD = iD; }
+	public void setPriorVersion(Version priorVersion) { this.priorVersion = priorVersion; }
+	public void setVersion(Version version) { this.version = version; }
+	public void setIsRoot(boolean isRoot) { this.isRoot = isRoot; }
+	public void setValue(Object value) { this.value = value; }
+	public void setTags(TagList tags) { this.tags = tags; }
+	public void setDir(ArrayList<DEntry> dir) { this.dir = dir; }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Mutation)) return false;
+		final Mutation other = (Mutation)obj;
+		if (!(this.iD.equals(other.iD))) return false;
+		if (!(this.priorVersion.equals(other.priorVersion))) return false;
+		if (!(this.version.equals(other.version))) return false;
+		if (this.isRoot != other.isRoot) return false;
+		if (!(this.value.equals(other.value))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		if (!(this.dir.equals(other.dir))) return false;
+		return true;
+	}
 }

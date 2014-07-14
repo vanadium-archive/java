@@ -92,19 +92,46 @@ import java.util.HashMap;
 // that the group is finished.  Here is an example result stream containing
 // only the NestedResult values.  The parentheses show the grouping.
 //  (0 (1 (2, 2), 1 (3), 1 (4, 4, 4)), (0 (1, 1 (5, 5)))
-public class QueryResult { 
+public final class QueryResult { 
 	// NestedResult, if non-zero, specifies which previous result contains
 // this result.
-public long nestedResult;
+	private NestedResult nestedResult;
 	// Name is the Object name of this value.  It is relative to the query
 // root or, if NestedResult is non-zero, to the parent result.
-public String name;
+	private String name;
 	// Fields will be non-nil if this query result is of a dynamic type
 // specified by the selection operator. The keys will be the names
 // used in the selection.  If a field represents a subquery, the
 // value will be a NestedResult and subsequent QueryResults will
 // have the same valued NestedResult.  See the example above.
-public HashMap<String, java.lang.Object> fields;
+	private HashMap<String, java.lang.Object> fields;
 	// Value will be non-nil if this query result is of a known type.
-public java.lang.Object value;
+	private java.lang.Object value;
+
+	public QueryResult(NestedResult nestedResult, String name, HashMap<String, java.lang.Object> fields, java.lang.Object value) { 
+		this.nestedResult = nestedResult;
+		this.name = name;
+		this.fields = fields;
+		this.value = value;
+	}
+	public NestedResult getNestedResult() { return this.nestedResult; }
+	public String getName() { return this.name; }
+	public HashMap<String, java.lang.Object> getFields() { return this.fields; }
+	public java.lang.Object getValue() { return this.value; }
+
+	public void setNestedResult(NestedResult nestedResult) { this.nestedResult = nestedResult; }
+	public void setName(String name) { this.name = name; }
+	public void setFields(HashMap<String, java.lang.Object> fields) { this.fields = fields; }
+	public void setValue(java.lang.Object value) { this.value = value; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof QueryResult)) return false;
+		final QueryResult other = (QueryResult)obj;
+		if (!(this.nestedResult.equals(other.nestedResult))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.fields.equals(other.fields))) return false;
+		if (!(this.value.equals(other.value))) return false;
+		return true;
+	}
 }

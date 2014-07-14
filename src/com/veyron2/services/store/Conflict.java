@@ -3,19 +3,51 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
+import com.veyron2.storage.ID;
 
 /**
  * Conflict represents a conflicting update in the store.
 **/
-public class Conflict { 
+public final class Conflict { 
 	// Ty is the IDL name of the type.
-public String ty;
+	private String ty;
 	// ID is the identifier for the entry.
-public byte[] iD;
+	private ID iD;
 	// Local is the local value for the entry.
-public Entry local;
+	private Entry local;
 	// Remove is the conflicting update.
-public Entry remote;
+	private Entry remote;
 	// Root is a common ancestor.
-public Entry root;
+	private Entry root;
+
+	public Conflict(String ty, ID iD, Entry local, Entry remote, Entry root) { 
+		this.ty = ty;
+		this.iD = iD;
+		this.local = local;
+		this.remote = remote;
+		this.root = root;
+	}
+	public String getTy() { return this.ty; }
+	public ID getID() { return this.iD; }
+	public Entry getLocal() { return this.local; }
+	public Entry getRemote() { return this.remote; }
+	public Entry getRoot() { return this.root; }
+
+	public void setTy(String ty) { this.ty = ty; }
+	public void setID(ID iD) { this.iD = iD; }
+	public void setLocal(Entry local) { this.local = local; }
+	public void setRemote(Entry remote) { this.remote = remote; }
+	public void setRoot(Entry root) { this.root = root; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Conflict)) return false;
+		final Conflict other = (Conflict)obj;
+		if (!(this.ty.equals(other.ty))) return false;
+		if (!(this.iD.equals(other.iD))) return false;
+		if (!(this.local.equals(other.local))) return false;
+		if (!(this.remote.equals(other.remote))) return false;
+		if (!(this.root.equals(other.root))) return false;
+		return true;
+	}
 }

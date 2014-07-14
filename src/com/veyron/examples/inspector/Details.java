@@ -4,14 +4,49 @@
 package com.veyron.examples.inspector;
 
 
-public class Details { 
-	public String name;
-	public long size;
-	public int mode;
+public final class Details { 
+		private String name;
+		private long size;
+		private int mode;
 	// TODO: add native time format to the idl+vom
 // Seconds since the start of the Unix epoch
-public long modUnixSecs;
+	private long modUnixSecs;
 	// Nanoseconds in the current second
-public int modNano;
-	public boolean isDir;
+	private int modNano;
+		private boolean isDir;
+
+	public Details(String name, long size, int mode, long modUnixSecs, int modNano, boolean isDir) { 
+		this.name = name;
+		this.size = size;
+		this.mode = mode;
+		this.modUnixSecs = modUnixSecs;
+		this.modNano = modNano;
+		this.isDir = isDir;
+	}
+	public String getName() { return this.name; }
+	public long getSize() { return this.size; }
+	public int getMode() { return this.mode; }
+	public long getModUnixSecs() { return this.modUnixSecs; }
+	public int getModNano() { return this.modNano; }
+	public boolean getIsDir() { return this.isDir; }
+
+	public void setName(String name) { this.name = name; }
+	public void setSize(long size) { this.size = size; }
+	public void setMode(int mode) { this.mode = mode; }
+	public void setModUnixSecs(long modUnixSecs) { this.modUnixSecs = modUnixSecs; }
+	public void setModNano(int modNano) { this.modNano = modNano; }
+	public void setIsDir(boolean isDir) { this.isDir = isDir; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Details)) return false;
+		final Details other = (Details)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (this.size != other.size) return false;
+		if (this.mode != other.mode) return false;
+		if (this.modUnixSecs != other.modUnixSecs) return false;
+		if (this.modNano != other.modNano) return false;
+		if (this.isDir != other.isDir) return false;
+		return true;
+	}
 }

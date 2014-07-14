@@ -3,27 +3,57 @@
 // Source: service.vdl
 package com.veyron2.services.watch;
 
-import java.util.ArrayList;
 
 /**
  * Change is the new value for a watched entity.
 **/
-public class Change { 
+public final class Change { 
 	// Name is the Object name of the entity that changed.  This name is relative
 // to the root entity (i.e. the name of the Watcher service).
-public String name;
+	private String name;
 	// State must be one of Exists, DoesNotExist, or InitialStateSkipped.
-public int state;
+	private int state;
 	// Value contains the service-specific data for the entity.
-public Object value;
+	private Object value;
 	// If present, provides a compact representation of all the messages
 // that have been received by the caller for the given Watch call.
 // For example, it could be a sequence number or a multi-part
 // timestamp/version vector. This marker can be provided in the
 // Request message to allow the caller to resume the stream watching
 // at a specific point without fetching the initial state.
-public ArrayList<Byte> resumeMarker;
+	private ResumeMarker resumeMarker;
 	// If true, this Change is followed by more Changes that are in the
 // same group as this Change.
-public boolean continued;
+	private boolean continued;
+
+	public Change(String name, int state, Object value, ResumeMarker resumeMarker, boolean continued) { 
+		this.name = name;
+		this.state = state;
+		this.value = value;
+		this.resumeMarker = resumeMarker;
+		this.continued = continued;
+	}
+	public String getName() { return this.name; }
+	public int getState() { return this.state; }
+	public Object getValue() { return this.value; }
+	public ResumeMarker getResumeMarker() { return this.resumeMarker; }
+	public boolean getContinued() { return this.continued; }
+
+	public void setName(String name) { this.name = name; }
+	public void setState(int state) { this.state = state; }
+	public void setValue(Object value) { this.value = value; }
+	public void setResumeMarker(ResumeMarker resumeMarker) { this.resumeMarker = resumeMarker; }
+	public void setContinued(boolean continued) { this.continued = continued; }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Change)) return false;
+		final Change other = (Change)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (this.state != other.state) return false;
+		if (!(this.value.equals(other.value))) return false;
+		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
+		if (this.continued != other.continued) return false;
+		return true;
+	}
 }

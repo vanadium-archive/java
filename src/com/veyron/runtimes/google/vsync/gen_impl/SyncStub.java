@@ -21,11 +21,11 @@ public final class SyncStub implements Sync {
 	}
 	// Methods from interface Sync.
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,LogRec,java.util.HashMap<java.lang.String, java.lang.Long>> getDeltas(com.veyron2.ipc.Context context, java.util.HashMap<java.lang.String, java.lang.Long> In, java.lang.String ClientID) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,LogRec,com.veyron.runtimes.google.vsync.GenVector> getDeltas(com.veyron2.ipc.Context context, com.veyron.runtimes.google.vsync.GenVector In, com.veyron.runtimes.google.vsync.DeviceID ClientID) throws com.veyron2.ipc.VeyronException {
 		return getDeltas(context, In, ClientID, null);
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,LogRec,java.util.HashMap<java.lang.String, java.lang.Long>> getDeltas(com.veyron2.ipc.Context context, java.util.HashMap<java.lang.String, java.lang.Long> In, java.lang.String ClientID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.lang.Void,LogRec,com.veyron.runtimes.google.vsync.GenVector> getDeltas(com.veyron2.ipc.Context context, com.veyron.runtimes.google.vsync.GenVector In, com.veyron.runtimes.google.vsync.DeviceID ClientID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
 		final java.lang.Object[] inArgs = new java.lang.Object[]{ In, ClientID };
 
@@ -40,7 +40,7 @@ public final class SyncStub implements Sync {
 		// Start the call.
 		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "GetDeltas", inArgs, veyronOpts);
 
-		return new com.veyron2.vdl.ClientStream<java.lang.Void, LogRec, java.util.HashMap<java.lang.String, java.lang.Long>>() {
+		return new com.veyron2.vdl.ClientStream<java.lang.Void, LogRec, com.veyron.runtimes.google.vsync.GenVector>() {
 			@Override
 			public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
 				call.send(item);
@@ -56,10 +56,10 @@ public final class SyncStub implements Sync {
 				}
 			}
 			@Override
-			public java.util.HashMap<java.lang.String, java.lang.Long> finish() throws com.veyron2.ipc.VeyronException {
+			public com.veyron.runtimes.google.vsync.GenVector finish() throws com.veyron2.ipc.VeyronException {
 				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.util.HashMap<java.lang.String, java.lang.Long>>() {} };
-					return (java.util.HashMap<java.lang.String, java.lang.Long>)call.finish(resultTypes)[0];
+					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<com.veyron.runtimes.google.vsync.GenVector>() {} };
+					return (com.veyron.runtimes.google.vsync.GenVector)call.finish(resultTypes)[0];
 
 			}
 		};

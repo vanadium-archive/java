@@ -7,7 +7,26 @@ package com.veyron2.storage;
 /**
  * DEntry is a directory entry.
 **/
-public class DEntry { 
-	public String name;
-	public byte[] iD;
+public final class DEntry { 
+		private String name;
+		private ID iD;
+
+	public DEntry(String name, ID iD) { 
+		this.name = name;
+		this.iD = iD;
+	}
+	public String getName() { return this.name; }
+	public ID getID() { return this.iD; }
+
+	public void setName(String name) { this.name = name; }
+	public void setID(ID iD) { this.iD = iD; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof DEntry)) return false;
+		final DEntry other = (DEntry)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.iD.equals(other.iD))) return false;
+		return true;
+	}
 }

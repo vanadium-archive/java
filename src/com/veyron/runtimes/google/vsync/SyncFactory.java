@@ -11,7 +11,6 @@ import com.veyron2.ipc.Client;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.ClientStream;
-import java.util.HashMap;
 
 /* Factory for binding to Sync interfaces. */
 public class SyncFactory {

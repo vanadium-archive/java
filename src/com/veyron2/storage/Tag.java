@@ -7,8 +7,27 @@ package com.veyron2.storage;
 /**
  * Tag has an TagOp and an ACL.
 **/
-public class Tag { 
-	public byte op;
+public final class Tag { 
+		private TagOp op;
 	// ACL is a reference (ID) to the stored ACL struct.
-public byte[] aCL;
+	private ID aCL;
+
+	public Tag(TagOp op, ID aCL) { 
+		this.op = op;
+		this.aCL = aCL;
+	}
+	public TagOp getOp() { return this.op; }
+	public ID getACL() { return this.aCL; }
+
+	public void setOp(TagOp op) { this.op = op; }
+	public void setACL(ID aCL) { this.aCL = aCL; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Tag)) return false;
+		final Tag other = (Tag)obj;
+		if (!(this.op.equals(other.op))) return false;
+		if (!(this.aCL.equals(other.aCL))) return false;
+		return true;
+	}
 }

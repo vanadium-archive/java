@@ -24,7 +24,7 @@ public class BankServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "Connect") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;
 	}

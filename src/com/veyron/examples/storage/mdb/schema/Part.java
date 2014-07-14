@@ -3,11 +3,31 @@
 // Source: schema.vdl
 package com.veyron.examples.storage.mdb.schema;
 
+import com.veyron2.storage.ID;
 
 /**
  * Part represents the role of an actor.
 **/
-public class Part { 
-	public byte[] actor; // Person
-	public String character;
+public final class Part { 
+		private ID actor; // Person
+		private String character;
+
+	public Part(ID actor, String character) { 
+		this.actor = actor;
+		this.character = character;
+	}
+	public ID getActor() { return this.actor; }
+	public String getCharacter() { return this.character; }
+
+	public void setActor(ID actor) { this.actor = actor; }
+	public void setCharacter(String character) { this.character = character; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Part)) return false;
+		final Part other = (Part)obj;
+		if (!(this.actor.equals(other.actor))) return false;
+		if (!(this.character.equals(other.character))) return false;
+		return true;
+	}
 }

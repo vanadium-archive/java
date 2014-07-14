@@ -3,18 +3,62 @@
 // Source: schema.vdl
 package com.veyron.examples.storage.mdb.schema;
 
+import com.veyron2.storage.ID;
 
 /**
  * Movie represents a movie.
 **/
-public class Movie { 
-	public String image; // URL
-	public String title;
-	public String summary;
-	public String language;
+public final class Movie { 
+		private String image; // URL
+		private String title;
+		private String summary;
+		private String language;
 	// TODO(jyh): Replace these times with IDL types when they are implemented.
-public long releaseDate; // ns since the Unix epoch.
-	public long runtime; // ns
-	public String genre;
-	public byte[] director;
+	private long releaseDate; // ns since the Unix epoch.
+		private long runtime; // ns
+		private String genre;
+		private ID director;
+
+	public Movie(String image, String title, String summary, String language, long releaseDate, long runtime, String genre, ID director) { 
+		this.image = image;
+		this.title = title;
+		this.summary = summary;
+		this.language = language;
+		this.releaseDate = releaseDate;
+		this.runtime = runtime;
+		this.genre = genre;
+		this.director = director;
+	}
+	public String getImage() { return this.image; }
+	public String getTitle() { return this.title; }
+	public String getSummary() { return this.summary; }
+	public String getLanguage() { return this.language; }
+	public long getReleaseDate() { return this.releaseDate; }
+	public long getRuntime() { return this.runtime; }
+	public String getGenre() { return this.genre; }
+	public ID getDirector() { return this.director; }
+
+	public void setImage(String image) { this.image = image; }
+	public void setTitle(String title) { this.title = title; }
+	public void setSummary(String summary) { this.summary = summary; }
+	public void setLanguage(String language) { this.language = language; }
+	public void setReleaseDate(long releaseDate) { this.releaseDate = releaseDate; }
+	public void setRuntime(long runtime) { this.runtime = runtime; }
+	public void setGenre(String genre) { this.genre = genre; }
+	public void setDirector(ID director) { this.director = director; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Movie)) return false;
+		final Movie other = (Movie)obj;
+		if (!(this.image.equals(other.image))) return false;
+		if (!(this.title.equals(other.title))) return false;
+		if (!(this.summary.equals(other.summary))) return false;
+		if (!(this.language.equals(other.language))) return false;
+		if (this.releaseDate != other.releaseDate) return false;
+		if (this.runtime != other.runtime) return false;
+		if (!(this.genre.equals(other.genre))) return false;
+		if (!(this.director.equals(other.director))) return false;
+		return true;
+	}
 }

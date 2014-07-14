@@ -13,7 +13,26 @@ import java.util.HashMap;
  * the target instruction set architecture (e.g. for ELF this could be
  * one of SPARC, x86, PowerPC, ARM, IA-64, x86-64, and AArch64).
 **/
-public class Format { 
-	public String name;
-	public HashMap<String, String> attributes;
+public final class Format { 
+		private String name;
+		private HashMap<String, String> attributes;
+
+	public Format(String name, HashMap<String, String> attributes) { 
+		this.name = name;
+		this.attributes = attributes;
+	}
+	public String getName() { return this.name; }
+	public HashMap<String, String> getAttributes() { return this.attributes; }
+
+	public void setName(String name) { this.name = name; }
+	public void setAttributes(HashMap<String, String> attributes) { this.attributes = attributes; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Format)) return false;
+		final Format other = (Format)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.attributes.equals(other.attributes))) return false;
+		return true;
+	}
 }

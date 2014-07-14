@@ -5,6 +5,6 @@ package com.veyron2.services.mgmt.binary;
 
 public class VeyronConsts { 
 	/* The following constants originate in file: binary.vdl. */
-	public static final String MISSING_CHECKSUM = "";
-	public static final long MISSING_SIZE = -1L;
+		public static final String MISSING_CHECKSUM = "";
+		public static final long MISSING_SIZE = -1L;
 }

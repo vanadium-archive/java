@@ -27,10 +27,10 @@ public class TunnelServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "Forward") {
-			return new Object[]{ 4 };
+			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
 		if (method == "Shell") {
-			return new Object[]{ 4 };
+			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
 		return null;
 	}

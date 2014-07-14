@@ -8,8 +8,31 @@ import java.util.ArrayList;
 /**
  * StructType represents a struct; a sequence of fields.
 **/
-public class StructType { 
-	public ArrayList<FieldType> fields;
-	public String name;
-	public ArrayList<String> tags;
+public final class StructType { 
+		private ArrayList<FieldType> fields;
+		private String name;
+		private ArrayList<String> tags;
+
+	public StructType(ArrayList<FieldType> fields, String name, ArrayList<String> tags) { 
+		this.fields = fields;
+		this.name = name;
+		this.tags = tags;
+	}
+	public ArrayList<FieldType> getFields() { return this.fields; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setFields(ArrayList<FieldType> fields) { this.fields = fields; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof StructType)) return false;
+		final StructType other = (StructType)obj;
+		if (!(this.fields.equals(other.fields))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

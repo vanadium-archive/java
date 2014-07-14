@@ -3,13 +3,28 @@
 // Source: service.vdl
 package com.veyron.services.store.raw;
 
-import java.util.ArrayList;
+import com.veyron2.services.watch.ResumeMarker;
 
 /**
  * Request specifies how to resume from a previous Watch call.
 **/
-public class Request { 
+public final class Request { 
 	// ResumeMarker specifies how to resume from a previous Watch call.
 // See the ResumeMarker type for detailed comments.
-public ArrayList<Byte> resumeMarker;
+	private ResumeMarker resumeMarker;
+
+	public Request(ResumeMarker resumeMarker) { 
+		this.resumeMarker = resumeMarker;
+	}
+	public ResumeMarker getResumeMarker() { return this.resumeMarker; }
+
+	public void setResumeMarker(ResumeMarker resumeMarker) { this.resumeMarker = resumeMarker; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Request)) return false;
+		final Request other = (Request)obj;
+		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
+		return true;
+	}
 }

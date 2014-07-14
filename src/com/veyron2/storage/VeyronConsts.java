@@ -6,12 +6,12 @@ package com.veyron2.storage;
 public class VeyronConsts { 
 	/* The following constants originate in file: types.vdl. */
 	// RemoveACL means to remove the ACL from any inherited ACLs.
-public static final byte REMOVEACL = 0;
+	public static final TagOp REMOVEACL = new TagOp((byte)0);
 	// AddACL means to add the ACL for a single value; it is not inherited.
-public static final byte ADDACL = 1;
+	public static final TagOp ADDACL = new TagOp((byte)1);
 	// AddInheritedACL means to add the ACL for the value and all of its
 // descendents.
-public static final byte ADD_INHERITEDACL = 2;
+	public static final TagOp ADD_INHERITEDACL = new TagOp((byte)2);
 	// NoVersion means the entry is not present in the store.
-public static final long NO_VERSION = 0L;
+	public static final Version NO_VERSION = new Version(0L);
 }

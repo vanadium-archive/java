@@ -9,13 +9,40 @@ import java.util.HashSet;
  * Specification is how we represent a profile internally. It should
  * provide enough information to allow matching of binaries to nodes.
 **/
-public class Specification { 
+public final class Specification { 
 	// Format is the file format of the application binary.
-public Format format;
+	private Format format;
 	// Libraries is a set of libraries the application binary depends on.
-public HashSet<Library> libraries;
+	private HashSet<Library> libraries;
 	// A human-friendly concise label for the profile, e.g. "linux-media"
-public String label;
+	private String label;
 	// A human-friendly description of the profile.
-public String description;
+	private String description;
+
+	public Specification(Format format, HashSet<Library> libraries, String label, String description) { 
+		this.format = format;
+		this.libraries = libraries;
+		this.label = label;
+		this.description = description;
+	}
+	public Format getFormat() { return this.format; }
+	public HashSet<Library> getLibraries() { return this.libraries; }
+	public String getLabel() { return this.label; }
+	public String getDescription() { return this.description; }
+
+	public void setFormat(Format format) { this.format = format; }
+	public void setLibraries(HashSet<Library> libraries) { this.libraries = libraries; }
+	public void setLabel(String label) { this.label = label; }
+	public void setDescription(String description) { this.description = description; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Specification)) return false;
+		final Specification other = (Specification)obj;
+		if (!(this.format.equals(other.format))) return false;
+		if (!(this.libraries.equals(other.libraries))) return false;
+		if (!(this.label.equals(other.label))) return false;
+		if (!(this.description.equals(other.description))) return false;
+		return true;
+	}
 }

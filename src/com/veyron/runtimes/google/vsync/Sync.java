@@ -6,7 +6,6 @@ import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.ClientStream;
-import java.util.HashMap;
 
 /**
  * Sync allows a device to GetDeltas from another device.
@@ -14,6 +13,6 @@ import java.util.HashMap;
 public interface Sync { 
 	// GetDeltas returns a device's current generation vector and all the missing log records
 // when compared to the incoming generation vector.
-	public ClientStream<Void,LogRec,HashMap<String, Long>> getDeltas(Context context, HashMap<String, Long> in, String clientID) throws VeyronException;
-	public ClientStream<Void,LogRec,HashMap<String, Long>> getDeltas(Context context, HashMap<String, Long> in, String clientID, Options veyronOpts) throws VeyronException;
+	public ClientStream<Void,LogRec,GenVector> getDeltas(Context context, GenVector in, DeviceID clientID) throws VeyronException;
+	public ClientStream<Void,LogRec,GenVector> getDeltas(Context context, GenVector in, DeviceID clientID, Options veyronOpts) throws VeyronException;
 }

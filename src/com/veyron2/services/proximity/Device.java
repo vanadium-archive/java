@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * MAC address, observed names, and the average distance to the device.
  * TODO(bprosnitz) This is bluetooth specific. We need a more generate service as well.
 **/
-public class Device { 
+public final class Device { 
 	// MAC is remote device's MAC address, in one of the following formats
 // (as per http://golang.org/pkg/net/#ParseMAC):
 //   01:23:45:67:89:ab
@@ -19,11 +19,34 @@ public class Device {
 //   01-23-45-67-89-ab-cd-ef
 //   0123.4567.89ab
 //   0123.4567.89ab.cdef
-public String mAC;
+	private String mAC;
 	// Names represents all unique observed names of the remote device.
-public ArrayList<String> names;
+	private ArrayList<String> names;
 	// Distance represents the (estimated) distance to the neighborhood
 // device.  It can be parsed using distance.Parse method.
 // TODO(bprosnitz) Change from string.
-public String distance;
+	private String distance;
+
+	public Device(String mAC, ArrayList<String> names, String distance) { 
+		this.mAC = mAC;
+		this.names = names;
+		this.distance = distance;
+	}
+	public String getMAC() { return this.mAC; }
+	public ArrayList<String> getNames() { return this.names; }
+	public String getDistance() { return this.distance; }
+
+	public void setMAC(String mAC) { this.mAC = mAC; }
+	public void setNames(ArrayList<String> names) { this.names = names; }
+	public void setDistance(String distance) { this.distance = distance; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Device)) return false;
+		final Device other = (Device)obj;
+		if (!(this.mAC.equals(other.mAC))) return false;
+		if (!(this.names.equals(other.names))) return false;
+		if (!(this.distance.equals(other.distance))) return false;
+		return true;
+	}
 }

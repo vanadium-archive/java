@@ -8,11 +8,30 @@ import com.veyron2.ipc.VeyronException;
 /**
  * Response is sent by the proxy to the server after processing Request.
 **/
-public class Response { 
+public final class Response { 
 	// Error is a description of why the proxy refused to proxy the server.
 // A nil error indicates that the proxy will route traffic to the server.
-public VeyronException error;
+	private VeyronException error;
 	// Endpoint is the string representation of an endpoint that can be
 // used to communicate with the server through the proxy.
-public String endpoint;
+	private String endpoint;
+
+	public Response(VeyronException error, String endpoint) { 
+		this.error = error;
+		this.endpoint = endpoint;
+	}
+	public VeyronException getError() { return this.error; }
+	public String getEndpoint() { return this.endpoint; }
+
+	public void setError(VeyronException error) { this.error = error; }
+	public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Response)) return false;
+		final Response other = (Response)obj;
+		if (!(this.error.equals(other.error))) return false;
+		if (!(this.endpoint.equals(other.endpoint))) return false;
+		return true;
+	}
 }

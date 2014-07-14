@@ -3,12 +3,30 @@
 // Source: types.vdl
 package com.veyron2.storage;
 
-import java.util.HashMap;
 
 /**
  * ACL has a security.ACL and a name.
 **/
-public class ACL { 
-	public String name;
-	public HashMap<String, Integer> contents;
+public final class ACL { 
+		private String name;
+		private com.veyron2.security.ACL contents;
+
+	public ACL(String name, com.veyron2.security.ACL contents) { 
+		this.name = name;
+		this.contents = contents;
+	}
+	public String getName() { return this.name; }
+	public com.veyron2.security.ACL getContents() { return this.contents; }
+
+	public void setName(String name) { this.name = name; }
+	public void setContents(com.veyron2.security.ACL contents) { this.contents = contents; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ACL)) return false;
+		final ACL other = (ACL)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.contents.equals(other.contents))) return false;
+		return true;
+	}
 }

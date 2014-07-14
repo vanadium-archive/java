@@ -6,7 +6,7 @@ package com.veyron2.security.wire;
 public class VeyronConsts { 
 	/* The following constants originate in file: wire.vdl. */
 	// KeyCurveP256 describes the NIST P256 curve.
-public static final byte KEY_CURVE_P256 = 0;
+	public static final KeyCurve KEY_CURVE_P256 = new KeyCurve((byte)0);
 	// ChainSeparator is used to join blessing names to form a blessing chain name.
-public static final String CHAIN_SEPARATOR = "/";
+	public static final String CHAIN_SEPARATOR = "/";
 }

@@ -8,8 +8,27 @@ import java.util.ArrayList;
 /**
  * Signature represents an ECDSA signature.
 **/
-public class Signature { 
+public final class Signature { 
 	// R, S specify the pair of integers that make up an ECDSA signature.
-public ArrayList<Byte> r;
-	public ArrayList<Byte> s;
+	private ArrayList<Byte> r;
+		private ArrayList<Byte> s;
+
+	public Signature(ArrayList<Byte> r, ArrayList<Byte> s) { 
+		this.r = r;
+		this.s = s;
+	}
+	public ArrayList<Byte> getR() { return this.r; }
+	public ArrayList<Byte> getS() { return this.s; }
+
+	public void setR(ArrayList<Byte> r) { this.r = r; }
+	public void setS(ArrayList<Byte> s) { this.s = s; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Signature)) return false;
+		final Signature other = (Signature)obj;
+		if (!(this.r.equals(other.r))) return false;
+		if (!(this.s.equals(other.s))) return false;
+		return true;
+	}
 }

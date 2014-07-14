@@ -8,8 +8,23 @@ package com.veyron2.services.security.access;
  * Group represents a group of principals in the TBD Group API.  This is
  * just a placeholder for now.
 **/
-public class Group { 
+public final class Group { 
 	// Name is the Object name of the group.  This name must
 // implement the TBD Group API.
-public String name;
+	private String name;
+
+	public Group(String name) { 
+		this.name = name;
+	}
+	public String getName() { return this.name; }
+
+	public void setName(String name) { this.name = name; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Group)) return false;
+		final Group other = (Group)obj;
+		if (!(this.name.equals(other.name))) return false;
+		return true;
+	}
 }

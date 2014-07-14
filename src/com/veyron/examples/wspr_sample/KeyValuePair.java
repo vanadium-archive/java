@@ -7,7 +7,26 @@ package com.veyron.examples.wspr_sample;
 /**
  * KeyValuePair is a representation of a cached key and value pair.
 **/
-public class KeyValuePair { 
-	public String key;
-	public Object value;
+public final class KeyValuePair { 
+		private String key;
+		private Object value;
+
+	public KeyValuePair(String key, Object value) { 
+		this.key = key;
+		this.value = value;
+	}
+	public String getKey() { return this.key; }
+	public Object getValue() { return this.value; }
+
+	public void setKey(String key) { this.key = key; }
+	public void setValue(Object value) { this.value = value; }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof KeyValuePair)) return false;
+		final KeyValuePair other = (KeyValuePair)obj;
+		if (!(this.key.equals(other.key))) return false;
+		if (!(this.value.equals(other.value))) return false;
+		return true;
+	}
 }

@@ -26,13 +26,13 @@ public final class StoreStub implements Store {
 	}
 	// Methods from interface Store.
 	@Override
-	public void createTransaction(com.veyron2.ipc.Context context, long TID, java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+	public void createTransaction(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
 		createTransaction(context, TID, Options, null);
 	}
 	@Override
-	public void createTransaction(com.veyron2.ipc.Context context, long TID, java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public void createTransaction(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID), Options };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID, Options };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -51,13 +51,13 @@ public final class StoreStub implements Store {
 
 	}
 	@Override
-	public void commit(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public void commit(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		commit(context, TID, null);
 	}
 	@Override
-	public void commit(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public void commit(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -76,13 +76,13 @@ public final class StoreStub implements Store {
 
 	}
 	@Override
-	public void abort(com.veyron2.ipc.Context context, long TID) throws com.veyron2.ipc.VeyronException {
+	public void abort(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
 		abort(context, TID, null);
 	}
 	@Override
-	public void abort(com.veyron2.ipc.Context context, long TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public void abort(com.veyron2.ipc.Context context, com.veyron2.services.store.TransactionID TID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(TID) };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ TID };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch

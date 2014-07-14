@@ -8,8 +8,31 @@ import java.util.ArrayList;
 /**
  * SliceType represents a variable-length sequence of Elem values.
 **/
-public class SliceType { 
-	public long elem;
-	public String name;
-	public ArrayList<String> tags;
+public final class SliceType { 
+		private TypeID elem;
+		private String name;
+		private ArrayList<String> tags;
+
+	public SliceType(TypeID elem, String name, ArrayList<String> tags) { 
+		this.elem = elem;
+		this.name = name;
+		this.tags = tags;
+	}
+	public TypeID getElem() { return this.elem; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setElem(TypeID elem) { this.elem = elem; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof SliceType)) return false;
+		final SliceType other = (SliceType)obj;
+		if (!(this.elem.equals(other.elem))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

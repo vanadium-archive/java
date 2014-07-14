@@ -14,7 +14,22 @@ import java.util.ArrayList;
  * considered the PublicID's public key. The chain of certificates, if valid, effectively binds a chain
  * of names to the PublicID's public key.
 **/
-public class ChainPublicID { 
+public final class ChainPublicID { 
 	// Certificates specifies the chain of certificates for the PublicID.
-public ArrayList<Certificate> certificates;
+	private ArrayList<Certificate> certificates;
+
+	public ChainPublicID(ArrayList<Certificate> certificates) { 
+		this.certificates = certificates;
+	}
+	public ArrayList<Certificate> getCertificates() { return this.certificates; }
+
+	public void setCertificates(ArrayList<Certificate> certificates) { this.certificates = certificates; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ChainPublicID)) return false;
+		final ChainPublicID other = (ChainPublicID)obj;
+		if (!(this.certificates.equals(other.certificates))) return false;
+		return true;
+	}
 }

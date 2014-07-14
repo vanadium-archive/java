@@ -100,11 +100,11 @@ public final class NodeStub implements Node {
 	}
 	// Methods from sub-interface Application.
 	@Override
-	public java.lang.String install(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return install(context, null);
+	public java.lang.String install(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+		return install(context, Name, null);
 	}
 	@Override
-	public java.lang.String install(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public java.lang.String install(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
 	    // Java to encoding/decoding from vom.Value objects.
@@ -112,7 +112,7 @@ public final class NodeStub implements Node {
 		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
 			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
 		}
-		return this.application.install(context, veyronOpts);
+		return this.application.install(context, Name, veyronOpts);
 	}
 	@Override
 	public void refresh(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
@@ -248,5 +248,20 @@ public final class NodeStub implements Node {
 			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
 		}
 		this.application.update(context, veyronOpts);
+	}
+	@Override
+	public void updateTo(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+		updateTo(context, Name, null);
+	}
+	@Override
+	public void updateTo(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+		// Add VDL path option.
+		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+	    // Java to encoding/decoding from vom.Value objects.
+		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
+		}
+		this.application.updateTo(context, Name, veyronOpts);
 	}
 }

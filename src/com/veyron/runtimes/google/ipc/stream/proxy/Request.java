@@ -9,5 +9,16 @@ package com.veyron.runtimes.google.ipc.stream.proxy;
  * traffic intended for the server's RoutingID to the network connection
  * between the server and the proxy.
 **/
-public class Request { 
+public final class Request { 
+
+	public Request() { 
+	}
+
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Request)) return false;
+		final Request other = (Request)obj;
+		return true;
+	}
 }

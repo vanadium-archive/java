@@ -4,7 +4,26 @@
 package com.veyron.examples.rockpaperscissors;
 
 
-public class PlayerAction { 
-	public String move; // The move that the player wants to make.
-	public boolean quit; // Whether the player wants to quit the game.
+public final class PlayerAction { 
+		private String move; // The move that the player wants to make.
+		private boolean quit; // Whether the player wants to quit the game.
+
+	public PlayerAction(String move, boolean quit) { 
+		this.move = move;
+		this.quit = quit;
+	}
+	public String getMove() { return this.move; }
+	public boolean getQuit() { return this.quit; }
+
+	public void setMove(String move) { this.move = move; }
+	public void setQuit(boolean quit) { this.quit = quit; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof PlayerAction)) return false;
+		final PlayerAction other = (PlayerAction)obj;
+		if (!(this.move.equals(other.move))) return false;
+		if (this.quit != other.quit) return false;
+		return true;
+	}
 }

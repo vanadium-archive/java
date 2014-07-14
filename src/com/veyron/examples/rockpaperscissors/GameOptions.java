@@ -7,7 +7,26 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * GameOptions specifies the parameters of a game.
 **/
-public class GameOptions { 
-	public int numRounds; // The number of rounds that a player must win to win the game.
-	public byte gameType; // The type of game to play: Classic or LizardSpock.
+public final class GameOptions { 
+		private int numRounds; // The number of rounds that a player must win to win the game.
+		private GameTypeTag gameType; // The type of game to play: Classic or LizardSpock.
+
+	public GameOptions(int numRounds, GameTypeTag gameType) { 
+		this.numRounds = numRounds;
+		this.gameType = gameType;
+	}
+	public int getNumRounds() { return this.numRounds; }
+	public GameTypeTag getGameType() { return this.gameType; }
+
+	public void setNumRounds(int numRounds) { this.numRounds = numRounds; }
+	public void setGameType(GameTypeTag gameType) { this.gameType = gameType; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof GameOptions)) return false;
+		final GameOptions other = (GameOptions)obj;
+		if (this.numRounds != other.numRounds) return false;
+		if (!(this.gameType.equals(other.gameType))) return false;
+		return true;
+	}
 }

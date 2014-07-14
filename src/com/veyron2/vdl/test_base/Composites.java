@@ -7,11 +7,42 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.math3.complex.Complex;
 
-public class Composites { 
-	public Scalars a0;
-	public Scalars[] a1;
-	public ArrayList<Scalars> a2;
+public final class Composites { 
+		private Scalars a0;
+		private Scalars[] a1;
+		private ArrayList<Scalars> a2;
 	//A3 set[Scalars]
-public HashMap<String, Scalars> a4;
-	public HashMap<Scalars, ArrayList<HashMap<String, Complex>>> a5;
+	private HashMap<String, Scalars> a4;
+		private HashMap<Scalars, ArrayList<HashMap<String, Complex>>> a5;
+
+	public Composites(Scalars a0, Scalars[] a1, ArrayList<Scalars> a2, HashMap<String, Scalars> a4, HashMap<Scalars, ArrayList<HashMap<String, Complex>>> a5) { 
+		this.a0 = a0;
+		this.a1 = a1;
+		this.a2 = a2;
+		this.a4 = a4;
+		this.a5 = a5;
+	}
+	public Scalars getA0() { return this.a0; }
+	public Scalars[] getA1() { return this.a1; }
+	public ArrayList<Scalars> getA2() { return this.a2; }
+	public HashMap<String, Scalars> getA4() { return this.a4; }
+	public HashMap<Scalars, ArrayList<HashMap<String, Complex>>> getA5() { return this.a5; }
+
+	public void setA0(Scalars a0) { this.a0 = a0; }
+	public void setA1(Scalars[] a1) { this.a1 = a1; }
+	public void setA2(ArrayList<Scalars> a2) { this.a2 = a2; }
+	public void setA4(HashMap<String, Scalars> a4) { this.a4 = a4; }
+	public void setA5(HashMap<Scalars, ArrayList<HashMap<String, Complex>>> a5) { this.a5 = a5; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Composites)) return false;
+		final Composites other = (Composites)obj;
+		if (!(this.a0.equals(other.a0))) return false;
+		if (!(this.a1.equals(other.a1))) return false;
+		if (!(this.a2.equals(other.a2))) return false;
+		if (!(this.a4.equals(other.a4))) return false;
+		if (!(this.a5.equals(other.a5))) return false;
+		return true;
+	}
 }

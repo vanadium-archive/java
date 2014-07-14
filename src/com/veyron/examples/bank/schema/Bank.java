@@ -8,6 +8,21 @@ import java.util.HashMap;
 /**
  * Bank is used to represent the information stored in a bank.
 **/
-public class Bank { 
-	public HashMap<String, Long> accounts;
+public final class Bank { 
+		private HashMap<String, Long> accounts;
+
+	public Bank(HashMap<String, Long> accounts) { 
+		this.accounts = accounts;
+	}
+	public HashMap<String, Long> getAccounts() { return this.accounts; }
+
+	public void setAccounts(HashMap<String, Long> accounts) { this.accounts = accounts; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Bank)) return false;
+		final Bank other = (Bank)obj;
+		if (!(this.accounts.equals(other.accounts))) return false;
+		return true;
+	}
 }

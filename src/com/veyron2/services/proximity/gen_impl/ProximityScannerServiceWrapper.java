@@ -29,7 +29,7 @@ public class ProximityScannerServiceWrapper {
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
 		if (method == "NearbyDevices") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;
 	}

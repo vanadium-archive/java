@@ -34,13 +34,13 @@ public class MountTableServiceWrapper {
 			if (tags != null) return tags;
 		}
 		if (method == "Mount") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		if (method == "Unmount") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		if (method == "ResolveStep") {
-			return new Object[]{ 1 };
+			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;
 	}

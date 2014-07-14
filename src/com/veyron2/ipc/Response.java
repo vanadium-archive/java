@@ -10,14 +10,37 @@ package com.veyron2.ipc;
  * non-zero response header is sent at the end of the RPC call, right before
  * the positional results.
 **/
-public class Response { 
+public final class Response { 
 	// Error in processing the RPC at the server. Implies EndStreamResults.
-public VeyronException error;
+	private VeyronException error;
 	// EndStreamResults is true iff no more streaming results will be sent; the
 // remainder of the stream consists of NumPosResults positional results.
-public boolean endStreamResults;
+	private boolean endStreamResults;
 	// NumPosResults is the number of positional results, which immediately follow
 // on the response stream.  After these results, no further data will be sent
 // on the response stream.
-public long numPosResults;
+	private long numPosResults;
+
+	public Response(VeyronException error, boolean endStreamResults, long numPosResults) { 
+		this.error = error;
+		this.endStreamResults = endStreamResults;
+		this.numPosResults = numPosResults;
+	}
+	public VeyronException getError() { return this.error; }
+	public boolean getEndStreamResults() { return this.endStreamResults; }
+	public long getNumPosResults() { return this.numPosResults; }
+
+	public void setError(VeyronException error) { this.error = error; }
+	public void setEndStreamResults(boolean endStreamResults) { this.endStreamResults = endStreamResults; }
+	public void setNumPosResults(long numPosResults) { this.numPosResults = numPosResults; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Response)) return false;
+		final Response other = (Response)obj;
+		if (!(this.error.equals(other.error))) return false;
+		if (this.endStreamResults != other.endStreamResults) return false;
+		if (this.numPosResults != other.numPosResults) return false;
+		return true;
+	}
 }

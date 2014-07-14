@@ -5,12 +5,51 @@ package com.veyron.examples.rockpaperscissors;
 
 import java.util.ArrayList;
 
-public class ScoreCard { 
-	public GameOptions opts; // The game options.
-	public String judge; // The name of the judge.
-	public ArrayList<String> players; // The name of the players.
-	public ArrayList<Round> rounds; // The outcome of each round.
-	public long startTimeNS; // The time at which the game started.
-	public long endTimeNS; // The time at which the game ended.
-	public byte winner; // Who won the game.
+public final class ScoreCard { 
+		private GameOptions opts; // The game options.
+		private String judge; // The name of the judge.
+		private ArrayList<String> players; // The name of the players.
+		private ArrayList<Round> rounds; // The outcome of each round.
+		private long startTimeNS; // The time at which the game started.
+		private long endTimeNS; // The time at which the game ended.
+		private WinnerTag winner; // Who won the game.
+
+	public ScoreCard(GameOptions opts, String judge, ArrayList<String> players, ArrayList<Round> rounds, long startTimeNS, long endTimeNS, WinnerTag winner) { 
+		this.opts = opts;
+		this.judge = judge;
+		this.players = players;
+		this.rounds = rounds;
+		this.startTimeNS = startTimeNS;
+		this.endTimeNS = endTimeNS;
+		this.winner = winner;
+	}
+	public GameOptions getOpts() { return this.opts; }
+	public String getJudge() { return this.judge; }
+	public ArrayList<String> getPlayers() { return this.players; }
+	public ArrayList<Round> getRounds() { return this.rounds; }
+	public long getStartTimeNS() { return this.startTimeNS; }
+	public long getEndTimeNS() { return this.endTimeNS; }
+	public WinnerTag getWinner() { return this.winner; }
+
+	public void setOpts(GameOptions opts) { this.opts = opts; }
+	public void setJudge(String judge) { this.judge = judge; }
+	public void setPlayers(ArrayList<String> players) { this.players = players; }
+	public void setRounds(ArrayList<Round> rounds) { this.rounds = rounds; }
+	public void setStartTimeNS(long startTimeNS) { this.startTimeNS = startTimeNS; }
+	public void setEndTimeNS(long endTimeNS) { this.endTimeNS = endTimeNS; }
+	public void setWinner(WinnerTag winner) { this.winner = winner; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof ScoreCard)) return false;
+		final ScoreCard other = (ScoreCard)obj;
+		if (!(this.opts.equals(other.opts))) return false;
+		if (!(this.judge.equals(other.judge))) return false;
+		if (!(this.players.equals(other.players))) return false;
+		if (!(this.rounds.equals(other.rounds))) return false;
+		if (this.startTimeNS != other.startTimeNS) return false;
+		if (this.endTimeNS != other.endTimeNS) return false;
+		if (!(this.winner.equals(other.winner))) return false;
+		return true;
+	}
 }

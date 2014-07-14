@@ -11,26 +11,70 @@ package com.veyron2.ipc;
  * streaming arg, terminated by a non-zero request header with EndStreamArgs set
  * to true.
 **/
-public class Request { 
+public final class Request { 
 	// Suffix of the name used to identify the object hosting the service.
-public String suffix;
+	private String suffix;
 	// Method to invoke on the service.
-public String method;
+	private String method;
 	// NumPosArgs is the number of positional arguments, which follow this message
 // (and any blessings) on the request stream.
-public long numPosArgs;
+	private long numPosArgs;
 	// EndStreamArgs is true iff no more streaming arguments will be sent.  No
 // more data will be sent on the request stream.
-public boolean endStreamArgs;
+	private boolean endStreamArgs;
 	// Timeout is the duration after which the request should be cancelled.  This
 // is a hint to the server, to avoid wasted work.
 //
 // TODO(toddw): Change to time.Time when a built-in idl time package is added.
-public long timeout;
+	private long timeout;
 	// HasBlessing is true iff a blessing credential, bound to the identity of
 // the server (provided by the client) appears immediately after this request
 // message.
 // TODO(toddw,ashankar): Ideally, this would be the blessing itself, but
 // vom currently does not allow for data-type interfaces.
-public boolean hasBlessing;
+	private boolean hasBlessing;
+	// NumDischarges specifies the number of third party caveat discharges that
+// are sent after the blessing to fulfill its caveats.
+// TODO(toddw,ashankar,andreser): Ideally, this would be the a slice of
+// discharges, but vom currently does not allow for data-type interfaces.
+	private long numDischarges;
+
+	public Request(String suffix, String method, long numPosArgs, boolean endStreamArgs, long timeout, boolean hasBlessing, long numDischarges) { 
+		this.suffix = suffix;
+		this.method = method;
+		this.numPosArgs = numPosArgs;
+		this.endStreamArgs = endStreamArgs;
+		this.timeout = timeout;
+		this.hasBlessing = hasBlessing;
+		this.numDischarges = numDischarges;
+	}
+	public String getSuffix() { return this.suffix; }
+	public String getMethod() { return this.method; }
+	public long getNumPosArgs() { return this.numPosArgs; }
+	public boolean getEndStreamArgs() { return this.endStreamArgs; }
+	public long getTimeout() { return this.timeout; }
+	public boolean getHasBlessing() { return this.hasBlessing; }
+	public long getNumDischarges() { return this.numDischarges; }
+
+	public void setSuffix(String suffix) { this.suffix = suffix; }
+	public void setMethod(String method) { this.method = method; }
+	public void setNumPosArgs(long numPosArgs) { this.numPosArgs = numPosArgs; }
+	public void setEndStreamArgs(boolean endStreamArgs) { this.endStreamArgs = endStreamArgs; }
+	public void setTimeout(long timeout) { this.timeout = timeout; }
+	public void setHasBlessing(boolean hasBlessing) { this.hasBlessing = hasBlessing; }
+	public void setNumDischarges(long numDischarges) { this.numDischarges = numDischarges; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Request)) return false;
+		final Request other = (Request)obj;
+		if (!(this.suffix.equals(other.suffix))) return false;
+		if (!(this.method.equals(other.method))) return false;
+		if (this.numPosArgs != other.numPosArgs) return false;
+		if (this.endStreamArgs != other.endStreamArgs) return false;
+		if (this.timeout != other.timeout) return false;
+		if (this.hasBlessing != other.hasBlessing) return false;
+		if (this.numDischarges != other.numDischarges) return false;
+		return true;
+	}
 }

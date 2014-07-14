@@ -11,7 +11,26 @@ import java.util.HashMap;
  * to resolve the method argument types.
  * TODO(bprosnitz) Rename this and move it to wiretype.
 **/
-public class ServiceSignature { 
-	public ArrayList<Object> typeDefs; // A slice of wiretype structures form the type definition.
-	public HashMap<String, MethodSignature> methods;
+public final class ServiceSignature { 
+		private ArrayList<Object> typeDefs; // A slice of wiretype structures form the type definition.
+		private HashMap<String, MethodSignature> methods;
+
+	public ServiceSignature(ArrayList<Object> typeDefs, HashMap<String, MethodSignature> methods) { 
+		this.typeDefs = typeDefs;
+		this.methods = methods;
+	}
+	public ArrayList<Object> getTypeDefs() { return this.typeDefs; }
+	public HashMap<String, MethodSignature> getMethods() { return this.methods; }
+
+	public void setTypeDefs(ArrayList<Object> typeDefs) { this.typeDefs = typeDefs; }
+	public void setMethods(HashMap<String, MethodSignature> methods) { this.methods = methods; }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof ServiceSignature)) return false;
+		final ServiceSignature other = (ServiceSignature)obj;
+		if (!(this.typeDefs.equals(other.typeDefs))) return false;
+		if (!(this.methods.equals(other.methods))) return false;
+		return true;
+	}
 }

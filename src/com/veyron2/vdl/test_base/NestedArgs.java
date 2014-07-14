@@ -9,6 +9,21 @@ package com.veyron2.vdl.test_base;
  * allowed in our vdl files.  The compiler will re-order dependent types to ease
  * code generation in other languages.
 **/
-public class NestedArgs { 
-	public Args args;
+public final class NestedArgs { 
+		private Args args;
+
+	public NestedArgs(Args args) { 
+		this.args = args;
+	}
+	public Args getArgs() { return this.args; }
+
+	public void setArgs(Args args) { this.args = args; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof NestedArgs)) return false;
+		final NestedArgs other = (NestedArgs)obj;
+		if (!(this.args.equals(other.args))) return false;
+		return true;
+	}
 }

@@ -55,11 +55,14 @@ public class ApplicationServiceWrapper {
 		if (method == "Update") {
 			return new Object[]{  };
 		}
+		if (method == "UpdateTo") {
+			return new Object[]{  };
+		}
 		return null;
 	}
 	// Methods from interface Application.
-	public String install(ServerCall call) throws VeyronException { 
-		return this.service.install(call);
+	public String install(ServerCall call, String Name) throws VeyronException { 
+		return this.service.install(call, Name);
 	}
 	public void refresh(ServerCall call) throws VeyronException { 
 		this.service.refresh(call);
@@ -87,5 +90,8 @@ public class ApplicationServiceWrapper {
 	}
 	public void update(ServerCall call) throws VeyronException { 
 		this.service.update(call);
+	}
+	public void updateTo(ServerCall call, String Name) throws VeyronException { 
+		this.service.updateTo(call, Name);
 	}
 }

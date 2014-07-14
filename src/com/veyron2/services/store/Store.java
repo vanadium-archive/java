@@ -13,19 +13,19 @@ import java.util.ArrayList;
 **/
 public interface Store { 
 	// CreateTransaction creates the transaction and sets the options for it.
-	public void createTransaction(Context context, long tID, ArrayList<java.lang.Object> options) throws VeyronException;
-	public void createTransaction(Context context, long tID, ArrayList<java.lang.Object> options, Options veyronOpts) throws VeyronException;
+	public void createTransaction(Context context, TransactionID tID, ArrayList<java.lang.Object> options) throws VeyronException;
+	public void createTransaction(Context context, TransactionID tID, ArrayList<java.lang.Object> options, Options veyronOpts) throws VeyronException;
 	// Commit commits the changes in the transaction to the store.  The
 // operation is atomic, so all mutations are performed, or none.  Returns an
 // error if the transaction aborted.
-	public void commit(Context context, long tID) throws VeyronException;
-	public void commit(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public void commit(Context context, TransactionID tID) throws VeyronException;
+	public void commit(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// Abort discards a transaction.  This is an optimization; transactions
 // eventually time out and get discarded.  However, live transactions
 // consume resources, so if you know that you won't be using a transaction
 // anymore, you should discard it explicitly.
-	public void abort(Context context, long tID) throws VeyronException;
-	public void abort(Context context, long tID, Options veyronOpts) throws VeyronException;
+	public void abort(Context context, TransactionID tID) throws VeyronException;
+	public void abort(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
 	// ReadConflicts returns the stream of conflicts to store values.  A
 // conflict occurs when there is a concurrent modification to a value.
 	public ClientStream<Void,Conflict,Void> readConflicts(Context context) throws VeyronException;

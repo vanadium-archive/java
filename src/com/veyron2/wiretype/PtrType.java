@@ -10,8 +10,31 @@ import java.util.ArrayList;
  * TODO(bprosnitz) Remove this.
  * PtrType represents a pointer; a value referencing an underlying Elem value.
 **/
-public class PtrType { 
-	public long elem;
-	public String name;
-	public ArrayList<String> tags;
+public final class PtrType { 
+		private TypeID elem;
+		private String name;
+		private ArrayList<String> tags;
+
+	public PtrType(TypeID elem, String name, ArrayList<String> tags) { 
+		this.elem = elem;
+		this.name = name;
+		this.tags = tags;
+	}
+	public TypeID getElem() { return this.elem; }
+	public String getName() { return this.name; }
+	public ArrayList<String> getTags() { return this.tags; }
+
+	public void setElem(TypeID elem) { this.elem = elem; }
+	public void setName(String name) { this.name = name; }
+	public void setTags(ArrayList<String> tags) { this.tags = tags; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof PtrType)) return false;
+		final PtrType other = (PtrType)obj;
+		if (!(this.elem.equals(other.elem))) return false;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.tags.equals(other.tags))) return false;
+		return true;
+	}
 }

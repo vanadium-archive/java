@@ -5,10 +5,41 @@ package com.veyron.examples.rockpaperscissors;
 
 import java.util.ArrayList;
 
-public class JudgeAction { 
-	public int playerNum; // The player's number.
-	public String opponentName; // The name of the opponent.
-	public ArrayList<String> moveOptions; // A list of allowed moves that the player must choose from. Not always present.
-	public Round roundResult; // The result of the previous round. Not always present.
-	public ScoreCard score; // The result of the game. Not always present.
+public final class JudgeAction { 
+		private int playerNum; // The player's number.
+		private String opponentName; // The name of the opponent.
+		private ArrayList<String> moveOptions; // A list of allowed moves that the player must choose from. Not always present.
+		private Round roundResult; // The result of the previous round. Not always present.
+		private ScoreCard score; // The result of the game. Not always present.
+
+	public JudgeAction(int playerNum, String opponentName, ArrayList<String> moveOptions, Round roundResult, ScoreCard score) { 
+		this.playerNum = playerNum;
+		this.opponentName = opponentName;
+		this.moveOptions = moveOptions;
+		this.roundResult = roundResult;
+		this.score = score;
+	}
+	public int getPlayerNum() { return this.playerNum; }
+	public String getOpponentName() { return this.opponentName; }
+	public ArrayList<String> getMoveOptions() { return this.moveOptions; }
+	public Round getRoundResult() { return this.roundResult; }
+	public ScoreCard getScore() { return this.score; }
+
+	public void setPlayerNum(int playerNum) { this.playerNum = playerNum; }
+	public void setOpponentName(String opponentName) { this.opponentName = opponentName; }
+	public void setMoveOptions(ArrayList<String> moveOptions) { this.moveOptions = moveOptions; }
+	public void setRoundResult(Round roundResult) { this.roundResult = roundResult; }
+	public void setScore(ScoreCard score) { this.score = score; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof JudgeAction)) return false;
+		final JudgeAction other = (JudgeAction)obj;
+		if (this.playerNum != other.playerNum) return false;
+		if (!(this.opponentName.equals(other.opponentName))) return false;
+		if (!(this.moveOptions.equals(other.moveOptions))) return false;
+		if (!(this.roundResult.equals(other.roundResult))) return false;
+		if (!(this.score.equals(other.score))) return false;
+		return true;
+	}
 }

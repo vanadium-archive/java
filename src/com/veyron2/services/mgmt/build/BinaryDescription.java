@@ -10,10 +10,10 @@ import java.util.HashMap;
  * profiles. The mechanism for determing profiles is specifically not
  * specified and left to the implementation of the Build interface.
 **/
-public class BinaryDescription { 
+public final class BinaryDescription { 
 	// Name is the Object name of the application binary that can be
 // used to fetch the actual binary from a content server.
-public String name;
+	private String name;
 	// Profiles is a set of names of compatible profiles.  Each name can either
 // be an Object name that resolves to a Profile, or can be the profile's
 // label, e.g.:
@@ -23,5 +23,24 @@ public String name;
 // Application developers can specify compatible profiles by hand, but we also
 // want to be able to automatically derive the matching profiles from
 // examining the binary itself (e.g. that's what Build.Describe() does).
-public HashMap<String, Boolean> profiles;
+	private HashMap<String, Boolean> profiles;
+
+	public BinaryDescription(String name, HashMap<String, Boolean> profiles) { 
+		this.name = name;
+		this.profiles = profiles;
+	}
+	public String getName() { return this.name; }
+	public HashMap<String, Boolean> getProfiles() { return this.profiles; }
+
+	public void setName(String name) { this.name = name; }
+	public void setProfiles(HashMap<String, Boolean> profiles) { this.profiles = profiles; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof BinaryDescription)) return false;
+		final BinaryDescription other = (BinaryDescription)obj;
+		if (!(this.name.equals(other.name))) return false;
+		if (!(this.profiles.equals(other.profiles))) return false;
+		return true;
+	}
 }

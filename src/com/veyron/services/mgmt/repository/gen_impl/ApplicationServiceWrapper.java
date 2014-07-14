@@ -32,10 +32,10 @@ public class ApplicationServiceWrapper {
 			if (tags != null) return tags;
 		}
 		if (method == "Put") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		if (method == "Remove") {
-			return new Object[]{ 2 };
+			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;
 	}

@@ -4,8 +4,31 @@
 package com.veyron2.vdl.test_base;
 
 
-public class NamedStruct { 
-	public boolean a;
-	public String b;
-	public int c;
+public final class NamedStruct { 
+		private boolean a;
+		private String b;
+		private int c;
+
+	public NamedStruct(boolean a, String b, int c) { 
+		this.a = a;
+		this.b = b;
+		this.c = c;
+	}
+	public boolean getA() { return this.a; }
+	public String getB() { return this.b; }
+	public int getC() { return this.c; }
+
+	public void setA(boolean a) { this.a = a; }
+	public void setB(String b) { this.b = b; }
+	public void setC(int c) { this.c = c; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof NamedStruct)) return false;
+		final NamedStruct other = (NamedStruct)obj;
+		if (this.a != other.a) return false;
+		if (!(this.b.equals(other.b))) return false;
+		if (this.c != other.c) return false;
+		return true;
+	}
 }

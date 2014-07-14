@@ -3,6 +3,8 @@
 package com.veyron.runtimes.google.vsync.gen_impl;
 
 import com.google.common.reflect.TypeToken;
+import com.veyron.runtimes.google.vsync.DeviceID;
+import com.veyron.runtimes.google.vsync.GenVector;
 import com.veyron.runtimes.google.vsync.LogRec;
 import com.veyron.runtimes.google.vsync.LogValue;
 import com.veyron.runtimes.google.vsync.Sync;
@@ -12,7 +14,6 @@ import com.veyron.runtimes.google.vsync.VeyronConsts;
 import com.veyron2.ipc.ServerCall;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.Stream;
-import java.util.HashMap;
 
 public class SyncServiceWrapper {
 
@@ -32,7 +33,7 @@ public class SyncServiceWrapper {
 		return null;
 	}
 	// Methods from interface Sync.
-	public HashMap<String, Long> getDeltas(ServerCall call, HashMap<String, Long> In, String ClientID) throws VeyronException { 
+	public GenVector getDeltas(ServerCall call, GenVector In, DeviceID ClientID) throws VeyronException { 
 		final ServerCall serverCall = call;
 		final Stream<LogRec,Void> stream = new Stream<LogRec,Void>() {
 			@Override

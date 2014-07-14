@@ -7,8 +7,23 @@ package com.veyron.examples.storage.mdb.schema;
 /**
  * Dir is used to represent directories.
 **/
-public class Dir { 
+public final class Dir { 
 	// TODO(jyh): The IDL does not recognize empty structs.  Fix it and remove this
 // useless field.
-public byte x;
+	private byte x;
+
+	public Dir(byte x) { 
+		this.x = x;
+	}
+	public byte getX() { return this.x; }
+
+	public void setX(byte x) { this.x = x; }
+
+	@Override
+	public boolean equals(java.lang.Object obj) {
+		if (!(obj instanceof Dir)) return false;
+		final Dir other = (Dir)obj;
+		if (this.x != other.x) return false;
+		return true;
+	}
 }
