@@ -92,7 +92,9 @@ public class PublicID implements com.veyron2.security.PublicID {
 				@Override
 				public ECParameterSpec getParams() { return spec; }
 			};
-		} catch (NumberFormatException|VeyronException e) {
+		} catch (NumberFormatException e) {
+			return null;
+		} catch (VeyronException e) {
 			return null;
 		}
 	}

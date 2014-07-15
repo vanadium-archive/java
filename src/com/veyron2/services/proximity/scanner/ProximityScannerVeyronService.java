@@ -62,20 +62,19 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
         Collection<BluetoothScanner.Device> bDevices = scanner.getDevices();
         ArrayList<Device> devices = new ArrayList<Device>();
         for (BluetoothScanner.Device bDevice : bDevices) {
-            Device d = new Device();
-            d.distance = Integer.toString(computeAverageDBm(bDevice.readings));
-            d.mAC = bDevice.device.getAddress();
-            d.names = new ArrayList<String>();
-            d.names.add(bDevice.device.getName());
-            devices.add(d);
+            ArrayList<String> names = new ArrayList<String>();
+            names.add(bDevice.device.getName());
+            Device d = new Device(bDevice.device.getAddress(),
+            		names, 
+            		Integer.toString(computeAverageDBm(bDevice.readings)));
         }
         Collections.sort(devices, new Comparator<Device>() {
             @Override
             public int compare(Device d1, Device d2) {
-                if (d1 == null || d1.distance == null || d2 == null || d2.distance == null) {
+                if (d1 == null || d1.getDistance() == null || d2 == null || d2.getDistance() == null) {
                     return 0;
                 }
-                return Integer.parseInt(d2.distance) - Integer.parseInt(d1.distance);
+                return Integer.parseInt(d2.getDistance()) - Integer.parseInt(d1.getDistance());
             }
         });
         return devices;
