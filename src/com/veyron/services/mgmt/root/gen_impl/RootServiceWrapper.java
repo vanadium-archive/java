@@ -20,7 +20,7 @@ public class RootServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Reset") {
+		if ("reset".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

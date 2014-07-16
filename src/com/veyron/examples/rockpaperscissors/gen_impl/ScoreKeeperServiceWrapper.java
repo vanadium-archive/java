@@ -37,7 +37,7 @@ public class ScoreKeeperServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Record") {
+		if ("record".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

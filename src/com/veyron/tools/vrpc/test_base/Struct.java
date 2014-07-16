@@ -20,10 +20,20 @@ public final class Struct {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Struct)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Struct other = (Struct)obj;
 		if (this.x != other.x) return false;
 		if (this.y != other.y) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
 	}
 }

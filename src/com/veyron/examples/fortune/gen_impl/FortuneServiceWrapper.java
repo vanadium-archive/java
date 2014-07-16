@@ -20,10 +20,10 @@ public class FortuneServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Get") {
+		if ("get".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "Add") {
+		if ("add".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;

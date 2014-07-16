@@ -23,10 +23,20 @@ public final class KeyValuePair {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof KeyValuePair)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final KeyValuePair other = (KeyValuePair)obj;
 		if (!(this.key.equals(other.key))) return false;
 		if (!(this.value.equals(other.value))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (key == null ? 0 : key.hashCode());
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		return result;
 	}
 }

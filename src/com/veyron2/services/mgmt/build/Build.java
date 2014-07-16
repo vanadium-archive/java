@@ -5,13 +5,20 @@ package com.veyron2.services.mgmt.build;
 import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.services.mgmt.binary.Description;
+import com.veyron2.vdl.ClientStream;
+import java.util.ArrayList;
 
 /**
  * Build describes an interface for building binaries from source.
 **/
 public interface Build { 
-	// Describe generates a BinaryDescription for a binary identified by
+	// Build streams sources to the build server, which then attempts to
+// build the sources and returns the output.
+	public ClientStream<File,Void,ArrayList<Byte>> build(Context context) throws VeyronException;
+	public ClientStream<File,Void,ArrayList<Byte>> build(Context context, Options veyronOpts) throws VeyronException;
+	// Describe generates a description for a binary identified by
 // the given Object name.
-	public BinaryDescription describe(Context context, String name) throws VeyronException;
-	public BinaryDescription describe(Context context, String name, Options veyronOpts) throws VeyronException;
+	public Description describe(Context context, String name) throws VeyronException;
+	public Description describe(Context context, String name, Options veyronOpts) throws VeyronException;
 }

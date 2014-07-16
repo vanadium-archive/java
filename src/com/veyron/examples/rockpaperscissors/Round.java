@@ -35,7 +35,9 @@ public final class Round {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Round)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Round other = (Round)obj;
 		if (!(this.moves.equals(other.moves))) return false;
 		if (!(this.comment.equals(other.comment))) return false;
@@ -43,5 +45,16 @@ public final class Round {
 		if (this.startTimeNS != other.startTimeNS) return false;
 		if (this.endTimeNS != other.endTimeNS) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (moves == null ? 0 : moves.hashCode());
+		result = prime * result + (comment == null ? 0 : comment.hashCode());
+		result = prime * result + (winner == null ? 0 : winner.hashCode());
+		result = prime * result + Long.valueOf(startTimeNS).hashCode();
+		result = prime * result + Long.valueOf(endTimeNS).hashCode();
+		return result;
 	}
 }

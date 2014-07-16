@@ -20,9 +20,18 @@ public final class NestedResult {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NestedResult)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NestedResult other = (NestedResult)obj;
 		if (this.value != other.value) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + Long.valueOf(value).hashCode();
+		return result;
 	}
 }

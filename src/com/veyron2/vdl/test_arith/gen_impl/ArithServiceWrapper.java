@@ -34,28 +34,28 @@ public class ArithServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Add") {
+		if ("add".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "DivMod") {
+		if ("divMod".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Sub") {
+		if ("sub".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Mul") {
+		if ("mul".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GenError") {
+		if ("genError".equals(method)) {
 			return new Object[]{ "foo", "barz", "hello", 129, 36L };
 		}
-		if (method == "Count") {
+		if ("count".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "StreamingAdd") {
+		if ("streamingAdd".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "QuoteAny") {
+		if ("quoteAny".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

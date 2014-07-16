@@ -40,12 +40,24 @@ public final class Certificate {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Certificate)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Certificate other = (Certificate)obj;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.publicKey.equals(other.publicKey))) return false;
 		if (!(this.caveats.equals(other.caveats))) return false;
 		if (!(this.signature.equals(other.signature))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (publicKey == null ? 0 : publicKey.hashCode());
+		result = prime * result + (caveats == null ? 0 : caveats.hashCode());
+		result = prime * result + (signature == null ? 0 : signature.hashCode());
+		return result;
 	}
 }

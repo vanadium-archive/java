@@ -24,10 +24,20 @@ public final class Tag {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Tag)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Tag other = (Tag)obj;
 		if (!(this.op.equals(other.op))) return false;
 		if (!(this.aCL.equals(other.aCL))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (op == null ? 0 : op.hashCode());
+		result = prime * result + (aCL == null ? 0 : aCL.hashCode());
+		return result;
 	}
 }

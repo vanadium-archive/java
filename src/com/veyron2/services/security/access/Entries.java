@@ -32,10 +32,20 @@ public final class Entries {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Entries)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Entries other = (Entries)obj;
 		if (!(this.principals.equals(other.principals))) return false;
 		if (!(this.groups.equals(other.groups))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (principals == null ? 0 : principals.hashCode());
+		result = prime * result + (groups == null ? 0 : groups.hashCode());
+		return result;
 	}
 }

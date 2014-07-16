@@ -21,9 +21,18 @@ public final class NestedArgs {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NestedArgs)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NestedArgs other = (NestedArgs)obj;
 		if (!(this.args.equals(other.args))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (args == null ? 0 : args.hashCode());
+		return result;
 	}
 }

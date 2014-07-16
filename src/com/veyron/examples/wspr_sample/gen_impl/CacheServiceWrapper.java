@@ -28,58 +28,58 @@ public class CacheServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Set") {
+		if ("set".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Get") {
+		if ("get".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsByte") {
+		if ("getAsByte".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsInt32") {
+		if ("getAsInt32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsInt64") {
+		if ("getAsInt64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsUint32") {
+		if ("getAsUint32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsUint64") {
+		if ("getAsUint64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsFloat32") {
+		if ("getAsFloat32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsFloat64") {
+		if ("getAsFloat64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsString") {
+		if ("getAsString".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsBool") {
+		if ("getAsBool".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GetAsError") {
+		if ("getAsError".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "AsMap") {
+		if ("asMap".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "KeyValuePairs") {
+		if ("keyValuePairs".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "MostRecentSet") {
+		if ("mostRecentSet".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "KeyPage") {
+		if ("keyPage".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Size") {
+		if ("size".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "MultiGet") {
+		if ("multiGet".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

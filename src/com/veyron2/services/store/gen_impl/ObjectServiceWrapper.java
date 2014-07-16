@@ -60,28 +60,28 @@ public class ObjectServiceWrapper {
 			final Object[] tags = this.queryWatcher.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "Exists") {
+		if ("exists".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Get") {
+		if ("get".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Put") {
+		if ("put".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Remove") {
+		if ("remove".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "SetAttr") {
+		if ("setAttr".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Stat") {
+		if ("stat".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Query") {
+		if ("query".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "GlobT") {
+		if ("globT".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

@@ -25,37 +25,37 @@ public class ApplicationServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Install") {
+		if ("install".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Refresh") {
+		if ("refresh".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Restart") {
+		if ("restart".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Resume") {
+		if ("resume".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Revert") {
+		if ("revert".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Start") {
+		if ("start".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Stop") {
+		if ("stop".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Suspend") {
+		if ("suspend".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Uninstall") {
+		if ("uninstall".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Update") {
+		if ("update".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "UpdateTo") {
+		if ("updateTo".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

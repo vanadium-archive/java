@@ -21,9 +21,18 @@ public final class Query {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Query)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Query other = (Query)obj;
 		if (!(this.stmt.equals(other.stmt))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (stmt == null ? 0 : stmt.hashCode());
+		return result;
 	}
 }

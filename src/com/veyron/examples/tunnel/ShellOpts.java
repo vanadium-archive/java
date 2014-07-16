@@ -29,12 +29,24 @@ public final class ShellOpts {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ShellOpts)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ShellOpts other = (ShellOpts)obj;
 		if (this.usePty != other.usePty) return false;
 		if (!(this.environment.equals(other.environment))) return false;
 		if (this.rows != other.rows) return false;
 		if (this.cols != other.cols) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + Boolean.valueOf(usePty).hashCode();
+		result = prime * result + (environment == null ? 0 : environment.hashCode());
+		result = prime * result + rows;
+		result = prime * result + cols;
+		return result;
 	}
 }

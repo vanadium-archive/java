@@ -5,7 +5,6 @@ package com.veyron2.services.mgmt.node;
 import com.veyron2.Options;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.build.BinaryDescription;
 
 /**
  * Node can be used to manage a node. The idea is that this interace
@@ -16,8 +15,8 @@ public interface Node extends Application {
 	public Description describe(Context context) throws VeyronException;
 	public Description describe(Context context, Options veyronOpts) throws VeyronException;
 	// IsRunnable checks if the node can execute the given binary.
-	public boolean isRunnable(Context context, BinaryDescription binary) throws VeyronException;
-	public boolean isRunnable(Context context, BinaryDescription binary, Options veyronOpts) throws VeyronException;
+	public boolean isRunnable(Context context, com.veyron2.services.mgmt.binary.Description description) throws VeyronException;
+	public boolean isRunnable(Context context, com.veyron2.services.mgmt.binary.Description description, Options veyronOpts) throws VeyronException;
 	// Reset resets the node. If the deadline is non-zero and the node
 // in question is still running after the given deadline expired,
 // reset of the node is enforced.

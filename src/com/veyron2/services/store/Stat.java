@@ -36,11 +36,22 @@ public final class Stat {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Stat)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Stat other = (Stat)obj;
 		if (!(this.iD.equals(other.iD))) return false;
 		if (this.mTimeNS != other.mTimeNS) return false;
 		if (!(this.attrs.equals(other.attrs))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (iD == null ? 0 : iD.hashCode());
+		result = prime * result + Long.valueOf(mTimeNS).hashCode();
+		result = prime * result + (attrs == null ? 0 : attrs.hashCode());
+		return result;
 	}
 }

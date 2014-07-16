@@ -24,10 +24,20 @@ public final class FortuneData {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof FortuneData)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final FortuneData other = (FortuneData)obj;
 		if (!(this.fortune.equals(other.fortune))) return false;
 		if (!(this.userName.equals(other.userName))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (fortune == null ? 0 : fortune.hashCode());
+		result = prime * result + (userName == null ? 0 : userName.hashCode());
+		return result;
 	}
 }

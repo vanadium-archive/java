@@ -23,10 +23,10 @@ public class BenchmarkServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Echo") {
+		if ("echo".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoStream") {
+		if ("echoStream".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

@@ -19,9 +19,18 @@ public final class Label {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Label)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Label other = (Label)obj;
 		if (this.value != other.value) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + value;
+		return result;
 	}
 }

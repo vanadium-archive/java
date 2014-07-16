@@ -25,34 +25,34 @@ public class ErrorThrowerServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "ThrowAborted") {
+		if ("throwAborted".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowBadArg") {
+		if ("throwBadArg".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowBadProtocol") {
+		if ("throwBadProtocol".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowInternal") {
+		if ("throwInternal".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowNotAuthorized") {
+		if ("throwNotAuthorized".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowNotFound") {
+		if ("throwNotFound".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowUnknown") {
+		if ("throwUnknown".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowGoError") {
+		if ("throwGoError".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ThrowCustomStandardError") {
+		if ("throwCustomStandardError".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ListAllBuiltInErrorIDs") {
+		if ("listAllBuiltInErrorIDs".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

@@ -20,10 +20,20 @@ public final class PlayerAction {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof PlayerAction)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final PlayerAction other = (PlayerAction)obj;
 		if (!(this.move.equals(other.move))) return false;
 		if (this.quit != other.quit) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (move == null ? 0 : move.hashCode());
+		result = prime * result + Boolean.valueOf(quit).hashCode();
+		return result;
 	}
 }

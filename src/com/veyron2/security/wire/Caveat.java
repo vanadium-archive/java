@@ -28,10 +28,20 @@ public final class Caveat {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Caveat)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Caveat other = (Caveat)obj;
 		if (!(this.service.equals(other.service))) return false;
 		if (!(this.bytes.equals(other.bytes))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (service == null ? 0 : service.hashCode());
+		result = prime * result + (bytes == null ? 0 : bytes.hashCode());
+		return result;
 	}
 }

@@ -28,10 +28,20 @@ public final class GlobRequest {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof GlobRequest)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final GlobRequest other = (GlobRequest)obj;
 		if (!(this.pattern.equals(other.pattern))) return false;
 		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (pattern == null ? 0 : pattern.hashCode());
+		result = prime * result + (resumeMarker == null ? 0 : resumeMarker.hashCode());
+		return result;
 	}
 }

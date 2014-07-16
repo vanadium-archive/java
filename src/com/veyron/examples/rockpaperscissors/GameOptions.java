@@ -23,10 +23,20 @@ public final class GameOptions {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof GameOptions)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final GameOptions other = (GameOptions)obj;
 		if (this.numRounds != other.numRounds) return false;
 		if (!(this.gameType.equals(other.gameType))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + numRounds;
+		result = prime * result + (gameType == null ? 0 : gameType.hashCode());
+		return result;
 	}
 }

@@ -23,16 +23,16 @@ public class BankAccountServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Deposit") {
+		if ("deposit".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Withdraw") {
+		if ("withdraw".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Transfer") {
+		if ("transfer".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Balance") {
+		if ("balance".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;

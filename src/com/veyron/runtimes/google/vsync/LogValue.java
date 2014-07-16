@@ -39,12 +39,24 @@ public final class LogValue {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof LogValue)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final LogValue other = (LogValue)obj;
 		if (!(this.mutation.equals(other.mutation))) return false;
 		if (this.syncTime != other.syncTime) return false;
 		if (this.delete != other.delete) return false;
 		if (this.continued != other.continued) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (mutation == null ? 0 : mutation.hashCode());
+		result = prime * result + Long.valueOf(syncTime).hashCode();
+		result = prime * result + Boolean.valueOf(delete).hashCode();
+		result = prime * result + Boolean.valueOf(continued).hashCode();
+		return result;
 	}
 }

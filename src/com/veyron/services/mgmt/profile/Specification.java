@@ -37,12 +37,24 @@ public final class Specification {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Specification)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Specification other = (Specification)obj;
 		if (!(this.format.equals(other.format))) return false;
 		if (!(this.libraries.equals(other.libraries))) return false;
 		if (!(this.label.equals(other.label))) return false;
 		if (!(this.description.equals(other.description))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (format == null ? 0 : format.hashCode());
+		result = prime * result + (libraries == null ? 0 : libraries.hashCode());
+		result = prime * result + (label == null ? 0 : label.hashCode());
+		result = prime * result + (description == null ? 0 : description.hashCode());
+		return result;
 	}
 }

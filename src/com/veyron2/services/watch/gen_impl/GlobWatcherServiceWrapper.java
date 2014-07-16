@@ -30,7 +30,7 @@ public class GlobWatcherServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "WatchGlob") {
+		if ("watchGlob".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

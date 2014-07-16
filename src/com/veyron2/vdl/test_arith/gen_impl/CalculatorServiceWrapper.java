@@ -46,10 +46,10 @@ public class CalculatorServiceWrapper {
 			final Object[] tags = this.advancedMath.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "On") {
+		if ("on".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Off") {
+		if ("off".equals(method)) {
 			return new Object[]{ "offtag" };
 		}
 		return null;

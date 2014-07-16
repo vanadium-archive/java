@@ -31,10 +31,10 @@ public class ApplicationServiceWrapper {
 			final Object[] tags = this.application.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "Put") {
+		if ("put".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Remove") {
+		if ("remove".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;

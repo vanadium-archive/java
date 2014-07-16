@@ -4,11 +4,10 @@ package com.veyron2.services.mgmt.node.gen_impl;
 
 import com.veyron2.ipc.ServerCall;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.build.BinaryDescription;
+import com.veyron2.services.mgmt.binary.Description;
 import com.veyron2.services.mgmt.node.Application;
 import com.veyron2.services.mgmt.node.ApplicationFactory;
 import com.veyron2.services.mgmt.node.ApplicationService;
-import com.veyron2.services.mgmt.node.Description;
 import com.veyron2.services.mgmt.node.Node;
 import com.veyron2.services.mgmt.node.NodeFactory;
 import com.veyron2.services.mgmt.node.NodeService;
@@ -32,23 +31,23 @@ public class NodeServiceWrapper {
 			final Object[] tags = this.application.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "Describe") {
+		if ("describe".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "IsRunnable") {
+		if ("isRunnable".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Reset") {
+		if ("reset".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;
 	}
 	// Methods from interface Node.
-	public Description describe(ServerCall call) throws VeyronException { 
+	public com.veyron2.services.mgmt.node.Description describe(ServerCall call) throws VeyronException { 
 		return this.service.describe(call);
 	}
-	public boolean isRunnable(ServerCall call, BinaryDescription Binary) throws VeyronException { 
-		return this.service.isRunnable(call, Binary);
+	public boolean isRunnable(ServerCall call, Description Description) throws VeyronException { 
+		return this.service.isRunnable(call, Description);
 	}
 	public void reset(ServerCall call, long Deadline) throws VeyronException { 
 		this.service.reset(call, Deadline);

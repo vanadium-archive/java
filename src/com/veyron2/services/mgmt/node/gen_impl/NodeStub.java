@@ -49,13 +49,13 @@ public final class NodeStub implements Node {
 
 	}
 	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.build.BinaryDescription Binary) throws com.veyron2.ipc.VeyronException {
-		return isRunnable(context, Binary, null);
+	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
+		return isRunnable(context, Description, null);
 	}
 	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.build.BinaryDescription Binary, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Binary };
+		final java.lang.Object[] inArgs = new java.lang.Object[]{ Description };
 
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch

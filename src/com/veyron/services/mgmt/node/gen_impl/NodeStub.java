@@ -40,11 +40,11 @@ public final class NodeStub implements Node {
 		return this.node.describe(context, veyronOpts);
 	}
 	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.build.BinaryDescription Binary) throws com.veyron2.ipc.VeyronException {
-		return isRunnable(context, Binary, null);
+	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
+		return isRunnable(context, Description, null);
 	}
 	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.build.BinaryDescription Binary, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Add VDL path option.
 		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
 	    // Java to encoding/decoding from vom.Value objects.
@@ -52,7 +52,7 @@ public final class NodeStub implements Node {
 		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
 			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
 		}
-		return this.node.isRunnable(context, Binary, veyronOpts);
+		return this.node.isRunnable(context, Description, veyronOpts);
 	}
 	@Override
 	public void reset(com.veyron2.ipc.Context context, long Deadline) throws com.veyron2.ipc.VeyronException {

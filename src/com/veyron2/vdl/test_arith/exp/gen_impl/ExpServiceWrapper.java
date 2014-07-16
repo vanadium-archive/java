@@ -20,7 +20,7 @@ public class ExpServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Exp") {
+		if ("exp".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

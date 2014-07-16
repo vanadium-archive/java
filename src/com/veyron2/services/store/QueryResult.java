@@ -126,12 +126,24 @@ public final class QueryResult {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof QueryResult)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final QueryResult other = (QueryResult)obj;
 		if (!(this.nestedResult.equals(other.nestedResult))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.fields.equals(other.fields))) return false;
 		if (!(this.value.equals(other.value))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (nestedResult == null ? 0 : nestedResult.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (fields == null ? 0 : fields.hashCode());
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		return result;
 	}
 }

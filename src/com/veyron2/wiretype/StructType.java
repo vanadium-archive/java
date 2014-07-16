@@ -28,11 +28,22 @@ public final class StructType {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof StructType)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final StructType other = (StructType)obj;
 		if (!(this.fields.equals(other.fields))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.tags.equals(other.tags))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (fields == null ? 0 : fields.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (tags == null ? 0 : tags.hashCode());
+		return result;
 	}
 }

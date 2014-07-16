@@ -23,7 +23,7 @@ public class ClockServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Time") {
+		if ("time".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

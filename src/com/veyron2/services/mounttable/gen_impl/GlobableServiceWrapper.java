@@ -27,7 +27,7 @@ public class GlobableServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Glob") {
+		if ("glob".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;

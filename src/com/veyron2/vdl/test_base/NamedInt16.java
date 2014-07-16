@@ -16,9 +16,18 @@ public final class NamedInt16 {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NamedInt16)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NamedInt16 other = (NamedInt16)obj;
 		if (this.value != other.value) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (int)value;
+		return result;
 	}
 }

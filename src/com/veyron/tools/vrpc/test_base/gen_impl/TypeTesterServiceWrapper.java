@@ -25,64 +25,64 @@ public class TypeTesterServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "EchoBool") {
+		if ("echoBool".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoFloat32") {
+		if ("echoFloat32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoFloat64") {
+		if ("echoFloat64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoInt32") {
+		if ("echoInt32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoInt64") {
+		if ("echoInt64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoString") {
+		if ("echoString".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoByte") {
+		if ("echoByte".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoUInt32") {
+		if ("echoUInt32".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "EchoUInt64") {
+		if ("echoUInt64".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "InputArray") {
+		if ("inputArray".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "InputMap") {
+		if ("inputMap".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "InputSlice") {
+		if ("inputSlice".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "InputStruct") {
+		if ("inputStruct".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "OutputArray") {
+		if ("outputArray".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "OutputMap") {
+		if ("outputMap".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "OutputSlice") {
+		if ("outputSlice".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "OutputStruct") {
+		if ("outputStruct".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "NoArguments") {
+		if ("noArguments".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "MultipleArguments") {
+		if ("multipleArguments".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "StreamingOutput") {
+		if ("streamingOutput".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

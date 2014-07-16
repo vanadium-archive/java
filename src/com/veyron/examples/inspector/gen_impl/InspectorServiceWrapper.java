@@ -23,10 +23,10 @@ public class InspectorServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Ls") {
+		if ("ls".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "LsDetails") {
+		if ("lsDetails".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

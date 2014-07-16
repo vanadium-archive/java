@@ -4,15 +4,21 @@ package com.veyron2.services.mgmt.build;
 
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.services.mgmt.binary.Description;
 import com.veyron2.services.mgmt.build.gen_impl.BuildServiceWrapper;
+import com.veyron2.vdl.Stream;
 import com.veyron2.vdl.VeyronService;
+import java.util.ArrayList;
 
 /**
  * Build describes an interface for building binaries from source.
 **/
 @VeyronService(serviceWrapper=BuildServiceWrapper.class)
 public interface BuildService { 
-	// Describe generates a BinaryDescription for a binary identified by
+	// Build streams sources to the build server, which then attempts to
+// build the sources and returns the output.
+	public ArrayList<Byte> build(ServerContext context, Stream<Void,File> stream) throws VeyronException;
+	// Describe generates a description for a binary identified by
 // the given Object name.
-	public BinaryDescription describe(ServerContext context, String name) throws VeyronException;
+	public Description describe(ServerContext context, String name) throws VeyronException;
 }

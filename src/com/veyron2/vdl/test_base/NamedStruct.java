@@ -24,11 +24,22 @@ public final class NamedStruct {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NamedStruct)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NamedStruct other = (NamedStruct)obj;
 		if (this.a != other.a) return false;
 		if (!(this.b.equals(other.b))) return false;
 		if (this.c != other.c) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + Boolean.valueOf(a).hashCode();
+		result = prime * result + (b == null ? 0 : b.hashCode());
+		result = prime * result + c;
+		return result;
 	}
 }

@@ -27,10 +27,20 @@ public final class ServiceSignature {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof ServiceSignature)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ServiceSignature other = (ServiceSignature)obj;
 		if (!(this.typeDefs.equals(other.typeDefs))) return false;
 		if (!(this.methods.equals(other.methods))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (typeDefs == null ? 0 : typeDefs.hashCode());
+		result = prime * result + (methods == null ? 0 : methods.hashCode());
+		return result;
 	}
 }

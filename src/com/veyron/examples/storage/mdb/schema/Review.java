@@ -23,10 +23,20 @@ public final class Review {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Review)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Review other = (Review)obj;
 		if (this.rating != other.rating) return false;
 		if (!(this.text.equals(other.text))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (int)rating;
+		result = prime * result + (text == null ? 0 : text.hashCode());
+		return result;
 	}
 }

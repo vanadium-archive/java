@@ -27,7 +27,7 @@ public class SyncServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "GetDeltas") {
+		if ("getDeltas".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

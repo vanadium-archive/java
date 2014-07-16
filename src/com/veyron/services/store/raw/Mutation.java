@@ -61,7 +61,9 @@ public final class Mutation {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Mutation)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Mutation other = (Mutation)obj;
 		if (!(this.iD.equals(other.iD))) return false;
 		if (!(this.priorVersion.equals(other.priorVersion))) return false;
@@ -71,5 +73,18 @@ public final class Mutation {
 		if (!(this.tags.equals(other.tags))) return false;
 		if (!(this.dir.equals(other.dir))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (iD == null ? 0 : iD.hashCode());
+		result = prime * result + (priorVersion == null ? 0 : priorVersion.hashCode());
+		result = prime * result + (version == null ? 0 : version.hashCode());
+		result = prime * result + Boolean.valueOf(isRoot).hashCode();
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		result = prime * result + (tags == null ? 0 : tags.hashCode());
+		result = prime * result + (dir == null ? 0 : dir.hashCode());
+		return result;
 	}
 }

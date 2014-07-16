@@ -30,13 +30,13 @@ public class ProfileServiceWrapper {
 			final Object[] tags = this.profile.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "Specification") {
+		if ("specification".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "Put") {
+		if ("put".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Remove") {
+		if ("remove".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;

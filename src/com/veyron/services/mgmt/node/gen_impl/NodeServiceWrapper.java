@@ -10,9 +10,8 @@ import com.veyron.services.mgmt.node.NodeFactory;
 import com.veyron.services.mgmt.node.NodeService;
 import com.veyron2.ipc.ServerCall;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.build.BinaryDescription;
+import com.veyron2.services.mgmt.binary.Description;
 import com.veyron2.services.mgmt.node.ApplicationService;
-import com.veyron2.services.mgmt.node.Description;
 
 public class NodeServiceWrapper {
 
@@ -42,11 +41,11 @@ public class NodeServiceWrapper {
 	}
 	// Methods from interface Node.
 	// Methods from sub-interface Node.
-	public Description describe(ServerCall call) throws VeyronException {
+	public com.veyron2.services.mgmt.node.Description describe(ServerCall call) throws VeyronException {
 		return this.node.describe(call);
 	}
-	public boolean isRunnable(ServerCall call, BinaryDescription Binary) throws VeyronException {
-		return this.node.isRunnable(call, Binary);
+	public boolean isRunnable(ServerCall call, Description Description) throws VeyronException {
+		return this.node.isRunnable(call, Description);
 	}
 	public void reset(ServerCall call, long Deadline) throws VeyronException {
 		this.node.reset(call, Deadline);

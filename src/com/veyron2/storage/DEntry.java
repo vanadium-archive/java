@@ -23,10 +23,20 @@ public final class DEntry {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof DEntry)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final DEntry other = (DEntry)obj;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.iD.equals(other.iD))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (iD == null ? 0 : iD.hashCode());
+		return result;
 	}
 }

@@ -27,10 +27,20 @@ public final class PublicKey {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof PublicKey)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final PublicKey other = (PublicKey)obj;
 		if (!(this.curve.equals(other.curve))) return false;
 		if (!(this.xY.equals(other.xY))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (curve == null ? 0 : curve.hashCode());
+		result = prime * result + (xY == null ? 0 : xY.hashCode());
+		return result;
 	}
 }

@@ -42,12 +42,24 @@ public final class Envelope {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Envelope)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Envelope other = (Envelope)obj;
 		if (!(this.title.equals(other.title))) return false;
 		if (!(this.args.equals(other.args))) return false;
 		if (!(this.binary.equals(other.binary))) return false;
 		if (!(this.env.equals(other.env))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (title == null ? 0 : title.hashCode());
+		result = prime * result + (args == null ? 0 : args.hashCode());
+		result = prime * result + (binary == null ? 0 : binary.hashCode());
+		result = prime * result + (env == null ? 0 : env.hashCode());
+		return result;
 	}
 }

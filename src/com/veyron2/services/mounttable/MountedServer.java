@@ -25,10 +25,20 @@ public final class MountedServer {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof MountedServer)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final MountedServer other = (MountedServer)obj;
 		if (!(this.server.equals(other.server))) return false;
 		if (this.tTL != other.tTL) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (server == null ? 0 : server.hashCode());
+		result = prime * result + tTL;
+		return result;
 	}
 }

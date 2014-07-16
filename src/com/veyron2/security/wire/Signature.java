@@ -25,10 +25,20 @@ public final class Signature {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Signature)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Signature other = (Signature)obj;
 		if (!(this.r.equals(other.r))) return false;
 		if (!(this.s.equals(other.s))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (r == null ? 0 : r.hashCode());
+		result = prime * result + (s == null ? 0 : s.hashCode());
+		return result;
 	}
 }

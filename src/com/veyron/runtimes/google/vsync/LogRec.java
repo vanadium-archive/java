@@ -66,7 +66,9 @@ public final class LogRec {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof LogRec)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final LogRec other = (LogRec)obj;
 		if (!(this.devID.equals(other.devID))) return false;
 		if (!(this.gNum.equals(other.gNum))) return false;
@@ -77,5 +79,19 @@ public final class LogRec {
 		if (!(this.parents.equals(other.parents))) return false;
 		if (!(this.value.equals(other.value))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (devID == null ? 0 : devID.hashCode());
+		result = prime * result + (gNum == null ? 0 : gNum.hashCode());
+		result = prime * result + (lSN == null ? 0 : lSN.hashCode());
+		result = prime * result + (int)recType;
+		result = prime * result + (objID == null ? 0 : objID.hashCode());
+		result = prime * result + (curVers == null ? 0 : curVers.hashCode());
+		result = prime * result + (parents == null ? 0 : parents.hashCode());
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		return result;
 	}
 }

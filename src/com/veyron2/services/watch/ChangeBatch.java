@@ -20,9 +20,18 @@ public final class ChangeBatch {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ChangeBatch)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ChangeBatch other = (ChangeBatch)obj;
 		if (!(this.changes.equals(other.changes))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (changes == null ? 0 : changes.hashCode());
+		return result;
 	}
 }

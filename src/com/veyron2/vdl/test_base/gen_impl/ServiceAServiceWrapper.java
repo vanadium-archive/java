@@ -32,16 +32,16 @@ public class ServiceAServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "MethodA1") {
+		if ("methodA1".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "MethodA2") {
+		if ("methodA2".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "MethodA3") {
+		if ("methodA3".equals(method)) {
 			return new Object[]{ "tag", 6L };
 		}
-		if (method == "MethodA4") {
+		if ("methodA4".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

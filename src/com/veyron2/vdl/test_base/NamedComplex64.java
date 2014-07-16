@@ -17,9 +17,18 @@ public final class NamedComplex64 {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NamedComplex64)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NamedComplex64 other = (NamedComplex64)obj;
 		if (!(this.value.equals(other.value))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		return result;
 	}
 }

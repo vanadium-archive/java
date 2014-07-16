@@ -9,7 +9,10 @@ import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Client;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.services.mgmt.binary.Description;
 import com.veyron2.services.mgmt.build.gen_impl.BuildStub;
+import com.veyron2.vdl.ClientStream;
+import java.util.ArrayList;
 
 /* Factory for binding to Build interfaces. */
 public class BuildFactory {

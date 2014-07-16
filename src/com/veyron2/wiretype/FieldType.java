@@ -23,10 +23,20 @@ public final class FieldType {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof FieldType)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final FieldType other = (FieldType)obj;
 		if (!(this.type.equals(other.type))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (type == null ? 0 : type.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		return result;
 	}
 }

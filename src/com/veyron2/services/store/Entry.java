@@ -25,10 +25,20 @@ public final class Entry {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Entry)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Entry other = (Entry)obj;
 		if (!(this.stat.equals(other.stat))) return false;
 		if (!(this.value.equals(other.value))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (stat == null ? 0 : stat.hashCode());
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		return result;
 	}
 }

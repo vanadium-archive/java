@@ -28,11 +28,22 @@ public final class SliceType {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof SliceType)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final SliceType other = (SliceType)obj;
 		if (!(this.elem.equals(other.elem))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.tags.equals(other.tags))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (elem == null ? 0 : elem.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (tags == null ? 0 : tags.hashCode());
+		return result;
 	}
 }

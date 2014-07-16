@@ -9,7 +9,7 @@ import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Client;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.build.BinaryDescription;
+import com.veyron2.services.mgmt.binary.Description;
 import com.veyron2.services.mgmt.node.gen_impl.NodeStub;
 import java.util.ArrayList;
 

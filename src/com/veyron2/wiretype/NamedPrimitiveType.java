@@ -28,11 +28,22 @@ public final class NamedPrimitiveType {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof NamedPrimitiveType)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final NamedPrimitiveType other = (NamedPrimitiveType)obj;
 		if (!(this.type.equals(other.type))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.tags.equals(other.tags))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (type == null ? 0 : type.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (tags == null ? 0 : tags.hashCode());
+		return result;
 	}
 }

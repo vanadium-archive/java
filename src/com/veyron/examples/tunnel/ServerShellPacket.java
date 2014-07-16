@@ -23,10 +23,20 @@ public final class ServerShellPacket {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ServerShellPacket)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ServerShellPacket other = (ServerShellPacket)obj;
 		if (!(this.stdout.equals(other.stdout))) return false;
 		if (!(this.stderr.equals(other.stderr))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (stdout == null ? 0 : stdout.hashCode());
+		result = prime * result + (stderr == null ? 0 : stderr.hashCode());
+		return result;
 	}
 }

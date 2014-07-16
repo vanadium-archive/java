@@ -3,7 +3,7 @@
 // Source: binary.vdl
 
 /**
- * Package binary supports storing and serving veyron application
- * binaries.
+ * Package binary contains types and interfaces for managing
+ * application binaries.
 **/
 package com.veyron2.services.mgmt.binary;

@@ -33,7 +33,9 @@ public final class JudgeAction {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof JudgeAction)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final JudgeAction other = (JudgeAction)obj;
 		if (this.playerNum != other.playerNum) return false;
 		if (!(this.opponentName.equals(other.opponentName))) return false;
@@ -41,5 +43,16 @@ public final class JudgeAction {
 		if (!(this.roundResult.equals(other.roundResult))) return false;
 		if (!(this.score.equals(other.score))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + playerNum;
+		result = prime * result + (opponentName == null ? 0 : opponentName.hashCode());
+		result = prime * result + (moveOptions == null ? 0 : moveOptions.hashCode());
+		result = prime * result + (roundResult == null ? 0 : roundResult.hashCode());
+		result = prime * result + (score == null ? 0 : score.hashCode());
+		return result;
 	}
 }

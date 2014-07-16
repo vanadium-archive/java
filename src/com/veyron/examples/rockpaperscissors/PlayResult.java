@@ -19,9 +19,18 @@ public final class PlayResult {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof PlayResult)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final PlayResult other = (PlayResult)obj;
 		if (this.youWon != other.youWon) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + Boolean.valueOf(youWon).hashCode();
+		return result;
 	}
 }

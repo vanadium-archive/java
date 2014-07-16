@@ -21,10 +21,10 @@ public class CollectionServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Export") {
+		if ("export".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Lookup") {
+		if ("lookup".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

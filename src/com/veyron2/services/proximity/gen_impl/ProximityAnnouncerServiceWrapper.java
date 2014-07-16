@@ -27,10 +27,10 @@ public class ProximityAnnouncerServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "RegisterName") {
+		if ("registerName".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "UnregisterName") {
+		if ("unregisterName".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;

@@ -4,7 +4,6 @@ package com.veyron2.services.mgmt.node;
 
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.build.BinaryDescription;
 import com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper;
 import com.veyron2.vdl.VeyronService;
 
@@ -17,7 +16,7 @@ public interface NodeService extends ApplicationService {
 	// Describe generates a description of the node.
 	public Description describe(ServerContext context) throws VeyronException;
 	// IsRunnable checks if the node can execute the given binary.
-	public boolean isRunnable(ServerContext context, BinaryDescription binary) throws VeyronException;
+	public boolean isRunnable(ServerContext context, com.veyron2.services.mgmt.binary.Description description) throws VeyronException;
 	// Reset resets the node. If the deadline is non-zero and the node
 // in question is still running after the given deadline expired,
 // reset of the node is enforced.

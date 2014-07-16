@@ -28,9 +28,18 @@ public final class Description {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Description)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Description other = (Description)obj;
 		if (!(this.profiles.equals(other.profiles))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (profiles == null ? 0 : profiles.hashCode());
+		return result;
 	}
 }

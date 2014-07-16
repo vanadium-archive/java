@@ -28,11 +28,22 @@ public final class Person {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Person)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Person other = (Person)obj;
 		if (!(this.image.equals(other.image))) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (this.birthDate != other.birthDate) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (image == null ? 0 : image.hashCode());
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + Long.valueOf(birthDate).hashCode();
+		return result;
 	}
 }

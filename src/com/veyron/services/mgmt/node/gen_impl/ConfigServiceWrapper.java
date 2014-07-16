@@ -23,7 +23,7 @@ public class ConfigServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Set") {
+		if ("set".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

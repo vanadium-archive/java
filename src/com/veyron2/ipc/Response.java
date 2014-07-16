@@ -36,11 +36,22 @@ public final class Response {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Response)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Response other = (Response)obj;
 		if (!(this.error.equals(other.error))) return false;
 		if (this.endStreamResults != other.endStreamResults) return false;
 		if (this.numPosResults != other.numPosResults) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (error == null ? 0 : error.hashCode());
+		result = prime * result + Boolean.valueOf(endStreamResults).hashCode();
+		result = prime * result + Long.valueOf(numPosResults).hashCode();
+		return result;
 	}
 }

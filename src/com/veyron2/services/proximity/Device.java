@@ -42,11 +42,22 @@ public final class Device {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Device)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Device other = (Device)obj;
 		if (!(this.mAC.equals(other.mAC))) return false;
 		if (!(this.names.equals(other.names))) return false;
 		if (!(this.distance.equals(other.distance))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (mAC == null ? 0 : mAC.hashCode());
+		result = prime * result + (names == null ? 0 : names.hashCode());
+		result = prime * result + (distance == null ? 0 : distance.hashCode());
+		return result;
 	}
 }

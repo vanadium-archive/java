@@ -41,7 +41,9 @@ public final class ScoreCard {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ScoreCard)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ScoreCard other = (ScoreCard)obj;
 		if (!(this.opts.equals(other.opts))) return false;
 		if (!(this.judge.equals(other.judge))) return false;
@@ -51,5 +53,18 @@ public final class ScoreCard {
 		if (this.endTimeNS != other.endTimeNS) return false;
 		if (!(this.winner.equals(other.winner))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (opts == null ? 0 : opts.hashCode());
+		result = prime * result + (judge == null ? 0 : judge.hashCode());
+		result = prime * result + (players == null ? 0 : players.hashCode());
+		result = prime * result + (rounds == null ? 0 : rounds.hashCode());
+		result = prime * result + Long.valueOf(startTimeNS).hashCode();
+		result = prime * result + Long.valueOf(endTimeNS).hashCode();
+		result = prime * result + (winner == null ? 0 : winner.hashCode());
+		return result;
 	}
 }

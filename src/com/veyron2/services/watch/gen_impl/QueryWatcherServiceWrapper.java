@@ -30,7 +30,7 @@ public class QueryWatcherServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "WatchQuery") {
+		if ("watchQuery".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

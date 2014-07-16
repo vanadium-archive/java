@@ -26,10 +26,10 @@ public class ProfileServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Label") {
+		if ("label".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "Description") {
+		if ("description".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;

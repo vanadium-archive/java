@@ -30,22 +30,22 @@ public class BinaryServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Create") {
+		if ("create".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Delete") {
+		if ("delete".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Download") {
+		if ("download".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "DownloadURL") {
+		if ("downloadURL".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "Stat") {
+		if ("stat".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		if (method == "Upload") {
+		if ("upload".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
 		return null;

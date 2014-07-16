@@ -39,10 +39,10 @@ public class JudgeServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "CreateGame") {
+		if ("createGame".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Play") {
+		if ("play".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

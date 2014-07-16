@@ -47,7 +47,9 @@ public final class Change {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Change)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Change other = (Change)obj;
 		if (!(this.name.equals(other.name))) return false;
 		if (this.state != other.state) return false;
@@ -55,5 +57,16 @@ public final class Change {
 		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
 		if (this.continued != other.continued) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + state;
+		result = prime * result + (value == null ? 0 : value.hashCode());
+		result = prime * result + (resumeMarker == null ? 0 : resumeMarker.hashCode());
+		result = prime * result + Boolean.valueOf(continued).hashCode();
+		return result;
 	}
 }

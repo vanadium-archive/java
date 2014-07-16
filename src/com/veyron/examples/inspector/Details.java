@@ -39,7 +39,9 @@ public final class Details {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Details)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Details other = (Details)obj;
 		if (!(this.name.equals(other.name))) return false;
 		if (this.size != other.size) return false;
@@ -48,5 +50,17 @@ public final class Details {
 		if (this.modNano != other.modNano) return false;
 		if (this.isDir != other.isDir) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + Long.valueOf(size).hashCode();
+		result = prime * result + mode;
+		result = prime * result + Long.valueOf(modUnixSecs).hashCode();
+		result = prime * result + modNano;
+		result = prime * result + Boolean.valueOf(isDir).hashCode();
+		return result;
 	}
 }

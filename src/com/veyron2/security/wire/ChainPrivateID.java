@@ -27,10 +27,20 @@ public final class ChainPrivateID {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ChainPrivateID)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ChainPrivateID other = (ChainPrivateID)obj;
 		if (!(this.publicID.equals(other.publicID))) return false;
 		if (!(this.secret.equals(other.secret))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (publicID == null ? 0 : publicID.hashCode());
+		result = prime * result + (secret == null ? 0 : secret.hashCode());
+		return result;
 	}
 }

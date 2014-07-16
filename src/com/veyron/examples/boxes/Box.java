@@ -31,11 +31,22 @@ public final class Box {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Box)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Box other = (Box)obj;
 		if (!(this.deviceId.equals(other.deviceId))) return false;
 		if (!(this.boxId.equals(other.boxId))) return false;
 		if (!(this.points.equals(other.points))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (deviceId == null ? 0 : deviceId.hashCode());
+		result = prime * result + (boxId == null ? 0 : boxId.hashCode());
+		result = prime * result + (points == null ? 0 : points.hashCode());
+		return result;
 	}
 }

@@ -23,7 +23,7 @@ public class ViewerServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Pipe") {
+		if ("pipe".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

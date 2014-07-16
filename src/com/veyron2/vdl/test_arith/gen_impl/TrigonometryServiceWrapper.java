@@ -30,10 +30,10 @@ public class TrigonometryServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Sine") {
+		if ("sine".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Cosine") {
+		if ("cosine".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

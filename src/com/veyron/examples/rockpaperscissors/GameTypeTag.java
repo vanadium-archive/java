@@ -16,9 +16,18 @@ public final class GameTypeTag {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof GameTypeTag)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final GameTypeTag other = (GameTypeTag)obj;
 		if (this.value != other.value) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (int)value;
+		return result;
 	}
 }

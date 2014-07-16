@@ -37,7 +37,7 @@ public class ServiceBServiceWrapper {
 			final Object[] tags = this.serviceA.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "MethodB1") {
+		if ("methodB1".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

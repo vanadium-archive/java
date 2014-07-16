@@ -34,7 +34,9 @@ public final class CompComp {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof CompComp)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final CompComp other = (CompComp)obj;
 		if (!(this.a0.equals(other.a0))) return false;
 		if (!(this.a1.equals(other.a1))) return false;
@@ -42,5 +44,16 @@ public final class CompComp {
 		if (!(this.a3.equals(other.a3))) return false;
 		if (!(this.a4.equals(other.a4))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (a0 == null ? 0 : a0.hashCode());
+		result = prime * result + (a1 == null ? 0 : a1.hashCode());
+		result = prime * result + (a2 == null ? 0 : a2.hashCode());
+		result = prime * result + (a3 == null ? 0 : a3.hashCode());
+		result = prime * result + (a4 == null ? 0 : a4.hashCode());
+		return result;
 	}
 }

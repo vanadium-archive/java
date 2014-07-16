@@ -24,10 +24,10 @@ public class BoxSignallingServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Add") {
+		if ("add".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Get") {
+		if ("get".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

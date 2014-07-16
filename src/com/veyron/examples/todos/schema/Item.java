@@ -28,11 +28,22 @@ public final class Item {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Item)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Item other = (Item)obj;
 		if (!(this.text.equals(other.text))) return false;
 		if (this.done != other.done) return false;
 		if (!(this.tags.equals(other.tags))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (text == null ? 0 : text.hashCode());
+		result = prime * result + Boolean.valueOf(done).hashCode();
+		result = prime * result + (tags == null ? 0 : tags.hashCode());
+		return result;
 	}
 }

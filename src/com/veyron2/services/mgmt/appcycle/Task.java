@@ -32,10 +32,20 @@ public final class Task {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Task)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Task other = (Task)obj;
 		if (this.progress != other.progress) return false;
 		if (this.goal != other.goal) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + progress;
+		result = prime * result + goal;
+		return result;
 	}
 }

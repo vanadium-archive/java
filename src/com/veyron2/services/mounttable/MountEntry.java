@@ -26,10 +26,20 @@ public final class MountEntry {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof MountEntry)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final MountEntry other = (MountEntry)obj;
 		if (!(this.name.equals(other.name))) return false;
 		if (!(this.servers.equals(other.servers))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		result = prime * result + (servers == null ? 0 : servers.hashCode());
+		return result;
 	}
 }

@@ -36,7 +36,9 @@ public final class Composites {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Composites)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Composites other = (Composites)obj;
 		if (!(this.a0.equals(other.a0))) return false;
 		if (!(this.a1.equals(other.a1))) return false;
@@ -44,5 +46,16 @@ public final class Composites {
 		if (!(this.a4.equals(other.a4))) return false;
 		if (!(this.a5.equals(other.a5))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (a0 == null ? 0 : a0.hashCode());
+		result = prime * result + (a1 == null ? 0 : a1.hashCode());
+		result = prime * result + (a2 == null ? 0 : a2.hashCode());
+		result = prime * result + (a4 == null ? 0 : a4.hashCode());
+		result = prime * result + (a5 == null ? 0 : a5.hashCode());
+		return result;
 	}
 }

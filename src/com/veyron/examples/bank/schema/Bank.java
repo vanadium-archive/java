@@ -20,9 +20,18 @@ public final class Bank {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Bank)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Bank other = (Bank)obj;
 		if (!(this.accounts.equals(other.accounts))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (accounts == null ? 0 : accounts.hashCode());
+		return result;
 	}
 }

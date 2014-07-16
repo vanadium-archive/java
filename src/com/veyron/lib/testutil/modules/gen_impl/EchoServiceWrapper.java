@@ -23,7 +23,7 @@ public class EchoServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Echo") {
+		if ("echo".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

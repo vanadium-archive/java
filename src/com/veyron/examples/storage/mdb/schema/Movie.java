@@ -49,7 +49,9 @@ public final class Movie {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Movie)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Movie other = (Movie)obj;
 		if (!(this.image.equals(other.image))) return false;
 		if (!(this.title.equals(other.title))) return false;
@@ -60,5 +62,19 @@ public final class Movie {
 		if (!(this.genre.equals(other.genre))) return false;
 		if (!(this.director.equals(other.director))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (image == null ? 0 : image.hashCode());
+		result = prime * result + (title == null ? 0 : title.hashCode());
+		result = prime * result + (summary == null ? 0 : summary.hashCode());
+		result = prime * result + (language == null ? 0 : language.hashCode());
+		result = prime * result + Long.valueOf(releaseDate).hashCode();
+		result = prime * result + Long.valueOf(runtime).hashCode();
+		result = prime * result + (genre == null ? 0 : genre.hashCode());
+		result = prime * result + (director == null ? 0 : director.hashCode());
+		return result;
 	}
 }

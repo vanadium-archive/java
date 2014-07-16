@@ -33,13 +33,13 @@ public class MountTableServiceWrapper {
 			final Object[] tags = this.globable.getMethodTags(call, method);
 			if (tags != null) return tags;
 		}
-		if (method == "Mount") {
+		if ("mount".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "Unmount") {
+		if ("unmount".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		if (method == "ResolveStep") {
+		if ("resolveStep".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		return null;

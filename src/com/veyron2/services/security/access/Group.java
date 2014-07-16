@@ -22,9 +22,18 @@ public final class Group {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Group)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Group other = (Group)obj;
 		if (!(this.name.equals(other.name))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (name == null ? 0 : name.hashCode());
+		return result;
 	}
 }

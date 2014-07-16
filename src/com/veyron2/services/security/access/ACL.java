@@ -54,10 +54,20 @@ public final class ACL {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof ACL)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final ACL other = (ACL)obj;
 		if (!(this.in.equals(other.in))) return false;
 		if (!(this.notIn.equals(other.notIn))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (in == null ? 0 : in.hashCode());
+		result = prime * result + (notIn == null ? 0 : notIn.hashCode());
+		return result;
 	}
 }

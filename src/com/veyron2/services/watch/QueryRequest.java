@@ -29,10 +29,20 @@ public final class QueryRequest {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof QueryRequest)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final QueryRequest other = (QueryRequest)obj;
 		if (!(this.query.equals(other.query))) return false;
 		if (!(this.resumeMarker.equals(other.resumeMarker))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (query == null ? 0 : query.hashCode());
+		result = prime * result + (resumeMarker == null ? 0 : resumeMarker.hashCode());
+		return result;
 	}
 }

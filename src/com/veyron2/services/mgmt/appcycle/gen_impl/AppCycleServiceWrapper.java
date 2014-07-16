@@ -23,10 +23,10 @@ public class AppCycleServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Stop") {
+		if ("stop".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ForceStop") {
+		if ("forceStop".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

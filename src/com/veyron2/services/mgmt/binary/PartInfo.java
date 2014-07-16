@@ -5,7 +5,7 @@ package com.veyron2.services.mgmt.binary;
 
 
 /**
- * Info holds information describing a binary part.
+ * PartInfo holds information describing a binary part.
 **/
 public final class PartInfo { 
 	// Checksum holds the hex-encoded MD5 checksum of the binary part.
@@ -25,10 +25,20 @@ public final class PartInfo {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof PartInfo)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final PartInfo other = (PartInfo)obj;
 		if (!(this.checksum.equals(other.checksum))) return false;
 		if (this.size != other.size) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (checksum == null ? 0 : checksum.hashCode());
+		result = prime * result + Long.valueOf(size).hashCode();
+		return result;
 	}
 }

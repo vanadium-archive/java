@@ -130,7 +130,9 @@ public final class Scalars {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Scalars)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Scalars other = (Scalars)obj;
 		if (this.a0 != other.a0) return false;
 		if (this.a1 != other.a1) return false;
@@ -162,5 +164,40 @@ public final class Scalars {
 		if (!(this.b11.equals(other.b11))) return false;
 		if (!(this.b12.equals(other.b12))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + Boolean.valueOf(a0).hashCode();
+		result = prime * result + (int)a1;
+		result = prime * result + (int)a2;
+		result = prime * result + a3;
+		result = prime * result + Long.valueOf(a4).hashCode();
+		result = prime * result + (int)a5;
+		result = prime * result + a6;
+		result = prime * result + Long.valueOf(a7).hashCode();
+		result = prime * result + Float.valueOf(a8).hashCode();
+		result = prime * result + Double.valueOf(a9).hashCode();
+		result = prime * result + (a10 == null ? 0 : a10.hashCode());
+		result = prime * result + (a11 == null ? 0 : a11.hashCode());
+		result = prime * result + (a12 == null ? 0 : a12.hashCode());
+		result = prime * result + (a13 == null ? 0 : a13.hashCode());
+		result = prime * result + (a14 == null ? 0 : a14.hashCode());
+		result = prime * result + (a15 == null ? 0 : a15.hashCode());
+		result = prime * result + (b0 == null ? 0 : b0.hashCode());
+		result = prime * result + (b1 == null ? 0 : b1.hashCode());
+		result = prime * result + (b2 == null ? 0 : b2.hashCode());
+		result = prime * result + (b3 == null ? 0 : b3.hashCode());
+		result = prime * result + (b4 == null ? 0 : b4.hashCode());
+		result = prime * result + (b5 == null ? 0 : b5.hashCode());
+		result = prime * result + (b6 == null ? 0 : b6.hashCode());
+		result = prime * result + (b7 == null ? 0 : b7.hashCode());
+		result = prime * result + (b8 == null ? 0 : b8.hashCode());
+		result = prime * result + (b9 == null ? 0 : b9.hashCode());
+		result = prime * result + (b10 == null ? 0 : b10.hashCode());
+		result = prime * result + (b11 == null ? 0 : b11.hashCode());
+		result = prime * result + (b12 == null ? 0 : b12.hashCode());
+		return result;
 	}
 }

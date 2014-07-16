@@ -26,10 +26,10 @@ public class StoreServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Watch") {
+		if ("watch".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "PutMutations") {
+		if ("putMutations".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

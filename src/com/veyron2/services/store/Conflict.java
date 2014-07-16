@@ -41,7 +41,9 @@ public final class Conflict {
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
-		if (!(obj instanceof Conflict)) return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Conflict other = (Conflict)obj;
 		if (!(this.ty.equals(other.ty))) return false;
 		if (!(this.iD.equals(other.iD))) return false;
@@ -49,5 +51,16 @@ public final class Conflict {
 		if (!(this.remote.equals(other.remote))) return false;
 		if (!(this.root.equals(other.root))) return false;
 		return true;
+	}
+	@Override
+	public int hashCode() {
+		int result = 1;
+		final int prime = 31;
+		result = prime * result + (ty == null ? 0 : ty.hashCode());
+		result = prime * result + (iD == null ? 0 : iD.hashCode());
+		result = prime * result + (local == null ? 0 : local.hashCode());
+		result = prime * result + (remote == null ? 0 : remote.hashCode());
+		result = prime * result + (root == null ? 0 : root.hashCode());
+		return result;
 	}
 }

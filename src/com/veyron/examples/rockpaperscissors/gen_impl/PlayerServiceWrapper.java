@@ -37,7 +37,7 @@ public class PlayerServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Challenge") {
+		if ("challenge".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

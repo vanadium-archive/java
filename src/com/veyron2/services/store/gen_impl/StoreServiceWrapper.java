@@ -31,16 +31,16 @@ public class StoreServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "CreateTransaction") {
+		if ("createTransaction".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Commit") {
+		if ("commit".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "Abort") {
+		if ("abort".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "ReadConflicts") {
+		if ("readConflicts".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;

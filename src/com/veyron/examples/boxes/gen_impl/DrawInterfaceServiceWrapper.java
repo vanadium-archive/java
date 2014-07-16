@@ -26,10 +26,10 @@ public class DrawInterfaceServiceWrapper {
 	 * by this service.
 	 */
 	public Object[] getMethodTags(ServerCall call, String method) { 
-		if (method == "Draw") {
+		if ("draw".equals(method)) {
 			return new Object[]{  };
 		}
-		if (method == "SyncBoxes") {
+		if ("syncBoxes".equals(method)) {
 			return new Object[]{  };
 		}
 		return null;
