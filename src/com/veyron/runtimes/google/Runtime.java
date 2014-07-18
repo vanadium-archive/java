@@ -10,7 +10,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-
+import com.veyron.runtimes.google.android.RedirectStderr;
 import com.veyron2.OptionDefs;
 import com.veyron2.Options;
 import com.veyron2.ipc.Dispatcher;
@@ -43,6 +43,7 @@ public class Runtime implements com.veyron2.Runtime {
 	static {
 		System.loadLibrary("jniwrapper");
 		System.loadLibrary("veyronjni");
+		RedirectStderr.Start();
 	}
 
 	private final long nativePtr;
