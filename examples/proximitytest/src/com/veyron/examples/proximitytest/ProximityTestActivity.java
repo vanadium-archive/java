@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.veyron2.services.proximity.Device;
 import com.veyron2.services.proximity.ProximityFactory;
 import com.veyron2.services.proximity.ProximityScanner;
 import com.veyron2.services.proximity.scanner.ProximityScannerAndroidService;
+import com.veyron2.services.proximity.scanner.ProximityScannerVeyronService.BluetoothNotEnabledException;
 
 /**
  * ProximityTestActivity monitors the list of nearby bluetooth devices and
@@ -49,7 +51,7 @@ public class ProximityTestActivity extends Activity {
         startService(intent);
         boolean success = bindService(intent, conn, Context.BIND_AUTO_CREATE);
         if (!success) {
-            throw new RuntimeException("Failed to bind to service");
+            Log.e("ProximityTestActivity", "Failed to bind to service");
         }
     }
 
@@ -70,6 +72,16 @@ public class ProximityTestActivity extends Activity {
             ProximityScannerAndroidService.BluetoothTestBinder binder =
                     (ProximityScannerAndroidService.BluetoothTestBinder) service;
             serv = binder.getService();
+            try {
+                serv.start();
+            } catch (BluetoothNotEnabledException e) {
+                Log.i("ProximityTestActivity", "Starting proximity test failed because bluetooth is not enabled.");
+                Toast.makeText(getApplicationContext(), "Bluetooth must be enabled. Please renable it and restart the app.", Toast.LENGTH_SHORT).show();
+                return;
+            } catch(VeyronException e) {
+                Toast.makeText(getApplicationContext(), "VeyronException while starting service: " + e, Toast.LENGTH_SHORT).show();
+                return;
+            }
             handler = new PauseHandler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -160,10 +172,7 @@ public class ProximityTestActivity extends Activity {
 
             final Device device = (Device) getItem(position);
             if (device != null) {
-                String deviceStr = String.format("distance: %s names: %s, mac: %s",
-                        device.getDistance(), device.getNames(), device.getMAC());
-                textView.setText(String.format("distance: %s names: %s, mac: %s", device.getDistance(),
-                        device.getNames(), device.getMAC()));
+                textView.setText(String.format("distance: %s names: %s, mac: %s", device.getDistance(), device.getNames(), device.getMAC()));
                 if (device.getDistance() != null && Math.abs(Integer.parseInt(device.getDistance())) < 50) {
                     textView.setTextColor(Color.GREEN);
                 } else {

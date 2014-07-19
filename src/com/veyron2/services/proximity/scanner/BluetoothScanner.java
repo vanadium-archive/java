@@ -32,20 +32,24 @@ class BluetoothScanner implements BluetoothAdapter.LeScanCallback {
 
     /**
      * Construct the bluetooth scanner.
-     * 
+     *
      * @param btAdapter
      */
     public BluetoothScanner(BluetoothAdapter btAdapter) {
         this.adapter = btAdapter;
         devices = new ConcurrentHashMap<String, Device>();
         handler = new PauseHandler();
-        adapter.startLeScan(this);
+        if (!adapter.startLeScan(this)) {
+            Log.e("BluetoothScanner", "Failed to start LE scan.");
+        }
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 adapter.stopLeScan(BluetoothScanner.this);
                 updateState();
-                adapter.startLeScan(BluetoothScanner.this);
+                if (!adapter.startLeScan(BluetoothScanner.this)) {
+                    Log.e("BluetoothScanner", "Failed to start LE scan.");
+                }
                 handler.postDelayed(this, BT_SCAN_PERIOD);
             }
         }, BT_SCAN_PERIOD);

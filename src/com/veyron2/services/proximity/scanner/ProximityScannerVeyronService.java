@@ -1,3 +1,4 @@
+
 package com.veyron2.services.proximity.scanner;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.util.Log;
 
 import com.veyron2.ipc.ServerContext;
 import com.veyron2.ipc.VeyronException;
@@ -22,10 +24,12 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
         this.scanner = scanner;
     }
 
-    public static ProximityScannerVeyronService create(final BluetoothManager bluetoothManager) {
+    public static ProximityScannerVeyronService create(final BluetoothManager bluetoothManager)
+            throws BluetoothNotEnabledException {
         final BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            throw new RuntimeException("Bluetooth not enabled");
+            throw new BluetoothNotEnabledException(
+                    "Creating service failed because bluetooth not enabled");
         }
 
         final BluetoothScanner scanner = new BluetoothScanner(bluetoothAdapter);
@@ -44,9 +48,9 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
             // This should never happen as:
             // - readings.size() > 0 and,
             // - we trim floor(2 * readings.size() / 3) elements from
-            // 'readings',
-            // which leaves at least ceil(readings.size() / 3) elements, which
-            // is greater than 0 when readings.size() > 0.
+            // 'readings', which leaves at least ceil(readings.size() / 3)
+            // elements, which is greater than 0 when readings.size() > 0.
+            Log.e("ProximityScannerVeyronService", "Trimmed readings list is unexpectedly empty.");
             return Integer.MIN_VALUE;
         }
         int totaldBm = 0;
@@ -64,14 +68,15 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
         for (BluetoothScanner.Device bDevice : bDevices) {
             ArrayList<String> names = new ArrayList<String>();
             names.add(bDevice.device.getName());
-            Device d = new Device(bDevice.device.getAddress(),
-            		names, 
-            		Integer.toString(computeAverageDBm(bDevice.readings)));
+            devices.add(new Device(bDevice.device.getAddress(),
+                    names,
+                    Integer.toString(computeAverageDBm(bDevice.readings))));
         }
         Collections.sort(devices, new Comparator<Device>() {
             @Override
             public int compare(Device d1, Device d2) {
-                if (d1 == null || d1.getDistance() == null || d2 == null || d2.getDistance() == null) {
+                if (d1 == null || d1.getDistance() == null || d2 == null
+                        || d2.getDistance() == null) {
                     return 0;
                 }
                 return Integer.parseInt(d2.getDistance()) - Integer.parseInt(d1.getDistance());
@@ -86,5 +91,13 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
 
     public void resume() {
         scanner.resume();
+    }
+
+    public static class BluetoothNotEnabledException extends Exception {
+        private static final long serialVersionUID = -6246827253767202652L;
+
+        public BluetoothNotEnabledException(String msg) {
+            super(msg);
+        }
     }
 }
