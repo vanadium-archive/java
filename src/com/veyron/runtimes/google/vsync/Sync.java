@@ -9,7 +9,7 @@ import com.veyron2.vdl.ClientStream;
 
 /**
  * Sync allows a device to GetDeltas from another device.
-**/
+ */
 public interface Sync { 
 	// GetDeltas returns a device's current generation vector and all the missing log records
 // when compared to the incoming generation vector.

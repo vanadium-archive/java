@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  * Store is the client interface to the storage system.
-**/
+ */
 public interface Store { 
 	// CreateTransaction creates the transaction and sets the options for it.
 	public void createTransaction(Context context, TransactionID tID, ArrayList<java.lang.Object> options) throws VeyronException;

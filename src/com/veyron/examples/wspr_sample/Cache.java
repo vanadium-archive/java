@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 /**
  * A Cache service mimics the memcache interface.
-**/
+ */
 public interface Cache { 
 	// Set sets a value for a key.
 	public void set(Context context, String key, Object value) throws VeyronException;

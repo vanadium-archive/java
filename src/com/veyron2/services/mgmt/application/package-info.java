@@ -4,5 +4,5 @@
 
 /**
  * Package application defines the type for describing an application.
-**/
+ */
 package com.veyron2.services.mgmt.application;

@@ -12,7 +12,7 @@ import com.veyron2.vdl.test_arith.gen_impl.AdvancedMathServiceWrapper;
  * interfaces defined both in the same file and in an external package; and in
  * turn it is embedded by arith.Calculator (which is in the same package but
  * different file) to verify that embedding works in all these scenarios.
-**/
+ */
 @VeyronService(serviceWrapper=AdvancedMathServiceWrapper.class)
 public interface AdvancedMathService extends TrigonometryService, ExpService { 
 }

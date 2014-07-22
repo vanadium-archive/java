@@ -11,7 +11,7 @@ import com.veyron2.vdl.ClientStream;
 /**
  * Store defines a raw interface for the Veyron store. Mutations can be received
  * via the Watcher interface, and committed via PutMutation.
-**/
+ */
 public interface Store { 
 	// Watch returns a stream of all changes.
 	public ClientStream<Void,ChangeBatch,Void> watch(Context context, Request req) throws VeyronException;

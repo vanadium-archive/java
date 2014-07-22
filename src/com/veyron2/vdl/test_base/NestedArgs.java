@@ -8,7 +8,7 @@ package com.veyron2.vdl.test_base;
  * NestedArgs is defined before Args; that's allowed in regular Go, and also
  * allowed in our vdl files.  The compiler will re-order dependent types to ease
  * code generation in other languages.
-**/
+ */
 public final class NestedArgs { 
 		private Args args;
 

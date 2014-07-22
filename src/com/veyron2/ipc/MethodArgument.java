@@ -7,7 +7,7 @@ import com.veyron2.wiretype.TypeID;
 
 /**
  * MethodArgument represents the argument to a method in a method signature.
-**/
+ */
 public final class MethodArgument { 
 		private String name; // Argument name
 		private TypeID type;

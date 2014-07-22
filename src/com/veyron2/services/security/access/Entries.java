@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  * Entries describes a set of principals and groups (of principals).
-**/
+ */
 public final class Entries { 
 	// Principals specifies the type of access being granted or revoked to any
 // Identity that matches the PrincipalPattern.  If multiple patterns match

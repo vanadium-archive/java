@@ -7,7 +7,7 @@ package com.veyron.examples.boxes;
 /**
  * Box describes the name and co-ordinates of a given box that
  * is displayed in the View of a peer device.
-**/
+ */
 public final class Box { 
 	// DeviceID that generated the box
 	private String deviceId;

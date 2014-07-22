@@ -6,7 +6,7 @@ package com.veyron2.services.watch;
 
 /**
  * Change is the new value for a watched entity.
-**/
+ */
 public final class Change { 
 	// Name is the Object name of the entity that changed.  This name is relative
 // to the root entity (i.e. the name of the Watcher service).

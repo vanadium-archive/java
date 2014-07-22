@@ -7,7 +7,7 @@ import com.veyron2.services.watch.ResumeMarker;
 
 /**
  * Request specifies how to resume from a previous Watch call.
-**/
+ */
 public final class Request { 
 	// ResumeMarker specifies how to resume from a previous Watch call.
 // See the ResumeMarker type for detailed comments.

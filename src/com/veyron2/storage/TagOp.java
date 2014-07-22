@@ -6,7 +6,7 @@ package com.veyron2.storage;
 
 /**
  * TagOp is an operation to perform with an ACL.
-**/
+ */
 public final class TagOp { 
 		private byte value;
 

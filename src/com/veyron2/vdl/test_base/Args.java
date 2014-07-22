@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 
 /**
  * Args will be reordered to show up before NestedArgs in the generated output.
-**/
+ */
 public final class Args { 
 		private int a;
 		private int b;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * StructType represents a struct; a sequence of fields.
-**/
+ */
 public final class StructType { 
 		private ArrayList<FieldType> fields;
 		private String name;

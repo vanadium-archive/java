@@ -6,7 +6,7 @@ package com.veyron.examples.storage.mdb.schema;
 
 /**
  * Review is a movie review.
-**/
+ */
 public final class Review { 
 		private byte rating; // 1-10.
 		private String text;

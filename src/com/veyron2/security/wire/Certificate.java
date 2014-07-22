@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * of caveats. The issuer of a Certificate is the principal that possesses the private key
  * under which the Certificate was signed. The Certificate's signature is over the contents
  * of the Certificate along with the Signature of the issuer.
-**/
+ */
 public final class Certificate { 
 	// Name specified in the certificate, e.g., Alice, Bob. Name must not have the
 // character "/".

@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Object provides access control for Veyron objects.
-**/
+ */
 public interface Object { 
 	// SetACL replaces the current ACL for an object.  etag allows for optional,
 // optimistic concurrency control.  If non-empty, etag's value must come

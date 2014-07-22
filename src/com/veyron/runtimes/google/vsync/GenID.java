@@ -6,7 +6,7 @@ package com.veyron.runtimes.google.vsync;
 
 /**
  * GenID is the unique ID per generation per device.
-**/
+ */
 public final class GenID { 
 		private long value;
 

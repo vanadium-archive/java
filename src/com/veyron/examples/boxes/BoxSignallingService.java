@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * BoxSignalling allows peers to rendezvous with each other
-**/
+ */
 @VeyronService(serviceWrapper=BoxSignallingServiceWrapper.class)
 public interface BoxSignallingService { 
 	// Add endpoint information to the signalling server.

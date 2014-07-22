@@ -5,5 +5,5 @@
 /**
  * package benchmark provides simple tools to measure the performance of the
  * IPC system.
-**/
+ */
 package com.veyron.runtimes.google.ipc.benchmarks;

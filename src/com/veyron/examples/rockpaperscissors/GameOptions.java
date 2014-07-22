@@ -6,7 +6,7 @@ package com.veyron.examples.rockpaperscissors;
 
 /**
  * GameOptions specifies the parameters of a game.
-**/
+ */
 public final class GameOptions { 
 		private int numRounds; // The number of rounds that a player must win to win the game.
 		private GameTypeTag gameType; // The type of game to play: Classic or LizardSpock.

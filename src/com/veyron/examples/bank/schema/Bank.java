@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 /**
  * Bank is used to represent the information stored in a bank.
-**/
+ */
 public final class Bank { 
 		private HashMap<String, Long> accounts;
 

@@ -11,7 +11,7 @@ import com.veyron2.ipc.VeyronException;
  * readings from nearby devices.  It also continuously advertises a set of
  * provided names, which will be visible at nearby devices and associated
  * with this device.
-**/
+ */
 public interface ProximityAnnouncer { 
 	// RegisterName adds a name that this device will be associated with;
 // a remote device will see all the unique names currently registered

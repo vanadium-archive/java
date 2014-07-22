@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * Envelope is a collection of metadata that describes an application.
-**/
+ */
 public final class Envelope { 
 	// Title is the publisher-assigned application title.  Application
 // installations with the same title are considered as belonging to the

@@ -10,7 +10,7 @@ import com.veyron2.vdl.ClientStream;
 /**
  * QueryWatcher allows a client to receive updates for changes to objects
  * that match a query.  See the package comments for details.
-**/
+ */
 public interface QueryWatcher { 
 	// WatchQuery returns a stream of changes that satisy a query.
 	public ClientStream<Void,ChangeBatch,Void> watchQuery(Context context, QueryRequest req) throws VeyronException;

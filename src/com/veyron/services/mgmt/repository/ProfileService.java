@@ -11,7 +11,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Profile describes a profile internally. Besides the public Profile
  * interface, it allows to add and remove profile specifications.
-**/
+ */
 @VeyronService(serviceWrapper=ProfileServiceWrapper.class)
 public interface ProfileService extends com.veyron2.services.mgmt.repository.ProfileService { 
 	// Specification returns the profile specification for the profile

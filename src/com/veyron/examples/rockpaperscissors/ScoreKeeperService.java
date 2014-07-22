@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * ScoreKeeper receives the outcome of games from Judges.
-**/
+ */
 @VeyronService(serviceWrapper=ScoreKeeperServiceWrapper.class)
 public interface ScoreKeeperService { 
 		public void record(ServerContext context, ScoreCard score) throws VeyronException;

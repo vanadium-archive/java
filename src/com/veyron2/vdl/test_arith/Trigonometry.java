@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Trigonometry is an interface that specifies a couple trigonometric functions.
-**/
+ */
 public interface Trigonometry { 
 		public double sine(Context context, double angle) throws VeyronException;
 	public double sine(Context context, double angle, Options veyronOpts) throws VeyronException;

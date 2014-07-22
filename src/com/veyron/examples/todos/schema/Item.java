@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * Item is a single task to be done.
-**/
+ */
 public final class Item { 
 		private String text;
 		private boolean done;

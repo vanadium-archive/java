@@ -10,7 +10,7 @@ import java.util.HashMap;
  * determined to run on some set of profiles. The mechanism for
  * determing profiles is specifically not specified and left to the
  * implementation of the interface that generates the description.
-**/
+ */
 public final class Description { 
 	// Name is the Object name of the application binary that can
 // be used to fetch the actual binary from a content server.

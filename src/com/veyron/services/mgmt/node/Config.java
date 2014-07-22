@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Config is an RPC API to the config service.
-**/
+ */
 public interface Config { 
 	// Set sets the value for key.
 	public void set(Context context, String key, String value) throws VeyronException;

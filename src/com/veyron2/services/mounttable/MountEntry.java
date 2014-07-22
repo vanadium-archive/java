@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * MountEntry represents a given name mounted in the mounttable.
-**/
+ */
 public final class MountEntry { 
 	// Name is the mounted name.
 	private String name;

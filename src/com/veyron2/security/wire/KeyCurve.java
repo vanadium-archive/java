@@ -6,7 +6,7 @@ package com.veyron2.security.wire;
 
 /**
  * KeyCurve defines a namespace for elliptic curves.
-**/
+ */
 public final class KeyCurve { 
 		private byte value;
 

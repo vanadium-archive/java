@@ -5,5 +5,5 @@
 /**
  * Package root contains root process implementation and internal
  * interfaces and types used by the implementation.
-**/
+ */
 package com.veyron.services.mgmt.root;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Store is the client interface to the storage system.
-**/
+ */
 @VeyronService(serviceWrapper=StoreServiceWrapper.class)
 public interface StoreService { 
 	// CreateTransaction creates the transaction and sets the options for it.

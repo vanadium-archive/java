@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * The BankAccount can only be accessed by blessed users
-**/
+ */
 public interface BankAccount { 
 	// Deposit adds the amount given to this account.
 	public void deposit(Context context, long amount) throws VeyronException;

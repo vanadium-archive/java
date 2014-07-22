@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * AppCycle interfaces with the process running a veyron runtime.
-**/
+ */
 @VeyronService(serviceWrapper=AppCycleServiceWrapper.class)
 public interface AppCycleService { 
 	// Stop initiates shutdown of the server.  It streams back periodic

@@ -9,7 +9,7 @@ import com.veyron2.vdl.test_arith.gen_impl.TrigonometryServiceWrapper;
 
 /**
  * Trigonometry is an interface that specifies a couple trigonometric functions.
-**/
+ */
 @VeyronService(serviceWrapper=TrigonometryServiceWrapper.class)
 public interface TrigonometryService { 
 		public double sine(ServerContext context, double angle) throws VeyronException;

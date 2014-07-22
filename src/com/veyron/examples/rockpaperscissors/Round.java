@@ -6,7 +6,7 @@ package com.veyron.examples.rockpaperscissors;
 
 /**
  * Round represents the state of a round.
-**/
+ */
 public final class Round { 
 		private String[] moves; // Each player's move.
 		private String comment; // A text comment from judge about the round.

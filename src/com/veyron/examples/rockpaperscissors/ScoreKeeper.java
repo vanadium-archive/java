@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * ScoreKeeper receives the outcome of games from Judges.
-**/
+ */
 public interface ScoreKeeper { 
 		public void record(Context context, ScoreCard score) throws VeyronException;
 	public void record(Context context, ScoreCard score, Options veyronOpts) throws VeyronException;

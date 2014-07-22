@@ -7,7 +7,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Response is sent by the proxy to the server after processing Request.
-**/
+ */
 public final class Response { 
 	// Error is a description of why the proxy refused to proxy the server.
 // A nil error indicates that the proxy will route traffic to the server.

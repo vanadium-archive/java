@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * PublicKey represents an ECDSA PublicKey.
-**/
+ */
 public final class PublicKey { 
 	// Curve identifies the curve of an ECDSA PublicKey.
 	private KeyCurve curve;

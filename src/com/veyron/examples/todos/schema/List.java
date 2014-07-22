@@ -6,7 +6,7 @@ package com.veyron.examples.todos.schema;
 
 /**
  * List is a list of items.
-**/
+ */
 public final class List { 
 		private String name;
 

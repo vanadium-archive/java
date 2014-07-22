@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * The BankAccount can only be accessed by blessed users
-**/
+ */
 @VeyronService(serviceWrapper=BankAccountServiceWrapper.class)
 public interface BankAccountService { 
 	// Deposit adds the amount given to this account.

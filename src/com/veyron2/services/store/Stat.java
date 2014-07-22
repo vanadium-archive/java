@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 /**
  * Stat provides information about an entry in the store.
- *
+ * 
  * TODO(jyh): Specify versioning more precisely.
-**/
+ */
 public final class Stat { 
 	// ID is the unique identifier of the entry.
 	private ID iD;

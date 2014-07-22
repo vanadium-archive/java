@@ -6,7 +6,7 @@ package com.veyron.runtimes.google.vsync;
 
 /**
  * LSN is the log sequence number.
-**/
+ */
 public final class LSN { 
 		private long value;
 

@@ -7,7 +7,7 @@ import com.veyron2.storage.ID;
 
 /**
  * FortuneData contains the information regarding a fortune.
-**/
+ */
 public final class FortuneData { 
 		private String fortune;
 		private ID userName;

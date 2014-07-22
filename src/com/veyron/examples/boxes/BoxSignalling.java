@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * BoxSignalling allows peers to rendezvous with each other
-**/
+ */
 public interface BoxSignalling { 
 	// Add endpoint information to the signalling server.
 	public void add(Context context, String endpoint) throws VeyronException;

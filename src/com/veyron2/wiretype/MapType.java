@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * is unique.  Go has a single canonical map, but other languages may use the
  * tag to indicate the representation; e.g. C++ may use tags "rbtree" and
  * "hashmap" to indicate std::map and std::unordered_map respectively.
-**/
+ */
 public final class MapType { 
 		private TypeID key;
 		private TypeID elem;

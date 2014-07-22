@@ -11,7 +11,7 @@ import com.veyron2.ipc.VeyronException;
  * specifics such as the operating system, hardware architecture, and
  * the set of installed libraries. Profiles describe binaries and
  * devices, and are used to match them.
-**/
+ */
 public interface Profile { 
 	// Label is the human-readable profile key for the profile,
 // e.g. "linux-media". The label can be used to uniquely identify

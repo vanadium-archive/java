@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * Caveat represents a veyron2/security.ServiceCaveat.
-**/
+ */
 public final class Caveat { 
 	// Service is a pattern identifying the services that the caveat encoded in Bytes
 // is bound to.

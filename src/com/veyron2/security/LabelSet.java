@@ -6,7 +6,7 @@ package com.veyron2.security;
 
 /**
  * LabelSet is a set of access control labels, represented as a bitmask.
-**/
+ */
 public final class LabelSet { 
 		private Label value;
 

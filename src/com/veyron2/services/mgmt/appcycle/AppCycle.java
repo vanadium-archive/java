@@ -9,7 +9,7 @@ import com.veyron2.vdl.ClientStream;
 
 /**
  * AppCycle interfaces with the process running a veyron runtime.
-**/
+ */
 public interface AppCycle { 
 	// Stop initiates shutdown of the server.  It streams back periodic
 // updates to give the client an idea of how the shutdown is

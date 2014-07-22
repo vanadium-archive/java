@@ -7,7 +7,7 @@ import com.veyron2.storage.ID;
 
 /**
  * Movie represents a movie.
-**/
+ */
 public final class Movie { 
 		private String image; // URL
 		private String title;

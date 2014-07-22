@@ -4,5 +4,5 @@
 
 /**
  * Package appcycle supports managing the application process.
-**/
+ */
 package com.veyron2.services.mgmt.appcycle;

@@ -5,5 +5,5 @@
 /**
  * Package profile contains implementation and internal interfaces and
  * types used by the implementation of Veyron profiles.
-**/
+ */
 package com.veyron.services.mgmt.profile;

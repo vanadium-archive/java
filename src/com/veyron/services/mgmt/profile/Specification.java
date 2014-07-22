@@ -3,37 +3,51 @@
 // Source: profile.vdl
 package com.veyron.services.mgmt.profile;
 
+import com.veyron2.services.mgmt.build.Architecture;
+import com.veyron2.services.mgmt.build.Format;
+import com.veyron2.services.mgmt.build.OperatingSystem;
 import java.util.HashSet;
 
 /**
  * Specification is how we represent a profile internally. It should
  * provide enough information to allow matching of binaries to nodes.
-**/
+ */
 public final class Specification { 
-	// Format is the file format of the application binary.
-	private Format format;
-	// Libraries is a set of libraries the application binary depends on.
-	private HashSet<Library> libraries;
-	// A human-friendly concise label for the profile, e.g. "linux-media"
-	private String label;
-	// A human-friendly description of the profile.
+	// Arch is the target hardware architecture of the profile.
+	private Architecture arch;
+	// Description is a human-friendly description of the profile.
 	private String description;
+	// Format is the file format supported by the profile.
+	private Format format;
+	// Libraries is a set of libraries the profile requires.
+	private HashSet<Library> libraries;
+	// Label is a human-friendly concise label for the profile,
+// e.g. "linux-media".
+	private String label;
+	// OS is the target operating system of the profile.
+	private OperatingSystem oS;
 
-	public Specification(Format format, HashSet<Library> libraries, String label, String description) { 
+	public Specification(Architecture arch, String description, Format format, HashSet<Library> libraries, String label, OperatingSystem oS) { 
+		this.arch = arch;
+		this.description = description;
 		this.format = format;
 		this.libraries = libraries;
 		this.label = label;
-		this.description = description;
+		this.oS = oS;
 	}
+	public Architecture getArch() { return this.arch; }
+	public String getDescription() { return this.description; }
 	public Format getFormat() { return this.format; }
 	public HashSet<Library> getLibraries() { return this.libraries; }
 	public String getLabel() { return this.label; }
-	public String getDescription() { return this.description; }
+	public OperatingSystem getOS() { return this.oS; }
 
+	public void setArch(Architecture arch) { this.arch = arch; }
+	public void setDescription(String description) { this.description = description; }
 	public void setFormat(Format format) { this.format = format; }
 	public void setLibraries(HashSet<Library> libraries) { this.libraries = libraries; }
 	public void setLabel(String label) { this.label = label; }
-	public void setDescription(String description) { this.description = description; }
+	public void setOS(OperatingSystem oS) { this.oS = oS; }
 
 	@Override
 	public boolean equals(java.lang.Object obj) {
@@ -41,20 +55,24 @@ public final class Specification {
 		if (obj == null) return false;
 		if (this.getClass() != obj.getClass()) return false;
 		final Specification other = (Specification)obj;
+		if (!(this.arch.equals(other.arch))) return false;
+		if (!(this.description.equals(other.description))) return false;
 		if (!(this.format.equals(other.format))) return false;
 		if (!(this.libraries.equals(other.libraries))) return false;
 		if (!(this.label.equals(other.label))) return false;
-		if (!(this.description.equals(other.description))) return false;
+		if (!(this.oS.equals(other.oS))) return false;
 		return true;
 	}
 	@Override
 	public int hashCode() {
 		int result = 1;
 		final int prime = 31;
+		result = prime * result + (arch == null ? 0 : arch.hashCode());
+		result = prime * result + (description == null ? 0 : description.hashCode());
 		result = prime * result + (format == null ? 0 : format.hashCode());
 		result = prime * result + (libraries == null ? 0 : libraries.hashCode());
 		result = prime * result + (label == null ? 0 : label.hashCode());
-		result = prime * result + (description == null ? 0 : description.hashCode());
+		result = prime * result + (oS == null ? 0 : oS.hashCode());
 		return result;
 	}
 }

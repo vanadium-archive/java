@@ -10,7 +10,7 @@ package com.veyron2.storage;
  * of a single ID, meaning that if two stores contain an entry with the same ID
  * and version, then the entries represent the same thing, at the same point in
  * time (as agreed upon by the two stores).
-**/
+ */
 public final class Version { 
 		private long value;
 

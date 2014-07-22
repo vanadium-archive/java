@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Application describes an application repository internally. Besides
  * the public Application interface, it allows to add and remove
  * application envelopes.
-**/
+ */
 @VeyronService(serviceWrapper=ApplicationServiceWrapper.class)
 public interface ApplicationService extends com.veyron2.services.mgmt.repository.ApplicationService { 
 	// Put adds the given tuple of application version (specified

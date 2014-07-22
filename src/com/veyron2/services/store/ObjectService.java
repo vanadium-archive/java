@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * ObjectService is the interface for a value in the store.
-**/
+ */
 @VeyronService(serviceWrapper=ObjectServiceWrapper.class)
 public interface ObjectService extends GlobableService, GlobWatcherService, QueryWatcherService { 
 	// Exists returns true iff the Entry has a value.

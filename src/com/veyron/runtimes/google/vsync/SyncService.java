@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * Sync allows a device to GetDeltas from another device.
-**/
+ */
 @VeyronService(serviceWrapper=SyncServiceWrapper.class)
 public interface SyncService { 
 	// GetDeltas returns a device's current generation vector and all the missing log records

@@ -12,7 +12,7 @@ import com.veyron2.vdl.VeyronService;
  * specifics such as the operating system, hardware architecture, and
  * the set of installed libraries. Profiles describe binaries and
  * devices, and are used to match them.
-**/
+ */
 @VeyronService(serviceWrapper=ProfileServiceWrapper.class)
 public interface ProfileService { 
 	// Label is the human-readable profile key for the profile,

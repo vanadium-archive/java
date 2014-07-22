@@ -9,7 +9,7 @@ import com.veyron2.vdl.ClientStream;
 
 /**
  * DrawInterface enables adding a box on another peer
-**/
+ */
 public interface DrawInterface { 
 	// Draw is used to send/receive a stream of boxes to another peer
 	public ClientStream<Box,Box,Void> draw(Context context) throws VeyronException;

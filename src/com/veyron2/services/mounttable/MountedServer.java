@@ -6,7 +6,7 @@ package com.veyron2.services.mounttable;
 
 /**
  * MountedServer represents a server mounted on a specific name.
-**/
+ */
 public final class MountedServer { 
 	// Server is the OA that's mounted.
 	private String server;

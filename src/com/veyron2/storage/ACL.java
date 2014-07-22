@@ -6,7 +6,7 @@ package com.veyron2.storage;
 
 /**
  * ACL has a security.ACL and a name.
-**/
+ */
 public final class ACL { 
 		private String name;
 		private com.veyron2.security.ACL contents;

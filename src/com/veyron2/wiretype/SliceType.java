@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * SliceType represents a variable-length sequence of Elem values.
-**/
+ */
 public final class SliceType { 
 		private TypeID elem;
 		private String name;

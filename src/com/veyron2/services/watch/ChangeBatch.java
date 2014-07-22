@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * ChangeBatch is a batch of Change messages.
-**/
+ */
 public final class ChangeBatch { 
 		private ArrayList<Change> changes;
 

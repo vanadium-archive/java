@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * MountTable defines the interface to talk to a mounttable.
-**/
+ */
 public interface MountTable extends Globable { 
 	// Mount Server (a global name) onto the receiver.
 // Subsequent mounts add to the servers mounted there.  The multiple

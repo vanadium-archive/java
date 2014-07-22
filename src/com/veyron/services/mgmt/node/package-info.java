@@ -5,5 +5,5 @@
 /**
  * Package node contains implementation of managing a node and
  * applications running on the node.
-**/
+ */
 package com.veyron.services.mgmt.node;

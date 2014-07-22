@@ -7,7 +7,7 @@ import com.veyron.services.store.raw.Mutation;
 
 /**
  * LogValue represents an object mutation within a transaction.
-**/
+ */
 public final class LogValue { 
 	// Mutation is the store mutation representing the change in the object.
 	private Mutation mutation;

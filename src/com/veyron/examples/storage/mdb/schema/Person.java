@@ -7,7 +7,7 @@ package com.veyron.examples.storage.mdb.schema;
 /**
  * Person represents a person, in any role, including producers, director,
  * actor, etc.
-**/
+ */
 public final class Person { 
 		private String image; // URL
 		private String name;

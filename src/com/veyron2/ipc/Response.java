@@ -9,7 +9,7 @@ package com.veyron2.ipc;
  * zero response header is sent before each streaming arg.  Thereafter a
  * non-zero response header is sent at the end of the RPC call, right before
  * the positional results.
-**/
+ */
 public final class Response { 
 	// Error in processing the RPC at the server. Implies EndStreamResults.
 	private VeyronException error;

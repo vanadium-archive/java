@@ -6,7 +6,7 @@ package com.veyron2.services.store;
 
 /**
  * Entry represents a value at some point in time in the store.
-**/
+ */
 public final class Entry { 
 	// Stat is the entry's metadata.
 	private Stat stat;

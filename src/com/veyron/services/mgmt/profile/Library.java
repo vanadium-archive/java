@@ -6,7 +6,7 @@ package com.veyron.services.mgmt.profile;
 
 /**
  * Library describes a shared library that applications may use.
-**/
+ */
 public final class Library { 
 	// Name is the name of the library.
 	private String name;

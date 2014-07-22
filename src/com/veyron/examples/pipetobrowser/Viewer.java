@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 /**
  * Viewer allows clients to stream data to it and to request a particular viewer to format and display the data.
-**/
+ */
 public interface Viewer { 
 	// Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
-	public ClientStream<ArrayList<Byte>,Void,Long> pipe(Context context) throws VeyronException;
-	public ClientStream<ArrayList<Byte>,Void,Long> pipe(Context context, Options veyronOpts) throws VeyronException;
+	public ClientStream<ArrayList<Byte>,Void,Object> pipe(Context context) throws VeyronException;
+	public ClientStream<ArrayList<Byte>,Void,Object> pipe(Context context, Options veyronOpts) throws VeyronException;
 }

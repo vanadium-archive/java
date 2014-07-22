@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  * ObjectService is the interface for a value in the store.
-**/
+ */
 public interface Object extends Globable, GlobWatcher, QueryWatcher { 
 	// Exists returns true iff the Entry has a value.
 	public boolean exists(Context context, TransactionID tID) throws VeyronException;

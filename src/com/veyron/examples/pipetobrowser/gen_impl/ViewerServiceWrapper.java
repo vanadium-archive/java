@@ -29,7 +29,7 @@ public class ViewerServiceWrapper {
 		return null;
 	}
 	// Methods from interface Viewer.
-	public long pipe(ServerCall call) throws VeyronException { 
+	public Object pipe(ServerCall call) throws VeyronException { 
 		final ServerCall serverCall = call;
 		final Stream<Void,ArrayList<Byte>> stream = new Stream<Void,ArrayList<Byte>>() {
 			@Override

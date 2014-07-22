@@ -7,7 +7,7 @@ package com.veyron2.query;
 /**
  * Query is the Veyron query language.  The specification of this
  * language is at <placeholder>.
-**/
+ */
 public final class Query { 
 	// Stmt is the human-readable representation of the query.
 	private String stmt;

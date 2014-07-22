@@ -8,7 +8,7 @@ package com.veyron.runtimes.google.ipc.stream.proxy;
  * Request is the message sent by a server to request that the proxy route
  * traffic intended for the server's RoutingID to the network connection
  * between the server and the proxy.
-**/
+ */
 public final class Request { 
 
 	public Request() { 

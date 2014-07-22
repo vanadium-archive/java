@@ -6,7 +6,7 @@ package com.veyron2.security;
 
 /**
  * PrincipalPattern is a pattern identifying a set of principal names.
-**/
+ */
 public final class PrincipalPattern { 
 		private String value;
 

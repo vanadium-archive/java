@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * DischargeIssuer service issues caveat discharges when requested.
-**/
+ */
 @VeyronService(serviceWrapper=DischargerServiceWrapper.class)
 public interface DischargerService { 
 	// Discharge is called by a principal that holds a blessing with a third

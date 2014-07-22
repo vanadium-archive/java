@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * A testing interface with methods that throw various types of errors
-**/
+ */
 public interface ErrorThrower { 
 	// Throws veyron2/vError.Aborted error
 	public void throwAborted(Context context) throws VeyronException;

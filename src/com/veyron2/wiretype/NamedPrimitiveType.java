@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * NamedPrimitiveType adds name and tag meta-information to a primitive type.
-**/
+ */
 public final class NamedPrimitiveType { 
 		private TypeID type;
 		private String name;

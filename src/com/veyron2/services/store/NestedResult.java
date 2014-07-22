@@ -7,7 +7,7 @@ package com.veyron2.services.store;
 /**
  * NestedResult allows nested query results to be sent out-of-line.
  * See QueryResult for a full explanation.
-**/
+ */
 public final class NestedResult { 
 		private long value;
 

@@ -6,7 +6,7 @@ package com.veyron2.services.mgmt.binary;
 
 /**
  * PartInfo holds information describing a binary part.
-**/
+ */
 public final class PartInfo { 
 	// Checksum holds the hex-encoded MD5 checksum of the binary part.
 	private String checksum;

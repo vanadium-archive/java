@@ -10,7 +10,7 @@ import java.util.HashMap;
  * ServiceSignature represents the signature of the service. This includes type information needed
  * to resolve the method argument types.
  * TODO(bprosnitz) Rename this and move it to wiretype.
-**/
+ */
 public final class ServiceSignature { 
 		private ArrayList<Object> typeDefs; // A slice of wiretype structures form the type definition.
 		private HashMap<String, MethodSignature> methods;

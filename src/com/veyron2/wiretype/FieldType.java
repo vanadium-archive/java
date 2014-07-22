@@ -6,7 +6,7 @@ package com.veyron2.wiretype;
 
 /**
  * FieldType represents a single possibly-named field in a struct.
-**/
+ */
 public final class FieldType { 
 		private TypeID type;
 		private String name;

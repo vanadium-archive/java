@@ -12,12 +12,12 @@ import java.util.ArrayList;
 
 /**
  * Build describes an interface for building binaries from source.
-**/
+ */
 @VeyronService(serviceWrapper=BuildServiceWrapper.class)
 public interface BuildService { 
 	// Build streams sources to the build server, which then attempts to
-// build the sources and returns the output.
-	public ArrayList<Byte> build(ServerContext context, Stream<Void,File> stream) throws VeyronException;
+// build the sources and streams back the compiled binaries.
+	public ArrayList<Byte> build(ServerContext context, Stream<File,File> stream) throws VeyronException;
 	// Describe generates a description for a binary identified by
 // the given Object name.
 	public Description describe(ServerContext context, String name) throws VeyronException;

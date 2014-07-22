@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * DischargeIssuer service issues caveat discharges when requested.
-**/
+ */
 public interface Discharger { 
 	// Discharge is called by a principal that holds a blessing with a third
 // party caveat and seeks to get a discharge that proves the fulfillment of

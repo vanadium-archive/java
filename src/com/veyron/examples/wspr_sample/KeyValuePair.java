@@ -6,7 +6,7 @@ package com.veyron.examples.wspr_sample;
 
 /**
  * KeyValuePair is a representation of a cached key and value pair.
-**/
+ */
 public final class KeyValuePair { 
 		private String key;
 		private Object value;

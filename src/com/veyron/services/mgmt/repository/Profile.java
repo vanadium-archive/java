@@ -10,7 +10,7 @@ import com.veyron2.ipc.VeyronException;
 /**
  * Profile describes a profile internally. Besides the public Profile
  * interface, it allows to add and remove profile specifications.
-**/
+ */
 public interface Profile extends com.veyron2.services.mgmt.repository.Profile { 
 	// Specification returns the profile specification for the profile
 // identified through the object name suffix.

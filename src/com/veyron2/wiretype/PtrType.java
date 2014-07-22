@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * WARNING: DEPRECATED
  * TODO(bprosnitz) Remove this.
  * PtrType represents a pointer; a value referencing an underlying Elem value.
-**/
+ */
 public final class PtrType { 
 		private TypeID elem;
 		private String name;

@@ -9,7 +9,7 @@ import com.veyron2.ipc.VeyronException;
 /**
  * Root is an interface to be implemented by a process with root level
  * privileges.
-**/
+ */
 public interface Root { 
 	// Reset waits for the given deadline (in milliseconds) and then
 // restars the host node machine.

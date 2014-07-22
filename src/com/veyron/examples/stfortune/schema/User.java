@@ -6,7 +6,7 @@ package com.veyron.examples.stfortune.schema;
 
 /**
  * User contains the information corresponding to a particular UserName in the store.
-**/
+ */
 public final class User { 
 		private String name;
 

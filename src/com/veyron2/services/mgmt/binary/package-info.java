@@ -5,5 +5,5 @@
 /**
  * Package binary contains types and interfaces for managing
  * application binaries.
-**/
+ */
 package com.veyron2.services.mgmt.binary;

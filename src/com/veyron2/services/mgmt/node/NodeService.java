@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Node can be used to manage a node. The idea is that this interace
  * will be invoked using an object name that identifies the node.
-**/
+ */
 @VeyronService(serviceWrapper=NodeServiceWrapper.class)
 public interface NodeService extends ApplicationService { 
 	// Describe generates a description of the node.

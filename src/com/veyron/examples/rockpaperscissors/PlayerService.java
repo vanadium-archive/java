@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * Player can receive challenges from other players.
-**/
+ */
 @VeyronService(serviceWrapper=PlayerServiceWrapper.class)
 public interface PlayerService { 
 	// Challenge is used by other players to challenge this player to a game. If

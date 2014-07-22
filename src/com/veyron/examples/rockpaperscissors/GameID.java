@@ -6,7 +6,7 @@ package com.veyron.examples.rockpaperscissors;
 
 /**
  * A GameID is used to uniquely identify a game within one Judge.
-**/
+ */
 public final class GameID { 
 		private String iD;
 

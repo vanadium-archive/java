@@ -10,7 +10,7 @@ package com.veyron2.ipc;
  * the positional args.  Thereafter a zero request header is sent before each
  * streaming arg, terminated by a non-zero request header with EndStreamArgs set
  * to true.
-**/
+ */
 public final class Request { 
 	// Suffix of the name used to identify the object hosting the service.
 	private String suffix;

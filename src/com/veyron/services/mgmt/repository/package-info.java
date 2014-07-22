@@ -5,5 +5,5 @@
 /**
  * Package repository contains implementation of the interface for
  * storing and serving various veyron management objects.
-**/
+ */
 package com.veyron.services.mgmt.repository;

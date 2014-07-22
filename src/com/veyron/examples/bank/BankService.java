@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Bank allows clients to store virtual money. Certain implementations can use persistent storage.
  * Uses the client's Veyron Identity to determine account access.
-**/
+ */
 @VeyronService(serviceWrapper=BankServiceWrapper.class)
 public interface BankService { 
 	// ConnectOut packages output arguments for method Connect.

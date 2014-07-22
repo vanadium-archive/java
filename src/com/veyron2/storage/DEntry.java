@@ -6,7 +6,7 @@ package com.veyron2.storage;
 
 /**
  * DEntry is a directory entry.
-**/
+ */
 public final class DEntry { 
 		private String name;
 		private ID iD;

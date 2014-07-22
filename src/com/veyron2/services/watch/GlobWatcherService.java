@@ -11,7 +11,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * GlobWatcher allows a client to receive updates for changes to objects
  * that match a pattern.  See the package comments for details.
-**/
+ */
 @VeyronService(serviceWrapper=GlobWatcherServiceWrapper.class)
 public interface GlobWatcherService { 
 	// WatchGlob returns a stream of changes that match a pattern.

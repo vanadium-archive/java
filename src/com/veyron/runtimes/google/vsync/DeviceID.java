@@ -6,7 +6,7 @@ package com.veyron.runtimes.google.vsync;
 
 /**
  * DeviceID is the globally unique ID of a device.
-**/
+ */
 public final class DeviceID { 
 		private String value;
 

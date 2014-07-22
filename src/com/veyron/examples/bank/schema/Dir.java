@@ -6,7 +6,7 @@ package com.veyron.examples.bank.schema;
 
 /**
  * Dir is used to represent directories.
-**/
+ */
 public final class Dir { 
 	// TODO(jyh): The IDL does not recognize empty structs.  Fix it and remove this
 // useless field.

@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Device represents one neighborhood device.  It contains that device's
  * MAC address, observed names, and the average distance to the device.
  * TODO(bprosnitz) This is bluetooth specific. We need a more generate service as well.
-**/
+ */
 public final class Device { 
 	// MAC is remote device's MAC address, in one of the following formats
 // (as per http://golang.org/pkg/net/#ParseMAC):

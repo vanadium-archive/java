@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * ArrayType represents a fixed-length sequence of Elem values.
-**/
+ */
 public final class ArrayType { 
 		private TypeID elem;
 		private long len;

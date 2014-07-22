@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  * A testing interface with methods that throw various types of errors
-**/
+ */
 @VeyronService(serviceWrapper=ErrorThrowerServiceWrapper.class)
 public interface ErrorThrowerService { 
 	// Throws veyron2/vError.Aborted error

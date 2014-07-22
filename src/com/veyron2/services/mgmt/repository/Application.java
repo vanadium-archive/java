@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * application envelope is identified by an application name and an
  * application version, which are specified through the object name,
  * and a profile name, which is specified using a method argument.
- *
+ * 
  * Example:
  * /apps/search/v1.Match([]string{"base", "media"})
- *   returns an application envelope that can be used for downloading
- *   and executing the "search" application, version "v1", runnable
- *   on either the "base" or "media" profile.
-**/
+ * returns an application envelope that can be used for downloading
+ * and executing the "search" application, version "v1", runnable
+ * on either the "base" or "media" profile.
+ */
 public interface Application { 
 	// Match checks if any of the given profiles contains an application
 // envelope for the given application version (specified through the

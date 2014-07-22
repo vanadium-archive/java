@@ -10,6 +10,7 @@ import com.veyron2.services.mgmt.build.Build;
 import com.veyron2.services.mgmt.build.BuildFactory;
 import com.veyron2.services.mgmt.build.BuildService;
 import com.veyron2.services.mgmt.build.File;
+import com.veyron2.services.mgmt.build.VeyronConsts;
 import com.veyron2.vdl.Stream;
 import java.util.ArrayList;
 
@@ -36,9 +37,9 @@ public class BuildServiceWrapper {
 	// Methods from interface Build.
 	public ArrayList<Byte> build(ServerCall call) throws VeyronException { 
 		final ServerCall serverCall = call;
-		final Stream<Void,File> stream = new Stream<Void,File>() {
+		final Stream<File,File> stream = new Stream<File,File>() {
 			@Override
-			public void send(Void item) throws VeyronException {
+			public void send(File item) throws VeyronException {
 				serverCall.send(item);
 			}
 			@Override

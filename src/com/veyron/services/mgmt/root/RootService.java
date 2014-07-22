@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * Root is an interface to be implemented by a process with root level
  * privileges.
-**/
+ */
 @VeyronService(serviceWrapper=RootServiceWrapper.class)
 public interface RootService { 
 	// Reset waits for the given deadline (in milliseconds) and then

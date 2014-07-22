@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 /**
  * Description enumerates the profiles that a Node supports.
-**/
+ */
 public final class Description { 
 	// Profiles is a set of names of supported profiles.	Each name can
 // either be an object name that resolves to a Profile, or can be the

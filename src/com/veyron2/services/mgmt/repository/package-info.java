@@ -5,5 +5,5 @@
 /**
  * Package repository can be used for storing and serving various
  * veyron management objects.
-**/
+ */
 package com.veyron2.services.mgmt.repository;

@@ -11,7 +11,7 @@ import com.veyron2.vdl.VeyronService;
 /**
  * QueryWatcher allows a client to receive updates for changes to objects
  * that match a query.  See the package comments for details.
-**/
+ */
 @VeyronService(serviceWrapper=QueryWatcherServiceWrapper.class)
 public interface QueryWatcherService { 
 	// WatchQuery returns a stream of changes that satisy a query.

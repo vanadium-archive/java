@@ -7,7 +7,7 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * WinnerTag is a type used to indicate whether a round or a game was a draw,
  * was won by player 1 or was won by player 2.
-**/
+ */
 public final class WinnerTag { 
 		private byte value;
 

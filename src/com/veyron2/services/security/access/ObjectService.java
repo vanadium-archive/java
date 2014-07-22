@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * Object provides access control for Veyron objects.
-**/
+ */
 @VeyronService(serviceWrapper=ObjectServiceWrapper.class)
 public interface ObjectService { 
 	// SetACL replaces the current ACL for an object.  etag allows for optional,

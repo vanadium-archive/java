@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
-**/
+ */
 public final class Mutation { 
 	// ID is the key that identifies the entry.
 	private ID iD;

@@ -12,8 +12,8 @@ import com.veyron2.vdl.test_base.NestedArgs;
 /**
  * Arith is an example of an interface definition for an arithmetic service.
  * Things to note:
- *   * There must be at least 1 out-arg, and the last out-arg must be error.
-**/
+ * * There must be at least 1 out-arg, and the last out-arg must be error.
+ */
 public interface Arith { 
 	// Add is a typical method with multiple input and output arguments.
 	public int add(Context context, int a, int b) throws VeyronException;

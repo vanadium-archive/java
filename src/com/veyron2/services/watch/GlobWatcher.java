@@ -10,7 +10,7 @@ import com.veyron2.vdl.ClientStream;
 /**
  * GlobWatcher allows a client to receive updates for changes to objects
  * that match a pattern.  See the package comments for details.
-**/
+ */
 public interface GlobWatcher { 
 	// WatchGlob returns a stream of changes that match a pattern.
 	public ClientStream<Void,ChangeBatch,Void> watchGlob(Context context, GlobRequest req) throws VeyronException;

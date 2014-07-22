@@ -10,12 +10,12 @@ package com.veyron2.services.mgmt.appcycle;
  * The meaning of Progress and Goal are up to the developer (the server provides
  * the framework with values for these).  The recommended meanings are:
  * - Progress: how far along the shutdown sequence the server is.  This should
- *   be a monotonically increasing number.
+ * be a monotonically increasing number.
  * - Goal: when Progress reaches this value, the shutdown is expected to
- *   complete.  This should not change during a stream, but could change if
- *   e.g. new shutdown tasks are triggered that were not forseen at the outset
- *   of the shutdown.
-**/
+ * complete.  This should not change during a stream, but could change if
+ * e.g. new shutdown tasks are triggered that were not forseen at the outset
+ * of the shutdown.
+ */
 public final class Task { 
 		private int progress;
 		private int goal;

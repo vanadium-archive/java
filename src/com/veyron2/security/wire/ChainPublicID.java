@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * chain). The first certificate of the chain is "self signed". The last certificate's public key is
  * considered the PublicID's public key. The chain of certificates, if valid, effectively binds a chain
  * of names to the PublicID's public key.
-**/
+ */
 public final class ChainPublicID { 
 	// Certificates specifies the chain of certificates for the PublicID.
 	private ArrayList<Certificate> certificates;

@@ -8,7 +8,7 @@ package com.veyron2.wiretype;
  * TypeID serves as a reference to a type definition.  The TypeID is only unique
  * within a single Encoder / Decoder stream; different streams may use different
  * TypeIDs to represent the same types.
-**/
+ */
 public final class TypeID { 
 		private long value;
 

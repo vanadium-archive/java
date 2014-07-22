@@ -4,5 +4,5 @@
 
 /**
  * Package mounttable defines a set of mount points and how to traverse them.
-**/
+ */
 package com.veyron2.services.mounttable;

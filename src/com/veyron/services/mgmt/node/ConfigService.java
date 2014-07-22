@@ -9,7 +9,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * Config is an RPC API to the config service.
-**/
+ */
 @VeyronService(serviceWrapper=ConfigServiceWrapper.class)
 public interface ConfigService { 
 	// Set sets the value for key.

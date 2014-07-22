@@ -7,7 +7,7 @@ import com.veyron2.storage.ID;
 
 /**
  * Part represents the role of an actor.
-**/
+ */
 public final class Part { 
 		private ID actor; // Person
 		private String character;

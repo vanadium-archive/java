@@ -7,7 +7,7 @@ package com.veyron2.services.watch;
 /**
  * GlobRequest specifies which entities should be watched and, optionally,
  * how to resume from a previous Watch call.
-**/
+ */
 public final class GlobRequest { 
 	// Pattern specifies the subset of the children of the root entity
 // for which the client wants updates.

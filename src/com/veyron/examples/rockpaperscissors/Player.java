@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Player can receive challenges from other players.
-**/
+ */
 public interface Player { 
 	// Challenge is used by other players to challenge this player to a game. If
 // the challenge is accepted, the method returns nil.

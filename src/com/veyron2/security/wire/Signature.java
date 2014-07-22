@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * Signature represents an ECDSA signature.
-**/
+ */
 public final class Signature { 
 	// R, S specify the pair of integers that make up an ECDSA signature.
 	private ArrayList<Byte> r;

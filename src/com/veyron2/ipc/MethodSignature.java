@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * MethodSignature represents the structure for passing around method
  * signatures. This is usually sent in a ServiceSignature.
-**/
+ */
 public final class MethodSignature { 
 		private ArrayList<MethodArgument> inArgs; // Positional Argument information.
 		private ArrayList<MethodArgument> outArgs;

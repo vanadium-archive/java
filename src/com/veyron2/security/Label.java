@@ -6,7 +6,7 @@ package com.veyron2.security;
 
 /**
  * Label is an access control right, like Read, Write, Admin, etc.
-**/
+ */
 public final class Label { 
 		private int value;
 

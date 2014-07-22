@@ -9,7 +9,7 @@ import com.veyron2.ipc.VeyronException;
 /**
  * Bank allows clients to store virtual money. Certain implementations can use persistent storage.
  * Uses the client's Veyron Identity to determine account access.
-**/
+ */
 public interface Bank { 
 	// ConnectOut packages output arguments for method Connect.
 	public static class ConnectOut { 

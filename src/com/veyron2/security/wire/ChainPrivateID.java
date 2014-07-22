@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * ChainPrivateID represents the chain implementation of PrivateIDs from veyron/runtimes/google/security.
-**/
+ */
 public final class ChainPrivateID { 
 	// PublicID associated with the PrivateID.
 	private ChainPublicID publicID;

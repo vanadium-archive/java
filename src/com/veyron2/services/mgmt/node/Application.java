@@ -12,76 +12,76 @@ import java.util.ArrayList;
  * idea is that this interace will be invoked using an object name that
  * identifies the application and its installations and instances
  * where applicable.
- *
+ * 
  * In particular, the interface methods can be divided into three
  * groups based on their intended receiver:
- *
+ * 
  * 1) Method receiver is an application:
  * -- Install()
- *
+ * 
  * 2) Method receiver is an application installation:
  * -- Start()
  * -- Uninstall()
  * -- Update()
- *
+ * 
  * 3) Method receiver is application installation instance:
  * -- Refresh()
  * -- Restart()
  * -- Resume()
  * -- Stop()
  * -- Suspend()
- *
+ * 
  * For groups 2) and 3), the suffix that specifies the receiver can
  * optionally omit the installation and/or instance, in which case the
  * operation applies to all installations and/or instances in the
  * scope of the suffix.
- *
+ * 
  * Examples:
  * # Install Google Maps on the node.
  * device/apps.Install("/google.com/appstore/maps") --> "google maps/0"
- *
+ * 
  * # Start an instance of the previously installed maps application installation.
  * device/apps/google maps/0.Start() --> { "0" }
- *
+ * 
  * # Start a second instance of the previously installed maps application installation.
  * device/apps/google maps/0.Start() --> { "1" }
- *
+ * 
  * # Stop the first instance previously started.
  * device/apps/google maps/0/0.Stop()
- *
+ * 
  * # Install a second Google Maps installation.
  * device/apps.Install("/google.com/appstore/maps") --> "google maps/1"
- *
+ * 
  * # Start an instance for all maps application installations.
  * device/apps/google maps.Start() --> {"0/2", "1/0"}
- *
+ * 
  * # Refresh the state of all instances of all maps application installations.
  * device/apps/google maps.Refresh()
- *
+ * 
  * # Refresh the state of all instances of the maps application installation
  * identified by the given suffix.
  * device/apps/google maps/0.Refresh()
- *
+ * 
  * # Refresh the state of the maps application installation instance identified by
  * the given suffix.
  * device/apps/google maps/0/2.Refresh()
- *
+ * 
  * # Update the second maps installation to the latest version available.
  * device/apps/google maps/1.Update()
- *
+ * 
  * # Update the first maps installation to a specific version.
  * device/apps/google maps/0.UpdateTo("/google.com/appstore/beta/maps")
- *
+ * 
  * Further, the following methods complement one another:
  * -- Install() and Uninstall()
  * -- Start() and Stop()
  * -- Suspend() and Resume()
- *
+ * 
  * Finally, an application installation instance can be in one of
  * three abstract states: 1) "does not exist", 2) "running", or 3)
  * "suspended". The interface methods transition between these
  * abstract states using the following state machine:
- *
+ * 
  * apply(Start(), "does not exists") = "running"
  * apply(Refresh(), "running") = "running"
  * apply(Refresh(), "suspended") = "suspended"
@@ -93,10 +93,10 @@ import java.util.ArrayList;
  * apply(Stop(), "suspended") = "does not exist"
  * apply(Suspend(), "running") = "suspended"
  * apply(Suspend(), "suspended") = "suspended"
- *
+ * 
  * In other words, invoking any method using an existing application
  * installation instance as a receiver is well-defined.
-**/
+ */
 public interface Application { 
 	// Install installs the application identified by the argument and
 // returns an object name suffix that identifies the new installation.

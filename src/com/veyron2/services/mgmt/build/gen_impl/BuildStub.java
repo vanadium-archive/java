@@ -6,6 +6,7 @@ import com.veyron2.services.mgmt.build.Build;
 import com.veyron2.services.mgmt.build.BuildFactory;
 import com.veyron2.services.mgmt.build.BuildService;
 import com.veyron2.services.mgmt.build.File;
+import com.veyron2.services.mgmt.build.VeyronConsts;
 
 /* Client stub for interface: Build. */
 public final class BuildStub implements Build {
@@ -19,11 +20,11 @@ public final class BuildStub implements Build {
 	}
 	// Methods from interface Build.
 	@Override
-	public com.veyron2.vdl.ClientStream<File,java.lang.Void,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<File,File,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
 		return build(context, null);
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<File,java.lang.Void,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<File,File,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
 		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
 
@@ -38,17 +39,17 @@ public final class BuildStub implements Build {
 		// Start the call.
 		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Build", inArgs, veyronOpts);
 
-		return new com.veyron2.vdl.ClientStream<File, java.lang.Void, java.util.ArrayList<java.lang.Byte>>() {
+		return new com.veyron2.vdl.ClientStream<File, File, java.util.ArrayList<java.lang.Byte>>() {
 			@Override
 			public void send(File item) throws com.veyron2.ipc.VeyronException {
 				call.send(item);
 			}
 			@Override
-			public java.lang.Void recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.lang.Void>() {};
+			public File recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<File>() {};
 				final java.lang.Object result = call.recv(type);
 				try {
-					return (java.lang.Void)result;
+					return (File)result;
 				} catch (java.lang.ClassCastException e) {
 					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
 				}

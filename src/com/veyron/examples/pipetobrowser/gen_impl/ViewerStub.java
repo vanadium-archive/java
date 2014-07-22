@@ -18,11 +18,11 @@ public final class ViewerStub implements Viewer {
 	}
 	// Methods from interface Viewer.
 	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Long> pipe(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Object> pipe(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
 		return pipe(context, null);
 	}
 	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Long> pipe(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Object> pipe(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
 		// Prepare input arguments.
 		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
 
@@ -37,7 +37,7 @@ public final class ViewerStub implements Viewer {
 		// Start the call.
 		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Pipe", inArgs, veyronOpts);
 
-		return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Long>() {
+		return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Object>() {
 			@Override
 			public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
 				call.send(item);
@@ -53,10 +53,10 @@ public final class ViewerStub implements Viewer {
 				}
 			}
 			@Override
-			public java.lang.Long finish() throws com.veyron2.ipc.VeyronException {
+			public java.lang.Object finish() throws com.veyron2.ipc.VeyronException {
 				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-					return (java.lang.Long)call.finish(resultTypes)[0];
+					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Object>() {} };
+					return (java.lang.Object)call.finish(resultTypes)[0];
 
 			}
 		};

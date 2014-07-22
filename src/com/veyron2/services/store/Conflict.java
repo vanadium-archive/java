@@ -7,7 +7,7 @@ import com.veyron2.storage.ID;
 
 /**
  * Conflict represents a conflicting update in the store.
-**/
+ */
 public final class Conflict { 
 	// Ty is the IDL name of the type.
 	private String ty;

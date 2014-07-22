@@ -7,15 +7,15 @@ package com.veyron2.services.store;
 /**
  * TransactionID is a transaction identifier.  The identifier is chosen by the
  * client.
- *
+ * 
  * TransactionIDs do not span store instances.  If you use the same
  * TransactionID with two different store instances, the transactions are
  * separate, and must be committed separately.  Don't do that, it will lead to
  * confusion.  Use fresh TransactionIDs for each store instance.
- *
+ * 
  * TODO(jyh): Consider using a larger identifier space to reduce chance of
  * collisions.
-**/
+ */
 public final class TransactionID { 
 		private long value;
 

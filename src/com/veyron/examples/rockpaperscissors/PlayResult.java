@@ -6,7 +6,7 @@ package com.veyron.examples.rockpaperscissors;
 
 /**
  * PlayResult is the value returned by the Play method. It indicates the outcome of the game.
-**/
+ */
 public final class PlayResult { 
 		private boolean youWon; // True if the player receiving the result won the game.
 

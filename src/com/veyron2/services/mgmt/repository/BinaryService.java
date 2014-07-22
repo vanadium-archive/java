@@ -13,14 +13,14 @@ import java.util.ArrayList;
 /**
  * Binary can be used to store and retrieve veyron application
  * binaries.
- *
+ * 
  * To create a binary, clients first invoke the Create() method that
  * specifies the number of parts the binary consists of. Clients then
  * uploads the individual parts through the Upload() method, which
  * identifies the part being uploaded. To resume an upload after a
  * failure, clients invoke the UploadStatus() method, which returns a
  * slice that identifies which parts are missing.
- *
+ * 
  * To download a binary, clients first invoke Stat(), which returns
  * information describing the binary, including the number of parts
  * the binary consists of. Clients then download the individual parts
@@ -28,9 +28,9 @@ import java.util.ArrayList;
  * downloaded. Alternatively, clients can download the binary through
  * HTTP using a transient URL available through the DownloadURL()
  * method.
- *
+ * 
  * To delete the binary, clients invoke the Delete() method.
-**/
+ */
 @VeyronService(serviceWrapper=BinaryServiceWrapper.class)
 public interface BinaryService { 
 	// Create expresses the intent to create a binary identified by the

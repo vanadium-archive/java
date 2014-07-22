@@ -8,7 +8,7 @@ import com.veyron2.ipc.VeyronException;
 
 /**
  * Fortune allows clients to Get and Add fortune strings.
-**/
+ */
 public interface Fortune { 
 	// Get returns a random fortune.
 	public String get(Context context) throws VeyronException;

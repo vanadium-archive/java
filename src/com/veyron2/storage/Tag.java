@@ -6,7 +6,7 @@ package com.veyron2.storage;
 
 /**
  * Tag has an TagOp and an ACL.
-**/
+ */
 public final class Tag { 
 		private TagOp op;
 	// ACL is a reference (ID) to the stored ACL struct.

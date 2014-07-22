@@ -10,7 +10,7 @@ import com.veyron2.vdl.VeyronService;
 
 /**
  * DrawInterface enables adding a box on another peer
-**/
+ */
 @VeyronService(serviceWrapper=DrawInterfaceServiceWrapper.class)
 public interface DrawInterfaceService { 
 	// Draw is used to send/receive a stream of boxes to another peer
