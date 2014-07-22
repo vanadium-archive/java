@@ -28,11 +28,10 @@ public class MountTableServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.globable.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.globable.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
 		if ("mount".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
@@ -42,7 +41,7 @@ public class MountTableServiceWrapper {
 		if ("resolveStep".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface MountTable.
 	public void mount(ServerCall call, String Server, int TTL) throws VeyronException { 

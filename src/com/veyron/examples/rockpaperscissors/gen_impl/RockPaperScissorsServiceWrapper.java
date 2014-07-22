@@ -43,20 +43,17 @@ public class RockPaperScissorsServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.judge.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		{
-			final Object[] tags = this.player.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		{
-			final Object[] tags = this.scoreKeeper.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		return null;
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.judge.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		try {
+			return this.player.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		try {
+			return this.scoreKeeper.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface RockPaperScissors.
 	// Methods from sub-interface Judge.

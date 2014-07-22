@@ -47,19 +47,16 @@ public class ObjectServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.globable.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		{
-			final Object[] tags = this.globWatcher.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		{
-			final Object[] tags = this.queryWatcher.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.globable.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		try {
+			return this.globWatcher.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		try {
+			return this.queryWatcher.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
 		if ("exists".equals(method)) {
 			return new Object[]{  };
 		}
@@ -84,7 +81,7 @@ public class ObjectServiceWrapper {
 		if ("globT".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Object.
 	public boolean exists(ServerCall call, TransactionID TID) throws VeyronException { 

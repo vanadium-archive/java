@@ -24,7 +24,7 @@ public class TypeTesterServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("echoBool".equals(method)) {
 			return new Object[]{  };
 		}
@@ -85,7 +85,7 @@ public class TypeTesterServiceWrapper {
 		if ("streamingOutput".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface TypeTester.
 	public boolean echoBool(ServerCall call, boolean I1) throws VeyronException { 

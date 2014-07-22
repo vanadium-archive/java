@@ -26,11 +26,11 @@ public class SyncServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("getDeltas".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Sync.
 	public GenVector getDeltas(ServerCall call, GenVector In, DeviceID ClientID) throws VeyronException { 

@@ -19,14 +19,14 @@ public class FortuneServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("get".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
 		if ("add".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Fortune.
 	public String get(ServerCall call) throws VeyronException { 

@@ -29,7 +29,7 @@ public class BinaryServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("create".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
@@ -48,7 +48,7 @@ public class BinaryServiceWrapper {
 		if ("upload".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Binary.
 	public void create(ServerCall call, int nparts) throws VeyronException { 

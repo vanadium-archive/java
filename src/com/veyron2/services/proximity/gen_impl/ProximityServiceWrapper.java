@@ -31,16 +31,14 @@ public class ProximityServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.proximityAnnouncer.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		{
-			final Object[] tags = this.proximityScanner.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
-		return null;
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.proximityAnnouncer.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		try {
+			return this.proximityScanner.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Proximity.
 	// Methods from sub-interface ProximityAnnouncer.

@@ -22,7 +22,7 @@ public class BankAccountServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("deposit".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
@@ -35,7 +35,7 @@ public class BankAccountServiceWrapper {
 		if ("balance".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface BankAccount.
 	public void deposit(ServerCall call, long amount) throws VeyronException { 

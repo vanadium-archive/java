@@ -27,11 +27,11 @@ public class ApplicationServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("match".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Application.
 	public Envelope match(ServerCall call, ArrayList<String> Profiles) throws VeyronException { 

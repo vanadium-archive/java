@@ -22,14 +22,14 @@ public class InspectorServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("ls".equals(method)) {
 			return new Object[]{  };
 		}
 		if ("lsDetails".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Inspector.
 	public void ls(ServerCall call, String Glob) throws VeyronException { 

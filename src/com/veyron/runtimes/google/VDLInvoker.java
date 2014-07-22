@@ -113,19 +113,15 @@ public final class VDLInvoker {
                 try {
                     final Object[] tags =
                         (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
-                    if (tags != null) {
-                        for (Object tag : tags) {
-                            if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
-                                label = (Label)tag;
-                                break;
-                            }
+                    for (Object tag : tags) {
+                        if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
+                            label = (Label)tag;
+                            break;
                         }
                     }
-                } catch (InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalArgumentException(String.format(
-                        "Error getting security label for method %s: %s",
-                        m.getValue().getName(), e.getMessage()));
-                }
+                } catch (IllegalAccessException|InvocationTargetException e) {
+                    // Use the default label.
+                }    
                 invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), label));
             }
         }

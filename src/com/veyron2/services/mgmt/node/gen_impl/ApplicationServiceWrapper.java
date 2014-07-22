@@ -24,7 +24,7 @@ public class ApplicationServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("install".equals(method)) {
 			return new Object[]{  };
 		}
@@ -58,7 +58,7 @@ public class ApplicationServiceWrapper {
 		if ("updateTo".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Application.
 	public String install(ServerCall call, String Name) throws VeyronException { 

@@ -25,14 +25,14 @@ public class TunnelServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("forward".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
 		if ("shell".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Tunnel.
 	public void forward(ServerCall call, String network, String address) throws VeyronException { 

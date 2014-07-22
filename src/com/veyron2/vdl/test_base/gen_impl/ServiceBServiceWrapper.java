@@ -32,15 +32,14 @@ public class ServiceBServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.serviceA.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.serviceA.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
 		if ("methodB1".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface ServiceB.
 	public CompComp methodB1(ServerCall call, Scalars a, Composites b) throws VeyronException { 

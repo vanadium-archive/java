@@ -26,11 +26,10 @@ public class NodeServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.application.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.application.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
 		if ("describe".equals(method)) {
 			return new Object[]{  };
 		}
@@ -40,7 +39,7 @@ public class NodeServiceWrapper {
 		if ("reset".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Node.
 	public com.veyron2.services.mgmt.node.Description describe(ServerCall call) throws VeyronException { 

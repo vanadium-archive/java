@@ -25,11 +25,10 @@ public class ProfileServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
-		{
-			final Object[] tags = this.profile.getMethodTags(call, method);
-			if (tags != null) return tags;
-		}
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
+		try {
+			return this.profile.getMethodTags(call, method);
+		} catch (VeyronException e) {}  // method not found.
 		if ("specification".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
@@ -39,7 +38,7 @@ public class ProfileServiceWrapper {
 		if ("remove".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Profile.
 	public Specification specification(ServerCall call) throws VeyronException { 

@@ -25,14 +25,14 @@ public class StoreServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("watch".equals(method)) {
 			return new Object[]{  };
 		}
 		if ("putMutations".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Store.
 	public void watch(ServerCall call, Request Req) throws VeyronException { 

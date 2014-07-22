@@ -38,14 +38,14 @@ public class JudgeServiceWrapper {
 	 * Returns all tags associated with the provided method or null if the method isn't implemented
 	 * by this service.
 	 */
-	public Object[] getMethodTags(ServerCall call, String method) { 
+	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
 		if ("createGame".equals(method)) {
 			return new Object[]{  };
 		}
 		if ("play".equals(method)) {
 			return new Object[]{  };
 		}
-		return null;
+		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Judge.
 	public GameID createGame(ServerCall call, GameOptions Opts) throws VeyronException { 
