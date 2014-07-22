@@ -3,6 +3,7 @@ package com.veyron.runtimes.google.security;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.ServiceCaveat;
 
+import com.veyron2.security.PrincipalPattern;
 import java.math.BigInteger;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +58,7 @@ public class PublicID implements com.veyron2.security.PublicID {
 	private native long nativeAuthorize(long nativePtr, com.veyron2.security.Context context)
 		throws VeyronException;
 	private native ServiceCaveat[] nativeThirdPartyCaveats(long nativePtr);
+	private native boolean nativeEquals(long nativePtr, long otherNativePtr);
 	private native void nativeFinalize(long nativePtr);
 
 	public PublicID(long nativePtr) {
@@ -68,8 +70,8 @@ public class PublicID implements com.veyron2.security.PublicID {
 		return nativeNames(this.nativePtr);
 	}
 	@Override
-	public boolean match(String pattern) {
-		return nativeMatch(this.nativePtr, pattern);
+	public boolean match(PrincipalPattern pattern) {
+		return nativeMatch(this.nativePtr, pattern.getValue());
 	}
 	@Override
 	public ECPublicKey publicKey() {
@@ -108,6 +110,12 @@ public class PublicID implements com.veyron2.security.PublicID {
 		return nativeThirdPartyCaveats(this.nativePtr);
 	}
 	// Implements java.lang.Object.
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof PublicID)) return false;
+		final PublicID other = (PublicID)obj;
+		return nativeEquals(this.nativePtr, other.nativePtr);
+	}
 	@Override
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);

@@ -6,25 +6,22 @@ package com.veyron2.ipc;
  */
 public interface Dispatcher {
 	/**
-	 * Returns the object identified by the given suffix on which methods will be
-	 * served.  Returning null indicates that this Dispatcher does handle the object -
+	 * Returns the container storing (1) the service object identified by the given suffix on which
+	 * methods will be served and (2) the Authorizer which allows control over authorization checks.
+	 * Returning a null container indicates that this Dispatcher does handle the object -
 	 * the framework should try other Dispatchers.
 	 *
-	 * An Authorizer is also returned to allow control over authorization checks.
-	 * Returning a null Authorizer indicates the default authorization checks
-	 * should be used.
-	 * TODO(spetrovic): Return Authorizer for real.
+	 * A thrown exception indicates the dispatch lookup has failed.  The error will be delivered
+	 * back to the client and no further dispatch lookups will be performed.
 	 *
-	 * A thrown exception indicates the dispatch lookup has failed.  The error will
-	 * be delivered back to the client and no further dispatch lookups
-	 * will be performed.
-	 *
-	 * Lookup may be invoked concurrently by the underlying RPC system and hence
+	 * This method may be invoked concurrently by the underlying RPC system and hence
 	 * must be thread-safe.
 	 *
 	 * @param  suffix          the object's name suffix
-	 * @return Object          the object identified by the given suffix
+	 * @return                 a container storing (1) the service object identified by the given
+	 *                         suffix and (2) the associated Authorizer; null is returned if this
+	 *                         dispatcher doesn't handle the object
 	 * @throws VeyronException if the lookup error has occured
 	 */
-	public Object lookup(String suffix) throws VeyronException;
+	public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException;
 }

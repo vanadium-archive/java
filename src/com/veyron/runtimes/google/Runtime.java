@@ -15,6 +15,7 @@ import com.veyron2.OptionDefs;
 import com.veyron2.Options;
 import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.security.Label;
 import com.veyron2.security.PublicID;
 
 /**
@@ -332,7 +333,7 @@ public class Runtime implements com.veyron2.Runtime {
 			return this.context.suffix();
 		}
 		@Override
-		public int label() {
+		public Label label() {
 			return this.context.label();
 		}
 		@Override

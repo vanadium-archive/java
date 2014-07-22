@@ -13,5 +13,5 @@ public interface Authorizer {
 	 * @param  context         a context to be authorized.
 	 * @throws VeyronException iff the context isn't authorized.
 	 */
-	public void Authorize(Context context) throws VeyronException;
+	public void authorize(Context context) throws VeyronException;
 }

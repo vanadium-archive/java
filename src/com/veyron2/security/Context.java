@@ -30,7 +30,7 @@ public interface Context {
 	 *
 	 * @return method's security label.
 	 */
-	public int label();
+	public Label label();
 
 	/**
 	 * Returns the PublicID of the principal at the local end of the request.

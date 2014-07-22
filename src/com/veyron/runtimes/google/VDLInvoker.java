@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.veyron2.security.Label;
+import com.veyron2.security.Security;
+import com.veyron2.security.VeyronConsts;
 import com.veyron2.ipc.ServerCall;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
@@ -24,6 +26,8 @@ import com.veyron2.vdl.VeyronService;
  * provided objects implement exactly one VDL interface.
  */
 public final class VDLInvoker {
+    private static final Label DEFAULT_LABEL = VeyronConsts.ADMIN_LABEL;
+
     // A cache of ClassInfo objects, aiming to reduce the cost of expensive
     // reflection operations.
     private static Map<Class<?>, ClassInfo> serviceWrapperClasses = new HashMap<Class<?>, ClassInfo>();
@@ -31,11 +35,15 @@ public final class VDLInvoker {
     private final static class ServiceMethod {
         private final Object wrappedService;
         private final Method method;
+        private final Label label;
 
-        public ServiceMethod(Object wrappedService, Method method) {
+        public ServiceMethod(Object wrappedService, Method method, Label label) {
             this.wrappedService = wrappedService;
             this.method = method;
+            this.label = label;
         }
+
+        public Label getLabel() { return this.label; }
 
         public Object invoke(Object... args) throws IllegalAccessException,
         IllegalArgumentException, InvocationTargetException {
@@ -60,8 +68,8 @@ public final class VDLInvoker {
     /**
      * Creates a new invoker for the given object.
      *
-     * @param obj service object we're invoking methods on
-     * @returns Invoker new VDL invoker instance
+     * @param obj                       service object we're invoking methods on
+     * @return                          new VDL invoker instance
      * @throws IllegalArgumentException if the provided object is invalid
      *             (either null or doesn't implement exactly one VDL interface)
      */
@@ -92,10 +100,45 @@ public final class VDLInvoker {
                 }
             }
 
-            for (Entry<String, Method> m : cInfo.getMethods()) {
-                invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue()));
+            final Map<String, Method> methods = cInfo.getMethods();
+            final Method tagGetter = methods.get("getMethodTags");
+            if (tagGetter == null) {
+                throw new IllegalArgumentException(String.format(
+                    "Service class %s doesn't have the 'getMethodTags' method.",
+                    c.getCanonicalName()));
+            }
+            for (Entry<String, Method> m : methods.entrySet()) {
+                // Get the method label.
+                Label label = DEFAULT_LABEL;
+                try {
+                    final Object[] tags =
+                        (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
+                    if (tags != null) {
+                        for (Object tag : tags) {
+                            if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
+                                label = (Label)tag;
+                                break;
+                            }
+                        }
+                    }
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    throw new IllegalArgumentException(String.format(
+                        "Error getting security label for method %s: %s",
+                        m.getValue().getName(), e.getMessage()));
+                }
+                invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), label));
             }
         }
+    }
+
+    public Label getSecurityLabel(String method) throws IllegalArgumentException {
+        final ServiceMethod m = this.invokableMethods.get(method);
+        if (m == null) {
+            throw new IllegalArgumentException(String.format(
+                    "Couldn't find method %s in class %s",
+                    method, this.serviceClass.getCanonicalName()));
+        }
+        return m.getLabel();
     }
 
     private String serviceName(Class<?> serviceClass) {
@@ -111,15 +154,14 @@ public final class VDLInvoker {
      * Iterate through the veyron services an object implements and generates
      * service wrappers for each.
      *
-     * @param srv The service object
-     * @return A list of service wrappers
-     * @throws IllegalArgumentException If the input service is invalid.
+     * @param srv                       the service object
+     * @return                          a list of service wrappers
+     * @throws IllegalArgumentException if the input service is invalid.
      */
     private List<Object> wrapService(Object srv) throws IllegalArgumentException {
-        Class<?> klass = srv.getClass();
         List<Object> stubs = new ArrayList<Object>();
         List<String> implementedServiceList = new ArrayList<String>();
-        for (Class<?> iface : klass.getInterfaces()) {
+        for (Class<?> iface : srv.getClass().getInterfaces()) {
             VeyronService vs = iface.getAnnotation(VeyronService.class);
             if (vs == null) {
             	continue;
@@ -266,8 +308,8 @@ public final class VDLInvoker {
             }
         }
 
-        Set<Entry<String, Method>> getMethods() {
-            return this.methods.entrySet();
+        Map<String, Method> getMethods() {
+            return this.methods;
         }
     }
 }

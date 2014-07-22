@@ -29,7 +29,7 @@ public interface PublicID {
 	 * @param  pattern that pattern used for name-matching.
 	 * @return         true iff the principal has a name matching the provided pattern.
 	 */
-	public boolean match(String pattern);
+	public boolean match(PrincipalPattern pattern);
 
 	/**
 	 * Returns the public key corresponding to the private key

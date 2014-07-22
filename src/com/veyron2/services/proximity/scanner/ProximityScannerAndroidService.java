@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Dispatcher;
+import com.veyron2.ipc.ServiceObjectWithAuthorizer;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.services.proximity.scanner.ProximityScannerVeyronService.BluetoothNotEnabledException;
 
@@ -31,8 +32,8 @@ public class ProximityScannerAndroidService extends Service {
         endpoint = s.listen("tcp", "127.0.0.1:8100");
         s.serve("proximity", new Dispatcher() {
             @Override
-            public Object lookup(String suffix) throws VeyronException {
-                return proxService;
+            public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
+                return new ServiceObjectWithAuthorizer(proxService, null);
             }
         });
     }
@@ -44,7 +45,7 @@ public class ProximityScannerAndroidService extends Service {
             }
         } catch (VeyronException e) {
             // We don't expect this exception to occur.
-            Log.e("ProxmityScannerAndroidService", "Failed to stop veyron service: " + e);
+            Log.e("ProximityScannerAndroidService", "Failed to stop veyron service: " + e);
         }
         endpoint = null;
         proxService = null;

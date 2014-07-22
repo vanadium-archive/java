@@ -1,5 +1,7 @@
 package com.veyron.runtimes.google.security;
 
+import com.veyron2.security.Label;
+
 public class Context implements com.veyron2.security.Context {
 	private final long nativePtr;
 
@@ -30,8 +32,8 @@ public class Context implements com.veyron2.security.Context {
 		return nativeSuffix(this.nativePtr);
 	}
 	@Override
-	public int label() {
-		return nativeLabel(this.nativePtr);
+	public Label label() {
+		return new Label(nativeLabel(this.nativePtr));
 	}
 	@Override
 	public com.veyron2.security.PublicID localID() {
