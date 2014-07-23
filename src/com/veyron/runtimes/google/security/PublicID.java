@@ -1,5 +1,7 @@
 package com.veyron.runtimes.google.security;
 
+import android.util.Log;
+
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.ServiceCaveat;
 

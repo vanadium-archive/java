@@ -36,5 +36,10 @@
 			<type>2</type>
 			<locationURI>$%7BVEYRON_ROOT%7D/veyron/java/src/com</locationURI>
 		</link>
+		<link>
+			<name>src/com/veyron/examples/proximitytest</name>
+			<type>2</type>
+			<location>/usr/local/google/home/bprosnitz/veyron/veyron/java/examples/proximitytest/src/com/veyron/examples/proximitytest</location>
+		</link>
 	</linkedResources>
 </projectDescription>

@@ -38,6 +38,9 @@ public class ProximityServiceWrapper {
 		try {
 			return this.proximityScanner.getMethodTags(call, method);
 		} catch (VeyronException e) {}  // method not found.
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Proximity.

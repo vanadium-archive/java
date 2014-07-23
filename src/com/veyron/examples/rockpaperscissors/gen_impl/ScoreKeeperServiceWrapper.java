@@ -40,6 +40,9 @@ public class ScoreKeeperServiceWrapper {
 		if ("record".equals(method)) {
 			return new Object[]{  };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface ScoreKeeper.

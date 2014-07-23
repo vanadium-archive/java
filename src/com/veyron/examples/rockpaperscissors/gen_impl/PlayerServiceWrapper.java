@@ -40,6 +40,9 @@ public class PlayerServiceWrapper {
 		if ("challenge".equals(method)) {
 			return new Object[]{  };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Player.

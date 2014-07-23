@@ -53,6 +53,9 @@ public class RockPaperScissorsServiceWrapper {
 		try {
 			return this.scoreKeeper.getMethodTags(call, method);
 		} catch (VeyronException e) {}  // method not found.
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface RockPaperScissors.

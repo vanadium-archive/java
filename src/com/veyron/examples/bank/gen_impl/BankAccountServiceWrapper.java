@@ -35,6 +35,9 @@ public class BankAccountServiceWrapper {
 		if ("balance".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(1) };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface BankAccount.

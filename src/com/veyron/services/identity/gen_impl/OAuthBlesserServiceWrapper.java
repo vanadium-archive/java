@@ -23,6 +23,9 @@ public class OAuthBlesserServiceWrapper {
 		if ("bless".equals(method)) {
 			return new Object[]{  };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface OAuthBlesser.

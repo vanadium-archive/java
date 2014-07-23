@@ -32,6 +32,9 @@ public class TunnelServiceWrapper {
 		if ("shell".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(4) };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Tunnel.

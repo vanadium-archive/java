@@ -48,6 +48,9 @@ public class BinaryServiceWrapper {
 		if ("upload".equals(method)) {
 			return new Object[]{ new com.veyron2.security.Label(2) };
 		}
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Binary.

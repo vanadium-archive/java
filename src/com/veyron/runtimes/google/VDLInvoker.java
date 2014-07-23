@@ -1,6 +1,8 @@
 
 package com.veyron.runtimes.google;
 
+import android.util.Log;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -75,7 +77,7 @@ public final class VDLInvoker {
      */
     // TODO(bprosnitz) We need to throw better exception types in the final
     // release.
-    public VDLInvoker(Object obj) throws IllegalArgumentException {
+    public VDLInvoker(Object obj) throws IllegalArgumentException, VeyronException {
         if (obj == null) {
             throw new IllegalArgumentException("Can't create VDLInvoker with a null object.");
         }
@@ -119,9 +121,12 @@ public final class VDLInvoker {
                             break;
                         }
                     }
-                } catch (IllegalAccessException|InvocationTargetException e) {
-                    // Use the default label.
-                }    
+                } catch (IllegalAccessException e) {
+                    // getMethodTags() not defined so use the default label.
+                } catch (InvocationTargetException e) {
+                    // getMethodTags threw an exception.
+                    throw new VeyronException(e.getTargetException().getMessage());
+                }
                 invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), label));
             }
         }

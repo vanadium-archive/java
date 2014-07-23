@@ -2,6 +2,7 @@
 package com.veyron2.services.proximity.scanner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;

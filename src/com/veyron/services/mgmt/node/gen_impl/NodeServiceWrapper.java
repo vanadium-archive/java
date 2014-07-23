@@ -35,6 +35,9 @@ public class NodeServiceWrapper {
 		try {
 			return this.config.getMethodTags(call, method);
 		} catch (VeyronException e) {}  // method not found.
+        if ("getMethodTags".equals(method)) {
+            return new Object[]{};
+        }
 		throw new VeyronException("method: " + method + " not found");
 	}
 	// Methods from interface Node.
