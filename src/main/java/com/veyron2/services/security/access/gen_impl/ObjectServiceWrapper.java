@@ -23,7 +23,7 @@ public final class ObjectServiceWrapper {
         
         if ("getACL".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(4), 
+                 new com.veyron2.security.Label(8), 
             };
         }
         
@@ -35,7 +35,7 @@ public final class ObjectServiceWrapper {
         
         if ("setACL".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(4), 
+                 new com.veyron2.security.Label(8), 
             };
         }
         

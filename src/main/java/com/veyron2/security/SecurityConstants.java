@@ -16,34 +16,40 @@ public final class SecurityConstants {
     public static final java.lang.String ALL_PRINCIPALS = "*";
     
     /**
+ * ResolveLabel allows resolve operations.
+ */
+
+    public static final com.veyron2.security.Label RESOLVE_LABEL = new com.veyron2.security.Label(1);
+    
+    /**
  * ReadLabel allows read operations.
  */
 
-    public static final com.veyron2.security.Label READ_LABEL = new com.veyron2.security.Label(1);
+    public static final com.veyron2.security.Label READ_LABEL = new com.veyron2.security.Label(2);
     
     /**
  * WriteLabel allows write operations.
  */
 
-    public static final com.veyron2.security.Label WRITE_LABEL = new com.veyron2.security.Label(2);
+    public static final com.veyron2.security.Label WRITE_LABEL = new com.veyron2.security.Label(4);
     
     /**
  * AdminLabel allows administrative operations.
  */
 
-    public static final com.veyron2.security.Label ADMIN_LABEL = new com.veyron2.security.Label(4);
+    public static final com.veyron2.security.Label ADMIN_LABEL = new com.veyron2.security.Label(8);
     
     /**
  * DebugLabel allows debug operations.
  */
 
-    public static final com.veyron2.security.Label DEBUG_LABEL = new com.veyron2.security.Label(8);
+    public static final com.veyron2.security.Label DEBUG_LABEL = new com.veyron2.security.Label(16);
     
     /**
  * MonitoringLabel allows monitoring operations.
  */
 
-    public static final com.veyron2.security.Label MONITORING_LABEL = new com.veyron2.security.Label(16);
+    public static final com.veyron2.security.Label MONITORING_LABEL = new com.veyron2.security.Label(32);
     
     /**
  * SHA1Hash denotes the SHA1 cryptographic hash function as defined

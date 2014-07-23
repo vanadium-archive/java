@@ -29,7 +29,7 @@ public final class RevokerServiceWrapper {
         
         if ("revoke".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         

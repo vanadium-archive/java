@@ -23,13 +23,13 @@ public final class FortuneServiceWrapper {
         
         if ("add".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         
         if ("get".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         

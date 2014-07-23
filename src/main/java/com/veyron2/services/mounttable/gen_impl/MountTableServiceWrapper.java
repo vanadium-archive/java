@@ -34,19 +34,19 @@ public final class MountTableServiceWrapper {
         
         if ("mount".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         
         if ("resolveStep".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         
         if ("unmount".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         

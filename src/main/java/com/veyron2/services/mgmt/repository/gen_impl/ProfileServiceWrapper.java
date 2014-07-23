@@ -23,7 +23,7 @@ public final class ProfileServiceWrapper {
         
         if ("description".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         
@@ -35,7 +35,7 @@ public final class ProfileServiceWrapper {
         
         if ("label".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         

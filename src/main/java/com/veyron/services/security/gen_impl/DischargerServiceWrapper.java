@@ -23,7 +23,7 @@ public final class DischargerServiceWrapper {
         
         if ("discharge".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         

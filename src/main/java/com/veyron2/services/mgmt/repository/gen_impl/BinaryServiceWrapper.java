@@ -23,25 +23,25 @@ public final class BinaryServiceWrapper {
         
         if ("create".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         
         if ("delete".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         
         if ("download".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         
         if ("downloadURL".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         
@@ -53,13 +53,13 @@ public final class BinaryServiceWrapper {
         
         if ("stat".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(1), 
+                 new com.veyron2.security.Label(2), 
             };
         }
         
         if ("upload".equals(method)) {
             return new java.lang.Object[] {
-                 new com.veyron2.security.Label(2), 
+                 new com.veyron2.security.Label(4), 
             };
         }
         
