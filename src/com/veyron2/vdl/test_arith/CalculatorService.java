@@ -2,13 +2,16 @@
 // Source: arith.vdl
 package com.veyron2.vdl.test_arith;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-import com.veyron2.vdl.test_arith.gen_impl.CalculatorServiceWrapper;
 
-@VeyronService(serviceWrapper=CalculatorServiceWrapper.class)
-public interface CalculatorService extends ArithService, AdvancedMathService { 
-		public void on(ServerContext context) throws VeyronException; // On turns the calculator on.
-		public void off(ServerContext context) throws VeyronException; // Off turns the calculator off.
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.gen_impl.CalculatorServiceWrapper.class)
+public interface CalculatorService extends com.veyron2.vdl.test_arith.ArithService, com.veyron2.vdl.test_arith.AdvancedMathService {
+
+    
+    
+    public void on(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public void off(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

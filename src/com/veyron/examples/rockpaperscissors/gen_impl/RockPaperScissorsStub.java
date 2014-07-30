@@ -2,104 +2,86 @@
 // Source(s):  service.vdl
 package com.veyron.examples.rockpaperscissors.gen_impl;
 
-import com.veyron.examples.rockpaperscissors.GameID;
-import com.veyron.examples.rockpaperscissors.GameOptions;
-import com.veyron.examples.rockpaperscissors.Judge;
-import com.veyron.examples.rockpaperscissors.JudgeAction;
-import com.veyron.examples.rockpaperscissors.JudgeFactory;
-import com.veyron.examples.rockpaperscissors.JudgeService;
-import com.veyron.examples.rockpaperscissors.PlayResult;
-import com.veyron.examples.rockpaperscissors.Player;
-import com.veyron.examples.rockpaperscissors.PlayerAction;
-import com.veyron.examples.rockpaperscissors.PlayerFactory;
-import com.veyron.examples.rockpaperscissors.PlayerService;
-import com.veyron.examples.rockpaperscissors.RockPaperScissors;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsFactory;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsService;
-import com.veyron.examples.rockpaperscissors.Round;
-import com.veyron.examples.rockpaperscissors.ScoreCard;
-import com.veyron.examples.rockpaperscissors.ScoreKeeper;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperFactory;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperService;
-import com.veyron.examples.rockpaperscissors.VeyronConsts;
-
 /* Client stub for interface: RockPaperScissors. */
-public final class RockPaperScissorsStub implements RockPaperScissors {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.RockPaperScissors";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
-	private final Judge judge;
-	private final Player player;
-	private final ScoreKeeper scoreKeeper;
+public final class RockPaperScissorsStub implements com.veyron.examples.rockpaperscissors.RockPaperScissors {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.RockPaperScissors";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public RockPaperScissorsStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-		this.judge = new com.veyron.examples.rockpaperscissors.gen_impl.JudgeStub(client, name);
-		this.player = new com.veyron.examples.rockpaperscissors.gen_impl.PlayerStub(client, name);
-		this.scoreKeeper = new com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperStub(client, name);
-	}
-	// Methods from sub-interface Judge.
-	@Override
-	public GameID createGame(com.veyron2.ipc.Context context, GameOptions Opts) throws com.veyron2.ipc.VeyronException {
-		return createGame(context, Opts, null);
-	}
-	@Override
-	public GameID createGame(com.veyron2.ipc.Context context, GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, RockPaperScissorsStub.vdlIfacePathOpt);
-		}
-		return this.judge.createGame(context, Opts, veyronOpts);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<PlayerAction,JudgeAction,PlayResult> play(com.veyron2.ipc.Context context, GameID ID) throws com.veyron2.ipc.VeyronException {
-		return play(context, ID, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<PlayerAction,JudgeAction,PlayResult> play(com.veyron2.ipc.Context context, GameID ID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, RockPaperScissorsStub.vdlIfacePathOpt);
-		}
-		return this.judge.play(context, ID, veyronOpts);
-	}
-	// Methods from sub-interface Player.
-	@Override
-	public void challenge(com.veyron2.ipc.Context context, java.lang.String Address, GameID ID, GameOptions Opts) throws com.veyron2.ipc.VeyronException {
-		challenge(context, Address, ID, Opts, null);
-	}
-	@Override
-	public void challenge(com.veyron2.ipc.Context context, java.lang.String Address, GameID ID, GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, RockPaperScissorsStub.vdlIfacePathOpt);
-		}
-		this.player.challenge(context, Address, ID, Opts, veyronOpts);
-	}
-	// Methods from sub-interface ScoreKeeper.
-	@Override
-	public void record(com.veyron2.ipc.Context context, ScoreCard Score) throws com.veyron2.ipc.VeyronException {
-		record(context, Score, null);
-	}
-	@Override
-	public void record(com.veyron2.ipc.Context context, ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, RockPaperScissorsStub.vdlIfacePathOpt);
-		}
-		this.scoreKeeper.record(context, Score, veyronOpts);
-	}
+    
+    
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.JudgeStub judgeStub;
+    
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.PlayerStub playerStub;
+    
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperStub scoreKeeperStub;
+    
+
+    public RockPaperScissorsStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+        this.judgeStub = new com.veyron.examples.rockpaperscissors.gen_impl.JudgeStub(client, veyronName);
+         
+        this.playerStub = new com.veyron.examples.rockpaperscissors.gen_impl.PlayerStub(client, veyronName);
+         
+        this.scoreKeeperStub = new com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperStub(client, veyronName);
+         
+    }
+
+    // Methods from interface RockPaperScissors.
+
+
+
+
+
+    @Override
+    public void challenge(final com.veyron2.ipc.Context context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+         this.playerStub.challenge(context, Address, ID, Opts);
+    }
+    @Override
+    public void challenge(final com.veyron2.ipc.Context context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.playerStub.challenge(context, Address, ID, Opts, veyronOpts);
+    }
+
+    @Override
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
+        
+         this.scoreKeeperStub.record(context, Score);
+    }
+    @Override
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.scoreKeeperStub.record(context, Score, veyronOpts);
+    }
+
+    @Override
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+        return this.judgeStub.createGame(context, Opts);
+    }
+    @Override
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.judgeStub.createGame(context, Opts, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
+        
+        return this.judgeStub.play(context, ID);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.judgeStub.play(context, ID, veyronOpts);
+    }
+
+
 }

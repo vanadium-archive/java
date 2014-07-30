@@ -3,34 +3,35 @@
 // Source: types.vdl
 package com.veyron2.security;
 
-
 /**
+ * type LabelSet veyron2/security.Label uint32 
  * LabelSet is a set of access control labels, represented as a bitmask.
- */
-public final class LabelSet { 
-		private Label value;
+ **/
+public final class LabelSet {
+    private com.veyron2.security.Label value;
 
-	public LabelSet(Label value) { 
-		this.value = value;
-	}
-	public Label getValue() { return this.value; }
+    public LabelSet(com.veyron2.security.Label value) {
+        this.value = value;
+    }
+    public com.veyron2.security.Label getValue() { return this.value; }
 
-	public void setValue(Label value) { this.value = value; }
+    public void setValue(com.veyron2.security.Label value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final LabelSet other = (LabelSet)obj;
-		if (!(this.value.equals(other.value))) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (value == null ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.security.LabelSet other = (com.veyron2.security.LabelSet)obj;
+        
+        if (this.value == null) {
+            return other.value == null;
+        }
+        return this.value.equals(other.value);
+        
+    }
+    @Override
+    public int hashCode() {
+        return (value == null ? 0 : value.hashCode());
+    }
 }

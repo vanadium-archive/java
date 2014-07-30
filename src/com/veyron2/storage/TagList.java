@@ -2,41 +2,36 @@
 // Source: types.vdl
 package com.veyron2.storage;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * type TagList []veyron2/storage.Tag struct{Op veyron2/storage.TagOp byte;ACL veyron2/storage.ID [16]byte} 
  * TagList is a labeled list of tags.  Each value in the store can be labeled with
  * a TagList to specify permissions.
  **/
-public final class TagList implements List<com.veyron2.storage.Tag> {
-	private List<com.veyron2.storage.Tag> impl;
+public final class TagList implements java.util.List<com.veyron2.storage.Tag> {
+    private java.util.List<com.veyron2.storage.Tag> impl;
 
-	public TagList(List<com.veyron2.storage.Tag> impl) {
-		this.impl = impl;
-	}
-	public List<com.veyron2.storage.Tag> getValue() { return this.impl; }
+    public TagList(java.util.List<com.veyron2.storage.Tag> impl) {
+        this.impl = impl;
+    }
+    public java.util.List<com.veyron2.storage.Tag> getValue() { return this.impl; }
 
-	public void setValue(List<com.veyron2.storage.Tag> newImpl) {
-	    this.impl = newImpl;
-	}
+    public void setValue(java.util.List<com.veyron2.storage.Tag> newImpl) {
+        this.impl = newImpl;
+    }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final TagList other = (TagList)obj;
-		if (!(this.impl.equals(other.impl))) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		return (impl == null ? 0 : impl.hashCode());
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final TagList other = (TagList)obj;
+        if (!(this.impl.equals(other.impl))) return false;
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        return (impl == null ? 0 : impl.hashCode());
+    }
     @Override
     public void add(int location, com.veyron2.storage.Tag object) {
         impl.add(location, object);
@@ -46,11 +41,11 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         return impl.add(object);
     }
     @Override
-    public boolean addAll(int location, Collection<? extends com.veyron2.storage.Tag> collection) {
+    public boolean addAll(int location, java.util.Collection<? extends com.veyron2.storage.Tag> collection) {
         return impl.addAll(location, collection);
     }
     @Override
-    public boolean addAll(Collection<? extends com.veyron2.storage.Tag> collection) {
+    public boolean addAll(java.util.Collection<? extends com.veyron2.storage.Tag> collection) {
         return impl.addAll(collection);
     }
     @Override
@@ -58,11 +53,11 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         impl.clear();
     }
     @Override
-    public boolean contains(Object object) {
+    public boolean contains(java.lang.Object object) {
         return impl.contains(object);
     }
     @Override
-    public boolean containsAll(Collection<?> collection) {
+    public boolean containsAll(java.util.Collection<?> collection) {
         return impl.containsAll(collection);
     }
     @Override
@@ -70,7 +65,7 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         return impl.get(location);
     }
     @Override
-    public int indexOf(Object object) {
+    public int indexOf(java.lang.Object object) {
         return impl.indexOf(object);
     }
     @Override
@@ -78,19 +73,19 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         return impl.isEmpty();
     }
     @Override
-    public Iterator<com.veyron2.storage.Tag> iterator() {
+    public java.util.Iterator<com.veyron2.storage.Tag> iterator() {
         return impl.iterator();
     }
     @Override
-    public int lastIndexOf(Object object) {
+    public int lastIndexOf(java.lang.Object object) {
         return impl.lastIndexOf(object);
     }
     @Override
-    public ListIterator<com.veyron2.storage.Tag> listIterator() {
+    public java.util.ListIterator<com.veyron2.storage.Tag> listIterator() {
         return impl.listIterator();
     }
     @Override
-    public ListIterator<com.veyron2.storage.Tag> listIterator(int location) {
+    public java.util.ListIterator<com.veyron2.storage.Tag> listIterator(int location) {
         return impl.listIterator(location);
     }
     @Override
@@ -98,15 +93,15 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         return impl.remove(location);
     }
     @Override
-    public boolean remove(Object object) {
+    public boolean remove(java.lang.Object object) {
         return impl.remove(object);
     }
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(java.util.Collection<?> collection) {
         return impl.removeAll(collection);
     }
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(java.util.Collection<?> collection) {
         return impl.retainAll(collection);
     }
     @Override
@@ -118,11 +113,11 @@ public final class TagList implements List<com.veyron2.storage.Tag> {
         return impl.size();
     }
     @Override
-    public List<com.veyron2.storage.Tag> subList(int start, int end) {
+    public java.util.List<com.veyron2.storage.Tag> subList(int start, int end) {
         return impl.subList(start, end);
     }
     @Override
-    public Object[] toArray() {
+    public java.lang.Object[] toArray() {
         return impl.toArray();
     }
     @Override

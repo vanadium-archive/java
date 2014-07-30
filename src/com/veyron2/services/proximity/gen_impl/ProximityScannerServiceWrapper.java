@@ -2,42 +2,50 @@
 // Source(s):  proximity.vdl
 package com.veyron2.services.proximity.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.proximity.Device;
-import com.veyron2.services.proximity.Proximity;
-import com.veyron2.services.proximity.ProximityAnnouncer;
-import com.veyron2.services.proximity.ProximityAnnouncerFactory;
-import com.veyron2.services.proximity.ProximityAnnouncerService;
-import com.veyron2.services.proximity.ProximityFactory;
-import com.veyron2.services.proximity.ProximityScanner;
-import com.veyron2.services.proximity.ProximityScannerFactory;
-import com.veyron2.services.proximity.ProximityScannerService;
-import com.veyron2.services.proximity.ProximityService;
-import java.util.ArrayList;
+public final class ProximityScannerServiceWrapper {
 
-public class ProximityScannerServiceWrapper {
+    private final com.veyron2.services.proximity.ProximityScannerService service;
 
-	private final ProximityScannerService service;
 
-	public ProximityScannerServiceWrapper(ProximityScannerService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("nearbyDevices".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
+
+
+    public ProximityScannerServiceWrapper(final com.veyron2.services.proximity.ProximityScannerService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface ProximityScanner.
-	public ArrayList<Device> nearbyDevices(ServerCall call) throws VeyronException { 
-		return this.service.nearbyDevices(call);
-	}
+        
+        if ("nearbyDevices".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.nearbyDevices( call   );
+    }
+
+
+
+ 
+
 }

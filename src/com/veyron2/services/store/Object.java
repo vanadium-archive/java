@@ -2,47 +2,87 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.query.Query;
-import com.veyron2.services.mounttable.Globable;
-import com.veyron2.services.watch.GlobWatcher;
-import com.veyron2.services.watch.QueryWatcher;
-import com.veyron2.vdl.ClientStream;
-import java.util.ArrayList;
-
 /**
  * ObjectService is the interface for a value in the store.
  */
-public interface Object extends Globable, GlobWatcher, QueryWatcher { 
-	// Exists returns true iff the Entry has a value.
-	public boolean exists(Context context, TransactionID tID) throws VeyronException;
-	public boolean exists(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// Get returns the value for the Object.  The value returned is from the
+
+public interface Object extends com.veyron2.services.mounttable.Globable, com.veyron2.services.watch.GlobWatcher, com.veyron2.services.watch.QueryWatcher {
+
+    
+    
+
+    
+    // Exists returns true iff the Entry has a value.
+
+    public boolean exists(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public boolean exists(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Get returns the value for the Object.  The value returned is from the
 // most recent mutation of the entry in the Transaction, or from the
 // Transaction's snapshot if there is no mutation.
-	public Entry get(Context context, TransactionID tID) throws VeyronException;
-	public Entry get(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// Put modifies the value of the Object.
-	public Stat put(Context context, TransactionID tID, java.lang.Object v) throws VeyronException;
-	public Stat put(Context context, TransactionID tID, java.lang.Object v, Options veyronOpts) throws VeyronException;
-	// Remove removes the Object.
-	public void remove(Context context, TransactionID tID) throws VeyronException;
-	public void remove(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// SetAttr changes the attributes of the entry, such as permissions and
+
+    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Put modifies the value of the Object.
+
+    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.lang.Object V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Remove removes the Object.
+
+    public void remove(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public void remove(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // SetAttr changes the attributes of the entry, such as permissions and
 // replication groups.  Attributes are associated with the value, not the
 // path.
-	public void setAttr(Context context, TransactionID tID, ArrayList<java.lang.Object> attrs) throws VeyronException;
-	public void setAttr(Context context, TransactionID tID, ArrayList<java.lang.Object> attrs, Options veyronOpts) throws VeyronException;
-	// Stat returns entry info.
-	public Stat stat(Context context, TransactionID tID) throws VeyronException;
-	public Stat stat(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// Query returns the sequence of elements that satisfy the query.
-	public ClientStream<Void,QueryResult,Void> query(Context context, TransactionID tID, Query q) throws VeyronException;
-	public ClientStream<Void,QueryResult,Void> query(Context context, TransactionID tID, Query q, Options veyronOpts) throws VeyronException;
-	// GlobT finds objects beneath this value that match the given pattern.
+
+    public void setAttr(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException;
+    public void setAttr(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Attrs, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Stat returns entry info.
+
+    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Query returns the sequence of elements that satisfy the query.
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.store.QueryResult, java.lang.Void> query(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.query.Query Q) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.store.QueryResult, java.lang.Void> query(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.query.Query Q, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // GlobT finds objects beneath this value that match the given pattern.
 // This is the same as Glob, but operates within a transaction.
-	public ClientStream<Void,String,Void> globT(Context context, TransactionID tID, String pattern) throws VeyronException;
-	public ClientStream<Void,String,Void> globT(Context context, TransactionID tID, String pattern, Options veyronOpts) throws VeyronException;
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String, java.lang.Void> globT(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String, java.lang.Void> globT(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.lang.String pattern, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

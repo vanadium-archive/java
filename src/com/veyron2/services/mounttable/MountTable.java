@@ -2,16 +2,17 @@
 // Source: service.vdl
 package com.veyron2.services.mounttable;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import java.util.ArrayList;
-
 /**
  * MountTable defines the interface to talk to a mounttable.
  */
-public interface MountTable extends Globable { 
-	// Mount Server (a global name) onto the receiver.
+
+public interface MountTable extends com.veyron2.services.mounttable.Globable {
+
+    
+    
+
+    
+    // Mount Server (a global name) onto the receiver.
 // Subsequent mounts add to the servers mounted there.  The multiple
 // servers are considered equivalent and are meant solely for
 // availability, i.e., no load balancing is guaranteed.
@@ -21,20 +22,37 @@ public interface MountTable extends Globable {
 // duration.  A server with an expired TTL should never appear in the
 // results nor affect the operation of any MountTable method, and should
 // act as if it was never present as far as the interface is concerned.
-	public void mount(Context context, String server, int tTL) throws VeyronException;
-	public void mount(Context context, String server, int tTL, Options veyronOpts) throws VeyronException;
-	// Unmount removes Server from the mount point.  If Server is empty, remove all
+
+    public void mount(final com.veyron2.ipc.Context context, final java.lang.String Server, final int TTL) throws com.veyron2.ipc.VeyronException;
+    public void mount(final com.veyron2.ipc.Context context, final java.lang.String Server, final int TTL, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Unmount removes Server from the mount point.  If Server is empty, remove all
 // servers mounted there.
 // Returns a non-nil error iff Server remains mounted at the mount point.
-	public void unmount(Context context, String server) throws VeyronException;
-	public void unmount(Context context, String server, Options veyronOpts) throws VeyronException;
-	// ResolveStepOut packages output arguments for method ResolveStep.
-	public static class ResolveStepOut { 
-		public ArrayList<MountedServer> servers;
-		public String suffix;
-	}
-	// ResolveStep takes the next step in resolving a name.  Returns the next
+
+    public void unmount(final com.veyron2.ipc.Context context, final java.lang.String Server) throws com.veyron2.ipc.VeyronException;
+    public void unmount(final com.veyron2.ipc.Context context, final java.lang.String Server, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public static class ResolveStepOut {
+        
+        public java.util.ArrayList<com.veyron2.services.mounttable.MountedServer> servers;
+        
+        public java.lang.String suffix;
+        
+    }
+    
+
+    
+    // ResolveStep takes the next step in resolving a name.  Returns the next
 // servers to query and the suffix at those servers.
-	public MountTable.ResolveStepOut resolveStep(Context context) throws VeyronException;
-	public MountTable.ResolveStepOut resolveStep(Context context, Options veyronOpts) throws VeyronException;
+
+    public com.veyron2.services.mounttable.MountTable.ResolveStepOut resolveStep(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.mounttable.MountTable.ResolveStepOut resolveStep(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

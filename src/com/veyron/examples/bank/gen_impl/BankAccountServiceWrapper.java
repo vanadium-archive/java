@@ -2,55 +2,83 @@
 // Source(s):  bank.vdl
 package com.veyron.examples.bank.gen_impl;
 
-import com.veyron.examples.bank.Bank;
-import com.veyron.examples.bank.BankAccount;
-import com.veyron.examples.bank.BankAccountFactory;
-import com.veyron.examples.bank.BankAccountService;
-import com.veyron.examples.bank.BankFactory;
-import com.veyron.examples.bank.BankService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class BankAccountServiceWrapper {
 
-public class BankAccountServiceWrapper {
+    private final com.veyron.examples.bank.BankAccountService service;
 
-	private final BankAccountService service;
 
-	public BankAccountServiceWrapper(BankAccountService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("deposit".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("withdraw".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("transfer".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("balance".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public BankAccountServiceWrapper(final com.veyron.examples.bank.BankAccountService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("balance".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface BankAccount.
-	public void deposit(ServerCall call, long amount) throws VeyronException { 
-		this.service.deposit(call, amount);
-	}
-	public void withdraw(ServerCall call, long amount) throws VeyronException { 
-		this.service.withdraw(call, amount);
-	}
-	public void transfer(ServerCall call, long receiver, long amount) throws VeyronException { 
-		this.service.transfer(call, receiver, amount);
-	}
-	public long balance(ServerCall call) throws VeyronException { 
-		return this.service.balance(call);
-	}
+        
+        if ("deposit".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("transfer".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        if ("withdraw".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void deposit(final com.veyron2.ipc.ServerCall call, final long amount) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.deposit( call , amount  );
+    }
+
+    public void withdraw(final com.veyron2.ipc.ServerCall call, final long amount) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.withdraw( call , amount  );
+    }
+
+    public void transfer(final com.veyron2.ipc.ServerCall call, final long receiver, final long amount) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.transfer( call , receiver, amount  );
+    }
+
+    public long balance(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.balance( call   );
+    }
+
+
+
+ 
+
 }

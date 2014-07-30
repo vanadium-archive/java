@@ -2,80 +2,102 @@
 // Source(s):  service.vdl
 package com.veyron2.services.store.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.store.Conflict;
-import com.veyron2.services.store.Entry;
-import com.veyron2.services.store.ObjectFactory;
-import com.veyron2.services.store.ObjectService;
-import com.veyron2.services.store.QueryResult;
-import com.veyron2.services.store.Stat;
-import com.veyron2.services.store.Store;
-import com.veyron2.services.store.StoreFactory;
-import com.veyron2.services.store.StoreService;
-import com.veyron2.services.store.TransactionID;
-import com.veyron2.services.store.VeyronConsts;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class StoreServiceWrapper {
 
-public class StoreServiceWrapper {
+    private final com.veyron2.services.store.StoreService service;
 
-	private final StoreService service;
 
-	public StoreServiceWrapper(StoreService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("createTransaction".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("commit".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("abort".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("readConflicts".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public StoreServiceWrapper(final com.veyron2.services.store.StoreService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("abort".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Store.
-	public void createTransaction(ServerCall call, TransactionID TID, ArrayList<Object> Options) throws VeyronException { 
-		this.service.createTransaction(call, TID, Options);
-	}
-	public void commit(ServerCall call, TransactionID TID) throws VeyronException { 
-		this.service.commit(call, TID);
-	}
-	public void abort(ServerCall call, TransactionID TID) throws VeyronException { 
-		this.service.abort(call, TID);
-	}
-	public void readConflicts(ServerCall call) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<Conflict,Void> stream = new Stream<Conflict,Void>() {
-			@Override
-			public void send(Conflict item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.readConflicts(call, stream);
-	}
+        
+        if ("commit".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("createTransaction".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("readConflicts".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void createTransaction(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.createTransaction( call , TID, Options  );
+    }
+
+    public void commit(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.commit( call , TID  );
+    }
+
+    public void abort(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.abort( call , TID  );
+    }
+
+    public void readConflicts(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.store.Conflict> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.store.Conflict>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.store.Conflict recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.store.Conflict >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.store.Conflict)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.readConflicts( call   ,stream  );
+    }
+
+
+
+ 
+
 }

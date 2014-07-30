@@ -2,76 +2,91 @@
 // Source(s):  proximity.vdl
 package com.veyron2.services.proximity.gen_impl;
 
-import com.veyron2.services.proximity.Device;
-import com.veyron2.services.proximity.Proximity;
-import com.veyron2.services.proximity.ProximityAnnouncer;
-import com.veyron2.services.proximity.ProximityAnnouncerFactory;
-import com.veyron2.services.proximity.ProximityAnnouncerService;
-import com.veyron2.services.proximity.ProximityFactory;
-import com.veyron2.services.proximity.ProximityScanner;
-import com.veyron2.services.proximity.ProximityScannerFactory;
-import com.veyron2.services.proximity.ProximityScannerService;
-import com.veyron2.services.proximity.ProximityService;
-
 /* Client stub for interface: ProximityAnnouncer. */
-public final class ProximityAnnouncerStub implements ProximityAnnouncer {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.ProximityAnnouncer";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ProximityAnnouncerStub implements com.veyron2.services.proximity.ProximityAnnouncer {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.ProximityAnnouncer";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ProximityAnnouncerStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface ProximityAnnouncer.
-	@Override
-	public void registerName(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		registerName(context, Name, null);
-	}
-	@Override
-	public void registerName(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityAnnouncerStub.vdlIfacePathOpt);
-		}
+    public ProximityAnnouncerStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "RegisterName", inArgs, veyronOpts);
+    // Methods from interface ProximityAnnouncer.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
-	@Override
-	public void unregisterName(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		unregisterName(context, Name, null);
-	}
-	@Override
-	public void unregisterName(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+    
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+         registerName(context, Name, null);
+    }
+    
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityAnnouncerStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityAnnouncerStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "UnregisterName", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
 
-	}
+        
+    }
+
+    
+    public void unregisterName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+         unregisterName(context, Name, null);
+    }
+    
+    public void unregisterName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityAnnouncerStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+
 }

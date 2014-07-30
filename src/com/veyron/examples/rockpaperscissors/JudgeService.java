@@ -2,17 +2,19 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
 
-@VeyronService(serviceWrapper=JudgeServiceWrapper.class)
-public interface JudgeService { 
-	// CreateGame creates a new game with the given game options and returns a game
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper.class)
+public interface JudgeService  {
+
+    
+    // CreateGame creates a new game with the given game options and returns a game
 // identifier that can be used by the players to join the game.
-	public GameID createGame(ServerContext context, GameOptions opts) throws VeyronException;
-	// Play lets a player join an existing game and play.
-	public PlayResult play(ServerContext context, GameID iD, Stream<JudgeAction,PlayerAction> stream) throws VeyronException;
+
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.ServerContext context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Play lets a player join an existing game and play.
+
+    public com.veyron.examples.rockpaperscissors.PlayResult play(final com.veyron2.ipc.ServerContext context, final com.veyron.examples.rockpaperscissors.GameID ID, com.veyron2.vdl.Stream<com.veyron.examples.rockpaperscissors.PlayerAction, com.veyron.examples.rockpaperscissors.JudgeAction> stream) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -3,10 +3,6 @@
 
 package com.veyron2.security;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * type ACL map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32 
  * ACL pairs principal sets with label sets. This should be treated as an
@@ -14,18 +10,18 @@ import java.util.Set;
  * allowed access using <label> if there exists a pair (principals, labels)
  * in the ACL such that <pid>.Match(principals) and labels.HasLabel(label).
  **/
-public final class ACL implements Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> {
-    private Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> impl;
+public final class ACL implements java.util.Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> {
+    private java.util.Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> impl;
 
-    public ACL(Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> impl) {
+    public ACL(java.util.Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> impl) {
         this.impl = impl;
     }
 
-    public Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> getValue() {
+    public java.util.Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> getValue() {
         return this.impl;
     }
 
-    public void setValue(Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> newImpl) {
+    public void setValue(java.util.Map<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> newImpl) {
         this.impl = newImpl;
     }
 
@@ -54,22 +50,22 @@ public final class ACL implements Map<com.veyron2.security.PrincipalPattern, com
     }
 
     @Override
-    public boolean containsKey(Object key) {
+    public boolean containsKey(java.lang.Object key) {
         return impl.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(Object value) {
+    public boolean containsValue(java.lang.Object value) {
         return impl.containsValue(value);
     }
 
     @Override
-    public Set<java.util.Map.Entry<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet>> entrySet() {
+    public java.util.Set<java.util.Map.Entry<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet>> entrySet() {
         return impl.entrySet();
     }
 
     @Override
-    public com.veyron2.security.LabelSet get(Object key) {
+    public com.veyron2.security.LabelSet get(java.lang.Object key) {
         return impl.get(key);
     }
 
@@ -79,7 +75,7 @@ public final class ACL implements Map<com.veyron2.security.PrincipalPattern, com
     }
 
     @Override
-    public Set<com.veyron2.security.PrincipalPattern> keySet() {
+    public java.util.Set<com.veyron2.security.PrincipalPattern> keySet() {
         return impl.keySet();
     }
 
@@ -89,12 +85,12 @@ public final class ACL implements Map<com.veyron2.security.PrincipalPattern, com
     }
 
     @Override
-    public void putAll(Map<? extends com.veyron2.security.PrincipalPattern, ? extends com.veyron2.security.LabelSet> map) {
+    public void putAll(java.util.Map<? extends com.veyron2.security.PrincipalPattern, ? extends com.veyron2.security.LabelSet> map) {
         impl.putAll(map);
     }
 
     @Override
-    public com.veyron2.security.LabelSet remove(Object key) {
+    public com.veyron2.security.LabelSet remove(java.lang.Object key) {
         return impl.remove(key);
     }
 
@@ -104,7 +100,7 @@ public final class ACL implements Map<com.veyron2.security.PrincipalPattern, com
     }
 
     @Override
-    public Collection<com.veyron2.security.LabelSet> values() {
+    public java.util.Collection<com.veyron2.security.LabelSet> values() {
         return impl.values();
     }
 }

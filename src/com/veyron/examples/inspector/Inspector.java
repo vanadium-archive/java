@@ -2,14 +2,23 @@
 // Source: inspector.vdl
 package com.veyron.examples.inspector;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
 
-public interface Inspector { 
-		public ClientStream<Void,String,Void> ls(Context context, String glob) throws VeyronException;
-	public ClientStream<Void,String,Void> ls(Context context, String glob, Options veyronOpts) throws VeyronException;
-		public ClientStream<Void,Details,Void> lsDetails(Context context, String glob) throws VeyronException;
-	public ClientStream<Void,Details,Void> lsDetails(Context context, String glob, Options veyronOpts) throws VeyronException;
+public interface Inspector  {
+
+    
+    
+
+    
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String, java.lang.Void> ls(final com.veyron2.ipc.Context context, final java.lang.String Glob) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.String, java.lang.Void> ls(final com.veyron2.ipc.Context context, final java.lang.String Glob, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron.examples.inspector.Details, java.lang.Void> lsDetails(final com.veyron2.ipc.Context context, final java.lang.String Glob) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron.examples.inspector.Details, java.lang.Void> lsDetails(final com.veyron2.ipc.Context context, final java.lang.String Glob, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

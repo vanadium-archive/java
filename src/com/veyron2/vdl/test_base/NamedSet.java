@@ -3,25 +3,21 @@
 
 package com.veyron2.vdl.test_base;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-
 /**
  * NamedSet set[string] 
  **/
-public final class NamedSet implements Set<java.lang.String> {
-    private Set<java.lang.String> impl;
+public final class NamedSet implements java.util.Set<java.lang.String> {
+    private java.util.Set<java.lang.String> impl;
 
-    public NamedSet(Set<java.lang.String> impl) {
+    public NamedSet(java.util.Set<java.lang.String> impl) {
         this.impl = impl;
     }
 
-    public Set<java.lang.String> getValue() {
+    public java.util.Set<java.lang.String> getValue() {
         return this.impl;
     }
 
-    public void setValue(Set<java.lang.String> newImpl) {
+    public void setValue(java.util.Set<java.lang.String> newImpl) {
         this.impl = newImpl;
     }
 
@@ -55,17 +51,17 @@ public final class NamedSet implements Set<java.lang.String> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends java.lang.String> collection) {
+    public boolean addAll(java.util.Collection<? extends java.lang.String> collection) {
         return impl.addAll(collection);
     }
 
     @Override
-    public boolean contains(Object object) {
+    public boolean contains(java.lang.Object object) {
         return impl.contains(object);
     }
 
     @Override
-    public boolean containsAll(Collection<?> collection) {
+    public boolean containsAll(java.util.Collection<?> collection) {
         return impl.containsAll(collection);
     }
 
@@ -75,22 +71,22 @@ public final class NamedSet implements Set<java.lang.String> {
     }
 
     @Override
-    public Iterator<java.lang.String> iterator() {
+    public java.util.Iterator<java.lang.String> iterator() {
         return impl.iterator();
     }
 
     @Override
-    public boolean remove(Object object) {
+    public boolean remove(java.lang.Object object) {
         return impl.remove(object);
     }
 
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(java.util.Collection<?> collection) {
         return impl.removeAll(collection);
     }
 
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(java.util.Collection<?> collection) {
         return impl.retainAll(collection);
     }
 
@@ -100,7 +96,7 @@ public final class NamedSet implements Set<java.lang.String> {
     }
 
     @Override
-    public Object[] toArray() {
+    public java.lang.Object[] toArray() {
         return impl.toArray();
     }
 

@@ -2,76 +2,86 @@
 // Source(s):  service.vdl
 package com.veyron.examples.rockpaperscissors.gen_impl;
 
-import com.veyron.examples.rockpaperscissors.GameID;
-import com.veyron.examples.rockpaperscissors.GameOptions;
-import com.veyron.examples.rockpaperscissors.Judge;
-import com.veyron.examples.rockpaperscissors.JudgeAction;
-import com.veyron.examples.rockpaperscissors.JudgeFactory;
-import com.veyron.examples.rockpaperscissors.JudgeService;
-import com.veyron.examples.rockpaperscissors.PlayResult;
-import com.veyron.examples.rockpaperscissors.Player;
-import com.veyron.examples.rockpaperscissors.PlayerAction;
-import com.veyron.examples.rockpaperscissors.PlayerFactory;
-import com.veyron.examples.rockpaperscissors.PlayerService;
-import com.veyron.examples.rockpaperscissors.RockPaperScissors;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsFactory;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsService;
-import com.veyron.examples.rockpaperscissors.Round;
-import com.veyron.examples.rockpaperscissors.ScoreCard;
-import com.veyron.examples.rockpaperscissors.ScoreKeeper;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperFactory;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperService;
-import com.veyron.examples.rockpaperscissors.VeyronConsts;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
+public final class RockPaperScissorsServiceWrapper {
 
-public class RockPaperScissorsServiceWrapper {
+    private final com.veyron.examples.rockpaperscissors.RockPaperScissorsService service;
 
-	private final RockPaperScissorsService service;
-	private final JudgeServiceWrapper judge;
-	private final PlayerServiceWrapper player;
-	private final ScoreKeeperServiceWrapper scoreKeeper;
 
-	public RockPaperScissorsServiceWrapper(RockPaperScissorsService service) {
-		this.judge = new JudgeServiceWrapper(service);
-		this.player = new PlayerServiceWrapper(service);
-		this.scoreKeeper = new ScoreKeeperServiceWrapper(service);
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		try {
-			return this.judge.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		try {
-			return this.player.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		try {
-			return this.scoreKeeper.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
+
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper judgeWrapper;
+    
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper playerWrapper;
+    
+    
+    private final com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper scoreKeeperWrapper;
+    
+
+    public RockPaperScissorsServiceWrapper(final com.veyron.examples.rockpaperscissors.RockPaperScissorsService service) {
+        this.service = service;
+        
+        
+        this.judgeWrapper = new com.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper(service);
+        
+        this.playerWrapper = new com.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper(service);
+        
+        this.scoreKeeperWrapper = new com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper(service);
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface RockPaperScissors.
-	// Methods from sub-interface Judge.
-	public GameID createGame(ServerCall call, GameOptions Opts) throws VeyronException {
-		return this.judge.createGame(call, Opts);
-	}
-	public PlayResult play(ServerCall call, GameID ID) throws VeyronException {
-		return this.judge.play(call, ID);
-	}
-	// Methods from sub-interface Player.
-	public void challenge(ServerCall call, String Address, GameID ID, GameOptions Opts) throws VeyronException {
-		this.player.challenge(call, Address, ID, Opts);
-	}
-	// Methods from sub-interface ScoreKeeper.
-	public void record(ServerCall call, ScoreCard Score) throws VeyronException {
-		this.scoreKeeper.record(call, Score);
-	}
+        
+        
+        try {
+            return this.judgeWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        try {
+            return this.playerWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        try {
+            return this.scoreKeeperWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+
+
+
+    public com.veyron.examples.rockpaperscissors.PlayResult play(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.judgeWrapper.play(call, ID);
+    }
+
+    public void challenge(final com.veyron2.ipc.ServerCall call, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+          this.playerWrapper.challenge(call, Address, ID, Opts);
+    }
+
+    public void record(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
+        
+          this.scoreKeeperWrapper.record(call, Score);
+    }
+
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.judgeWrapper.createGame(call, Opts);
+    }
+ 
+
 }

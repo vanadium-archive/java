@@ -2,90 +2,107 @@
 // Source(s):  repository.vdl
 package com.veyron.services.mgmt.repository.gen_impl;
 
-import com.veyron.services.mgmt.repository.Application;
-import com.veyron.services.mgmt.repository.ApplicationFactory;
-import com.veyron.services.mgmt.repository.ApplicationService;
-import com.veyron.services.mgmt.repository.Profile;
-import com.veyron.services.mgmt.repository.ProfileFactory;
-import com.veyron.services.mgmt.repository.ProfileService;
-
 /* Client stub for interface: Application. */
-public final class ApplicationStub implements Application {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.repository.Application";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
-	private final com.veyron2.services.mgmt.repository.Application application;
+public final class ApplicationStub implements com.veyron.services.mgmt.repository.Application {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.repository.Application";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ApplicationStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-		this.application = new com.veyron2.services.mgmt.repository.gen_impl.ApplicationStub(client, name);
-	}
-	// Methods from interface Application.
-	@Override
-	public void put(com.veyron2.ipc.Context context, java.util.ArrayList<java.lang.String> Profiles, com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
-		put(context, Profiles, Envelope, null);
-	}
-	@Override
-	public void put(com.veyron2.ipc.Context context, java.util.ArrayList<java.lang.String> Profiles, com.veyron2.services.mgmt.application.Envelope Envelope, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Profiles, Envelope };
+    
+    
+    
+    private final com.veyron2.services.mgmt.repository.gen_impl.ApplicationStub applicationStub;
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ApplicationStub.vdlIfacePathOpt);
-		}
+    public ApplicationStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+        this.applicationStub = new com.veyron2.services.mgmt.repository.gen_impl.ApplicationStub(client, veyronName);
+         
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Put", inArgs, veyronOpts);
+    // Methods from interface Application.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
-	@Override
-	public void remove(com.veyron2.ipc.Context context, java.lang.String Profile) throws com.veyron2.ipc.VeyronException {
-		remove(context, Profile, null);
-	}
-	@Override
-	public void remove(com.veyron2.ipc.Context context, java.lang.String Profile, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Profile };
+    
+    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
+         put(context, Profiles, Envelope, null);
+    }
+    
+    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ApplicationStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ApplicationStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Profiles, Envelope };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Remove", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
 
-	}
-	// Methods from sub-interface Application.
-	@Override
-	public com.veyron2.services.mgmt.application.Envelope match(com.veyron2.ipc.Context context, java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
-		return match(context, Profiles, null);
-	}
-	@Override
-	public com.veyron2.services.mgmt.application.Envelope match(com.veyron2.ipc.Context context, java.util.ArrayList<java.lang.String> Profiles, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ApplicationStub.vdlIfacePathOpt);
-		}
-		return this.application.match(context, Profiles, veyronOpts);
-	}
+        
+    }
+
+    
+    public void remove(final com.veyron2.ipc.Context context, final java.lang.String Profile) throws com.veyron2.ipc.VeyronException {
+         remove(context, Profile, null);
+    }
+    
+    public void remove(final com.veyron2.ipc.Context context, final java.lang.String Profile, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ApplicationStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Profile };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+    @Override
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
+        
+        return this.applicationStub.match(context, Profiles);
+    }
+    @Override
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationStub.match(context, Profiles, veyronOpts);
+    }
+
+
 }

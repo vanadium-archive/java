@@ -2,20 +2,22 @@
 // Source: collection_test.vdl
 package com.veyron.services.mounttable.lib;
 
-import com.veyron.services.mounttable.lib.gen_impl.CollectionServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
 
-@VeyronService(serviceWrapper=CollectionServiceWrapper.class)
-public interface CollectionService { 
-	// Export sets the value for a name.  Overwrite controls the behavior when
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mounttable.lib.gen_impl.CollectionServiceWrapper.class)
+public interface CollectionService  {
+
+    
+    // Export sets the value for a name.  Overwrite controls the behavior when
 // an entry exists, if Overwrite is true, then the binding is replaced,
 // otherwise the call fails with an error.  The Val must be no larger than
 // MaxSize bytes.
-	public void export(ServerContext context, String val, boolean overwrite) throws VeyronException;
-	// Lookup retrieves the value associated with a name.  Returns an error if
+
+    public void export(final com.veyron2.ipc.ServerContext context, final java.lang.String Val, final boolean Overwrite) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Lookup retrieves the value associated with a name.  Returns an error if
 // there is no such binding.
-	public ArrayList<Byte> lookup(ServerContext context) throws VeyronException;
+
+    public java.util.ArrayList<java.lang.Byte> lookup(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

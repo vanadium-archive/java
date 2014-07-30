@@ -3,34 +3,32 @@
 // Source: wire.vdl
 package com.veyron2.security.wire;
 
-
 /**
+ * type KeyCurve byte 
  * KeyCurve defines a namespace for elliptic curves.
- */
-public final class KeyCurve { 
-		private byte value;
+ **/
+public final class KeyCurve {
+    private byte value;
 
-	public KeyCurve(byte value) { 
-		this.value = value;
-	}
-	public byte getValue() { return this.value; }
+    public KeyCurve(byte value) {
+        this.value = value;
+    }
+    public byte getValue() { return this.value; }
 
-	public void setValue(byte value) { this.value = value; }
+    public void setValue(byte value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final KeyCurve other = (KeyCurve)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (int)value;
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.security.wire.KeyCurve other = (com.veyron2.security.wire.KeyCurve)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return (int)value;
+    }
 }

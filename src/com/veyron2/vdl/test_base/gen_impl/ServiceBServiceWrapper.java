@@ -2,63 +2,79 @@
 // Source(s):  base.vdl
 package com.veyron2.vdl.test_base.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.test_base.Args;
-import com.veyron2.vdl.test_base.CompComp;
-import com.veyron2.vdl.test_base.Composites;
-import com.veyron2.vdl.test_base.NamedStruct;
-import com.veyron2.vdl.test_base.NestedArgs;
-import com.veyron2.vdl.test_base.Scalars;
-import com.veyron2.vdl.test_base.ServiceA;
-import com.veyron2.vdl.test_base.ServiceAFactory;
-import com.veyron2.vdl.test_base.ServiceAService;
-import com.veyron2.vdl.test_base.ServiceB;
-import com.veyron2.vdl.test_base.ServiceBFactory;
-import com.veyron2.vdl.test_base.ServiceBService;
-import com.veyron2.vdl.test_base.VeyronConsts;
+public final class ServiceBServiceWrapper {
 
-public class ServiceBServiceWrapper {
+    private final com.veyron2.vdl.test_base.ServiceBService service;
 
-	private final ServiceBService service;
-	private final ServiceAServiceWrapper serviceA;
 
-	public ServiceBServiceWrapper(ServiceBService service) {
-		this.serviceA = new ServiceAServiceWrapper(service);
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		try {
-			return this.serviceA.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		if ("methodB1".equals(method)) {
-			return new Object[]{  };
-		}
+
+    
+    private final com.veyron2.vdl.test_base.gen_impl.ServiceAServiceWrapper serviceAWrapper;
+    
+
+    public ServiceBServiceWrapper(final com.veyron2.vdl.test_base.ServiceBService service) {
+        this.service = service;
+        
+        
+        this.serviceAWrapper = new com.veyron2.vdl.test_base.gen_impl.ServiceAServiceWrapper(service);
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface ServiceB.
-	public CompComp methodB1(ServerCall call, Scalars a, Composites b) throws VeyronException { 
-		return this.service.methodB1(call, a, b);
-	}
-	// Methods from sub-interface ServiceA.
-	public void methodA1(ServerCall call) throws VeyronException {
-		this.serviceA.methodA1(call);
-	}
-	public String methodA2(ServerCall call, int a, String b) throws VeyronException {
-		return this.serviceA.methodA2(call, a, b);
-	}
-	public String methodA3(ServerCall call, int a) throws VeyronException {
-		return this.serviceA.methodA3(call, a);
-	}
-	public void methodA4(ServerCall call, int a) throws VeyronException {
-		this.serviceA.methodA4(call, a);
-	}
+        
+        if ("methodB1".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        try {
+            return this.serviceAWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public com.veyron2.vdl.test_base.CompComp methodB1(final com.veyron2.ipc.ServerCall call, final com.veyron2.vdl.test_base.Scalars a, final com.veyron2.vdl.test_base.Composites b) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.methodB1( call , a, b  );
+    }
+
+
+
+
+    public void methodA1(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.serviceAWrapper.methodA1(call);
+    }
+
+    public java.lang.String methodA2(final com.veyron2.ipc.ServerCall call, final int a, final java.lang.String b) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.serviceAWrapper.methodA2(call, a, b);
+    }
+
+    public java.lang.String methodA3(final com.veyron2.ipc.ServerCall call, final int a) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.serviceAWrapper.methodA3(call, a);
+    }
+
+    public void methodA4(final com.veyron2.ipc.ServerCall call, final int a) throws com.veyron2.ipc.VeyronException {
+        
+          this.serviceAWrapper.methodA4(call, a);
+    }
+ 
+
 }

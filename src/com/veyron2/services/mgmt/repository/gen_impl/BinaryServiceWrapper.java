@@ -2,108 +2,143 @@
 // Source(s):  repository.vdl
 package com.veyron2.services.mgmt.repository.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.binary.PartInfo;
-import com.veyron2.services.mgmt.repository.Application;
-import com.veyron2.services.mgmt.repository.ApplicationFactory;
-import com.veyron2.services.mgmt.repository.ApplicationService;
-import com.veyron2.services.mgmt.repository.Binary;
-import com.veyron2.services.mgmt.repository.BinaryFactory;
-import com.veyron2.services.mgmt.repository.BinaryService;
-import com.veyron2.services.mgmt.repository.Profile;
-import com.veyron2.services.mgmt.repository.ProfileFactory;
-import com.veyron2.services.mgmt.repository.ProfileService;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class BinaryServiceWrapper {
 
-public class BinaryServiceWrapper {
+    private final com.veyron2.services.mgmt.repository.BinaryService service;
 
-	private final BinaryService service;
 
-	public BinaryServiceWrapper(BinaryService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("create".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("delete".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("download".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
-		if ("downloadURL".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
-		if ("stat".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
-		if ("upload".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public BinaryServiceWrapper(final com.veyron2.services.mgmt.repository.BinaryService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("create".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Binary.
-	public void create(ServerCall call, int nparts) throws VeyronException { 
-		this.service.create(call, nparts);
-	}
-	public void delete(ServerCall call) throws VeyronException { 
-		this.service.delete(call);
-	}
-	public void download(ServerCall call, int part) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<ArrayList<Byte>,Void> stream = new Stream<ArrayList<Byte>,Void>() {
-			@Override
-			public void send(ArrayList<Byte> item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.download(call, part, stream);
-	}
-	public BinaryService.DownloadURLOut downloadURL(ServerCall call) throws VeyronException { 
-		return this.service.downloadURL(call);
-	}
-	public ArrayList<PartInfo> stat(ServerCall call) throws VeyronException { 
-		return this.service.stat(call);
-	}
-	public void upload(ServerCall call, int part) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<Void,ArrayList<Byte>> stream = new Stream<Void,ArrayList<Byte>>() {
-			@Override
-			public void send(Void item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public ArrayList<Byte> recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<ArrayList<Byte>>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (ArrayList<Byte>)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.upload(call, part, stream);
-	}
+        
+        if ("delete".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        if ("download".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        if ("downloadURL".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("stat".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        if ("upload".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void create(final com.veyron2.ipc.ServerCall call, final int nparts) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.create( call , nparts  );
+    }
+
+    public void delete(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.delete( call   );
+    }
+
+    public void download(final com.veyron2.ipc.ServerCall call, final int part) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.ArrayList<java.lang.Byte> >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.util.ArrayList<java.lang.Byte>)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.download( call , part  ,stream  );
+    }
+
+    public com.veyron2.services.mgmt.repository.Binary.DownloadURLOut downloadURL(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.downloadURL( call   );
+    }
+
+    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.stat( call   );
+    }
+
+    public void upload(final com.veyron2.ipc.ServerCall call, final int part) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+            @Override
+            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.lang.Void recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.lang.Void >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.lang.Void)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.upload( call , part  ,stream  );
+    }
+
+
+
+ 
+
 }

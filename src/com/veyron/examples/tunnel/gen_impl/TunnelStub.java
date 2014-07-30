@@ -2,111 +2,134 @@
 // Source(s):  tunnel.vdl
 package com.veyron.examples.tunnel.gen_impl;
 
-import com.veyron.examples.tunnel.ClientShellPacket;
-import com.veyron.examples.tunnel.ServerShellPacket;
-import com.veyron.examples.tunnel.ShellOpts;
-import com.veyron.examples.tunnel.Tunnel;
-import com.veyron.examples.tunnel.TunnelFactory;
-import com.veyron.examples.tunnel.TunnelService;
-
 /* Client stub for interface: Tunnel. */
-public final class TunnelStub implements Tunnel {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.tunnel.Tunnel";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class TunnelStub implements com.veyron.examples.tunnel.Tunnel {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.tunnel.Tunnel";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public TunnelStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Tunnel.
-	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.util.ArrayList<java.lang.Byte>,java.lang.Void> forward(com.veyron2.ipc.Context context, java.lang.String network, java.lang.String address) throws com.veyron2.ipc.VeyronException {
-		return forward(context, network, address, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.util.ArrayList<java.lang.Byte>,java.lang.Void> forward(com.veyron2.ipc.Context context, java.lang.String network, java.lang.String address, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ network, address };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, TunnelStub.vdlIfacePathOpt);
-		}
+    public TunnelStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Forward", inArgs, veyronOpts);
+    // Methods from interface Tunnel.
 
-		return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
-			@Override
-			public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (java.util.ArrayList<java.lang.Byte>)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-					call.finish(resultTypes);
-					return null;
 
-			}
-		};
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<ClientShellPacket,ServerShellPacket,java.lang.Integer> shell(com.veyron2.ipc.Context context, java.lang.String command, ShellOpts shellOpts) throws com.veyron2.ipc.VeyronException {
-		return shell(context, command, shellOpts, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<ClientShellPacket,ServerShellPacket,java.lang.Integer> shell(com.veyron2.ipc.Context context, java.lang.String command, ShellOpts shellOpts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ command, shellOpts };
+    
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.util.ArrayList<java.lang.Byte>, java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address) throws com.veyron2.ipc.VeyronException {
+        return forward(context, network, address, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.util.ArrayList<java.lang.Byte>, java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, TunnelStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, TunnelStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ network, address };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Shell", inArgs, veyronOpts);
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+            @Override
+            public void send(final java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.util.ArrayList<java.lang.Byte>)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
+                
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+                call.finish(resultTypes);
+                return null;
+                 
+            }
+        };
+        
+    }
 
-		return new com.veyron2.vdl.ClientStream<ClientShellPacket, ServerShellPacket, java.lang.Integer>() {
-			@Override
-			public void send(ClientShellPacket item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public ServerShellPacket recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<ServerShellPacket>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (ServerShellPacket)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.lang.Integer finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Integer>() {} };
-					return (java.lang.Integer)call.finish(resultTypes)[0];
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.tunnel.ClientShellPacket,com.veyron.examples.tunnel.ServerShellPacket, java.lang.Integer> shell(final com.veyron2.ipc.Context context, final java.lang.String command, final com.veyron.examples.tunnel.ShellOpts shellOpts) throws com.veyron2.ipc.VeyronException {
+        return shell(context, command, shellOpts, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.tunnel.ClientShellPacket,com.veyron.examples.tunnel.ServerShellPacket, java.lang.Integer> shell(final com.veyron2.ipc.Context context, final java.lang.String command, final com.veyron.examples.tunnel.ShellOpts shellOpts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, TunnelStub.vdlIfacePathOpt);
+        }
 
-			}
-		};
-	}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ command, shellOpts };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<com.veyron.examples.tunnel.ClientShellPacket, com.veyron.examples.tunnel.ServerShellPacket, java.lang.Integer>() {
+            @Override
+            public void send(final com.veyron.examples.tunnel.ClientShellPacket item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron.examples.tunnel.ServerShellPacket recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron.examples.tunnel.ServerShellPacket>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron.examples.tunnel.ServerShellPacket)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.lang.Integer finish() throws com.veyron2.ipc.VeyronException {
+                 
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+                    new com.google.common.reflect.TypeToken<java.lang.Integer>() {
+                        private static final long serialVersionUID = 1L;
+                    }
+                };
+                return (java.lang.Integer)call.finish(resultTypes)[0];
+                 
+            }
+        };
+        
+    }
+
+
+
+
+
 }

@@ -2,61 +2,59 @@
 // Source(s):  service.vdl
 package com.veyron.examples.rockpaperscissors.gen_impl;
 
-import com.veyron.examples.rockpaperscissors.GameID;
-import com.veyron.examples.rockpaperscissors.GameOptions;
-import com.veyron.examples.rockpaperscissors.Judge;
-import com.veyron.examples.rockpaperscissors.JudgeAction;
-import com.veyron.examples.rockpaperscissors.JudgeFactory;
-import com.veyron.examples.rockpaperscissors.JudgeService;
-import com.veyron.examples.rockpaperscissors.PlayResult;
-import com.veyron.examples.rockpaperscissors.Player;
-import com.veyron.examples.rockpaperscissors.PlayerAction;
-import com.veyron.examples.rockpaperscissors.PlayerFactory;
-import com.veyron.examples.rockpaperscissors.PlayerService;
-import com.veyron.examples.rockpaperscissors.RockPaperScissors;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsFactory;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsService;
-import com.veyron.examples.rockpaperscissors.Round;
-import com.veyron.examples.rockpaperscissors.ScoreCard;
-import com.veyron.examples.rockpaperscissors.ScoreKeeper;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperFactory;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperService;
-import com.veyron.examples.rockpaperscissors.VeyronConsts;
-
 /* Client stub for interface: ScoreKeeper. */
-public final class ScoreKeeperStub implements ScoreKeeper {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.ScoreKeeper";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ScoreKeeperStub implements com.veyron.examples.rockpaperscissors.ScoreKeeper {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.ScoreKeeper";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ScoreKeeperStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface ScoreKeeper.
-	@Override
-	public void record(com.veyron2.ipc.Context context, ScoreCard Score) throws com.veyron2.ipc.VeyronException {
-		record(context, Score, null);
-	}
-	@Override
-	public void record(com.veyron2.ipc.Context context, ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Score };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ScoreKeeperStub.vdlIfacePathOpt);
-		}
+    public ScoreKeeperStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Record", inArgs, veyronOpts);
+    // Methods from interface ScoreKeeper.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
+    
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
+         record(context, Score, null);
+    }
+    
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ScoreKeeperStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Score };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+
 }

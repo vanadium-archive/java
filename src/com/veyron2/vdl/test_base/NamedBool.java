@@ -3,31 +3,31 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
+/**
+ * type NamedBool bool 
+ **/
+public final class NamedBool {
+    private boolean value;
 
-public final class NamedBool { 
-		private boolean value;
+    public NamedBool(boolean value) {
+        this.value = value;
+    }
+    public boolean getValue() { return this.value; }
 
-	public NamedBool(boolean value) { 
-		this.value = value;
-	}
-	public boolean getValue() { return this.value; }
+    public void setValue(boolean value) { this.value = value; }
 
-	public void setValue(boolean value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final NamedBool other = (NamedBool)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Boolean.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.vdl.test_base.NamedBool other = (com.veyron2.vdl.test_base.NamedBool)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Boolean.valueOf(value).hashCode();
+    }
 }

@@ -2,62 +2,86 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mounttable.Globable;
-import com.veyron2.services.mounttable.GlobableFactory;
-import com.veyron2.services.mounttable.GlobableService;
-import com.veyron2.services.mounttable.MountEntry;
-import com.veyron2.services.mounttable.MountTable;
-import com.veyron2.services.mounttable.MountTableFactory;
-import com.veyron2.services.mounttable.MountTableService;
-import com.veyron2.services.mounttable.MountedServer;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class MountTableServiceWrapper {
 
-public class MountTableServiceWrapper {
+    private final com.veyron2.services.mounttable.MountTableService service;
 
-	private final MountTableService service;
-	private final GlobableServiceWrapper globable;
 
-	public MountTableServiceWrapper(MountTableService service) {
-		this.globable = new GlobableServiceWrapper(service);
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		try {
-			return this.globable.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		if ("mount".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("unmount".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-		if ("resolveStep".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
+
+    
+    private final com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper globableWrapper;
+    
+
+    public MountTableServiceWrapper(final com.veyron2.services.mounttable.MountTableService service) {
+        this.service = service;
+        
+        
+        this.globableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper(service);
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface MountTable.
-	public void mount(ServerCall call, String Server, int TTL) throws VeyronException { 
-		this.service.mount(call, Server, TTL);
-	}
-	public void unmount(ServerCall call, String Server) throws VeyronException { 
-		this.service.unmount(call, Server);
-	}
-	public MountTableService.ResolveStepOut resolveStep(ServerCall call) throws VeyronException { 
-		return this.service.resolveStep(call);
-	}
-	// Methods from sub-interface Globable.
-	public void glob(ServerCall call, String pattern) throws VeyronException {
-		this.globable.glob(call, pattern);
-	}
+        
+        if ("mount".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        if ("resolveStep".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        if ("unmount".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
+        }
+        
+        
+        try {
+            return this.globableWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void mount(final com.veyron2.ipc.ServerCall call, final java.lang.String Server, final int TTL) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.mount( call , Server, TTL  );
+    }
+
+    public void unmount(final com.veyron2.ipc.ServerCall call, final java.lang.String Server) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.unmount( call , Server  );
+    }
+
+    public com.veyron2.services.mounttable.MountTable.ResolveStepOut resolveStep(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.resolveStep( call   );
+    }
+
+
+
+
+    public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+          this.globableWrapper.glob(call, pattern);
+    }
+ 
+
 }

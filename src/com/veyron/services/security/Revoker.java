@@ -2,10 +2,6 @@
 // Source: revoker.vdl
 package com.veyron.services.security;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Revoker is the interface for preventing discharges from being issued. The
  * dicharger ensures that no discharges will be issued for caveats that
@@ -23,9 +19,17 @@ import com.veyron2.ipc.VeyronException;
  * authentication. Not keeping track of non-revoked caveats enables
  * performance improvements on the Discharger side.
  */
-public interface Revoker { 
-	// Revoke ensures that iff a nil is returned, all discharge requests to the
+
+public interface Revoker  {
+
+    
+    
+
+    
+    // Revoke ensures that iff a nil is returned, all discharge requests to the
 // caveat with nonce sha256(caveatPreimage) are going to be denied.
-	public void revoke(Context context, RevocationToken caveatPreimage) throws VeyronException;
-	public void revoke(Context context, RevocationToken caveatPreimage, Options veyronOpts) throws VeyronException;
+
+    public void revoke(final com.veyron2.ipc.Context context, final com.veyron.services.security.RevocationToken caveatPreimage) throws com.veyron2.ipc.VeyronException;
+    public void revoke(final com.veyron2.ipc.Context context, final com.veyron.services.security.RevocationToken caveatPreimage, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

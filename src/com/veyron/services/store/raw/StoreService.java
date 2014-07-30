@@ -2,23 +2,24 @@
 // Source: service.vdl
 package com.veyron.services.store.raw;
 
-import com.veyron.services.store.raw.gen_impl.StoreServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.watch.ChangeBatch;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Store defines a raw interface for the Veyron store. Mutations can be received
  * via the Watcher interface, and committed via PutMutation.
  */
-@VeyronService(serviceWrapper=StoreServiceWrapper.class)
-public interface StoreService { 
-	// Watch returns a stream of all changes.
-	public void watch(ServerContext context, Request req, Stream<ChangeBatch,Void> stream) throws VeyronException;
-	// PutMutations atomically commits a stream of Mutations when the stream is
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.store.raw.gen_impl.StoreServiceWrapper.class)
+public interface StoreService  {
+
+    
+    // Watch returns a stream of all changes.
+
+    public void watch(final com.veyron2.ipc.ServerContext context, final com.veyron.services.store.raw.Request Req, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.ChangeBatch> stream) throws com.veyron2.ipc.VeyronException;
+
+    
+    // PutMutations atomically commits a stream of Mutations when the stream is
 // closed. Mutations are not committed if the request is cancelled before
 // the stream has been closed.
-	public void putMutations(ServerContext context, Stream<Void,Mutation> stream) throws VeyronException;
+
+    public void putMutations(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<com.veyron.services.store.raw.Mutation, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
+
 }

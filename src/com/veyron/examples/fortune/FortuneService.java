@@ -2,18 +2,21 @@
 // Source: fortune.vdl
 package com.veyron.examples.fortune;
 
-import com.veyron.examples.fortune.gen_impl.FortuneServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Fortune allows clients to Get and Add fortune strings.
  */
-@VeyronService(serviceWrapper=FortuneServiceWrapper.class)
-public interface FortuneService { 
-	// Get returns a random fortune.
-	public String get(ServerContext context) throws VeyronException;
-	// Add stores a fortune in the set used by Get.
-	public void add(ServerContext context, String fortune) throws VeyronException;
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.fortune.gen_impl.FortuneServiceWrapper.class)
+public interface FortuneService  {
+
+    
+    // Get returns a random fortune.
+
+    public java.lang.String get(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Add stores a fortune in the set used by Get.
+
+    public void add(final com.veyron2.ipc.ServerContext context, final java.lang.String Fortune) throws com.veyron2.ipc.VeyronException;
+
 }

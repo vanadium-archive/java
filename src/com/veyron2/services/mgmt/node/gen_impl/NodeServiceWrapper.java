@@ -2,90 +2,136 @@
 // Source(s):  node.vdl
 package com.veyron2.services.mgmt.node.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.binary.Description;
-import com.veyron2.services.mgmt.node.Application;
-import com.veyron2.services.mgmt.node.ApplicationFactory;
-import com.veyron2.services.mgmt.node.ApplicationService;
-import com.veyron2.services.mgmt.node.Node;
-import com.veyron2.services.mgmt.node.NodeFactory;
-import com.veyron2.services.mgmt.node.NodeService;
-import java.util.ArrayList;
+public final class NodeServiceWrapper {
 
-public class NodeServiceWrapper {
+    private final com.veyron2.services.mgmt.node.NodeService service;
 
-	private final NodeService service;
-	private final ApplicationServiceWrapper application;
 
-	public NodeServiceWrapper(NodeService service) {
-		this.application = new ApplicationServiceWrapper(service);
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		try {
-			return this.application.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		if ("describe".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("isRunnable".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("reset".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+    
+    private final com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper applicationWrapper;
+    
+
+    public NodeServiceWrapper(final com.veyron2.services.mgmt.node.NodeService service) {
+        this.service = service;
+        
+        
+        this.applicationWrapper = new com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper(service);
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("describe".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Node.
-	public com.veyron2.services.mgmt.node.Description describe(ServerCall call) throws VeyronException { 
-		return this.service.describe(call);
-	}
-	public boolean isRunnable(ServerCall call, Description Description) throws VeyronException { 
-		return this.service.isRunnable(call, Description);
-	}
-	public void reset(ServerCall call, long Deadline) throws VeyronException { 
-		this.service.reset(call, Deadline);
-	}
-	// Methods from sub-interface Application.
-	public String install(ServerCall call, String Name) throws VeyronException {
-		return this.application.install(call, Name);
-	}
-	public void refresh(ServerCall call) throws VeyronException {
-		this.application.refresh(call);
-	}
-	public void restart(ServerCall call) throws VeyronException {
-		this.application.restart(call);
-	}
-	public void resume(ServerCall call) throws VeyronException {
-		this.application.resume(call);
-	}
-	public void revert(ServerCall call) throws VeyronException {
-		this.application.revert(call);
-	}
-	public ArrayList<String> start(ServerCall call) throws VeyronException {
-		return this.application.start(call);
-	}
-	public void stop(ServerCall call, long Deadline) throws VeyronException {
-		this.application.stop(call, Deadline);
-	}
-	public void suspend(ServerCall call) throws VeyronException {
-		this.application.suspend(call);
-	}
-	public void uninstall(ServerCall call) throws VeyronException {
-		this.application.uninstall(call);
-	}
-	public void update(ServerCall call) throws VeyronException {
-		this.application.update(call);
-	}
-	public void updateTo(ServerCall call, String Name) throws VeyronException {
-		this.application.updateTo(call, Name);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("isRunnable".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("reset".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        try {
+            return this.applicationWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.describe( call   );
+    }
+
+    public boolean isRunnable(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.isRunnable( call , Description  );
+    }
+
+    public void reset(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.reset( call , Deadline  );
+    }
+
+
+
+
+    public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.refresh(call);
+    }
+
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationWrapper.start(call);
+    }
+
+    public void stop(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.stop(call, Deadline);
+    }
+
+    public void update(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.update(call);
+    }
+
+    public java.lang.String install(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationWrapper.install(call, Name);
+    }
+
+    public void resume(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.resume(call);
+    }
+
+    public void revert(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.revert(call);
+    }
+
+    public void suspend(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.suspend(call);
+    }
+
+    public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.uninstall(call);
+    }
+
+    public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.updateTo(call, Name);
+    }
+
+    public void restart(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.restart(call);
+    }
+ 
+
 }

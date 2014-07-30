@@ -2,18 +2,28 @@
 // Source: boxes.vdl
 package com.veyron.examples.boxes;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * BoxSignalling allows peers to rendezvous with each other
  */
-public interface BoxSignalling { 
-	// Add endpoint information to the signalling server.
-	public void add(Context context, String endpoint) throws VeyronException;
-	public void add(Context context, String endpoint, Options veyronOpts) throws VeyronException;
-	// Get endpoint information about a peer.
-	public String get(Context context) throws VeyronException;
-	public String get(Context context, Options veyronOpts) throws VeyronException;
+
+public interface BoxSignalling  {
+
+    
+    
+
+    
+    // Add endpoint information to the signalling server.
+
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Endpoint) throws com.veyron2.ipc.VeyronException;
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Endpoint, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Get endpoint information about a peer.
+
+    public java.lang.String get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String get(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

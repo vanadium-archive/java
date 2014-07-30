@@ -2,47 +2,59 @@
 // Source(s):  node.vdl
 package com.veyron.services.mgmt.node.gen_impl;
 
-import com.veyron.services.mgmt.node.Config;
-import com.veyron.services.mgmt.node.ConfigFactory;
-import com.veyron.services.mgmt.node.ConfigService;
-import com.veyron.services.mgmt.node.Node;
-import com.veyron.services.mgmt.node.NodeFactory;
-import com.veyron.services.mgmt.node.NodeService;
-
 /* Client stub for interface: Config. */
-public final class ConfigStub implements Config {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.node.Config";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ConfigStub implements com.veyron.services.mgmt.node.Config {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.node.Config";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ConfigStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Config.
-	@Override
-	public void set(com.veyron2.ipc.Context context, java.lang.String key, java.lang.String value) throws com.veyron2.ipc.VeyronException {
-		set(context, key, value, null);
-	}
-	@Override
-	public void set(com.veyron2.ipc.Context context, java.lang.String key, java.lang.String value, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ key, value };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ConfigStub.vdlIfacePathOpt);
-		}
+    public ConfigStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Set", inArgs, veyronOpts);
+    // Methods from interface Config.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
+    
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.String value) throws com.veyron2.ipc.VeyronException {
+         set(context, key, value, null);
+    }
+    
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.String value, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ConfigStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ key, value };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+
 }

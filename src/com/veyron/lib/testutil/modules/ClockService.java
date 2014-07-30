@@ -2,13 +2,13 @@
 // Source: servers.vdl
 package com.veyron.lib.testutil.modules;
 
-import com.veyron.lib.testutil.modules.gen_impl.ClockServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
 
-@VeyronService(serviceWrapper=ClockServiceWrapper.class)
-public interface ClockService { 
-	// Time returns a string of the form "(current time) msg"
-	public String time(ServerContext context, String msg) throws VeyronException;
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.lib.testutil.modules.gen_impl.ClockServiceWrapper.class)
+public interface ClockService  {
+
+    
+    // Time returns a string of the form "(current time) msg"
+
+    public java.lang.String time(final com.veyron2.ipc.ServerContext context, final java.lang.String msg) throws com.veyron2.ipc.VeyronException;
+
 }

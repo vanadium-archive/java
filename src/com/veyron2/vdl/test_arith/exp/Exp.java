@@ -2,11 +2,15 @@
 // Source: exp.vdl
 package com.veyron2.vdl.test_arith.exp;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
 
-public interface Exp { 
-		public double exp(Context context, double x) throws VeyronException;
-	public double exp(Context context, double x, Options veyronOpts) throws VeyronException;
+public interface Exp  {
+
+    
+    
+
+    
+    
+    public double exp(final com.veyron2.ipc.Context context, final double x) throws com.veyron2.ipc.VeyronException;
+    public double exp(final com.veyron2.ipc.Context context, final double x, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

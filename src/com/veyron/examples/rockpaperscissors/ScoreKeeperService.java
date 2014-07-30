@@ -2,15 +2,15 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * ScoreKeeper receives the outcome of games from Judges.
  */
-@VeyronService(serviceWrapper=ScoreKeeperServiceWrapper.class)
-public interface ScoreKeeperService { 
-		public void record(ServerContext context, ScoreCard score) throws VeyronException;
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper.class)
+public interface ScoreKeeperService  {
+
+    
+    
+    public void record(final com.veyron2.ipc.ServerContext context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException;
+
 }

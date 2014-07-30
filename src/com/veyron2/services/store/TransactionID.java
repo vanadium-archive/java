@@ -3,8 +3,8 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
-
 /**
+ * type TransactionID uint64 
  * TransactionID is a transaction identifier.  The identifier is chosen by the
  * client.
  * 
@@ -15,31 +15,29 @@ package com.veyron2.services.store;
  * 
  * TODO(jyh): Consider using a larger identifier space to reduce chance of
  * collisions.
- */
-public final class TransactionID { 
-		private long value;
+ **/
+public final class TransactionID {
+    private long value;
 
-	public TransactionID(long value) { 
-		this.value = value;
-	}
-	public long getValue() { return this.value; }
+    public TransactionID(long value) {
+        this.value = value;
+    }
+    public long getValue() { return this.value; }
 
-	public void setValue(long value) { this.value = value; }
+    public void setValue(long value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final TransactionID other = (TransactionID)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Long.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.services.store.TransactionID other = (com.veyron2.services.store.TransactionID)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Long.valueOf(value).hashCode();
+    }
 }

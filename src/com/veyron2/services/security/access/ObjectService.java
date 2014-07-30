@@ -2,17 +2,15 @@
 // Source: service.vdl
 package com.veyron2.services.security.access;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Object provides access control for Veyron objects.
  */
-@VeyronService(serviceWrapper=ObjectServiceWrapper.class)
-public interface ObjectService { 
-	// SetACL replaces the current ACL for an object.  etag allows for optional,
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper.class)
+public interface ObjectService  {
+
+    
+    // SetACL replaces the current ACL for an object.  etag allows for optional,
 // optimistic concurrency control.  If non-empty, etag's value must come
 // from GetACL.  If any client has successfully called SetACL in the
 // meantime, the etag will be stale and SetACL will fail.
@@ -27,15 +25,15 @@ public interface ObjectService {
 // endpoint.  To modify the mount point's ACL, use ResolveToMountTable
 // to get an endpoint and call SetACL on that.  This means that clients
 // must know when a name refers to a mount point to change its ACL.
-	public void setACL(ServerContext context, ACL acl, String etag) throws VeyronException;
-	// GetACLOut packages output arguments for method GetACL.
-	public static class GetACLOut { 
-		public ACL acl;
-		public String etag;
-	}
-	// GetACL returns the complete, current ACL for an object.  The returned etag
+
+    public void setACL(final com.veyron2.ipc.ServerContext context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
+
+    
+    // GetACL returns the complete, current ACL for an object.  The returned etag
 // can be passed to a subsequent call to SetACL for optimistic concurrency
 // control. A successful call to SetACL will invalidate etag, and the client
 // must call GetACL again to get the current etag.
-	public ObjectService.GetACLOut getACL(ServerContext context) throws VeyronException;
+
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

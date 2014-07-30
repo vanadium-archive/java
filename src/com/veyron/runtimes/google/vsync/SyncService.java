@@ -2,18 +2,17 @@
 // Source: vsync.vdl
 package com.veyron.runtimes.google.vsync;
 
-import com.veyron.runtimes.google.vsync.gen_impl.SyncServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Sync allows a device to GetDeltas from another device.
  */
-@VeyronService(serviceWrapper=SyncServiceWrapper.class)
-public interface SyncService { 
-	// GetDeltas returns a device's current generation vector and all the missing log records
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.runtimes.google.vsync.gen_impl.SyncServiceWrapper.class)
+public interface SyncService  {
+
+    
+    // GetDeltas returns a device's current generation vector and all the missing log records
 // when compared to the incoming generation vector.
-	public GenVector getDeltas(ServerContext context, GenVector in, DeviceID clientID, Stream<LogRec,Void> stream) throws VeyronException;
+
+    public com.veyron.runtimes.google.vsync.GenVector getDeltas(final com.veyron2.ipc.ServerContext context, final com.veyron.runtimes.google.vsync.GenVector In, final com.veyron.runtimes.google.vsync.DeviceID ClientID, com.veyron2.vdl.Stream<java.lang.Void, com.veyron.runtimes.google.vsync.LogRec> stream) throws com.veyron2.ipc.VeyronException;
+
 }

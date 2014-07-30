@@ -2,93 +2,111 @@
 // Source(s):  boxes.vdl
 package com.veyron.examples.boxes.gen_impl;
 
-import com.veyron.examples.boxes.Box;
-import com.veyron.examples.boxes.BoxSignalling;
-import com.veyron.examples.boxes.BoxSignallingFactory;
-import com.veyron.examples.boxes.BoxSignallingService;
-import com.veyron.examples.boxes.DrawInterface;
-import com.veyron.examples.boxes.DrawInterfaceFactory;
-import com.veyron.examples.boxes.DrawInterfaceService;
-
 /* Client stub for interface: DrawInterface. */
-public final class DrawInterfaceStub implements DrawInterface {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.DrawInterface";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class DrawInterfaceStub implements com.veyron.examples.boxes.DrawInterface {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.boxes.DrawInterface";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public DrawInterfaceStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface DrawInterface.
-	@Override
-	public com.veyron2.vdl.ClientStream<Box,Box,java.lang.Void> draw(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return draw(context, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<Box,Box,java.lang.Void> draw(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DrawInterfaceStub.vdlIfacePathOpt);
-		}
+    public DrawInterfaceStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Draw", inArgs, veyronOpts);
+    // Methods from interface DrawInterface.
 
-		return new com.veyron2.vdl.ClientStream<Box, Box, java.lang.Void>() {
-			@Override
-			public void send(Box item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public Box recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<Box>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (Box)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-					call.finish(resultTypes);
-					return null;
 
-			}
-		};
-	}
-	@Override
-	public void syncBoxes(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		syncBoxes(context, null);
-	}
-	@Override
-	public void syncBoxes(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.boxes.Box,com.veyron.examples.boxes.Box, java.lang.Void> draw(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return draw(context, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.boxes.Box,com.veyron.examples.boxes.Box, java.lang.Void> draw(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DrawInterfaceStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DrawInterfaceStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "SyncBoxes", inArgs, veyronOpts);
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<com.veyron.examples.boxes.Box, com.veyron.examples.boxes.Box, java.lang.Void>() {
+            @Override
+            public void send(final com.veyron.examples.boxes.Box item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron.examples.boxes.Box recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron.examples.boxes.Box>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron.examples.boxes.Box)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
+                
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+                call.finish(resultTypes);
+                return null;
+                 
+            }
+        };
+        
+    }
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+    
+    public void syncBoxes(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+         syncBoxes(context, null);
+    }
+    
+    public void syncBoxes(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DrawInterfaceStub.vdlIfacePathOpt);
+        }
 
-	}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+
 }

@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 public class Security {
 	// Set of all valid Labels for IPC methods.
 	public static Label[] VALID_LABELS =
-		{ VeyronConsts.READ_LABEL, VeyronConsts.WRITE_LABEL, VeyronConsts.ADMIN_LABEL,
-		  VeyronConsts.DEBUG_LABEL, VeyronConsts.MONITORING_LABEL };
+		{ SecurityConstants.READ_LABEL, SecurityConstants.WRITE_LABEL, SecurityConstants.ADMIN_LABEL,
+		  SecurityConstants.DEBUG_LABEL, SecurityConstants.MONITORING_LABEL };
 
 	/**
 	 * Returns true iff the provided label is among the set of valid labels.

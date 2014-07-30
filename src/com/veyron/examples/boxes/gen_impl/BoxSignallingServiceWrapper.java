@@ -2,44 +2,61 @@
 // Source(s):  boxes.vdl
 package com.veyron.examples.boxes.gen_impl;
 
-import com.veyron.examples.boxes.Box;
-import com.veyron.examples.boxes.BoxSignalling;
-import com.veyron.examples.boxes.BoxSignallingFactory;
-import com.veyron.examples.boxes.BoxSignallingService;
-import com.veyron.examples.boxes.DrawInterface;
-import com.veyron.examples.boxes.DrawInterfaceFactory;
-import com.veyron.examples.boxes.DrawInterfaceService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class BoxSignallingServiceWrapper {
 
-public class BoxSignallingServiceWrapper {
+    private final com.veyron.examples.boxes.BoxSignallingService service;
 
-	private final BoxSignallingService service;
 
-	public BoxSignallingServiceWrapper(BoxSignallingService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("add".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("get".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public BoxSignallingServiceWrapper(final com.veyron.examples.boxes.BoxSignallingService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("add".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface BoxSignalling.
-	public void add(ServerCall call, String Endpoint) throws VeyronException { 
-		this.service.add(call, Endpoint);
-	}
-	public String get(ServerCall call) throws VeyronException { 
-		return this.service.get(call);
-	}
+        
+        if ("get".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void add(final com.veyron2.ipc.ServerCall call, final java.lang.String Endpoint) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.add( call , Endpoint  );
+    }
+
+    public java.lang.String get(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.get( call   );
+    }
+
+
+
+ 
+
 }

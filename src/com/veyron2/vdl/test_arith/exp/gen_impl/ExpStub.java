@@ -2,44 +2,69 @@
 // Source(s):  exp.vdl
 package com.veyron2.vdl.test_arith.exp.gen_impl;
 
-import com.veyron2.vdl.test_arith.exp.Exp;
-import com.veyron2.vdl.test_arith.exp.ExpFactory;
-import com.veyron2.vdl.test_arith.exp.ExpService;
-
 /* Client stub for interface: Exp. */
-public final class ExpStub implements Exp {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.Exp";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ExpStub implements com.veyron2.vdl.test_arith.exp.Exp {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.Exp";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ExpStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Exp.
-	@Override
-	public double exp(com.veyron2.ipc.Context context, double x) throws com.veyron2.ipc.VeyronException {
-		return exp(context, x, null);
-	}
-	@Override
-	public double exp(com.veyron2.ipc.Context context, double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Double(x) };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ExpStub.vdlIfacePathOpt);
-		}
+    public ExpStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Exp", inArgs, veyronOpts);
+    // Methods from interface Exp.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Double>() {} };
-			return (java.lang.Double)call.finish(resultTypes)[0];
 
-	}
+    
+    public double exp(final com.veyron2.ipc.Context context, final double x) throws com.veyron2.ipc.VeyronException {
+        return exp(context, x, null);
+    }
+    
+    public double exp(final com.veyron2.ipc.Context context, final double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ExpStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ x };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.Double>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (java.lang.Double)results[0];
+         
+
+         
+
+        
+    }
+
+
+
+
+
 }

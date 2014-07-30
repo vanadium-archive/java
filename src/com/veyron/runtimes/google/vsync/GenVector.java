@@ -3,26 +3,22 @@
 
 package com.veyron.runtimes.google.vsync;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * type GenVector map[veyron/runtimes/google/vsync.DeviceID string]veyron/runtimes/google/vsync.GenID uint64 
  * GenVector is the generation vector.
  **/
-public final class GenVector implements Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> {
-    private Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> impl;
+public final class GenVector implements java.util.Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> {
+    private java.util.Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> impl;
 
-    public GenVector(Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> impl) {
+    public GenVector(java.util.Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> impl) {
         this.impl = impl;
     }
 
-    public Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> getValue() {
+    public java.util.Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> getValue() {
         return this.impl;
     }
 
-    public void setValue(Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> newImpl) {
+    public void setValue(java.util.Map<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID> newImpl) {
         this.impl = newImpl;
     }
 
@@ -51,22 +47,22 @@ public final class GenVector implements Map<com.veyron.runtimes.google.vsync.Dev
     }
 
     @Override
-    public boolean containsKey(Object key) {
+    public boolean containsKey(java.lang.Object key) {
         return impl.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(Object value) {
+    public boolean containsValue(java.lang.Object value) {
         return impl.containsValue(value);
     }
 
     @Override
-    public Set<java.util.Map.Entry<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID>> entrySet() {
+    public java.util.Set<java.util.Map.Entry<com.veyron.runtimes.google.vsync.DeviceID, com.veyron.runtimes.google.vsync.GenID>> entrySet() {
         return impl.entrySet();
     }
 
     @Override
-    public com.veyron.runtimes.google.vsync.GenID get(Object key) {
+    public com.veyron.runtimes.google.vsync.GenID get(java.lang.Object key) {
         return impl.get(key);
     }
 
@@ -76,7 +72,7 @@ public final class GenVector implements Map<com.veyron.runtimes.google.vsync.Dev
     }
 
     @Override
-    public Set<com.veyron.runtimes.google.vsync.DeviceID> keySet() {
+    public java.util.Set<com.veyron.runtimes.google.vsync.DeviceID> keySet() {
         return impl.keySet();
     }
 
@@ -86,12 +82,12 @@ public final class GenVector implements Map<com.veyron.runtimes.google.vsync.Dev
     }
 
     @Override
-    public void putAll(Map<? extends com.veyron.runtimes.google.vsync.DeviceID, ? extends com.veyron.runtimes.google.vsync.GenID> map) {
+    public void putAll(java.util.Map<? extends com.veyron.runtimes.google.vsync.DeviceID, ? extends com.veyron.runtimes.google.vsync.GenID> map) {
         impl.putAll(map);
     }
 
     @Override
-    public com.veyron.runtimes.google.vsync.GenID remove(Object key) {
+    public com.veyron.runtimes.google.vsync.GenID remove(java.lang.Object key) {
         return impl.remove(key);
     }
 
@@ -101,7 +97,7 @@ public final class GenVector implements Map<com.veyron.runtimes.google.vsync.Dev
     }
 
     @Override
-    public Collection<com.veyron.runtimes.google.vsync.GenID> values() {
+    public java.util.Collection<com.veyron.runtimes.google.vsync.GenID> values() {
         return impl.values();
     }
 }

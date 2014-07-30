@@ -2,23 +2,23 @@
 // Source: build.vdl
 package com.veyron2.services.mgmt.build;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.binary.Description;
-import com.veyron2.services.mgmt.build.gen_impl.BuildServiceWrapper;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
-
 /**
  * Build describes an interface for building binaries from source.
  */
-@VeyronService(serviceWrapper=BuildServiceWrapper.class)
-public interface BuildService { 
-	// Build streams sources to the build server, which then attempts to
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.build.gen_impl.BuildServiceWrapper.class)
+public interface BuildService  {
+
+    
+    // Build streams sources to the build server, which then attempts to
 // build the sources and streams back the compiled binaries.
-	public ArrayList<Byte> build(ServerContext context, Stream<File,File> stream) throws VeyronException;
-	// Describe generates a description for a binary identified by
+
+    public java.util.ArrayList<java.lang.Byte> build(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<com.veyron2.services.mgmt.build.File, com.veyron2.services.mgmt.build.File> stream) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Describe generates a description for a binary identified by
 // the given Object name.
-	public Description describe(ServerContext context, String name) throws VeyronException;
+
+    public com.veyron2.services.mgmt.binary.Description describe(final com.veyron2.ipc.ServerContext context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -3,5 +3,6 @@
 package com.veyron2.services.proximity;
 
 
-public interface Proximity extends ProximityAnnouncer, ProximityScanner { 
+public interface Proximity extends com.veyron2.services.proximity.ProximityAnnouncer, com.veyron2.services.proximity.ProximityScanner {
+
 }

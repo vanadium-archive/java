@@ -2,11 +2,15 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
 
-public interface ServiceB extends ServiceA { 
-		public CompComp methodB1(Context context, Scalars a, Composites b) throws VeyronException;
-	public CompComp methodB1(Context context, Scalars a, Composites b, Options veyronOpts) throws VeyronException;
+public interface ServiceB extends com.veyron2.vdl.test_base.ServiceA {
+
+    
+    
+
+    
+    
+    public com.veyron2.vdl.test_base.CompComp methodB1(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Scalars a, final com.veyron2.vdl.test_base.Composites b) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.test_base.CompComp methodB1(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Scalars a, final com.veyron2.vdl.test_base.Composites b, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

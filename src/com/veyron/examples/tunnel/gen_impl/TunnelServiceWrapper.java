@@ -2,80 +2,99 @@
 // Source(s):  tunnel.vdl
 package com.veyron.examples.tunnel.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron.examples.tunnel.ClientShellPacket;
-import com.veyron.examples.tunnel.ServerShellPacket;
-import com.veyron.examples.tunnel.ShellOpts;
-import com.veyron.examples.tunnel.Tunnel;
-import com.veyron.examples.tunnel.TunnelFactory;
-import com.veyron.examples.tunnel.TunnelService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class TunnelServiceWrapper {
 
-public class TunnelServiceWrapper {
+    private final com.veyron.examples.tunnel.TunnelService service;
 
-	private final TunnelService service;
 
-	public TunnelServiceWrapper(TunnelService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("forward".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(4) };
-		}
-		if ("shell".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(4) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public TunnelServiceWrapper(final com.veyron.examples.tunnel.TunnelService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("forward".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(4), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Tunnel.
-	public void forward(ServerCall call, String network, String address) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<ArrayList<Byte>,ArrayList<Byte>> stream = new Stream<ArrayList<Byte>,ArrayList<Byte>>() {
-			@Override
-			public void send(ArrayList<Byte> item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public ArrayList<Byte> recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<ArrayList<Byte>>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (ArrayList<Byte>)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.forward(call, network, address, stream);
-	}
-	public int shell(ServerCall call, String command, ShellOpts shellOpts) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<ServerShellPacket,ClientShellPacket> stream = new Stream<ServerShellPacket,ClientShellPacket>() {
-			@Override
-			public void send(ServerShellPacket item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public ClientShellPacket recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<ClientShellPacket>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (ClientShellPacket)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		return this.service.shell(call, command, shellOpts, stream);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("shell".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(4), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void forward(final com.veyron2.ipc.ServerCall call, final java.lang.String network, final java.lang.String address) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>>() {
+            @Override
+            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.ArrayList<java.lang.Byte> >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.util.ArrayList<java.lang.Byte>)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.forward( call , network, address  ,stream  );
+    }
+
+    public int shell(final com.veyron2.ipc.ServerCall call, final java.lang.String command, final com.veyron.examples.tunnel.ShellOpts shellOpts) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<com.veyron.examples.tunnel.ClientShellPacket, com.veyron.examples.tunnel.ServerShellPacket> stream = new com.veyron2.vdl.Stream<com.veyron.examples.tunnel.ClientShellPacket, com.veyron.examples.tunnel.ServerShellPacket>() {
+            @Override
+            public void send(com.veyron.examples.tunnel.ClientShellPacket item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron.examples.tunnel.ServerShellPacket recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron.examples.tunnel.ServerShellPacket >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron.examples.tunnel.ServerShellPacket)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         return  this.service.shell( call , command, shellOpts  ,stream  );
+    }
+
+
+
+ 
+
 }

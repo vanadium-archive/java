@@ -2,25 +2,30 @@
 // Source: repository.vdl
 package com.veyron.services.mgmt.repository;
 
-import com.veyron.services.mgmt.profile.Specification;
-import com.veyron.services.mgmt.repository.gen_impl.ProfileServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Profile describes a profile internally. Besides the public Profile
  * interface, it allows to add and remove profile specifications.
  */
-@VeyronService(serviceWrapper=ProfileServiceWrapper.class)
-public interface ProfileService extends com.veyron2.services.mgmt.repository.ProfileService { 
-	// Specification returns the profile specification for the profile
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.repository.gen_impl.ProfileServiceWrapper.class)
+public interface ProfileService extends com.veyron2.services.mgmt.repository.ProfileService {
+
+    
+    // Specification returns the profile specification for the profile
 // identified through the object name suffix.
-	public Specification specification(ServerContext context) throws VeyronException;
-	// Put sets the profile specification for the profile identified
+
+    public com.veyron.services.mgmt.profile.Specification specification(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Put sets the profile specification for the profile identified
 // through the object name suffix.
-	public void put(ServerContext context, Specification specification) throws VeyronException;
-	// Remove removes the profile specification for the profile
+
+    public void put(final com.veyron2.ipc.ServerContext context, final com.veyron.services.mgmt.profile.Specification Specification) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Remove removes the profile specification for the profile
 // identified through the object name suffix.
-	public void remove(ServerContext context) throws VeyronException;
+
+    public void remove(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,37 +2,50 @@
 // Source(s):  node.vdl
 package com.veyron.services.mgmt.node.gen_impl;
 
-import com.veyron.services.mgmt.node.Config;
-import com.veyron.services.mgmt.node.ConfigFactory;
-import com.veyron.services.mgmt.node.ConfigService;
-import com.veyron.services.mgmt.node.Node;
-import com.veyron.services.mgmt.node.NodeFactory;
-import com.veyron.services.mgmt.node.NodeService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class ConfigServiceWrapper {
 
-public class ConfigServiceWrapper {
+    private final com.veyron.services.mgmt.node.ConfigService service;
 
-	private final ConfigService service;
 
-	public ConfigServiceWrapper(ConfigService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("set".equals(method)) {
-			return new Object[]{  };
-		}
+
+
+    public ConfigServiceWrapper(final com.veyron.services.mgmt.node.ConfigService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Config.
-	public void set(ServerCall call, String key, String value) throws VeyronException { 
-		this.service.set(call, key, value);
-	}
+        
+        if ("set".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void set(final com.veyron2.ipc.ServerCall call, final java.lang.String key, final java.lang.String value) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.set( call , key, value  );
+    }
+
+
+
+ 
+
 }

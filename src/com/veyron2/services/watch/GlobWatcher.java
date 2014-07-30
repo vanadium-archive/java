@@ -2,17 +2,20 @@
 // Source: service.vdl
 package com.veyron2.services.watch;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-
 /**
  * GlobWatcher allows a client to receive updates for changes to objects
  * that match a pattern.  See the package comments for details.
  */
-public interface GlobWatcher { 
-	// WatchGlob returns a stream of changes that match a pattern.
-	public ClientStream<Void,ChangeBatch,Void> watchGlob(Context context, GlobRequest req) throws VeyronException;
-	public ClientStream<Void,ChangeBatch,Void> watchGlob(Context context, GlobRequest req, Options veyronOpts) throws VeyronException;
+
+public interface GlobWatcher  {
+
+    
+    
+
+    
+    // WatchGlob returns a stream of changes that match a pattern.
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,14 +2,18 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * ScoreKeeper receives the outcome of games from Judges.
  */
-public interface ScoreKeeper { 
-		public void record(Context context, ScoreCard score) throws VeyronException;
-	public void record(Context context, ScoreCard score, Options veyronOpts) throws VeyronException;
+
+public interface ScoreKeeper  {
+
+    
+    
+
+    
+    
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException;
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

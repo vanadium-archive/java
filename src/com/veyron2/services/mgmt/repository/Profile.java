@@ -2,25 +2,35 @@
 // Source: repository.vdl
 package com.veyron2.services.mgmt.repository;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Profile abstracts a device's ability to run binaries, and hides
  * specifics such as the operating system, hardware architecture, and
  * the set of installed libraries. Profiles describe binaries and
  * devices, and are used to match them.
  */
-public interface Profile { 
-	// Label is the human-readable profile key for the profile,
+
+public interface Profile  {
+
+    
+    
+
+    
+    // Label is the human-readable profile key for the profile,
 // e.g. "linux-media". The label can be used to uniquely identify
 // the profile (for the purpose of matching application binaries and
 // nodes).
-	public String label(Context context) throws VeyronException;
-	public String label(Context context, Options veyronOpts) throws VeyronException;
-	// Description is a free-text description of the profile, meant for
+
+    public java.lang.String label(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String label(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Description is a free-text description of the profile, meant for
 // human consumption.
-	public String description(Context context) throws VeyronException;
-	public String description(Context context, Options veyronOpts) throws VeyronException;
+
+    public java.lang.String description(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String description(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

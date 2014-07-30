@@ -2,37 +2,50 @@
 // Source(s):  bank.vdl
 package com.veyron.examples.bank.gen_impl;
 
-import com.veyron.examples.bank.Bank;
-import com.veyron.examples.bank.BankAccount;
-import com.veyron.examples.bank.BankAccountFactory;
-import com.veyron.examples.bank.BankAccountService;
-import com.veyron.examples.bank.BankFactory;
-import com.veyron.examples.bank.BankService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class BankServiceWrapper {
 
-public class BankServiceWrapper {
+    private final com.veyron.examples.bank.BankService service;
 
-	private final BankService service;
 
-	public BankServiceWrapper(BankService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("connect".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public BankServiceWrapper(final com.veyron.examples.bank.BankService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("connect".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Bank.
-	public BankService.ConnectOut connect(ServerCall call) throws VeyronException { 
-		return this.service.connect(call);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public com.veyron.examples.bank.Bank.ConnectOut connect(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.connect( call   );
+    }
+
+
+
+ 
+
 }

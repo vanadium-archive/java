@@ -2,58 +2,69 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mounttable.Globable;
-import com.veyron2.services.mounttable.GlobableFactory;
-import com.veyron2.services.mounttable.GlobableService;
-import com.veyron2.services.mounttable.MountEntry;
-import com.veyron2.services.mounttable.MountTable;
-import com.veyron2.services.mounttable.MountTableFactory;
-import com.veyron2.services.mounttable.MountTableService;
-import com.veyron2.services.mounttable.MountedServer;
-import com.veyron2.vdl.Stream;
+public final class GlobableServiceWrapper {
 
-public class GlobableServiceWrapper {
+    private final com.veyron2.services.mounttable.GlobableService service;
 
-	private final GlobableService service;
 
-	public GlobableServiceWrapper(GlobableService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("glob".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
+
+
+    public GlobableServiceWrapper(final com.veyron2.services.mounttable.GlobableService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Globable.
-	public void glob(ServerCall call, String pattern) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<MountEntry,Void> stream = new Stream<MountEntry,Void>() {
-			@Override
-			public void send(MountEntry item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.glob(call, pattern, stream);
-	}
+        
+        if ("glob".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.mounttable.MountEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.mounttable.MountEntry >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.mounttable.MountEntry)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.glob( call , pattern  ,stream  );
+    }
+
+
+
+ 
+
 }

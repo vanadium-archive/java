@@ -2,12 +2,16 @@
 // Source: servers.vdl
 package com.veyron.lib.testutil.modules;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
 
-public interface Echo { 
-	// Echo simply returns its argument as its result
-	public String echo(Context context, String msg) throws VeyronException;
-	public String echo(Context context, String msg, Options veyronOpts) throws VeyronException;
+public interface Echo  {
+
+    
+    
+
+    
+    // Echo simply returns its argument as its result
+
+    public java.lang.String echo(final com.veyron2.ipc.Context context, final java.lang.String msg) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String echo(final com.veyron2.ipc.Context context, final java.lang.String msg, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

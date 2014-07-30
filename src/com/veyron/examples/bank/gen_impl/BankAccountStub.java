@@ -2,122 +2,165 @@
 // Source(s):  bank.vdl
 package com.veyron.examples.bank.gen_impl;
 
-import com.veyron.examples.bank.Bank;
-import com.veyron.examples.bank.BankAccount;
-import com.veyron.examples.bank.BankAccountFactory;
-import com.veyron.examples.bank.BankAccountService;
-import com.veyron.examples.bank.BankFactory;
-import com.veyron.examples.bank.BankService;
-
 /* Client stub for interface: BankAccount. */
-public final class BankAccountStub implements BankAccount {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.BankAccount";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class BankAccountStub implements com.veyron.examples.bank.BankAccount {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.BankAccount";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public BankAccountStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface BankAccount.
-	@Override
-	public void deposit(com.veyron2.ipc.Context context, long amount) throws com.veyron2.ipc.VeyronException {
-		deposit(context, amount, null);
-	}
-	@Override
-	public void deposit(com.veyron2.ipc.Context context, long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(amount) };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
-		}
+    public BankAccountStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Deposit", inArgs, veyronOpts);
+    // Methods from interface BankAccount.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
-	@Override
-	public void withdraw(com.veyron2.ipc.Context context, long amount) throws com.veyron2.ipc.VeyronException {
-		withdraw(context, amount, null);
-	}
-	@Override
-	public void withdraw(com.veyron2.ipc.Context context, long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(amount) };
+    
+    public void deposit(final com.veyron2.ipc.Context context, final long amount) throws com.veyron2.ipc.VeyronException {
+         deposit(context, amount, null);
+    }
+    
+    public void deposit(final com.veyron2.ipc.Context context, final long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ amount };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Withdraw", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
 
-	}
-	@Override
-	public void transfer(com.veyron2.ipc.Context context, long receiver, long amount) throws com.veyron2.ipc.VeyronException {
-		transfer(context, receiver, amount, null);
-	}
-	@Override
-	public void transfer(com.veyron2.ipc.Context context, long receiver, long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(receiver), new java.lang.Long(amount) };
+        
+    }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
-		}
+    
+    public void withdraw(final com.veyron2.ipc.Context context, final long amount) throws com.veyron2.ipc.VeyronException {
+         withdraw(context, amount, null);
+    }
+    
+    public void withdraw(final com.veyron2.ipc.Context context, final long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
+        }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Transfer", inArgs, veyronOpts);
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ amount };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        // Finish the call.
+        
+        
 
-	}
-	@Override
-	public long balance(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return balance(context, null);
-	}
-	@Override
-	public long balance(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
-		}
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Balance", inArgs, veyronOpts);
+    
+    public void transfer(final com.veyron2.ipc.Context context, final long receiver, final long amount) throws com.veyron2.ipc.VeyronException {
+         transfer(context, receiver, amount, null);
+    }
+    
+    public void transfer(final com.veyron2.ipc.Context context, final long receiver, final long amount, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
+        }
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-			return (java.lang.Long)call.finish(resultTypes)[0];
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ receiver, amount };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-	}
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+    
+    public long balance(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return balance(context, null);
+    }
+    
+    public long balance(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankAccountStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.Long>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (java.lang.Long)results[0];
+         
+
+         
+
+        
+    }
+
+
+
+
+
 }

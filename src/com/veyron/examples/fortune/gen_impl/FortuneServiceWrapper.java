@@ -2,40 +2,61 @@
 // Source(s):  fortune.vdl
 package com.veyron.examples.fortune.gen_impl;
 
-import com.veyron.examples.fortune.Fortune;
-import com.veyron.examples.fortune.FortuneFactory;
-import com.veyron.examples.fortune.FortuneService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class FortuneServiceWrapper {
 
-public class FortuneServiceWrapper {
+    private final com.veyron.examples.fortune.FortuneService service;
 
-	private final FortuneService service;
 
-	public FortuneServiceWrapper(FortuneService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("get".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
-		if ("add".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(2) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public FortuneServiceWrapper(final com.veyron.examples.fortune.FortuneService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("add".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(2), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Fortune.
-	public String get(ServerCall call) throws VeyronException { 
-		return this.service.get(call);
-	}
-	public void add(ServerCall call, String Fortune) throws VeyronException { 
-		this.service.add(call, Fortune);
-	}
+        
+        if ("get".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.lang.String get(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.get( call   );
+    }
+
+    public void add(final com.veyron2.ipc.ServerCall call, final java.lang.String Fortune) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.add( call , Fortune  );
+    }
+
+
+
+ 
+
 }

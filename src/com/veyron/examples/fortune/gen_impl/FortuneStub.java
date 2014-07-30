@@ -2,69 +2,101 @@
 // Source(s):  fortune.vdl
 package com.veyron.examples.fortune.gen_impl;
 
-import com.veyron.examples.fortune.Fortune;
-import com.veyron.examples.fortune.FortuneFactory;
-import com.veyron.examples.fortune.FortuneService;
-
 /* Client stub for interface: Fortune. */
-public final class FortuneStub implements Fortune {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.fortune.Fortune";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class FortuneStub implements com.veyron.examples.fortune.Fortune {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.fortune.Fortune";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public FortuneStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Fortune.
-	@Override
-	public java.lang.String get(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return get(context, null);
-	}
-	@Override
-	public java.lang.String get(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
-		}
+    public FortuneStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Get", inArgs, veyronOpts);
+    // Methods from interface Fortune.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.String>() {} };
-			return (java.lang.String)call.finish(resultTypes)[0];
 
-	}
-	@Override
-	public void add(com.veyron2.ipc.Context context, java.lang.String Fortune) throws com.veyron2.ipc.VeyronException {
-		add(context, Fortune, null);
-	}
-	@Override
-	public void add(com.veyron2.ipc.Context context, java.lang.String Fortune, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Fortune };
+    
+    public java.lang.String get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return get(context, null);
+    }
+    
+    public java.lang.String get(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Add", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.String>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (java.lang.String)results[0];
+         
 
-	}
+         
+
+        
+    }
+
+    
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Fortune) throws com.veyron2.ipc.VeyronException {
+         add(context, Fortune, null);
+    }
+    
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Fortune, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, FortuneStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Fortune };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+
 }

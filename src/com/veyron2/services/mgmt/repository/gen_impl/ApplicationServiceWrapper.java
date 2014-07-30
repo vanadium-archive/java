@@ -2,42 +2,50 @@
 // Source(s):  repository.vdl
 package com.veyron2.services.mgmt.repository.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.application.Envelope;
-import com.veyron2.services.mgmt.repository.Application;
-import com.veyron2.services.mgmt.repository.ApplicationFactory;
-import com.veyron2.services.mgmt.repository.ApplicationService;
-import com.veyron2.services.mgmt.repository.Binary;
-import com.veyron2.services.mgmt.repository.BinaryFactory;
-import com.veyron2.services.mgmt.repository.BinaryService;
-import com.veyron2.services.mgmt.repository.Profile;
-import com.veyron2.services.mgmt.repository.ProfileFactory;
-import com.veyron2.services.mgmt.repository.ProfileService;
-import java.util.ArrayList;
+public final class ApplicationServiceWrapper {
 
-public class ApplicationServiceWrapper {
+    private final com.veyron2.services.mgmt.repository.ApplicationService service;
 
-	private final ApplicationService service;
 
-	public ApplicationServiceWrapper(ApplicationService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("match".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(1) };
-		}
+
+
+    public ApplicationServiceWrapper(final com.veyron2.services.mgmt.repository.ApplicationService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Application.
-	public Envelope match(ServerCall call, ArrayList<String> Profiles) throws VeyronException { 
-		return this.service.match(call, Profiles);
-	}
+        
+        if ("match".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(1), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.match( call , Profiles  );
+    }
+
+
+
+ 
+
 }

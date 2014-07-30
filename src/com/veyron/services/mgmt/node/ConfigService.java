@@ -2,16 +2,16 @@
 // Source: node.vdl
 package com.veyron.services.mgmt.node;
 
-import com.veyron.services.mgmt.node.gen_impl.ConfigServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Config is an RPC API to the config service.
  */
-@VeyronService(serviceWrapper=ConfigServiceWrapper.class)
-public interface ConfigService { 
-	// Set sets the value for key.
-	public void set(ServerContext context, String key, String value) throws VeyronException;
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.node.gen_impl.ConfigServiceWrapper.class)
+public interface ConfigService  {
+
+    
+    // Set sets the value for key.
+
+    public void set(final com.veyron2.ipc.ServerContext context, final java.lang.String key, final java.lang.String value) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,32 +2,52 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-import java.util.ArrayList;
-
 /**
  * Store is the client interface to the storage system.
  */
-public interface Store { 
-	// CreateTransaction creates the transaction and sets the options for it.
-	public void createTransaction(Context context, TransactionID tID, ArrayList<java.lang.Object> options) throws VeyronException;
-	public void createTransaction(Context context, TransactionID tID, ArrayList<java.lang.Object> options, Options veyronOpts) throws VeyronException;
-	// Commit commits the changes in the transaction to the store.  The
+
+public interface Store  {
+
+    
+    
+
+    
+    // CreateTransaction creates the transaction and sets the options for it.
+
+    public void createTransaction(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException;
+    public void createTransaction(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Options, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Commit commits the changes in the transaction to the store.  The
 // operation is atomic, so all mutations are performed, or none.  Returns an
 // error if the transaction aborted.
-	public void commit(Context context, TransactionID tID) throws VeyronException;
-	public void commit(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// Abort discards a transaction.  This is an optimization; transactions
+
+    public void commit(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public void commit(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Abort discards a transaction.  This is an optimization; transactions
 // eventually time out and get discarded.  However, live transactions
 // consume resources, so if you know that you won't be using a transaction
 // anymore, you should discard it explicitly.
-	public void abort(Context context, TransactionID tID) throws VeyronException;
-	public void abort(Context context, TransactionID tID, Options veyronOpts) throws VeyronException;
-	// ReadConflicts returns the stream of conflicts to store values.  A
+
+    public void abort(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException;
+    public void abort(final com.veyron2.ipc.Context context, final com.veyron2.services.store.TransactionID TID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // ReadConflicts returns the stream of conflicts to store values.  A
 // conflict occurs when there is a concurrent modification to a value.
-	public ClientStream<Void,Conflict,Void> readConflicts(Context context) throws VeyronException;
-	public ClientStream<Void,Conflict,Void> readConflicts(Context context, Options veyronOpts) throws VeyronException;
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.store.Conflict, java.lang.Void> readConflicts(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.store.Conflict, java.lang.Void> readConflicts(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

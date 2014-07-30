@@ -2,90 +2,124 @@
 // Source(s):  build.vdl
 package com.veyron2.services.mgmt.build.gen_impl;
 
-import com.veyron2.services.mgmt.build.Build;
-import com.veyron2.services.mgmt.build.BuildFactory;
-import com.veyron2.services.mgmt.build.BuildService;
-import com.veyron2.services.mgmt.build.File;
-import com.veyron2.services.mgmt.build.VeyronConsts;
-
 /* Client stub for interface: Build. */
-public final class BuildStub implements Build {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.build.Build";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class BuildStub implements com.veyron2.services.mgmt.build.Build {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.build.Build";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public BuildStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Build.
-	@Override
-	public com.veyron2.vdl.ClientStream<File,File,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return build(context, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<File,File,java.util.ArrayList<java.lang.Byte>> build(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BuildStub.vdlIfacePathOpt);
-		}
+    public BuildStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Build", inArgs, veyronOpts);
+    // Methods from interface Build.
 
-		return new com.veyron2.vdl.ClientStream<File, File, java.util.ArrayList<java.lang.Byte>>() {
-			@Override
-			public void send(File item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public File recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<File>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (File)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.util.ArrayList<java.lang.Byte> finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {} };
-					return (java.util.ArrayList<java.lang.Byte>)call.finish(resultTypes)[0];
 
-			}
-		};
-	}
-	@Override
-	public com.veyron2.services.mgmt.binary.Description describe(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		return describe(context, Name, null);
-	}
-	@Override
-	public com.veyron2.services.mgmt.binary.Description describe(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+    
+    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, java.util.ArrayList<java.lang.Byte>> build(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return build(context, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, java.util.ArrayList<java.lang.Byte>> build(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BuildStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BuildStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Describe", inArgs, veyronOpts);
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File, com.veyron2.services.mgmt.build.File, java.util.ArrayList<java.lang.Byte>>() {
+            @Override
+            public void send(final com.veyron2.services.mgmt.build.File item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.mgmt.build.File recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.build.File>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.mgmt.build.File)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.util.ArrayList<java.lang.Byte> finish() throws com.veyron2.ipc.VeyronException {
+                 
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+                    new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {
+                        private static final long serialVersionUID = 1L;
+                    }
+                };
+                return (java.util.ArrayList<java.lang.Byte>)call.finish(resultTypes)[0];
+                 
+            }
+        };
+        
+    }
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.binary.Description>() {} };
-			return (com.veyron2.services.mgmt.binary.Description)call.finish(resultTypes)[0];
+    
+    public com.veyron2.services.mgmt.binary.Description describe(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        return describe(context, Name, null);
+    }
+    
+    public com.veyron2.services.mgmt.binary.Description describe(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BuildStub.vdlIfacePathOpt);
+        }
 
-	}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.binary.Description>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (com.veyron2.services.mgmt.binary.Description)results[0];
+         
+
+         
+
+        
+    }
+
+
+
+
+
 }

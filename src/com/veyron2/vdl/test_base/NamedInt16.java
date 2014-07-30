@@ -3,31 +3,31 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
+/**
+ * type NamedInt16 int16 
+ **/
+public final class NamedInt16 {
+    private short value;
 
-public final class NamedInt16 { 
-		private short value;
+    public NamedInt16(short value) {
+        this.value = value;
+    }
+    public short getValue() { return this.value; }
 
-	public NamedInt16(short value) { 
-		this.value = value;
-	}
-	public short getValue() { return this.value; }
+    public void setValue(short value) { this.value = value; }
 
-	public void setValue(short value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final NamedInt16 other = (NamedInt16)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (int)value;
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.vdl.test_base.NamedInt16 other = (com.veyron2.vdl.test_base.NamedInt16)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return (int)value;
+    }
 }

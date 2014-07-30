@@ -2,76 +2,70 @@
 // Source(s):  proximity.vdl
 package com.veyron2.services.proximity.gen_impl;
 
-import com.veyron2.services.proximity.Device;
-import com.veyron2.services.proximity.Proximity;
-import com.veyron2.services.proximity.ProximityAnnouncer;
-import com.veyron2.services.proximity.ProximityAnnouncerFactory;
-import com.veyron2.services.proximity.ProximityAnnouncerService;
-import com.veyron2.services.proximity.ProximityFactory;
-import com.veyron2.services.proximity.ProximityScanner;
-import com.veyron2.services.proximity.ProximityScannerFactory;
-import com.veyron2.services.proximity.ProximityScannerService;
-import com.veyron2.services.proximity.ProximityService;
-
 /* Client stub for interface: Proximity. */
-public final class ProximityStub implements Proximity {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.Proximity";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
-	private final ProximityAnnouncer proximityAnnouncer;
-	private final ProximityScanner proximityScanner;
+public final class ProximityStub implements com.veyron2.services.proximity.Proximity {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.proximity.Proximity";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ProximityStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-		this.proximityAnnouncer = new com.veyron2.services.proximity.gen_impl.ProximityAnnouncerStub(client, name);
-		this.proximityScanner = new com.veyron2.services.proximity.gen_impl.ProximityScannerStub(client, name);
-	}
-	// Methods from sub-interface ProximityAnnouncer.
-	@Override
-	public void registerName(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		registerName(context, Name, null);
-	}
-	@Override
-	public void registerName(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityStub.vdlIfacePathOpt);
-		}
-		this.proximityAnnouncer.registerName(context, Name, veyronOpts);
-	}
-	@Override
-	public void unregisterName(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		unregisterName(context, Name, null);
-	}
-	@Override
-	public void unregisterName(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityStub.vdlIfacePathOpt);
-		}
-		this.proximityAnnouncer.unregisterName(context, Name, veyronOpts);
-	}
-	// Methods from sub-interface ProximityScanner.
-	@Override
-	public java.util.ArrayList<Device> nearbyDevices(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return nearbyDevices(context, null);
-	}
-	@Override
-	public java.util.ArrayList<Device> nearbyDevices(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ProximityStub.vdlIfacePathOpt);
-		}
-		return this.proximityScanner.nearbyDevices(context, veyronOpts);
-	}
+    
+    
+    
+    private final com.veyron2.services.proximity.gen_impl.ProximityAnnouncerStub proximityAnnouncerStub;
+    
+    
+    private final com.veyron2.services.proximity.gen_impl.ProximityScannerStub proximityScannerStub;
+    
+
+    public ProximityStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+        this.proximityAnnouncerStub = new com.veyron2.services.proximity.gen_impl.ProximityAnnouncerStub(client, veyronName);
+         
+        this.proximityScannerStub = new com.veyron2.services.proximity.gen_impl.ProximityScannerStub(client, veyronName);
+         
+    }
+
+    // Methods from interface Proximity.
+
+
+
+
+
+    @Override
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+         this.proximityAnnouncerStub.registerName(context, Name);
+    }
+    @Override
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.proximityAnnouncerStub.registerName(context, Name, veyronOpts);
+    }
+
+    @Override
+    public void unregisterName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+         this.proximityAnnouncerStub.unregisterName(context, Name);
+    }
+    @Override
+    public void unregisterName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.proximityAnnouncerStub.unregisterName(context, Name, veyronOpts);
+    }
+
+    @Override
+    public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.proximityScannerStub.nearbyDevices(context);
+    }
+    @Override
+    public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.proximityScannerStub.nearbyDevices(context, veyronOpts);
+    }
+
+
 }

@@ -2,61 +2,69 @@
 // Source(s):  service.vdl
 package com.veyron2.services.watch.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.watch.Change;
-import com.veyron2.services.watch.ChangeBatch;
-import com.veyron2.services.watch.GlobRequest;
-import com.veyron2.services.watch.GlobWatcher;
-import com.veyron2.services.watch.GlobWatcherFactory;
-import com.veyron2.services.watch.GlobWatcherService;
-import com.veyron2.services.watch.QueryRequest;
-import com.veyron2.services.watch.QueryWatcher;
-import com.veyron2.services.watch.QueryWatcherFactory;
-import com.veyron2.services.watch.QueryWatcherService;
-import com.veyron2.services.watch.VeyronConsts;
-import com.veyron2.vdl.Stream;
+public final class QueryWatcherServiceWrapper {
 
-public class QueryWatcherServiceWrapper {
+    private final com.veyron2.services.watch.QueryWatcherService service;
 
-	private final QueryWatcherService service;
 
-	public QueryWatcherServiceWrapper(QueryWatcherService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("watchQuery".equals(method)) {
-			return new Object[]{  };
-		}
+
+
+    public QueryWatcherServiceWrapper(final com.veyron2.services.watch.QueryWatcherService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface QueryWatcher.
-	public void watchQuery(ServerCall call, QueryRequest Req) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<ChangeBatch,Void> stream = new Stream<ChangeBatch,Void>() {
-			@Override
-			public void send(ChangeBatch item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.watchQuery(call, Req, stream);
-	}
+        
+        if ("watchQuery".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.ChangeBatch> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.ChangeBatch>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.watch.ChangeBatch recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.watch.ChangeBatch >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.watch.ChangeBatch)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.watchQuery( call , Req  ,stream  );
+    }
+
+
+
+ 
+
 }

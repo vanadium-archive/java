@@ -2,43 +2,100 @@
 // Source: error_thrower.vdl
 package com.veyron.examples.wspr_sample;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import java.util.ArrayList;
-
 /**
  * A testing interface with methods that throw various types of errors
  */
-public interface ErrorThrower { 
-	// Throws veyron2/vError.Aborted error
-	public void throwAborted(Context context) throws VeyronException;
-	public void throwAborted(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.BadArg error
-	public void throwBadArg(Context context) throws VeyronException;
-	public void throwBadArg(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.BadProtocol error
-	public void throwBadProtocol(Context context) throws VeyronException;
-	public void throwBadProtocol(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.Internal error
-	public void throwInternal(Context context) throws VeyronException;
-	public void throwInternal(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.NotAuthorized error
-	public void throwNotAuthorized(Context context) throws VeyronException;
-	public void throwNotAuthorized(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.NotFound error
-	public void throwNotFound(Context context) throws VeyronException;
-	public void throwNotFound(Context context, Options veyronOpts) throws VeyronException;
-	// Throws veyron2/vError.Unknown error
-	public void throwUnknown(Context context) throws VeyronException;
-	public void throwUnknown(Context context, Options veyronOpts) throws VeyronException;
-	// Throws normal Go error
-	public void throwGoError(Context context) throws VeyronException;
-	public void throwGoError(Context context, Options veyronOpts) throws VeyronException;
-	// Throws custom error created by using Standard
-	public void throwCustomStandardError(Context context) throws VeyronException;
-	public void throwCustomStandardError(Context context, Options veyronOpts) throws VeyronException;
-	// Lists all errors Ids available in veyron2/verror
-	public ArrayList<String> listAllBuiltInErrorIDs(Context context) throws VeyronException;
-	public ArrayList<String> listAllBuiltInErrorIDs(Context context, Options veyronOpts) throws VeyronException;
+
+public interface ErrorThrower  {
+
+    
+    
+
+    
+    // Throws veyron2/vError.Aborted error
+
+    public void throwAborted(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwAborted(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.BadArg error
+
+    public void throwBadArg(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwBadArg(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.BadProtocol error
+
+    public void throwBadProtocol(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwBadProtocol(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.Internal error
+
+    public void throwInternal(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwInternal(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.NotAuthorized error
+
+    public void throwNotAuthorized(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwNotAuthorized(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.NotFound error
+
+    public void throwNotFound(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwNotFound(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws veyron2/vError.Unknown error
+
+    public void throwUnknown(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwUnknown(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws normal Go error
+
+    public void throwGoError(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwGoError(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Throws custom error created by using Standard
+
+    public void throwCustomStandardError(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void throwCustomStandardError(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Lists all errors Ids available in veyron2/verror
+
+    public java.util.ArrayList<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.ArrayList<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,14 +2,6 @@
 // Source: repository.vdl
 package com.veyron2.services.mgmt.repository;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.binary.PartInfo;
-import com.veyron2.services.mgmt.repository.gen_impl.BinaryServiceWrapper;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
-
 /**
  * Binary can be used to store and retrieve veyron application
  * binaries.
@@ -31,43 +23,58 @@ import java.util.ArrayList;
  * 
  * To delete the binary, clients invoke the Delete() method.
  */
-@VeyronService(serviceWrapper=BinaryServiceWrapper.class)
-public interface BinaryService { 
-	// Create expresses the intent to create a binary identified by the
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.repository.gen_impl.BinaryServiceWrapper.class)
+public interface BinaryService  {
+
+    
+    // Create expresses the intent to create a binary identified by the
 // object name suffix consisting of the given number of parts. If
 // the suffix identifies a binary that has already been created, the
 // method returns an error.
-	public void create(ServerContext context, int nparts) throws VeyronException;
-	// Delete deletes the binary identified by the object name
+
+    public void create(final com.veyron2.ipc.ServerContext context, final int nparts) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Delete deletes the binary identified by the object name
 // suffix. If the binary that has not been created, the method
 // returns an error.
-	public void delete(ServerContext context) throws VeyronException;
-	// Download opens a stream that can used for downloading the given
+
+    public void delete(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Download opens a stream that can used for downloading the given
 // part of the binary identified by the object name suffix. If the
 // binary part has not been uploaded, the method returns an
 // error. If the Delete() method is invoked when the Download()
 // method is in progress, the outcome the Download() method is
 // undefined.
-	public void download(ServerContext context, int part, Stream<ArrayList<Byte>,Void> stream) throws VeyronException;
-	// DownloadURLOut packages output arguments for method DownloadURL.
-	public static class DownloadURLOut { 
-		public String uRL;
-		public long tTL;
-	}
-	// DownloadURL returns a transient URL from which the binary
+
+    public void download(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+
+    
+    // DownloadURL returns a transient URL from which the binary
 // identified by the object name suffix can be downloaded using the
 // HTTP protocol. If not all parts of the binary have been uploaded,
 // the method returns an error.
-	public BinaryService.DownloadURLOut downloadURL(ServerContext context) throws VeyronException;
-	// Stat returns information describing the parts of the binary
+
+    public com.veyron2.services.mgmt.repository.Binary.DownloadURLOut downloadURL(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Stat returns information describing the parts of the binary
 // identified by the object name suffix. If the binary has not been
 // created, the method returns an error.
-	public ArrayList<PartInfo> stat(ServerContext context) throws VeyronException;
-	// Upload opens a stream that can be used for uploading the given
+
+    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Upload opens a stream that can be used for uploading the given
 // part of the binary identified by the object name suffix. If the
 // binary has not been created, the method returns an error. If the
 // binary part has been uploaded, the method returns an error. If
 // the same binary part is being uploaded by another caller, the
 // method returns an error.
-	public void upload(ServerContext context, int part, Stream<Void,ArrayList<Byte>> stream) throws VeyronException;
+
+    public void upload(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
+
 }

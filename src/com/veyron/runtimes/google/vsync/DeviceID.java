@@ -3,34 +3,35 @@
 // Source: vsync.vdl
 package com.veyron.runtimes.google.vsync;
 
-
 /**
+ * type DeviceID string 
  * DeviceID is the globally unique ID of a device.
- */
-public final class DeviceID { 
-		private String value;
+ **/
+public final class DeviceID {
+    private java.lang.String value;
 
-	public DeviceID(String value) { 
-		this.value = value;
-	}
-	public String getValue() { return this.value; }
+    public DeviceID(java.lang.String value) {
+        this.value = value;
+    }
+    public java.lang.String getValue() { return this.value; }
 
-	public void setValue(String value) { this.value = value; }
+    public void setValue(java.lang.String value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final DeviceID other = (DeviceID)obj;
-		if (!(this.value.equals(other.value))) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (value == null ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron.runtimes.google.vsync.DeviceID other = (com.veyron.runtimes.google.vsync.DeviceID)obj;
+        
+        if (this.value == null) {
+            return other.value == null;
+        }
+        return this.value.equals(other.value);
+        
+    }
+    @Override
+    public int hashCode() {
+        return (value == null ? 0 : value.hashCode());
+    }
 }

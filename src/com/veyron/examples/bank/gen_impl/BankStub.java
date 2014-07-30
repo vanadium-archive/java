@@ -2,53 +2,79 @@
 // Source(s):  bank.vdl
 package com.veyron.examples.bank.gen_impl;
 
-import com.veyron.examples.bank.Bank;
-import com.veyron.examples.bank.BankAccount;
-import com.veyron.examples.bank.BankAccountFactory;
-import com.veyron.examples.bank.BankAccountService;
-import com.veyron.examples.bank.BankFactory;
-import com.veyron.examples.bank.BankService;
-
 /* Client stub for interface: Bank. */
-public final class BankStub implements Bank {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.Bank";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class BankStub implements com.veyron.examples.bank.Bank {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.bank.Bank";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public BankStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Bank.
-	@Override
-	public Bank.ConnectOut connect(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return connect(context, null);
-	}
-	@Override
-	public Bank.ConnectOut connect(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankStub.vdlIfacePathOpt);
-		}
+    public BankStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Connect", inArgs, veyronOpts);
+    // Methods from interface Bank.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.String>() {}, new com.google.common.reflect.TypeToken<java.lang.Long>() {} };
-			final java.lang.Object[] results = call.finish(resultTypes);
-			// Pack the results.
-			final Bank.ConnectOut ret = new Bank.ConnectOut();
-			int resultIdx = 0;
-			ret.newIdentity = (java.lang.String)results[resultIdx++];
-			ret.accountNumber = (java.lang.Long)results[resultIdx++];
-			return ret;
 
-	}
+    
+    public com.veyron.examples.bank.Bank.ConnectOut connect(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return connect(context, null);
+    }
+    
+    public com.veyron.examples.bank.Bank.ConnectOut connect(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, BankStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.String>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+            new com.google.common.reflect.TypeToken<java.lang.Long>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+        
+        final com.veyron.examples.bank.Bank.ConnectOut ret = new com.veyron.examples.bank.Bank.ConnectOut();
+            
+        ret.newIdentity = (java.lang.String)results[0];
+            
+        ret.accountNumber = (java.lang.Long)results[1];
+             
+        return ret;
+         
+
+         
+
+        
+    }
+
+
+
+
+
 }

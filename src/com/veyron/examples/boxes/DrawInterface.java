@@ -2,20 +2,29 @@
 // Source: boxes.vdl
 package com.veyron.examples.boxes;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-
 /**
  * DrawInterface enables adding a box on another peer
  */
-public interface DrawInterface { 
-	// Draw is used to send/receive a stream of boxes to another peer
-	public ClientStream<Box,Box,Void> draw(Context context) throws VeyronException;
-	public ClientStream<Box,Box,Void> draw(Context context, Options veyronOpts) throws VeyronException;
-	// SyncBoxes is used to setup a sync service over store to send/receive
+
+public interface DrawInterface  {
+
+    
+    
+
+    
+    // Draw is used to send/receive a stream of boxes to another peer
+
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.boxes.Box,com.veyron.examples.boxes.Box, java.lang.Void> draw(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.boxes.Box,com.veyron.examples.boxes.Box, java.lang.Void> draw(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // SyncBoxes is used to setup a sync service over store to send/receive
 // boxes to another peer
-	public void syncBoxes(Context context) throws VeyronException;
-	public void syncBoxes(Context context, Options veyronOpts) throws VeyronException;
+
+    public void syncBoxes(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void syncBoxes(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

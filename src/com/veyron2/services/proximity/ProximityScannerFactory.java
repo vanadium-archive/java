@@ -2,30 +2,20 @@
 // Source(s):  proximity.vdl
 package com.veyron2.services.proximity;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.OptionDefs;
-import com.veyron2.Options;
-import com.veyron2.RuntimeFactory;
-import com.veyron2.ipc.Client;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.proximity.gen_impl.ProximityScannerStub;
-import java.util.ArrayList;
-
 /* Factory for binding to ProximityScanner interfaces. */
-public class ProximityScannerFactory {
-	public static ProximityScanner bind(String name) throws VeyronException {
-		return bind(name, null);
-	}
-	public static ProximityScanner bind(String name, Options veyronOpts) throws VeyronException {
-		Client client = null;
-		if (veyronOpts != null && veyronOpts.get(OptionDefs.CLIENT) != null) {
-			client = veyronOpts.get(OptionDefs.CLIENT, Client.class);
-		} else if (veyronOpts != null && veyronOpts.get(OptionDefs.RUNTIME) != null) {
-			client = veyronOpts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
-		} else {
-			client = RuntimeFactory.getRuntime().getClient();
-		}
-		return new ProximityScannerStub(client, name);
-	}
+public final class ProximityScannerFactory {
+    public static ProximityScanner bind(final java.lang.String name) throws com.veyron2.ipc.VeyronException {
+        return bind(name, null);
+    }
+    public static ProximityScanner bind(final java.lang.String name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        com.veyron2.ipc.Client client = null;
+        if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.CLIENT) != null) {
+            client = veyronOpts.get(com.veyron2.OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+        } else if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.RUNTIME) != null) {
+            client = veyronOpts.get(com.veyron2.OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+        } else {
+            client = com.veyron2.RuntimeFactory.getRuntime().getClient();
+        }
+        return new com.veyron2.services.proximity.gen_impl.ProximityScannerStub(client, name);
+    }
 }

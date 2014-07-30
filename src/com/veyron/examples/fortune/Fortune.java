@@ -2,18 +2,28 @@
 // Source: fortune.vdl
 package com.veyron.examples.fortune;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Fortune allows clients to Get and Add fortune strings.
  */
-public interface Fortune { 
-	// Get returns a random fortune.
-	public String get(Context context) throws VeyronException;
-	public String get(Context context, Options veyronOpts) throws VeyronException;
-	// Add stores a fortune in the set used by Get.
-	public void add(Context context, String fortune) throws VeyronException;
-	public void add(Context context, String fortune, Options veyronOpts) throws VeyronException;
+
+public interface Fortune  {
+
+    
+    
+
+    
+    // Get returns a random fortune.
+
+    public java.lang.String get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String get(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Add stores a fortune in the set used by Get.
+
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Fortune) throws com.veyron2.ipc.VeyronException;
+    public void add(final com.veyron2.ipc.Context context, final java.lang.String Fortune, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

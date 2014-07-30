@@ -3,35 +3,33 @@
 // Source: service.vdl
 package com.veyron2.services.store;
 
-
 /**
+ * type NestedResult int64 
  * NestedResult allows nested query results to be sent out-of-line.
  * See QueryResult for a full explanation.
- */
-public final class NestedResult { 
-		private long value;
+ **/
+public final class NestedResult {
+    private long value;
 
-	public NestedResult(long value) { 
-		this.value = value;
-	}
-	public long getValue() { return this.value; }
+    public NestedResult(long value) {
+        this.value = value;
+    }
+    public long getValue() { return this.value; }
 
-	public void setValue(long value) { this.value = value; }
+    public void setValue(long value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final NestedResult other = (NestedResult)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Long.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.services.store.NestedResult other = (com.veyron2.services.store.NestedResult)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Long.valueOf(value).hashCode();
+    }
 }

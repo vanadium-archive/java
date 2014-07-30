@@ -2,61 +2,179 @@
 // Source: test_base.vdl
 package com.veyron.tools.vrpc.test_base;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-public interface TypeTester { 
-	// Methods to test support for generic types.
-	public boolean echoBool(Context context, boolean i1) throws VeyronException;
-	public boolean echoBool(Context context, boolean i1, Options veyronOpts) throws VeyronException;
-		public float echoFloat32(Context context, float i1) throws VeyronException;
-	public float echoFloat32(Context context, float i1, Options veyronOpts) throws VeyronException;
-		public double echoFloat64(Context context, double i1) throws VeyronException;
-	public double echoFloat64(Context context, double i1, Options veyronOpts) throws VeyronException;
-		public int echoInt32(Context context, int i1) throws VeyronException;
-	public int echoInt32(Context context, int i1, Options veyronOpts) throws VeyronException;
-		public long echoInt64(Context context, long i1) throws VeyronException;
-	public long echoInt64(Context context, long i1, Options veyronOpts) throws VeyronException;
-		public String echoString(Context context, String i1) throws VeyronException;
-	public String echoString(Context context, String i1, Options veyronOpts) throws VeyronException;
-		public byte echoByte(Context context, byte i1) throws VeyronException;
-	public byte echoByte(Context context, byte i1, Options veyronOpts) throws VeyronException;
-		public int echoUInt32(Context context, int i1) throws VeyronException;
-	public int echoUInt32(Context context, int i1, Options veyronOpts) throws VeyronException;
-		public long echoUInt64(Context context, long i1) throws VeyronException;
-	public long echoUInt64(Context context, long i1, Options veyronOpts) throws VeyronException;
-	// Methods to test support for composite types.
-	public void inputArray(Context context, byte[] i1) throws VeyronException;
-	public void inputArray(Context context, byte[] i1, Options veyronOpts) throws VeyronException;
-		public void inputMap(Context context, HashMap<Byte, Byte> i1) throws VeyronException;
-	public void inputMap(Context context, HashMap<Byte, Byte> i1, Options veyronOpts) throws VeyronException;
-		public void inputSlice(Context context, ArrayList<Byte> i1) throws VeyronException;
-	public void inputSlice(Context context, ArrayList<Byte> i1, Options veyronOpts) throws VeyronException;
-		public void inputStruct(Context context, Struct i1) throws VeyronException;
-	public void inputStruct(Context context, Struct i1, Options veyronOpts) throws VeyronException;
-		public byte[] outputArray(Context context) throws VeyronException;
-	public byte[] outputArray(Context context, Options veyronOpts) throws VeyronException;
-		public HashMap<Byte, Byte> outputMap(Context context) throws VeyronException;
-	public HashMap<Byte, Byte> outputMap(Context context, Options veyronOpts) throws VeyronException;
-		public ArrayList<Byte> outputSlice(Context context) throws VeyronException;
-	public ArrayList<Byte> outputSlice(Context context, Options veyronOpts) throws VeyronException;
-		public Struct outputStruct(Context context) throws VeyronException;
-	public Struct outputStruct(Context context, Options veyronOpts) throws VeyronException;
-	// Methods to test support for different number of arguments.
-	public void noArguments(Context context) throws VeyronException;
-	public void noArguments(Context context, Options veyronOpts) throws VeyronException;
-	// MultipleArgumentsOut packages output arguments for method MultipleArguments.
-	public static class MultipleArgumentsOut { 
-		public int o1;
-		public int o2;
-	}
-		public TypeTester.MultipleArgumentsOut multipleArguments(Context context, int i1, int i2) throws VeyronException;
-	public TypeTester.MultipleArgumentsOut multipleArguments(Context context, int i1, int i2, Options veyronOpts) throws VeyronException;
-	// Methods to test support for streaming.
-	public ClientStream<Void,Boolean,Void> streamingOutput(Context context, int numStreamItems, boolean streamItem) throws VeyronException;
-	public ClientStream<Void,Boolean,Void> streamingOutput(Context context, int numStreamItems, boolean streamItem, Options veyronOpts) throws VeyronException;
+public interface TypeTester  {
+
+    
+    
+
+    
+    // Methods to test support for generic types.
+
+    public boolean echoBool(final com.veyron2.ipc.Context context, final boolean I1) throws com.veyron2.ipc.VeyronException;
+    public boolean echoBool(final com.veyron2.ipc.Context context, final boolean I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public float echoFloat32(final com.veyron2.ipc.Context context, final float I1) throws com.veyron2.ipc.VeyronException;
+    public float echoFloat32(final com.veyron2.ipc.Context context, final float I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public double echoFloat64(final com.veyron2.ipc.Context context, final double I1) throws com.veyron2.ipc.VeyronException;
+    public double echoFloat64(final com.veyron2.ipc.Context context, final double I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public int echoInt32(final com.veyron2.ipc.Context context, final int I1) throws com.veyron2.ipc.VeyronException;
+    public int echoInt32(final com.veyron2.ipc.Context context, final int I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public long echoInt64(final com.veyron2.ipc.Context context, final long I1) throws com.veyron2.ipc.VeyronException;
+    public long echoInt64(final com.veyron2.ipc.Context context, final long I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public java.lang.String echoString(final com.veyron2.ipc.Context context, final java.lang.String I1) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String echoString(final com.veyron2.ipc.Context context, final java.lang.String I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public byte echoByte(final com.veyron2.ipc.Context context, final byte I1) throws com.veyron2.ipc.VeyronException;
+    public byte echoByte(final com.veyron2.ipc.Context context, final byte I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public int echoUInt32(final com.veyron2.ipc.Context context, final int I1) throws com.veyron2.ipc.VeyronException;
+    public int echoUInt32(final com.veyron2.ipc.Context context, final int I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public long echoUInt64(final com.veyron2.ipc.Context context, final long I1) throws com.veyron2.ipc.VeyronException;
+    public long echoUInt64(final com.veyron2.ipc.Context context, final long I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Methods to test support for composite types.
+
+    public void inputArray(final com.veyron2.ipc.Context context, final byte[] I1) throws com.veyron2.ipc.VeyronException;
+    public void inputArray(final com.veyron2.ipc.Context context, final byte[] I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public void inputMap(final com.veyron2.ipc.Context context, final java.util.HashMap<java.lang.Byte, java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
+    public void inputMap(final com.veyron2.ipc.Context context, final java.util.HashMap<java.lang.Byte, java.lang.Byte> I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
+    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Byte> I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public void inputStruct(final com.veyron2.ipc.Context context, final com.veyron.tools.vrpc.test_base.Struct I1) throws com.veyron2.ipc.VeyronException;
+    public void inputStruct(final com.veyron2.ipc.Context context, final com.veyron.tools.vrpc.test_base.Struct I1, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public byte[] outputArray(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public byte[] outputArray(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public java.util.HashMap<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.HashMap<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public java.util.ArrayList<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.ArrayList<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public com.veyron.tools.vrpc.test_base.Struct outputStruct(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron.tools.vrpc.test_base.Struct outputStruct(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Methods to test support for different number of arguments.
+
+    public void noArguments(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void noArguments(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public static class MultipleArgumentsOut {
+        
+        public int o1;
+        
+        public int o2;
+        
+    }
+    
+
+    
+    
+    public com.veyron.tools.vrpc.test_base.TypeTester.MultipleArgumentsOut multipleArguments(final com.veyron2.ipc.Context context, final int I1, final int I2) throws com.veyron2.ipc.VeyronException;
+    public com.veyron.tools.vrpc.test_base.TypeTester.MultipleArgumentsOut multipleArguments(final com.veyron2.ipc.Context context, final int I1, final int I2, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Methods to test support for streaming.
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.Boolean, java.lang.Void> streamingOutput(final com.veyron2.ipc.Context context, final int NumStreamItems, final boolean StreamItem) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.Boolean, java.lang.Void> streamingOutput(final com.veyron2.ipc.Context context, final int NumStreamItems, final boolean StreamItem, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

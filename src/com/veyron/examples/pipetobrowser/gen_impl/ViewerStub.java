@@ -2,63 +2,82 @@
 // Source(s):  p2b.vdl
 package com.veyron.examples.pipetobrowser.gen_impl;
 
-import com.veyron.examples.pipetobrowser.Viewer;
-import com.veyron.examples.pipetobrowser.ViewerFactory;
-import com.veyron.examples.pipetobrowser.ViewerService;
-
 /* Client stub for interface: Viewer. */
-public final class ViewerStub implements Viewer {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.pipetobrowser.Viewer";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewer {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.pipetobrowser.Viewer";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ViewerStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Viewer.
-	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Object> pipe(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return pipe(context, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void,java.lang.Object> pipe(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ViewerStub.vdlIfacePathOpt);
-		}
+    public ViewerStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Pipe", inArgs, veyronOpts);
+    // Methods from interface Viewer.
 
-		return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Object>() {
-			@Override
-			public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public java.lang.Void recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.lang.Void>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (java.lang.Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.lang.Object finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Object>() {} };
-					return (java.lang.Object)call.finish(resultTypes)[0];
 
-			}
-		};
-	}
+    
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return pipe(context, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ViewerStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Object>() {
+            @Override
+            public void send(final java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.lang.Void recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.lang.Void>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.lang.Void)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.lang.Object finish() throws com.veyron2.ipc.VeyronException {
+                 
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+                    new com.google.common.reflect.TypeToken<java.lang.Object>() {
+                        private static final long serialVersionUID = 1L;
+                    }
+                };
+                return (java.lang.Object)call.finish(resultTypes)[0];
+                 
+            }
+        };
+        
+    }
+
+
+
+
+
 }

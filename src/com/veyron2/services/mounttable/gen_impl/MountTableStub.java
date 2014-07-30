@@ -2,123 +2,159 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable.gen_impl;
 
-import com.veyron2.services.mounttable.Globable;
-import com.veyron2.services.mounttable.GlobableFactory;
-import com.veyron2.services.mounttable.GlobableService;
-import com.veyron2.services.mounttable.MountEntry;
-import com.veyron2.services.mounttable.MountTable;
-import com.veyron2.services.mounttable.MountTableFactory;
-import com.veyron2.services.mounttable.MountTableService;
-import com.veyron2.services.mounttable.MountedServer;
-
 /* Client stub for interface: MountTable. */
-public final class MountTableStub implements MountTable {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.MountTable";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
-	private final Globable globable;
+public final class MountTableStub implements com.veyron2.services.mounttable.MountTable {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.MountTable";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public MountTableStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-		this.globable = new com.veyron2.services.mounttable.gen_impl.GlobableStub(client, name);
-	}
-	// Methods from interface MountTable.
-	@Override
-	public void mount(com.veyron2.ipc.Context context, java.lang.String Server, int TTL) throws com.veyron2.ipc.VeyronException {
-		mount(context, Server, TTL, null);
-	}
-	@Override
-	public void mount(com.veyron2.ipc.Context context, java.lang.String Server, int TTL, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Server, new java.lang.Integer(TTL) };
+    
+    
+    
+    private final com.veyron2.services.mounttable.gen_impl.GlobableStub globableStub;
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
-		}
+    public MountTableStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+        this.globableStub = new com.veyron2.services.mounttable.gen_impl.GlobableStub(client, veyronName);
+         
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Mount", inArgs, veyronOpts);
+    // Methods from interface MountTable.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
 
-	}
-	@Override
-	public void unmount(com.veyron2.ipc.Context context, java.lang.String Server) throws com.veyron2.ipc.VeyronException {
-		unmount(context, Server, null);
-	}
-	@Override
-	public void unmount(com.veyron2.ipc.Context context, java.lang.String Server, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Server };
+    
+    public void mount(final com.veyron2.ipc.Context context, final java.lang.String Server, final int TTL) throws com.veyron2.ipc.VeyronException {
+         mount(context, Server, TTL, null);
+    }
+    
+    public void mount(final com.veyron2.ipc.Context context, final java.lang.String Server, final int TTL, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Server, TTL };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Unmount", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
 
-	}
-	@Override
-	public MountTable.ResolveStepOut resolveStep(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return resolveStep(context, null);
-	}
-	@Override
-	public MountTable.ResolveStepOut resolveStep(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        
+    }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
-		}
+    
+    public void unmount(final com.veyron2.ipc.Context context, final java.lang.String Server) throws com.veyron2.ipc.VeyronException {
+         unmount(context, Server, null);
+    }
+    
+    public void unmount(final com.veyron2.ipc.Context context, final java.lang.String Server, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
+        }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "ResolveStep", inArgs, veyronOpts);
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Server };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.util.ArrayList<MountedServer>>() {}, new com.google.common.reflect.TypeToken<java.lang.String>() {} };
-			final java.lang.Object[] results = call.finish(resultTypes);
-			// Pack the results.
-			final MountTable.ResolveStepOut ret = new MountTable.ResolveStepOut();
-			int resultIdx = 0;
-			ret.servers = (java.util.ArrayList<MountedServer>)results[resultIdx++];
-			ret.suffix = (java.lang.String)results[resultIdx++];
-			return ret;
+        // Finish the call.
+        
+        
 
-	}
-	// Methods from sub-interface Globable.
-	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,MountEntry,java.lang.Void> glob(com.veyron2.ipc.Context context, java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
-		return glob(context, pattern, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,MountEntry,java.lang.Void> glob(com.veyron2.ipc.Context context, java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
-		}
-		return this.globable.glob(context, pattern, veyronOpts);
-	}
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+    
+    public com.veyron2.services.mounttable.MountTable.ResolveStepOut resolveStep(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return resolveStep(context, null);
+    }
+    
+    public com.veyron2.services.mounttable.MountTable.ResolveStepOut resolveStep(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, MountTableStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.util.ArrayList<com.veyron2.services.mounttable.MountedServer>>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+            new com.google.common.reflect.TypeToken<java.lang.String>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+        
+        final com.veyron2.services.mounttable.MountTable.ResolveStepOut ret = new com.veyron2.services.mounttable.MountTable.ResolveStepOut();
+            
+        ret.servers = (java.util.ArrayList<com.veyron2.services.mounttable.MountedServer>)results[0];
+            
+        ret.suffix = (java.lang.String)results[1];
+             
+        return ret;
+         
+
+         
+
+        
+    }
+
+
+
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+        return this.globableStub.glob(context, pattern);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.globableStub.glob(context, pattern, veyronOpts);
+    }
+
+
 }

@@ -2,10 +2,8 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron.examples.rockpaperscissors.gen_impl.RockPaperScissorsServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.vdl.VeyronService;
 
-@VeyronService(serviceWrapper=RockPaperScissorsServiceWrapper.class)
-public interface RockPaperScissorsService extends JudgeService, PlayerService, ScoreKeeperService { 
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.rockpaperscissors.gen_impl.RockPaperScissorsServiceWrapper.class)
+public interface RockPaperScissorsService extends com.veyron.examples.rockpaperscissors.JudgeService, com.veyron.examples.rockpaperscissors.PlayerService, com.veyron.examples.rockpaperscissors.ScoreKeeperService {
+
 }

@@ -3,34 +3,32 @@
 // Source: vsync.vdl
 package com.veyron.runtimes.google.vsync;
 
-
 /**
+ * type GenID uint64 
  * GenID is the unique ID per generation per device.
- */
-public final class GenID { 
-		private long value;
+ **/
+public final class GenID {
+    private long value;
 
-	public GenID(long value) { 
-		this.value = value;
-	}
-	public long getValue() { return this.value; }
+    public GenID(long value) {
+        this.value = value;
+    }
+    public long getValue() { return this.value; }
 
-	public void setValue(long value) { this.value = value; }
+    public void setValue(long value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final GenID other = (GenID)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Long.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron.runtimes.google.vsync.GenID other = (com.veyron.runtimes.google.vsync.GenID)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Long.valueOf(value).hashCode();
+    }
 }

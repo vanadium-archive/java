@@ -2,17 +2,19 @@
 // Source: p2b.vdl
 package com.veyron.examples.pipetobrowser;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-import java.util.ArrayList;
-
 /**
  * Viewer allows clients to stream data to it and to request a particular viewer to format and display the data.
  */
-public interface Viewer { 
-	// Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
-	public ClientStream<ArrayList<Byte>,Void,Object> pipe(Context context) throws VeyronException;
-	public ClientStream<ArrayList<Byte>,Void,Object> pipe(Context context, Options veyronOpts) throws VeyronException;
+
+public interface Viewer  {
+
+    
+    
+
+    
+    // Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
+
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

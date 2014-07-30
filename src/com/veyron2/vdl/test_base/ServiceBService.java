@@ -2,12 +2,12 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-import com.veyron2.vdl.test_base.gen_impl.ServiceBServiceWrapper;
 
-@VeyronService(serviceWrapper=ServiceBServiceWrapper.class)
-public interface ServiceBService extends ServiceAService { 
-		public CompComp methodB1(ServerContext context, Scalars a, Composites b) throws VeyronException;
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_base.gen_impl.ServiceBServiceWrapper.class)
+public interface ServiceBService extends com.veyron2.vdl.test_base.ServiceAService {
+
+    
+    
+    public com.veyron2.vdl.test_base.CompComp methodB1(final com.veyron2.ipc.ServerContext context, final com.veyron2.vdl.test_base.Scalars a, final com.veyron2.vdl.test_base.Composites b) throws com.veyron2.ipc.VeyronException;
+
 }

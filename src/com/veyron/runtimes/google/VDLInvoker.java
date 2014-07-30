@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.veyron2.security.Label;
 import com.veyron2.security.Security;
-import com.veyron2.security.VeyronConsts;
+import com.veyron2.security.SecurityConstants;
 import com.veyron2.ipc.ServerCall;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.vdl.VeyronService;
@@ -28,7 +28,7 @@ import com.veyron2.vdl.VeyronService;
  * provided objects implement exactly one VDL interface.
  */
 public final class VDLInvoker {
-    private static final Label DEFAULT_LABEL = VeyronConsts.ADMIN_LABEL;
+    private static final Label DEFAULT_LABEL = SecurityConstants.ADMIN_LABEL;
 
     // A cache of ClassInfo objects, aiming to reduce the cost of expensive
     // reflection operations.

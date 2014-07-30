@@ -2,11 +2,6 @@
 // Source: identity.vdl
 package com.veyron.services.identity;
 
-import com.veyron.services.identity.gen_impl.OAuthBlesserServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * OAuthBlesser exchanges the provided authorization code for an email addres
  * from an OAuth-based identity provider and uses the email address as the
@@ -15,12 +10,17 @@ import com.veyron2.vdl.VeyronService;
  * The redirect URL used to obtain the authorization code must also be
  * provided in order to ensure a successful exchange.
  */
-@VeyronService(serviceWrapper=OAuthBlesserServiceWrapper.class)
-public interface OAuthBlesserService { 
-	// TODO(ashankar,toddw): Once the "OneOf" type becomes available in VDL,
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.identity.gen_impl.OAuthBlesserServiceWrapper.class)
+public interface OAuthBlesserService  {
+
+    
+    // TODO(ashankar,toddw): Once the "OneOf" type becomes available in VDL,
 // then the "any" should be replaced by:
 // OneOf<wire.ChainPublicID, []wire.ChainPublicID>
 // where wire is from:
 // import "veyron2/security/wire"
-	public Object bless(ServerContext context, String authcode, String redirecturl) throws VeyronException;
+
+    public java.lang.Object bless(final com.veyron2.ipc.ServerContext context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException;
+
 }

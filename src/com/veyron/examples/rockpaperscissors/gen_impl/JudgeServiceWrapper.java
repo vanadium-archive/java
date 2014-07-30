@@ -2,76 +2,80 @@
 // Source(s):  service.vdl
 package com.veyron.examples.rockpaperscissors.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron.examples.rockpaperscissors.GameID;
-import com.veyron.examples.rockpaperscissors.GameOptions;
-import com.veyron.examples.rockpaperscissors.Judge;
-import com.veyron.examples.rockpaperscissors.JudgeAction;
-import com.veyron.examples.rockpaperscissors.JudgeFactory;
-import com.veyron.examples.rockpaperscissors.JudgeService;
-import com.veyron.examples.rockpaperscissors.PlayResult;
-import com.veyron.examples.rockpaperscissors.Player;
-import com.veyron.examples.rockpaperscissors.PlayerAction;
-import com.veyron.examples.rockpaperscissors.PlayerFactory;
-import com.veyron.examples.rockpaperscissors.PlayerService;
-import com.veyron.examples.rockpaperscissors.RockPaperScissors;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsFactory;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsService;
-import com.veyron.examples.rockpaperscissors.Round;
-import com.veyron.examples.rockpaperscissors.ScoreCard;
-import com.veyron.examples.rockpaperscissors.ScoreKeeper;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperFactory;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperService;
-import com.veyron.examples.rockpaperscissors.VeyronConsts;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
+public final class JudgeServiceWrapper {
 
-public class JudgeServiceWrapper {
+    private final com.veyron.examples.rockpaperscissors.JudgeService service;
 
-	private final JudgeService service;
 
-	public JudgeServiceWrapper(JudgeService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("createGame".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("play".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public JudgeServiceWrapper(final com.veyron.examples.rockpaperscissors.JudgeService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("createGame".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Judge.
-	public GameID createGame(ServerCall call, GameOptions Opts) throws VeyronException { 
-		return this.service.createGame(call, Opts);
-	}
-	public PlayResult play(ServerCall call, GameID ID) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<JudgeAction,PlayerAction> stream = new Stream<JudgeAction,PlayerAction>() {
-			@Override
-			public void send(JudgeAction item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public PlayerAction recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<PlayerAction>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (PlayerAction)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		return this.service.play(call, ID, stream);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("play".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.createGame( call , Opts  );
+    }
+
+    public com.veyron.examples.rockpaperscissors.PlayResult play(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<com.veyron.examples.rockpaperscissors.PlayerAction, com.veyron.examples.rockpaperscissors.JudgeAction> stream = new com.veyron2.vdl.Stream<com.veyron.examples.rockpaperscissors.PlayerAction, com.veyron.examples.rockpaperscissors.JudgeAction>() {
+            @Override
+            public void send(com.veyron.examples.rockpaperscissors.PlayerAction item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron.examples.rockpaperscissors.JudgeAction recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron.examples.rockpaperscissors.JudgeAction >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron.examples.rockpaperscissors.JudgeAction)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         return  this.service.play( call , ID  ,stream  );
+    }
+
+
+
+ 
+
 }

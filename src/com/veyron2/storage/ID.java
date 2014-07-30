@@ -3,13 +3,6 @@
 
 package com.veyron2.storage;
 
-import com.veyron2.vdl.FixedLengthList;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * type ID [16]byte 
  * ID is the type of keys for the key/value store.  The key is a numeric
@@ -19,9 +12,9 @@ import java.util.ListIterator;
  * as identifier.  The ID is large enough that collisions are extremely
  * unlikely.
  **/
-public final class ID implements List<java.lang.Byte> {
+public final class ID implements java.util.List<java.lang.Byte> {
     private final static int length = 16;
-    private FixedLengthList<java.lang.Byte> impl;
+    private com.veyron2.vdl.FixedLengthList<java.lang.Byte> impl;
 
     public ID(java.lang.Byte[] impl) {
         setValue(impl);
@@ -36,7 +29,7 @@ public final class ID implements List<java.lang.Byte> {
             throw new IllegalArgumentException("Invalid length " + length + " expected "
                     + arr.length);
         }
-        this.impl = new FixedLengthList<java.lang.Byte>(arr);
+        this.impl = new com.veyron2.vdl.FixedLengthList<java.lang.Byte>(arr);
     }
 
     @Override
@@ -69,12 +62,12 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public boolean addAll(int location, Collection<? extends java.lang.Byte> collection) {
+    public boolean addAll(int location, java.util.Collection<? extends java.lang.Byte> collection) {
         return impl.addAll(location, collection);
     }
 
     @Override
-    public boolean addAll(Collection<? extends java.lang.Byte> collection) {
+    public boolean addAll(java.util.Collection<? extends java.lang.Byte> collection) {
         return impl.addAll(collection);
     }
 
@@ -84,12 +77,12 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public boolean contains(Object object) {
+    public boolean contains(java.lang.Object object) {
         return impl.contains(object);
     }
 
     @Override
-    public boolean containsAll(Collection<?> collection) {
+    public boolean containsAll(java.util.Collection<?> collection) {
         return impl.containsAll(collection);
     }
 
@@ -99,7 +92,7 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public int indexOf(Object object) {
+    public int indexOf(java.lang.Object object) {
         return impl.indexOf(object);
     }
 
@@ -109,22 +102,22 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public Iterator<java.lang.Byte> iterator() {
+    public java.util.Iterator<java.lang.Byte> iterator() {
         return impl.iterator();
     }
 
     @Override
-    public int lastIndexOf(Object object) {
+    public int lastIndexOf(java.lang.Object object) {
         return impl.lastIndexOf(object);
     }
 
     @Override
-    public ListIterator<java.lang.Byte> listIterator() {
+    public java.util.ListIterator<java.lang.Byte> listIterator() {
         return impl.listIterator();
     }
 
     @Override
-    public ListIterator<java.lang.Byte> listIterator(int location) {
+    public java.util.ListIterator<java.lang.Byte> listIterator(int location) {
         return impl.listIterator(location);
     }
 
@@ -134,17 +127,17 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public boolean remove(Object object) {
+    public boolean remove(java.lang.Object object) {
         return impl.remove(object);
     }
 
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(java.util.Collection<?> collection) {
         return impl.removeAll(collection);
     }
 
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(java.util.Collection<?> collection) {
         return impl.retainAll(collection);
     }
 
@@ -159,12 +152,12 @@ public final class ID implements List<java.lang.Byte> {
     }
 
     @Override
-    public List<java.lang.Byte> subList(int start, int end) {
+    public java.util.List<java.lang.Byte> subList(int start, int end) {
         return impl.subList(start, end);
     }
 
     @Override
-    public Object[] toArray() {
+    public java.lang.Object[] toArray() {
         return impl.toArray();
     }
 

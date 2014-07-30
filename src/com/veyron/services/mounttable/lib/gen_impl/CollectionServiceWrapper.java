@@ -2,41 +2,61 @@
 // Source(s):  collection_test.vdl
 package com.veyron.services.mounttable.lib.gen_impl;
 
-import com.veyron.services.mounttable.lib.Collection;
-import com.veyron.services.mounttable.lib.CollectionFactory;
-import com.veyron.services.mounttable.lib.CollectionService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import java.util.ArrayList;
+public final class CollectionServiceWrapper {
 
-public class CollectionServiceWrapper {
+    private final com.veyron.services.mounttable.lib.CollectionService service;
 
-	private final CollectionService service;
 
-	public CollectionServiceWrapper(CollectionService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("export".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("lookup".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public CollectionServiceWrapper(final com.veyron.services.mounttable.lib.CollectionService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("export".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Collection.
-	public void export(ServerCall call, String Val, boolean Overwrite) throws VeyronException { 
-		this.service.export(call, Val, Overwrite);
-	}
-	public ArrayList<Byte> lookup(ServerCall call) throws VeyronException { 
-		return this.service.lookup(call);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("lookup".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void export(final com.veyron2.ipc.ServerCall call, final java.lang.String Val, final boolean Overwrite) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.export( call , Val, Overwrite  );
+    }
+
+    public java.util.ArrayList<java.lang.Byte> lookup(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.lookup( call   );
+    }
+
+
+
+ 
+
 }

@@ -2,11 +2,6 @@
 // Source: service.vdl
 package com.veyron2.services.watch;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * type ResumeMarker []byte 
  * ResumeMarker specifies how much of the existing underlying state
@@ -42,31 +37,31 @@ import java.util.ListIterator;
  * (initial state fetching) and the "now" marker. It need not
  * support resuming from a specific point.
  **/
-public final class ResumeMarker implements List<java.lang.Byte> {
-	private List<java.lang.Byte> impl;
+public final class ResumeMarker implements java.util.List<java.lang.Byte> {
+    private java.util.List<java.lang.Byte> impl;
 
-	public ResumeMarker(List<java.lang.Byte> impl) {
-		this.impl = impl;
-	}
-	public List<java.lang.Byte> getValue() { return this.impl; }
+    public ResumeMarker(java.util.List<java.lang.Byte> impl) {
+        this.impl = impl;
+    }
+    public java.util.List<java.lang.Byte> getValue() { return this.impl; }
 
-	public void setValue(List<java.lang.Byte> newImpl) {
-	    this.impl = newImpl;
-	}
+    public void setValue(java.util.List<java.lang.Byte> newImpl) {
+        this.impl = newImpl;
+    }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final ResumeMarker other = (ResumeMarker)obj;
-		if (!(this.impl.equals(other.impl))) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		return (impl == null ? 0 : impl.hashCode());
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final ResumeMarker other = (ResumeMarker)obj;
+        if (!(this.impl.equals(other.impl))) return false;
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        return (impl == null ? 0 : impl.hashCode());
+    }
     @Override
     public void add(int location, java.lang.Byte object) {
         impl.add(location, object);
@@ -76,11 +71,11 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         return impl.add(object);
     }
     @Override
-    public boolean addAll(int location, Collection<? extends java.lang.Byte> collection) {
+    public boolean addAll(int location, java.util.Collection<? extends java.lang.Byte> collection) {
         return impl.addAll(location, collection);
     }
     @Override
-    public boolean addAll(Collection<? extends java.lang.Byte> collection) {
+    public boolean addAll(java.util.Collection<? extends java.lang.Byte> collection) {
         return impl.addAll(collection);
     }
     @Override
@@ -88,11 +83,11 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         impl.clear();
     }
     @Override
-    public boolean contains(Object object) {
+    public boolean contains(java.lang.Object object) {
         return impl.contains(object);
     }
     @Override
-    public boolean containsAll(Collection<?> collection) {
+    public boolean containsAll(java.util.Collection<?> collection) {
         return impl.containsAll(collection);
     }
     @Override
@@ -100,7 +95,7 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         return impl.get(location);
     }
     @Override
-    public int indexOf(Object object) {
+    public int indexOf(java.lang.Object object) {
         return impl.indexOf(object);
     }
     @Override
@@ -108,19 +103,19 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         return impl.isEmpty();
     }
     @Override
-    public Iterator<java.lang.Byte> iterator() {
+    public java.util.Iterator<java.lang.Byte> iterator() {
         return impl.iterator();
     }
     @Override
-    public int lastIndexOf(Object object) {
+    public int lastIndexOf(java.lang.Object object) {
         return impl.lastIndexOf(object);
     }
     @Override
-    public ListIterator<java.lang.Byte> listIterator() {
+    public java.util.ListIterator<java.lang.Byte> listIterator() {
         return impl.listIterator();
     }
     @Override
-    public ListIterator<java.lang.Byte> listIterator(int location) {
+    public java.util.ListIterator<java.lang.Byte> listIterator(int location) {
         return impl.listIterator(location);
     }
     @Override
@@ -128,15 +123,15 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         return impl.remove(location);
     }
     @Override
-    public boolean remove(Object object) {
+    public boolean remove(java.lang.Object object) {
         return impl.remove(object);
     }
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(java.util.Collection<?> collection) {
         return impl.removeAll(collection);
     }
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(java.util.Collection<?> collection) {
         return impl.retainAll(collection);
     }
     @Override
@@ -148,11 +143,11 @@ public final class ResumeMarker implements List<java.lang.Byte> {
         return impl.size();
     }
     @Override
-    public List<java.lang.Byte> subList(int start, int end) {
+    public java.util.List<java.lang.Byte> subList(int start, int end) {
         return impl.subList(start, end);
     }
     @Override
-    public Object[] toArray() {
+    public java.lang.Object[] toArray() {
         return impl.toArray();
     }
     @Override

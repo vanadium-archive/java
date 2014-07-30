@@ -2,78 +2,184 @@
 // Source: cache.vdl
 package com.veyron.examples.wspr_sample;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  * A Cache service mimics the memcache interface.
  */
-public interface Cache { 
-	// Set sets a value for a key.
-	public void set(Context context, String key, Object value) throws VeyronException;
-	public void set(Context context, String key, Object value, Options veyronOpts) throws VeyronException;
-	// Get returns the value for a key.  If the value is not found, returns
+
+public interface Cache  {
+
+    
+    
+
+    
+    // Set sets a value for a key.
+
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value) throws com.veyron2.ipc.VeyronException;
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Get returns the value for a key.  If the value is not found, returns
 // a not found error.
-	public Object get(Context context, String key) throws VeyronException;
-	public Object get(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an byte.
-	public byte getAsByte(Context context, String key) throws VeyronException;
-	public byte getAsByte(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an int32.
-	public int getAsInt32(Context context, String key) throws VeyronException;
-	public int getAsInt32(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an int64.
-	public long getAsInt64(Context context, String key) throws VeyronException;
-	public long getAsInt64(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an uint32.
-	public int getAsUint32(Context context, String key) throws VeyronException;
-	public int getAsUint32(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an uint64.
-	public long getAsUint64(Context context, String key) throws VeyronException;
-	public long getAsUint64(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an float32.
-	public float getAsFloat32(Context context, String key) throws VeyronException;
-	public float getAsFloat32(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an float64.
-	public double getAsFloat64(Context context, String key) throws VeyronException;
-	public double getAsFloat64(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to a string.
-	public String getAsString(Context context, String key) throws VeyronException;
-	public String getAsString(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to a bool.
-	public boolean getAsBool(Context context, String key) throws VeyronException;
-	public boolean getAsBool(Context context, String key, Options veyronOpts) throws VeyronException;
-	// Same as Get, but casts the return argument to an error.
-	public VeyronException getAsError(Context context, String key) throws VeyronException;
-	public VeyronException getAsError(Context context, String key, Options veyronOpts) throws VeyronException;
-	// AsMap returns the full contents of the cache as a map.
-	public HashMap<String, Object> asMap(Context context) throws VeyronException;
-	public HashMap<String, Object> asMap(Context context, Options veyronOpts) throws VeyronException;
-	// KeyValuePairs returns the full contents of the cache as a slice of pairs.
-	public ArrayList<KeyValuePair> keyValuePairs(Context context) throws VeyronException;
-	public ArrayList<KeyValuePair> keyValuePairs(Context context, Options veyronOpts) throws VeyronException;
-	// MostRecentSetOut packages output arguments for method MostRecentSet.
-	public static class MostRecentSetOut { 
-		public KeyValuePair value;
-		public long time;
-	}
-	// MostRecentSet returns the key and value and the timestamp for the most
+
+    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an byte.
+
+    public byte getAsByte(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public byte getAsByte(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an int32.
+
+    public int getAsInt32(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public int getAsInt32(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an int64.
+
+    public long getAsInt64(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public long getAsInt64(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an uint32.
+
+    public int getAsUint32(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public int getAsUint32(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an uint64.
+
+    public long getAsUint64(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public long getAsUint64(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an float32.
+
+    public float getAsFloat32(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public float getAsFloat32(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an float64.
+
+    public double getAsFloat64(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public double getAsFloat64(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to a string.
+
+    public java.lang.String getAsString(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String getAsString(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to a bool.
+
+    public boolean getAsBool(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public boolean getAsBool(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Same as Get, but casts the return argument to an error.
+
+    public com.veyron2.ipc.VeyronException getAsError(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.ipc.VeyronException getAsError(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // AsMap returns the full contents of the cache as a map.
+
+    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // KeyValuePairs returns the full contents of the cache as a slice of pairs.
+
+    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public static class MostRecentSetOut {
+        
+        public com.veyron.examples.wspr_sample.KeyValuePair value;
+        
+        public long time;
+        
+    }
+    
+
+    
+    // MostRecentSet returns the key and value and the timestamp for the most
 // recent set operation
 // TODO(bprosnitz) support type types and change time to native time type
-	public Cache.MostRecentSetOut mostRecentSet(Context context) throws VeyronException;
-	public Cache.MostRecentSetOut mostRecentSet(Context context, Options veyronOpts) throws VeyronException;
-	// KeyPage indexes into the keys (in alphanumerically sorted order) and
+
+    public com.veyron.examples.wspr_sample.Cache.MostRecentSetOut mostRecentSet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron.examples.wspr_sample.Cache.MostRecentSetOut mostRecentSet(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // KeyPage indexes into the keys (in alphanumerically sorted order) and
 // returns the indexth page of 10 keys.
-	public String[] keyPage(Context context, long index) throws VeyronException;
-	public String[] keyPage(Context context, long index, Options veyronOpts) throws VeyronException;
-	// Size returns the total number of entries in the cache.
-	public long size(Context context) throws VeyronException;
-	public long size(Context context, Options veyronOpts) throws VeyronException;
-	// MultiGet sets up a stream that allows fetching multiple keys.
-	public ClientStream<String,Object,Void> multiGet(Context context) throws VeyronException;
-	public ClientStream<String,Object,Void> multiGet(Context context, Options veyronOpts) throws VeyronException;
+
+    public java.lang.String[] keyPage(final com.veyron2.ipc.Context context, final long index) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String[] keyPage(final com.veyron2.ipc.Context context, final long index, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Size returns the total number of entries in the cache.
+
+    public long size(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public long size(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // MultiGet sets up a stream that allows fetching multiple keys.
+
+    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

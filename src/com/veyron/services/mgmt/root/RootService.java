@@ -2,18 +2,18 @@
 // Source: root.vdl
 package com.veyron.services.mgmt.root;
 
-import com.veyron.services.mgmt.root.gen_impl.RootServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Root is an interface to be implemented by a process with root level
  * privileges.
  */
-@VeyronService(serviceWrapper=RootServiceWrapper.class)
-public interface RootService { 
-	// Reset waits for the given deadline (in milliseconds) and then
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.root.gen_impl.RootServiceWrapper.class)
+public interface RootService  {
+
+    
+    // Reset waits for the given deadline (in milliseconds) and then
 // restars the host node machine.
-	public void reset(ServerContext context, long deadline) throws VeyronException;
+
+    public void reset(final com.veyron2.ipc.ServerContext context, final long Deadline) throws com.veyron2.ipc.VeyronException;
+
 }

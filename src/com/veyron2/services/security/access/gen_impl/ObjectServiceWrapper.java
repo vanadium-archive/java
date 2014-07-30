@@ -2,42 +2,61 @@
 // Source(s):  service.vdl
 package com.veyron2.services.security.access.gen_impl;
 
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.security.access.ACL;
-import com.veyron2.services.security.access.Entries;
-import com.veyron2.services.security.access.Group;
-import com.veyron2.services.security.access.ObjectFactory;
-import com.veyron2.services.security.access.ObjectService;
+public final class ObjectServiceWrapper {
 
-public class ObjectServiceWrapper {
+    private final com.veyron2.services.security.access.ObjectService service;
 
-	private final ObjectService service;
 
-	public ObjectServiceWrapper(ObjectService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("setACL".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(4) };
-		}
-		if ("getACL".equals(method)) {
-			return new Object[]{ new com.veyron2.security.Label(4) };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public ObjectServiceWrapper(final com.veyron2.services.security.access.ObjectService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("getACL".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(4), 
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Object.
-	public void setACL(ServerCall call, ACL acl, String etag) throws VeyronException { 
-		this.service.setACL(call, acl, etag);
-	}
-	public ObjectService.GetACLOut getACL(ServerCall call) throws VeyronException { 
-		return this.service.getACL(call);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("setACL".equals(method)) {
+            return new java.lang.Object[] {
+                 new com.veyron2.security.Label(4), 
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void setACL(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.setACL( call , acl, etag  );
+    }
+
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.getACL( call   );
+    }
+
+
+
+ 
+
 }

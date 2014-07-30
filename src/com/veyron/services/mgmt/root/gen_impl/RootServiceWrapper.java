@@ -2,34 +2,50 @@
 // Source(s):  root.vdl
 package com.veyron.services.mgmt.root.gen_impl;
 
-import com.veyron.services.mgmt.root.Root;
-import com.veyron.services.mgmt.root.RootFactory;
-import com.veyron.services.mgmt.root.RootService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class RootServiceWrapper {
 
-public class RootServiceWrapper {
+    private final com.veyron.services.mgmt.root.RootService service;
 
-	private final RootService service;
 
-	public RootServiceWrapper(RootService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("reset".equals(method)) {
-			return new Object[]{  };
-		}
+
+
+    public RootServiceWrapper(final com.veyron.services.mgmt.root.RootService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Root.
-	public void reset(ServerCall call, long Deadline) throws VeyronException { 
-		this.service.reset(call, Deadline);
-	}
+        
+        if ("reset".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public void reset(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.reset( call , Deadline  );
+    }
+
+
+
+ 
+
 }

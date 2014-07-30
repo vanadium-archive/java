@@ -2,18 +2,39 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
 
-public interface ServiceA { 
-		public void methodA1(Context context) throws VeyronException;
-	public void methodA1(Context context, Options veyronOpts) throws VeyronException;
-		public String methodA2(Context context, int a, String b) throws VeyronException;
-	public String methodA2(Context context, int a, String b, Options veyronOpts) throws VeyronException;
-		public ClientStream<Void,Scalars,String> methodA3(Context context, int a) throws VeyronException;
-	public ClientStream<Void,Scalars,String> methodA3(Context context, int a, Options veyronOpts) throws VeyronException;
-		public ClientStream<Integer,String,Void> methodA4(Context context, int a) throws VeyronException;
-	public ClientStream<Integer,String,Void> methodA4(Context context, int a, Options veyronOpts) throws VeyronException;
+public interface ServiceA  {
+
+    
+    
+
+    
+    
+    public void methodA1(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void methodA1(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public java.lang.String methodA2(final com.veyron2.ipc.Context context, final int a, final java.lang.String b) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String methodA2(final com.veyron2.ipc.Context context, final int a, final java.lang.String b, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

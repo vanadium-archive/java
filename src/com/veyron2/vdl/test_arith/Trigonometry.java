@@ -2,16 +2,26 @@
 // Source: advanced.vdl
 package com.veyron2.vdl.test_arith;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Trigonometry is an interface that specifies a couple trigonometric functions.
  */
-public interface Trigonometry { 
-		public double sine(Context context, double angle) throws VeyronException;
-	public double sine(Context context, double angle, Options veyronOpts) throws VeyronException;
-		public double cosine(Context context, double angle) throws VeyronException;
-	public double cosine(Context context, double angle, Options veyronOpts) throws VeyronException;
+
+public interface Trigonometry  {
+
+    
+    
+
+    
+    
+    public double sine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException;
+    public double sine(final com.veyron2.ipc.Context context, final double angle, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    
+    public double cosine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException;
+    public double cosine(final com.veyron2.ipc.Context context, final double angle, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

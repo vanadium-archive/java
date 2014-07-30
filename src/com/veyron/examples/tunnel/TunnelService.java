@@ -2,24 +2,25 @@
 // Source: tunnel.vdl
 package com.veyron.examples.tunnel;
 
-import com.veyron.examples.tunnel.gen_impl.TunnelServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
 
-@VeyronService(serviceWrapper=TunnelServiceWrapper.class)
-public interface TunnelService { 
-	// The Forward method is used for network forwarding. All the data sent over
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.tunnel.gen_impl.TunnelServiceWrapper.class)
+public interface TunnelService  {
+
+    
+    // The Forward method is used for network forwarding. All the data sent over
 // the byte stream is forwarded to the requested network address and all the
 // data received from that network connection is sent back in the reply
 // stream.
-	public void forward(ServerContext context, String network, String address, Stream<ArrayList<Byte>,ArrayList<Byte>> stream) throws VeyronException;
-	// The Shell method is used to either run shell commands remotely, or to open
+
+    public void forward(final com.veyron2.ipc.ServerContext context, final java.lang.String network, final java.lang.String address, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+
+    
+    // The Shell method is used to either run shell commands remotely, or to open
 // an interactive shell. The data received over the byte stream is sent to the
 // shell's stdin, and the data received from the shell's stdout and stderr is
 // sent back in the reply stream. It returns the exit status of the shell
 // command.
-	public int shell(ServerContext context, String command, ShellOpts shellOpts, Stream<ServerShellPacket,ClientShellPacket> stream) throws VeyronException;
+
+    public int shell(final com.veyron2.ipc.ServerContext context, final java.lang.String command, final com.veyron.examples.tunnel.ShellOpts shellOpts, com.veyron2.vdl.Stream<com.veyron.examples.tunnel.ClientShellPacket, com.veyron.examples.tunnel.ServerShellPacket> stream) throws com.veyron2.ipc.VeyronException;
+
 }

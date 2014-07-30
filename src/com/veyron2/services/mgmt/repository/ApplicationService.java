@@ -2,13 +2,6 @@
 // Source: repository.vdl
 package com.veyron2.services.mgmt.repository;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.application.Envelope;
-import com.veyron2.services.mgmt.repository.gen_impl.ApplicationServiceWrapper;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
-
 /**
  * Application provides access to application envelopes. An
  * application envelope is identified by an application name and an
@@ -21,12 +14,17 @@ import java.util.ArrayList;
  * and executing the "search" application, version "v1", runnable
  * on either the "base" or "media" profile.
  */
-@VeyronService(serviceWrapper=ApplicationServiceWrapper.class)
-public interface ApplicationService { 
-	// Match checks if any of the given profiles contains an application
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.repository.gen_impl.ApplicationServiceWrapper.class)
+public interface ApplicationService  {
+
+    
+    // Match checks if any of the given profiles contains an application
 // envelope for the given application version (specified through the
 // object name suffix) and if so, returns this envelope. If multiple
 // profile matches are possible, the method returns the first
 // matching profile, respecting the order of the input argument.
-	public Envelope match(ServerContext context, ArrayList<String> profiles) throws VeyronException;
+
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException;
+
 }

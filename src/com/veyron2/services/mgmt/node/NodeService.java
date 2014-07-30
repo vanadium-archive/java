@@ -2,26 +2,32 @@
 // Source: node.vdl
 package com.veyron2.services.mgmt.node;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Node can be used to manage a node. The idea is that this interace
  * will be invoked using an object name that identifies the node.
  */
-@VeyronService(serviceWrapper=NodeServiceWrapper.class)
-public interface NodeService extends ApplicationService { 
-	// Describe generates a description of the node.
-	public Description describe(ServerContext context) throws VeyronException;
-	// IsRunnable checks if the node can execute the given binary.
-	public boolean isRunnable(ServerContext context, com.veyron2.services.mgmt.binary.Description description) throws VeyronException;
-	// Reset resets the node. If the deadline is non-zero and the node
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper.class)
+public interface NodeService extends com.veyron2.services.mgmt.node.ApplicationService {
+
+    
+    // Describe generates a description of the node.
+
+    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
+    
+    // IsRunnable checks if the node can execute the given binary.
+
+    public boolean isRunnable(final com.veyron2.ipc.ServerContext context, final com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Reset resets the node. If the deadline is non-zero and the node
 // in question is still running after the given deadline expired,
 // reset of the node is enforced.
 //
 // TODO(jsimsa): Switch deadline to time.Duration when built-in types
 // are implemented.
-	public void reset(ServerContext context, long deadline) throws VeyronException;
+
+    public void reset(final com.veyron2.ipc.ServerContext context, final long Deadline) throws com.veyron2.ipc.VeyronException;
+
 }

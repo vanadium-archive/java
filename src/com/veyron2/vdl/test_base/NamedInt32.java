@@ -3,31 +3,31 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
+/**
+ * type NamedInt32 int32 
+ **/
+public final class NamedInt32 {
+    private int value;
 
-public final class NamedInt32 { 
-		private int value;
+    public NamedInt32(int value) {
+        this.value = value;
+    }
+    public int getValue() { return this.value; }
 
-	public NamedInt32(int value) { 
-		this.value = value;
-	}
-	public int getValue() { return this.value; }
+    public void setValue(int value) { this.value = value; }
 
-	public void setValue(int value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final NamedInt32 other = (NamedInt32)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + value;
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.vdl.test_base.NamedInt32 other = (com.veyron2.vdl.test_base.NamedInt32)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return value;
+    }
 }

@@ -2,17 +2,17 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Player can receive challenges from other players.
  */
-@VeyronService(serviceWrapper=PlayerServiceWrapper.class)
-public interface PlayerService { 
-	// Challenge is used by other players to challenge this player to a game. If
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper.class)
+public interface PlayerService  {
+
+    
+    // Challenge is used by other players to challenge this player to a game. If
 // the challenge is accepted, the method returns nil.
-	public void challenge(ServerContext context, String address, GameID iD, GameOptions opts) throws VeyronException;
+
+    public void challenge(final com.veyron2.ipc.ServerContext context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException;
+
 }

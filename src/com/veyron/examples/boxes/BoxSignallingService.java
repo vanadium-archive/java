@@ -2,18 +2,21 @@
 // Source: boxes.vdl
 package com.veyron.examples.boxes;
 
-import com.veyron.examples.boxes.gen_impl.BoxSignallingServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * BoxSignalling allows peers to rendezvous with each other
  */
-@VeyronService(serviceWrapper=BoxSignallingServiceWrapper.class)
-public interface BoxSignallingService { 
-	// Add endpoint information to the signalling server.
-	public void add(ServerContext context, String endpoint) throws VeyronException;
-	// Get endpoint information about a peer.
-	public String get(ServerContext context) throws VeyronException;
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.boxes.gen_impl.BoxSignallingServiceWrapper.class)
+public interface BoxSignallingService  {
+
+    
+    // Add endpoint information to the signalling server.
+
+    public void add(final com.veyron2.ipc.ServerContext context, final java.lang.String Endpoint) throws com.veyron2.ipc.VeyronException;
+
+    
+    // Get endpoint information about a peer.
+
+    public java.lang.String get(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

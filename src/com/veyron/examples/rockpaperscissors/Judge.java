@@ -2,17 +2,26 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
 
-public interface Judge { 
-	// CreateGame creates a new game with the given game options and returns a game
+public interface Judge  {
+
+    
+    
+
+    
+    // CreateGame creates a new game with the given game options and returns a game
 // identifier that can be used by the players to join the game.
-	public GameID createGame(Context context, GameOptions opts) throws VeyronException;
-	public GameID createGame(Context context, GameOptions opts, Options veyronOpts) throws VeyronException;
-	// Play lets a player join an existing game and play.
-	public ClientStream<PlayerAction,JudgeAction,PlayResult> play(Context context, GameID iD) throws VeyronException;
-	public ClientStream<PlayerAction,JudgeAction,PlayResult> play(Context context, GameID iD, Options veyronOpts) throws VeyronException;
+
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Play lets a player join an existing game and play.
+
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

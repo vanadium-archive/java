@@ -2,26 +2,41 @@
 // Source: repository.vdl
 package com.veyron.services.mgmt.repository;
 
-import com.veyron.services.mgmt.profile.Specification;
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Profile describes a profile internally. Besides the public Profile
  * interface, it allows to add and remove profile specifications.
  */
-public interface Profile extends com.veyron2.services.mgmt.repository.Profile { 
-	// Specification returns the profile specification for the profile
+
+public interface Profile extends com.veyron2.services.mgmt.repository.Profile {
+
+    
+    
+
+    
+    // Specification returns the profile specification for the profile
 // identified through the object name suffix.
-	public Specification specification(Context context) throws VeyronException;
-	public Specification specification(Context context, Options veyronOpts) throws VeyronException;
-	// Put sets the profile specification for the profile identified
+
+    public com.veyron.services.mgmt.profile.Specification specification(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron.services.mgmt.profile.Specification specification(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Put sets the profile specification for the profile identified
 // through the object name suffix.
-	public void put(Context context, Specification specification) throws VeyronException;
-	public void put(Context context, Specification specification, Options veyronOpts) throws VeyronException;
-	// Remove removes the profile specification for the profile
+
+    public void put(final com.veyron2.ipc.Context context, final com.veyron.services.mgmt.profile.Specification Specification) throws com.veyron2.ipc.VeyronException;
+    public void put(final com.veyron2.ipc.Context context, final com.veyron.services.mgmt.profile.Specification Specification, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Remove removes the profile specification for the profile
 // identified through the object name suffix.
-	public void remove(Context context) throws VeyronException;
-	public void remove(Context context, Options veyronOpts) throws VeyronException;
+
+    public void remove(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void remove(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

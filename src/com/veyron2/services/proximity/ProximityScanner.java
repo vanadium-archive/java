@@ -2,14 +2,17 @@
 // Source: proximity.vdl
 package com.veyron2.services.proximity;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import java.util.ArrayList;
 
-public interface ProximityScanner { 
-	// NearbyDevices returns the most up-to-date list of nearby devices,
+public interface ProximityScanner  {
+
+    
+    
+
+    
+    // NearbyDevices returns the most up-to-date list of nearby devices,
 // sorted in increasing distance order.
-	public ArrayList<Device> nearbyDevices(Context context) throws VeyronException;
-	public ArrayList<Device> nearbyDevices(Context context, Options veyronOpts) throws VeyronException;
+
+    public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

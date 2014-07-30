@@ -2,37 +2,50 @@
 // Source(s):  servers.vdl
 package com.veyron.lib.testutil.modules.gen_impl;
 
-import com.veyron.lib.testutil.modules.Clock;
-import com.veyron.lib.testutil.modules.ClockFactory;
-import com.veyron.lib.testutil.modules.ClockService;
-import com.veyron.lib.testutil.modules.Echo;
-import com.veyron.lib.testutil.modules.EchoFactory;
-import com.veyron.lib.testutil.modules.EchoService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class ClockServiceWrapper {
 
-public class ClockServiceWrapper {
+    private final com.veyron.lib.testutil.modules.ClockService service;
 
-	private final ClockService service;
 
-	public ClockServiceWrapper(ClockService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("time".equals(method)) {
-			return new Object[]{  };
-		}
+
+
+    public ClockServiceWrapper(final com.veyron.lib.testutil.modules.ClockService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Clock.
-	public String time(ServerCall call, String msg) throws VeyronException { 
-		return this.service.time(call, msg);
-	}
+        
+        if ("time".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.lang.String time(final com.veyron2.ipc.ServerCall call, final java.lang.String msg) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.time( call , msg  );
+    }
+
+
+
+ 
+
 }

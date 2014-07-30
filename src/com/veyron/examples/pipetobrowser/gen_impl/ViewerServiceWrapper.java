@@ -2,54 +2,69 @@
 // Source(s):  p2b.vdl
 package com.veyron.examples.pipetobrowser.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron.examples.pipetobrowser.Viewer;
-import com.veyron.examples.pipetobrowser.ViewerFactory;
-import com.veyron.examples.pipetobrowser.ViewerService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class ViewerServiceWrapper {
 
-public class ViewerServiceWrapper {
+    private final com.veyron.examples.pipetobrowser.ViewerService service;
 
-	private final ViewerService service;
 
-	public ViewerServiceWrapper(ViewerService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("pipe".equals(method)) {
-			return new Object[]{  };
-		}
+
+
+    public ViewerServiceWrapper(final com.veyron.examples.pipetobrowser.ViewerService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
         if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Viewer.
-	public Object pipe(ServerCall call) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<Void,ArrayList<Byte>> stream = new Stream<Void,ArrayList<Byte>>() {
-			@Override
-			public void send(Void item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public ArrayList<Byte> recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<ArrayList<Byte>>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (ArrayList<Byte>)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		return this.service.pipe(call, stream);
-	}
+        
+        if ("pipe".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.lang.Object pipe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+            @Override
+            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.lang.Void recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.lang.Void >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.lang.Void)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         return  this.service.pipe( call   ,stream  );
+    }
+
+
+
+ 
+
 }

@@ -2,34 +2,50 @@
 // Source(s):  identity.vdl
 package com.veyron.services.identity.gen_impl;
 
-import com.veyron.services.identity.OAuthBlesser;
-import com.veyron.services.identity.OAuthBlesserFactory;
-import com.veyron.services.identity.OAuthBlesserService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
+public final class OAuthBlesserServiceWrapper {
 
-public class OAuthBlesserServiceWrapper {
+    private final com.veyron.services.identity.OAuthBlesserService service;
 
-	private final OAuthBlesserService service;
 
-	public OAuthBlesserServiceWrapper(OAuthBlesserService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("bless".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public OAuthBlesserServiceWrapper(final com.veyron.services.identity.OAuthBlesserService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("bless".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface OAuthBlesser.
-	public Object bless(ServerCall call, String authcode, String redirecturl) throws VeyronException { 
-		return this.service.bless(call, authcode, redirecturl);
-	}
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.lang.Object bless(final com.veyron2.ipc.ServerCall call, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.bless( call , authcode, redirecturl  );
+    }
+
+
+
+ 
+
 }

@@ -2,72 +2,79 @@
 // Source(s):  service.vdl
 package com.veyron2.services.watch.gen_impl;
 
-import com.veyron2.services.watch.Change;
-import com.veyron2.services.watch.ChangeBatch;
-import com.veyron2.services.watch.GlobRequest;
-import com.veyron2.services.watch.GlobWatcher;
-import com.veyron2.services.watch.GlobWatcherFactory;
-import com.veyron2.services.watch.GlobWatcherService;
-import com.veyron2.services.watch.QueryRequest;
-import com.veyron2.services.watch.QueryWatcher;
-import com.veyron2.services.watch.QueryWatcherFactory;
-import com.veyron2.services.watch.QueryWatcherService;
-import com.veyron2.services.watch.VeyronConsts;
-
 /* Client stub for interface: QueryWatcher. */
-public final class QueryWatcherStub implements QueryWatcher {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.QueryWatcher";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class QueryWatcherStub implements com.veyron2.services.watch.QueryWatcher {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.watch.QueryWatcher";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public QueryWatcherStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface QueryWatcher.
-	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,ChangeBatch,java.lang.Void> watchQuery(com.veyron2.ipc.Context context, QueryRequest Req) throws com.veyron2.ipc.VeyronException {
-		return watchQuery(context, Req, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<java.lang.Void,ChangeBatch,java.lang.Void> watchQuery(com.veyron2.ipc.Context context, QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Req };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, QueryWatcherStub.vdlIfacePathOpt);
-		}
+    public QueryWatcherStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "WatchQuery", inArgs, veyronOpts);
+    // Methods from interface QueryWatcher.
 
-		return new com.veyron2.vdl.ClientStream<java.lang.Void, ChangeBatch, java.lang.Void>() {
-			@Override
-			public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public ChangeBatch recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<ChangeBatch>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (ChangeBatch)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-					call.finish(resultTypes);
-					return null;
 
-			}
-		};
-	}
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        return watchQuery(context, Req, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, QueryWatcherStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Req };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.watch.ChangeBatch, java.lang.Void>() {
+            @Override
+            public void send(final java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.watch.ChangeBatch recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.watch.ChangeBatch>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.watch.ChangeBatch)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public java.lang.Void finish() throws com.veyron2.ipc.VeyronException {
+                
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+                call.finish(resultTypes);
+                return null;
+                 
+            }
+        };
+        
+    }
+
+
+
+
+
 }

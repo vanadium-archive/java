@@ -2,47 +2,69 @@
 // Source(s):  servers.vdl
 package com.veyron.lib.testutil.modules.gen_impl;
 
-import com.veyron.lib.testutil.modules.Clock;
-import com.veyron.lib.testutil.modules.ClockFactory;
-import com.veyron.lib.testutil.modules.ClockService;
-import com.veyron.lib.testutil.modules.Echo;
-import com.veyron.lib.testutil.modules.EchoFactory;
-import com.veyron.lib.testutil.modules.EchoService;
-
 /* Client stub for interface: Clock. */
-public final class ClockStub implements Clock {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.Clock";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class ClockStub implements com.veyron.lib.testutil.modules.Clock {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.Clock";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public ClockStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Clock.
-	@Override
-	public java.lang.String time(com.veyron2.ipc.Context context, java.lang.String msg) throws com.veyron2.ipc.VeyronException {
-		return time(context, msg, null);
-	}
-	@Override
-	public java.lang.String time(com.veyron2.ipc.Context context, java.lang.String msg, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ msg };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ClockStub.vdlIfacePathOpt);
-		}
+    public ClockStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Time", inArgs, veyronOpts);
+    // Methods from interface Clock.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.String>() {} };
-			return (java.lang.String)call.finish(resultTypes)[0];
 
-	}
+    
+    public java.lang.String time(final com.veyron2.ipc.Context context, final java.lang.String msg) throws com.veyron2.ipc.VeyronException {
+        return time(context, msg, null);
+    }
+    
+    public java.lang.String time(final com.veyron2.ipc.Context context, final java.lang.String msg, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ClockStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ msg };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.String>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (java.lang.String)results[0];
+         
+
+         
+
+        
+    }
+
+
+
+
+
 }

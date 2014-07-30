@@ -2,11 +2,6 @@
 // Source: node.vdl
 package com.veyron2.services.mgmt.node;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import java.util.ArrayList;
-
 /**
  * Application can be used to manage applications on a device. The
  * idea is that this interace will be invoked using an object name that
@@ -97,8 +92,14 @@ import java.util.ArrayList;
  * In other words, invoking any method using an existing application
  * installation instance as a receiver is well-defined.
  */
-public interface Application { 
-	// Install installs the application identified by the argument and
+
+public interface Application  {
+
+    
+    
+
+    
+    // Install installs the application identified by the argument and
 // returns an object name suffix that identifies the new installation.
 //
 // The argument should be an object name. The service it identifies must
@@ -111,55 +112,117 @@ public interface Application {
 // The suffix will contain the title of the application as a prefix,
 // which can then be used to control all the installations of the given
 // application.
-	public String install(Context context, String name) throws VeyronException;
-	public String install(Context context, String name, Options veyronOpts) throws VeyronException;
-	// Refresh refreshes the state of application installation(s)
+
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Refresh refreshes the state of application installation(s)
 // instance(s).
-	public void refresh(Context context) throws VeyronException;
-	public void refresh(Context context, Options veyronOpts) throws VeyronException;
-	// Restart restarts execution of application installation(s)
+
+    public void refresh(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void refresh(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Restart restarts execution of application installation(s)
 // instance(s).
-	public void restart(Context context) throws VeyronException;
-	public void restart(Context context, Options veyronOpts) throws VeyronException;
-	// Resume resumes execution of application installation(s)
+
+    public void restart(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void restart(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Resume resumes execution of application installation(s)
 // instance(s).
-	public void resume(Context context) throws VeyronException;
-	public void resume(Context context, Options veyronOpts) throws VeyronException;
-	// Revert reverts application installation(s) to the most recent
+
+    public void resume(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void resume(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Revert reverts application installation(s) to the most recent
 // previous installation.
-	public void revert(Context context) throws VeyronException;
-	public void revert(Context context, Options veyronOpts) throws VeyronException;
-	// Start starts an instance of application installation(s) and
+
+    public void revert(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void revert(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Start starts an instance of application installation(s) and
 // returns the object name(s) that identifies/identify the new
 // instance(s).
-	public ArrayList<String> start(Context context) throws VeyronException;
-	public ArrayList<String> start(Context context, Options veyronOpts) throws VeyronException;
-	// Stop attempts a clean shutdown of application installation(s)
+
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Stop attempts a clean shutdown of application installation(s)
 // instance(s). If the deadline is non-zero and the instance(s) in
 // questions are still running after the given deadline, shutdown of
 // the instance(s) is enforced.
 //
 // TODO(jsimsa): Switch deadline to time.Duration when built-in types
 // are implemented.
-	public void stop(Context context, long deadline) throws VeyronException;
-	public void stop(Context context, long deadline, Options veyronOpts) throws VeyronException;
-	// Suspend suspends execution of application installation(s)
+
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException;
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Suspend suspends execution of application installation(s)
 // instance(s).
-	public void suspend(Context context) throws VeyronException;
-	public void suspend(Context context, Options veyronOpts) throws VeyronException;
-	// Uninstall uninstalls application installation(s).
-	public void uninstall(Context context) throws VeyronException;
-	public void uninstall(Context context, Options veyronOpts) throws VeyronException;
-	// Update updates the application installation(s) from the object name
+
+    public void suspend(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void suspend(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Uninstall uninstalls application installation(s).
+
+    public void uninstall(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void uninstall(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // Update updates the application installation(s) from the object name
 // provided during Install.  If the new application envelope contains a
 // different application title, the update does not occur, and an error
 // is returned.
-	public void update(Context context) throws VeyronException;
-	public void update(Context context, Options veyronOpts) throws VeyronException;
-	// UpdateTo updates the application installation(s) to the application
+
+    public void update(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void update(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // UpdateTo updates the application installation(s) to the application
 // specified by the object name argument.  If the new application
 // envelope contains a different application title, the update does not
 // occur, and an error is returned.
-	public void updateTo(Context context, String name) throws VeyronException;
-	public void updateTo(Context context, String name, Options veyronOpts) throws VeyronException;
+
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException;
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

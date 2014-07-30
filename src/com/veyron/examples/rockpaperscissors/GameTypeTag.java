@@ -3,31 +3,31 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
+/**
+ * type GameTypeTag byte 
+ **/
+public final class GameTypeTag {
+    private byte value;
 
-public final class GameTypeTag { 
-		private byte value;
+    public GameTypeTag(byte value) {
+        this.value = value;
+    }
+    public byte getValue() { return this.value; }
 
-	public GameTypeTag(byte value) { 
-		this.value = value;
-	}
-	public byte getValue() { return this.value; }
+    public void setValue(byte value) { this.value = value; }
 
-	public void setValue(byte value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final GameTypeTag other = (GameTypeTag)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (int)value;
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron.examples.rockpaperscissors.GameTypeTag other = (com.veyron.examples.rockpaperscissors.GameTypeTag)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return (int)value;
+    }
 }

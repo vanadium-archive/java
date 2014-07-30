@@ -2,14 +2,16 @@
 // Source: inspector.vdl
 package com.veyron.examples.inspector;
 
-import com.veyron.examples.inspector.gen_impl.InspectorServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
 
-@VeyronService(serviceWrapper=InspectorServiceWrapper.class)
-public interface InspectorService { 
-		public void ls(ServerContext context, String glob, Stream<String,Void> stream) throws VeyronException;
-		public void lsDetails(ServerContext context, String glob, Stream<Details,Void> stream) throws VeyronException;
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.inspector.gen_impl.InspectorServiceWrapper.class)
+public interface InspectorService  {
+
+    
+    
+    public void ls(final com.veyron2.ipc.ServerContext context, final java.lang.String Glob, com.veyron2.vdl.Stream<java.lang.Void, java.lang.String> stream) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public void lsDetails(final com.veyron2.ipc.ServerContext context, final java.lang.String Glob, com.veyron2.vdl.Stream<java.lang.Void, com.veyron.examples.inspector.Details> stream) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,60 +2,80 @@
 // Source(s):  service.vdl
 package com.veyron.runtimes.google.ipc.benchmarks.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron.runtimes.google.ipc.benchmarks.Benchmark;
-import com.veyron.runtimes.google.ipc.benchmarks.BenchmarkFactory;
-import com.veyron.runtimes.google.ipc.benchmarks.BenchmarkService;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class BenchmarkServiceWrapper {
 
-public class BenchmarkServiceWrapper {
+    private final com.veyron.runtimes.google.ipc.benchmarks.BenchmarkService service;
 
-	private final BenchmarkService service;
 
-	public BenchmarkServiceWrapper(BenchmarkService service) {
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		if ("echo".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("echoStream".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+
+    public BenchmarkServiceWrapper(final com.veyron.runtimes.google.ipc.benchmarks.BenchmarkService service) {
+        this.service = service;
+        
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("echo".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Benchmark.
-	public ArrayList<Byte> echo(ServerCall call, ArrayList<Byte> Payload) throws VeyronException { 
-		return this.service.echo(call, Payload);
-	}
-	public void echoStream(ServerCall call) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<ArrayList<Byte>,ArrayList<Byte>> stream = new Stream<ArrayList<Byte>,ArrayList<Byte>>() {
-			@Override
-			public void send(ArrayList<Byte> item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public ArrayList<Byte> recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<ArrayList<Byte>>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (ArrayList<Byte>)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.echoStream(call, stream);
-	}
+        
+        if ("echoStream".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public java.util.ArrayList<java.lang.Byte> echo(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.echo( call , Payload  );
+    }
+
+    public void echoStream(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>>() {
+            @Override
+            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.ArrayList<java.lang.Byte> >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.util.ArrayList<java.lang.Byte>)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.echoStream( call   ,stream  );
+    }
+
+
+
+ 
+
 }

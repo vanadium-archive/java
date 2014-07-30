@@ -2,16 +2,20 @@
 // Source: service.vdl
 package com.veyron.examples.rockpaperscissors;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Player can receive challenges from other players.
  */
-public interface Player { 
-	// Challenge is used by other players to challenge this player to a game. If
+
+public interface Player  {
+
+    
+    
+
+    
+    // Challenge is used by other players to challenge this player to a game. If
 // the challenge is accepted, the method returns nil.
-	public void challenge(Context context, String address, GameID iD, GameOptions opts) throws VeyronException;
-	public void challenge(Context context, String address, GameID iD, GameOptions opts, Options veyronOpts) throws VeyronException;
+
+    public void challenge(final com.veyron2.ipc.Context context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException;
+    public void challenge(final com.veyron2.ipc.Context context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

@@ -2,105 +2,124 @@
 // Source(s):  service.vdl
 package com.veyron.examples.rockpaperscissors.gen_impl;
 
-import com.veyron.examples.rockpaperscissors.GameID;
-import com.veyron.examples.rockpaperscissors.GameOptions;
-import com.veyron.examples.rockpaperscissors.Judge;
-import com.veyron.examples.rockpaperscissors.JudgeAction;
-import com.veyron.examples.rockpaperscissors.JudgeFactory;
-import com.veyron.examples.rockpaperscissors.JudgeService;
-import com.veyron.examples.rockpaperscissors.PlayResult;
-import com.veyron.examples.rockpaperscissors.Player;
-import com.veyron.examples.rockpaperscissors.PlayerAction;
-import com.veyron.examples.rockpaperscissors.PlayerFactory;
-import com.veyron.examples.rockpaperscissors.PlayerService;
-import com.veyron.examples.rockpaperscissors.RockPaperScissors;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsFactory;
-import com.veyron.examples.rockpaperscissors.RockPaperScissorsService;
-import com.veyron.examples.rockpaperscissors.Round;
-import com.veyron.examples.rockpaperscissors.ScoreCard;
-import com.veyron.examples.rockpaperscissors.ScoreKeeper;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperFactory;
-import com.veyron.examples.rockpaperscissors.ScoreKeeperService;
-import com.veyron.examples.rockpaperscissors.VeyronConsts;
-
 /* Client stub for interface: Judge. */
-public final class JudgeStub implements Judge {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.Judge";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
+public final class JudgeStub implements com.veyron.examples.rockpaperscissors.Judge {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron.examples.rockpaperscissors.Judge";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public JudgeStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-	}
-	// Methods from interface Judge.
-	@Override
-	public GameID createGame(com.veyron2.ipc.Context context, GameOptions Opts) throws com.veyron2.ipc.VeyronException {
-		return createGame(context, Opts, null);
-	}
-	@Override
-	public GameID createGame(com.veyron2.ipc.Context context, GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Opts };
+    
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, JudgeStub.vdlIfacePathOpt);
-		}
+    public JudgeStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "CreateGame", inArgs, veyronOpts);
+    // Methods from interface Judge.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<GameID>() {} };
-			return (GameID)call.finish(resultTypes)[0];
 
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<PlayerAction,JudgeAction,PlayResult> play(com.veyron2.ipc.Context context, GameID ID) throws com.veyron2.ipc.VeyronException {
-		return play(context, ID, null);
-	}
-	@Override
-	public com.veyron2.vdl.ClientStream<PlayerAction,JudgeAction,PlayResult> play(com.veyron2.ipc.Context context, GameID ID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ ID };
+    
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        return createGame(context, Opts, null);
+    }
+    
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, JudgeStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, JudgeStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Opts };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Play", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		return new com.veyron2.vdl.ClientStream<PlayerAction, JudgeAction, PlayResult>() {
-			@Override
-			public void send(PlayerAction item) throws com.veyron2.ipc.VeyronException {
-				call.send(item);
-			}
-			@Override
-			public JudgeAction recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-				final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<JudgeAction>() {};
-				final java.lang.Object result = call.recv(type);
-				try {
-					return (JudgeAction)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-			@Override
-			public PlayResult finish() throws com.veyron2.ipc.VeyronException {
-				// Prepare output argument and finish the call.
-					final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<PlayResult>() {} };
-					return (PlayResult)call.finish(resultTypes)[0];
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<com.veyron.examples.rockpaperscissors.GameID>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (com.veyron.examples.rockpaperscissors.GameID)results[0];
+         
 
-			}
-		};
-	}
+         
+
+        
+    }
+
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
+        return play(context, ID, null);
+    }
+    
+    public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, JudgeStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ ID };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+         
+        return new com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction, com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult>() {
+            @Override
+            public void send(final com.veyron.examples.rockpaperscissors.PlayerAction item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron.examples.rockpaperscissors.JudgeAction recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron.examples.rockpaperscissors.JudgeAction>() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron.examples.rockpaperscissors.JudgeAction)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+            @Override
+            public com.veyron.examples.rockpaperscissors.PlayResult finish() throws com.veyron2.ipc.VeyronException {
+                 
+                final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+                    new com.google.common.reflect.TypeToken<com.veyron.examples.rockpaperscissors.PlayResult>() {
+                        private static final long serialVersionUID = 1L;
+                    }
+                };
+                return (com.veyron.examples.rockpaperscissors.PlayResult)call.finish(resultTypes)[0];
+                 
+            }
+        };
+        
+    }
+
+
+
+
+
 }

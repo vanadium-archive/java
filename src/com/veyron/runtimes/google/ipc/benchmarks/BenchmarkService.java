@@ -2,17 +2,18 @@
 // Source: service.vdl
 package com.veyron.runtimes.google.ipc.benchmarks;
 
-import com.veyron.runtimes.google.ipc.benchmarks.gen_impl.BenchmarkServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
-import java.util.ArrayList;
 
-@VeyronService(serviceWrapper=BenchmarkServiceWrapper.class)
-public interface BenchmarkService { 
-	// Echo returns the payload that it receives.
-	public ArrayList<Byte> echo(ServerContext context, ArrayList<Byte> payload) throws VeyronException;
-	// EchoStream returns the payload that it receives via the stream.
-	public void echoStream(ServerContext context, Stream<ArrayList<Byte>,ArrayList<Byte>> stream) throws VeyronException;
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.runtimes.google.ipc.benchmarks.gen_impl.BenchmarkServiceWrapper.class)
+public interface BenchmarkService  {
+
+    
+    // Echo returns the payload that it receives.
+
+    public java.util.ArrayList<java.lang.Byte> echo(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException;
+
+    
+    // EchoStream returns the payload that it receives via the stream.
+
+    public void echoStream(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+
 }

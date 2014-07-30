@@ -3,31 +3,31 @@
 // Source: base.vdl
 package com.veyron2.vdl.test_base;
 
+/**
+ * type NamedUint64 uint64 
+ **/
+public final class NamedUint64 {
+    private long value;
 
-public final class NamedUint64 { 
-		private long value;
+    public NamedUint64(long value) {
+        this.value = value;
+    }
+    public long getValue() { return this.value; }
 
-	public NamedUint64(long value) { 
-		this.value = value;
-	}
-	public long getValue() { return this.value; }
+    public void setValue(long value) { this.value = value; }
 
-	public void setValue(long value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final NamedUint64 other = (NamedUint64)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Long.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.vdl.test_base.NamedUint64 other = (com.veyron2.vdl.test_base.NamedUint64)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Long.valueOf(value).hashCode();
+    }
 }

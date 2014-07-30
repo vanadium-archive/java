@@ -2,30 +2,20 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.OptionDefs;
-import com.veyron2.Options;
-import com.veyron2.RuntimeFactory;
-import com.veyron2.ipc.Client;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mounttable.gen_impl.GlobableStub;
-import com.veyron2.vdl.ClientStream;
-
 /* Factory for binding to Globable interfaces. */
-public class GlobableFactory {
-	public static Globable bind(String name) throws VeyronException {
-		return bind(name, null);
-	}
-	public static Globable bind(String name, Options veyronOpts) throws VeyronException {
-		Client client = null;
-		if (veyronOpts != null && veyronOpts.get(OptionDefs.CLIENT) != null) {
-			client = veyronOpts.get(OptionDefs.CLIENT, Client.class);
-		} else if (veyronOpts != null && veyronOpts.get(OptionDefs.RUNTIME) != null) {
-			client = veyronOpts.get(OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
-		} else {
-			client = RuntimeFactory.getRuntime().getClient();
-		}
-		return new GlobableStub(client, name);
-	}
+public final class GlobableFactory {
+    public static Globable bind(final java.lang.String name) throws com.veyron2.ipc.VeyronException {
+        return bind(name, null);
+    }
+    public static Globable bind(final java.lang.String name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        com.veyron2.ipc.Client client = null;
+        if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.CLIENT) != null) {
+            client = veyronOpts.get(com.veyron2.OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
+        } else if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.RUNTIME) != null) {
+            client = veyronOpts.get(com.veyron2.OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
+        } else {
+            client = com.veyron2.RuntimeFactory.getRuntime().getClient();
+        }
+        return new com.veyron2.services.mounttable.gen_impl.GlobableStub(client, name);
+    }
 }

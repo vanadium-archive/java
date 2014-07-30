@@ -2,14 +2,13 @@
 // Source: service.vdl
 package com.veyron2.services.mounttable;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.VeyronService;
 
-@VeyronService(serviceWrapper=GlobableServiceWrapper.class)
-public interface GlobableService { 
-	// Glob returns all matching entries at the given server.
-	public void glob(ServerContext context, String pattern, Stream<MountEntry,Void> stream) throws VeyronException;
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper.class)
+public interface GlobableService  {
+
+    
+    // Glob returns all matching entries at the given server.
+
+    public void glob(final com.veyron2.ipc.ServerContext context, final java.lang.String pattern, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry> stream) throws com.veyron2.ipc.VeyronException;
+
 }

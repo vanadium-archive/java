@@ -2,15 +2,17 @@
 // Source: service.vdl
 package com.veyron2.services.security.access;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-
 /**
  * Object provides access control for Veyron objects.
  */
-public interface Object { 
-	// SetACL replaces the current ACL for an object.  etag allows for optional,
+
+public interface Object  {
+
+    
+    
+
+    
+    // SetACL replaces the current ACL for an object.  etag allows for optional,
 // optimistic concurrency control.  If non-empty, etag's value must come
 // from GetACL.  If any client has successfully called SetACL in the
 // meantime, the etag will be stale and SetACL will fail.
@@ -25,17 +27,28 @@ public interface Object {
 // endpoint.  To modify the mount point's ACL, use ResolveToMountTable
 // to get an endpoint and call SetACL on that.  This means that clients
 // must know when a name refers to a mount point to change its ACL.
-	public void setACL(Context context, ACL acl, String etag) throws VeyronException;
-	public void setACL(Context context, ACL acl, String etag, Options veyronOpts) throws VeyronException;
-	// GetACLOut packages output arguments for method GetACL.
-	public static class GetACLOut { 
-		public ACL acl;
-		public String etag;
-	}
-	// GetACL returns the complete, current ACL for an object.  The returned etag
+
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+    public static class GetACLOut {
+        
+        public com.veyron2.services.security.access.ACL acl;
+        
+        public java.lang.String etag;
+        
+    }
+    
+
+    
+    // GetACL returns the complete, current ACL for an object.  The returned etag
 // can be passed to a subsequent call to SetACL for optimistic concurrency
 // control. A successful call to SetACL will invalidate etag, and the client
 // must call GetACL again to get the current etag.
-	public Object.GetACLOut getACL(Context context) throws VeyronException;
-	public Object.GetACLOut getACL(Context context, Options veyronOpts) throws VeyronException;
+
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

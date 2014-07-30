@@ -2,159 +2,207 @@
 // Source(s):  service.vdl
 package com.veyron2.services.store.gen_impl;
 
-import com.google.common.reflect.TypeToken;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.query.Query;
-import com.veyron2.services.mounttable.GlobableService;
-import com.veyron2.services.mounttable.MountEntry;
-import com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper;
-import com.veyron2.services.store.Conflict;
-import com.veyron2.services.store.Entry;
-import com.veyron2.services.store.ObjectFactory;
-import com.veyron2.services.store.ObjectService;
-import com.veyron2.services.store.QueryResult;
-import com.veyron2.services.store.Stat;
-import com.veyron2.services.store.Store;
-import com.veyron2.services.store.StoreFactory;
-import com.veyron2.services.store.StoreService;
-import com.veyron2.services.store.TransactionID;
-import com.veyron2.services.store.VeyronConsts;
-import com.veyron2.services.watch.ChangeBatch;
-import com.veyron2.services.watch.GlobRequest;
-import com.veyron2.services.watch.GlobWatcherService;
-import com.veyron2.services.watch.QueryRequest;
-import com.veyron2.services.watch.QueryWatcherService;
-import com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper;
-import com.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper;
-import com.veyron2.vdl.Stream;
-import java.util.ArrayList;
+public final class ObjectServiceWrapper {
 
-public class ObjectServiceWrapper {
+    private final com.veyron2.services.store.ObjectService service;
 
-	private final ObjectService service;
-	private final GlobableServiceWrapper globable;
-	private final GlobWatcherServiceWrapper globWatcher;
-	private final QueryWatcherServiceWrapper queryWatcher;
 
-	public ObjectServiceWrapper(ObjectService service) {
-		this.globable = new GlobableServiceWrapper(service);
-		this.globWatcher = new GlobWatcherServiceWrapper(service);
-		this.queryWatcher = new QueryWatcherServiceWrapper(service);
-		this.service = service;
-	}
-	/**
-	 * Returns all tags associated with the provided method or null if the method isn't implemented
-	 * by this service.
-	 */
-	public Object[] getMethodTags(ServerCall call, String method) throws VeyronException { 
-		try {
-			return this.globable.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		try {
-			return this.globWatcher.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		try {
-			return this.queryWatcher.getMethodTags(call, method);
-		} catch (VeyronException e) {}  // method not found.
-		if ("exists".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("get".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("put".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("remove".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("setAttr".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("stat".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("query".equals(method)) {
-			return new Object[]{  };
-		}
-		if ("globT".equals(method)) {
-			return new Object[]{  };
-		}
-        if ("getMethodTags".equals(method)) {
-            return new Object[]{};
+
+    
+    private final com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper globableWrapper;
+    
+    
+    private final com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper globWatcherWrapper;
+    
+    
+    private final com.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper queryWatcherWrapper;
+    
+
+    public ObjectServiceWrapper(final com.veyron2.services.store.ObjectService service) {
+        this.service = service;
+        
+        
+        this.globableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper(service);
+        
+        this.globWatcherWrapper = new com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper(service);
+        
+        this.queryWatcherWrapper = new com.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper(service);
+        
+    }
+
+    /**
+     * Returns all tags associated with the provided method or null if the method isn't implemented
+     * by this service.
+     */
+    public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
+        
+        if ("exists".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
         }
-		throw new VeyronException("method: " + method + " not found");
-	}
-	// Methods from interface Object.
-	public boolean exists(ServerCall call, TransactionID TID) throws VeyronException { 
-		return this.service.exists(call, TID);
-	}
-	public Entry get(ServerCall call, TransactionID TID) throws VeyronException { 
-		return this.service.get(call, TID);
-	}
-	public Stat put(ServerCall call, TransactionID TID, Object V) throws VeyronException { 
-		return this.service.put(call, TID, V);
-	}
-	public void remove(ServerCall call, TransactionID TID) throws VeyronException { 
-		this.service.remove(call, TID);
-	}
-	public void setAttr(ServerCall call, TransactionID TID, ArrayList<Object> Attrs) throws VeyronException { 
-		this.service.setAttr(call, TID, Attrs);
-	}
-	public Stat stat(ServerCall call, TransactionID TID) throws VeyronException { 
-		return this.service.stat(call, TID);
-	}
-	public void query(ServerCall call, TransactionID TID, Query Q) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<QueryResult,Void> stream = new Stream<QueryResult,Void>() {
-			@Override
-			public void send(QueryResult item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.query(call, TID, Q, stream);
-	}
-	public void globT(ServerCall call, TransactionID TID, String pattern) throws VeyronException { 
-		final ServerCall serverCall = call;
-		final Stream<String,Void> stream = new Stream<String,Void>() {
-			@Override
-			public void send(String item) throws VeyronException {
-				serverCall.send(item);
-			}
-			@Override
-			public Void recv() throws java.io.EOFException, VeyronException {
-				final TypeToken<?> type = new TypeToken<Void>() {};
-				final Object result = serverCall.recv(type);
-				try {
-					return (Void)result;
-				} catch (java.lang.ClassCastException e) {
-					throw new VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
-				}
-			}
-		};
-		this.service.globT(call, TID, pattern, stream);
-	}
-	// Methods from sub-interface Globable.
-	public void glob(ServerCall call, String pattern) throws VeyronException {
-		this.globable.glob(call, pattern);
-	}
-	// Methods from sub-interface GlobWatcher.
-	public void watchGlob(ServerCall call, GlobRequest Req) throws VeyronException {
-		this.globWatcher.watchGlob(call, Req);
-	}
-	// Methods from sub-interface QueryWatcher.
-	public void watchQuery(ServerCall call, QueryRequest Req) throws VeyronException {
-		this.queryWatcher.watchQuery(call, Req);
-	}
+        
+        if ("get".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("getMethodTags".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("globT".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("put".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("query".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("remove".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("setAttr".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("stat".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        
+        try {
+            return this.globableWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        try {
+            return this.globWatcherWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        try {
+            return this.queryWatcherWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
+        
+        throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
+    }
+
+     
+    
+    public boolean exists(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.exists( call , TID  );
+    }
+
+    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.get( call , TID  );
+    }
+
+    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.put( call , TID, V  );
+    }
+
+    public void remove(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.remove( call , TID  );
+    }
+
+    public void setAttr(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID, final java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.setAttr( call , TID, Attrs  );
+    }
+
+    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.stat( call , TID  );
+    }
+
+    public void query(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID, final com.veyron2.query.Query Q) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.store.QueryResult> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.store.QueryResult>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public com.veyron2.services.store.QueryResult recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.store.QueryResult >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (com.veyron2.services.store.QueryResult)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.query( call , TID, Q  ,stream  );
+    }
+
+    public void globT(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.store.TransactionID TID, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+        final com.veyron2.vdl.Stream<java.lang.Void, java.lang.String> stream = new com.veyron2.vdl.Stream<java.lang.Void, java.lang.String>() {
+            @Override
+            public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
+                call.send(item);
+            }
+            @Override
+            public java.lang.String recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.lang.String >() {
+                    private static final long serialVersionUID = 1L;
+                };
+                final java.lang.Object result = call.recv(type);
+                try {
+                    return (java.lang.String)result;
+                } catch (java.lang.ClassCastException e) {
+                    throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
+                }
+            }
+        };
+         
+         this.service.globT( call , TID, pattern  ,stream  );
+    }
+
+
+
+
+    public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+          this.globableWrapper.glob(call, pattern);
+    }
+
+    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+          this.globWatcherWrapper.watchGlob(call, Req);
+    }
+
+    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+          this.queryWatcherWrapper.watchQuery(call, Req);
+    }
+ 
+
 }

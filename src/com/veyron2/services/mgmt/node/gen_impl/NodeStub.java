@@ -2,266 +2,269 @@
 // Source(s):  node.vdl
 package com.veyron2.services.mgmt.node.gen_impl;
 
-import com.veyron2.services.mgmt.node.Application;
-import com.veyron2.services.mgmt.node.ApplicationFactory;
-import com.veyron2.services.mgmt.node.ApplicationService;
-import com.veyron2.services.mgmt.node.Description;
-import com.veyron2.services.mgmt.node.Node;
-import com.veyron2.services.mgmt.node.NodeFactory;
-import com.veyron2.services.mgmt.node.NodeService;
-
 /* Client stub for interface: Node. */
-public final class NodeStub implements Node {
-	private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.Node";
-	private final com.veyron2.ipc.Client client;
-	private final java.lang.String name;
-	private final Application application;
+public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.node.Node";
+    private final com.veyron2.ipc.Client client;
+    private final java.lang.String veyronName;
 
-	public NodeStub(com.veyron2.ipc.Client client, java.lang.String name) {
-		this.client = client;
-		this.name = name;
-		this.application = new com.veyron2.services.mgmt.node.gen_impl.ApplicationStub(client, name);
-	}
-	// Methods from interface Node.
-	@Override
-	public Description describe(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return describe(context, null);
-	}
-	@Override
-	public Description describe(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+    
+    
+    
+    private final com.veyron2.services.mgmt.node.gen_impl.ApplicationStub applicationStub;
+    
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
+    public NodeStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+        this.client = client;
+        this.veyronName = veyronName;
+        
+        
+        this.applicationStub = new com.veyron2.services.mgmt.node.gen_impl.ApplicationStub(client, veyronName);
+         
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Describe", inArgs, veyronOpts);
+    // Methods from interface Node.
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<Description>() {} };
-			return (Description)call.finish(resultTypes)[0];
 
-	}
-	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
-		return isRunnable(context, Description, null);
-	}
-	@Override
-	public boolean isRunnable(com.veyron2.ipc.Context context, com.veyron2.services.mgmt.binary.Description Description, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ Description };
+    
+    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        return describe(context, null);
+    }
+    
+    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
+        }
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "IsRunnable", inArgs, veyronOpts);
+        // Finish the call.
+        
+        
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{ new com.google.common.reflect.TypeToken<java.lang.Boolean>() {} };
-			return (java.lang.Boolean)call.finish(resultTypes)[0];
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.node.Description>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (com.veyron2.services.mgmt.node.Description)results[0];
+         
 
-	}
-	@Override
-	public void reset(com.veyron2.ipc.Context context, long Deadline) throws com.veyron2.ipc.VeyronException {
-		reset(context, Deadline, null);
-	}
-	@Override
-	public void reset(com.veyron2.ipc.Context context, long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Prepare input arguments.
-		final java.lang.Object[] inArgs = new java.lang.Object[]{ new java.lang.Long(Deadline) };
+         
 
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-		// Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
+        
+    }
 
-		// Start the call.
-		final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.name, "Reset", inArgs, veyronOpts);
+    
+    public boolean isRunnable(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
+        return isRunnable(context, Description, null);
+    }
+    
+    public boolean isRunnable(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.binary.Description Description, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
+        }
 
-		// Prepare output argument and finish the call.
-			final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{  };
-			call.finish(resultTypes);
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Description };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
 
-	}
-	// Methods from sub-interface Application.
-	@Override
-	public java.lang.String install(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		return install(context, Name, null);
-	}
-	@Override
-	public java.lang.String install(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		return this.application.install(context, Name, veyronOpts);
-	}
-	@Override
-	public void refresh(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		refresh(context, null);
-	}
-	@Override
-	public void refresh(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.refresh(context, veyronOpts);
-	}
-	@Override
-	public void restart(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		restart(context, null);
-	}
-	@Override
-	public void restart(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.restart(context, veyronOpts);
-	}
-	@Override
-	public void resume(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		resume(context, null);
-	}
-	@Override
-	public void resume(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.resume(context, veyronOpts);
-	}
-	@Override
-	public void revert(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		revert(context, null);
-	}
-	@Override
-	public void revert(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.revert(context, veyronOpts);
-	}
-	@Override
-	public java.util.ArrayList<java.lang.String> start(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		return start(context, null);
-	}
-	@Override
-	public java.util.ArrayList<java.lang.String> start(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		return this.application.start(context, veyronOpts);
-	}
-	@Override
-	public void stop(com.veyron2.ipc.Context context, long Deadline) throws com.veyron2.ipc.VeyronException {
-		stop(context, Deadline, null);
-	}
-	@Override
-	public void stop(com.veyron2.ipc.Context context, long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.stop(context, Deadline, veyronOpts);
-	}
-	@Override
-	public void suspend(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		suspend(context, null);
-	}
-	@Override
-	public void suspend(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.suspend(context, veyronOpts);
-	}
-	@Override
-	public void uninstall(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		uninstall(context, null);
-	}
-	@Override
-	public void uninstall(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.uninstall(context, veyronOpts);
-	}
-	@Override
-	public void update(com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-		update(context, null);
-	}
-	@Override
-	public void update(com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.update(context, veyronOpts);
-	}
-	@Override
-	public void updateTo(com.veyron2.ipc.Context context, java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-		updateTo(context, Name, null);
-	}
-	@Override
-	public void updateTo(com.veyron2.ipc.Context context, java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-		// Add VDL path option.
-		// NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-	    // Java to encoding/decoding from vom.Value objects.
-		if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-		if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-			veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
-		}
-		this.application.updateTo(context, Name, veyronOpts);
-	}
+        // Finish the call.
+        
+        
+
+         
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
+            
+            new com.google.common.reflect.TypeToken<java.lang.Boolean>() {
+                private static final long serialVersionUID = 1L;
+            },
+            
+        };
+        final java.lang.Object[] results = call.finish(resultTypes);
+         
+        return (java.lang.Boolean)results[0];
+         
+
+         
+
+        
+    }
+
+    
+    public void reset(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException {
+         reset(context, Deadline, null);
+    }
+    
+    public void reset(final com.veyron2.ipc.Context context, final long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Deadline };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+
+
+
+    @Override
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.stop(context, Deadline);
+    }
+    @Override
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.stop(context, Deadline, veyronOpts);
+    }
+
+    @Override
+    public void uninstall(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.uninstall(context);
+    }
+    @Override
+    public void uninstall(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.uninstall(context, veyronOpts);
+    }
+
+    @Override
+    public void update(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.update(context);
+    }
+    @Override
+    public void update(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.update(context, veyronOpts);
+    }
+
+    @Override
+    public void refresh(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.refresh(context);
+    }
+    @Override
+    public void refresh(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.refresh(context, veyronOpts);
+    }
+
+    @Override
+    public void restart(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.restart(context);
+    }
+    @Override
+    public void restart(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.restart(context, veyronOpts);
+    }
+
+    @Override
+    public void resume(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.resume(context);
+    }
+    @Override
+    public void resume(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.resume(context, veyronOpts);
+    }
+
+    @Override
+    public void revert(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.revert(context);
+    }
+    @Override
+    public void revert(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.revert(context, veyronOpts);
+    }
+
+    @Override
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.applicationStub.start(context);
+    }
+    @Override
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationStub.start(context, veyronOpts);
+    }
+
+    @Override
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.updateTo(context, Name);
+    }
+    @Override
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.updateTo(context, Name, veyronOpts);
+    }
+
+    @Override
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+        return this.applicationStub.install(context, Name);
+    }
+    @Override
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationStub.install(context, Name, veyronOpts);
+    }
+
+    @Override
+    public void suspend(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.suspend(context);
+    }
+    @Override
+    public void suspend(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.suspend(context, veyronOpts);
+    }
+
+
 }

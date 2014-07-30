@@ -3,34 +3,32 @@
 // Source: wiretype.vdl
 package com.veyron2.vom2;
 
-
 /**
+ * type TypeID uint64 
  * TypeID uniquely identifies a type definition within a vom stream.
- */
-public final class TypeID { 
-		private long value;
+ **/
+public final class TypeID {
+    private long value;
 
-	public TypeID(long value) { 
-		this.value = value;
-	}
-	public long getValue() { return this.value; }
+    public TypeID(long value) {
+        this.value = value;
+    }
+    public long getValue() { return this.value; }
 
-	public void setValue(long value) { this.value = value; }
+    public void setValue(long value) { this.value = value; }
 
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final TypeID other = (TypeID)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + Long.valueOf(value).hashCode();
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.vom2.TypeID other = (com.veyron2.vom2.TypeID)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return java.lang.Long.valueOf(value).hashCode();
+    }
 }

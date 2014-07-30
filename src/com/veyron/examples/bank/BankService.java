@@ -2,22 +2,17 @@
 // Source: bank.vdl
 package com.veyron.examples.bank;
 
-import com.veyron.examples.bank.gen_impl.BankServiceWrapper;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.VeyronService;
-
 /**
  * Bank allows clients to store virtual money. Certain implementations can use persistent storage.
  * Uses the client's Veyron Identity to determine account access.
  */
-@VeyronService(serviceWrapper=BankServiceWrapper.class)
-public interface BankService { 
-	// ConnectOut packages output arguments for method Connect.
-	public static class ConnectOut { 
-		public String newIdentity;
-		public long accountNumber;
-	}
-	// Connect causes the bank to bless a new user (string) and return their bank account number (int64). Existing users are not blessed (""), but still receive their account number (int64).
-	public BankService.ConnectOut connect(ServerContext context) throws VeyronException;
+
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.examples.bank.gen_impl.BankServiceWrapper.class)
+public interface BankService  {
+
+    
+    // Connect causes the bank to bless a new user (string) and return their bank account number (int64). Existing users are not blessed (""), but still receive their account number (int64).
+
+    public com.veyron.examples.bank.Bank.ConnectOut connect(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+
 }

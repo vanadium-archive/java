@@ -3,20 +3,13 @@
 
 package com.veyron2.vdl.test_base;
 
-import com.veyron2.vdl.FixedLengthList;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 /**
  * type NamedArray [2]bool 
  * NamedEnum       enum{A;B;C}
  **/
-public final class NamedArray implements List<java.lang.Boolean> {
+public final class NamedArray implements java.util.List<java.lang.Boolean> {
     private final static int length = 2;
-    private FixedLengthList<java.lang.Boolean> impl;
+    private com.veyron2.vdl.FixedLengthList<java.lang.Boolean> impl;
 
     public NamedArray(java.lang.Boolean[] impl) {
         setValue(impl);
@@ -31,7 +24,7 @@ public final class NamedArray implements List<java.lang.Boolean> {
             throw new IllegalArgumentException("Invalid length " + length + " expected "
                     + arr.length);
         }
-        this.impl = new FixedLengthList<java.lang.Boolean>(arr);
+        this.impl = new com.veyron2.vdl.FixedLengthList<java.lang.Boolean>(arr);
     }
 
     @Override
@@ -64,12 +57,12 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public boolean addAll(int location, Collection<? extends java.lang.Boolean> collection) {
+    public boolean addAll(int location, java.util.Collection<? extends java.lang.Boolean> collection) {
         return impl.addAll(location, collection);
     }
 
     @Override
-    public boolean addAll(Collection<? extends java.lang.Boolean> collection) {
+    public boolean addAll(java.util.Collection<? extends java.lang.Boolean> collection) {
         return impl.addAll(collection);
     }
 
@@ -79,12 +72,12 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public boolean contains(Object object) {
+    public boolean contains(java.lang.Object object) {
         return impl.contains(object);
     }
 
     @Override
-    public boolean containsAll(Collection<?> collection) {
+    public boolean containsAll(java.util.Collection<?> collection) {
         return impl.containsAll(collection);
     }
 
@@ -94,7 +87,7 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public int indexOf(Object object) {
+    public int indexOf(java.lang.Object object) {
         return impl.indexOf(object);
     }
 
@@ -104,22 +97,22 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public Iterator<java.lang.Boolean> iterator() {
+    public java.util.Iterator<java.lang.Boolean> iterator() {
         return impl.iterator();
     }
 
     @Override
-    public int lastIndexOf(Object object) {
+    public int lastIndexOf(java.lang.Object object) {
         return impl.lastIndexOf(object);
     }
 
     @Override
-    public ListIterator<java.lang.Boolean> listIterator() {
+    public java.util.ListIterator<java.lang.Boolean> listIterator() {
         return impl.listIterator();
     }
 
     @Override
-    public ListIterator<java.lang.Boolean> listIterator(int location) {
+    public java.util.ListIterator<java.lang.Boolean> listIterator(int location) {
         return impl.listIterator(location);
     }
 
@@ -129,17 +122,17 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public boolean remove(Object object) {
+    public boolean remove(java.lang.Object object) {
         return impl.remove(object);
     }
 
     @Override
-    public boolean removeAll(Collection<?> collection) {
+    public boolean removeAll(java.util.Collection<?> collection) {
         return impl.removeAll(collection);
     }
 
     @Override
-    public boolean retainAll(Collection<?> collection) {
+    public boolean retainAll(java.util.Collection<?> collection) {
         return impl.retainAll(collection);
     }
 
@@ -154,12 +147,12 @@ public final class NamedArray implements List<java.lang.Boolean> {
     }
 
     @Override
-    public List<java.lang.Boolean> subList(int start, int end) {
+    public java.util.List<java.lang.Boolean> subList(int start, int end) {
         return impl.subList(start, end);
     }
 
     @Override
-    public Object[] toArray() {
+    public java.lang.Object[] toArray() {
         return impl.toArray();
     }
 

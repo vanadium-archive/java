@@ -2,23 +2,32 @@
 // Source: appcycle.vdl
 package com.veyron2.services.mgmt.appcycle;
 
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.vdl.ClientStream;
-
 /**
  * AppCycle interfaces with the process running a veyron runtime.
  */
-public interface AppCycle { 
-	// Stop initiates shutdown of the server.  It streams back periodic
+
+public interface AppCycle  {
+
+    
+    
+
+    
+    // Stop initiates shutdown of the server.  It streams back periodic
 // updates to give the client an idea of how the shutdown is
 // progressing.
-	public ClientStream<Void,Task,Void> stop(Context context) throws VeyronException;
-	public ClientStream<Void,Task,Void> stop(Context context, Options veyronOpts) throws VeyronException;
-	// ForceStop tells the server to shut down right away.  It can be issued
+
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.appcycle.Task, java.lang.Void> stop(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.appcycle.Task, java.lang.Void> stop(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
+    
+    
+
+    
+    // ForceStop tells the server to shut down right away.  It can be issued
 // while a Stop is outstanding if for example the client does not want
 // to wait any longer.
-	public void forceStop(Context context) throws VeyronException;
-	public void forceStop(Context context, Options veyronOpts) throws VeyronException;
+
+    public void forceStop(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void forceStop(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+
 }

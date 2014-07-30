@@ -3,31 +3,31 @@
 // Source: build.vdl
 package com.veyron2.services.mgmt.build;
 
+/**
+ * type Format byte 
+ **/
+public final class Format {
+    private byte value;
 
-public final class Format { 
-		private byte value;
+    public Format(byte value) {
+        this.value = value;
+    }
+    public byte getValue() { return this.value; }
 
-	public Format(byte value) { 
-		this.value = value;
-	}
-	public byte getValue() { return this.value; }
+    public void setValue(byte value) { this.value = value; }
 
-	public void setValue(byte value) { this.value = value; }
-
-	@Override
-	public boolean equals(java.lang.Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final Format other = (Format)obj;
-		if (this.value != other.value) return false;
-		return true;
-	}
-	@Override
-	public int hashCode() {
-		int result = 1;
-		final int prime = 31;
-		result = prime * result + (int)value;
-		return result;
-	}
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final com.veyron2.services.mgmt.build.Format other = (com.veyron2.services.mgmt.build.Format)obj;
+        
+        return this.value == other.value;
+        
+    }
+    @Override
+    public int hashCode() {
+        return (int)value;
+    }
 }
