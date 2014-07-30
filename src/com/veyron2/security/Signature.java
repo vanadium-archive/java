@@ -3,11 +3,13 @@
 package com.veyron2.security;
 
 /**
- * type Signature struct{R []byte;S []byte} 
+ * type Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte} 
  * Signature represents an ECDSA signature.
  **/
 public final class Signature {
     
+    
+      private com.veyron2.security.Hash hash;
     
       private java.util.ArrayList<java.lang.Byte> r;
     
@@ -15,7 +17,9 @@ public final class Signature {
     
 
     
-    public Signature(final java.util.ArrayList<java.lang.Byte> r, final java.util.ArrayList<java.lang.Byte> s) {
+    public Signature(final com.veyron2.security.Hash hash, final java.util.ArrayList<java.lang.Byte> r, final java.util.ArrayList<java.lang.Byte> s) {
+        
+            this.hash = hash;
         
             this.r = r;
         
@@ -24,6 +28,13 @@ public final class Signature {
     }
 
     
+    
+    public com.veyron2.security.Hash getHash() {
+        return this.hash;
+    }
+    public void setHash(com.veyron2.security.Hash hash) {
+        this.hash = hash;
+    }
     
     public java.util.ArrayList<java.lang.Byte> getR() {
         return this.r;
@@ -47,6 +58,16 @@ public final class Signature {
         if (this.getClass() != obj.getClass()) return false;
         final Signature other = (Signature)obj;
 
+        
+        
+        if (this.hash == null) {
+            if (other.hash != null) {
+                return false;
+            }
+        } else if (!this.hash.equals(other.hash)) {
+            return false;
+        }
+         
         
         
         if (this.r == null) {
@@ -74,6 +95,8 @@ public final class Signature {
     public int hashCode() {
         int result = 1;
         final int prime = 31;
+        
+        result = prime * result + (hash == null ? 0 : hash.hashCode());
         
         result = prime * result + (r == null ? 0 : r.hashCode());
         

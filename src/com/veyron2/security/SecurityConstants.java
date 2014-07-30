@@ -45,6 +45,40 @@ public final class SecurityConstants {
 
     public static final com.veyron2.security.Label MONITORING_LABEL = new com.veyron2.security.Label(16);
     
+    /**
+ * SHA1Hash denotes the SHA1 cryptographic hash function as defined
+ * in RFC3174.
+ */
+
+    public static final com.veyron2.security.Hash SHA1_HASH = new com.veyron2.security.Hash("SHA1");
+    
+    /**
+ * SHA256Hash denotes the SHA256 cryptographic hash function as defined
+ * in FIPS 180-4.
+ */
+
+    public static final com.veyron2.security.Hash SHA256_HASH = new com.veyron2.security.Hash("SHA256");
+    
+    /**
+ * SHA384Hash denotes the SHA384 cryptographic hash function as defined
+ * in FIPS 180-2.
+ */
+
+    public static final com.veyron2.security.Hash SHA384_HASH = new com.veyron2.security.Hash("SHA384");
+    
+    /**
+ * SHA512Hash denotes the SHA512 cryptographic hash function as defined
+ * in FIPS 180-2.
+ */
+
+    public static final com.veyron2.security.Hash SHA512_HASH = new com.veyron2.security.Hash("SHA512");
+    
+    /**
+ * NoHash denotes the identity hash function.
+ */
+
+    public static final com.veyron2.security.Hash NO_HASH = new com.veyron2.security.Hash("");
+    
     
     
 
