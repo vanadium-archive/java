@@ -3,8 +3,8 @@
 package com.veyron2.services.mounttable;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper.class)
-public interface GlobableService  {
+@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper.class)
+public interface GlobbableService  {
 
     
     // Glob returns all matching entries at the given server.

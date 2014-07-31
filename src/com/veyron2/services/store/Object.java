@@ -6,7 +6,7 @@ package com.veyron2.services.store;
  * ObjectService is the interface for a value in the store.
  */
 
-public interface Object extends com.veyron2.services.mounttable.Globable, com.veyron2.services.watch.GlobWatcher, com.veyron2.services.watch.QueryWatcher {
+public interface Object extends com.veyron2.services.mounttable.Globbable, com.veyron2.services.watch.GlobWatcher, com.veyron2.services.watch.QueryWatcher {
 
     
     

@@ -2,12 +2,12 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable;
 
-/* Factory for binding to Globable interfaces. */
-public final class GlobableFactory {
-    public static Globable bind(final java.lang.String name) throws com.veyron2.ipc.VeyronException {
+/* Factory for binding to Globbable interfaces. */
+public final class GlobbableFactory {
+    public static Globbable bind(final java.lang.String name) throws com.veyron2.ipc.VeyronException {
         return bind(name, null);
     }
-    public static Globable bind(final java.lang.String name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public static Globbable bind(final java.lang.String name, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         com.veyron2.ipc.Client client = null;
         if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.CLIENT) != null) {
             client = veyronOpts.get(com.veyron2.OptionDefs.CLIENT, com.veyron2.ipc.Client.class);
@@ -16,6 +16,6 @@ public final class GlobableFactory {
         } else {
             client = com.veyron2.RuntimeFactory.getRuntime().getClient();
         }
-        return new com.veyron2.services.mounttable.gen_impl.GlobableStub(client, name);
+        return new com.veyron2.services.mounttable.gen_impl.GlobbableStub(client, name);
     }
 }

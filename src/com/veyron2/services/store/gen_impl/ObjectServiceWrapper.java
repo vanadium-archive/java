@@ -9,7 +9,7 @@ public final class ObjectServiceWrapper {
 
 
     
-    private final com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper globableWrapper;
+    private final com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper globbableWrapper;
     
     
     private final com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper globWatcherWrapper;
@@ -22,7 +22,7 @@ public final class ObjectServiceWrapper {
         this.service = service;
         
         
-        this.globableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper(service);
+        this.globbableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper(service);
         
         this.globWatcherWrapper = new com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper(service);
         
@@ -92,7 +92,7 @@ public final class ObjectServiceWrapper {
         
         
         try {
-            return this.globableWrapper.getMethodTags(call, method);
+            return this.globbableWrapper.getMethodTags(call, method);
         } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
         
         try {
@@ -191,7 +191,7 @@ public final class ObjectServiceWrapper {
 
     public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
         
-          this.globableWrapper.glob(call, pattern);
+          this.globbableWrapper.glob(call, pattern);
     }
 
     public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {

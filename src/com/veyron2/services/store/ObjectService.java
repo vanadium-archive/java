@@ -7,7 +7,7 @@ package com.veyron2.services.store;
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.store.gen_impl.ObjectServiceWrapper.class)
-public interface ObjectService extends com.veyron2.services.mounttable.GlobableService, com.veyron2.services.watch.GlobWatcherService, com.veyron2.services.watch.QueryWatcherService {
+public interface ObjectService extends com.veyron2.services.mounttable.GlobbableService, com.veyron2.services.watch.GlobWatcherService, com.veyron2.services.watch.QueryWatcherService {
 
     
     // Exists returns true iff the Entry has a value.

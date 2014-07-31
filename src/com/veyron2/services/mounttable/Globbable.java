@@ -3,7 +3,7 @@
 package com.veyron2.services.mounttable;
 
 
-public interface Globable  {
+public interface Globbable  {
 
     
     

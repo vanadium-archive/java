@@ -9,14 +9,14 @@ public final class MountTableServiceWrapper {
 
 
     
-    private final com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper globableWrapper;
+    private final com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper globbableWrapper;
     
 
     public MountTableServiceWrapper(final com.veyron2.services.mounttable.MountTableService service) {
         this.service = service;
         
         
-        this.globableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobableServiceWrapper(service);
+        this.globbableWrapper = new com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper(service);
         
     }
 
@@ -52,7 +52,7 @@ public final class MountTableServiceWrapper {
         
         
         try {
-            return this.globableWrapper.getMethodTags(call, method);
+            return this.globbableWrapper.getMethodTags(call, method);
         } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
         
         throw new com.veyron2.ipc.VeyronException("method: " + method + " not found");
@@ -80,7 +80,7 @@ public final class MountTableServiceWrapper {
 
     public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
         
-          this.globableWrapper.glob(call, pattern);
+          this.globbableWrapper.glob(call, pattern);
     }
  
 

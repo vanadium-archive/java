@@ -2,14 +2,14 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable.gen_impl;
 
-public final class GlobableServiceWrapper {
+public final class GlobbableServiceWrapper {
 
-    private final com.veyron2.services.mounttable.GlobableService service;
-
-
+    private final com.veyron2.services.mounttable.GlobbableService service;
 
 
-    public GlobableServiceWrapper(final com.veyron2.services.mounttable.GlobableService service) {
+
+
+    public GlobbableServiceWrapper(final com.veyron2.services.mounttable.GlobbableService service) {
         this.service = service;
         
         

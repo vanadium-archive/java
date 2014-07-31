@@ -2,23 +2,23 @@
 // Source(s):  service.vdl
 package com.veyron2.services.mounttable.gen_impl;
 
-/* Client stub for interface: Globable. */
-public final class GlobableStub implements com.veyron2.services.mounttable.Globable {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.Globable";
+/* Client stub for interface: Globbable. */
+public final class GlobbableStub implements com.veyron2.services.mounttable.Globbable {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.Globbable";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 
     
     
 
-    public GlobableStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+    public GlobbableStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
         this.client = client;
         this.veyronName = veyronName;
         
         
     }
 
-    // Methods from interface Globable.
+    // Methods from interface Globbable.
 
 
     
@@ -33,7 +33,7 @@ public final class GlobableStub implements com.veyron2.services.mounttable.Globa
         // Java to encoding/decoding from vom.Value objects.
         if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
         if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, GlobableStub.vdlIfacePathOpt);
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, GlobbableStub.vdlIfacePathOpt);
         }
 
         

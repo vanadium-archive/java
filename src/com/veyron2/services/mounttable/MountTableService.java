@@ -7,7 +7,7 @@ package com.veyron2.services.mounttable;
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.MountTableServiceWrapper.class)
-public interface MountTableService extends com.veyron2.services.mounttable.GlobableService {
+public interface MountTableService extends com.veyron2.services.mounttable.GlobbableService {
 
     
     // Mount Server (a global name) onto the receiver.

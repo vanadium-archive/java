@@ -6,7 +6,7 @@ package com.veyron2.services.mounttable;
  * MountTable defines the interface to talk to a mounttable.
  */
 
-public interface MountTable extends com.veyron2.services.mounttable.Globable {
+public interface MountTable extends com.veyron2.services.mounttable.Globbable {
 
     
     
