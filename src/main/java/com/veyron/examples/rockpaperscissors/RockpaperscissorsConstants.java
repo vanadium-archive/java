@@ -19,10 +19,10 @@ public final class RockpaperscissorsConstants {
     public static final com.veyron.examples.rockpaperscissors.WinnerTag DRAW = new com.veyron.examples.rockpaperscissors.WinnerTag((byte)0);
     
     
-    public static final com.veyron.examples.rockpaperscissors.WinnerTag PLAYER1 = new com.veyron.examples.rockpaperscissors.WinnerTag((byte)1);
+    public static final com.veyron.examples.rockpaperscissors.WinnerTag PLAYER_1 = new com.veyron.examples.rockpaperscissors.WinnerTag((byte)1);
     
     
-    public static final com.veyron.examples.rockpaperscissors.WinnerTag PLAYER2 = new com.veyron.examples.rockpaperscissors.WinnerTag((byte)2);
+    public static final com.veyron.examples.rockpaperscissors.WinnerTag PLAYER_2 = new com.veyron.examples.rockpaperscissors.WinnerTag((byte)2);
     
     
     

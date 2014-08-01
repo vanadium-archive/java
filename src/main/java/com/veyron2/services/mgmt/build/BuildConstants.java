@@ -10,10 +10,10 @@ public final class BuildConstants {
     
     
     
-    public static final com.veyron2.services.mgmt.build.Architecture X86 = new com.veyron2.services.mgmt.build.Architecture("386");
+    public static final com.veyron2.services.mgmt.build.Architecture X_86 = new com.veyron2.services.mgmt.build.Architecture("386");
     
     
-    public static final com.veyron2.services.mgmt.build.Architecture AM_D64 = new com.veyron2.services.mgmt.build.Architecture("amd64");
+    public static final com.veyron2.services.mgmt.build.Architecture AMD_64 = new com.veyron2.services.mgmt.build.Architecture("amd64");
     
     
     public static final com.veyron2.services.mgmt.build.Architecture ARM = new com.veyron2.services.mgmt.build.Architecture("arm");
@@ -43,7 +43,7 @@ public final class BuildConstants {
     public static final com.veyron2.services.mgmt.build.OperatingSystem WINDOWS = new com.veyron2.services.mgmt.build.OperatingSystem("windows");
     
     
-    public static final com.veyron2.services.mgmt.build.OperatingSystem UNSUPPORTEDOS = new com.veyron2.services.mgmt.build.OperatingSystem("unsupported");
+    public static final com.veyron2.services.mgmt.build.OperatingSystem UNSUPPORTED_OS = new com.veyron2.services.mgmt.build.OperatingSystem("unsupported");
     
     
     

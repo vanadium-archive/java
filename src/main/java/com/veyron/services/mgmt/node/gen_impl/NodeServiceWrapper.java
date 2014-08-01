@@ -63,44 +63,9 @@ public final class NodeServiceWrapper {
 
 
 
-    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.nodeWrapper.describe(call);
-    }
-
     public boolean isRunnable(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.mgmt.binary.Description Description) throws com.veyron2.ipc.VeyronException {
         
         return  this.nodeWrapper.isRunnable(call, Description);
-    }
-
-    public void resume(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.resume(call);
-    }
-
-    public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.uninstall(call);
-    }
-
-    public void set(final com.veyron2.ipc.ServerCall call, final java.lang.String key, final java.lang.String value) throws com.veyron2.ipc.VeyronException {
-        
-          this.configWrapper.set(call, key, value);
-    }
-
-    public void reset(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
-        
-          this.nodeWrapper.reset(call, Deadline);
-    }
-
-    public void restart(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.restart(call);
-    }
-
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.applicationWrapper.start(call);
     }
 
     public java.lang.String install(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
@@ -118,9 +83,14 @@ public final class NodeServiceWrapper {
           this.applicationWrapper.stop(call, Deadline);
     }
 
-    public void suspend(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
-          this.applicationWrapper.suspend(call);
+          this.applicationWrapper.uninstall(call);
+    }
+
+    public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.nodeWrapper.describe(call);
     }
 
     public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
@@ -128,9 +98,39 @@ public final class NodeServiceWrapper {
           this.applicationWrapper.refresh(call);
     }
 
+    public void resume(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.resume(call);
+    }
+
     public void update(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.update(call);
+    }
+
+    public void set(final com.veyron2.ipc.ServerCall call, final java.lang.String key, final java.lang.String value) throws com.veyron2.ipc.VeyronException {
+        
+          this.configWrapper.set(call, key, value);
+    }
+
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationWrapper.start(call);
+    }
+
+    public void reset(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
+        
+          this.nodeWrapper.reset(call, Deadline);
+    }
+
+    public void restart(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.restart(call);
+    }
+
+    public void suspend(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.suspend(call);
     }
 
     public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {

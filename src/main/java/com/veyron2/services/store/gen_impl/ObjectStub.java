@@ -334,39 +334,6 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
 
 
     @Override
-    public void commit(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.transactionStub.commit(context);
-    }
-    @Override
-    public void commit(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.transactionStub.commit(context, veyronOpts);
-    }
-
-    @Override
-    public void abort(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.transactionStub.abort(context);
-    }
-    @Override
-    public void abort(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.transactionStub.abort(context, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
-        
-        return this.globbableStub.glob(context, pattern);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.globbableStub.glob(context, pattern, veyronOpts);
-    }
-
-    @Override
     public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
         
         return this.globWatcherStub.watchGlob(context, Req);
@@ -397,6 +364,39 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.transactionRootStub.createTransaction(context, Options, veyronOpts);
+    }
+
+    @Override
+    public void commit(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.transactionStub.commit(context);
+    }
+    @Override
+    public void commit(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.transactionStub.commit(context, veyronOpts);
+    }
+
+    @Override
+    public void abort(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.transactionStub.abort(context);
+    }
+    @Override
+    public void abort(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.transactionStub.abort(context, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+        return this.globbableStub.glob(context, pattern);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.globbableStub.glob(context, pattern, veyronOpts);
     }
 
 

@@ -16,28 +16,28 @@ public final class Test_baseConstants {
     public static final byte CBYTE = (byte)1;
     
     
-    public static final int CINT32 = 2;
+    public static final int CINT_32 = 2;
     
     
-    public static final long CINT64 = 3L;
+    public static final long CINT_64 = 3L;
     
     
-    public static final int CUINT32 = 4;
+    public static final int CUINT_32 = 4;
     
     
-    public static final long CUINT64 = 5L;
+    public static final long CUINT_64 = 5L;
     
     
-    public static final float CFLOAT32 = 6.0f;
+    public static final float CFLOAT_32 = 6.0f;
     
     
-    public static final double CFLOAT64 = 7.0;
+    public static final double CFLOAT_64 = 7.0;
     
     
-    public static final org.apache.commons.math3.complex.Complex CCOMPLEX64 = new org.apache.commons.math3.complex.Complex(8, 9);
+    public static final org.apache.commons.math3.complex.Complex CCOMPLEX_64 = new org.apache.commons.math3.complex.Complex(8, 9);
     
     
-    public static final org.apache.commons.math3.complex.Complex CCOMPLEX128 = new org.apache.commons.math3.complex.Complex(10, 11);
+    public static final org.apache.commons.math3.complex.Complex CCOMPLEX_128 = new org.apache.commons.math3.complex.Complex(10, 11);
     
     
     public static final java.lang.String CSTRING = "foo";
@@ -66,10 +66,10 @@ public final class Test_baseConstants {
     
     
     
-    public static final java.lang.String ERRID_FOO = "veyron2/vdl/test_base.ErrIDFoo";
+    public static final java.lang.String ERR_ID_FOO = "veyron2/vdl/test_base.ErrIDFoo";
     
     
-    public static final java.lang.String ERRID_BAR = "some/path.ErrIdOther";
+    public static final java.lang.String ERR_ID_BAR = "some/path.ErrIdOther";
     
 
     

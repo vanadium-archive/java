@@ -78,14 +78,14 @@ public final class ProfileServiceWrapper {
 
 
 
-    public java.lang.String description(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.profileWrapper.description(call);
-    }
-
     public java.lang.String label(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
         return  this.profileWrapper.label(call);
+    }
+
+    public java.lang.String description(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.profileWrapper.description(call);
     }
  
 

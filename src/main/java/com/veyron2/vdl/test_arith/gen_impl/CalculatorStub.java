@@ -109,14 +109,14 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
 
 
     @Override
-    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
         
-        return this.arithStub.sub(context, args);
+        return this.arithStub.divMod(context, a, b);
     }
     @Override
-    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
-        return  this.arithStub.sub(context, args, veyronOpts);
+        return  this.arithStub.divMod(context, a, b, veyronOpts);
     }
 
     @Override
@@ -139,61 +139,6 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
     public com.veyron2.vdl.ClientStream<java.lang.Void,java.lang.Integer, java.lang.Void> count(final com.veyron2.ipc.Context context, final int Start, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.arithStub.count(context, Start, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.streamingAdd(context);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.streamingAdd(context, veyronOpts);
-    }
-
-    @Override
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.quoteAny(context, a);
-    }
-    @Override
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.quoteAny(context, a, veyronOpts);
-    }
-
-    @Override
-    public double exp(final com.veyron2.ipc.Context context, final double x) throws com.veyron2.ipc.VeyronException {
-        
-        return this.expStub.exp(context, x);
-    }
-    @Override
-    public double exp(final com.veyron2.ipc.Context context, final double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.expStub.exp(context, x, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.divMod(context, a, b);
-    }
-    @Override
-    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.divMod(context, a, b, veyronOpts);
-    }
-
-    @Override
-    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.mul(context, nested);
-    }
-    @Override
-    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.mul(context, nested, veyronOpts);
     }
 
     @Override
@@ -227,6 +172,61 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
     public int add(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.arithStub.add(context, a, b, veyronOpts);
+    }
+
+    @Override
+    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.sub(context, args);
+    }
+    @Override
+    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.sub(context, args, veyronOpts);
+    }
+
+    @Override
+    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.mul(context, nested);
+    }
+    @Override
+    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.mul(context, nested, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.streamingAdd(context);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.streamingAdd(context, veyronOpts);
+    }
+
+    @Override
+    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.quoteAny(context, a);
+    }
+    @Override
+    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.quoteAny(context, a, veyronOpts);
+    }
+
+    @Override
+    public double exp(final com.veyron2.ipc.Context context, final double x) throws com.veyron2.ipc.VeyronException {
+        
+        return this.expStub.exp(context, x);
+    }
+    @Override
+    public double exp(final com.veyron2.ipc.Context context, final double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.expStub.exp(context, x, veyronOpts);
     }
 
 

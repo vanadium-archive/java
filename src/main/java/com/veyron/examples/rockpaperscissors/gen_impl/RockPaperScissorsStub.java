@@ -40,6 +40,17 @@ public final class RockPaperScissorsStub implements com.veyron.examples.rockpape
 
 
     @Override
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+        return this.judgeStub.createGame(context, Opts);
+    }
+    @Override
+    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.judgeStub.createGame(context, Opts, veyronOpts);
+    }
+
+    @Override
     public com.veyron2.vdl.ClientStream<com.veyron.examples.rockpaperscissors.PlayerAction,com.veyron.examples.rockpaperscissors.JudgeAction, com.veyron.examples.rockpaperscissors.PlayResult> play(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
         
         return this.judgeStub.play(context, ID);
@@ -70,17 +81,6 @@ public final class RockPaperScissorsStub implements com.veyron.examples.rockpape
     public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
           this.scoreKeeperStub.record(context, Score, veyronOpts);
-    }
-
-    @Override
-    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
-        
-        return this.judgeStub.createGame(context, Opts);
-    }
-    @Override
-    public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.judgeStub.createGame(context, Opts, veyronOpts);
     }
 
 

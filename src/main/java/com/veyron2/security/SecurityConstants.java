@@ -50,28 +50,28 @@ public final class SecurityConstants {
  * in RFC3174.
  */
 
-    public static final com.veyron2.security.Hash SH_A1_HASH = new com.veyron2.security.Hash("SHA1");
+    public static final com.veyron2.security.Hash SHA_1_HASH = new com.veyron2.security.Hash("SHA1");
     
     /**
  * SHA256Hash denotes the SHA256 cryptographic hash function as defined
  * in FIPS 180-4.
  */
 
-    public static final com.veyron2.security.Hash SH_A256_HASH = new com.veyron2.security.Hash("SHA256");
+    public static final com.veyron2.security.Hash SHA_256_HASH = new com.veyron2.security.Hash("SHA256");
     
     /**
  * SHA384Hash denotes the SHA384 cryptographic hash function as defined
  * in FIPS 180-2.
  */
 
-    public static final com.veyron2.security.Hash SH_A384_HASH = new com.veyron2.security.Hash("SHA384");
+    public static final com.veyron2.security.Hash SHA_384_HASH = new com.veyron2.security.Hash("SHA384");
     
     /**
  * SHA512Hash denotes the SHA512 cryptographic hash function as defined
  * in FIPS 180-2.
  */
 
-    public static final com.veyron2.security.Hash SH_A512_HASH = new com.veyron2.security.Hash("SHA512");
+    public static final com.veyron2.security.Hash SHA_512_HASH = new com.veyron2.security.Hash("SHA512");
     
     /**
  * NoHash denotes the identity hash function.

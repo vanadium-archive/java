@@ -146,58 +146,14 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
 
 
     @Override
-    public void resume(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
         
-         this.applicationStub.resume(context);
+         this.applicationStub.updateTo(context, Name);
     }
     @Override
-    public void resume(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
-          this.applicationStub.resume(context, veyronOpts);
-    }
-
-    @Override
-    public void revert(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.applicationStub.revert(context);
-    }
-    @Override
-    public void revert(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationStub.revert(context, veyronOpts);
-    }
-
-    @Override
-    public void uninstall(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.applicationStub.uninstall(context);
-    }
-    @Override
-    public void uninstall(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationStub.uninstall(context, veyronOpts);
-    }
-
-    @Override
-    public void update(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.applicationStub.update(context);
-    }
-    @Override
-    public void update(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationStub.update(context, veyronOpts);
-    }
-
-    @Override
-    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-        
-        return this.applicationStub.install(context, Name);
-    }
-    @Override
-    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.applicationStub.install(context, Name, veyronOpts);
+          this.applicationStub.updateTo(context, Name, veyronOpts);
     }
 
     @Override
@@ -223,6 +179,28 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     }
 
     @Override
+    public void resume(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.resume(context);
+    }
+    @Override
+    public void resume(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.resume(context, veyronOpts);
+    }
+
+    @Override
+    public void revert(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.revert(context);
+    }
+    @Override
+    public void revert(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.revert(context, veyronOpts);
+    }
+
+    @Override
     public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
         return this.applicationStub.start(context);
@@ -231,17 +209,6 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationStub.start(context, veyronOpts);
-    }
-
-    @Override
-    public void stop(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException {
-        
-         this.applicationStub.stop(context, Deadline);
-    }
-    @Override
-    public void stop(final com.veyron2.ipc.Context context, final long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationStub.stop(context, Deadline, veyronOpts);
     }
 
     @Override
@@ -256,14 +223,47 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     }
 
     @Override
-    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+    public void update(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
-         this.applicationStub.updateTo(context, Name);
+         this.applicationStub.update(context);
     }
     @Override
-    public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void update(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
-          this.applicationStub.updateTo(context, Name, veyronOpts);
+          this.applicationStub.update(context, veyronOpts);
+    }
+
+    @Override
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+        return this.applicationStub.install(context, Name);
+    }
+    @Override
+    public java.lang.String install(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationStub.install(context, Name, veyronOpts);
+    }
+
+    @Override
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.stop(context, Deadline);
+    }
+    @Override
+    public void stop(final com.veyron2.ipc.Context context, final long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.stop(context, Deadline, veyronOpts);
+    }
+
+    @Override
+    public void uninstall(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.applicationStub.uninstall(context);
+    }
+    @Override
+    public void uninstall(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationStub.uninstall(context, veyronOpts);
     }
 
 

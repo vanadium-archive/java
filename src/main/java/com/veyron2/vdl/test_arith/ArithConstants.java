@@ -28,14 +28,14 @@ public final class ArithConstants {
  * Int32Const shows explicit integer typing.
  */
 
-    public static final int INT32_CONST = 123;
+    public static final int INT_32_CONST = 123;
     
     /**
  * Int64Const shows explicit integer conversion from another type, and referencing
  * a constant from another package.
  */
 
-    public static final long INT64_CONST = 128L;
+    public static final long INT_64_CONST = 128L;
     
     /**
  * FloatConst shows arithmetic expressions may be used.

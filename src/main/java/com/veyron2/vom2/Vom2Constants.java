@@ -13,101 +13,101 @@ public final class Vom2Constants {
  * Primitives
  */
 
-    public static final com.veyron2.vom2.TypeID WIRE_ANYID = new com.veyron2.vom2.TypeID(1L);
+    public static final com.veyron2.vom2.TypeID WIRE_ANY_ID = new com.veyron2.vom2.TypeID(1L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_TYPEID = new com.veyron2.vom2.TypeID(2L);
+    public static final com.veyron2.vom2.TypeID WIRE_TYPE_ID = new com.veyron2.vom2.TypeID(2L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_BOOLID = new com.veyron2.vom2.TypeID(3L);
+    public static final com.veyron2.vom2.TypeID WIRE_BOOL_ID = new com.veyron2.vom2.TypeID(3L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_STRINGID = new com.veyron2.vom2.TypeID(4L);
+    public static final com.veyron2.vom2.TypeID WIRE_STRING_ID = new com.veyron2.vom2.TypeID(4L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_BYTEID = new com.veyron2.vom2.TypeID(5L);
+    public static final com.veyron2.vom2.TypeID WIRE_BYTE_ID = new com.veyron2.vom2.TypeID(5L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_UINT16ID = new com.veyron2.vom2.TypeID(6L);
+    public static final com.veyron2.vom2.TypeID WIRE_UINT_16_ID = new com.veyron2.vom2.TypeID(6L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_UINT32ID = new com.veyron2.vom2.TypeID(7L);
+    public static final com.veyron2.vom2.TypeID WIRE_UINT_32_ID = new com.veyron2.vom2.TypeID(7L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_UINT64ID = new com.veyron2.vom2.TypeID(8L);
+    public static final com.veyron2.vom2.TypeID WIRE_UINT_64_ID = new com.veyron2.vom2.TypeID(8L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_INT16ID = new com.veyron2.vom2.TypeID(9L);
+    public static final com.veyron2.vom2.TypeID WIRE_INT_16_ID = new com.veyron2.vom2.TypeID(9L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_INT32ID = new com.veyron2.vom2.TypeID(10L);
+    public static final com.veyron2.vom2.TypeID WIRE_INT_32_ID = new com.veyron2.vom2.TypeID(10L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_INT64ID = new com.veyron2.vom2.TypeID(11L);
+    public static final com.veyron2.vom2.TypeID WIRE_INT_64_ID = new com.veyron2.vom2.TypeID(11L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_FLOAT32ID = new com.veyron2.vom2.TypeID(12L);
+    public static final com.veyron2.vom2.TypeID WIRE_FLOAT_32_ID = new com.veyron2.vom2.TypeID(12L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_FLOAT64ID = new com.veyron2.vom2.TypeID(13L);
+    public static final com.veyron2.vom2.TypeID WIRE_FLOAT_64_ID = new com.veyron2.vom2.TypeID(13L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_COMPLEX64ID = new com.veyron2.vom2.TypeID(14L);
+    public static final com.veyron2.vom2.TypeID WIRE_COMPLEX_64_ID = new com.veyron2.vom2.TypeID(14L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_COMPLEX128ID = new com.veyron2.vom2.TypeID(15L);
+    public static final com.veyron2.vom2.TypeID WIRE_COMPLEX_128_ID = new com.veyron2.vom2.TypeID(15L);
     
     /**
  * Composites only used in type definitions
  */
 
-    public static final com.veyron2.vom2.TypeID WIRE_NAMEDID = new com.veyron2.vom2.TypeID(16L);
+    public static final com.veyron2.vom2.TypeID WIRE_NAMED_ID = new com.veyron2.vom2.TypeID(16L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_ENUMID = new com.veyron2.vom2.TypeID(17L);
+    public static final com.veyron2.vom2.TypeID WIRE_ENUM_ID = new com.veyron2.vom2.TypeID(17L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_ARRAYID = new com.veyron2.vom2.TypeID(18L);
+    public static final com.veyron2.vom2.TypeID WIRE_ARRAY_ID = new com.veyron2.vom2.TypeID(18L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_LISTID = new com.veyron2.vom2.TypeID(19L);
+    public static final com.veyron2.vom2.TypeID WIRE_LIST_ID = new com.veyron2.vom2.TypeID(19L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_SETID = new com.veyron2.vom2.TypeID(20L);
+    public static final com.veyron2.vom2.TypeID WIRE_SET_ID = new com.veyron2.vom2.TypeID(20L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_MAPID = new com.veyron2.vom2.TypeID(21L);
+    public static final com.veyron2.vom2.TypeID WIRE_MAP_ID = new com.veyron2.vom2.TypeID(21L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_STRUCTID = new com.veyron2.vom2.TypeID(22L);
+    public static final com.veyron2.vom2.TypeID WIRE_STRUCT_ID = new com.veyron2.vom2.TypeID(22L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_FIELDID = new com.veyron2.vom2.TypeID(23L);
+    public static final com.veyron2.vom2.TypeID WIRE_FIELD_ID = new com.veyron2.vom2.TypeID(23L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_FIELD_LISTID = new com.veyron2.vom2.TypeID(24L);
+    public static final com.veyron2.vom2.TypeID WIRE_FIELD_LIST_ID = new com.veyron2.vom2.TypeID(24L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_ONE_OFID = new com.veyron2.vom2.TypeID(25L);
+    public static final com.veyron2.vom2.TypeID WIRE_ONE_OF_ID = new com.veyron2.vom2.TypeID(25L);
     
     /**
  * Other commonly used composites
  */
 
-    public static final com.veyron2.vom2.TypeID WIRE_BYTE_LISTID = new com.veyron2.vom2.TypeID(26L);
+    public static final com.veyron2.vom2.TypeID WIRE_BYTE_LIST_ID = new com.veyron2.vom2.TypeID(26L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_STRING_LISTID = new com.veyron2.vom2.TypeID(27L);
+    public static final com.veyron2.vom2.TypeID WIRE_STRING_LIST_ID = new com.veyron2.vom2.TypeID(27L);
     
     
-    public static final com.veyron2.vom2.TypeID WIRE_TYPE_LISTID = new com.veyron2.vom2.TypeID(28L);
+    public static final com.veyron2.vom2.TypeID WIRE_TYPE_LIST_ID = new com.veyron2.vom2.TypeID(28L);
     
     /**
  * The first user-defined TypeID is 65.  Note that -64 is encoded as 1 byte,
  * while -65 is encoded as 2 bytes.
  */
 
-    public static final com.veyron2.vom2.TypeID WIRE_TYPE_FIRST_USERID = new com.veyron2.vom2.TypeID(65L);
+    public static final com.veyron2.vom2.TypeID WIRE_TYPE_FIRST_USER_ID = new com.veyron2.vom2.TypeID(65L);
     
     
     

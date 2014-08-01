@@ -177,21 +177,6 @@ public final class ObjectServiceWrapper {
 
 
 
-    public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
-        
-          this.globbableWrapper.glob(call, pattern);
-    }
-
-    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
-        
-          this.globWatcherWrapper.watchGlob(call, Req);
-    }
-
-    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
-        
-          this.queryWatcherWrapper.watchQuery(call, Req);
-    }
-
     public java.lang.String createTransaction(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
         
         return  this.transactionRootWrapper.createTransaction(call, Options);
@@ -205,6 +190,21 @@ public final class ObjectServiceWrapper {
     public void abort(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.transactionWrapper.abort(call);
+    }
+
+    public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+          this.globbableWrapper.glob(call, pattern);
+    }
+
+    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+          this.globWatcherWrapper.watchGlob(call, Req);
+    }
+
+    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+          this.queryWatcherWrapper.watchQuery(call, Req);
     }
  
 

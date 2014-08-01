@@ -13,20 +13,20 @@ public final class StorageConstants {
  * RemoveACL means to remove the ACL from any inherited ACLs.
  */
 
-    public static final com.veyron2.storage.TagOp REMOVEACL = new com.veyron2.storage.TagOp((byte)0);
+    public static final com.veyron2.storage.TagOp REMOVE_ACL = new com.veyron2.storage.TagOp((byte)0);
     
     /**
  * AddACL means to add the ACL for a single value; it is not inherited.
  */
 
-    public static final com.veyron2.storage.TagOp ADDACL = new com.veyron2.storage.TagOp((byte)1);
+    public static final com.veyron2.storage.TagOp ADD_ACL = new com.veyron2.storage.TagOp((byte)1);
     
     /**
  * AddInheritedACL means to add the ACL for the value and all of its
  * descendents.
  */
 
-    public static final com.veyron2.storage.TagOp ADD_INHERITEDACL = new com.veyron2.storage.TagOp((byte)2);
+    public static final com.veyron2.storage.TagOp ADD_INHERITED_ACL = new com.veyron2.storage.TagOp((byte)2);
     
     /**
  * NoVersion means the entry is not present in the store.

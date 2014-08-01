@@ -35,6 +35,17 @@ public final class AdvancedMathStub implements com.veyron2.vdl.test_arith.Advanc
 
 
     @Override
+    public double sine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
+        
+        return this.trigonometryStub.sine(context, angle);
+    }
+    @Override
+    public double sine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.trigonometryStub.sine(context, angle, veyronOpts);
+    }
+
+    @Override
     public double cosine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
         
         return this.trigonometryStub.cosine(context, angle);
@@ -54,17 +65,6 @@ public final class AdvancedMathStub implements com.veyron2.vdl.test_arith.Advanc
     public double exp(final com.veyron2.ipc.Context context, final double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.expStub.exp(context, x, veyronOpts);
-    }
-
-    @Override
-    public double sine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
-        
-        return this.trigonometryStub.sine(context, angle);
-    }
-    @Override
-    public double sine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.trigonometryStub.sine(context, angle, veyronOpts);
     }
 
 

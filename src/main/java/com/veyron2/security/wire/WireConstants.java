@@ -13,7 +13,7 @@ public final class WireConstants {
  * KeyCurveP256 describes the NIST P256 curve.
  */
 
-    public static final com.veyron2.security.wire.KeyCurve KEY_CURVE_P256 = new com.veyron2.security.wire.KeyCurve((byte)0);
+    public static final com.veyron2.security.wire.KeyCurve KEY_CURVE_P_256 = new com.veyron2.security.wire.KeyCurve((byte)0);
     
     /**
  * ChainSeparator is used to join blessing names to form a blessing chain name.
