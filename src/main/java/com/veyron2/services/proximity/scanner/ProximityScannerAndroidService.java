@@ -28,7 +28,7 @@ public class ProximityScannerAndroidService extends Service {
     public void start() throws VeyronException, BluetoothNotEnabledException {
         proxService = ProximityScannerVeyronService
                 .create((BluetoothManager) getSystemService(BLUETOOTH_SERVICE));
-        s = RuntimeFactory.getRuntime().newServer();
+        s = RuntimeFactory.defaultRuntime().newServer();
         endpoint = s.listen("tcp", "127.0.0.1:8100");
         s.serve("proximity", new Dispatcher() {
             @Override
