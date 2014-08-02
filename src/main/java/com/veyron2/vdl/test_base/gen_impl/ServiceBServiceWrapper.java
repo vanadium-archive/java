@@ -56,11 +56,6 @@ public final class ServiceBServiceWrapper {
 
 
 
-    public void methodA1(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.serviceAWrapper.methodA1(call);
-    }
-
     public java.lang.String methodA2(final com.veyron2.ipc.ServerCall call, final int a, final java.lang.String b) throws com.veyron2.ipc.VeyronException {
         
         return  this.serviceAWrapper.methodA2(call, a, b);
@@ -74,6 +69,11 @@ public final class ServiceBServiceWrapper {
     public void methodA4(final com.veyron2.ipc.ServerCall call, final int a) throws com.veyron2.ipc.VeyronException {
         
           this.serviceAWrapper.methodA4(call, a);
+    }
+
+    public void methodA1(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.serviceAWrapper.methodA1(call);
     }
  
 

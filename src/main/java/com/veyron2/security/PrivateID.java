@@ -11,7 +11,7 @@ import org.joda.time.Duration;
  * Each principal has a unique (private, public) key pair. The private key
  * is known only to the principal and is not expected to be shared.
  */
-public interface PrivateID {
+public interface PrivateID extends Signer {
 	/**
 	 * Returns the non-secret component of principal's identity (which can be encoded and
 	 * transmitted across the network perhaps).
@@ -19,16 +19,6 @@ public interface PrivateID {
 	 * @return the non-secret component of principal's identity.
 	 */
 	public PublicID publicID();
-
-	/**
-	 * Signs an arbitrary length message (often the hash of a larger message) using the private
-	 * key associated with this identity.
-	 *
-	 * @param message          a message to be signed.
-	 * @return                 the signed message.
-	 * @throws VeyronException if the message cannot be signed.
-	 */
-	public byte[] sign(byte[] message) throws VeyronException;
 
 	/**
 	 * Creates a constrained PublicID from the provided one. The returned PublicID:

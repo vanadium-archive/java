@@ -1,39 +1,44 @@
 package com.veyron.runtimes.google.security;
 
+
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.ServiceCaveat;
+import com.veyron2.security.Signature;
 
 import org.joda.time.Duration;
 
+import java.security.interfaces.ECPublicKey;
+
 public class PrivateID implements com.veyron2.security.PrivateID {
-	private static native long nativeCreate(String name) throws VeyronException;
+	private static native long nativeCreate(String name, Signer signer) throws VeyronException;
 
 	/**
-	 * Returns a new PrivateID containing a freshly generated private key, a single self-signed
-	 * certificate specifying the provided name, and the public key corresponding to the generated
-	 * private key.
+	 * Returns a new PrivateID that uses the provided Signer to generate signatures.  The returned
+	 * PrivateID contains a single self-signed certificate with the given name.
 	 *
 	 * @param  name            a name specified in the certificate, e.g., Alice, Bob.
+	 * @param  signer          a signer used for generating signatures.
 	 * @return                 the private id.
 	 * @throws VeyronException if the private id couldn't be created.
 	 */
-	public static PrivateID create(String name) throws VeyronException {
-		return new PrivateID(nativeCreate(name));
+	public static PrivateID create(String name, Signer signer) throws VeyronException {
+		return new PrivateID(nativeCreate(name, signer), signer);
 	}
 
 	private final long nativePtr;
+	private final com.veyron2.security.Signer signer;
 
 	private native long nativePublicID(long nativePtr);
-	private native byte[] nativeSign(long nativePtr, byte[] message) throws VeyronException;
 	private native long nativeBless(long nativePtr, com.veyron2.security.PublicID blessee,
-		String blessingName, long durationMilliseconds, ServiceCaveat[] caveats)
+		String blessingName, Duration duration, ServiceCaveat[] caveats)
 		throws VeyronException;
 	private native long nativeDerive(long nativePtr, com.veyron2.security.PublicID publicID)
 		throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	public PrivateID(long nativePtr) {
+	public PrivateID(long nativePtr, com.veyron2.security.Signer signer) {
 		this.nativePtr = nativePtr;
+		this.signer = signer;
 	}
 	// Implements com.veyron2.security.PrivateID.
 	@Override
@@ -41,19 +46,23 @@ public class PrivateID implements com.veyron2.security.PrivateID {
 		return new PublicID(nativePublicID(this.nativePtr));
 	}
 	@Override
-	public byte[] sign(byte[] message) throws VeyronException {
-		return nativeSign(this.nativePtr, message);
+	public Signature sign(byte[] message) throws VeyronException {
+		return this.signer.sign(message);
+	}
+	@Override
+	public ECPublicKey publicKey() {
+		return this.signer.publicKey();
 	}
 	@Override
 	public com.veyron2.security.PublicID bless(com.veyron2.security.PublicID blessee,
 		String blessingName, Duration duration,	ServiceCaveat[] caveats) throws VeyronException {
 		return new PublicID(
-			nativeBless(this.nativePtr, blessee, blessingName, duration.getMillis(), caveats));
+			nativeBless(this.nativePtr, blessee, blessingName, duration, caveats));
 	}
 	@Override
 	public com.veyron2.security.PrivateID derive(com.veyron2.security.PublicID publicID)
 		throws VeyronException {
-		return new PrivateID(nativeDerive(this.nativePtr, publicID));
+		return new PrivateID(nativeDerive(this.nativePtr, publicID), this.signer);
 	}
 	// Implements java.lang.Object.
 	@Override

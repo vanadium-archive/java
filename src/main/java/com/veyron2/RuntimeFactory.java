@@ -1,13 +1,14 @@
 package com.veyron2;
 
+import android.content.Context;
 import com.veyron2.Runtime;
 import com.veyron2.ipc.VeyronException;
 
 /**
- * RuntimeFactory creates new Runtimes.  It represents an entry point into the Veyron environment.
+ * RuntimeFactory creates new Runtimes.  It represents an entry point into the Veyron codebase.
  * The expected usage pattern of this class goes something like this:
  *
- *    RuntimeFactory.init();  // optional
+ *    RuntimeFactory.init();
  *    ...
  *    final Runtime r = RuntimeFactory.getRuntime();
  *    final Server s = r.newServer();
@@ -17,33 +18,38 @@ import com.veyron2.ipc.VeyronException;
  */
 public class RuntimeFactory {
   /**
-   * Initialize the runtime factory, creating a pre-initialized instance of a Runtime.
-   * Invoking this operation is optional (Runtime creation methods below ensure that it will
-   * be invoked, exactly once), but as it can be expensive it is provided for performance-aware
-   * clients to invoke at an opportune time (e.g., initialization).
+   * Returns the initialized global instance of the Runtime.  Calling this method multiple times
+   * will always return the result of the first call to <code>init</code> (ignoring subsequently
+   * provided options). All Veyron apps should call <code>init</code> as the first thing in their
+   * execution flow.
    *
-   * @return Runtime a pre-initialized runtime instance.
+   * @param ctx   android context.
+   * @param opts  runtime options.
+   * @return      a pre-initialized runtime instance.
    */
-  public static synchronized Runtime init() {
-    return com.veyron.runtimes.google.Runtime.global();
+  public static synchronized Runtime init(Context ctx, Options opts) {
+      return com.veyron.runtimes.google.Runtime.init(ctx, opts);
   }
 
   /**
-   * Returns the pre-initialized instance of a Runtime.
+   * Returns the global, pre-initialized instance of a Runtime.  Returns <code>null</code> if init()
+   * hasn't already been invoked.
    *
-   * @return Runtime a pre-initialized runtime instance.
+   * @return a pre-initialized runtime instance.
    */
-  public static synchronized Runtime getRuntime() {
-    return com.veyron.runtimes.google.Runtime.global();
+  public static synchronized Runtime defaultRuntime() {
+    return com.veyron.runtimes.google.Runtime.defaultRuntime();
   }
 
   /**
-   * Creates and returns a new Runtime instance.
+   * Creates and initializes a new Runtime instance.  This method should be used in unit tests
+   * and any situation where a single global runtime instance is inappropriate.
    *
-   * @return Runtime a new Runtime instance.
-   * @throws VeyronException if the new runtime cannot be created.
+   * @param ctx   android context.
+   * @param opts  runtime options.
+   * @return      a new Runtime instance.
    */
-  public static Runtime newRuntime() throws VeyronException {
-    return new com.veyron.runtimes.google.Runtime();
+  public static Runtime newRuntime(Context ctx, Options opts) {
+    return com.veyron.runtimes.google.Runtime.newRuntime(ctx, opts);
   }
 }

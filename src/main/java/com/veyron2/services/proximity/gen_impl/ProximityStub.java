@@ -35,6 +35,17 @@ public final class ProximityStub implements com.veyron2.services.proximity.Proxi
 
 
     @Override
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+         this.proximityAnnouncerStub.registerName(context, Name);
+    }
+    @Override
+    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.proximityAnnouncerStub.registerName(context, Name, veyronOpts);
+    }
+
+    @Override
     public void unregisterName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
         
          this.proximityAnnouncerStub.unregisterName(context, Name);
@@ -54,17 +65,6 @@ public final class ProximityStub implements com.veyron2.services.proximity.Proxi
     public java.util.ArrayList<com.veyron2.services.proximity.Device> nearbyDevices(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.proximityScannerStub.nearbyDevices(context, veyronOpts);
-    }
-
-    @Override
-    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-        
-         this.proximityAnnouncerStub.registerName(context, Name);
-    }
-    @Override
-    public void registerName(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.proximityAnnouncerStub.registerName(context, Name, veyronOpts);
     }
 
 

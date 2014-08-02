@@ -24,4 +24,10 @@ public class OptionDefs {
      * A key for an option of type {@link com.veyron2.ipc.Client} that specifies a Client.
      */
     public static String CLIENT = "com.veyron2.CLIENT";
+
+    /**
+     * A key for an option of type {@link com.veyron2.security.PrivateID} that specifies the
+     * identity to be used by the runtime.
+     */
+    public static String RUNTIME_ID = "com.veyron2.RUNTIME_ID";
 }

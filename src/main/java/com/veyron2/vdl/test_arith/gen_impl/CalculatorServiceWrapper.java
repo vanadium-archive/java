@@ -94,14 +94,29 @@ public final class CalculatorServiceWrapper {
 
 
 
-    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.ServerCall call, final int a, final int b) throws com.veyron2.ipc.VeyronException {
+    public double sine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
         
-        return  this.arithWrapper.divMod(call, a, b);
+        return  this.trigonometryWrapper.sine(call, angle);
+    }
+
+    public double cosine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.trigonometryWrapper.cosine(call, angle);
+    }
+
+    public double exp(final com.veyron2.ipc.ServerCall call, final double x) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.expWrapper.exp(call, x);
     }
 
     public int sub(final com.veyron2.ipc.ServerCall call, final com.veyron2.vdl.test_base.Args args) throws com.veyron2.ipc.VeyronException {
         
         return  this.arithWrapper.sub(call, args);
+    }
+
+    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.ServerCall call, final int a, final int b) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithWrapper.divMod(call, a, b);
     }
 
     public int mul(final com.veyron2.ipc.ServerCall call, final com.veyron2.vdl.test_base.NestedArgs nested) throws com.veyron2.ipc.VeyronException {
@@ -114,29 +129,14 @@ public final class CalculatorServiceWrapper {
           this.arithWrapper.genError(call);
     }
 
-    public int streamingAdd(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithWrapper.streamingAdd(call);
-    }
-
-    public double sine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.trigonometryWrapper.sine(call, angle);
-    }
-
-    public double cosine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.trigonometryWrapper.cosine(call, angle);
-    }
-
-    public int add(final com.veyron2.ipc.ServerCall call, final int a, final int b) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithWrapper.add(call, a, b);
-    }
-
     public void count(final com.veyron2.ipc.ServerCall call, final int Start) throws com.veyron2.ipc.VeyronException {
         
           this.arithWrapper.count(call, Start);
+    }
+
+    public int streamingAdd(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithWrapper.streamingAdd(call);
     }
 
     public java.lang.Object quoteAny(final com.veyron2.ipc.ServerCall call, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
@@ -144,9 +144,9 @@ public final class CalculatorServiceWrapper {
         return  this.arithWrapper.quoteAny(call, a);
     }
 
-    public double exp(final com.veyron2.ipc.ServerCall call, final double x) throws com.veyron2.ipc.VeyronException {
+    public int add(final com.veyron2.ipc.ServerCall call, final int a, final int b) throws com.veyron2.ipc.VeyronException {
         
-        return  this.expWrapper.exp(call, x);
+        return  this.arithWrapper.add(call, a, b);
     }
  
 

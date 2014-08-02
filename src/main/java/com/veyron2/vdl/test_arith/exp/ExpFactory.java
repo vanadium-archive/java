@@ -14,7 +14,7 @@ public final class ExpFactory {
         } else if (veyronOpts != null && veyronOpts.get(com.veyron2.OptionDefs.RUNTIME) != null) {
             client = veyronOpts.get(com.veyron2.OptionDefs.RUNTIME, com.veyron2.Runtime.class).getClient();
         } else {
-            client = com.veyron2.RuntimeFactory.getRuntime().getClient();
+            client = com.veyron2.RuntimeFactory.defaultRuntime().getClient();
         }
         return new com.veyron2.vdl.test_arith.exp.gen_impl.ExpStub(client, name);
     }

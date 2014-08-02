@@ -22,4 +22,10 @@ public class Caveat implements com.veyron2.security.Caveat {
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);
 	}
+	/**
+	 * Returns the pointer to the native implementation.
+	 *
+	 * @return the pointer to the native implementation.
+	 */
+	private long getNativePtr() { return this.nativePtr; }
 }

@@ -1,16 +1,15 @@
 package com.veyron.runtimes.google;
 
-import java.io.EOFException;
-import java.util.Date;
-
-import org.joda.time.Duration;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+
 import com.veyron.runtimes.google.android.RedirectStderr;
+import com.veyron.runtimes.google.security.CryptoUtil;
+import com.veyron.runtimes.google.security.PrivateID;
+import com.veyron.runtimes.google.security.Signer;
 import com.veyron2.OptionDefs;
 import com.veyron2.Options;
 import com.veyron2.ipc.Dispatcher;
@@ -18,27 +17,88 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.Label;
 import com.veyron2.security.PublicID;
 
+import org.joda.time.Duration;
+
+import java.io.EOFException;
+import java.security.KeyStore;
+import java.security.interfaces.ECPublicKey;
+import java.util.Date;
+
 /**
- * Runtime is the Veyron runtime that calls to native implementations for most of
- * its functionalities.
+ * Runtime is an implementation of Veyron Runtime that calls to native Go code for most of its
+ * functionalities.
  */
 public class Runtime implements com.veyron2.Runtime {
 	private static Runtime globalRuntime = null;
 
+	private static native long nativeInit(Options opts);
+	private static native long nativeNewRuntime(Options opts) throws VeyronException;
+
 	/**
-	 * Returns the global runtime instance.
+	 * Returns the initialized global instance of the Runtime.
 	 *
-	 * @return Runtime a global runtime instance.
+	 * @param  ctx  android context.
+	 * @param  opts runtime options.
+	 * @return      a pre-initialized runtime instance.
 	 */
-	public static synchronized Runtime global() {
+	public static synchronized Runtime init(android.content.Context ctx, Options opts) {
 		if (Runtime.globalRuntime == null) {
 			try {
-				Runtime.globalRuntime = new Runtime(false);
+				setupRuntimeOptions(ctx, opts);
+				Runtime.globalRuntime = new Runtime(nativeInit(opts));
 			} catch (VeyronException e) {
-				throw new RuntimeException("Unexpected VeyronException: "+ e.getMessage());
+				throw new RuntimeException(
+					"Couldn't initialize global Veyron Runtime instance: " + e.getMessage());
 			}
 		}
 		return Runtime.globalRuntime;
+	}
+
+	/**
+	 * Returns the pre-initialized global Runtime instance.  Returns <code>null</code> if init()
+	 * hasn't already been invoked.
+	 *
+	 * @return a pre-initialized runtime instance.
+	 */
+	public static synchronized Runtime defaultRuntime() {
+		return Runtime.globalRuntime;
+	}
+
+	/**
+	 * Creates and initializes a new Runtime instance.
+	 *
+	 * @param  ctx  android context.
+	 * @param  opts runtime options.
+	 * @return      a new runtime instance.
+	 */
+	public static synchronized Runtime newRuntime(android.content.Context ctx, Options opts) {
+		try {
+			setupRuntimeOptions(ctx, opts);
+			return new Runtime(nativeNewRuntime(opts));
+		} catch (VeyronException e) {
+			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
+		}
+	}
+
+	private static void setupRuntimeOptions(android.content.Context ctx, Options opts)
+		throws VeyronException {
+		// If the PrivateID option isn't specified, generate a new PrivateID.  Note that we
+		// choose to generate keys inside Java (instead of native code) because we can
+		// conveniently store them inside Android KeyStore.
+		if (!opts.has(OptionDefs.RUNTIME_ID) || opts.get(OptionDefs.RUNTIME_ID) == null) {
+			// Check if the private key has already been generated for this package.
+			// (NOTE: Android package names are unique.)
+			KeyStore.PrivateKeyEntry keyEntry =
+				CryptoUtil.getKeyStorePrivateKey(ctx.getPackageName());
+			if (keyEntry == null) {
+				// Generate a new private key.
+				keyEntry = CryptoUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
+			}
+			final Signer signer = new Signer(
+				keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
+			final PrivateID id = PrivateID.create(ctx.getPackageName(), signer);
+			opts.set(OptionDefs.RUNTIME_ID, id);
+		}
 	}
 
 	static {
@@ -50,18 +110,14 @@ public class Runtime implements com.veyron2.Runtime {
 	private final long nativePtr;
 	private Client client = null;
 
-	private native long nativeInit(boolean create) throws VeyronException;
 	private native long nativeNewClient(long nativePtr, long timeoutMillis) throws VeyronException;
 	private native long nativeNewServer(long nativePtr) throws VeyronException;
 	private native long nativeGetClient(long nativePtr);
 	private native long nativeNewContext(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
-	public Runtime() throws VeyronException {
-		this.nativePtr = nativeInit(true);
-	}
-	private Runtime(boolean create) throws VeyronException {
-		this.nativePtr = nativeInit(create);
+	private Runtime(long nativePtr) {
+		this.nativePtr = nativePtr;
 	}
 	@Override
 	public com.veyron2.ipc.Client newClient() throws VeyronException {
