@@ -39,7 +39,7 @@ public final class ProximityAnnouncerStub implements com.veyron2.services.proxim
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "registerName", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class ProximityAnnouncerStub implements com.veyron2.services.proxim
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "unregisterName", inArgs, veyronOpts);
 
         // Finish the call.
         

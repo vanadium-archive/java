@@ -39,7 +39,7 @@ public final class JudgeStub implements com.veyron.examples.rockpaperscissors.Ju
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Opts };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "createGame", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -81,7 +81,7 @@ public final class JudgeStub implements com.veyron.examples.rockpaperscissors.Ju
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ ID };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "play", inArgs, veyronOpts);
 
         // Finish the call.
         

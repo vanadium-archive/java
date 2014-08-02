@@ -39,7 +39,7 @@ public final class AppCycleStub implements com.veyron2.services.mgmt.appcycle.Ap
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "stop", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -91,7 +91,7 @@ public final class AppCycleStub implements com.veyron2.services.mgmt.appcycle.Ap
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "forceStop", inArgs, veyronOpts);
 
         // Finish the call.
         

@@ -39,7 +39,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key, value };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "set", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "get", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -113,7 +113,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsByte", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -155,7 +155,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsInt32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -197,7 +197,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsInt64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -239,7 +239,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsUint32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -281,7 +281,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsUint64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -323,7 +323,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsFloat32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -365,7 +365,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsFloat64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -407,7 +407,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsString", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -449,7 +449,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsBool", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -491,7 +491,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getAsError", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -533,7 +533,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "asMap", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -575,7 +575,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "keyValuePairs", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -617,7 +617,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "mostRecentSet", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -669,7 +669,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ index };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "keyPage", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -711,7 +711,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "size", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -753,7 +753,7 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "multiGet", inArgs, veyronOpts);
 
         // Finish the call.
         

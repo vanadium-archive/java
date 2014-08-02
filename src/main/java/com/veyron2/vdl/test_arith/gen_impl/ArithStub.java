@@ -39,7 +39,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a, b };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "add", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -81,7 +81,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a, b };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "divMod", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -133,7 +133,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ args };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "sub", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -175,7 +175,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ nested };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "mul", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -217,7 +217,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "genError", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -249,7 +249,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Start };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "count", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -301,7 +301,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "streamingAdd", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -356,7 +356,7 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "quoteAny", inArgs, veyronOpts);
 
         // Finish the call.
         

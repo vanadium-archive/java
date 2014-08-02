@@ -39,7 +39,7 @@ public final class StoreStub implements com.veyron.services.store.raw.Store {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Req };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "watch", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -91,7 +91,7 @@ public final class StoreStub implements com.veyron.services.store.raw.Store {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "putMutations", inArgs, veyronOpts);
 
         // Finish the call.
         

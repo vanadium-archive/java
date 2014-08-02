@@ -39,7 +39,7 @@ public final class ExpStub implements com.veyron2.vdl.test_arith.exp.Exp {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ x };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "exp", inArgs, veyronOpts);
 
         // Finish the call.
         

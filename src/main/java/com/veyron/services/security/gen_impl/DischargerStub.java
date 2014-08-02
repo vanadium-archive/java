@@ -39,7 +39,7 @@ public final class DischargerStub implements com.veyron.services.security.Discha
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Caveat };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "discharge", inArgs, veyronOpts);
 
         // Finish the call.
         

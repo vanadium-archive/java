@@ -39,7 +39,7 @@ public final class TransactionStub implements com.veyron2.services.store.Transac
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "commit", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class TransactionStub implements com.veyron2.services.store.Transac
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "abort", inArgs, veyronOpts);
 
         // Finish the call.
         

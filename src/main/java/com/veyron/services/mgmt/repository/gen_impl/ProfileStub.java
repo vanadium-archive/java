@@ -44,7 +44,7 @@ public final class ProfileStub implements com.veyron.services.mgmt.repository.Pr
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "specification", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -86,7 +86,7 @@ public final class ProfileStub implements com.veyron.services.mgmt.repository.Pr
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Specification };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "put", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -118,7 +118,7 @@ public final class ProfileStub implements com.veyron.services.mgmt.repository.Pr
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "remove", inArgs, veyronOpts);
 
         // Finish the call.
         

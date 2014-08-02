@@ -39,7 +39,7 @@ public final class ObjectStub implements com.veyron2.services.security.access.Ob
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ acl, etag };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "setACL", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class ObjectStub implements com.veyron2.services.security.access.Ob
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getACL", inArgs, veyronOpts);
 
         // Finish the call.
         

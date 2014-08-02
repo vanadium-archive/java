@@ -39,7 +39,7 @@ public final class ServiceAStub implements com.veyron2.vdl.test_base.ServiceA {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "methodA1", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class ServiceAStub implements com.veyron2.vdl.test_base.ServiceA {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a, b };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "methodA2", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -113,7 +113,7 @@ public final class ServiceAStub implements com.veyron2.vdl.test_base.ServiceA {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "methodA3", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -168,7 +168,7 @@ public final class ServiceAStub implements com.veyron2.vdl.test_base.ServiceA {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "methodA4", inArgs, veyronOpts);
 
         // Finish the call.
         

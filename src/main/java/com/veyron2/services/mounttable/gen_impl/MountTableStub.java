@@ -44,7 +44,7 @@ public final class MountTableStub implements com.veyron2.services.mounttable.Mou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Server, TTL };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "mount", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -76,7 +76,7 @@ public final class MountTableStub implements com.veyron2.services.mounttable.Mou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Server };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "unmount", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -108,7 +108,7 @@ public final class MountTableStub implements com.veyron2.services.mounttable.Mou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "resolveStep", inArgs, veyronOpts);
 
         // Finish the call.
         

@@ -39,7 +39,7 @@ public final class BenchmarkStub implements com.veyron.runtimes.google.ipc.bench
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Payload };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echo", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -81,7 +81,7 @@ public final class BenchmarkStub implements com.veyron.runtimes.google.ipc.bench
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoStream", inArgs, veyronOpts);
 
         // Finish the call.
         

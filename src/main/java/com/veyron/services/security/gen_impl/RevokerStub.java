@@ -39,7 +39,7 @@ public final class RevokerStub implements com.veyron.services.security.Revoker {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ caveatPreimage };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "revoke", inArgs, veyronOpts);
 
         // Finish the call.
         

@@ -39,7 +39,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "install", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -81,7 +81,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "refresh", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -113,7 +113,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "restart", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -145,7 +145,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "resume", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -177,7 +177,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "revert", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -209,7 +209,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "start", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -251,7 +251,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Deadline };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "stop", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -283,7 +283,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "suspend", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -315,7 +315,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "uninstall", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -347,7 +347,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "update", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -379,7 +379,7 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "updateTo", inArgs, veyronOpts);
 
         // Finish the call.
         

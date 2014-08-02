@@ -1,7 +1,5 @@
 package com.veyron.runtimes.google;
 
-import android.util.Log;
-
 import java.io.EOFException;
 import java.util.Date;
 
@@ -167,6 +165,9 @@ public class Runtime implements com.veyron2.Runtime {
 		@Override
 		public Call startCall(com.veyron2.ipc.Context context, String name, String method,
 			Object[] args, Options opts) throws VeyronException {
+			if (method == "") {
+				throw new VeyronException("Empty method name invoked on object %s", name);
+			}
 			// Read options.
 			final Duration timeout = opts.get(OptionDefs.CALL_TIMEOUT, Duration.class);
 			final String vdlPath = opts.get(OptionDefs.VDL_INTERFACE_PATH, String.class);
@@ -183,6 +184,8 @@ public class Runtime implements com.veyron2.Runtime {
 			}
 
 			// Invoke native method.
+			// Make sure that the method name starts with an uppercase character.
+			method = Character.toUpperCase(method.charAt(0)) + method.substring(1);
 			final long nativeCallPtr =
 				nativeStartCall(this.nativePtr, context, name, method, jsonArgs, vdlPath,
 					timeout != null ? timeout.getMillis() : -1);

@@ -59,7 +59,7 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "on", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -91,7 +91,7 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "off", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -107,17 +107,6 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
 
 
 
-
-    @Override
-    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.divMod(context, a, b);
-    }
-    @Override
-    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.divMod(context, a, b, veyronOpts);
-    }
 
     @Override
     public void genError(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
@@ -142,72 +131,6 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
     }
 
     @Override
-    public double sine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
-        
-        return this.trigonometryStub.sine(context, angle);
-    }
-    @Override
-    public double sine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.trigonometryStub.sine(context, angle, veyronOpts);
-    }
-
-    @Override
-    public double cosine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
-        
-        return this.trigonometryStub.cosine(context, angle);
-    }
-    @Override
-    public double cosine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.trigonometryStub.cosine(context, angle, veyronOpts);
-    }
-
-    @Override
-    public int add(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.add(context, a, b);
-    }
-    @Override
-    public int add(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.add(context, a, b, veyronOpts);
-    }
-
-    @Override
-    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.sub(context, args);
-    }
-    @Override
-    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.sub(context, args, veyronOpts);
-    }
-
-    @Override
-    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.mul(context, nested);
-    }
-    @Override
-    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.mul(context, nested, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-        return this.arithStub.streamingAdd(context);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.arithStub.streamingAdd(context, veyronOpts);
-    }
-
-    @Override
     public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
         
         return this.arithStub.quoteAny(context, a);
@@ -227,6 +150,83 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
     public double exp(final com.veyron2.ipc.Context context, final double x, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.expStub.exp(context, x, veyronOpts);
+    }
+
+    @Override
+    public int add(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.add(context, a, b);
+    }
+    @Override
+    public int add(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.add(context, a, b, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.divMod(context, a, b);
+    }
+    @Override
+    public com.veyron2.vdl.test_arith.Arith.DivModOut divMod(final com.veyron2.ipc.Context context, final int a, final int b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.divMod(context, a, b, veyronOpts);
+    }
+
+    @Override
+    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.mul(context, nested);
+    }
+    @Override
+    public int mul(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.NestedArgs nested, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.mul(context, nested, veyronOpts);
+    }
+
+    @Override
+    public double cosine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
+        
+        return this.trigonometryStub.cosine(context, angle);
+    }
+    @Override
+    public double cosine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.trigonometryStub.cosine(context, angle, veyronOpts);
+    }
+
+    @Override
+    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.sub(context, args);
+    }
+    @Override
+    public int sub(final com.veyron2.ipc.Context context, final com.veyron2.vdl.test_base.Args args, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.sub(context, args, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.arithStub.streamingAdd(context);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.Integer, java.lang.Integer> streamingAdd(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.arithStub.streamingAdd(context, veyronOpts);
+    }
+
+    @Override
+    public double sine(final com.veyron2.ipc.Context context, final double angle) throws com.veyron2.ipc.VeyronException {
+        
+        return this.trigonometryStub.sine(context, angle);
+    }
+    @Override
+    public double sine(final com.veyron2.ipc.Context context, final double angle, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.trigonometryStub.sine(context, angle, veyronOpts);
     }
 
 

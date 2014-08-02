@@ -39,7 +39,7 @@ public final class BankStub implements com.veyron.examples.bank.Bank {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "connect", inArgs, veyronOpts);
 
         // Finish the call.
         

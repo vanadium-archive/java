@@ -39,7 +39,7 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "pipe", inArgs, veyronOpts);
 
         // Finish the call.
         

@@ -39,7 +39,7 @@ public final class PlayerStub implements com.veyron.examples.rockpaperscissors.P
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Address, ID, Opts };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "challenge", inArgs, veyronOpts);
 
         // Finish the call.
         

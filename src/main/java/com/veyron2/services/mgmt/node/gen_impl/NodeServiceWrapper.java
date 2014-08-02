@@ -78,9 +78,19 @@ public final class NodeServiceWrapper {
 
 
 
+    public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.uninstall(call);
+    }
+
     public java.lang.String install(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationWrapper.install(call, Name);
+    }
+
+    public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.refresh(call);
     }
 
     public void restart(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
@@ -93,29 +103,14 @@ public final class NodeServiceWrapper {
           this.applicationWrapper.resume(call);
     }
 
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.applicationWrapper.start(call);
-    }
-
-    public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.uninstall(call);
-    }
-
-    public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.updateTo(call, Name);
-    }
-
-    public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.refresh(call);
-    }
-
     public void revert(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.revert(call);
+    }
+
+    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationWrapper.start(call);
     }
 
     public void stop(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
@@ -131,6 +126,11 @@ public final class NodeServiceWrapper {
     public void update(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.update(call);
+    }
+
+    public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.updateTo(call, Name);
     }
  
 

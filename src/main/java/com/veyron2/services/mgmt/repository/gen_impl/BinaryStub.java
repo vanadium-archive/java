@@ -39,7 +39,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ nparts };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "create", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "delete", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -103,7 +103,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ part };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "download", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -155,7 +155,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "downloadURL", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -207,7 +207,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "stat", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -249,7 +249,7 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ part };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "upload", inArgs, veyronOpts);
 
         // Finish the call.
         

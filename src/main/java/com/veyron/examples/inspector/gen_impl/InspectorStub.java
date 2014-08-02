@@ -39,7 +39,7 @@ public final class InspectorStub implements com.veyron.examples.inspector.Inspec
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Glob };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "ls", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -91,7 +91,7 @@ public final class InspectorStub implements com.veyron.examples.inspector.Inspec
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Glob };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "lsDetails", inArgs, veyronOpts);
 
         // Finish the call.
         

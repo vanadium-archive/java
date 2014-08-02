@@ -44,7 +44,7 @@ public final class ServiceBStub implements com.veyron2.vdl.test_base.ServiceB {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ a, b };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "methodB1", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -72,28 +72,6 @@ public final class ServiceBStub implements com.veyron2.vdl.test_base.ServiceB {
 
 
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException {
-        
-        return this.serviceAStub.methodA3(context, a);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.serviceAStub.methodA3(context, a, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException {
-        
-        return this.serviceAStub.methodA4(context, a);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.serviceAStub.methodA4(context, a, veyronOpts);
-    }
-
-    @Override
     public void methodA1(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
          this.serviceAStub.methodA1(context);
@@ -113,6 +91,28 @@ public final class ServiceBStub implements com.veyron2.vdl.test_base.ServiceB {
     public java.lang.String methodA2(final com.veyron2.ipc.Context context, final int a, final java.lang.String b, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.serviceAStub.methodA2(context, a, b, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException {
+        
+        return this.serviceAStub.methodA3(context, a);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.vdl.test_base.Scalars, java.lang.String> methodA3(final com.veyron2.ipc.Context context, final int a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.serviceAStub.methodA3(context, a, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a) throws com.veyron2.ipc.VeyronException {
+        
+        return this.serviceAStub.methodA4(context, a);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Integer,java.lang.String, java.lang.Void> methodA4(final com.veyron2.ipc.Context context, final int a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.serviceAStub.methodA4(context, a, veyronOpts);
     }
 
 

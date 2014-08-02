@@ -39,7 +39,7 @@ public final class SyncStub implements com.veyron.runtimes.google.vsync.Sync {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ In, ClientID };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "getDeltas", inArgs, veyronOpts);
 
         // Finish the call.
         

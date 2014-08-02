@@ -39,7 +39,7 @@ public final class BankAccountStub implements com.veyron.examples.bank.BankAccou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ amount };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "deposit", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class BankAccountStub implements com.veyron.examples.bank.BankAccou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ amount };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "withdraw", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -103,7 +103,7 @@ public final class BankAccountStub implements com.veyron.examples.bank.BankAccou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ receiver, amount };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "transfer", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -135,7 +135,7 @@ public final class BankAccountStub implements com.veyron.examples.bank.BankAccou
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "balance", inArgs, veyronOpts);
 
         // Finish the call.
         

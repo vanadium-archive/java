@@ -39,7 +39,7 @@ public final class CollectionStub implements com.veyron.services.mounttable.lib.
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Val, Overwrite };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "export", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class CollectionStub implements com.veyron.services.mounttable.lib.
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "lookup", inArgs, veyronOpts);
 
         // Finish the call.
         

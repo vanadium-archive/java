@@ -39,7 +39,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwAborted", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwBadArg", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -103,7 +103,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwBadProtocol", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -135,7 +135,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwInternal", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -167,7 +167,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwNotAuthorized", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -199,7 +199,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwNotFound", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -231,7 +231,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwUnknown", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -263,7 +263,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwGoError", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -295,7 +295,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "throwCustomStandardError", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -327,7 +327,7 @@ public final class ErrorThrowerStub implements com.veyron.examples.wspr_sample.E
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "listAllBuiltInErrorIDs", inArgs, veyronOpts);
 
         // Finish the call.
         

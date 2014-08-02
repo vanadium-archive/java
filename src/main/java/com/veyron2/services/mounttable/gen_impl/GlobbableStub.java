@@ -39,7 +39,7 @@ public final class GlobbableStub implements com.veyron2.services.mounttable.Glob
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ pattern };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "glob", inArgs, veyronOpts);
 
         // Finish the call.
         

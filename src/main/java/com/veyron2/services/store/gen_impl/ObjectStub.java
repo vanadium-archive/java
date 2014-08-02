@@ -64,7 +64,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "exists", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -106,7 +106,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "get", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -148,7 +148,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ V };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "put", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -190,7 +190,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "remove", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -222,7 +222,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Attrs };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "setAttr", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -254,7 +254,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "stat", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -296,7 +296,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Q };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "query", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -332,6 +332,28 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
 
 
 
+
+    @Override
+    public void abort(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+         this.transactionStub.abort(context);
+    }
+    @Override
+    public void abort(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.transactionStub.abort(context, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+        
+        return this.globbableStub.glob(context, pattern);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.globbableStub.glob(context, pattern, veyronOpts);
+    }
 
     @Override
     public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
@@ -375,28 +397,6 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     public void commit(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
           this.transactionStub.commit(context, veyronOpts);
-    }
-
-    @Override
-    public void abort(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.transactionStub.abort(context);
-    }
-    @Override
-    public void abort(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.transactionStub.abort(context, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
-        
-        return this.globbableStub.glob(context, pattern);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.globbableStub.glob(context, pattern, veyronOpts);
     }
 
 

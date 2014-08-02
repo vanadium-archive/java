@@ -39,7 +39,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoBool", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -81,7 +81,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoFloat32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -123,7 +123,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoFloat64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -165,7 +165,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoInt32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -207,7 +207,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoInt64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -249,7 +249,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoString", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -291,7 +291,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoByte", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -333,7 +333,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoUInt32", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -375,7 +375,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "echoUInt64", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -417,7 +417,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "inputArray", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -449,7 +449,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "inputMap", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -481,7 +481,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "inputSlice", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -513,7 +513,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "inputStruct", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -545,7 +545,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "outputArray", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -587,7 +587,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "outputMap", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -629,7 +629,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "outputSlice", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -671,7 +671,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "outputStruct", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -713,7 +713,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "noArguments", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -745,7 +745,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ I1, I2 };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "multipleArguments", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -797,7 +797,7 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ NumStreamItems, StreamItem };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "streamingOutput", inArgs, veyronOpts);
 
         // Finish the call.
         

@@ -39,7 +39,7 @@ public final class BuildStub implements com.veyron2.services.mgmt.build.Build {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Arch, OS };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "build", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -94,7 +94,7 @@ public final class BuildStub implements com.veyron2.services.mgmt.build.Build {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Name };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "describe", inArgs, veyronOpts);
 
         // Finish the call.
         

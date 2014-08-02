@@ -39,7 +39,7 @@ public final class BoxSignallingStub implements com.veyron.examples.boxes.BoxSig
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ Endpoint };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "add", inArgs, veyronOpts);
 
         // Finish the call.
         
@@ -71,7 +71,7 @@ public final class BoxSignallingStub implements com.veyron.examples.boxes.BoxSig
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "get", inArgs, veyronOpts);
 
         // Finish the call.
         

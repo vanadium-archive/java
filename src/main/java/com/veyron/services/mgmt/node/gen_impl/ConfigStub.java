@@ -39,7 +39,7 @@ public final class ConfigStub implements com.veyron.services.mgmt.node.Config {
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{ key, value };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "Glob", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "set", inArgs, veyronOpts);
 
         // Finish the call.
         
