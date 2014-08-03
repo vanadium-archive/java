@@ -3,12 +3,14 @@
 package com.veyron.examples.tunnel;
 
 /**
- * type ClientShellPacket struct{Stdin []byte;Rows uint32;Cols uint32} 
+ * type ClientShellPacket struct{Stdin []byte;EOF bool;Rows uint32;Cols uint32} 
  **/
 public final class ClientShellPacket {
     
     
       private java.util.ArrayList<java.lang.Byte> stdin;
+    
+      private boolean eOF;
     
       private int rows;
     
@@ -16,9 +18,11 @@ public final class ClientShellPacket {
     
 
     
-    public ClientShellPacket(final java.util.ArrayList<java.lang.Byte> stdin, final int rows, final int cols) {
+    public ClientShellPacket(final java.util.ArrayList<java.lang.Byte> stdin, final boolean eOF, final int rows, final int cols) {
         
             this.stdin = stdin;
+        
+            this.eOF = eOF;
         
             this.rows = rows;
         
@@ -33,6 +37,13 @@ public final class ClientShellPacket {
     }
     public void setStdin(java.util.ArrayList<java.lang.Byte> stdin) {
         this.stdin = stdin;
+    }
+    
+    public boolean getEOF() {
+        return this.eOF;
+    }
+    public void setEOF(boolean eOF) {
+        this.eOF = eOF;
     }
     
     public int getRows() {
@@ -69,6 +80,12 @@ public final class ClientShellPacket {
          
         
         
+        if (this.eOF != other.eOF) {
+            return false;
+        }
+         
+        
+        
         if (this.rows != other.rows) {
             return false;
         }
@@ -88,6 +105,8 @@ public final class ClientShellPacket {
         final int prime = 31;
         
         result = prime * result + (stdin == null ? 0 : stdin.hashCode());
+        
+        result = prime * result + java.lang.Boolean.valueOf(eOF).hashCode();
         
         result = prime * result + rows;
         

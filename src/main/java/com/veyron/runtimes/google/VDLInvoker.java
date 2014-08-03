@@ -266,7 +266,7 @@ public final class VDLInvoker {
         final Object[] ret = new Object[argsLength];
         ret[0] = call;
         for (int i = 0; i < inArgs.length; i++) {
-            ret[i + 1] = this.gson.fromJson(inArgs[i], inTypes[i]);
+            ret[i + 1] = this.gson.fromJson(inArgs[i], inTypes[i + 1]);
         }
         return ret;
     }

@@ -21,7 +21,13 @@ public final class OAuthBlesserServiceWrapper {
      */
     public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
         
-        if ("bless".equals(method)) {
+        if ("blessUsingAccessToken".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
+        if ("blessUsingAuthorizationCode".equals(method)) {
             return new java.lang.Object[] {
                 
             };
@@ -39,9 +45,14 @@ public final class OAuthBlesserServiceWrapper {
 
      
     
-    public java.lang.Object bless(final com.veyron2.ipc.ServerCall call, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
+    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.ServerCall call, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
          
-         return  this.service.bless( call , authcode, redirecturl  );
+         return  this.service.blessUsingAuthorizationCode( call , authcode, redirecturl  );
+    }
+
+    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.ServerCall call, final java.lang.String token) throws com.veyron2.ipc.VeyronException {
+         
+         return  this.service.blessUsingAccessToken( call , token  );
     }
 
 

@@ -3,24 +3,45 @@
 package com.veyron.services.identity;
 
 /**
- * OAuthBlesser exchanges the provided authorization code for an email addres
- * from an OAuth-based identity provider and uses the email address as the
- * name to bless the client with.
+ * OAuthBlesser exchanges OAuth authorization codes OR access tokens for
+ * an email address from an OAuth-based identity provider and uses the email
+ * address obtained to bless the client.
  * 
- * The redirect URL used to obtain the authorization code must also be
- * provided in order to ensure a successful exchange.
+ * OAuth is described in RFC 6749 (http:tools.ietf.org/html/rfc6749),
+ * though the Google implementation also has informative documentation at
+ * https:developers.google.com/accounts/docs/OAuth2
+ * 
+ * WARNING: There is no binding between the channel over which the
+ * authorization code or access token was obtained (typically https)
+ * and the channel used to make the RPC (a veyron virtual circuit).
+ * Thus, if Mallory possesses the authorization code or access token
+ * associated with Alice's account, she may be able to obtain a blessing
+ * with Alice's name on it.
+ * 
+ * TODO(ashankar,toddw): Once the "OneOf" type becomes available in VDL,
+ * then the "any" should be replaced by:
+ * OneOf<wire.ChainPublicID, []wire.ChainPublicID>
+ * where wire is from:
+ * import "veyron2/security/wire"
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.identity.gen_impl.OAuthBlesserServiceWrapper.class)
 public interface OAuthBlesserService  {
 
     
-    // TODO(ashankar,toddw): Once the "OneOf" type becomes available in VDL,
-// then the "any" should be replaced by:
-// OneOf<wire.ChainPublicID, []wire.ChainPublicID>
-// where wire is from:
-// import "veyron2/security/wire"
+    // BlessUsingAuthorizationCode exchanges the provided authorization code
+// for an access token and then uses that access token to obtain an
+// email address.
+//
+// The redirect URL used to obtain the authorization code must also
+// be provided.
 
-    public java.lang.Object bless(final com.veyron2.ipc.ServerContext context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException;
+    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.ServerContext context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException;
+
+    
+    // BlessUsingAccessToken uses the provided access token to obtain the email
+// address and returns a blessing.
+
+    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.ServerContext context, final java.lang.String token) throws com.veyron2.ipc.VeyronException;
 
 }

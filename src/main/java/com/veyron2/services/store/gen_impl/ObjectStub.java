@@ -334,6 +334,17 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
 
 
     @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+        return this.queryWatcherStub.watchQuery(context, Req);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.queryWatcherStub.watchQuery(context, Req, veyronOpts);
+    }
+
+    @Override
     public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
         
         return this.transactionRootStub.createTransaction(context, Options);
@@ -386,17 +397,6 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.globWatcherStub.watchGlob(context, Req, veyronOpts);
-    }
-
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
-        
-        return this.queryWatcherStub.watchQuery(context, Req);
-    }
-    @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.queryWatcherStub.watchQuery(context, Req, veyronOpts);
     }
 
 

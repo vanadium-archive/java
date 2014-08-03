@@ -78,14 +78,34 @@ public final class NodeServiceWrapper {
 
 
 
-    public java.lang.String install(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+    public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
-        return  this.applicationWrapper.install(call, Name);
+          this.applicationWrapper.refresh(call);
     }
 
     public void restart(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.restart(call);
+    }
+
+    public void revert(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.revert(call);
+    }
+
+    public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.updateTo(call, Name);
+    }
+
+    public java.lang.String install(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.applicationWrapper.install(call, Name);
+    }
+
+    public void resume(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.resume(call);
     }
 
     public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
@@ -103,34 +123,14 @@ public final class NodeServiceWrapper {
           this.applicationWrapper.suspend(call);
     }
 
-    public void update(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.update(call);
-    }
-
-    public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.updateTo(call, Name);
-    }
-
-    public void refresh(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.refresh(call);
-    }
-
-    public void resume(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.resume(call);
-    }
-
-    public void revert(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
-        
-          this.applicationWrapper.revert(call);
-    }
-
     public void uninstall(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.uninstall(call);
+    }
+
+    public void update(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+          this.applicationWrapper.update(call);
     }
  
 

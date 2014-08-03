@@ -63,16 +63,6 @@ public final class RockPaperScissorsServiceWrapper {
 
 
 
-    public void challenge(final com.veyron2.ipc.ServerCall call, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
-        
-          this.playerWrapper.challenge(call, Address, ID, Opts);
-    }
-
-    public void record(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
-        
-          this.scoreKeeperWrapper.record(call, Score);
-    }
-
     public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
         
         return  this.judgeWrapper.createGame(call, Opts);
@@ -81,6 +71,16 @@ public final class RockPaperScissorsServiceWrapper {
     public com.veyron.examples.rockpaperscissors.PlayResult play(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.GameID ID) throws com.veyron2.ipc.VeyronException {
         
         return  this.judgeWrapper.play(call, ID);
+    }
+
+    public void challenge(final com.veyron2.ipc.ServerCall call, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
+        
+          this.playerWrapper.challenge(call, Address, ID, Opts);
+    }
+
+    public void record(final com.veyron2.ipc.ServerCall call, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
+        
+          this.scoreKeeperWrapper.record(call, Score);
     }
  
 
