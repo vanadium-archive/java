@@ -25,8 +25,8 @@ public interface Object extends com.veyron2.services.store.TransactionRoot, com.
 // most recent mutation of the entry in the Transaction, or from the
 // Transaction's snapshot if there is no mutation.
 
-    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -34,8 +34,8 @@ public interface Object extends com.veyron2.services.store.TransactionRoot, com.
     
     // Put modifies the value of the Object.
 
-    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -50,21 +50,10 @@ public interface Object extends com.veyron2.services.store.TransactionRoot, com.
     
 
     
-    // SetAttr changes the attributes of the entry, such as permissions and
-// replication groups.  Attributes are associated with the value, not the
-// path.
-
-    public void setAttr(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException;
-    public void setAttr(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Attrs, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
-
-    
-    
-
-    
     // Stat returns entry info.
 
-    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

@@ -89,11 +89,11 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     
-    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return get(context, null);
     }
     
-    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -115,14 +115,14 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<com.veyron2.services.store.Entry>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.storage.Entry>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (com.veyron2.services.store.Entry)results[0];
+        return (com.veyron2.storage.Entry)results[0];
          
 
          
@@ -131,11 +131,11 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     
-    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
         return put(context, V, null);
     }
     
-    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -157,14 +157,14 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<com.veyron2.services.store.Stat>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.storage.Stat>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (com.veyron2.services.store.Stat)results[0];
+        return (com.veyron2.storage.Stat)results[0];
          
 
          
@@ -205,43 +205,11 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     
-    public void setAttr(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException {
-         setAttr(context, Attrs, null);
-    }
-    
-    public void setAttr(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Attrs, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        // Add VDL path option.
-        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-        // Java to encoding/decoding from vom.Value objects.
-        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
-        }
-
-        
-        // Start the call.
-        final java.lang.Object[] inArgs = new java.lang.Object[]{ Attrs };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "setAttr", inArgs, veyronOpts);
-
-        // Finish the call.
-        
-        
-
-        
-        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
-        call.finish(resultTypes);
-         
-
-        
-    }
-
-    
-    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return stat(context, null);
     }
     
-    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -263,14 +231,14 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<com.veyron2.services.store.Stat>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.storage.Stat>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (com.veyron2.services.store.Stat)results[0];
+        return (com.veyron2.storage.Stat)results[0];
          
 
          
@@ -334,14 +302,14 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
 
 
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
         
-        return this.queryWatcherStub.watchQuery(context, Req);
+        return this.globbableStub.glob(context, pattern);
     }
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
-        return  this.queryWatcherStub.watchQuery(context, Req, veyronOpts);
+        return  this.globbableStub.glob(context, pattern, veyronOpts);
     }
 
     @Override
@@ -356,17 +324,6 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     @Override
-    public void commit(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-         this.transactionStub.commit(context);
-    }
-    @Override
-    public void commit(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.transactionStub.commit(context, veyronOpts);
-    }
-
-    @Override
     public void abort(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
          this.transactionStub.abort(context);
@@ -378,14 +335,14 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+    public void commit(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
-        return this.globbableStub.glob(context, pattern);
+         this.transactionStub.commit(context);
     }
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void commit(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
-        return  this.globbableStub.glob(context, pattern, veyronOpts);
+          this.transactionStub.commit(context, veyronOpts);
     }
 
     @Override
@@ -397,6 +354,17 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.GlobRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.globWatcherStub.watchGlob(context, Req, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+        
+        return this.queryWatcherStub.watchQuery(context, Req);
+    }
+    @Override
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.queryWatcherStub.watchQuery(context, Req, veyronOpts);
     }
 
 

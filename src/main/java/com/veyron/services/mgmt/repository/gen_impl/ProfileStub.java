@@ -136,17 +136,6 @@ public final class ProfileStub implements com.veyron.services.mgmt.repository.Pr
 
 
     @Override
-    public java.lang.String label(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        
-        return this.profileStub.label(context);
-    }
-    @Override
-    public java.lang.String label(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        return  this.profileStub.label(context, veyronOpts);
-    }
-
-    @Override
     public java.lang.String description(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
         return this.profileStub.description(context);
@@ -155,6 +144,17 @@ public final class ProfileStub implements com.veyron.services.mgmt.repository.Pr
     public java.lang.String description(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.profileStub.description(context, veyronOpts);
+    }
+
+    @Override
+    public java.lang.String label(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.profileStub.label(context);
+    }
+    @Override
+    public java.lang.String label(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.profileStub.label(context, veyronOpts);
     }
 
 

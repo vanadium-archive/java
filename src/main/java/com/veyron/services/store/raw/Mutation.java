@@ -3,7 +3,7 @@
 package com.veyron.services.store.raw;
 
 /**
- * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron2/storage.Version uint64;Version veyron2/storage.Version;IsRoot bool;Value any;Tags veyron2/storage.TagList []veyron2/storage.Tag struct{Op veyron2/storage.TagOp byte;ACL veyron2/storage.ID};Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}} 
+ * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron2/storage.Version uint64;Version veyron2/storage.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}} 
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
  **/
@@ -20,13 +20,11 @@ public final class Mutation {
     
       private java.lang.Object value;
     
-      private com.veyron2.storage.TagList tags;
-    
       private java.util.ArrayList<com.veyron2.storage.DEntry> dir;
     
 
     
-    public Mutation(final com.veyron2.storage.ID iD, final com.veyron2.storage.Version priorVersion, final com.veyron2.storage.Version version, final boolean isRoot, final java.lang.Object value, final com.veyron2.storage.TagList tags, final java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
+    public Mutation(final com.veyron2.storage.ID iD, final com.veyron2.storage.Version priorVersion, final com.veyron2.storage.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
         
             this.iD = iD;
         
@@ -37,8 +35,6 @@ public final class Mutation {
             this.isRoot = isRoot;
         
             this.value = value;
-        
-            this.tags = tags;
         
             this.dir = dir;
         
@@ -79,13 +75,6 @@ public final class Mutation {
     }
     public void setValue(java.lang.Object value) {
         this.value = value;
-    }
-    
-    public com.veyron2.storage.TagList getTags() {
-        return this.tags;
-    }
-    public void setTags(com.veyron2.storage.TagList tags) {
-        this.tags = tags;
     }
     
     public java.util.ArrayList<com.veyron2.storage.DEntry> getDir() {
@@ -151,16 +140,6 @@ public final class Mutation {
          
         
         
-        if (this.tags == null) {
-            if (other.tags != null) {
-                return false;
-            }
-        } else if (!this.tags.equals(other.tags)) {
-            return false;
-        }
-         
-        
-        
         if (this.dir == null) {
             if (other.dir != null) {
                 return false;
@@ -186,8 +165,6 @@ public final class Mutation {
         result = prime * result + java.lang.Boolean.valueOf(isRoot).hashCode();
         
         result = prime * result + (value == null ? 0 : value.hashCode());
-        
-        result = prime * result + (tags == null ? 0 : tags.hashCode());
         
         result = prime * result + (dir == null ? 0 : dir.hashCode());
         

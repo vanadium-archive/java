@@ -234,11 +234,11 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
     }
 
     
-    public void stop(final com.veyron2.ipc.Context context, final long Deadline) throws com.veyron2.ipc.VeyronException {
+    public void stop(final com.veyron2.ipc.Context context, final int Deadline) throws com.veyron2.ipc.VeyronException {
          stop(context, Deadline, null);
     }
     
-    public void stop(final com.veyron2.ipc.Context context, final long Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void stop(final com.veyron2.ipc.Context context, final int Deadline, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch

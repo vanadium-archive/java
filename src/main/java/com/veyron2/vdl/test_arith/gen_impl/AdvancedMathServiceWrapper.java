@@ -54,9 +54,9 @@ public final class AdvancedMathServiceWrapper {
 
 
 
-    public double sine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
+    public double exp(final com.veyron2.ipc.ServerCall call, final double x) throws com.veyron2.ipc.VeyronException {
         
-        return  this.trigonometryWrapper.sine(call, angle);
+        return  this.expWrapper.exp(call, x);
     }
 
     public double cosine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
@@ -64,9 +64,9 @@ public final class AdvancedMathServiceWrapper {
         return  this.trigonometryWrapper.cosine(call, angle);
     }
 
-    public double exp(final com.veyron2.ipc.ServerCall call, final double x) throws com.veyron2.ipc.VeyronException {
+    public double sine(final com.veyron2.ipc.ServerCall call, final double angle) throws com.veyron2.ipc.VeyronException {
         
-        return  this.expWrapper.exp(call, x);
+        return  this.trigonometryWrapper.sine(call, angle);
     }
  
 

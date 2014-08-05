@@ -146,14 +146,14 @@ public interface ApplicationService  {
 
     
     // Stop attempts a clean shutdown of application installation(s)
-// instance(s). If the deadline is non-zero and the instance(s) in
-// questions are still running after the given deadline, shutdown of
-// the instance(s) is enforced.
+// instance(s). If the deadline (in seconds) is non-zero and the
+// instance(s) in questions are still running after the given deadline,
+// shutdown of the instance(s) is enforced.
 //
 // TODO(jsimsa): Switch deadline to time.Duration when built-in types
 // are implemented.
 
-    public void stop(final com.veyron2.ipc.ServerContext context, final long Deadline) throws com.veyron2.ipc.VeyronException;
+    public void stop(final com.veyron2.ipc.ServerContext context, final int Deadline) throws com.veyron2.ipc.VeyronException;
 
     
     // Suspend suspends execution of application installation(s)

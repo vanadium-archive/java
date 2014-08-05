@@ -40,17 +40,6 @@ public final class RockPaperScissorsStub implements com.veyron.examples.rockpape
 
 
     @Override
-    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
-        
-         this.scoreKeeperStub.record(context, Score);
-    }
-    @Override
-    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-          this.scoreKeeperStub.record(context, Score, veyronOpts);
-    }
-
-    @Override
     public com.veyron.examples.rockpaperscissors.GameID createGame(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.GameOptions Opts) throws com.veyron2.ipc.VeyronException {
         
         return this.judgeStub.createGame(context, Opts);
@@ -81,6 +70,17 @@ public final class RockPaperScissorsStub implements com.veyron.examples.rockpape
     public void challenge(final com.veyron2.ipc.Context context, final java.lang.String Address, final com.veyron.examples.rockpaperscissors.GameID ID, final com.veyron.examples.rockpaperscissors.GameOptions Opts, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
           this.playerStub.challenge(context, Address, ID, Opts, veyronOpts);
+    }
+
+    @Override
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score) throws com.veyron2.ipc.VeyronException {
+        
+         this.scoreKeeperStub.record(context, Score);
+    }
+    @Override
+    public void record(final com.veyron2.ipc.Context context, final com.veyron.examples.rockpaperscissors.ScoreCard Score, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.scoreKeeperStub.record(context, Score, veyronOpts);
     }
 
 

@@ -19,12 +19,12 @@ public interface ObjectService extends com.veyron2.services.store.TransactionRoo
 // most recent mutation of the entry in the Transaction, or from the
 // Transaction's snapshot if there is no mutation.
 
-    public com.veyron2.services.store.Entry get(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Entry get(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Put modifies the value of the Object.
 
-    public com.veyron2.services.store.Stat put(final com.veyron2.ipc.ServerContext context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerContext context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
 
     
     // Remove removes the Object.
@@ -32,16 +32,9 @@ public interface ObjectService extends com.veyron2.services.store.TransactionRoo
     public void remove(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
-    // SetAttr changes the attributes of the entry, such as permissions and
-// replication groups.  Attributes are associated with the value, not the
-// path.
-
-    public void setAttr(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.Object> Attrs) throws com.veyron2.ipc.VeyronException;
-
-    
     // Stat returns entry info.
 
-    public com.veyron2.services.store.Stat stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Query returns the sequence of elements that satisfy the query.

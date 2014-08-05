@@ -129,7 +129,7 @@ public final class ApplicationServiceWrapper {
          return  this.service.start( call   );
     }
 
-    public void stop(final com.veyron2.ipc.ServerCall call, final long Deadline) throws com.veyron2.ipc.VeyronException {
+    public void stop(final com.veyron2.ipc.ServerCall call, final int Deadline) throws com.veyron2.ipc.VeyronException {
          
          this.service.stop( call , Deadline  );
     }

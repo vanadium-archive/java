@@ -3,7 +3,7 @@
 package com.veyron.runtimes.google.vsync;
 
 /**
- * type LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron2/storage.Version uint64;Version veyron2/storage.Version;IsRoot bool;Value any;Tags veyron2/storage.TagList []veyron2/storage.Tag struct{Op veyron2/storage.TagOp byte;ACL veyron2/storage.ID};Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool} 
+ * type LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron2/storage.Version uint64;Version veyron2/storage.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool} 
  * LogValue represents an object mutation within a transaction.
  **/
 public final class LogValue {
