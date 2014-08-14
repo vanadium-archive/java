@@ -26,7 +26,7 @@ public interface LogFileService  {
 // position where the next entry starts. This value can be used as
 // StartPos for successive calls to ReadLog.
 //
-// The returned error will be io.EOF if and only if ReadLog reached the
+// The returned error will be EOF if and only if ReadLog reached the
 // end of the file and no log entries were returned.
 
     public long readLog(final com.veyron2.ipc.ServerContext context, final long StartPos, final int NumEntries, final boolean Follow, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.LogEntry> stream) throws com.veyron2.ipc.VeyronException;

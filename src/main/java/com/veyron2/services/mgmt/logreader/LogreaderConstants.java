@@ -14,9 +14,15 @@ public final class LogreaderConstants {
  * returned by ReadLog.
  */
 
-    public static final long ALL_ENTRIES = -1L;
+    public static final int ALL_ENTRIES = -1;
     
     
+    
+    /**
+ * This error indicates that the end of the file was reached.
+ */
+
+    public static final java.lang.String EOF = "veyron2/services/mgmt/logreader.EOF";
     
 
     
