@@ -45,7 +45,7 @@ public final class ObjectServiceWrapper {
 
      
     
-    public void setACL(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
+    public void setACL(final com.veyron2.ipc.ServerCall call, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
          
          this.service.setACL( call , acl, etag  );
     }

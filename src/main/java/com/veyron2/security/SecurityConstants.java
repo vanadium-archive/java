@@ -16,6 +16,12 @@ public final class SecurityConstants {
     public static final java.lang.String ALL_PRINCIPALS = "*";
     
     /**
+ * ChainSeparator joins blessing names to form a blessing chain name.
+ */
+
+    public static final java.lang.String CHAIN_SEPARATOR = "/";
+    
+    /**
  * ResolveLabel allows resolve operations.
  */
 

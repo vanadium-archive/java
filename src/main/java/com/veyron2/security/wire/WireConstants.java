@@ -15,12 +15,6 @@ public final class WireConstants {
 
     public static final com.veyron2.security.wire.KeyCurve KEY_CURVE_P_256 = new com.veyron2.security.wire.KeyCurve((byte)0);
     
-    /**
- * ChainSeparator is used to join blessing names to form a blessing chain name.
- */
-
-    public static final java.lang.String CHAIN_SEPARATOR = "/";
-    
     
     
 

@@ -22,11 +22,11 @@ public final class ObjectStub implements com.veyron2.services.security.access.Ob
 
 
     
-    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
          setACL(context, acl, etag, null);
     }
     
-    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -80,7 +80,7 @@ public final class ObjectStub implements com.veyron2.services.security.access.Ob
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<com.veyron2.services.security.access.ACL>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.security.ACL>() {
                 private static final long serialVersionUID = 1L;
             },
             
@@ -93,7 +93,7 @@ public final class ObjectStub implements com.veyron2.services.security.access.Ob
         
         final com.veyron2.services.security.access.Object.GetACLOut ret = new com.veyron2.services.security.access.Object.GetACLOut();
             
-        ret.acl = (com.veyron2.services.security.access.ACL)results[0];
+        ret.acl = (com.veyron2.security.ACL)results[0];
             
         ret.etag = (java.lang.String)results[1];
              

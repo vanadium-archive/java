@@ -6,6 +6,9 @@ package com.veyron2.security;
 /**
  * type PrincipalPattern string 
  * PrincipalPattern is a pattern identifying a set of principal names.
+ * A PrincipalPattern can be:
+ * - a fixed name pattern of the form p1/.../pk
+ * - a glob pattern of the form p1/.../pk
  **/
 public final class PrincipalPattern {
     private java.lang.String value;

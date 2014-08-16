@@ -26,7 +26,7 @@ public interface ObjectService  {
 // to get an endpoint and call SetACL on that.  This means that clients
 // must know when a name refers to a mount point to change its ACL.
 
-    public void setACL(final com.veyron2.ipc.ServerContext context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
+    public void setACL(final com.veyron2.ipc.ServerContext context, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
 
     
     // GetACL returns the complete, current ACL for an object.  The returned etag

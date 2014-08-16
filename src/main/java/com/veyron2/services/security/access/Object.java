@@ -28,14 +28,14 @@ public interface Object  {
 // to get an endpoint and call SetACL on that.  This means that clients
 // must know when a name refers to a mount point to change its ACL.
 
-    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
-    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.services.security.access.ACL acl, final java.lang.String etag, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException;
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
     public static class GetACLOut {
         
-        public com.veyron2.services.security.access.ACL acl;
+        public com.veyron2.security.ACL acl;
         
         public java.lang.String etag;
         
