@@ -39,9 +39,9 @@ public final class DischargerServiceWrapper {
 
      
     
-    public java.lang.Object discharge(final com.veyron2.ipc.ServerCall call, final java.lang.Object Caveat) throws com.veyron2.ipc.VeyronException {
+    public java.lang.Object discharge(final com.veyron2.ipc.ServerCall call, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException {
          
-         return  this.service.discharge( call , Caveat  );
+         return  this.service.discharge( call , Caveat, Impetus  );
     }
 
 

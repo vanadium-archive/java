@@ -3,7 +3,7 @@
 package com.veyron.services.security;
 
 /**
- * DischargeIssuer service issues caveat discharges when requested.
+ * Discharger is the interface for obtaining discharges for ThirdPartyCaveats.
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.security.gen_impl.DischargerServiceWrapper.class)
@@ -13,11 +13,12 @@ public interface DischargerService  {
     // Discharge is called by a principal that holds a blessing with a third
 // party caveat and seeks to get a discharge that proves the fulfillment of
 // this caveat.
+//
 // Caveat and Discharge are of type ThirdPartyCaveat and ThirdPartyDischarge
 // respectively. (not enforced here because vdl does not know these types)
 // TODO(ataly,ashankar): Figure out a VDL representation for ThirdPartyCaveat
 // and Discharge and use those here?
 
-    public java.lang.Object discharge(final com.veyron2.ipc.ServerContext context, final java.lang.Object Caveat) throws com.veyron2.ipc.VeyronException;
+    public java.lang.Object discharge(final com.veyron2.ipc.ServerContext context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException;
 
 }

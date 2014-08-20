@@ -22,11 +22,11 @@ public final class DischargerStub implements com.veyron.services.security.Discha
 
 
     
-    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat) throws com.veyron2.ipc.VeyronException {
-        return discharge(context, Caveat, null);
+    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException {
+        return discharge(context, Caveat, Impetus, null);
     }
     
-    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -38,7 +38,7 @@ public final class DischargerStub implements com.veyron.services.security.Discha
 
         
         // Start the call.
-        final java.lang.Object[] inArgs = new java.lang.Object[]{ Caveat };
+        final java.lang.Object[] inArgs = new java.lang.Object[]{ Caveat, Impetus };
         final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "discharge", inArgs, veyronOpts);
 
         // Finish the call.
