@@ -15,7 +15,7 @@ public interface QueryWatcher  {
     
     // WatchQuery returns a stream of changes that satisy a query.
 
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.QueryRequest Req, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

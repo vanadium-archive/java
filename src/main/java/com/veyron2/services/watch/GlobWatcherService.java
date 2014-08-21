@@ -13,6 +13,6 @@ public interface GlobWatcherService  {
     
     // WatchGlob returns a stream of changes that match a pattern.
 
-    public void watchGlob(final com.veyron2.ipc.ServerContext context, final com.veyron2.services.watch.GlobRequest Req, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.ChangeBatch> stream) throws com.veyron2.ipc.VeyronException;
+    public void watchGlob(final com.veyron2.ipc.ServerContext context, final com.veyron2.services.watch.types.GlobRequest Req, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.ChangeBatch> stream) throws com.veyron2.ipc.VeyronException;
 
 }

@@ -15,8 +15,8 @@ public interface Store  {
     
     // Watch returns a stream of all changes.
 
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watch(final com.veyron2.ipc.Context context, final com.veyron.services.store.raw.Request Req) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.ChangeBatch, java.lang.Void> watch(final com.veyron2.ipc.Context context, final com.veyron.services.store.raw.Request Req, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watch(final com.veyron2.ipc.Context context, final com.veyron.services.store.raw.Request Req) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watch(final com.veyron2.ipc.Context context, final com.veyron.services.store.raw.Request Req, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
