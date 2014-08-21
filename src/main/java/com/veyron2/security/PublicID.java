@@ -16,22 +16,6 @@ public interface PublicID {
 	public String[] names();
 
 	/**
-	 * Verifies if the principal has a name matching the provided pattern or can obtain a name
-	 * matching the pattern by manipulating its PublicID using PrivateID operations
-	 * (e.g., <code><PrivateID>.bless(<PublicID>, ..., ...)</code>). The provided pattern may be
-	 * of one of the following forms:
-	 * - pattern "*" matching all principals regardless of the names they have.
-	 * - a specific name <code><name></code>matching all principals who have a name that can be
-	 *   extended to <code><name></code>.
-	 * - pattern <code><name>/*</code> matching all principals who have a name that is an extension
-	 *   of the name <code><name></code>.
-	 *
-	 * @param  pattern that pattern used for name-matching.
-	 * @return         true iff the principal has a name matching the provided pattern.
-	 */
-	public boolean match(PrincipalPattern pattern);
-
-	/**
 	 * Returns the public key corresponding to the private key
 	 * that is held only by the principal represented by this PublicID.
 	 *
