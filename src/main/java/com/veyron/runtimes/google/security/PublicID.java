@@ -10,7 +10,6 @@ public class PublicID implements com.veyron2.security.PublicID {
 	private final long nativePtr;
 
 	private native String[] nativeNames(long nativePtr);
-	private native boolean nativeMatch(long nativePtr, String pattern);
 	private native byte[] nativePublicKey(long nativePtr) throws VeyronException;
 	private native long nativeAuthorize(long nativePtr, com.veyron2.security.Context context)
 		throws VeyronException;
@@ -25,10 +24,6 @@ public class PublicID implements com.veyron2.security.PublicID {
 	@Override
 	public String[] names() {
 		return nativeNames(this.nativePtr);
-	}
-	@Override
-	public boolean match(PrincipalPattern pattern) {
-		return nativeMatch(this.nativePtr, pattern.getValue());
 	}
 	@Override
 	public ECPublicKey publicKey() {
