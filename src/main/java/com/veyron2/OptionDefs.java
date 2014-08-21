@@ -30,4 +30,10 @@ public class OptionDefs {
      * identity to be used by the runtime.
      */
     public static String RUNTIME_ID = "com.veyron2.RUNTIME_ID";
+
+    /**
+     * A key for an option of type {@link com.veyron2.security.PublicIDStore} that specifies
+     * the public id store to be used by the runtime.
+     */
+    public static String RUNTIME_PUBLIC_ID_STORE = "com.veyron2.RUNTIME_PUBLIC_ID_STORE";
 }

@@ -10,7 +10,8 @@ import org.joda.time.Duration;
 import java.security.interfaces.ECPublicKey;
 
 public class PrivateID implements com.veyron2.security.PrivateID {
-	private static native long nativeCreate(String name, Signer signer) throws VeyronException;
+	private static native long nativeCreate(
+		String name, com.veyron2.security.Signer signer) throws VeyronException;
 
 	/**
 	 * Returns a new PrivateID that uses the provided Signer to generate signatures.  The returned
@@ -21,7 +22,8 @@ public class PrivateID implements com.veyron2.security.PrivateID {
 	 * @return                 the private id.
 	 * @throws VeyronException if the private id couldn't be created.
 	 */
-	public static PrivateID create(String name, Signer signer) throws VeyronException {
+	public static PrivateID create(
+		String name, com.veyron2.security.Signer signer) throws VeyronException {
 		return new PrivateID(nativeCreate(name, signer), signer);
 	}
 
