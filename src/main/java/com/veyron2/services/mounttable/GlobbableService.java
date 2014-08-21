@@ -9,6 +9,6 @@ public interface GlobbableService  {
     
     // Glob returns all matching entries at the given server.
 
-    public void glob(final com.veyron2.ipc.ServerContext context, final java.lang.String pattern, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry> stream) throws com.veyron2.ipc.VeyronException;
+    public void glob(final com.veyron2.ipc.ServerContext context, final java.lang.String pattern, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.types.MountEntry> stream) throws com.veyron2.ipc.VeyronException;
 
 }

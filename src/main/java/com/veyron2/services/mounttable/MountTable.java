@@ -41,7 +41,7 @@ public interface MountTable extends com.veyron2.services.mounttable.Globbable {
     
     public static class ResolveStepOut {
         
-        public java.util.ArrayList<com.veyron2.services.mounttable.MountedServer> servers;
+        public java.util.ArrayList<com.veyron2.services.mounttable.types.MountedServer> servers;
         
         public java.lang.String suffix;
         

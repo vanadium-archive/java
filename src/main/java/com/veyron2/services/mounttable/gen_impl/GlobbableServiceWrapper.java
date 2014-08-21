@@ -41,19 +41,19 @@ public final class GlobbableServiceWrapper {
     
     public void glob(final com.veyron2.ipc.ServerCall call, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.MountEntry>() {
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.types.MountEntry> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mounttable.types.MountEntry>() {
             @Override
             public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.mounttable.MountEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.mounttable.MountEntry >() {
+            public com.veyron2.services.mounttable.types.MountEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.mounttable.types.MountEntry >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.mounttable.MountEntry)result;
+                    return (com.veyron2.services.mounttable.types.MountEntry)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
