@@ -52,19 +52,19 @@ public final class LogFileServiceWrapper {
 
     public long readLog(final com.veyron2.ipc.ServerCall call, final long StartPos, final int NumEntries, final boolean Follow) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.LogEntry> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.LogEntry>() {
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.types.LogEntry> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.types.LogEntry>() {
             @Override
             public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.mgmt.logreader.LogEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.mgmt.logreader.LogEntry >() {
+            public com.veyron2.services.mgmt.logreader.types.LogEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.mgmt.logreader.types.LogEntry >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.mgmt.logreader.LogEntry)result;
+                    return (com.veyron2.services.mgmt.logreader.types.LogEntry)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
