@@ -22,11 +22,11 @@ public final class GlobbableStub implements com.veyron2.services.mounttable.Glob
 
 
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.types.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern) throws com.veyron2.ipc.VeyronException {
         return glob(context, pattern, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mounttable.types.MountEntry, java.lang.Void> glob(final com.veyron2.ipc.Context context, final java.lang.String pattern, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -44,19 +44,19 @@ public final class GlobbableStub implements com.veyron2.services.mounttable.Glob
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.mounttable.MountEntry, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.mounttable.types.MountEntry, java.lang.Void>() {
             @Override
             public void send(final java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.mounttable.MountEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.mounttable.MountEntry>() {
+            public com.veyron2.services.mounttable.types.MountEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.mounttable.types.MountEntry>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.mounttable.MountEntry)result;
+                    return (com.veyron2.services.mounttable.types.MountEntry)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
