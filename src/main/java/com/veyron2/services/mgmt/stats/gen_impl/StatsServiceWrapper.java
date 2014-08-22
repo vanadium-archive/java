@@ -70,7 +70,7 @@ public final class StatsServiceWrapper {
           this.globbableWrapper.glob(call, pattern);
     }
 
-    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
+    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.types.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
         
           this.globWatcherWrapper.watchGlob(call, Req);
     }

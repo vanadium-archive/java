@@ -186,12 +186,12 @@ public final class ObjectServiceWrapper {
           this.transactionWrapper.commit(call);
     }
 
-    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
+    public void watchGlob(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.types.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
         
           this.globWatcherWrapper.watchGlob(call, Req);
     }
 
-    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+    public void watchQuery(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
         
           this.queryWatcherWrapper.watchQuery(call, Req);
     }
