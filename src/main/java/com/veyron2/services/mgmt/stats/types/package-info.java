@@ -2,7 +2,7 @@
 // Source: types.vdl
 
 /**
- * Package types defines types used by the stats interface.
+ * Package types defines the types used by the stats interface.
  */
 
 package com.veyron2.services.mgmt.stats.types;
