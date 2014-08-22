@@ -29,6 +29,6 @@ public interface LogFileService  {
 // The returned error will be EOF if and only if ReadLog reached the
 // end of the file and no log entries were returned.
 
-    public long readLog(final com.veyron2.ipc.ServerContext context, final long StartPos, final int NumEntries, final boolean Follow, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.LogEntry> stream) throws com.veyron2.ipc.VeyronException;
+    public long readLog(final com.veyron2.ipc.ServerContext context, final long StartPos, final int NumEntries, final boolean Follow, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.mgmt.logreader.types.LogEntry> stream) throws com.veyron2.ipc.VeyronException;
 
 }

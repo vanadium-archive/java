@@ -64,11 +64,11 @@ public final class LogFileStub implements com.veyron2.services.mgmt.logreader.Lo
     }
 
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.logreader.LogEntry, java.lang.Long> readLog(final com.veyron2.ipc.Context context, final long StartPos, final int NumEntries, final boolean Follow) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.logreader.types.LogEntry, java.lang.Long> readLog(final com.veyron2.ipc.Context context, final long StartPos, final int NumEntries, final boolean Follow) throws com.veyron2.ipc.VeyronException {
         return readLog(context, StartPos, NumEntries, Follow, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.logreader.LogEntry, java.lang.Long> readLog(final com.veyron2.ipc.Context context, final long StartPos, final int NumEntries, final boolean Follow, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.mgmt.logreader.types.LogEntry, java.lang.Long> readLog(final com.veyron2.ipc.Context context, final long StartPos, final int NumEntries, final boolean Follow, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -86,19 +86,19 @@ public final class LogFileStub implements com.veyron2.services.mgmt.logreader.Lo
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.mgmt.logreader.LogEntry, java.lang.Long>() {
+        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.mgmt.logreader.types.LogEntry, java.lang.Long>() {
             @Override
             public void send(final java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.mgmt.logreader.LogEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.logreader.LogEntry>() {
+            public com.veyron2.services.mgmt.logreader.types.LogEntry recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.mgmt.logreader.types.LogEntry>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.mgmt.logreader.LogEntry)result;
+                    return (com.veyron2.services.mgmt.logreader.types.LogEntry)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
