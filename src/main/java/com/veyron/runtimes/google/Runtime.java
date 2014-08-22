@@ -9,6 +9,7 @@ import com.google.gson.JsonSyntaxException;
 import com.veyron.runtimes.google.android.RedirectStderr;
 import com.veyron.runtimes.google.security.CryptoUtil;
 import com.veyron.runtimes.google.security.PrivateID;
+import com.veyron.runtimes.google.security.PublicIDStore;
 import com.veyron.runtimes.google.security.Signer;
 import com.veyron2.OptionDefs;
 import com.veyron2.Options;
@@ -20,7 +21,11 @@ import com.veyron2.security.PublicID;
 import org.joda.time.Duration;
 
 import java.io.EOFException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 import java.util.Date;
 
@@ -45,7 +50,9 @@ public class Runtime implements com.veyron2.Runtime {
 		if (Runtime.globalRuntime == null) {
 			try {
 				setupRuntimeOptions(ctx, opts);
-				Runtime.globalRuntime = new Runtime(nativeInit(opts));
+				final com.veyron2.security.PrivateID privateID =
+					(com.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
+				Runtime.globalRuntime = new Runtime(nativeInit(opts), privateID);
 			} catch (VeyronException e) {
 				throw new RuntimeException(
 					"Couldn't initialize global Veyron Runtime instance: " + e.getMessage());
@@ -74,7 +81,9 @@ public class Runtime implements com.veyron2.Runtime {
 	public static synchronized Runtime newRuntime(android.content.Context ctx, Options opts) {
 		try {
 			setupRuntimeOptions(ctx, opts);
-			return new Runtime(nativeNewRuntime(opts));
+			final com.veyron2.security.PrivateID privateID =
+				(com.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
+			return new Runtime(nativeNewRuntime(opts), privateID);
 		} catch (VeyronException e) {
 			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
 		}
@@ -108,16 +117,20 @@ public class Runtime implements com.veyron2.Runtime {
 	}
 
 	private final long nativePtr;
-	private Client client = null;
+	private Client client;
+	private final com.veyron2.security.PrivateID privateID;  // non-null.
+	private com.veyron2.security.PublicIDStore publicIDStore;
 
 	private native long nativeNewClient(long nativePtr, long timeoutMillis) throws VeyronException;
 	private native long nativeNewServer(long nativePtr) throws VeyronException;
 	private native long nativeGetClient(long nativePtr);
 	private native long nativeNewContext(long nativePtr);
+	private native long nativeGetPublicIDStore(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
-	private Runtime(long nativePtr) {
+	private Runtime(long nativePtr, com.veyron2.security.PrivateID privateID) {
 		this.nativePtr = nativePtr;
+		this.privateID = privateID;
 	}
 	@Override
 	public com.veyron2.ipc.Client newClient() throws VeyronException {
@@ -151,6 +164,31 @@ public class Runtime implements com.veyron2.Runtime {
 	public com.veyron2.ipc.Context newContext() {
 		final long nativeContextPtr = nativeNewContext(this.nativePtr);
 		return new Context(nativeContextPtr);
+	}
+	@Override
+	public com.veyron2.security.PrivateID newIdentity(String name) throws VeyronException {
+		try {
+			// Generate a new private key, stored in the clear in the app's memory.
+			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+			final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+			keyGen.initialize(256, random);
+			final KeyPair keyPair = keyGen.generateKeyPair();
+			final Signer signer = new Signer(keyPair.getPrivate(), (ECPublicKey)keyPair.getPublic());
+			return PrivateID.create(name, signer);
+        } catch (NoSuchAlgorithmException e) {
+        	throw new VeyronException("ECDSA algorithm not supported: " + e.getMessage());
+        }
+	}
+	@Override
+	public com.veyron2.security.PrivateID getIdentity() {
+		return this.privateID;
+	}
+	@Override
+	public com.veyron2.security.PublicIDStore getPublicIDStore() {
+		if (this.publicIDStore == null) {
+			this.publicIDStore = new PublicIDStore(nativeGetPublicIDStore(this.nativePtr));
+		}
+		return this.publicIDStore;
 	}
 	@Override
 	protected void finalize() {

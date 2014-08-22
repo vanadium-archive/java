@@ -50,7 +50,7 @@ public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 		throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private PublicIDStore(long nativePtr) {
+	public PublicIDStore(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
 	// Implements com.veyron2.security.PublicIDStore.
