@@ -43,9 +43,6 @@ public final class Test_baseConstants {
     public static final java.lang.String CSTRING = "foo";
     
     
-    public static final boolean CANY = true;
-    
-    
     public static final boolean TRUE = true;
     
     

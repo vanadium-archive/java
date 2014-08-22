@@ -3,7 +3,7 @@
 package com.veyron2.vdl.test_base;
 
 /**
- * type Composites struct{A0 veyron2/vdl/test_base.Scalars struct{A0 bool;A1 byte;A2 uint16;A3 uint32;A4 uint64;A5 int16;A6 int32;A7 int64;A8 float32;A9 float64;A10 complex64;A11 complex128;A12 string;A13 error struct{Id string;Msg string};A14 any;A15 typeval;B0 veyron2/vdl/test_base.NamedBool bool;B1 veyron2/vdl/test_base.NamedByte byte;B2 veyron2/vdl/test_base.NamedUint16 uint16;B3 veyron2/vdl/test_base.NamedUint32 uint32;B4 veyron2/vdl/test_base.NamedUint64 uint64;B5 veyron2/vdl/test_base.NamedInt16 int16;B6 veyron2/vdl/test_base.NamedInt32 int32;B7 veyron2/vdl/test_base.NamedInt64 int64;B8 veyron2/vdl/test_base.NamedFloat32 float32;B9 veyron2/vdl/test_base.NamedFloat64 float64;B10 veyron2/vdl/test_base.NamedComplex64 complex64;B11 veyron2/vdl/test_base.NamedComplex128 complex128;B12 veyron2/vdl/test_base.NamedString string};A1 [2]veyron2/vdl/test_base.Scalars;A2 []veyron2/vdl/test_base.Scalars;A4 map[string]veyron2/vdl/test_base.Scalars;A5 map[veyron2/vdl/test_base.Scalars][]map[string]complex128} 
+ * type Composites struct{A0 veyron2/vdl/test_base.Scalars struct{A0 bool;A1 byte;A2 uint16;A3 uint32;A4 uint64;A5 int16;A6 int32;A7 int64;A8 float32;A9 float64;A10 complex64;A11 complex128;A12 string;A13 error struct{Id string;Msg string};A14 any;A15 typeval;B0 veyron2/vdl/test_base.NamedBool bool;B1 veyron2/vdl/test_base.NamedByte byte;B2 veyron2/vdl/test_base.NamedUint16 uint16;B3 veyron2/vdl/test_base.NamedUint32 uint32;B4 veyron2/vdl/test_base.NamedUint64 uint64;B5 veyron2/vdl/test_base.NamedInt16 int16;B6 veyron2/vdl/test_base.NamedInt32 int32;B7 veyron2/vdl/test_base.NamedInt64 int64;B8 veyron2/vdl/test_base.NamedFloat32 float32;B9 veyron2/vdl/test_base.NamedFloat64 float64;B10 veyron2/vdl/test_base.NamedComplex64 complex64;B11 veyron2/vdl/test_base.NamedComplex128 complex128;B12 veyron2/vdl/test_base.NamedString string};A1 [2]veyron2/vdl/test_base.Scalars;A2 []veyron2/vdl/test_base.Scalars;A3 set[veyron2/vdl/test_base.Scalars];A4 map[string]veyron2/vdl/test_base.Scalars;A5 map[veyron2/vdl/test_base.Scalars][]map[string]complex128} 
  **/
 public final class Composites {
     
@@ -14,19 +14,23 @@ public final class Composites {
     
       private java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2;
     
+      private java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3;
+    
       private java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4;
     
       private java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5;
     
 
     
-    public Composites(final com.veyron2.vdl.test_base.Scalars a0, final com.veyron2.vdl.test_base.Scalars[] a1, final java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2, final java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4, final java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
+    public Composites(final com.veyron2.vdl.test_base.Scalars a0, final com.veyron2.vdl.test_base.Scalars[] a1, final java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2, final java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3, final java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4, final java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
         
             this.a0 = a0;
         
             this.a1 = a1;
         
             this.a2 = a2;
+        
+            this.a3 = a3;
         
             this.a4 = a4;
         
@@ -55,6 +59,13 @@ public final class Composites {
     }
     public void setA2(java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2) {
         this.a2 = a2;
+    }
+    
+    public java.util.HashSet<com.veyron2.vdl.test_base.Scalars> getA3() {
+        return this.a3;
+    }
+    public void setA3(java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3) {
+        this.a3 = a3;
     }
     
     public java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> getA4() {
@@ -111,6 +122,16 @@ public final class Composites {
          
         
         
+        if (this.a3 == null) {
+            if (other.a3 != null) {
+                return false;
+            }
+        } else if (!this.a3.equals(other.a3)) {
+            return false;
+        }
+         
+        
+        
         if (this.a4 == null) {
             if (other.a4 != null) {
                 return false;
@@ -142,6 +163,8 @@ public final class Composites {
         result = prime * result + (a1 == null ? 0 : a1.hashCode());
         
         result = prime * result + (a2 == null ? 0 : a2.hashCode());
+        
+        result = prime * result + (a3 == null ? 0 : a3.hashCode());
         
         result = prime * result + (a4 == null ? 0 : a4.hashCode());
         
