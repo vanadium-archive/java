@@ -3,30 +3,19 @@
 package com.veyron.examples.mdb.schema;
 
 /**
- * type Dir struct{X byte} 
+ * type Dir struct{} 
  * Dir is used to represent directories.
  **/
 public final class Dir {
     
     
-      private byte x;
-    
 
     
-    public Dir(final byte x) {
-        
-            this.x = x;
+    public Dir() {
         
     }
 
     
-    
-    public byte getX() {
-        return this.x;
-    }
-    public void setX(byte x) {
-        this.x = x;
-    }
     
 
     @Override
@@ -36,12 +25,6 @@ public final class Dir {
         if (this.getClass() != obj.getClass()) return false;
         final Dir other = (Dir)obj;
 
-        
-        
-        if (this.x != other.x) {
-            return false;
-        }
-         
          
         return true;
     }
@@ -49,8 +32,6 @@ public final class Dir {
     public int hashCode() {
         int result = 1;
         final int prime = 31;
-        
-        result = prime * result + (int)x;
         
         return result;
     }
