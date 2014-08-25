@@ -3,7 +3,7 @@
 package com.veyron.services.syncgroup;
 
 /**
- * type SyncGroupInfo struct{Name string;Config veyron/services/syncgroup.SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string};RootOID veyron2/storage.ID [16]byte;ETag string;SGOID veyron2/storage.ID;Joiners map[veyron/services/syncgroup.NameIdentity struct{Name string;Identity string}]veyron/services/syncgroup.JoinerMetaData struct{SyncPriority int32}} 
+ * type SyncGroupInfo struct{Name string;Config veyron/services/syncgroup.SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string};RootOID veyron2/storage.ID [16]byte;ETag string;SGOID veyron/services/syncgroup.ID [16]byte;Joiners map[veyron/services/syncgroup.NameIdentity struct{Name string;Identity string}]veyron/services/syncgroup.JoinerMetaData struct{SyncPriority int32}} 
  * A SyncGroupInfo is the conceptual state of a SyncGroup object.
  **/
 public final class SyncGroupInfo {
@@ -17,13 +17,13 @@ public final class SyncGroupInfo {
     
       private java.lang.String eTag;
     
-      private com.veyron2.storage.ID sGOID;
+      private com.veyron.services.syncgroup.ID sGOID;
     
       private java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners;
     
 
     
-    public SyncGroupInfo(final java.lang.String name, final com.veyron.services.syncgroup.SyncGroupConfig config, final com.veyron2.storage.ID rootOID, final java.lang.String eTag, final com.veyron2.storage.ID sGOID, final java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
+    public SyncGroupInfo(final java.lang.String name, final com.veyron.services.syncgroup.SyncGroupConfig config, final com.veyron2.storage.ID rootOID, final java.lang.String eTag, final com.veyron.services.syncgroup.ID sGOID, final java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
         
             this.name = name;
         
@@ -69,10 +69,10 @@ public final class SyncGroupInfo {
         this.eTag = eTag;
     }
     
-    public com.veyron2.storage.ID getSGOID() {
+    public com.veyron.services.syncgroup.ID getSGOID() {
         return this.sGOID;
     }
-    public void setSGOID(com.veyron2.storage.ID sGOID) {
+    public void setSGOID(com.veyron.services.syncgroup.ID sGOID) {
         this.sGOID = sGOID;
     }
     
