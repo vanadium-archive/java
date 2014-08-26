@@ -3,7 +3,7 @@
 package com.veyron.services.store.raw;
 
 /**
- * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron2/storage.Version uint64;Version veyron2/storage.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}} 
+ * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron/services/store/raw.Version uint64;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}} 
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
  **/
@@ -12,9 +12,9 @@ public final class Mutation {
     
       private com.veyron2.storage.ID iD;
     
-      private com.veyron2.storage.Version priorVersion;
+      private com.veyron.services.store.raw.Version priorVersion;
     
-      private com.veyron2.storage.Version version;
+      private com.veyron.services.store.raw.Version version;
     
       private boolean isRoot;
     
@@ -24,7 +24,7 @@ public final class Mutation {
     
 
     
-    public Mutation(final com.veyron2.storage.ID iD, final com.veyron2.storage.Version priorVersion, final com.veyron2.storage.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
+    public Mutation(final com.veyron2.storage.ID iD, final com.veyron.services.store.raw.Version priorVersion, final com.veyron.services.store.raw.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
         
             this.iD = iD;
         
@@ -49,17 +49,17 @@ public final class Mutation {
         this.iD = iD;
     }
     
-    public com.veyron2.storage.Version getPriorVersion() {
+    public com.veyron.services.store.raw.Version getPriorVersion() {
         return this.priorVersion;
     }
-    public void setPriorVersion(com.veyron2.storage.Version priorVersion) {
+    public void setPriorVersion(com.veyron.services.store.raw.Version priorVersion) {
         this.priorVersion = priorVersion;
     }
     
-    public com.veyron2.storage.Version getVersion() {
+    public com.veyron.services.store.raw.Version getVersion() {
         return this.version;
     }
-    public void setVersion(com.veyron2.storage.Version version) {
+    public void setVersion(com.veyron.services.store.raw.Version version) {
         this.version = version;
     }
     

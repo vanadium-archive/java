@@ -3,7 +3,7 @@
 package com.veyron.runtimes.google.vsync;
 
 /**
- * type LogRec struct{DevID veyron/runtimes/google/vsync.DeviceID string;GNum veyron/runtimes/google/vsync.GenID uint64;LSN veyron/runtimes/google/vsync.LSN uint64;RecType byte;ObjID veyron2/storage.ID [16]byte;CurVers veyron2/storage.Version uint64;Parents []veyron2/storage.Version;Value veyron/runtimes/google/vsync.LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID;PriorVersion veyron2/storage.Version;Version veyron2/storage.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool}} 
+ * type LogRec struct{DevID veyron/runtimes/google/vsync.DeviceID string;GNum veyron/runtimes/google/vsync.GenID uint64;LSN veyron/runtimes/google/vsync.LSN uint64;RecType byte;ObjID veyron2/storage.ID [16]byte;CurVers veyron/services/store/raw.Version uint64;Parents []veyron/services/store/raw.Version;Value veyron/runtimes/google/vsync.LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID;PriorVersion veyron/services/store/raw.Version;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool}} 
  * LogRec represents a single log record that is exchanged between two
  * peers.
  * 
@@ -33,15 +33,15 @@ public final class LogRec {
     
       private com.veyron2.storage.ID objID;
     
-      private com.veyron2.storage.Version curVers;
+      private com.veyron.services.store.raw.Version curVers;
     
-      private java.util.ArrayList<com.veyron2.storage.Version> parents;
+      private java.util.ArrayList<com.veyron.services.store.raw.Version> parents;
     
       private com.veyron.runtimes.google.vsync.LogValue value;
     
 
     
-    public LogRec(final com.veyron.runtimes.google.vsync.DeviceID devID, final com.veyron.runtimes.google.vsync.GenID gNum, final com.veyron.runtimes.google.vsync.LSN lSN, final byte recType, final com.veyron2.storage.ID objID, final com.veyron2.storage.Version curVers, final java.util.ArrayList<com.veyron2.storage.Version> parents, final com.veyron.runtimes.google.vsync.LogValue value) {
+    public LogRec(final com.veyron.runtimes.google.vsync.DeviceID devID, final com.veyron.runtimes.google.vsync.GenID gNum, final com.veyron.runtimes.google.vsync.LSN lSN, final byte recType, final com.veyron2.storage.ID objID, final com.veyron.services.store.raw.Version curVers, final java.util.ArrayList<com.veyron.services.store.raw.Version> parents, final com.veyron.runtimes.google.vsync.LogValue value) {
         
             this.devID = devID;
         
@@ -98,17 +98,17 @@ public final class LogRec {
         this.objID = objID;
     }
     
-    public com.veyron2.storage.Version getCurVers() {
+    public com.veyron.services.store.raw.Version getCurVers() {
         return this.curVers;
     }
-    public void setCurVers(com.veyron2.storage.Version curVers) {
+    public void setCurVers(com.veyron.services.store.raw.Version curVers) {
         this.curVers = curVers;
     }
     
-    public java.util.ArrayList<com.veyron2.storage.Version> getParents() {
+    public java.util.ArrayList<com.veyron.services.store.raw.Version> getParents() {
         return this.parents;
     }
-    public void setParents(java.util.ArrayList<com.veyron2.storage.Version> parents) {
+    public void setParents(java.util.ArrayList<com.veyron.services.store.raw.Version> parents) {
         this.parents = parents;
     }
     

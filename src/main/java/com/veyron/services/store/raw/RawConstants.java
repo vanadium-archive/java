@@ -16,6 +16,12 @@ public final class RawConstants {
 
     public static final java.lang.String RAW_STORE_SUFFIX = ".store.raw";
     
+    /**
+ * NoVersion means the entry is not present in the store.
+ */
+
+    public static final com.veyron.services.store.raw.Version NO_VERSION = new com.veyron.services.store.raw.Version(0L);
+    
     
     
 
