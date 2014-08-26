@@ -47,19 +47,19 @@ public final class StoreServiceWrapper {
     
     public void watch(final com.veyron2.ipc.ServerCall call, final com.veyron.services.store.raw.Request Req) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.ChangeBatch> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.ChangeBatch>() {
+        final com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.Change> stream = new com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.Change>() {
             @Override
             public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.watch.types.ChangeBatch recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.watch.types.ChangeBatch >() {
+            public com.veyron2.services.watch.types.Change recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.services.watch.types.Change >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.watch.types.ChangeBatch)result;
+                    return (com.veyron2.services.watch.types.Change)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }

@@ -13,7 +13,7 @@ public interface StoreService  {
     
     // Watch returns a stream of all changes.
 
-    public void watch(final com.veyron2.ipc.ServerContext context, final com.veyron.services.store.raw.Request Req, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.ChangeBatch> stream) throws com.veyron2.ipc.VeyronException;
+    public void watch(final com.veyron2.ipc.ServerContext context, final com.veyron.services.store.raw.Request Req, com.veyron2.vdl.Stream<java.lang.Void, com.veyron2.services.watch.types.Change> stream) throws com.veyron2.ipc.VeyronException;
 
     
     // PutMutations atomically commits a stream of Mutations when the stream is
