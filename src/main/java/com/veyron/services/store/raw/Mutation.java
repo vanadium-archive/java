@@ -3,7 +3,7 @@
 package com.veyron.services.store.raw;
 
 /**
- * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron/services/store/raw.Version uint64;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}} 
+ * type Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron/services/store/raw.Version uint64;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron/services/store/raw.DEntry struct{Name string;ID veyron2/storage.ID}} 
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
  **/
@@ -20,11 +20,11 @@ public final class Mutation {
     
       private java.lang.Object value;
     
-      private java.util.ArrayList<com.veyron2.storage.DEntry> dir;
+      private java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir;
     
 
     
-    public Mutation(final com.veyron2.storage.ID iD, final com.veyron.services.store.raw.Version priorVersion, final com.veyron.services.store.raw.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
+    public Mutation(final com.veyron2.storage.ID iD, final com.veyron.services.store.raw.Version priorVersion, final com.veyron.services.store.raw.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir) {
         
             this.iD = iD;
         
@@ -77,10 +77,10 @@ public final class Mutation {
         this.value = value;
     }
     
-    public java.util.ArrayList<com.veyron2.storage.DEntry> getDir() {
+    public java.util.ArrayList<com.veyron.services.store.raw.DEntry> getDir() {
         return this.dir;
     }
-    public void setDir(java.util.ArrayList<com.veyron2.storage.DEntry> dir) {
+    public void setDir(java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir) {
         this.dir = dir;
     }
     
