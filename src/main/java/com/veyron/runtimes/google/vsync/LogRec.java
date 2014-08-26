@@ -3,7 +3,7 @@
 package com.veyron.runtimes.google.vsync;
 
 /**
- * type LogRec struct{DevID veyron/runtimes/google/vsync.DeviceID string;GNum veyron/runtimes/google/vsync.GenID uint64;LSN veyron/runtimes/google/vsync.LSN uint64;RecType byte;ObjID veyron2/storage.ID [16]byte;CurVers veyron/services/store/raw.Version uint64;Parents []veyron/services/store/raw.Version;Value veyron/runtimes/google/vsync.LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID;PriorVersion veyron/services/store/raw.Version;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron2/storage.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool}} 
+ * type LogRec struct{DevID veyron/runtimes/google/vsync.DeviceID string;GNum veyron/runtimes/google/vsync.GenID uint64;LSN veyron/runtimes/google/vsync.LSN uint64;RecType byte;ObjID veyron2/storage.ID [16]byte;CurVers veyron/services/store/raw.Version uint64;Parents []veyron/services/store/raw.Version;Value veyron/runtimes/google/vsync.LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID;PriorVersion veyron/services/store/raw.Version;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron/services/store/raw.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool}} 
  * LogRec represents a single log record that is exchanged between two
  * peers.
  * 
