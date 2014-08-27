@@ -11,9 +11,10 @@ public final class SecurityConstants {
     
     /**
  * AllPrincipals is a pattern that all principals match.
+ * TODO(ashankar): Change to "..." to match the glob style and update comment for the BlessingPattern type.
  */
 
-    public static final java.lang.String ALL_PRINCIPALS = "*";
+    public static final com.veyron2.security.BlessingPattern ALL_PRINCIPALS = new com.veyron2.security.BlessingPattern("*");
     
     /**
  * ChainSeparator joins blessing names to form a blessing chain name.

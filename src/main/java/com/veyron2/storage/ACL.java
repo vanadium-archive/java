@@ -3,7 +3,7 @@
 package com.veyron2.storage;
 
 /**
- * type ACL struct{Name string;Contents veyron2/security.ACL map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32} 
+ * type ACL struct{Name string;Contents veyron2/security.ACL map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32} 
  * ACL has a security.ACL and a name.
  **/
 public final class ACL {

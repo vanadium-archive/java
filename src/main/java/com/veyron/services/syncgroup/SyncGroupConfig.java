@@ -3,7 +3,7 @@
 package com.veyron.services.syncgroup;
 
 /**
- * type SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string} 
+ * type SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string} 
  * A SyncGroupConfig contains some fields of SyncGroupInfo that
  * are passed at create time, but which can be changed later.
  **/

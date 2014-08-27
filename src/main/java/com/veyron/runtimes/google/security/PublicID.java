@@ -1,7 +1,7 @@
 package com.veyron.runtimes.google.security;
 
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.PrincipalPattern;
+import com.veyron2.security.BlessingPattern;
 import com.veyron2.security.ServiceCaveat;
 
 import java.security.interfaces.ECPublicKey;

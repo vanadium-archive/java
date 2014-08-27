@@ -6,10 +6,10 @@ import com.veyron2.ipc.VeyronException;
  * ServiceCaveat binds a caveat to a specific set of services.
  */
 public class ServiceCaveat implements Caveat {
-	private final PrincipalPattern services;
+	private final BlessingPattern services;
 	private final Caveat caveat;
 
-	public ServiceCaveat(PrincipalPattern services, Caveat caveat) {
+	public ServiceCaveat(BlessingPattern services, Caveat caveat) {
 		this.services = services;
 		this.caveat = caveat;
 	}
@@ -31,5 +31,5 @@ public class ServiceCaveat implements Caveat {
 	 *
 	 * @return the pattern identifying the services this caveat is bound to.
 	 */
-	public PrincipalPattern getServices() { return this.services; }
+	public BlessingPattern getServices() { return this.services; }
 }

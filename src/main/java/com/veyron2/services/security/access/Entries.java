@@ -3,19 +3,19 @@
 package com.veyron2.services.security.access;
 
 /**
- * type Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32;Groups map[veyron2/services/security/access.Group struct{Name string}]veyron2/security.LabelSet} 
+ * type Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32;Groups map[veyron2/services/security/access.Group struct{Name string}]veyron2/security.LabelSet} 
  * Entries describes a set of principals and groups (of principals).
  **/
 public final class Entries {
     
     
-      private java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals;
+      private java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals;
     
       private java.util.HashMap<com.veyron2.services.security.access.Group, com.veyron2.security.LabelSet> groups;
     
 
     
-    public Entries(final java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals, final java.util.HashMap<com.veyron2.services.security.access.Group, com.veyron2.security.LabelSet> groups) {
+    public Entries(final java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals, final java.util.HashMap<com.veyron2.services.security.access.Group, com.veyron2.security.LabelSet> groups) {
         
             this.principals = principals;
         
@@ -25,10 +25,10 @@ public final class Entries {
 
     
     
-    public java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> getPrincipals() {
+    public java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> getPrincipals() {
         return this.principals;
     }
-    public void setPrincipals(java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals) {
+    public void setPrincipals(java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals) {
         this.principals = principals;
     }
     

@@ -3,17 +3,17 @@
 package com.veyron2.security;
 
 /**
- * type Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32} 
+ * type Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32} 
  * Entries describes a set of principals.
  **/
 public final class Entries {
     
     
-      private java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals;
+      private java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals;
     
 
     
-    public Entries(final java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals) {
+    public Entries(final java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals) {
         
             this.principals = principals;
         
@@ -21,10 +21,10 @@ public final class Entries {
 
     
     
-    public java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> getPrincipals() {
+    public java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> getPrincipals() {
         return this.principals;
     }
-    public void setPrincipals(java.util.HashMap<com.veyron2.security.PrincipalPattern, com.veyron2.security.LabelSet> principals) {
+    public void setPrincipals(java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> principals) {
         this.principals = principals;
     }
     

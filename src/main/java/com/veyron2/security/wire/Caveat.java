@@ -3,19 +3,19 @@
 package com.veyron2.security.wire;
 
 /**
- * type Caveat struct{Service veyron2/security.PrincipalPattern string;Bytes []byte} 
+ * type Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte} 
  * Caveat represents a veyron2/security.ServiceCaveat.
  **/
 public final class Caveat {
     
     
-      private com.veyron2.security.PrincipalPattern service;
+      private com.veyron2.security.BlessingPattern service;
     
       private java.util.ArrayList<java.lang.Byte> bytes;
     
 
     
-    public Caveat(final com.veyron2.security.PrincipalPattern service, final java.util.ArrayList<java.lang.Byte> bytes) {
+    public Caveat(final com.veyron2.security.BlessingPattern service, final java.util.ArrayList<java.lang.Byte> bytes) {
         
             this.service = service;
         
@@ -25,10 +25,10 @@ public final class Caveat {
 
     
     
-    public com.veyron2.security.PrincipalPattern getService() {
+    public com.veyron2.security.BlessingPattern getService() {
         return this.service;
     }
-    public void setService(com.veyron2.security.PrincipalPattern service) {
+    public void setService(com.veyron2.security.BlessingPattern service) {
         this.service = service;
     }
     

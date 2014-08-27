@@ -3,7 +3,7 @@
 package com.veyron2.security;
 
 /**
- * type ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries} 
+ * type ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries} 
  * ACL (Access Control List) tracks which principals have access to an object
  * and which principals specifically do not have access to an object.
  * For example:

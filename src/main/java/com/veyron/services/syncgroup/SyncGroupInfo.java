@@ -3,7 +3,7 @@
 package com.veyron.services.syncgroup;
 
 /**
- * type SyncGroupInfo struct{Name string;Config veyron/services/syncgroup.SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string};RootOID veyron2/storage.ID [16]byte;ETag string;SGOID veyron/services/syncgroup.ID [16]byte;Joiners map[veyron/services/syncgroup.NameIdentity struct{Name string;Identity string}]veyron/services/syncgroup.JoinerMetaData struct{SyncPriority int32}} 
+ * type SyncGroupInfo struct{Name string;Config veyron/services/syncgroup.SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries};MountTables []string};RootOID veyron2/storage.ID [16]byte;ETag string;SGOID veyron/services/syncgroup.ID [16]byte;Joiners map[veyron/services/syncgroup.NameIdentity struct{Name string;Identity string}]veyron/services/syncgroup.JoinerMetaData struct{SyncPriority int32}} 
  * A SyncGroupInfo is the conceptual state of a SyncGroup object.
  **/
 public final class SyncGroupInfo {

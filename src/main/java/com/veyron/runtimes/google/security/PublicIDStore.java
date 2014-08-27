@@ -1,7 +1,7 @@
 package com.veyron.runtimes.google.security;
 
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.PrincipalPattern;
+import com.veyron2.security.BlessingPattern;
 
 public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 	/**
@@ -46,7 +46,7 @@ public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 	private native long nativeGetPeerID(long nativePtr, com.veyron2.security.PublicID peer)
 		throws VeyronException;
 	private native long nativeDefaultPublicID(long nativePtr) throws VeyronException;
-	private native void nativeSetDefaultPrincipalPattern(long nativePtr, PrincipalPattern pattern)
+	private native void nativeSetDefaultBlessingPattern(long nativePtr, BlessingPattern pattern)
 		throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
@@ -55,7 +55,7 @@ public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 	}
 	// Implements com.veyron2.security.PublicIDStore.
 	@Override
-	public void add(com.veyron2.security.PublicID id, PrincipalPattern peerPattern)
+	public void add(com.veyron2.security.PublicID id, BlessingPattern peerPattern)
 		throws VeyronException {
 		nativeAdd(this.nativePtr, id, peerPattern.getValue());
 	}
@@ -69,8 +69,8 @@ public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 		return new PublicID(nativeDefaultPublicID(this.nativePtr));
 	}
 	@Override
-	public void setDefaultPrincipalPattern(PrincipalPattern pattern) throws VeyronException {
-		nativeSetDefaultPrincipalPattern(this.nativePtr, pattern);
+	public void setDefaultBlessingPattern(BlessingPattern pattern) throws VeyronException {
+		nativeSetDefaultBlessingPattern(this.nativePtr, pattern);
 	}
 	// Implements java.lang.Object.
 	@Override

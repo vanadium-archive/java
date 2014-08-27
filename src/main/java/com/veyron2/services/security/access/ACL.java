@@ -3,7 +3,7 @@
 package com.veyron2.services.security.access;
 
 /**
- * type ACL struct{In veyron2/services/security/access.Entries struct{Principals map[veyron2/security.PrincipalPattern string]veyron2/security.LabelSet uint32;Groups map[veyron2/services/security/access.Group struct{Name string}]veyron2/security.LabelSet};NotIn veyron2/services/security/access.Entries} 
+ * type ACL struct{In veyron2/services/security/access.Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32;Groups map[veyron2/services/security/access.Group struct{Name string}]veyron2/security.LabelSet};NotIn veyron2/services/security/access.Entries} 
  * ACL (Access Control List) tracks which principals and groups have access to
  * an object and which principals and groups specifically do not have access
  * to an object.  For example:
