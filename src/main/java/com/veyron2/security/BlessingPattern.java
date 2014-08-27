@@ -8,14 +8,14 @@ package com.veyron2.security;
  * BlessingPattern is a pattern that is matched by specific blessings.
  * 
  * A pattern can be either a blessing (slash-separated human-readable string)
- * or a blessing ending in a glob (""). A blessing matches a pattern if it
+ * or a blessing ending in a glob ("/..."). A blessing matches a pattern if it
  * can be extended to produce the same string as the pattern.  For example, the
  * pattern "a/b/c" is matched by the blessings "a", "a/b" and "a/b/c" but not
  * "x", not "a/x", not "a/b/x" and not "a/b/c/x".
  * 
- * Additionally, when the pattern ends with a glob (""), it is matched by
+ * Additionally, when the pattern ends with a glob ("/..."), it is matched by
  * all blessings that represent delegates of the pattern string excluding the
- * glob. For example, the pattern "a/b/c" is matched by all the patterns
+ * glob. For example, the pattern "a/b/c/..." is matched by all the patterns
  * that match "a/b/c" ("a", "a/b", "a/b/c") and all delegates of "a/b/c" (like
  * "a/b/c/d", "a/b/c/d/e" etc.).
  **/
