@@ -3,11 +3,22 @@
 package com.veyron2.services.mgmt.node;
 
 /**
- * Node can be used to manage a node. The idea is that this interace
+ * Node can be used to manage a node. The idea is that this interface
  * will be invoked using an object name that identifies the node.
  */
 
 public interface Node extends com.veyron2.services.mgmt.node.Application {
+
+    
+    
+
+    
+    // Claim is used to claim ownership of a Node running on a device
+    // by blessing its identity. By default, after this call all node
+    // methods will be access protected to the identity of the claimer.
+
+    public void claim(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void claim(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

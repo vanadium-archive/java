@@ -26,6 +26,12 @@ public final class NodeServiceWrapper {
      */
     public java.lang.Object[] getMethodTags(final com.veyron2.ipc.ServerCall call, final java.lang.String method) throws com.veyron2.ipc.VeyronException {
         
+        if ("claim".equals(method)) {
+            return new java.lang.Object[] {
+                
+            };
+        }
+        
         if ("describe".equals(method)) {
             return new java.lang.Object[] {
                 
@@ -60,6 +66,11 @@ public final class NodeServiceWrapper {
 
      
     
+    public void claim(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+         
+         this.service.claim( call   );
+    }
+
     public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.describe( call   );

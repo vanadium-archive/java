@@ -102,10 +102,11 @@ public interface Application  {
     // Install installs the application identified by the argument and
 // returns an object name suffix that identifies the new installation.
 //
-// The argument should be an object name. The service it identifies must
-// implement repository.Application, and is expected to return either
-// the requested version (if the object name encodes a specific
-// version), or otherwise the latest available version, as appropriate.
+// The argument should be an object name for an application envelope.
+// The service it identifies must implement repository.Application, and
+// is expected to return either the requested version (if the object name
+// encodes a specific version), or otherwise the latest available version,
+// as appropriate.
 //
 // The returned suffix, when appended to the name used to reach the
 // receiver for Install, can be used to control the installation object.

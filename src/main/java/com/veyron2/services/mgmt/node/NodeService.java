@@ -3,12 +3,19 @@
 package com.veyron2.services.mgmt.node;
 
 /**
- * Node can be used to manage a node. The idea is that this interace
+ * Node can be used to manage a node. The idea is that this interface
  * will be invoked using an object name that identifies the node.
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper.class)
 public interface NodeService extends com.veyron2.services.mgmt.node.ApplicationService {
+
+    
+    // Claim is used to claim ownership of a Node running on a device
+    // by blessing its identity. By default, after this call all node
+    // methods will be access protected to the identity of the claimer.
+
+    public void claim(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Describe generates a description of the node.
@@ -22,11 +29,11 @@ public interface NodeService extends com.veyron2.services.mgmt.node.ApplicationS
 
     
     // Reset resets the node. If the deadline is non-zero and the node
-// in question is still running after the given deadline expired,
-// reset of the node is enforced.
-//
-// TODO(jsimsa): Switch deadline to time.Duration when built-in types
-// are implemented.
+    // in question is still running after the given deadline expired,
+    // reset of the node is enforced.
+    //
+    // TODO(jsimsa): Switch deadline to time.Duration when built-in types
+    // are implemented.
 
     public void reset(final com.veyron2.ipc.ServerContext context, final long Deadline) throws com.veyron2.ipc.VeyronException;
 

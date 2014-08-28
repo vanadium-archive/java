@@ -27,6 +27,38 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
 
 
     
+    public void claim(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+         claim(context, null);
+    }
+    
+    public void claim(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        // Add VDL path option.
+        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
+        // Java to encoding/decoding from vom.Value objects.
+        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
+        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, NodeStub.vdlIfacePathOpt);
+        }
+
+        
+        // Start the call.
+        final java.lang.Object[] inArgs = new java.lang.Object[]{  };
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "claim", inArgs, veyronOpts);
+
+        // Finish the call.
+        
+        
+
+        
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
+         
+
+        
+    }
+
+    
     public com.veyron2.services.mgmt.node.Description describe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return describe(context, null);
     }
