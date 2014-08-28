@@ -3,67 +3,26 @@
 package com.veyron2.security;
 
 /**
- * type ACL struct{In veyron2/security.Entries struct{Principals map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32};NotIn veyron2/security.Entries} 
- * ACL (Access Control List) tracks which principals have access to an object
- * and which principals specifically do not have access to an object.
- * For example:
- * ACL {
- * In {
- * Principals {
- * "user1": ["Read", "Write"],
- * "user2": ["Read"],
- * }
- * }
- * NotIn {
- * Principals {
- * "user1": ["Write"],
- * }
- * }
- * }
- * NotIn subtracts privileges.  In this example, it says that "user1" has
- * only "Read" access.  All of engineering has read access except for
- * engineering interns.
+ * type ACL struct{In map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32;NotIn map[string]veyron2/security.LabelSet} 
+ * ACL (Access Control List) tracks the set of blessings that grant
+ * access to an object and the type of access the blessing grants.
  * 
- * Principals can have multiple names.  As long as the principal has a name
- * that matches In and not NotIn, it is authorized. The reasoning is that the
- * principal can always hide a name if it wants to, so requiring all names to
- * satisfy the policy does not make sense.
- * 
- * Formally,
- * 
- * Delegate(pattern P, name N) checks if some name that exactly matches P is
- * equal to or blessed by N.
- * If P is of the form p_0/.../p_k; Delegate(P, N) is true iff N is of the form
- * n_0/.../n_m such that m <= k and for all i from 0 to m, p_i = n_i.
- * If P is of the form p_0/.../p_k; Delegate(P, N) is true iff N is of the
- * form n_0/.../n_m such that for all i from 0 to min(m, k), p_i = n_i.
- * 
- * Blesser(pattern P, name N) checks if some name that exactly matches P is
- * equal to or a blesser of N.
- * If P is of the form p_0/.../p_k; Blesser(P, N) is true iff N is of the form
- * n_0/.../n_m such that m >= k and for all i from 0 to k, p_i = n_i.
- * If P is of the form p_0/.../p_k; Blesser(P, N) is true iff N is of the form
- * n_0/.../n_m such that m >= k and for all i from 0 to k, p_i = n_i.
- * 
- * In(label L) = { pattern P | L ∈ ACL.In.Principals[P] }
- * NotIn(label L) = { pattern P | L ∈ ACL.NotIn.Principals[P] }
- * 
- * Matches(label L) = { id I | ∃ name N ∈ I.Names() |
- * ∃ P ∈ In(L) | Delegate(P, N)
- * ∧
- * ∀ P ∈ NotIn(L) ~Blesser(P, N)
- * }
+ * When a principal presents multiple blessings, it should be authorized
+ * if any one of those blessings matches the ACL. Since the principal
+ * chooses the subset of its blessings to share (and can thus withold
+ * any particular one), requiring all presented blessings to match the
+ * ACL does not provide any security benefits.
  **/
 public final class ACL {
     
     
-      private com.veyron2.security.Entries in;
+      private java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in;
     
-      private com.veyron2.security.Entries notIn;
+      private java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn;
     
 
     
-    public ACL(final com.veyron2.security.Entries in, final com.veyron2.security.Entries notIn) {
+    public ACL(final java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in, final java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn) {
         
             this.in = in;
         
@@ -73,17 +32,17 @@ public final class ACL {
 
     
     
-    public com.veyron2.security.Entries getIn() {
+    public java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> getIn() {
         return this.in;
     }
-    public void setIn(com.veyron2.security.Entries in) {
+    public void setIn(java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in) {
         this.in = in;
     }
     
-    public com.veyron2.security.Entries getNotIn() {
+    public java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> getNotIn() {
         return this.notIn;
     }
-    public void setNotIn(com.veyron2.security.Entries notIn) {
+    public void setNotIn(java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn) {
         this.notIn = notIn;
     }
     

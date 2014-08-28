@@ -48,7 +48,7 @@ public interface PublicIDStore {
 
 	/**
 	 * Sets the default BlessingPattern.  In the absence of any calls to this method, the default
-	 * BlessingPattern is assumed to be "*", which matches all PublicIDs.
+	 * BlessingPattern is assumed to be "...", which matches all PublicIDs.
 	 *
 	 * @param  pattern         the new default BlessingPattern.
 	 * @throws VeyronException if the new default principal pattern couldn't be set. 

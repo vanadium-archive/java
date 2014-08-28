@@ -9,87 +9,43 @@ public final class SecurityConstants {
     /* The following constants originate in file: types.vdl */
     
     
-    /**
- * AllPrincipals is a pattern that all principals match.
- * TODO(ashankar): Change to "..." to match the glob style and update comment for the BlessingPattern type.
- */
-
-    public static final com.veyron2.security.BlessingPattern ALL_PRINCIPALS = new com.veyron2.security.BlessingPattern("*");
     
-    /**
- * ChainSeparator joins blessing names to form a blessing chain name.
- */
-
+    public static final com.veyron2.security.BlessingPattern ALL_PRINCIPALS = new com.veyron2.security.BlessingPattern("...");
+    
+    
     public static final java.lang.String CHAIN_SEPARATOR = "/";
     
-    /**
- * ResolveLabel allows resolve operations.
- */
-
+    
     public static final com.veyron2.security.Label RESOLVE_LABEL = new com.veyron2.security.Label(1);
     
-    /**
- * ReadLabel allows read operations.
- */
-
+    
     public static final com.veyron2.security.Label READ_LABEL = new com.veyron2.security.Label(2);
     
-    /**
- * WriteLabel allows write operations.
- */
-
+    
     public static final com.veyron2.security.Label WRITE_LABEL = new com.veyron2.security.Label(4);
     
-    /**
- * AdminLabel allows administrative operations.
- */
-
+    
     public static final com.veyron2.security.Label ADMIN_LABEL = new com.veyron2.security.Label(8);
     
-    /**
- * DebugLabel allows debug operations.
- */
-
+    
     public static final com.veyron2.security.Label DEBUG_LABEL = new com.veyron2.security.Label(16);
     
-    /**
- * MonitoringLabel allows monitoring operations.
- */
-
+    
     public static final com.veyron2.security.Label MONITORING_LABEL = new com.veyron2.security.Label(32);
     
-    /**
- * SHA1Hash denotes the SHA1 cryptographic hash function as defined
- * in RFC3174.
- */
-
+    
     public static final com.veyron2.security.Hash SHA_1_HASH = new com.veyron2.security.Hash("SHA1");
     
-    /**
- * SHA256Hash denotes the SHA256 cryptographic hash function as defined
- * in FIPS 180-4.
- */
-
+    
     public static final com.veyron2.security.Hash SHA_256_HASH = new com.veyron2.security.Hash("SHA256");
     
-    /**
- * SHA384Hash denotes the SHA384 cryptographic hash function as defined
- * in FIPS 180-2.
- */
-
+    
     public static final com.veyron2.security.Hash SHA_384_HASH = new com.veyron2.security.Hash("SHA384");
     
-    /**
- * SHA512Hash denotes the SHA512 cryptographic hash function as defined
- * in FIPS 180-2.
- */
-
+    
     public static final com.veyron2.security.Hash SHA_512_HASH = new com.veyron2.security.Hash("SHA512");
     
-    /**
- * NoHash denotes the identity hash function.
- */
-
+    
     public static final com.veyron2.security.Hash NO_HASH = new com.veyron2.security.Hash("");
     
     
