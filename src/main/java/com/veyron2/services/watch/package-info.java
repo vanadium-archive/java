@@ -49,13 +49,6 @@
  * continued bit, i.e., they will just process each Change message as
  * it is received.
  * 
- * Batching
- * 
- * Multiple Change messages may be grouped into a single ChangeBatch message to
- * reduce message transfer overhead. A single ChangeBatch may contain many
- * atomic groups or a single atomic group may be split across many
- * ChangeBatches.
- * 
  * Initial State
  * 
  * The first atomic group delivered by a watch call is special. It is

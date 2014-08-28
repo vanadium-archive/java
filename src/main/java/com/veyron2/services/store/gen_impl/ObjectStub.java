@@ -346,23 +346,23 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.GlobRequest Req) throws com.veyron2.ipc.VeyronException {
         
         return this.globWatcherStub.watchGlob(context, Req);
     }
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.GlobRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchGlob(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.GlobRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.globWatcherStub.watchGlob(context, Req, veyronOpts);
     }
 
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
         
         return this.queryWatcherStub.watchQuery(context, Req);
     }
     @Override
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.queryWatcherStub.watchQuery(context, Req, veyronOpts);
     }

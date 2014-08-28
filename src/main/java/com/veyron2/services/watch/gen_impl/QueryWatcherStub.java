@@ -22,11 +22,11 @@ public final class QueryWatcherStub implements com.veyron2.services.watch.QueryW
 
 
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req) throws com.veyron2.ipc.VeyronException {
         return watchQuery(context, Req, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.ChangeBatch, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,com.veyron2.services.watch.types.Change, java.lang.Void> watchQuery(final com.veyron2.ipc.Context context, final com.veyron2.services.watch.types.QueryRequest Req, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -44,19 +44,19 @@ public final class QueryWatcherStub implements com.veyron2.services.watch.QueryW
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.watch.types.ChangeBatch, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<java.lang.Void, com.veyron2.services.watch.types.Change, java.lang.Void>() {
             @Override
             public void send(final java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public com.veyron2.services.watch.types.ChangeBatch recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.watch.types.ChangeBatch>() {
+            public com.veyron2.services.watch.types.Change recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.services.watch.types.Change>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (com.veyron2.services.watch.types.ChangeBatch)result;
+                    return (com.veyron2.services.watch.types.Change)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
