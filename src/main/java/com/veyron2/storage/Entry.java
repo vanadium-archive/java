@@ -3,7 +3,7 @@
 package com.veyron2.storage;
 
 /**
- * type Entry struct{Stat veyron2/storage.Stat struct{ID veyron2/storage.ID [16]byte;MTimeNS int64;Attrs []any};Value any} 
+ * type Entry struct{Stat veyron2/storage.Stat struct{Kind veyron2/storage.Kind int16;ID veyron2/storage.ID [16]byte;MTimeNS int64;Attrs []any};Value any} 
  * Entry represents a value at some point in time in the store.
  **/
 public final class Entry {

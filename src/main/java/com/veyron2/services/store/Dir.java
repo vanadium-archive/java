@@ -3,16 +3,16 @@
 package com.veyron2.services.store;
 
 /**
- * ObjectService is the interface for a value in the store.
+ * Dir is a directory containing Objects and other Dirs.
  */
 
-public interface Object extends com.veyron2.services.store.Transactable, com.veyron2.services.store.Statable, com.veyron2.services.mounttable.Globbable, com.veyron2.services.watch.GlobWatcher, com.veyron2.services.watch.QueryWatcher {
+public interface Dir extends com.veyron2.services.store.Transactable, com.veyron2.services.store.Statable, com.veyron2.services.mounttable.Globbable, com.veyron2.services.watch.GlobWatcher, com.veyron2.services.watch.QueryWatcher {
 
     
     
 
     
-    // Exists returns true iff the Entry has a value.
+    // Exists returns true iff this Dir is present in the Store.
 
     public boolean exists(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
     public boolean exists(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
@@ -21,27 +21,17 @@ public interface Object extends com.veyron2.services.store.Transactable, com.vey
     
 
     
-    // Get returns the value for the Object.  The value returned is from the
-// most recent mutation of the entry in the Transaction, or from the
-// Transaction's snapshot if there is no mutation.
+    // Make creates this directory and any ancestor directories that do not
+// exist (i.e. equivalent to Unix's 'mkdir -p').  Make is idempotent.
 
-    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
-
-    
-    
-
-    
-    // Put modifies the value of the Object.
-
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public void make(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public void make(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
 
     
-    // Remove removes the Object.
+    // Remove removes this directory and all of its children, recursively.
 
     public void remove(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
     public void remove(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;

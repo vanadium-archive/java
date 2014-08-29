@@ -2,9 +2,9 @@
 // Source(s):  service.vdl
 package com.veyron2.services.store.gen_impl;
 
-public final class ObjectServiceWrapper {
+public final class DirServiceWrapper {
 
-    private final com.veyron2.services.store.ObjectService service;
+    private final com.veyron2.services.store.DirService service;
 
 
 
@@ -24,7 +24,7 @@ public final class ObjectServiceWrapper {
     private final com.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper queryWatcherWrapper;
     
 
-    public ObjectServiceWrapper(final com.veyron2.services.store.ObjectService service) {
+    public DirServiceWrapper(final com.veyron2.services.store.DirService service) {
         this.service = service;
         
         
@@ -52,19 +52,13 @@ public final class ObjectServiceWrapper {
             };
         }
         
-        if ("get".equals(method)) {
-            return new java.lang.Object[] {
-                
-            };
-        }
-        
         if ("getMethodTags".equals(method)) {
             return new java.lang.Object[] {
                 
             };
         }
         
-        if ("put".equals(method)) {
+        if ("make".equals(method)) {
             return new java.lang.Object[] {
                 
             };
@@ -113,14 +107,9 @@ public final class ObjectServiceWrapper {
          return  this.service.exists( call   );
     }
 
-    public com.veyron2.storage.Entry get(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public void make(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
-         return  this.service.get( call   );
-    }
-
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerCall call, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
-         
-         return  this.service.put( call , V  );
+         this.service.make( call   );
     }
 
     public void remove(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {

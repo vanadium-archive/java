@@ -2,9 +2,9 @@
 // Source(s):  service.vdl
 package com.veyron2.services.store.gen_impl;
 
-/* Client stub for interface: Object. */
-public final class ObjectStub implements com.veyron2.services.store.Object {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.Object";
+/* Client stub for interface: Dir. */
+public final class DirStub implements com.veyron2.services.store.Dir {
+    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.store.Dir";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 
@@ -26,7 +26,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     private final com.veyron2.services.watch.gen_impl.QueryWatcherStub queryWatcherStub;
     
 
-    public ObjectStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
+    public DirStub(final com.veyron2.ipc.Client client, final java.lang.String veyronName) {
         this.client = client;
         this.veyronName = veyronName;
         
@@ -43,7 +43,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
          
     }
 
-    // Methods from interface Object.
+    // Methods from interface Dir.
 
 
     
@@ -58,7 +58,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         // Java to encoding/decoding from vom.Value objects.
         if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
         if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DirStub.vdlIfacePathOpt);
         }
 
         
@@ -89,84 +89,32 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     
-    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
-        return get(context, null);
+    public void make(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+         make(context, null);
     }
     
-    public com.veyron2.storage.Entry get(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void make(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
         // Java to encoding/decoding from vom.Value objects.
         if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
         if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DirStub.vdlIfacePathOpt);
         }
 
         
         // Start the call.
         final java.lang.Object[] inArgs = new java.lang.Object[]{  };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "get", inArgs, veyronOpts);
+        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "make", inArgs, veyronOpts);
 
         // Finish the call.
         
         
 
-         
-        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
-            
-            new com.google.common.reflect.TypeToken<com.veyron2.storage.Entry>() {
-                private static final long serialVersionUID = 1L;
-            },
-            
-        };
-        final java.lang.Object[] results = call.finish(resultTypes);
-         
-        return (com.veyron2.storage.Entry)results[0];
-         
-
-         
-
         
-    }
-
-    
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
-        return put(context, V, null);
-    }
-    
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
-        
-        // Add VDL path option.
-        // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
-        // Java to encoding/decoding from vom.Value objects.
-        if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
-        if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
-        }
-
-        
-        // Start the call.
-        final java.lang.Object[] inArgs = new java.lang.Object[]{ V };
-        final com.veyron2.ipc.Client.Call call = this.client.startCall(context, this.veyronName, "put", inArgs, veyronOpts);
-
-        // Finish the call.
-        
-        
-
-         
-        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
-            
-            new com.google.common.reflect.TypeToken<com.veyron2.storage.Stat>() {
-                private static final long serialVersionUID = 1L;
-            },
-            
-        };
-        final java.lang.Object[] results = call.finish(resultTypes);
-         
-        return (com.veyron2.storage.Stat)results[0];
-         
-
+        final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{};
+        call.finish(resultTypes);
          
 
         
@@ -184,7 +132,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         // Java to encoding/decoding from vom.Value objects.
         if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
         if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DirStub.vdlIfacePathOpt);
         }
 
         
@@ -216,7 +164,7 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
         // Java to encoding/decoding from vom.Value objects.
         if (veyronOpts == null) veyronOpts = new com.veyron2.Options();
         if (!veyronOpts.has(com.veyron2.OptionDefs.VDL_INTERFACE_PATH)) {
-            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, ObjectStub.vdlIfacePathOpt);
+            veyronOpts.set(com.veyron2.OptionDefs.VDL_INTERFACE_PATH, DirStub.vdlIfacePathOpt);
         }
 
         

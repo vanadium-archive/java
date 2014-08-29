@@ -7,7 +7,7 @@ package com.veyron2.services.store;
  */
 
 @com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.store.gen_impl.ObjectServiceWrapper.class)
-public interface ObjectService extends com.veyron2.services.store.TransactionRootService, com.veyron2.services.store.TransactionService, com.veyron2.services.mounttable.GlobbableService, com.veyron2.services.watch.GlobWatcherService, com.veyron2.services.watch.QueryWatcherService {
+public interface ObjectService extends com.veyron2.services.store.TransactableService, com.veyron2.services.store.StatableService, com.veyron2.services.mounttable.GlobbableService, com.veyron2.services.watch.GlobWatcherService, com.veyron2.services.watch.QueryWatcherService {
 
     
     // Exists returns true iff the Entry has a value.
@@ -30,11 +30,6 @@ public interface ObjectService extends com.veyron2.services.store.TransactionRoo
     // Remove removes the Object.
 
     public void remove(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
-
-    
-    // Stat returns entry info.
-
-    public com.veyron2.storage.Stat stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Query returns the sequence of elements that satisfy the query.

@@ -3,13 +3,15 @@
 package com.veyron2.storage;
 
 /**
- * type Stat struct{ID veyron2/storage.ID [16]byte;MTimeNS int64;Attrs []any} 
+ * type Stat struct{Kind veyron2/storage.Kind int16;ID veyron2/storage.ID [16]byte;MTimeNS int64;Attrs []any} 
  * Stat provides information about an entry in the store.
  * 
  * TODO(jyh): Specify versioning more precisely.
  **/
 public final class Stat {
     
+    
+      private com.veyron2.storage.Kind kind;
     
       private com.veyron2.storage.ID iD;
     
@@ -19,7 +21,9 @@ public final class Stat {
     
 
     
-    public Stat(final com.veyron2.storage.ID iD, final long mTimeNS, final java.util.ArrayList<java.lang.Object> attrs) {
+    public Stat(final com.veyron2.storage.Kind kind, final com.veyron2.storage.ID iD, final long mTimeNS, final java.util.ArrayList<java.lang.Object> attrs) {
+        
+            this.kind = kind;
         
             this.iD = iD;
         
@@ -30,6 +34,13 @@ public final class Stat {
     }
 
     
+    
+    public com.veyron2.storage.Kind getKind() {
+        return this.kind;
+    }
+    public void setKind(com.veyron2.storage.Kind kind) {
+        this.kind = kind;
+    }
     
     public com.veyron2.storage.ID getID() {
         return this.iD;
@@ -60,6 +71,16 @@ public final class Stat {
         if (this.getClass() != obj.getClass()) return false;
         final Stat other = (Stat)obj;
 
+        
+        
+        if (this.kind == null) {
+            if (other.kind != null) {
+                return false;
+            }
+        } else if (!this.kind.equals(other.kind)) {
+            return false;
+        }
+         
         
         
         if (this.iD == null) {
@@ -93,6 +114,8 @@ public final class Stat {
     public int hashCode() {
         int result = 1;
         final int prime = 31;
+        
+        result = prime * result + (kind == null ? 0 : kind.hashCode());
         
         result = prime * result + (iD == null ? 0 : iD.hashCode());
         
