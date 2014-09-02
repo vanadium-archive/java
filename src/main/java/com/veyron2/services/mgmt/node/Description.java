@@ -6,14 +6,16 @@ package com.veyron2.services.mgmt.node;
  * type Description struct{Profiles set[string]} 
  * Description enumerates the profiles that a Node supports.
  **/
-public final class Description {
+public final class Description implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.HashSet<java.lang.String> profiles;
+      private java.util.Set<java.lang.String> profiles;
     
 
     
-    public Description(final java.util.HashSet<java.lang.String> profiles) {
+    public Description(final java.util.Set<java.lang.String> profiles) {
         
             this.profiles = profiles;
         
@@ -21,10 +23,10 @@ public final class Description {
 
     
     
-    public java.util.HashSet<java.lang.String> getProfiles() {
+    public java.util.Set<java.lang.String> getProfiles() {
         return this.profiles;
     }
-    public void setProfiles(java.util.HashSet<java.lang.String> profiles) {
+    public void setProfiles(java.util.Set<java.lang.String> profiles) {
         this.profiles = profiles;
     }
     
@@ -58,4 +60,30 @@ public final class Description {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, profiles);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Description> CREATOR
+		= new android.os.Parcelable.Creator<Description>() {
+		@Override
+		public Description createFromParcel(android.os.Parcel in) {
+			return new Description(in);
+		}
+		@Override
+		public Description[] newArray(int size) {
+			return new Description[size];
+		}
+	};
+	private Description(android.os.Parcel in) {
+		
+			this.profiles = (java.util.Set<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.profiles);
+		
+	}
 }

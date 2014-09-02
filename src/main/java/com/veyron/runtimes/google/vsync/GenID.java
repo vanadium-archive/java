@@ -7,7 +7,7 @@ package com.veyron.runtimes.google.vsync;
  * type GenID uint64 
  * GenID is the unique ID per generation per device.
  **/
-public final class GenID {
+public final class GenID implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public GenID(long value) {
@@ -31,4 +31,26 @@ public final class GenID {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<GenID> CREATOR
+		= new android.os.Parcelable.Creator<GenID>() {
+		@Override
+		public GenID createFromParcel(android.os.Parcel in) {
+			return new GenID(in);
+		}
+		@Override
+		public GenID[] newArray(int size) {
+			return new GenID[size];
+		}
+	};
+	private GenID(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -143,7 +143,7 @@ public interface ApplicationService  {
 // returns the object name(s) that identifies/identify the new
 // instance(s).
 
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Stop attempts a clean shutdown of application installation(s)

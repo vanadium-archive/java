@@ -86,11 +86,11 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
     }
 
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.ArrayList<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.List<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException {
         return download(context, part, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.ArrayList<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.List<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -108,19 +108,19 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.lang.Void, java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<java.lang.Void, java.util.List<java.lang.Byte>, java.lang.Void>() {
             @Override
             public void send(final java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {
+            public java.util.List<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.util.List<java.lang.Byte>>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.util.ArrayList<java.lang.Byte>)result;
+                    return (java.util.List<java.lang.Byte>)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
@@ -190,11 +190,11 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
     }
 
     
-    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return stat(context, null);
     }
     
-    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -216,14 +216,14 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo>>() {
+            new com.google.common.reflect.TypeToken<java.util.List<com.veyron2.services.mgmt.binary.PartInfo>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo>)results[0];
+        return (java.util.List<com.veyron2.services.mgmt.binary.PartInfo>)results[0];
          
 
          
@@ -232,11 +232,11 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
     }
 
     
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException {
         return upload(context, part, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -254,9 +254,9 @@ public final class BinaryStub implements com.veyron2.services.mgmt.repository.Bi
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>, java.lang.Void, java.lang.Void>() {
             @Override
-            public void send(final java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(final java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override

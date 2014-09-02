@@ -11,7 +11,7 @@ package com.veyron.services.store.raw;
  * and version, then the entries represent the same thing, at the same point in
  * time (as agreed upon by the two stores).
  **/
-public final class Version {
+public final class Version implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public Version(long value) {
@@ -35,4 +35,26 @@ public final class Version {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<Version> CREATOR
+		= new android.os.Parcelable.Creator<Version>() {
+		@Override
+		public Version createFromParcel(android.os.Parcel in) {
+			return new Version(in);
+		}
+		@Override
+		public Version[] newArray(int size) {
+			return new Version[size];
+		}
+	};
+	private Version(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -5,10 +5,12 @@ package com.veyron.examples.tunnel;
 /**
  * type ClientShellPacket struct{Stdin []byte;EOF bool;Rows uint32;Cols uint32} 
  **/
-public final class ClientShellPacket {
+public final class ClientShellPacket implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<java.lang.Byte> stdin;
+      private java.util.List<java.lang.Byte> stdin;
     
       private boolean eOF;
     
@@ -18,7 +20,7 @@ public final class ClientShellPacket {
     
 
     
-    public ClientShellPacket(final java.util.ArrayList<java.lang.Byte> stdin, final boolean eOF, final int rows, final int cols) {
+    public ClientShellPacket(final java.util.List<java.lang.Byte> stdin, final boolean eOF, final int rows, final int cols) {
         
             this.stdin = stdin;
         
@@ -32,10 +34,10 @@ public final class ClientShellPacket {
 
     
     
-    public java.util.ArrayList<java.lang.Byte> getStdin() {
+    public java.util.List<java.lang.Byte> getStdin() {
         return this.stdin;
     }
-    public void setStdin(java.util.ArrayList<java.lang.Byte> stdin) {
+    public void setStdin(java.util.List<java.lang.Byte> stdin) {
         this.stdin = stdin;
     }
     
@@ -114,4 +116,42 @@ public final class ClientShellPacket {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, stdin);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, eOF);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, rows);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, cols);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ClientShellPacket> CREATOR
+		= new android.os.Parcelable.Creator<ClientShellPacket>() {
+		@Override
+		public ClientShellPacket createFromParcel(android.os.Parcel in) {
+			return new ClientShellPacket(in);
+		}
+		@Override
+		public ClientShellPacket[] newArray(int size) {
+			return new ClientShellPacket[size];
+		}
+	};
+	private ClientShellPacket(android.os.Parcel in) {
+		
+			this.stdin = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdin);
+		
+			this.eOF = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.eOF);
+		
+			this.rows = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.rows);
+		
+			this.cols = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.cols);
+		
+	}
 }

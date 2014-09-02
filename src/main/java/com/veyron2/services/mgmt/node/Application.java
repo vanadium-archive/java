@@ -165,8 +165,8 @@ public interface Application  {
 // returns the object name(s) that identifies/identify the new
 // instance(s).
 
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

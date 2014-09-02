@@ -7,12 +7,14 @@ package com.veyron2.ipc;
  * MethodSignature represents the structure for passing around method
  * signatures. This is usually sent in a ServiceSignature.
  **/
-public final class MethodSignature {
+public final class MethodSignature implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<com.veyron2.ipc.MethodArgument> inArgs;
+      private java.util.List<com.veyron2.ipc.MethodArgument> inArgs;
     
-      private java.util.ArrayList<com.veyron2.ipc.MethodArgument> outArgs;
+      private java.util.List<com.veyron2.ipc.MethodArgument> outArgs;
     
       private com.veyron2.wiretype.TypeID inStream;
     
@@ -20,7 +22,7 @@ public final class MethodSignature {
     
 
     
-    public MethodSignature(final java.util.ArrayList<com.veyron2.ipc.MethodArgument> inArgs, final java.util.ArrayList<com.veyron2.ipc.MethodArgument> outArgs, final com.veyron2.wiretype.TypeID inStream, final com.veyron2.wiretype.TypeID outStream) {
+    public MethodSignature(final java.util.List<com.veyron2.ipc.MethodArgument> inArgs, final java.util.List<com.veyron2.ipc.MethodArgument> outArgs, final com.veyron2.wiretype.TypeID inStream, final com.veyron2.wiretype.TypeID outStream) {
         
             this.inArgs = inArgs;
         
@@ -34,17 +36,17 @@ public final class MethodSignature {
 
     
     
-    public java.util.ArrayList<com.veyron2.ipc.MethodArgument> getInArgs() {
+    public java.util.List<com.veyron2.ipc.MethodArgument> getInArgs() {
         return this.inArgs;
     }
-    public void setInArgs(java.util.ArrayList<com.veyron2.ipc.MethodArgument> inArgs) {
+    public void setInArgs(java.util.List<com.veyron2.ipc.MethodArgument> inArgs) {
         this.inArgs = inArgs;
     }
     
-    public java.util.ArrayList<com.veyron2.ipc.MethodArgument> getOutArgs() {
+    public java.util.List<com.veyron2.ipc.MethodArgument> getOutArgs() {
         return this.outArgs;
     }
-    public void setOutArgs(java.util.ArrayList<com.veyron2.ipc.MethodArgument> outArgs) {
+    public void setOutArgs(java.util.List<com.veyron2.ipc.MethodArgument> outArgs) {
         this.outArgs = outArgs;
     }
     
@@ -128,4 +130,42 @@ public final class MethodSignature {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, inArgs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, outArgs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, inStream);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, outStream);
+    	
+    }
+	public static final android.os.Parcelable.Creator<MethodSignature> CREATOR
+		= new android.os.Parcelable.Creator<MethodSignature>() {
+		@Override
+		public MethodSignature createFromParcel(android.os.Parcel in) {
+			return new MethodSignature(in);
+		}
+		@Override
+		public MethodSignature[] newArray(int size) {
+			return new MethodSignature[size];
+		}
+	};
+	private MethodSignature(android.os.Parcel in) {
+		
+			this.inArgs = (java.util.List<com.veyron2.ipc.MethodArgument>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.inArgs);
+		
+			this.outArgs = (java.util.List<com.veyron2.ipc.MethodArgument>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.outArgs);
+		
+			this.inStream = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.inStream);
+		
+			this.outStream = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.outStream);
+		
+	}
 }

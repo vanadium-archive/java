@@ -32,11 +32,11 @@ public final class StatsStub implements com.veyron2.services.mgmt.stats.Stats {
 
 
     
-    public java.lang.Object value(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any value(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return value(context, null);
     }
     
-    public java.lang.Object value(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any value(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -58,14 +58,14 @@ public final class StatsStub implements com.veyron2.services.mgmt.stats.Stats {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          

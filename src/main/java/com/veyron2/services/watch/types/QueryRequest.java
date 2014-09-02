@@ -7,7 +7,9 @@ package com.veyron2.services.watch.types;
  * QueryRequest specifies which entities should be watched and, optionally,
  * how to resume from a previous Watch call.
  **/
-public final class QueryRequest {
+public final class QueryRequest implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.query.Query query;
@@ -82,4 +84,34 @@ public final class QueryRequest {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, query);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, resumeMarker);
+    	
+    }
+	public static final android.os.Parcelable.Creator<QueryRequest> CREATOR
+		= new android.os.Parcelable.Creator<QueryRequest>() {
+		@Override
+		public QueryRequest createFromParcel(android.os.Parcel in) {
+			return new QueryRequest(in);
+		}
+		@Override
+		public QueryRequest[] newArray(int size) {
+			return new QueryRequest[size];
+		}
+	};
+	private QueryRequest(android.os.Parcel in) {
+		
+			this.query = (com.veyron2.query.Query) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.query);
+		
+			this.resumeMarker = (com.veyron2.services.watch.types.ResumeMarker) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.resumeMarker);
+		
+	}
 }

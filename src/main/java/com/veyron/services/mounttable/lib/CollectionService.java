@@ -18,6 +18,6 @@ public interface CollectionService  {
     // Lookup retrieves the value associated with a name.  Returns an error if
 // there is no such binding.
 
-    public java.util.ArrayList<java.lang.Byte> lookup(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.Byte> lookup(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
 }

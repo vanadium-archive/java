@@ -6,7 +6,9 @@ package com.veyron2.services.mgmt.binary;
  * type PartInfo struct{Checksum string;Size int64} 
  * PartInfo holds information describing a binary part.
  **/
-public final class PartInfo {
+public final class PartInfo implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String checksum;
@@ -77,4 +79,34 @@ public final class PartInfo {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, checksum);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, size);
+    	
+    }
+	public static final android.os.Parcelable.Creator<PartInfo> CREATOR
+		= new android.os.Parcelable.Creator<PartInfo>() {
+		@Override
+		public PartInfo createFromParcel(android.os.Parcel in) {
+			return new PartInfo(in);
+		}
+		@Override
+		public PartInfo[] newArray(int size) {
+			return new PartInfo[size];
+		}
+	};
+	private PartInfo(android.os.Parcel in) {
+		
+			this.checksum = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.checksum);
+		
+			this.size = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.size);
+		
+	}
 }

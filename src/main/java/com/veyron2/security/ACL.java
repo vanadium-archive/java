@@ -13,16 +13,18 @@ package com.veyron2.security;
  * any particular one), requiring all presented blessings to match the
  * ACL does not provide any security benefits.
  **/
-public final class ACL {
+public final class ACL implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in;
+      private java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in;
     
-      private java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn;
+      private java.util.Map<java.lang.String, com.veyron2.security.LabelSet> notIn;
     
 
     
-    public ACL(final java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in, final java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn) {
+    public ACL(final java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in, final java.util.Map<java.lang.String, com.veyron2.security.LabelSet> notIn) {
         
             this.in = in;
         
@@ -32,17 +34,17 @@ public final class ACL {
 
     
     
-    public java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> getIn() {
+    public java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> getIn() {
         return this.in;
     }
-    public void setIn(java.util.HashMap<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in) {
+    public void setIn(java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in) {
         this.in = in;
     }
     
-    public java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> getNotIn() {
+    public java.util.Map<java.lang.String, com.veyron2.security.LabelSet> getNotIn() {
         return this.notIn;
     }
-    public void setNotIn(java.util.HashMap<java.lang.String, com.veyron2.security.LabelSet> notIn) {
+    public void setNotIn(java.util.Map<java.lang.String, com.veyron2.security.LabelSet> notIn) {
         this.notIn = notIn;
     }
     
@@ -88,4 +90,34 @@ public final class ACL {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, in);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, notIn);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ACL> CREATOR
+		= new android.os.Parcelable.Creator<ACL>() {
+		@Override
+		public ACL createFromParcel(android.os.Parcel in) {
+			return new ACL(in);
+		}
+		@Override
+		public ACL[] newArray(int size) {
+			return new ACL[size];
+		}
+	};
+	private ACL(android.os.Parcel in) {
+		
+			this.in = (java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.in);
+		
+			this.notIn = (java.util.Map<java.lang.String, com.veyron2.security.LabelSet>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.notIn);
+		
+	}
 }

@@ -81,19 +81,19 @@ public final class BinaryServiceWrapper {
 
     public void download(final com.veyron2.ipc.ServerCall call, final int part) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>>() {
+        final com.veyron2.vdl.Stream<java.lang.Void, java.util.List<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.lang.Void, java.util.List<java.lang.Byte>>() {
             @Override
             public void send(java.lang.Void item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.ArrayList<java.lang.Byte> >() {
+            public java.util.List<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.List<java.lang.Byte> >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.util.ArrayList<java.lang.Byte>)result;
+                    return (java.util.List<java.lang.Byte>)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }
@@ -108,16 +108,16 @@ public final class BinaryServiceWrapper {
          return  this.service.downloadURL( call   );
     }
 
-    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.stat( call   );
     }
 
     public void upload(final com.veyron2.ipc.ServerCall call, final int part) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+        final com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void>() {
             @Override
-            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override

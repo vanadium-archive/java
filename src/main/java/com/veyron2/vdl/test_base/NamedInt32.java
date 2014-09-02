@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedInt32 int32 
  **/
-public final class NamedInt32 {
+public final class NamedInt32 implements android.os.Parcelable, java.io.Serializable {
     private int value;
 
     public NamedInt32(int value) {
@@ -30,4 +30,26 @@ public final class NamedInt32 {
     public int hashCode() {
         return value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedInt32> CREATOR
+		= new android.os.Parcelable.Creator<NamedInt32>() {
+		@Override
+		public NamedInt32 createFromParcel(android.os.Parcel in) {
+			return new NamedInt32(in);
+		}
+		@Override
+		public NamedInt32[] newArray(int size) {
+			return new NamedInt32[size];
+		}
+	};
+	private NamedInt32(android.os.Parcel in) {
+		value = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -34,8 +34,8 @@ public interface Object extends com.veyron2.services.store.Transactable, com.vey
     
     // Put modifies the value of the Object.
 
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any V) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any V, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

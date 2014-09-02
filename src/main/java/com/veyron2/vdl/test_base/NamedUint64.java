@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedUint64 uint64 
  **/
-public final class NamedUint64 {
+public final class NamedUint64 implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public NamedUint64(long value) {
@@ -30,4 +30,26 @@ public final class NamedUint64 {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedUint64> CREATOR
+		= new android.os.Parcelable.Creator<NamedUint64>() {
+		@Override
+		public NamedUint64 createFromParcel(android.os.Parcel in) {
+			return new NamedUint64(in);
+		}
+		@Override
+		public NamedUint64[] newArray(int size) {
+			return new NamedUint64[size];
+		}
+	};
+	private NamedUint64(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -18,8 +18,8 @@ public interface Application extends com.veyron2.services.mgmt.repository.Applic
 // through the object name suffix) and application envelope to all
 // of the given application profiles.
 
-    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException;
-    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public void put(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException;
+    public void put(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

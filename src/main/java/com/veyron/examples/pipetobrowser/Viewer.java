@@ -14,7 +14,7 @@ public interface Viewer  {
     
     // Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
 
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

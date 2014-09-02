@@ -6,7 +6,9 @@ package com.veyron.services.store.raw;
  * type DEntry struct{Name string;ID veyron2/storage.ID [16]byte} 
  * DEntry is a directory entry.
  **/
-public final class DEntry {
+public final class DEntry implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class DEntry {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, iD);
+    	
+    }
+	public static final android.os.Parcelable.Creator<DEntry> CREATOR
+		= new android.os.Parcelable.Creator<DEntry>() {
+		@Override
+		public DEntry createFromParcel(android.os.Parcel in) {
+			return new DEntry(in);
+		}
+		@Override
+		public DEntry[] newArray(int size) {
+			return new DEntry[size];
+		}
+	};
+	private DEntry(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.iD = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.iD);
+		
+	}
 }

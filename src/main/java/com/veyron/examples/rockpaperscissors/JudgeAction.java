@@ -5,14 +5,16 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * type JudgeAction struct{PlayerNum int32;OpponentName string;MoveOptions []string;RoundResult veyron/examples/rockpaperscissors.Round struct{Moves [2]string;Comment string;Winner veyron/examples/rockpaperscissors.WinnerTag byte;StartTimeNS int64;EndTimeNS int64};Score veyron/examples/rockpaperscissors.ScoreCard struct{Opts veyron/examples/rockpaperscissors.GameOptions struct{NumRounds int32;GameType veyron/examples/rockpaperscissors.GameTypeTag byte};Judge string;Players []string;Rounds []veyron/examples/rockpaperscissors.Round;StartTimeNS int64;EndTimeNS int64;Winner veyron/examples/rockpaperscissors.WinnerTag}} 
  **/
-public final class JudgeAction {
+public final class JudgeAction implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int playerNum;
     
       private java.lang.String opponentName;
     
-      private java.util.ArrayList<java.lang.String> moveOptions;
+      private java.util.List<java.lang.String> moveOptions;
     
       private com.veyron.examples.rockpaperscissors.Round roundResult;
     
@@ -20,7 +22,7 @@ public final class JudgeAction {
     
 
     
-    public JudgeAction(final int playerNum, final java.lang.String opponentName, final java.util.ArrayList<java.lang.String> moveOptions, final com.veyron.examples.rockpaperscissors.Round roundResult, final com.veyron.examples.rockpaperscissors.ScoreCard score) {
+    public JudgeAction(final int playerNum, final java.lang.String opponentName, final java.util.List<java.lang.String> moveOptions, final com.veyron.examples.rockpaperscissors.Round roundResult, final com.veyron.examples.rockpaperscissors.ScoreCard score) {
         
             this.playerNum = playerNum;
         
@@ -50,10 +52,10 @@ public final class JudgeAction {
         this.opponentName = opponentName;
     }
     
-    public java.util.ArrayList<java.lang.String> getMoveOptions() {
+    public java.util.List<java.lang.String> getMoveOptions() {
         return this.moveOptions;
     }
-    public void setMoveOptions(java.util.ArrayList<java.lang.String> moveOptions) {
+    public void setMoveOptions(java.util.List<java.lang.String> moveOptions) {
         this.moveOptions = moveOptions;
     }
     
@@ -145,4 +147,46 @@ public final class JudgeAction {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, playerNum);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, opponentName);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, moveOptions);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, roundResult);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, score);
+    	
+    }
+	public static final android.os.Parcelable.Creator<JudgeAction> CREATOR
+		= new android.os.Parcelable.Creator<JudgeAction>() {
+		@Override
+		public JudgeAction createFromParcel(android.os.Parcel in) {
+			return new JudgeAction(in);
+		}
+		@Override
+		public JudgeAction[] newArray(int size) {
+			return new JudgeAction[size];
+		}
+	};
+	private JudgeAction(android.os.Parcel in) {
+		
+			this.playerNum = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.playerNum);
+		
+			this.opponentName = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.opponentName);
+		
+			this.moveOptions = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.moveOptions);
+		
+			this.roundResult = (com.veyron.examples.rockpaperscissors.Round) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.roundResult);
+		
+			this.score = (com.veyron.examples.rockpaperscissors.ScoreCard) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.score);
+		
+	}
 }

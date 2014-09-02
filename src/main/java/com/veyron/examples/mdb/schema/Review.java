@@ -6,7 +6,9 @@ package com.veyron.examples.mdb.schema;
  * type Review struct{Rating byte;Text string} 
  * Review is a movie review.
  **/
-public final class Review {
+public final class Review implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private byte rating;
@@ -77,4 +79,34 @@ public final class Review {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, rating);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, text);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Review> CREATOR
+		= new android.os.Parcelable.Creator<Review>() {
+		@Override
+		public Review createFromParcel(android.os.Parcel in) {
+			return new Review(in);
+		}
+		@Override
+		public Review[] newArray(int size) {
+			return new Review[size];
+		}
+	};
+	private Review(android.os.Parcel in) {
+		
+			this.rating = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.rating);
+		
+			this.text = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.text);
+		
+	}
 }

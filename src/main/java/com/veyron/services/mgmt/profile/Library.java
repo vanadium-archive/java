@@ -6,7 +6,9 @@ package com.veyron.services.mgmt.profile;
  * type Library struct{Name string;MajorVersion string;MinorVersion string} 
  * Library describes a shared library that applications may use.
  **/
-public final class Library {
+public final class Library implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -104,4 +106,38 @@ public final class Library {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, majorVersion);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, minorVersion);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Library> CREATOR
+		= new android.os.Parcelable.Creator<Library>() {
+		@Override
+		public Library createFromParcel(android.os.Parcel in) {
+			return new Library(in);
+		}
+		@Override
+		public Library[] newArray(int size) {
+			return new Library[size];
+		}
+	};
+	private Library(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.majorVersion = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.majorVersion);
+		
+			this.minorVersion = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.minorVersion);
+		
+	}
 }

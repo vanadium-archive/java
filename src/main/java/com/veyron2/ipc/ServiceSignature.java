@@ -8,16 +8,18 @@ package com.veyron2.ipc;
  * to resolve the method argument types.
  * TODO(bprosnitz) Rename this and move it to wiretype.
  **/
-public final class ServiceSignature {
+public final class ServiceSignature implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<java.lang.Object> typeDefs;
+      private java.util.List<com.veyron2.vdl.Any> typeDefs;
     
-      private java.util.HashMap<java.lang.String, com.veyron2.ipc.MethodSignature> methods;
+      private java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature> methods;
     
 
     
-    public ServiceSignature(final java.util.ArrayList<java.lang.Object> typeDefs, final java.util.HashMap<java.lang.String, com.veyron2.ipc.MethodSignature> methods) {
+    public ServiceSignature(final java.util.List<com.veyron2.vdl.Any> typeDefs, final java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature> methods) {
         
             this.typeDefs = typeDefs;
         
@@ -27,17 +29,17 @@ public final class ServiceSignature {
 
     
     
-    public java.util.ArrayList<java.lang.Object> getTypeDefs() {
+    public java.util.List<com.veyron2.vdl.Any> getTypeDefs() {
         return this.typeDefs;
     }
-    public void setTypeDefs(java.util.ArrayList<java.lang.Object> typeDefs) {
+    public void setTypeDefs(java.util.List<com.veyron2.vdl.Any> typeDefs) {
         this.typeDefs = typeDefs;
     }
     
-    public java.util.HashMap<java.lang.String, com.veyron2.ipc.MethodSignature> getMethods() {
+    public java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature> getMethods() {
         return this.methods;
     }
-    public void setMethods(java.util.HashMap<java.lang.String, com.veyron2.ipc.MethodSignature> methods) {
+    public void setMethods(java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature> methods) {
         this.methods = methods;
     }
     
@@ -83,4 +85,34 @@ public final class ServiceSignature {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, typeDefs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, methods);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ServiceSignature> CREATOR
+		= new android.os.Parcelable.Creator<ServiceSignature>() {
+		@Override
+		public ServiceSignature createFromParcel(android.os.Parcel in) {
+			return new ServiceSignature(in);
+		}
+		@Override
+		public ServiceSignature[] newArray(int size) {
+			return new ServiceSignature[size];
+		}
+	};
+	private ServiceSignature(android.os.Parcel in) {
+		
+			this.typeDefs = (java.util.List<com.veyron2.vdl.Any>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.typeDefs);
+		
+			this.methods = (java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.methods);
+		
+	}
 }

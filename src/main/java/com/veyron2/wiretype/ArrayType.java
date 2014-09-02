@@ -6,7 +6,9 @@ package com.veyron2.wiretype;
  * type ArrayType struct{Elem veyron2/wiretype.TypeID uint64;Len uint64;Name string;Tags []string} 
  * ArrayType represents a fixed-length sequence of Elem values.
  **/
-public final class ArrayType {
+public final class ArrayType implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.wiretype.TypeID elem;
@@ -15,11 +17,11 @@ public final class ArrayType {
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.String> tags;
+      private java.util.List<java.lang.String> tags;
     
 
     
-    public ArrayType(final com.veyron2.wiretype.TypeID elem, final long len, final java.lang.String name, final java.util.ArrayList<java.lang.String> tags) {
+    public ArrayType(final com.veyron2.wiretype.TypeID elem, final long len, final java.lang.String name, final java.util.List<java.lang.String> tags) {
         
             this.elem = elem;
         
@@ -54,10 +56,10 @@ public final class ArrayType {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.String> getTags() {
+    public java.util.List<java.lang.String> getTags() {
         return this.tags;
     }
-    public void setTags(java.util.ArrayList<java.lang.String> tags) {
+    public void setTags(java.util.List<java.lang.String> tags) {
         this.tags = tags;
     }
     
@@ -123,4 +125,42 @@ public final class ArrayType {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, elem);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, len);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, tags);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ArrayType> CREATOR
+		= new android.os.Parcelable.Creator<ArrayType>() {
+		@Override
+		public ArrayType createFromParcel(android.os.Parcel in) {
+			return new ArrayType(in);
+		}
+		@Override
+		public ArrayType[] newArray(int size) {
+			return new ArrayType[size];
+		}
+	};
+	private ArrayType(android.os.Parcel in) {
+		
+			this.elem = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.elem);
+		
+			this.len = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.len);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.tags = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.tags);
+		
+	}
 }

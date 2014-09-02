@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedUint16 uint16 
  **/
-public final class NamedUint16 {
+public final class NamedUint16 implements android.os.Parcelable, java.io.Serializable {
     private short value;
 
     public NamedUint16(short value) {
@@ -30,4 +30,26 @@ public final class NamedUint16 {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedUint16> CREATOR
+		= new android.os.Parcelable.Creator<NamedUint16>() {
+		@Override
+		public NamedUint16 createFromParcel(android.os.Parcel in) {
+			return new NamedUint16(in);
+		}
+		@Override
+		public NamedUint16[] newArray(int size) {
+			return new NamedUint16[size];
+		}
+	};
+	private NamedUint16(android.os.Parcel in) {
+		value = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

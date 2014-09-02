@@ -6,16 +6,18 @@ package com.veyron2.storage;
  * type Entry struct{Stat veyron2/storage.Stat struct{Kind veyron2/storage.Kind int16;ID veyron2/storage.ID [16]byte;MTimeNS int64;Attrs []any};Value any} 
  * Entry represents a value at some point in time in the store.
  **/
-public final class Entry {
+public final class Entry implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.storage.Stat stat;
     
-      private java.lang.Object value;
+      private com.veyron2.vdl.Any value;
     
 
     
-    public Entry(final com.veyron2.storage.Stat stat, final java.lang.Object value) {
+    public Entry(final com.veyron2.storage.Stat stat, final com.veyron2.vdl.Any value) {
         
             this.stat = stat;
         
@@ -32,10 +34,10 @@ public final class Entry {
         this.stat = stat;
     }
     
-    public java.lang.Object getValue() {
+    public com.veyron2.vdl.Any getValue() {
         return this.value;
     }
-    public void setValue(java.lang.Object value) {
+    public void setValue(com.veyron2.vdl.Any value) {
         this.value = value;
     }
     
@@ -81,4 +83,34 @@ public final class Entry {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, stat);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Entry> CREATOR
+		= new android.os.Parcelable.Creator<Entry>() {
+		@Override
+		public Entry createFromParcel(android.os.Parcel in) {
+			return new Entry(in);
+		}
+		@Override
+		public Entry[] newArray(int size) {
+			return new Entry[size];
+		}
+	};
+	private Entry(android.os.Parcel in) {
+		
+			this.stat = (com.veyron2.storage.Stat) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stat);
+		
+			this.value = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+	}
 }

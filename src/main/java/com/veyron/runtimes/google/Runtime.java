@@ -17,6 +17,7 @@ import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.Label;
 import com.veyron2.security.PublicID;
+import com.veyron2.vdl.Any;
 
 import org.joda.time.Duration;
 
@@ -372,11 +373,18 @@ public class Runtime implements com.veyron2.Runtime {
 			// JSON-decode results and return.
 			final Object[] ret = new Object[types.length];
 			for (int i = 0; i < types.length; i++) {
+				final TypeToken<?> type = types[i];
+				final String jsonResult = jsonResults[i];
+				if (type.equals(new TypeToken<Any>(){})) {  // Any type.
+					ret[i] = new Any(jsonResult);
+					continue;
+				}
 				try {
-					ret[i] = this.gson.fromJson(jsonResults[i], types[i].getType());
+					ret[i] = this.gson.fromJson(jsonResult, type.getType());
 				} catch (JsonSyntaxException e) {
 					throw new VeyronException(String.format(
-						"Error decoding result %s from JSON: %s", jsonResults[i], e.getMessage()));
+						"Error decoding JSON result %s into type %s: %s",
+						jsonResult, e.getMessage()));
 				}
 			}
 			return ret;

@@ -23,7 +23,7 @@ public interface Stats extends com.veyron2.services.mounttable.Globbable, com.ve
 // Some objects may not have a value, in which case, Value() returns
 // a NoValue error.
 
-    public java.lang.Object value(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public java.lang.Object value(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any value(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any value(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

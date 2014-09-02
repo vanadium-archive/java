@@ -22,11 +22,11 @@ public final class DischargerStub implements com.veyron.services.security.Discha
 
 
     
-    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any discharge(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException {
         return discharge(context, Caveat, Impetus, null);
     }
     
-    public java.lang.Object discharge(final com.veyron2.ipc.Context context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any discharge(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any Caveat, final com.veyron2.security.DischargeImpetus Impetus, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -48,14 +48,14 @@ public final class DischargerStub implements com.veyron.services.security.Discha
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          

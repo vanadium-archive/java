@@ -6,7 +6,9 @@ package com.veyron.examples.stfortune.schema;
  * type FortuneData struct{Fortune string;UserName veyron2/storage.ID [16]byte} 
  * FortuneData contains the information regarding a fortune.
  **/
-public final class FortuneData {
+public final class FortuneData implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String fortune;
@@ -81,4 +83,34 @@ public final class FortuneData {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, fortune);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, userName);
+    	
+    }
+	public static final android.os.Parcelable.Creator<FortuneData> CREATOR
+		= new android.os.Parcelable.Creator<FortuneData>() {
+		@Override
+		public FortuneData createFromParcel(android.os.Parcel in) {
+			return new FortuneData(in);
+		}
+		@Override
+		public FortuneData[] newArray(int size) {
+			return new FortuneData[size];
+		}
+	};
+	private FortuneData(android.os.Parcel in) {
+		
+			this.fortune = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.fortune);
+		
+			this.userName = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.userName);
+		
+	}
 }

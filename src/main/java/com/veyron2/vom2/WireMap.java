@@ -6,7 +6,9 @@ package com.veyron2.vom2;
  * type WireMap struct{Name string;Key veyron2/vom2.TypeID uint64;Elem veyron2/vom2.TypeID} 
  * WireMap represents a map type definition.
  **/
-public final class WireMap {
+public final class WireMap implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -104,4 +106,38 @@ public final class WireMap {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, key);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, elem);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireMap> CREATOR
+		= new android.os.Parcelable.Creator<WireMap>() {
+		@Override
+		public WireMap createFromParcel(android.os.Parcel in) {
+			return new WireMap(in);
+		}
+		@Override
+		public WireMap[] newArray(int size) {
+			return new WireMap[size];
+		}
+	};
+	private WireMap(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.key = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.key);
+		
+			this.elem = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.elem);
+		
+	}
 }

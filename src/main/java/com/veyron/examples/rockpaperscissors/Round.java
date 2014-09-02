@@ -6,7 +6,9 @@ package com.veyron.examples.rockpaperscissors;
  * type Round struct{Moves [2]string;Comment string;Winner veyron/examples/rockpaperscissors.WinnerTag byte;StartTimeNS int64;EndTimeNS int64} 
  * Round represents the state of a round.
  **/
-public final class Round {
+public final class Round implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String[] moves;
@@ -142,4 +144,46 @@ public final class Round {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, moves);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, comment);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, winner);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, startTimeNS);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, endTimeNS);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Round> CREATOR
+		= new android.os.Parcelable.Creator<Round>() {
+		@Override
+		public Round createFromParcel(android.os.Parcel in) {
+			return new Round(in);
+		}
+		@Override
+		public Round[] newArray(int size) {
+			return new Round[size];
+		}
+	};
+	private Round(android.os.Parcel in) {
+		
+			this.moves = (java.lang.String[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.moves);
+		
+			this.comment = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.comment);
+		
+			this.winner = (com.veyron.examples.rockpaperscissors.WinnerTag) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.winner);
+		
+			this.startTimeNS = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.startTimeNS);
+		
+			this.endTimeNS = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.endTimeNS);
+		
+	}
 }

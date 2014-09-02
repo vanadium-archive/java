@@ -6,7 +6,9 @@ package com.veyron.services.store.raw;
  * type Request struct{ResumeMarker veyron2/services/watch/types.ResumeMarker []byte} 
  * Request specifies how to resume from a previous Watch call.
  **/
-public final class Request {
+public final class Request implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.services.watch.types.ResumeMarker resumeMarker;
@@ -58,4 +60,30 @@ public final class Request {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, resumeMarker);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Request> CREATOR
+		= new android.os.Parcelable.Creator<Request>() {
+		@Override
+		public Request createFromParcel(android.os.Parcel in) {
+			return new Request(in);
+		}
+		@Override
+		public Request[] newArray(int size) {
+			return new Request[size];
+		}
+	};
+	private Request(android.os.Parcel in) {
+		
+			this.resumeMarker = (com.veyron2.services.watch.types.ResumeMarker) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.resumeMarker);
+		
+	}
 }

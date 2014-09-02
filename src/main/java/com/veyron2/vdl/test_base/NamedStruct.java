@@ -5,7 +5,9 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedStruct struct{A bool;B string;C int32} 
  **/
-public final class NamedStruct {
+public final class NamedStruct implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private boolean a;
@@ -95,4 +97,38 @@ public final class NamedStruct {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, c);
+    	
+    }
+	public static final android.os.Parcelable.Creator<NamedStruct> CREATOR
+		= new android.os.Parcelable.Creator<NamedStruct>() {
+		@Override
+		public NamedStruct createFromParcel(android.os.Parcel in) {
+			return new NamedStruct(in);
+		}
+		@Override
+		public NamedStruct[] newArray(int size) {
+			return new NamedStruct[size];
+		}
+	};
+	private NamedStruct(android.os.Parcel in) {
+		
+			this.a = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a);
+		
+			this.b = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b);
+		
+			this.c = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.c);
+		
+	}
 }

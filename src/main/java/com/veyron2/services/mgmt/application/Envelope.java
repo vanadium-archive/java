@@ -6,20 +6,22 @@ package com.veyron2.services.mgmt.application;
  * type Envelope struct{Title string;Args []string;Binary string;Env []string} 
  * Envelope is a collection of metadata that describes an application.
  **/
-public final class Envelope {
+public final class Envelope implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String title;
     
-      private java.util.ArrayList<java.lang.String> args;
+      private java.util.List<java.lang.String> args;
     
       private java.lang.String binary;
     
-      private java.util.ArrayList<java.lang.String> env;
+      private java.util.List<java.lang.String> env;
     
 
     
-    public Envelope(final java.lang.String title, final java.util.ArrayList<java.lang.String> args, final java.lang.String binary, final java.util.ArrayList<java.lang.String> env) {
+    public Envelope(final java.lang.String title, final java.util.List<java.lang.String> args, final java.lang.String binary, final java.util.List<java.lang.String> env) {
         
             this.title = title;
         
@@ -40,10 +42,10 @@ public final class Envelope {
         this.title = title;
     }
     
-    public java.util.ArrayList<java.lang.String> getArgs() {
+    public java.util.List<java.lang.String> getArgs() {
         return this.args;
     }
-    public void setArgs(java.util.ArrayList<java.lang.String> args) {
+    public void setArgs(java.util.List<java.lang.String> args) {
         this.args = args;
     }
     
@@ -54,10 +56,10 @@ public final class Envelope {
         this.binary = binary;
     }
     
-    public java.util.ArrayList<java.lang.String> getEnv() {
+    public java.util.List<java.lang.String> getEnv() {
         return this.env;
     }
-    public void setEnv(java.util.ArrayList<java.lang.String> env) {
+    public void setEnv(java.util.List<java.lang.String> env) {
         this.env = env;
     }
     
@@ -127,4 +129,42 @@ public final class Envelope {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, title);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, args);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, binary);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, env);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Envelope> CREATOR
+		= new android.os.Parcelable.Creator<Envelope>() {
+		@Override
+		public Envelope createFromParcel(android.os.Parcel in) {
+			return new Envelope(in);
+		}
+		@Override
+		public Envelope[] newArray(int size) {
+			return new Envelope[size];
+		}
+	};
+	private Envelope(android.os.Parcel in) {
+		
+			this.title = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.title);
+		
+			this.args = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.args);
+		
+			this.binary = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.binary);
+		
+			this.env = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.env);
+		
+	}
 }

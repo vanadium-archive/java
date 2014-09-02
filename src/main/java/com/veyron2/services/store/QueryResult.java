@@ -92,20 +92,22 @@ package com.veyron2.services.store;
  * only the NestedResult values.  The parentheses show the grouping.
  * (0 (1 (2, 2), 1 (3), 1 (4, 4, 4)), (0 (1, 1 (5, 5)))
  **/
-public final class QueryResult {
+public final class QueryResult implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.services.store.NestedResult nestedResult;
     
       private java.lang.String name;
     
-      private java.util.HashMap<java.lang.String, java.lang.Object> fields;
+      private java.util.Map<java.lang.String, com.veyron2.vdl.Any> fields;
     
-      private java.lang.Object value;
+      private com.veyron2.vdl.Any value;
     
 
     
-    public QueryResult(final com.veyron2.services.store.NestedResult nestedResult, final java.lang.String name, final java.util.HashMap<java.lang.String, java.lang.Object> fields, final java.lang.Object value) {
+    public QueryResult(final com.veyron2.services.store.NestedResult nestedResult, final java.lang.String name, final java.util.Map<java.lang.String, com.veyron2.vdl.Any> fields, final com.veyron2.vdl.Any value) {
         
             this.nestedResult = nestedResult;
         
@@ -133,17 +135,17 @@ public final class QueryResult {
         this.name = name;
     }
     
-    public java.util.HashMap<java.lang.String, java.lang.Object> getFields() {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> getFields() {
         return this.fields;
     }
-    public void setFields(java.util.HashMap<java.lang.String, java.lang.Object> fields) {
+    public void setFields(java.util.Map<java.lang.String, com.veyron2.vdl.Any> fields) {
         this.fields = fields;
     }
     
-    public java.lang.Object getValue() {
+    public com.veyron2.vdl.Any getValue() {
         return this.value;
     }
-    public void setValue(java.lang.Object value) {
+    public void setValue(com.veyron2.vdl.Any value) {
         this.value = value;
     }
     
@@ -213,4 +215,42 @@ public final class QueryResult {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, nestedResult);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, fields);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    }
+	public static final android.os.Parcelable.Creator<QueryResult> CREATOR
+		= new android.os.Parcelable.Creator<QueryResult>() {
+		@Override
+		public QueryResult createFromParcel(android.os.Parcel in) {
+			return new QueryResult(in);
+		}
+		@Override
+		public QueryResult[] newArray(int size) {
+			return new QueryResult[size];
+		}
+	};
+	private QueryResult(android.os.Parcel in) {
+		
+			this.nestedResult = (com.veyron2.services.store.NestedResult) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.nestedResult);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.fields = (java.util.Map<java.lang.String, com.veyron2.vdl.Any>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.fields);
+		
+			this.value = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+	}
 }

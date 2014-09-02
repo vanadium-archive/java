@@ -6,7 +6,9 @@ package com.veyron2.vom2;
  * type WireList struct{Name string;Elem veyron2/vom2.TypeID uint64} 
  * WireList represents a list type definition.
  **/
-public final class WireList {
+public final class WireList implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class WireList {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, elem);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireList> CREATOR
+		= new android.os.Parcelable.Creator<WireList>() {
+		@Override
+		public WireList createFromParcel(android.os.Parcel in) {
+			return new WireList(in);
+		}
+		@Override
+		public WireList[] newArray(int size) {
+			return new WireList[size];
+		}
+	};
+	private WireList(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.elem = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.elem);
+		
+	}
 }

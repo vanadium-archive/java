@@ -6,7 +6,9 @@ package com.veyron.examples.stfortune.schema;
  * type User struct{Name string} 
  * User contains the information corresponding to a particular UserName in the store.
  **/
-public final class User {
+public final class User implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -58,4 +60,30 @@ public final class User {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    }
+	public static final android.os.Parcelable.Creator<User> CREATOR
+		= new android.os.Parcelable.Creator<User>() {
+		@Override
+		public User createFromParcel(android.os.Parcel in) {
+			return new User(in);
+		}
+		@Override
+		public User[] newArray(int size) {
+			return new User[size];
+		}
+	};
+	private User(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+	}
 }

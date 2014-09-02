@@ -38,8 +38,8 @@ public interface OAuthBlesser  {
 // The redirect URL used to obtain the authorization code must also
 // be provided.
 
-    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException;
-    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -48,7 +48,7 @@ public interface OAuthBlesser  {
     // BlessUsingAccessToken uses the provided access token to obtain the email
 // address and returns a blessing.
 
-    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token) throws com.veyron2.ipc.VeyronException;
-    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

@@ -124,7 +124,7 @@ public final class CalculatorServiceWrapper {
         return  this.arithWrapper.mul(call, nested);
     }
 
-    public java.lang.Object quoteAny(final com.veyron2.ipc.ServerCall call, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.ServerCall call, final com.veyron2.vdl.Any a) throws com.veyron2.ipc.VeyronException {
         
         return  this.arithWrapper.quoteAny(call, a);
     }

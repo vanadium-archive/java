@@ -6,7 +6,9 @@ package com.veyron2.vom2;
  * type WireField struct{Name string;Type veyron2/vom2.TypeID uint64} 
  * WireField represents a field in a struct.
  **/
-public final class WireField {
+public final class WireField implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class WireField {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, type);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireField> CREATOR
+		= new android.os.Parcelable.Creator<WireField>() {
+		@Override
+		public WireField createFromParcel(android.os.Parcel in) {
+			return new WireField(in);
+		}
+		@Override
+		public WireField[] newArray(int size) {
+			return new WireField[size];
+		}
+	};
+	private WireField(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.type = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.type);
+		
+	}
 }

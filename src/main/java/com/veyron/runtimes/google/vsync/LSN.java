@@ -7,7 +7,7 @@ package com.veyron.runtimes.google.vsync;
  * type LSN uint64 
  * LSN is the log sequence number.
  **/
-public final class LSN {
+public final class LSN implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public LSN(long value) {
@@ -31,4 +31,26 @@ public final class LSN {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<LSN> CREATOR
+		= new android.os.Parcelable.Creator<LSN>() {
+		@Override
+		public LSN createFromParcel(android.os.Parcel in) {
+			return new LSN(in);
+		}
+		@Override
+		public LSN[] newArray(int size) {
+			return new LSN[size];
+		}
+	};
+	private LSN(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

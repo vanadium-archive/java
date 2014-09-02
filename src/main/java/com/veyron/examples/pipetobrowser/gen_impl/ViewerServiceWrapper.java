@@ -39,11 +39,11 @@ public final class ViewerServiceWrapper {
 
      
     
-    public java.lang.Object pipe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any pipe(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void>() {
+        final com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void> stream = new com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void>() {
             @Override
-            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override

@@ -432,11 +432,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public void inputMap(final com.veyron2.ipc.Context context, final java.util.HashMap<java.lang.Byte, java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
+    public void inputMap(final com.veyron2.ipc.Context context, final java.util.Map<java.lang.Byte, java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
          inputMap(context, I1, null);
     }
     
-    public void inputMap(final com.veyron2.ipc.Context context, final java.util.HashMap<java.lang.Byte, java.lang.Byte> I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void inputMap(final com.veyron2.ipc.Context context, final java.util.Map<java.lang.Byte, java.lang.Byte> I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -464,11 +464,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
+    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
          inputSlice(context, I1, null);
     }
     
-    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Byte> I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -570,11 +570,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public java.util.HashMap<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.Map<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return outputMap(context, null);
     }
     
-    public java.util.HashMap<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.Map<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -596,14 +596,14 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.HashMap<java.lang.Byte, java.lang.Byte>>() {
+            new com.google.common.reflect.TypeToken<java.util.Map<java.lang.Byte, java.lang.Byte>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.HashMap<java.lang.Byte, java.lang.Byte>)results[0];
+        return (java.util.Map<java.lang.Byte, java.lang.Byte>)results[0];
          
 
          
@@ -612,11 +612,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public java.util.ArrayList<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return outputSlice(context, null);
     }
     
-    public java.util.ArrayList<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -638,14 +638,14 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.Byte>>() {
+            new com.google.common.reflect.TypeToken<java.util.List<java.lang.Byte>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.ArrayList<java.lang.Byte>)results[0];
+        return (java.util.List<java.lang.Byte>)results[0];
          
 
          

@@ -117,7 +117,7 @@ public final class MountTableStub implements com.veyron2.services.mounttable.Mou
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.ArrayList<com.veyron2.services.mounttable.types.MountedServer>>() {
+            new com.google.common.reflect.TypeToken<java.util.List<com.veyron2.services.mounttable.types.MountedServer>>() {
                 private static final long serialVersionUID = 1L;
             },
             
@@ -130,7 +130,7 @@ public final class MountTableStub implements com.veyron2.services.mounttable.Mou
         
         final com.veyron2.services.mounttable.MountTable.ResolveStepOut ret = new com.veyron2.services.mounttable.MountTable.ResolveStepOut();
             
-        ret.servers = (java.util.ArrayList<com.veyron2.services.mounttable.types.MountedServer>)results[0];
+        ret.servers = (java.util.List<com.veyron2.services.mounttable.types.MountedServer>)results[0];
             
         ret.suffix = (java.lang.String)results[1];
              

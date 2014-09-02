@@ -7,7 +7,7 @@ package com.veyron2.security;
  * type Hash string 
  * Hash identifies a cryptographic hash function.
  **/
-public final class Hash {
+public final class Hash implements android.os.Parcelable, java.io.Serializable {
     private java.lang.String value;
 
     public Hash(java.lang.String value) {
@@ -34,4 +34,26 @@ public final class Hash {
     public int hashCode() {
         return (value == null ? 0 : value.hashCode());
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<Hash> CREATOR
+		= new android.os.Parcelable.Creator<Hash>() {
+		@Override
+		public Hash createFromParcel(android.os.Parcel in) {
+			return new Hash(in);
+		}
+		@Override
+		public Hash[] newArray(int size) {
+			return new Hash[size];
+		}
+	};
+	private Hash(android.os.Parcel in) {
+		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

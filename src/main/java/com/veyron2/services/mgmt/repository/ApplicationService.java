@@ -25,6 +25,6 @@ public interface ApplicationService  {
 // profile matches are possible, the method returns the first
 // matching profile, respecting the order of the input argument.
 
-    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerContext context, final java.util.List<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException;
 
 }

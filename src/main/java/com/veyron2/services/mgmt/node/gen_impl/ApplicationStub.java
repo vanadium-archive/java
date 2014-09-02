@@ -192,11 +192,11 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
     }
 
     
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return start(context, null);
     }
     
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -218,14 +218,14 @@ public final class ApplicationStub implements com.veyron2.services.mgmt.node.App
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.ArrayList<java.lang.String>>() {
+            new com.google.common.reflect.TypeToken<java.util.List<java.lang.String>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.ArrayList<java.lang.String>)results[0];
+        return (java.util.List<java.lang.String>)results[0];
          
 
          

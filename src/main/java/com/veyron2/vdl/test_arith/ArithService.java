@@ -53,6 +53,6 @@ public interface ArithService  {
     
     // QuoteAny shows the any built-in type, representing a value of any type.
 
-    public java.lang.Object quoteAny(final com.veyron2.ipc.ServerContext context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.ServerContext context, final com.veyron2.vdl.Any a) throws com.veyron2.ipc.VeyronException;
 
 }

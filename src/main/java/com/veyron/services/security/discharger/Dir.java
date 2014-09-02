@@ -5,7 +5,9 @@ package com.veyron.services.security.discharger;
 /**
  * type Dir struct{} 
  **/
-public final class Dir {
+public final class Dir implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
 
@@ -34,4 +36,26 @@ public final class Dir {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    }
+	public static final android.os.Parcelable.Creator<Dir> CREATOR
+		= new android.os.Parcelable.Creator<Dir>() {
+		@Override
+		public Dir createFromParcel(android.os.Parcel in) {
+			return new Dir(in);
+		}
+		@Override
+		public Dir[] newArray(int size) {
+			return new Dir[size];
+		}
+	};
+	private Dir(android.os.Parcel in) {
+		
+	}
 }

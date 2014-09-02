@@ -6,7 +6,9 @@ package com.veyron2.vom2;
  * type WireSet struct{Name string;Key veyron2/vom2.TypeID uint64} 
  * WireSet represents a set type definition.
  **/
-public final class WireSet {
+public final class WireSet implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class WireSet {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, key);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireSet> CREATOR
+		= new android.os.Parcelable.Creator<WireSet>() {
+		@Override
+		public WireSet createFromParcel(android.os.Parcel in) {
+			return new WireSet(in);
+		}
+		@Override
+		public WireSet[] newArray(int size) {
+			return new WireSet[size];
+		}
+	};
+	private WireSet(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.key = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.key);
+		
+	}
 }

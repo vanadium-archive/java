@@ -6,7 +6,7 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * type GameTypeTag byte 
  **/
-public final class GameTypeTag {
+public final class GameTypeTag implements android.os.Parcelable, java.io.Serializable {
     private byte value;
 
     public GameTypeTag(byte value) {
@@ -30,4 +30,26 @@ public final class GameTypeTag {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<GameTypeTag> CREATOR
+		= new android.os.Parcelable.Creator<GameTypeTag>() {
+		@Override
+		public GameTypeTag createFromParcel(android.os.Parcel in) {
+			return new GameTypeTag(in);
+		}
+		@Override
+		public GameTypeTag[] newArray(int size) {
+			return new GameTypeTag[size];
+		}
+	};
+	private GameTypeTag(android.os.Parcel in) {
+		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -6,18 +6,20 @@ package com.veyron2.wiretype;
  * type StructType struct{Fields []veyron2/wiretype.FieldType struct{Type veyron2/wiretype.TypeID uint64;Name string};Name string;Tags []string} 
  * StructType represents a struct; a sequence of fields.
  **/
-public final class StructType {
+public final class StructType implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<com.veyron2.wiretype.FieldType> fields;
+      private java.util.List<com.veyron2.wiretype.FieldType> fields;
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.String> tags;
+      private java.util.List<java.lang.String> tags;
     
 
     
-    public StructType(final java.util.ArrayList<com.veyron2.wiretype.FieldType> fields, final java.lang.String name, final java.util.ArrayList<java.lang.String> tags) {
+    public StructType(final java.util.List<com.veyron2.wiretype.FieldType> fields, final java.lang.String name, final java.util.List<java.lang.String> tags) {
         
             this.fields = fields;
         
@@ -29,10 +31,10 @@ public final class StructType {
 
     
     
-    public java.util.ArrayList<com.veyron2.wiretype.FieldType> getFields() {
+    public java.util.List<com.veyron2.wiretype.FieldType> getFields() {
         return this.fields;
     }
-    public void setFields(java.util.ArrayList<com.veyron2.wiretype.FieldType> fields) {
+    public void setFields(java.util.List<com.veyron2.wiretype.FieldType> fields) {
         this.fields = fields;
     }
     
@@ -43,10 +45,10 @@ public final class StructType {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.String> getTags() {
+    public java.util.List<java.lang.String> getTags() {
         return this.tags;
     }
-    public void setTags(java.util.ArrayList<java.lang.String> tags) {
+    public void setTags(java.util.List<java.lang.String> tags) {
         this.tags = tags;
     }
     
@@ -104,4 +106,38 @@ public final class StructType {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, fields);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, tags);
+    	
+    }
+	public static final android.os.Parcelable.Creator<StructType> CREATOR
+		= new android.os.Parcelable.Creator<StructType>() {
+		@Override
+		public StructType createFromParcel(android.os.Parcel in) {
+			return new StructType(in);
+		}
+		@Override
+		public StructType[] newArray(int size) {
+			return new StructType[size];
+		}
+	};
+	private StructType(android.os.Parcel in) {
+		
+			this.fields = (java.util.List<com.veyron2.wiretype.FieldType>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.fields);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.tags = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.tags);
+		
+	}
 }

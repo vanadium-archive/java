@@ -8,7 +8,9 @@ package com.veyron.services.syncgroup;
  * TODO(m3b):  When names include an identity, this should become a single
  * string.
  **/
-public final class NameIdentity {
+public final class NameIdentity implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -83,4 +85,34 @@ public final class NameIdentity {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, identity);
+    	
+    }
+	public static final android.os.Parcelable.Creator<NameIdentity> CREATOR
+		= new android.os.Parcelable.Creator<NameIdentity>() {
+		@Override
+		public NameIdentity createFromParcel(android.os.Parcel in) {
+			return new NameIdentity(in);
+		}
+		@Override
+		public NameIdentity[] newArray(int size) {
+			return new NameIdentity[size];
+		}
+	};
+	private NameIdentity(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.identity = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.identity);
+		
+	}
 }

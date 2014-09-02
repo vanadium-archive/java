@@ -9,11 +9,11 @@ public interface BenchmarkService  {
     
     // Echo returns the payload that it receives.
 
-    public java.util.ArrayList<java.lang.Byte> echo(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.Byte> echo(final com.veyron2.ipc.ServerContext context, final java.util.List<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException;
 
     
     // EchoStream returns the payload that it receives via the stream.
 
-    public void echoStream(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+    public void echoStream(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.util.List<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
 
 }

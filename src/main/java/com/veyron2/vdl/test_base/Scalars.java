@@ -5,7 +5,9 @@ package com.veyron2.vdl.test_base;
 /**
  * type Scalars struct{A0 bool;A1 byte;A2 uint16;A3 uint32;A4 uint64;A5 int16;A6 int32;A7 int64;A8 float32;A9 float64;A10 complex64;A11 complex128;A12 string;A13 error struct{Id string;Msg string};A14 any;A15 typeval;B0 veyron2/vdl/test_base.NamedBool bool;B1 veyron2/vdl/test_base.NamedByte byte;B2 veyron2/vdl/test_base.NamedUint16 uint16;B3 veyron2/vdl/test_base.NamedUint32 uint32;B4 veyron2/vdl/test_base.NamedUint64 uint64;B5 veyron2/vdl/test_base.NamedInt16 int16;B6 veyron2/vdl/test_base.NamedInt32 int32;B7 veyron2/vdl/test_base.NamedInt64 int64;B8 veyron2/vdl/test_base.NamedFloat32 float32;B9 veyron2/vdl/test_base.NamedFloat64 float64;B10 veyron2/vdl/test_base.NamedComplex64 complex64;B11 veyron2/vdl/test_base.NamedComplex128 complex128;B12 veyron2/vdl/test_base.NamedString string} 
  **/
-public final class Scalars {
+public final class Scalars implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private boolean a0;
@@ -36,7 +38,7 @@ public final class Scalars {
     
       private com.veyron2.ipc.VeyronException a13;
     
-      private java.lang.Object a14;
+      private com.veyron2.vdl.Any a14;
     
       private java.lang.Object a15;
     
@@ -68,7 +70,7 @@ public final class Scalars {
     
 
     
-    public Scalars(final boolean a0, final byte a1, final short a2, final int a3, final long a4, final short a5, final int a6, final long a7, final float a8, final double a9, final org.apache.commons.math3.complex.Complex a10, final org.apache.commons.math3.complex.Complex a11, final java.lang.String a12, final com.veyron2.ipc.VeyronException a13, final java.lang.Object a14, final java.lang.Object a15, final com.veyron2.vdl.test_base.NamedBool b0, final com.veyron2.vdl.test_base.NamedByte b1, final com.veyron2.vdl.test_base.NamedUint16 b2, final com.veyron2.vdl.test_base.NamedUint32 b3, final com.veyron2.vdl.test_base.NamedUint64 b4, final com.veyron2.vdl.test_base.NamedInt16 b5, final com.veyron2.vdl.test_base.NamedInt32 b6, final com.veyron2.vdl.test_base.NamedInt64 b7, final com.veyron2.vdl.test_base.NamedFloat32 b8, final com.veyron2.vdl.test_base.NamedFloat64 b9, final com.veyron2.vdl.test_base.NamedComplex64 b10, final com.veyron2.vdl.test_base.NamedComplex128 b11, final com.veyron2.vdl.test_base.NamedString b12) {
+    public Scalars(final boolean a0, final byte a1, final short a2, final int a3, final long a4, final short a5, final int a6, final long a7, final float a8, final double a9, final org.apache.commons.math3.complex.Complex a10, final org.apache.commons.math3.complex.Complex a11, final java.lang.String a12, final com.veyron2.ipc.VeyronException a13, final com.veyron2.vdl.Any a14, final java.lang.Object a15, final com.veyron2.vdl.test_base.NamedBool b0, final com.veyron2.vdl.test_base.NamedByte b1, final com.veyron2.vdl.test_base.NamedUint16 b2, final com.veyron2.vdl.test_base.NamedUint32 b3, final com.veyron2.vdl.test_base.NamedUint64 b4, final com.veyron2.vdl.test_base.NamedInt16 b5, final com.veyron2.vdl.test_base.NamedInt32 b6, final com.veyron2.vdl.test_base.NamedInt64 b7, final com.veyron2.vdl.test_base.NamedFloat32 b8, final com.veyron2.vdl.test_base.NamedFloat64 b9, final com.veyron2.vdl.test_base.NamedComplex64 b10, final com.veyron2.vdl.test_base.NamedComplex128 b11, final com.veyron2.vdl.test_base.NamedString b12) {
         
             this.a0 = a0;
         
@@ -230,10 +232,10 @@ public final class Scalars {
         this.a13 = a13;
     }
     
-    public java.lang.Object getA14() {
+    public com.veyron2.vdl.Any getA14() {
         return this.a14;
     }
-    public void setA14(java.lang.Object a14) {
+    public void setA14(com.veyron2.vdl.Any a14) {
         this.a14 = a14;
     }
     
@@ -661,4 +663,142 @@ public final class Scalars {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a0);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a1);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a2);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a3);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a4);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a5);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a6);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a7);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a8);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a9);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a10);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a11);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a12);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a13);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a14);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a15);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b0);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b1);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b2);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b3);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b4);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b5);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b6);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b7);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b8);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b9);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b10);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b11);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b12);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Scalars> CREATOR
+		= new android.os.Parcelable.Creator<Scalars>() {
+		@Override
+		public Scalars createFromParcel(android.os.Parcel in) {
+			return new Scalars(in);
+		}
+		@Override
+		public Scalars[] newArray(int size) {
+			return new Scalars[size];
+		}
+	};
+	private Scalars(android.os.Parcel in) {
+		
+			this.a0 = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a0);
+		
+			this.a1 = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a1);
+		
+			this.a2 = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a2);
+		
+			this.a3 = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a3);
+		
+			this.a4 = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a4);
+		
+			this.a5 = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a5);
+		
+			this.a6 = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a6);
+		
+			this.a7 = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a7);
+		
+			this.a8 = (float) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a8);
+		
+			this.a9 = (double) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a9);
+		
+			this.a10 = (org.apache.commons.math3.complex.Complex) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a10);
+		
+			this.a11 = (org.apache.commons.math3.complex.Complex) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a11);
+		
+			this.a12 = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a12);
+		
+			this.a13 = (com.veyron2.ipc.VeyronException) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a13);
+		
+			this.a14 = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a14);
+		
+			this.a15 = (java.lang.Object) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a15);
+		
+			this.b0 = (com.veyron2.vdl.test_base.NamedBool) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b0);
+		
+			this.b1 = (com.veyron2.vdl.test_base.NamedByte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b1);
+		
+			this.b2 = (com.veyron2.vdl.test_base.NamedUint16) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b2);
+		
+			this.b3 = (com.veyron2.vdl.test_base.NamedUint32) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b3);
+		
+			this.b4 = (com.veyron2.vdl.test_base.NamedUint64) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b4);
+		
+			this.b5 = (com.veyron2.vdl.test_base.NamedInt16) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b5);
+		
+			this.b6 = (com.veyron2.vdl.test_base.NamedInt32) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b6);
+		
+			this.b7 = (com.veyron2.vdl.test_base.NamedInt64) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b7);
+		
+			this.b8 = (com.veyron2.vdl.test_base.NamedFloat32) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b8);
+		
+			this.b9 = (com.veyron2.vdl.test_base.NamedFloat64) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b9);
+		
+			this.b10 = (com.veyron2.vdl.test_base.NamedComplex64) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b10);
+		
+			this.b11 = (com.veyron2.vdl.test_base.NamedComplex128) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b11);
+		
+			this.b12 = (com.veyron2.vdl.test_base.NamedString) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b12);
+		
+	}
 }

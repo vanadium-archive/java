@@ -7,7 +7,7 @@ package com.veyron2.storage;
  * type Kind int16 
  * Kind makes it possible to tell the difference between Dirs and Objects.
  **/
-public final class Kind {
+public final class Kind implements android.os.Parcelable, java.io.Serializable {
     private short value;
 
     public Kind(short value) {
@@ -31,4 +31,26 @@ public final class Kind {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<Kind> CREATOR
+		= new android.os.Parcelable.Creator<Kind>() {
+		@Override
+		public Kind createFromParcel(android.os.Parcel in) {
+			return new Kind(in);
+		}
+		@Override
+		public Kind[] newArray(int size) {
+			return new Kind[size];
+		}
+	};
+	private Kind(android.os.Parcel in) {
+		value = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

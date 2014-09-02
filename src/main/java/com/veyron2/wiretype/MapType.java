@@ -9,7 +9,9 @@ package com.veyron2.wiretype;
  * tag to indicate the representation; e.g. C++ may use tags "rbtree" and
  * "hashmap" to indicate std::map and std::unordered_map respectively.
  **/
-public final class MapType {
+public final class MapType implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.wiretype.TypeID key;
@@ -18,11 +20,11 @@ public final class MapType {
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.String> tags;
+      private java.util.List<java.lang.String> tags;
     
 
     
-    public MapType(final com.veyron2.wiretype.TypeID key, final com.veyron2.wiretype.TypeID elem, final java.lang.String name, final java.util.ArrayList<java.lang.String> tags) {
+    public MapType(final com.veyron2.wiretype.TypeID key, final com.veyron2.wiretype.TypeID elem, final java.lang.String name, final java.util.List<java.lang.String> tags) {
         
             this.key = key;
         
@@ -57,10 +59,10 @@ public final class MapType {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.String> getTags() {
+    public java.util.List<java.lang.String> getTags() {
         return this.tags;
     }
-    public void setTags(java.util.ArrayList<java.lang.String> tags) {
+    public void setTags(java.util.List<java.lang.String> tags) {
         this.tags = tags;
     }
     
@@ -130,4 +132,42 @@ public final class MapType {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, key);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, elem);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, tags);
+    	
+    }
+	public static final android.os.Parcelable.Creator<MapType> CREATOR
+		= new android.os.Parcelable.Creator<MapType>() {
+		@Override
+		public MapType createFromParcel(android.os.Parcel in) {
+			return new MapType(in);
+		}
+		@Override
+		public MapType[] newArray(int size) {
+			return new MapType[size];
+		}
+	};
+	private MapType(android.os.Parcel in) {
+		
+			this.key = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.key);
+		
+			this.elem = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.elem);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.tags = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.tags);
+		
+	}
 }

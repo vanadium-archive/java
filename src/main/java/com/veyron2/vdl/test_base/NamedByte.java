@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedByte byte 
  **/
-public final class NamedByte {
+public final class NamedByte implements android.os.Parcelable, java.io.Serializable {
     private byte value;
 
     public NamedByte(byte value) {
@@ -30,4 +30,26 @@ public final class NamedByte {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedByte> CREATOR
+		= new android.os.Parcelable.Creator<NamedByte>() {
+		@Override
+		public NamedByte createFromParcel(android.os.Parcel in) {
+			return new NamedByte(in);
+		}
+		@Override
+		public NamedByte[] newArray(int size) {
+			return new NamedByte[size];
+		}
+	};
+	private NamedByte(android.os.Parcel in) {
+		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

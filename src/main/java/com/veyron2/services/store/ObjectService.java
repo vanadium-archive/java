@@ -24,7 +24,7 @@ public interface ObjectService extends com.veyron2.services.store.TransactableSe
     
     // Put modifies the value of the Object.
 
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerContext context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerContext context, final com.veyron2.vdl.Any V) throws com.veyron2.ipc.VeyronException;
 
     
     // Remove removes the Object.

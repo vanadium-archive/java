@@ -6,18 +6,20 @@ package com.veyron.services.mgmt.stats;
  * type HistogramValue struct{Count int64;Sum int64;Buckets []veyron/services/mgmt/stats.HistogramBucket struct{LowBound int64;Count int64}} 
  * HistogramValue is the value of Histogram objects.
  **/
-public final class HistogramValue {
+public final class HistogramValue implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private long count;
     
       private long sum;
     
-      private java.util.ArrayList<com.veyron.services.mgmt.stats.HistogramBucket> buckets;
+      private java.util.List<com.veyron.services.mgmt.stats.HistogramBucket> buckets;
     
 
     
-    public HistogramValue(final long count, final long sum, final java.util.ArrayList<com.veyron.services.mgmt.stats.HistogramBucket> buckets) {
+    public HistogramValue(final long count, final long sum, final java.util.List<com.veyron.services.mgmt.stats.HistogramBucket> buckets) {
         
             this.count = count;
         
@@ -43,10 +45,10 @@ public final class HistogramValue {
         this.sum = sum;
     }
     
-    public java.util.ArrayList<com.veyron.services.mgmt.stats.HistogramBucket> getBuckets() {
+    public java.util.List<com.veyron.services.mgmt.stats.HistogramBucket> getBuckets() {
         return this.buckets;
     }
-    public void setBuckets(java.util.ArrayList<com.veyron.services.mgmt.stats.HistogramBucket> buckets) {
+    public void setBuckets(java.util.List<com.veyron.services.mgmt.stats.HistogramBucket> buckets) {
         this.buckets = buckets;
     }
     
@@ -96,4 +98,38 @@ public final class HistogramValue {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, count);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, sum);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, buckets);
+    	
+    }
+	public static final android.os.Parcelable.Creator<HistogramValue> CREATOR
+		= new android.os.Parcelable.Creator<HistogramValue>() {
+		@Override
+		public HistogramValue createFromParcel(android.os.Parcel in) {
+			return new HistogramValue(in);
+		}
+		@Override
+		public HistogramValue[] newArray(int size) {
+			return new HistogramValue[size];
+		}
+	};
+	private HistogramValue(android.os.Parcel in) {
+		
+			this.count = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.count);
+		
+			this.sum = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.sum);
+		
+			this.buckets = (java.util.List<com.veyron.services.mgmt.stats.HistogramBucket>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.buckets);
+		
+	}
 }

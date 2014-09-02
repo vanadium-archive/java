@@ -14,18 +14,20 @@ package com.veyron2.security;
  * discharge that bind the discharge to the impetus, thereby rendering the discharge unsuable
  * for any other purpose.
  **/
-public final class DischargeImpetus {
+public final class DischargeImpetus implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.lang.Object server;
+      private com.veyron2.vdl.Any server;
     
       private java.lang.String method;
     
-      private java.util.ArrayList<java.lang.Object> arguments;
+      private java.util.List<com.veyron2.vdl.Any> arguments;
     
 
     
-    public DischargeImpetus(final java.lang.Object server, final java.lang.String method, final java.util.ArrayList<java.lang.Object> arguments) {
+    public DischargeImpetus(final com.veyron2.vdl.Any server, final java.lang.String method, final java.util.List<com.veyron2.vdl.Any> arguments) {
         
             this.server = server;
         
@@ -37,10 +39,10 @@ public final class DischargeImpetus {
 
     
     
-    public java.lang.Object getServer() {
+    public com.veyron2.vdl.Any getServer() {
         return this.server;
     }
-    public void setServer(java.lang.Object server) {
+    public void setServer(com.veyron2.vdl.Any server) {
         this.server = server;
     }
     
@@ -51,10 +53,10 @@ public final class DischargeImpetus {
         this.method = method;
     }
     
-    public java.util.ArrayList<java.lang.Object> getArguments() {
+    public java.util.List<com.veyron2.vdl.Any> getArguments() {
         return this.arguments;
     }
-    public void setArguments(java.util.ArrayList<java.lang.Object> arguments) {
+    public void setArguments(java.util.List<com.veyron2.vdl.Any> arguments) {
         this.arguments = arguments;
     }
     
@@ -112,4 +114,38 @@ public final class DischargeImpetus {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, server);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, method);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, arguments);
+    	
+    }
+	public static final android.os.Parcelable.Creator<DischargeImpetus> CREATOR
+		= new android.os.Parcelable.Creator<DischargeImpetus>() {
+		@Override
+		public DischargeImpetus createFromParcel(android.os.Parcel in) {
+			return new DischargeImpetus(in);
+		}
+		@Override
+		public DischargeImpetus[] newArray(int size) {
+			return new DischargeImpetus[size];
+		}
+	};
+	private DischargeImpetus(android.os.Parcel in) {
+		
+			this.server = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.server);
+		
+			this.method = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.method);
+		
+			this.arguments = (java.util.List<com.veyron2.vdl.Any>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.arguments);
+		
+	}
 }

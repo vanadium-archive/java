@@ -22,11 +22,11 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
 
 
     
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return pipe(context, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>,java.lang.Void, java.lang.Object> pipe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -44,9 +44,9 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.util.ArrayList<java.lang.Byte>, java.lang.Void, java.lang.Object>() {
+        return new com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>, java.lang.Void, com.veyron2.vdl.Any>() {
             @Override
-            public void send(final java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(final java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
@@ -62,14 +62,14 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
                 }
             }
             @Override
-            public java.lang.Object finish() throws com.veyron2.ipc.VeyronException {
+            public com.veyron2.vdl.Any finish() throws com.veyron2.ipc.VeyronException {
                  
                 final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
-                    new com.google.common.reflect.TypeToken<java.lang.Object>() {
+                    new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                         private static final long serialVersionUID = 1L;
                     }
                 };
-                return (java.lang.Object)call.finish(resultTypes)[0];
+                return (com.veyron2.vdl.Any)call.finish(resultTypes)[0];
                  
             }
         };

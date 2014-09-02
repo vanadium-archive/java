@@ -8,7 +8,9 @@ package com.veyron2.storage;
  * 
  * TODO(jyh): Specify versioning more precisely.
  **/
-public final class Stat {
+public final class Stat implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.storage.Kind kind;
@@ -17,11 +19,11 @@ public final class Stat {
     
       private long mTimeNS;
     
-      private java.util.ArrayList<java.lang.Object> attrs;
+      private java.util.List<com.veyron2.vdl.Any> attrs;
     
 
     
-    public Stat(final com.veyron2.storage.Kind kind, final com.veyron2.storage.ID iD, final long mTimeNS, final java.util.ArrayList<java.lang.Object> attrs) {
+    public Stat(final com.veyron2.storage.Kind kind, final com.veyron2.storage.ID iD, final long mTimeNS, final java.util.List<com.veyron2.vdl.Any> attrs) {
         
             this.kind = kind;
         
@@ -56,10 +58,10 @@ public final class Stat {
         this.mTimeNS = mTimeNS;
     }
     
-    public java.util.ArrayList<java.lang.Object> getAttrs() {
+    public java.util.List<com.veyron2.vdl.Any> getAttrs() {
         return this.attrs;
     }
-    public void setAttrs(java.util.ArrayList<java.lang.Object> attrs) {
+    public void setAttrs(java.util.List<com.veyron2.vdl.Any> attrs) {
         this.attrs = attrs;
     }
     
@@ -125,4 +127,42 @@ public final class Stat {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, kind);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, iD);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, mTimeNS);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, attrs);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Stat> CREATOR
+		= new android.os.Parcelable.Creator<Stat>() {
+		@Override
+		public Stat createFromParcel(android.os.Parcel in) {
+			return new Stat(in);
+		}
+		@Override
+		public Stat[] newArray(int size) {
+			return new Stat[size];
+		}
+	};
+	private Stat(android.os.Parcel in) {
+		
+			this.kind = (com.veyron2.storage.Kind) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.kind);
+		
+			this.iD = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.iD);
+		
+			this.mTimeNS = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.mTimeNS);
+		
+			this.attrs = (java.util.List<com.veyron2.vdl.Any>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.attrs);
+		
+	}
 }

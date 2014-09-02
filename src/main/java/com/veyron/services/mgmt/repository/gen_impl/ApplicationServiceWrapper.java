@@ -54,7 +54,7 @@ public final class ApplicationServiceWrapper {
 
      
     
-    public void put(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
+    public void put(final com.veyron2.ipc.ServerCall call, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
          
          this.service.put( call , Profiles, Envelope  );
     }
@@ -67,7 +67,7 @@ public final class ApplicationServiceWrapper {
 
 
 
-    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerCall call, final java.util.List<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationWrapper.match(call, Profiles);
     }

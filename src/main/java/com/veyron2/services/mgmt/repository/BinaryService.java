@@ -50,7 +50,7 @@ public interface BinaryService  {
 // method is in progress, the outcome the Download() method is
 // undefined.
 
-    public void download(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.lang.Void, java.util.ArrayList<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+    public void download(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.lang.Void, java.util.List<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
 
     
     // DownloadURL returns a transient URL from which the binary
@@ -65,7 +65,7 @@ public interface BinaryService  {
 // identified by the object name suffix. If the binary has not been
 // created, the method returns an error.
 
-    public java.util.ArrayList<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<com.veyron2.services.mgmt.binary.PartInfo> stat(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     // Upload opens a stream that can be used for uploading the given
@@ -75,6 +75,6 @@ public interface BinaryService  {
 // the same binary part is being uploaded by another caller, the
 // method returns an error.
 
-    public void upload(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
+    public void upload(final com.veyron2.ipc.ServerContext context, final int part, com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
 
 }

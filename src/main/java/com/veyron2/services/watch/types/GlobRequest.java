@@ -7,7 +7,9 @@ package com.veyron2.services.watch.types;
  * GlobRequest specifies which entities should be watched and, optionally,
  * how to resume from a previous Watch call.
  **/
-public final class GlobRequest {
+public final class GlobRequest implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String pattern;
@@ -82,4 +84,34 @@ public final class GlobRequest {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, pattern);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, resumeMarker);
+    	
+    }
+	public static final android.os.Parcelable.Creator<GlobRequest> CREATOR
+		= new android.os.Parcelable.Creator<GlobRequest>() {
+		@Override
+		public GlobRequest createFromParcel(android.os.Parcel in) {
+			return new GlobRequest(in);
+		}
+		@Override
+		public GlobRequest[] newArray(int size) {
+			return new GlobRequest[size];
+		}
+	};
+	private GlobRequest(android.os.Parcel in) {
+		
+			this.pattern = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.pattern);
+		
+			this.resumeMarker = (com.veyron2.services.watch.types.ResumeMarker) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.resumeMarker);
+		
+	}
 }

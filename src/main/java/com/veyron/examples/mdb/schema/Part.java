@@ -6,7 +6,9 @@ package com.veyron.examples.mdb.schema;
  * type Part struct{Actor veyron2/storage.ID [16]byte;Character string} 
  * Part represents the role of an actor.
  **/
-public final class Part {
+public final class Part implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.storage.ID actor;
@@ -81,4 +83,34 @@ public final class Part {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, actor);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, character);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Part> CREATOR
+		= new android.os.Parcelable.Creator<Part>() {
+		@Override
+		public Part createFromParcel(android.os.Parcel in) {
+			return new Part(in);
+		}
+		@Override
+		public Part[] newArray(int size) {
+			return new Part[size];
+		}
+	};
+	private Part(android.os.Parcel in) {
+		
+			this.actor = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.actor);
+		
+			this.character = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.character);
+		
+	}
 }

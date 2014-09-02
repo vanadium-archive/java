@@ -6,7 +6,9 @@ package com.veyron.runtimes.google.vsync;
  * type LogValue struct{Mutation veyron/services/store/raw.Mutation struct{ID veyron2/storage.ID [16]byte;PriorVersion veyron/services/store/raw.Version uint64;Version veyron/services/store/raw.Version;IsRoot bool;Value any;Dir []veyron/services/store/raw.DEntry struct{Name string;ID veyron2/storage.ID}};SyncTime int64;Delete bool;Continued bool} 
  * LogValue represents an object mutation within a transaction.
  **/
-public final class LogValue {
+public final class LogValue implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron.services.store.raw.Mutation mutation;
@@ -115,4 +117,42 @@ public final class LogValue {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, mutation);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, syncTime);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, delete);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, continued);
+    	
+    }
+	public static final android.os.Parcelable.Creator<LogValue> CREATOR
+		= new android.os.Parcelable.Creator<LogValue>() {
+		@Override
+		public LogValue createFromParcel(android.os.Parcel in) {
+			return new LogValue(in);
+		}
+		@Override
+		public LogValue[] newArray(int size) {
+			return new LogValue[size];
+		}
+	};
+	private LogValue(android.os.Parcel in) {
+		
+			this.mutation = (com.veyron.services.store.raw.Mutation) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.mutation);
+		
+			this.syncTime = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.syncTime);
+		
+			this.delete = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.delete);
+		
+			this.continued = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.continued);
+		
+	}
 }

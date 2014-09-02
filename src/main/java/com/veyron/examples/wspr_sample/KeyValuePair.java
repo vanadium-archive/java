@@ -6,16 +6,18 @@ package com.veyron.examples.wspr_sample;
  * type KeyValuePair struct{Key string;Value any} 
  * KeyValuePair is a representation of a cached key and value pair.
  **/
-public final class KeyValuePair {
+public final class KeyValuePair implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String key;
     
-      private java.lang.Object value;
+      private com.veyron2.vdl.Any value;
     
 
     
-    public KeyValuePair(final java.lang.String key, final java.lang.Object value) {
+    public KeyValuePair(final java.lang.String key, final com.veyron2.vdl.Any value) {
         
             this.key = key;
         
@@ -32,10 +34,10 @@ public final class KeyValuePair {
         this.key = key;
     }
     
-    public java.lang.Object getValue() {
+    public com.veyron2.vdl.Any getValue() {
         return this.value;
     }
-    public void setValue(java.lang.Object value) {
+    public void setValue(com.veyron2.vdl.Any value) {
         this.value = value;
     }
     
@@ -81,4 +83,34 @@ public final class KeyValuePair {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, key);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    }
+	public static final android.os.Parcelable.Creator<KeyValuePair> CREATOR
+		= new android.os.Parcelable.Creator<KeyValuePair>() {
+		@Override
+		public KeyValuePair createFromParcel(android.os.Parcel in) {
+			return new KeyValuePair(in);
+		}
+		@Override
+		public KeyValuePair[] newArray(int size) {
+			return new KeyValuePair[size];
+		}
+	};
+	private KeyValuePair(android.os.Parcel in) {
+		
+			this.key = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.key);
+		
+			this.value = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+	}
 }

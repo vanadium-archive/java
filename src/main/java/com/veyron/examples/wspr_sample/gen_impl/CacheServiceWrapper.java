@@ -141,12 +141,12 @@ public final class CacheServiceWrapper {
 
      
     
-    public void set(final com.veyron2.ipc.ServerCall call, final java.lang.String key, final java.lang.Object value) throws com.veyron2.ipc.VeyronException {
+    public void set(final com.veyron2.ipc.ServerCall call, final java.lang.String key, final com.veyron2.vdl.Any value) throws com.veyron2.ipc.VeyronException {
          
          this.service.set( call , key, value  );
     }
 
-    public java.lang.Object get(final com.veyron2.ipc.ServerCall call, final java.lang.String key) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any get(final com.veyron2.ipc.ServerCall call, final java.lang.String key) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.get( call , key  );
     }
@@ -201,12 +201,12 @@ public final class CacheServiceWrapper {
          return  this.service.getAsError( call , key  );
     }
 
-    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> asMap(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.asMap( call   );
     }
 
-    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.keyValuePairs( call   );
     }
@@ -228,19 +228,19 @@ public final class CacheServiceWrapper {
 
     public void multiGet(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.lang.String, java.lang.Object> stream = new com.veyron2.vdl.Stream<java.lang.String, java.lang.Object>() {
+        final com.veyron2.vdl.Stream<java.lang.String, com.veyron2.vdl.Any> stream = new com.veyron2.vdl.Stream<java.lang.String, com.veyron2.vdl.Any>() {
             @Override
             public void send(java.lang.String item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.lang.Object recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.lang.Object >() {
+            public com.veyron2.vdl.Any recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< com.veyron2.vdl.Any >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.lang.Object)result;
+                    return (com.veyron2.vdl.Any)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }

@@ -50,11 +50,11 @@ public interface TypeTesterService  {
 
     
     
-    public void inputMap(final com.veyron2.ipc.ServerContext context, final java.util.HashMap<java.lang.Byte, java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
+    public void inputMap(final com.veyron2.ipc.ServerContext context, final java.util.Map<java.lang.Byte, java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
 
     
     
-    public void inputSlice(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
+    public void inputSlice(final com.veyron2.ipc.ServerContext context, final java.util.List<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -66,11 +66,11 @@ public interface TypeTesterService  {
 
     
     
-    public java.util.HashMap<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.Map<java.lang.Byte, java.lang.Byte> outputMap(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     
-    public java.util.ArrayList<java.lang.Byte> outputSlice(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     

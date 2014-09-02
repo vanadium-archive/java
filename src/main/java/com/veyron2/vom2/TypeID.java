@@ -7,7 +7,7 @@ package com.veyron2.vom2;
  * type TypeID uint64 
  * TypeID uniquely identifies a type definition within a vom stream.
  **/
-public final class TypeID {
+public final class TypeID implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public TypeID(long value) {
@@ -31,4 +31,26 @@ public final class TypeID {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<TypeID> CREATOR
+		= new android.os.Parcelable.Creator<TypeID>() {
+		@Override
+		public TypeID createFromParcel(android.os.Parcel in) {
+			return new TypeID(in);
+		}
+		@Override
+		public TypeID[] newArray(int size) {
+			return new TypeID[size];
+		}
+	};
+	private TypeID(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

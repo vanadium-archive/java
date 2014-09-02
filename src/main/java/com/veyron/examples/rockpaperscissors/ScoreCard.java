@@ -5,16 +5,18 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * type ScoreCard struct{Opts veyron/examples/rockpaperscissors.GameOptions struct{NumRounds int32;GameType veyron/examples/rockpaperscissors.GameTypeTag byte};Judge string;Players []string;Rounds []veyron/examples/rockpaperscissors.Round struct{Moves [2]string;Comment string;Winner veyron/examples/rockpaperscissors.WinnerTag byte;StartTimeNS int64;EndTimeNS int64};StartTimeNS int64;EndTimeNS int64;Winner veyron/examples/rockpaperscissors.WinnerTag} 
  **/
-public final class ScoreCard {
+public final class ScoreCard implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron.examples.rockpaperscissors.GameOptions opts;
     
       private java.lang.String judge;
     
-      private java.util.ArrayList<java.lang.String> players;
+      private java.util.List<java.lang.String> players;
     
-      private java.util.ArrayList<com.veyron.examples.rockpaperscissors.Round> rounds;
+      private java.util.List<com.veyron.examples.rockpaperscissors.Round> rounds;
     
       private long startTimeNS;
     
@@ -24,7 +26,7 @@ public final class ScoreCard {
     
 
     
-    public ScoreCard(final com.veyron.examples.rockpaperscissors.GameOptions opts, final java.lang.String judge, final java.util.ArrayList<java.lang.String> players, final java.util.ArrayList<com.veyron.examples.rockpaperscissors.Round> rounds, final long startTimeNS, final long endTimeNS, final com.veyron.examples.rockpaperscissors.WinnerTag winner) {
+    public ScoreCard(final com.veyron.examples.rockpaperscissors.GameOptions opts, final java.lang.String judge, final java.util.List<java.lang.String> players, final java.util.List<com.veyron.examples.rockpaperscissors.Round> rounds, final long startTimeNS, final long endTimeNS, final com.veyron.examples.rockpaperscissors.WinnerTag winner) {
         
             this.opts = opts;
         
@@ -58,17 +60,17 @@ public final class ScoreCard {
         this.judge = judge;
     }
     
-    public java.util.ArrayList<java.lang.String> getPlayers() {
+    public java.util.List<java.lang.String> getPlayers() {
         return this.players;
     }
-    public void setPlayers(java.util.ArrayList<java.lang.String> players) {
+    public void setPlayers(java.util.List<java.lang.String> players) {
         this.players = players;
     }
     
-    public java.util.ArrayList<com.veyron.examples.rockpaperscissors.Round> getRounds() {
+    public java.util.List<com.veyron.examples.rockpaperscissors.Round> getRounds() {
         return this.rounds;
     }
-    public void setRounds(java.util.ArrayList<com.veyron.examples.rockpaperscissors.Round> rounds) {
+    public void setRounds(java.util.List<com.veyron.examples.rockpaperscissors.Round> rounds) {
         this.rounds = rounds;
     }
     
@@ -187,4 +189,54 @@ public final class ScoreCard {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, opts);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, judge);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, players);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, rounds);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, startTimeNS);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, endTimeNS);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, winner);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ScoreCard> CREATOR
+		= new android.os.Parcelable.Creator<ScoreCard>() {
+		@Override
+		public ScoreCard createFromParcel(android.os.Parcel in) {
+			return new ScoreCard(in);
+		}
+		@Override
+		public ScoreCard[] newArray(int size) {
+			return new ScoreCard[size];
+		}
+	};
+	private ScoreCard(android.os.Parcel in) {
+		
+			this.opts = (com.veyron.examples.rockpaperscissors.GameOptions) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.opts);
+		
+			this.judge = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.judge);
+		
+			this.players = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.players);
+		
+			this.rounds = (java.util.List<com.veyron.examples.rockpaperscissors.Round>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.rounds);
+		
+			this.startTimeNS = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.startTimeNS);
+		
+			this.endTimeNS = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.endTimeNS);
+		
+			this.winner = (com.veyron.examples.rockpaperscissors.WinnerTag) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.winner);
+		
+	}
 }

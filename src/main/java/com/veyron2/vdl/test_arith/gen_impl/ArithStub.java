@@ -339,11 +339,11 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
     }
 
     
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any a) throws com.veyron2.ipc.VeyronException {
         return quoteAny(context, a, null);
     }
     
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -365,14 +365,14 @@ public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          

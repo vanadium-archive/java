@@ -19,6 +19,6 @@ public interface DischargerService  {
 // TODO(ataly,ashankar): Figure out a VDL representation for ThirdPartyCaveat
 // and Discharge and use those here?
 
-    public java.lang.Object discharge(final com.veyron2.ipc.ServerContext context, final java.lang.Object Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any discharge(final com.veyron2.ipc.ServerContext context, final com.veyron2.vdl.Any Caveat, final com.veyron2.security.DischargeImpetus Impetus) throws com.veyron2.ipc.VeyronException;
 
 }

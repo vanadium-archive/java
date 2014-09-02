@@ -6,16 +6,18 @@ package com.veyron2.services.mgmt.build;
  * type File struct{Name string;Contents []byte} 
  * File records the name and contents of a file.
  **/
-public final class File {
+public final class File implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.Byte> contents;
+      private java.util.List<java.lang.Byte> contents;
     
 
     
-    public File(final java.lang.String name, final java.util.ArrayList<java.lang.Byte> contents) {
+    public File(final java.lang.String name, final java.util.List<java.lang.Byte> contents) {
         
             this.name = name;
         
@@ -32,10 +34,10 @@ public final class File {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getContents() {
+    public java.util.List<java.lang.Byte> getContents() {
         return this.contents;
     }
-    public void setContents(java.util.ArrayList<java.lang.Byte> contents) {
+    public void setContents(java.util.List<java.lang.Byte> contents) {
         this.contents = contents;
     }
     
@@ -81,4 +83,34 @@ public final class File {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, contents);
+    	
+    }
+	public static final android.os.Parcelable.Creator<File> CREATOR
+		= new android.os.Parcelable.Creator<File>() {
+		@Override
+		public File createFromParcel(android.os.Parcel in) {
+			return new File(in);
+		}
+		@Override
+		public File[] newArray(int size) {
+			return new File[size];
+		}
+	};
+	private File(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.contents = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.contents);
+		
+	}
 }

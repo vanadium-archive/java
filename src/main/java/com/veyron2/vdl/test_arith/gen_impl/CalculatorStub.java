@@ -175,12 +175,12 @@ public final class CalculatorStub implements com.veyron2.vdl.test_arith.Calculat
     }
 
     @Override
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any a) throws com.veyron2.ipc.VeyronException {
         
         return this.arithStub.quoteAny(context, a);
     }
     @Override
-    public java.lang.Object quoteAny(final com.veyron2.ipc.Context context, final java.lang.Object a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any quoteAny(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any a, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.arithStub.quoteAny(context, a, veyronOpts);
     }

@@ -230,12 +230,12 @@ public final class DirStub implements com.veyron2.services.store.Dir {
     }
 
     @Override
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException {
         
         return this.transactableStub.newTransaction(context, Options);
     }
     @Override
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.transactableStub.newTransaction(context, Options, veyronOpts);
     }

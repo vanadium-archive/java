@@ -233,12 +233,12 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     }
 
     @Override
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         
         return this.applicationStub.start(context);
     }
     @Override
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationStub.start(context, veyronOpts);
     }

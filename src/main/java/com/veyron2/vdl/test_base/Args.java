@@ -6,7 +6,9 @@ package com.veyron2.vdl.test_base;
  * type Args struct{A int32;B int32} 
  * Args will be reordered to show up before NestedArgs in the generated output.
  **/
-public final class Args {
+public final class Args implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int a;
@@ -73,4 +75,34 @@ public final class Args {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, b);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Args> CREATOR
+		= new android.os.Parcelable.Creator<Args>() {
+		@Override
+		public Args createFromParcel(android.os.Parcel in) {
+			return new Args(in);
+		}
+		@Override
+		public Args[] newArray(int size) {
+			return new Args[size];
+		}
+	};
+	private Args(android.os.Parcel in) {
+		
+			this.a = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a);
+		
+			this.b = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.b);
+		
+	}
 }

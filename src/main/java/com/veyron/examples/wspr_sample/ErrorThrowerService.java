@@ -57,6 +57,6 @@ public interface ErrorThrowerService  {
     
     // Lists all errors Ids available in veyron2/verror
 
-    public java.util.ArrayList<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
 }

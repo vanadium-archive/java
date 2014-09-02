@@ -10,7 +10,9 @@ package com.veyron2.ipc;
  * streaming arg, terminated by a non-zero request header with EndStreamArgs set
  * to true.
  **/
-public final class Request {
+public final class Request implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String suffix;
@@ -180,4 +182,54 @@ public final class Request {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, suffix);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, method);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, numPosArgs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, endStreamArgs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, timeout);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, hasBlessing);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, numDischarges);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Request> CREATOR
+		= new android.os.Parcelable.Creator<Request>() {
+		@Override
+		public Request createFromParcel(android.os.Parcel in) {
+			return new Request(in);
+		}
+		@Override
+		public Request[] newArray(int size) {
+			return new Request[size];
+		}
+	};
+	private Request(android.os.Parcel in) {
+		
+			this.suffix = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.suffix);
+		
+			this.method = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.method);
+		
+			this.numPosArgs = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.numPosArgs);
+		
+			this.endStreamArgs = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.endStreamArgs);
+		
+			this.timeout = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.timeout);
+		
+			this.hasBlessing = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.hasBlessing);
+		
+			this.numDischarges = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.numDischarges);
+		
+	}
 }

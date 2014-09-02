@@ -22,11 +22,11 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
 
 
     
-    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value) throws com.veyron2.ipc.VeyronException {
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.vdl.Any value) throws com.veyron2.ipc.VeyronException {
          set(context, key, value, null);
     }
     
-    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.vdl.Any value, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -54,11 +54,11 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
     }
 
     
-    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any get(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException {
         return get(context, key, null);
     }
     
-    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any get(final com.veyron2.ipc.Context context, final java.lang.String key, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -80,14 +80,14 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          
@@ -516,11 +516,11 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
     }
 
     
-    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> asMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return asMap(context, null);
     }
     
-    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> asMap(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -542,14 +542,14 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.HashMap<java.lang.String, java.lang.Object>>() {
+            new com.google.common.reflect.TypeToken<java.util.Map<java.lang.String, com.veyron2.vdl.Any>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.HashMap<java.lang.String, java.lang.Object>)results[0];
+        return (java.util.Map<java.lang.String, com.veyron2.vdl.Any>)results[0];
          
 
          
@@ -558,11 +558,11 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
     }
 
     
-    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return keyValuePairs(context, null);
     }
     
-    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -584,14 +584,14 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair>>() {
+            new com.google.common.reflect.TypeToken<java.util.List<com.veyron.examples.wspr_sample.KeyValuePair>>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair>)results[0];
+        return (java.util.List<com.veyron.examples.wspr_sample.KeyValuePair>)results[0];
          
 
          
@@ -736,11 +736,11 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
     }
 
     
-    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.String,com.veyron2.vdl.Any, java.lang.Void> multiGet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return multiGet(context, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<java.lang.String,com.veyron2.vdl.Any, java.lang.Void> multiGet(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -758,19 +758,19 @@ public final class CacheStub implements com.veyron.examples.wspr_sample.Cache {
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.lang.String, java.lang.Object, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<java.lang.String, com.veyron2.vdl.Any, java.lang.Void>() {
             @Override
             public void send(final java.lang.String item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.lang.Object recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            public com.veyron2.vdl.Any recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.lang.Object)result;
+                    return (com.veyron2.vdl.Any)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }

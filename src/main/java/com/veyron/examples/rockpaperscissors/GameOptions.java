@@ -6,7 +6,9 @@ package com.veyron.examples.rockpaperscissors;
  * type GameOptions struct{NumRounds int32;GameType veyron/examples/rockpaperscissors.GameTypeTag byte} 
  * GameOptions specifies the parameters of a game.
  **/
-public final class GameOptions {
+public final class GameOptions implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int numRounds;
@@ -77,4 +79,34 @@ public final class GameOptions {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, numRounds);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, gameType);
+    	
+    }
+	public static final android.os.Parcelable.Creator<GameOptions> CREATOR
+		= new android.os.Parcelable.Creator<GameOptions>() {
+		@Override
+		public GameOptions createFromParcel(android.os.Parcel in) {
+			return new GameOptions(in);
+		}
+		@Override
+		public GameOptions[] newArray(int size) {
+			return new GameOptions[size];
+		}
+	};
+	private GameOptions(android.os.Parcel in) {
+		
+			this.numRounds = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.numRounds);
+		
+			this.gameType = (com.veyron.examples.rockpaperscissors.GameTypeTag) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.gameType);
+		
+	}
 }

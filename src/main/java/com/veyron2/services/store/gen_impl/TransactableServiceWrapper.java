@@ -39,7 +39,7 @@ public final class TransactableServiceWrapper {
 
      
     
-    public java.lang.String newTransaction(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.ServerCall call, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.newTransaction( call , Options  );
     }

@@ -16,7 +16,7 @@ public interface ApplicationService extends com.veyron2.services.mgmt.repository
 // through the object name suffix) and application envelope to all
 // of the given application profiles.
 
-    public void put(final com.veyron2.ipc.ServerContext context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException;
+    public void put(final com.veyron2.ipc.ServerContext context, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException;
 
     
     // Remove removes the application envelope for the given profile

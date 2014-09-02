@@ -5,12 +5,14 @@ package com.veyron.examples.tunnel;
 /**
  * type ShellOpts struct{UsePty bool;Environment []string;Rows uint32;Cols uint32} 
  **/
-public final class ShellOpts {
+public final class ShellOpts implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private boolean usePty;
     
-      private java.util.ArrayList<java.lang.String> environment;
+      private java.util.List<java.lang.String> environment;
     
       private int rows;
     
@@ -18,7 +20,7 @@ public final class ShellOpts {
     
 
     
-    public ShellOpts(final boolean usePty, final java.util.ArrayList<java.lang.String> environment, final int rows, final int cols) {
+    public ShellOpts(final boolean usePty, final java.util.List<java.lang.String> environment, final int rows, final int cols) {
         
             this.usePty = usePty;
         
@@ -39,10 +41,10 @@ public final class ShellOpts {
         this.usePty = usePty;
     }
     
-    public java.util.ArrayList<java.lang.String> getEnvironment() {
+    public java.util.List<java.lang.String> getEnvironment() {
         return this.environment;
     }
-    public void setEnvironment(java.util.ArrayList<java.lang.String> environment) {
+    public void setEnvironment(java.util.List<java.lang.String> environment) {
         this.environment = environment;
     }
     
@@ -114,4 +116,42 @@ public final class ShellOpts {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, usePty);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, environment);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, rows);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, cols);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ShellOpts> CREATOR
+		= new android.os.Parcelable.Creator<ShellOpts>() {
+		@Override
+		public ShellOpts createFromParcel(android.os.Parcel in) {
+			return new ShellOpts(in);
+		}
+		@Override
+		public ShellOpts[] newArray(int size) {
+			return new ShellOpts[size];
+		}
+	};
+	private ShellOpts(android.os.Parcel in) {
+		
+			this.usePty = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.usePty);
+		
+			this.environment = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.environment);
+		
+			this.rows = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.rows);
+		
+			this.cols = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.cols);
+		
+	}
 }

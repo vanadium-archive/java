@@ -6,16 +6,18 @@ package com.veyron2.security.wire;
  * type Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte} 
  * Caveat represents a veyron2/security.ServiceCaveat.
  **/
-public final class Caveat {
+public final class Caveat implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.security.BlessingPattern service;
     
-      private java.util.ArrayList<java.lang.Byte> bytes;
+      private java.util.List<java.lang.Byte> bytes;
     
 
     
-    public Caveat(final com.veyron2.security.BlessingPattern service, final java.util.ArrayList<java.lang.Byte> bytes) {
+    public Caveat(final com.veyron2.security.BlessingPattern service, final java.util.List<java.lang.Byte> bytes) {
         
             this.service = service;
         
@@ -32,10 +34,10 @@ public final class Caveat {
         this.service = service;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getBytes() {
+    public java.util.List<java.lang.Byte> getBytes() {
         return this.bytes;
     }
-    public void setBytes(java.util.ArrayList<java.lang.Byte> bytes) {
+    public void setBytes(java.util.List<java.lang.Byte> bytes) {
         this.bytes = bytes;
     }
     
@@ -81,4 +83,34 @@ public final class Caveat {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, service);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, bytes);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Caveat> CREATOR
+		= new android.os.Parcelable.Creator<Caveat>() {
+		@Override
+		public Caveat createFromParcel(android.os.Parcel in) {
+			return new Caveat(in);
+		}
+		@Override
+		public Caveat[] newArray(int size) {
+			return new Caveat[size];
+		}
+	};
+	private Caveat(android.os.Parcel in) {
+		
+			this.service = (com.veyron2.security.BlessingPattern) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.service);
+		
+			this.bytes = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.bytes);
+		
+	}
 }

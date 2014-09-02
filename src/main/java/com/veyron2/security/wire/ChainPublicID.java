@@ -12,14 +12,16 @@ package com.veyron2.security.wire;
  * considered the PublicID's public key. The chain of certificates, if valid, effectively binds a chain
  * of names to the PublicID's public key.
  **/
-public final class ChainPublicID {
+public final class ChainPublicID implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<com.veyron2.security.wire.Certificate> certificates;
+      private java.util.List<com.veyron2.security.wire.Certificate> certificates;
     
 
     
-    public ChainPublicID(final java.util.ArrayList<com.veyron2.security.wire.Certificate> certificates) {
+    public ChainPublicID(final java.util.List<com.veyron2.security.wire.Certificate> certificates) {
         
             this.certificates = certificates;
         
@@ -27,10 +29,10 @@ public final class ChainPublicID {
 
     
     
-    public java.util.ArrayList<com.veyron2.security.wire.Certificate> getCertificates() {
+    public java.util.List<com.veyron2.security.wire.Certificate> getCertificates() {
         return this.certificates;
     }
-    public void setCertificates(java.util.ArrayList<com.veyron2.security.wire.Certificate> certificates) {
+    public void setCertificates(java.util.List<com.veyron2.security.wire.Certificate> certificates) {
         this.certificates = certificates;
     }
     
@@ -64,4 +66,30 @@ public final class ChainPublicID {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, certificates);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ChainPublicID> CREATOR
+		= new android.os.Parcelable.Creator<ChainPublicID>() {
+		@Override
+		public ChainPublicID createFromParcel(android.os.Parcel in) {
+			return new ChainPublicID(in);
+		}
+		@Override
+		public ChainPublicID[] newArray(int size) {
+			return new ChainPublicID[size];
+		}
+	};
+	private ChainPublicID(android.os.Parcel in) {
+		
+			this.certificates = (java.util.List<com.veyron2.security.wire.Certificate>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.certificates);
+		
+	}
 }

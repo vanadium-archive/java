@@ -5,7 +5,9 @@ package com.veyron.examples.inspector;
 /**
  * type Details struct{Name string;Size int64;Mode uint32;ModUnixSecs int64;ModNano int32;IsDir bool} 
  **/
-public final class Details {
+public final class Details implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -152,4 +154,50 @@ public final class Details {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, size);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, mode);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, modUnixSecs);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, modNano);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, isDir);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Details> CREATOR
+		= new android.os.Parcelable.Creator<Details>() {
+		@Override
+		public Details createFromParcel(android.os.Parcel in) {
+			return new Details(in);
+		}
+		@Override
+		public Details[] newArray(int size) {
+			return new Details[size];
+		}
+	};
+	private Details(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.size = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.size);
+		
+			this.mode = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.mode);
+		
+			this.modUnixSecs = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.modUnixSecs);
+		
+			this.modNano = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.modNano);
+		
+			this.isDir = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.isDir);
+		
+	}
 }

@@ -8,7 +8,9 @@ package com.veyron2.vdl.test_base;
  * allowed in our vdl files.  The compiler will re-order dependent types to ease
  * code generation in other languages.
  **/
-public final class NestedArgs {
+public final class NestedArgs implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.vdl.test_base.Args args;
@@ -60,4 +62,30 @@ public final class NestedArgs {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, args);
+    	
+    }
+	public static final android.os.Parcelable.Creator<NestedArgs> CREATOR
+		= new android.os.Parcelable.Creator<NestedArgs>() {
+		@Override
+		public NestedArgs createFromParcel(android.os.Parcel in) {
+			return new NestedArgs(in);
+		}
+		@Override
+		public NestedArgs[] newArray(int size) {
+			return new NestedArgs[size];
+		}
+	};
+	private NestedArgs(android.os.Parcel in) {
+		
+			this.args = (com.veyron2.vdl.test_base.Args) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.args);
+		
+	}
 }

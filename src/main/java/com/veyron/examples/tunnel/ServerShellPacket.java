@@ -5,16 +5,18 @@ package com.veyron.examples.tunnel;
 /**
  * type ServerShellPacket struct{Stdout []byte;Stderr []byte} 
  **/
-public final class ServerShellPacket {
+public final class ServerShellPacket implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.ArrayList<java.lang.Byte> stdout;
+      private java.util.List<java.lang.Byte> stdout;
     
-      private java.util.ArrayList<java.lang.Byte> stderr;
+      private java.util.List<java.lang.Byte> stderr;
     
 
     
-    public ServerShellPacket(final java.util.ArrayList<java.lang.Byte> stdout, final java.util.ArrayList<java.lang.Byte> stderr) {
+    public ServerShellPacket(final java.util.List<java.lang.Byte> stdout, final java.util.List<java.lang.Byte> stderr) {
         
             this.stdout = stdout;
         
@@ -24,17 +26,17 @@ public final class ServerShellPacket {
 
     
     
-    public java.util.ArrayList<java.lang.Byte> getStdout() {
+    public java.util.List<java.lang.Byte> getStdout() {
         return this.stdout;
     }
-    public void setStdout(java.util.ArrayList<java.lang.Byte> stdout) {
+    public void setStdout(java.util.List<java.lang.Byte> stdout) {
         this.stdout = stdout;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getStderr() {
+    public java.util.List<java.lang.Byte> getStderr() {
         return this.stderr;
     }
-    public void setStderr(java.util.ArrayList<java.lang.Byte> stderr) {
+    public void setStderr(java.util.List<java.lang.Byte> stderr) {
         this.stderr = stderr;
     }
     
@@ -80,4 +82,34 @@ public final class ServerShellPacket {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, stdout);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, stderr);
+    	
+    }
+	public static final android.os.Parcelable.Creator<ServerShellPacket> CREATOR
+		= new android.os.Parcelable.Creator<ServerShellPacket>() {
+		@Override
+		public ServerShellPacket createFromParcel(android.os.Parcel in) {
+			return new ServerShellPacket(in);
+		}
+		@Override
+		public ServerShellPacket[] newArray(int size) {
+			return new ServerShellPacket[size];
+		}
+	};
+	private ServerShellPacket(android.os.Parcel in) {
+		
+			this.stdout = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdout);
+		
+			this.stderr = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stderr);
+		
+	}
 }

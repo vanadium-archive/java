@@ -20,7 +20,9 @@ package com.veyron.runtimes.google.vsync;
  * current version is derived from, and Value is the actual value of
  * the object mutation.
  **/
-public final class LogRec {
+public final class LogRec implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron.runtimes.google.vsync.DeviceID devID;
@@ -35,13 +37,13 @@ public final class LogRec {
     
       private com.veyron.services.store.raw.Version curVers;
     
-      private java.util.ArrayList<com.veyron.services.store.raw.Version> parents;
+      private java.util.List<com.veyron.services.store.raw.Version> parents;
     
       private com.veyron.runtimes.google.vsync.LogValue value;
     
 
     
-    public LogRec(final com.veyron.runtimes.google.vsync.DeviceID devID, final com.veyron.runtimes.google.vsync.GenID gNum, final com.veyron.runtimes.google.vsync.LSN lSN, final byte recType, final com.veyron2.storage.ID objID, final com.veyron.services.store.raw.Version curVers, final java.util.ArrayList<com.veyron.services.store.raw.Version> parents, final com.veyron.runtimes.google.vsync.LogValue value) {
+    public LogRec(final com.veyron.runtimes.google.vsync.DeviceID devID, final com.veyron.runtimes.google.vsync.GenID gNum, final com.veyron.runtimes.google.vsync.LSN lSN, final byte recType, final com.veyron2.storage.ID objID, final com.veyron.services.store.raw.Version curVers, final java.util.List<com.veyron.services.store.raw.Version> parents, final com.veyron.runtimes.google.vsync.LogValue value) {
         
             this.devID = devID;
         
@@ -105,10 +107,10 @@ public final class LogRec {
         this.curVers = curVers;
     }
     
-    public java.util.ArrayList<com.veyron.services.store.raw.Version> getParents() {
+    public java.util.List<com.veyron.services.store.raw.Version> getParents() {
         return this.parents;
     }
-    public void setParents(java.util.ArrayList<com.veyron.services.store.raw.Version> parents) {
+    public void setParents(java.util.List<com.veyron.services.store.raw.Version> parents) {
         this.parents = parents;
     }
     
@@ -229,4 +231,58 @@ public final class LogRec {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, devID);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, gNum);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, lSN);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, recType);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, objID);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, curVers);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, parents);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    }
+	public static final android.os.Parcelable.Creator<LogRec> CREATOR
+		= new android.os.Parcelable.Creator<LogRec>() {
+		@Override
+		public LogRec createFromParcel(android.os.Parcel in) {
+			return new LogRec(in);
+		}
+		@Override
+		public LogRec[] newArray(int size) {
+			return new LogRec[size];
+		}
+	};
+	private LogRec(android.os.Parcel in) {
+		
+			this.devID = (com.veyron.runtimes.google.vsync.DeviceID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.devID);
+		
+			this.gNum = (com.veyron.runtimes.google.vsync.GenID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.gNum);
+		
+			this.lSN = (com.veyron.runtimes.google.vsync.LSN) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.lSN);
+		
+			this.recType = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.recType);
+		
+			this.objID = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.objID);
+		
+			this.curVers = (com.veyron.services.store.raw.Version) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.curVers);
+		
+			this.parents = (java.util.List<com.veyron.services.store.raw.Version>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.parents);
+		
+			this.value = (com.veyron.runtimes.google.vsync.LogValue) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+	}
 }

@@ -5,7 +5,9 @@ package com.veyron.examples.rockpaperscissors;
 /**
  * type PlayerAction struct{Move string;Quit bool} 
  **/
-public final class PlayerAction {
+public final class PlayerAction implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String move;
@@ -76,4 +78,34 @@ public final class PlayerAction {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, move);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, quit);
+    	
+    }
+	public static final android.os.Parcelable.Creator<PlayerAction> CREATOR
+		= new android.os.Parcelable.Creator<PlayerAction>() {
+		@Override
+		public PlayerAction createFromParcel(android.os.Parcel in) {
+			return new PlayerAction(in);
+		}
+		@Override
+		public PlayerAction[] newArray(int size) {
+			return new PlayerAction[size];
+		}
+	};
+	private PlayerAction(android.os.Parcel in) {
+		
+			this.move = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.move);
+		
+			this.quit = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.quit);
+		
+	}
 }

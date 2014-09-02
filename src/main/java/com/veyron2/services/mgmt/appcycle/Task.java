@@ -15,7 +15,9 @@ package com.veyron2.services.mgmt.appcycle;
  * e.g. new shutdown tasks are triggered that were not forseen at the outset
  * of the shutdown.
  **/
-public final class Task {
+public final class Task implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int progress;
@@ -82,4 +84,34 @@ public final class Task {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, progress);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, goal);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Task> CREATOR
+		= new android.os.Parcelable.Creator<Task>() {
+		@Override
+		public Task createFromParcel(android.os.Parcel in) {
+			return new Task(in);
+		}
+		@Override
+		public Task[] newArray(int size) {
+			return new Task[size];
+		}
+	};
+	private Task(android.os.Parcel in) {
+		
+			this.progress = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.progress);
+		
+			this.goal = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.goal);
+		
+	}
 }

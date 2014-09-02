@@ -6,14 +6,16 @@ package com.veyron2.services.watch.types;
  * type Change struct{Name string;State int32;Value any;ResumeMarker veyron2/services/watch/types.ResumeMarker []byte;Continued bool} 
  * Change is the new value for a watched entity.
  **/
-public final class Change {
+public final class Change implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
     
       private int state;
     
-      private java.lang.Object value;
+      private com.veyron2.vdl.Any value;
     
       private com.veyron2.services.watch.types.ResumeMarker resumeMarker;
     
@@ -21,7 +23,7 @@ public final class Change {
     
 
     
-    public Change(final java.lang.String name, final int state, final java.lang.Object value, final com.veyron2.services.watch.types.ResumeMarker resumeMarker, final boolean continued) {
+    public Change(final java.lang.String name, final int state, final com.veyron2.vdl.Any value, final com.veyron2.services.watch.types.ResumeMarker resumeMarker, final boolean continued) {
         
             this.name = name;
         
@@ -51,10 +53,10 @@ public final class Change {
         this.state = state;
     }
     
-    public java.lang.Object getValue() {
+    public com.veyron2.vdl.Any getValue() {
         return this.value;
     }
-    public void setValue(java.lang.Object value) {
+    public void setValue(com.veyron2.vdl.Any value) {
         this.value = value;
     }
     
@@ -142,4 +144,46 @@ public final class Change {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, state);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, resumeMarker);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, continued);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Change> CREATOR
+		= new android.os.Parcelable.Creator<Change>() {
+		@Override
+		public Change createFromParcel(android.os.Parcel in) {
+			return new Change(in);
+		}
+		@Override
+		public Change[] newArray(int size) {
+			return new Change[size];
+		}
+	};
+	private Change(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.state = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.state);
+		
+			this.value = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+			this.resumeMarker = (com.veyron2.services.watch.types.ResumeMarker) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.resumeMarker);
+		
+			this.continued = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.continued);
+		
+	}
 }

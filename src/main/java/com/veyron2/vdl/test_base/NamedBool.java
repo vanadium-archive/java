@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedBool bool 
  **/
-public final class NamedBool {
+public final class NamedBool implements android.os.Parcelable, java.io.Serializable {
     private boolean value;
 
     public NamedBool(boolean value) {
@@ -30,4 +30,26 @@ public final class NamedBool {
     public int hashCode() {
         return java.lang.Boolean.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedBool> CREATOR
+		= new android.os.Parcelable.Creator<NamedBool>() {
+		@Override
+		public NamedBool createFromParcel(android.os.Parcel in) {
+			return new NamedBool(in);
+		}
+		@Override
+		public NamedBool[] newArray(int size) {
+			return new NamedBool[size];
+		}
+	};
+	private NamedBool(android.os.Parcel in) {
+		value = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -45,12 +45,12 @@ public final class OAuthBlesserServiceWrapper {
 
      
     
-    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.ServerCall call, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAuthorizationCode(final com.veyron2.ipc.ServerCall call, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.blessUsingAuthorizationCode( call , authcode, redirecturl  );
     }
 
-    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.ServerCall call, final java.lang.String token) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAccessToken(final com.veyron2.ipc.ServerCall call, final java.lang.String token) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.blessUsingAccessToken( call , token  );
     }

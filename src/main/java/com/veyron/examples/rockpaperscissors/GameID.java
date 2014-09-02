@@ -6,7 +6,9 @@ package com.veyron.examples.rockpaperscissors;
  * type GameID struct{ID string} 
  * A GameID is used to uniquely identify a game within one Judge.
  **/
-public final class GameID {
+public final class GameID implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String iD;
@@ -58,4 +60,30 @@ public final class GameID {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, iD);
+    	
+    }
+	public static final android.os.Parcelable.Creator<GameID> CREATOR
+		= new android.os.Parcelable.Creator<GameID>() {
+		@Override
+		public GameID createFromParcel(android.os.Parcel in) {
+			return new GameID(in);
+		}
+		@Override
+		public GameID[] newArray(int size) {
+			return new GameID[size];
+		}
+	};
+	private GameID(android.os.Parcel in) {
+		
+			this.iD = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.iD);
+		
+	}
 }

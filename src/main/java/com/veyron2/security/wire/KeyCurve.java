@@ -7,7 +7,7 @@ package com.veyron2.security.wire;
  * type KeyCurve byte 
  * KeyCurve defines a namespace for elliptic curves.
  **/
-public final class KeyCurve {
+public final class KeyCurve implements android.os.Parcelable, java.io.Serializable {
     private byte value;
 
     public KeyCurve(byte value) {
@@ -31,4 +31,26 @@ public final class KeyCurve {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<KeyCurve> CREATOR
+		= new android.os.Parcelable.Creator<KeyCurve>() {
+		@Override
+		public KeyCurve createFromParcel(android.os.Parcel in) {
+			return new KeyCurve(in);
+		}
+		@Override
+		public KeyCurve[] newArray(int size) {
+			return new KeyCurve[size];
+		}
+	};
+	private KeyCurve(android.os.Parcel in) {
+		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

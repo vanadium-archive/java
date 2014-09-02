@@ -39,7 +39,7 @@ public final class ApplicationServiceWrapper {
 
      
     
-    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.ServerCall call, final java.util.List<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.match( call , Profiles  );
     }

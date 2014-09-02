@@ -7,7 +7,9 @@ package com.veyron.services.store.raw;
  * Mutation represents an update to an entry in the store, and contains enough
  * information for a privileged service to replicate the update elsewhere.
  **/
-public final class Mutation {
+public final class Mutation implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.storage.ID iD;
@@ -18,13 +20,13 @@ public final class Mutation {
     
       private boolean isRoot;
     
-      private java.lang.Object value;
+      private com.veyron2.vdl.Any value;
     
-      private java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir;
+      private java.util.List<com.veyron.services.store.raw.DEntry> dir;
     
 
     
-    public Mutation(final com.veyron2.storage.ID iD, final com.veyron.services.store.raw.Version priorVersion, final com.veyron.services.store.raw.Version version, final boolean isRoot, final java.lang.Object value, final java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir) {
+    public Mutation(final com.veyron2.storage.ID iD, final com.veyron.services.store.raw.Version priorVersion, final com.veyron.services.store.raw.Version version, final boolean isRoot, final com.veyron2.vdl.Any value, final java.util.List<com.veyron.services.store.raw.DEntry> dir) {
         
             this.iD = iD;
         
@@ -70,17 +72,17 @@ public final class Mutation {
         this.isRoot = isRoot;
     }
     
-    public java.lang.Object getValue() {
+    public com.veyron2.vdl.Any getValue() {
         return this.value;
     }
-    public void setValue(java.lang.Object value) {
+    public void setValue(com.veyron2.vdl.Any value) {
         this.value = value;
     }
     
-    public java.util.ArrayList<com.veyron.services.store.raw.DEntry> getDir() {
+    public java.util.List<com.veyron.services.store.raw.DEntry> getDir() {
         return this.dir;
     }
-    public void setDir(java.util.ArrayList<com.veyron.services.store.raw.DEntry> dir) {
+    public void setDir(java.util.List<com.veyron.services.store.raw.DEntry> dir) {
         this.dir = dir;
     }
     
@@ -170,4 +172,50 @@ public final class Mutation {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, iD);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, priorVersion);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, version);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, isRoot);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, dir);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Mutation> CREATOR
+		= new android.os.Parcelable.Creator<Mutation>() {
+		@Override
+		public Mutation createFromParcel(android.os.Parcel in) {
+			return new Mutation(in);
+		}
+		@Override
+		public Mutation[] newArray(int size) {
+			return new Mutation[size];
+		}
+	};
+	private Mutation(android.os.Parcel in) {
+		
+			this.iD = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.iD);
+		
+			this.priorVersion = (com.veyron.services.store.raw.Version) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.priorVersion);
+		
+			this.version = (com.veyron.services.store.raw.Version) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.version);
+		
+			this.isRoot = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.isRoot);
+		
+			this.value = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.value);
+		
+			this.dir = (java.util.List<com.veyron.services.store.raw.DEntry>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.dir);
+		
+	}
 }

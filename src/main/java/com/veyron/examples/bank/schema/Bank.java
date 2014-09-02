@@ -6,14 +6,16 @@ package com.veyron.examples.bank.schema;
  * type Bank struct{Accounts map[string]int64} 
  * Bank is used to represent the information stored in a bank.
  **/
-public final class Bank {
+public final class Bank implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
-      private java.util.HashMap<java.lang.String, java.lang.Long> accounts;
+      private java.util.Map<java.lang.String, java.lang.Long> accounts;
     
 
     
-    public Bank(final java.util.HashMap<java.lang.String, java.lang.Long> accounts) {
+    public Bank(final java.util.Map<java.lang.String, java.lang.Long> accounts) {
         
             this.accounts = accounts;
         
@@ -21,10 +23,10 @@ public final class Bank {
 
     
     
-    public java.util.HashMap<java.lang.String, java.lang.Long> getAccounts() {
+    public java.util.Map<java.lang.String, java.lang.Long> getAccounts() {
         return this.accounts;
     }
-    public void setAccounts(java.util.HashMap<java.lang.String, java.lang.Long> accounts) {
+    public void setAccounts(java.util.Map<java.lang.String, java.lang.Long> accounts) {
         this.accounts = accounts;
     }
     
@@ -58,4 +60,30 @@ public final class Bank {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, accounts);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Bank> CREATOR
+		= new android.os.Parcelable.Creator<Bank>() {
+		@Override
+		public Bank createFromParcel(android.os.Parcel in) {
+			return new Bank(in);
+		}
+		@Override
+		public Bank[] newArray(int size) {
+			return new Bank[size];
+		}
+	};
+	private Bank(android.os.Parcel in) {
+		
+			this.accounts = (java.util.Map<java.lang.String, java.lang.Long>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.accounts);
+		
+	}
 }

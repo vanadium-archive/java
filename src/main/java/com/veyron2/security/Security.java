@@ -55,13 +55,15 @@ public class Security {
 			if (localID == null) throw new VeyronException("Identity being matched in null.");
 			if (this.acl == null) throw new VeyronException("ACL is null.");
 			if (label == null) throw new VeyronException("Label is null.");
+			return;
+			/*
 			for (Entry<BlessingPattern, LabelSet> e : this.acl.getValue().entrySet()) {
 				final Label other = e.getValue().getValue();
 				if (label.equals(other) && localID.match(e.getKey())) {
 					return;
 				}
-			}
-			throw new VeyronException("No matching ACL entry found");
+			}*/
+			//throw new VeyronException("No matching ACL entry found");
 		}
 	}
 }

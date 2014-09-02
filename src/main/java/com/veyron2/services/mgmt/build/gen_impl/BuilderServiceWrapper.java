@@ -45,7 +45,7 @@ public final class BuilderServiceWrapper {
 
      
     
-    public java.util.ArrayList<java.lang.Byte> build(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.Byte> build(final com.veyron2.ipc.ServerCall call, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS) throws com.veyron2.ipc.VeyronException {
         
         final com.veyron2.vdl.Stream<com.veyron2.services.mgmt.build.File, com.veyron2.services.mgmt.build.File> stream = new com.veyron2.vdl.Stream<com.veyron2.services.mgmt.build.File, com.veyron2.services.mgmt.build.File>() {
             @Override

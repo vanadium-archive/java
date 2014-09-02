@@ -6,18 +6,20 @@ package com.veyron.examples.todos.schema;
  * type Item struct{Text string;Done bool;Tags []string} 
  * Item is a single task to be done.
  **/
-public final class Item {
+public final class Item implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String text;
     
       private boolean done;
     
-      private java.util.ArrayList<java.lang.String> tags;
+      private java.util.List<java.lang.String> tags;
     
 
     
-    public Item(final java.lang.String text, final boolean done, final java.util.ArrayList<java.lang.String> tags) {
+    public Item(final java.lang.String text, final boolean done, final java.util.List<java.lang.String> tags) {
         
             this.text = text;
         
@@ -43,10 +45,10 @@ public final class Item {
         this.done = done;
     }
     
-    public java.util.ArrayList<java.lang.String> getTags() {
+    public java.util.List<java.lang.String> getTags() {
         return this.tags;
     }
-    public void setTags(java.util.ArrayList<java.lang.String> tags) {
+    public void setTags(java.util.List<java.lang.String> tags) {
         this.tags = tags;
     }
     
@@ -100,4 +102,38 @@ public final class Item {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, text);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, done);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, tags);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Item> CREATOR
+		= new android.os.Parcelable.Creator<Item>() {
+		@Override
+		public Item createFromParcel(android.os.Parcel in) {
+			return new Item(in);
+		}
+		@Override
+		public Item[] newArray(int size) {
+			return new Item[size];
+		}
+	};
+	private Item(android.os.Parcel in) {
+		
+			this.text = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.text);
+		
+			this.done = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.done);
+		
+			this.tags = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.tags);
+		
+	}
 }

@@ -6,7 +6,9 @@ package com.veyron.examples.mdb.schema;
  * type Movie struct{Image string;Title string;Summary string;Language string;ReleaseDate int64;Runtime int64;Genre string;Director veyron2/storage.ID [16]byte} 
  * Movie represents a movie.
  **/
-public final class Movie {
+public final class Movie implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String image;
@@ -211,4 +213,58 @@ public final class Movie {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, image);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, title);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, summary);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, language);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, releaseDate);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, runtime);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, genre);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, director);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Movie> CREATOR
+		= new android.os.Parcelable.Creator<Movie>() {
+		@Override
+		public Movie createFromParcel(android.os.Parcel in) {
+			return new Movie(in);
+		}
+		@Override
+		public Movie[] newArray(int size) {
+			return new Movie[size];
+		}
+	};
+	private Movie(android.os.Parcel in) {
+		
+			this.image = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.image);
+		
+			this.title = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.title);
+		
+			this.summary = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.summary);
+		
+			this.language = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.language);
+		
+			this.releaseDate = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.releaseDate);
+		
+			this.runtime = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.runtime);
+		
+			this.genre = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.genre);
+		
+			this.director = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.director);
+		
+	}
 }

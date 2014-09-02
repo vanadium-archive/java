@@ -22,11 +22,11 @@ public final class OAuthBlesserStub implements com.veyron.services.identity.OAut
 
 
     
-    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl) throws com.veyron2.ipc.VeyronException {
         return blessUsingAuthorizationCode(context, authcode, redirecturl, null);
     }
     
-    public java.lang.Object blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAuthorizationCode(final com.veyron2.ipc.Context context, final java.lang.String authcode, final java.lang.String redirecturl, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -48,14 +48,14 @@ public final class OAuthBlesserStub implements com.veyron.services.identity.OAut
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          
@@ -64,11 +64,11 @@ public final class OAuthBlesserStub implements com.veyron.services.identity.OAut
     }
 
     
-    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token) throws com.veyron2.ipc.VeyronException {
         return blessUsingAccessToken(context, token, null);
     }
     
-    public java.lang.Object blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any blessUsingAccessToken(final com.veyron2.ipc.Context context, final java.lang.String token, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -90,14 +90,14 @@ public final class OAuthBlesserStub implements com.veyron.services.identity.OAut
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.lang.Object>() {
+            new com.google.common.reflect.TypeToken<com.veyron2.vdl.Any>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.lang.Object)results[0];
+        return (com.veyron2.vdl.Any)results[0];
          
 
          

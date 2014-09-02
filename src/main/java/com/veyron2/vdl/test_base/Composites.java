@@ -5,24 +5,26 @@ package com.veyron2.vdl.test_base;
 /**
  * type Composites struct{A0 veyron2/vdl/test_base.Scalars struct{A0 bool;A1 byte;A2 uint16;A3 uint32;A4 uint64;A5 int16;A6 int32;A7 int64;A8 float32;A9 float64;A10 complex64;A11 complex128;A12 string;A13 error struct{Id string;Msg string};A14 any;A15 typeval;B0 veyron2/vdl/test_base.NamedBool bool;B1 veyron2/vdl/test_base.NamedByte byte;B2 veyron2/vdl/test_base.NamedUint16 uint16;B3 veyron2/vdl/test_base.NamedUint32 uint32;B4 veyron2/vdl/test_base.NamedUint64 uint64;B5 veyron2/vdl/test_base.NamedInt16 int16;B6 veyron2/vdl/test_base.NamedInt32 int32;B7 veyron2/vdl/test_base.NamedInt64 int64;B8 veyron2/vdl/test_base.NamedFloat32 float32;B9 veyron2/vdl/test_base.NamedFloat64 float64;B10 veyron2/vdl/test_base.NamedComplex64 complex64;B11 veyron2/vdl/test_base.NamedComplex128 complex128;B12 veyron2/vdl/test_base.NamedString string};A1 [2]veyron2/vdl/test_base.Scalars;A2 []veyron2/vdl/test_base.Scalars;A3 set[veyron2/vdl/test_base.Scalars];A4 map[string]veyron2/vdl/test_base.Scalars;A5 map[veyron2/vdl/test_base.Scalars][]map[string]complex128} 
  **/
-public final class Composites {
+public final class Composites implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.vdl.test_base.Scalars a0;
     
       private com.veyron2.vdl.test_base.Scalars[] a1;
     
-      private java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2;
+      private java.util.List<com.veyron2.vdl.test_base.Scalars> a2;
     
-      private java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3;
+      private java.util.Set<com.veyron2.vdl.test_base.Scalars> a3;
     
-      private java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4;
+      private java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4;
     
-      private java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5;
+      private java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5;
     
 
     
-    public Composites(final com.veyron2.vdl.test_base.Scalars a0, final com.veyron2.vdl.test_base.Scalars[] a1, final java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2, final java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3, final java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4, final java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
+    public Composites(final com.veyron2.vdl.test_base.Scalars a0, final com.veyron2.vdl.test_base.Scalars[] a1, final java.util.List<com.veyron2.vdl.test_base.Scalars> a2, final java.util.Set<com.veyron2.vdl.test_base.Scalars> a3, final java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4, final java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
         
             this.a0 = a0;
         
@@ -54,31 +56,31 @@ public final class Composites {
         this.a1 = a1;
     }
     
-    public java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> getA2() {
+    public java.util.List<com.veyron2.vdl.test_base.Scalars> getA2() {
         return this.a2;
     }
-    public void setA2(java.util.ArrayList<com.veyron2.vdl.test_base.Scalars> a2) {
+    public void setA2(java.util.List<com.veyron2.vdl.test_base.Scalars> a2) {
         this.a2 = a2;
     }
     
-    public java.util.HashSet<com.veyron2.vdl.test_base.Scalars> getA3() {
+    public java.util.Set<com.veyron2.vdl.test_base.Scalars> getA3() {
         return this.a3;
     }
-    public void setA3(java.util.HashSet<com.veyron2.vdl.test_base.Scalars> a3) {
+    public void setA3(java.util.Set<com.veyron2.vdl.test_base.Scalars> a3) {
         this.a3 = a3;
     }
     
-    public java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> getA4() {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars> getA4() {
         return this.a4;
     }
-    public void setA4(java.util.HashMap<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4) {
+    public void setA4(java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4) {
         this.a4 = a4;
     }
     
-    public java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> getA5() {
+    public java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>> getA5() {
         return this.a5;
     }
-    public void setA5(java.util.HashMap<com.veyron2.vdl.test_base.Scalars, java.util.ArrayList<java.util.HashMap<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
+    public void setA5(java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5) {
         this.a5 = a5;
     }
     
@@ -172,4 +174,50 @@ public final class Composites {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a0);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a1);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a2);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a3);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a4);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, a5);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Composites> CREATOR
+		= new android.os.Parcelable.Creator<Composites>() {
+		@Override
+		public Composites createFromParcel(android.os.Parcel in) {
+			return new Composites(in);
+		}
+		@Override
+		public Composites[] newArray(int size) {
+			return new Composites[size];
+		}
+	};
+	private Composites(android.os.Parcel in) {
+		
+			this.a0 = (com.veyron2.vdl.test_base.Scalars) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a0);
+		
+			this.a1 = (com.veyron2.vdl.test_base.Scalars[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a1);
+		
+			this.a2 = (java.util.List<com.veyron2.vdl.test_base.Scalars>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a2);
+		
+			this.a3 = (java.util.Set<com.veyron2.vdl.test_base.Scalars>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a3);
+		
+			this.a4 = (java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a4);
+		
+			this.a5 = (java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.a5);
+		
+	}
 }

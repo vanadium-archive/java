@@ -8,7 +8,7 @@ package com.veyron.examples.rockpaperscissors;
  * WinnerTag is a type used to indicate whether a round or a game was a draw,
  * was won by player 1 or was won by player 2.
  **/
-public final class WinnerTag {
+public final class WinnerTag implements android.os.Parcelable, java.io.Serializable {
     private byte value;
 
     public WinnerTag(byte value) {
@@ -32,4 +32,26 @@ public final class WinnerTag {
     public int hashCode() {
         return (int)value;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<WinnerTag> CREATOR
+		= new android.os.Parcelable.Creator<WinnerTag>() {
+		@Override
+		public WinnerTag createFromParcel(android.os.Parcel in) {
+			return new WinnerTag(in);
+		}
+		@Override
+		public WinnerTag[] newArray(int size) {
+			return new WinnerTag[size];
+		}
+	};
+	private WinnerTag(android.os.Parcel in) {
+		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -6,7 +6,9 @@ package com.veyron.services.syncgroup;
  * type SyncGroupInfo struct{Name string;Config veyron/services/syncgroup.SyncGroupConfig struct{Desc string;PathPatterns []string;Options map[string]any;ACL veyron2/security.ACL struct{In map[veyron2/security.BlessingPattern string]veyron2/security.LabelSet uint32;NotIn map[string]veyron2/security.LabelSet};MountTables []string};RootOID veyron2/storage.ID [16]byte;ETag string;SGOID veyron/services/syncgroup.ID [16]byte;Joiners map[veyron/services/syncgroup.NameIdentity struct{Name string;Identity string}]veyron/services/syncgroup.JoinerMetaData struct{SyncPriority int32}} 
  * A SyncGroupInfo is the conceptual state of a SyncGroup object.
  **/
-public final class SyncGroupInfo {
+public final class SyncGroupInfo implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -19,11 +21,11 @@ public final class SyncGroupInfo {
     
       private com.veyron.services.syncgroup.ID sGOID;
     
-      private java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners;
+      private java.util.Map<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners;
     
 
     
-    public SyncGroupInfo(final java.lang.String name, final com.veyron.services.syncgroup.SyncGroupConfig config, final com.veyron2.storage.ID rootOID, final java.lang.String eTag, final com.veyron.services.syncgroup.ID sGOID, final java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
+    public SyncGroupInfo(final java.lang.String name, final com.veyron.services.syncgroup.SyncGroupConfig config, final com.veyron2.storage.ID rootOID, final java.lang.String eTag, final com.veyron.services.syncgroup.ID sGOID, final java.util.Map<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
         
             this.name = name;
         
@@ -76,10 +78,10 @@ public final class SyncGroupInfo {
         this.sGOID = sGOID;
     }
     
-    public java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> getJoiners() {
+    public java.util.Map<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> getJoiners() {
         return this.joiners;
     }
-    public void setJoiners(java.util.HashMap<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
+    public void setJoiners(java.util.Map<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData> joiners) {
         this.joiners = joiners;
     }
     
@@ -173,4 +175,50 @@ public final class SyncGroupInfo {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, config);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, rootOID);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, eTag);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, sGOID);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, joiners);
+    	
+    }
+	public static final android.os.Parcelable.Creator<SyncGroupInfo> CREATOR
+		= new android.os.Parcelable.Creator<SyncGroupInfo>() {
+		@Override
+		public SyncGroupInfo createFromParcel(android.os.Parcel in) {
+			return new SyncGroupInfo(in);
+		}
+		@Override
+		public SyncGroupInfo[] newArray(int size) {
+			return new SyncGroupInfo[size];
+		}
+	};
+	private SyncGroupInfo(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.config = (com.veyron.services.syncgroup.SyncGroupConfig) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.config);
+		
+			this.rootOID = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.rootOID);
+		
+			this.eTag = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.eTag);
+		
+			this.sGOID = (com.veyron.services.syncgroup.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.sGOID);
+		
+			this.joiners = (java.util.Map<com.veyron.services.syncgroup.NameIdentity, com.veyron.services.syncgroup.JoinerMetaData>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.joiners);
+		
+	}
 }

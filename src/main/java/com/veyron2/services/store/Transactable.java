@@ -17,7 +17,7 @@ public interface Transactable  {
 // rebind to this new name to work with the receiver and its descendants as part
 // of the transaction.
 
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException;
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

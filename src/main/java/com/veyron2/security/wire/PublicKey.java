@@ -6,16 +6,18 @@ package com.veyron2.security.wire;
  * type PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte} 
  * PublicKey represents an ECDSA PublicKey.
  **/
-public final class PublicKey {
+public final class PublicKey implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.security.wire.KeyCurve curve;
     
-      private java.util.ArrayList<java.lang.Byte> xY;
+      private java.util.List<java.lang.Byte> xY;
     
 
     
-    public PublicKey(final com.veyron2.security.wire.KeyCurve curve, final java.util.ArrayList<java.lang.Byte> xY) {
+    public PublicKey(final com.veyron2.security.wire.KeyCurve curve, final java.util.List<java.lang.Byte> xY) {
         
             this.curve = curve;
         
@@ -32,10 +34,10 @@ public final class PublicKey {
         this.curve = curve;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getXY() {
+    public java.util.List<java.lang.Byte> getXY() {
         return this.xY;
     }
-    public void setXY(java.util.ArrayList<java.lang.Byte> xY) {
+    public void setXY(java.util.List<java.lang.Byte> xY) {
         this.xY = xY;
     }
     
@@ -81,4 +83,34 @@ public final class PublicKey {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, curve);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, xY);
+    	
+    }
+	public static final android.os.Parcelable.Creator<PublicKey> CREATOR
+		= new android.os.Parcelable.Creator<PublicKey>() {
+		@Override
+		public PublicKey createFromParcel(android.os.Parcel in) {
+			return new PublicKey(in);
+		}
+		@Override
+		public PublicKey[] newArray(int size) {
+			return new PublicKey[size];
+		}
+	};
+	private PublicKey(android.os.Parcel in) {
+		
+			this.curve = (com.veyron2.security.wire.KeyCurve) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.curve);
+		
+			this.xY = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.xY);
+		
+	}
 }

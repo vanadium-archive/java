@@ -6,16 +6,18 @@ package com.veyron2.vom2;
  * type WireOneOf struct{Name string;Types []veyron2/vom2.TypeID uint64} 
  * WireOneOf represents a oneof type definition.
  **/
-public final class WireOneOf {
+public final class WireOneOf implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
     
-      private java.util.ArrayList<com.veyron2.vom2.TypeID> types;
+      private java.util.List<com.veyron2.vom2.TypeID> types;
     
 
     
-    public WireOneOf(final java.lang.String name, final java.util.ArrayList<com.veyron2.vom2.TypeID> types) {
+    public WireOneOf(final java.lang.String name, final java.util.List<com.veyron2.vom2.TypeID> types) {
         
             this.name = name;
         
@@ -32,10 +34,10 @@ public final class WireOneOf {
         this.name = name;
     }
     
-    public java.util.ArrayList<com.veyron2.vom2.TypeID> getTypes() {
+    public java.util.List<com.veyron2.vom2.TypeID> getTypes() {
         return this.types;
     }
-    public void setTypes(java.util.ArrayList<com.veyron2.vom2.TypeID> types) {
+    public void setTypes(java.util.List<com.veyron2.vom2.TypeID> types) {
         this.types = types;
     }
     
@@ -81,4 +83,34 @@ public final class WireOneOf {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, types);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireOneOf> CREATOR
+		= new android.os.Parcelable.Creator<WireOneOf>() {
+		@Override
+		public WireOneOf createFromParcel(android.os.Parcel in) {
+			return new WireOneOf(in);
+		}
+		@Override
+		public WireOneOf[] newArray(int size) {
+			return new WireOneOf[size];
+		}
+	};
+	private WireOneOf(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.types = (java.util.List<com.veyron2.vom2.TypeID>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.types);
+		
+	}
 }

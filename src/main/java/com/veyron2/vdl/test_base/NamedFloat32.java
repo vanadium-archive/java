@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedFloat32 float32 
  **/
-public final class NamedFloat32 {
+public final class NamedFloat32 implements android.os.Parcelable, java.io.Serializable {
     private float value;
 
     public NamedFloat32(float value) {
@@ -30,4 +30,26 @@ public final class NamedFloat32 {
     public int hashCode() {
         return java.lang.Float.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NamedFloat32> CREATOR
+		= new android.os.Parcelable.Creator<NamedFloat32>() {
+		@Override
+		public NamedFloat32 createFromParcel(android.os.Parcel in) {
+			return new NamedFloat32(in);
+		}
+		@Override
+		public NamedFloat32[] newArray(int size) {
+			return new NamedFloat32[size];
+		}
+	};
+	private NamedFloat32(android.os.Parcel in) {
+		value = (float) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

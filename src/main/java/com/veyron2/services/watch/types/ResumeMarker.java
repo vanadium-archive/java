@@ -37,7 +37,9 @@ package com.veyron2.services.watch.types;
  * (initial state fetching) and the "now" marker. It need not
  * support resuming from a specific point.
  **/
-public final class ResumeMarker implements java.util.List<java.lang.Byte> {
+public final class ResumeMarker implements java.util.List<java.lang.Byte>, android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     private java.util.List<java.lang.Byte> impl;
 
     public ResumeMarker(java.util.List<java.lang.Byte> impl) {
@@ -153,5 +155,26 @@ public final class ResumeMarker implements java.util.List<java.lang.Byte> {
     @Override
     public <T> T[] toArray(T[] array) {
         return impl.toArray(array);
+    }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+        com.veyron2.vdl.ParcelUtil.writeValue(out, impl);
+    }
+    public static final android.os.Parcelable.Creator<ResumeMarker> CREATOR = new android.os.Parcelable.Creator<ResumeMarker>() {
+        @Override
+        public ResumeMarker createFromParcel(android.os.Parcel in) {
+            return new ResumeMarker(in);
+        }
+        @Override
+        public ResumeMarker[] newArray(int size) {
+            return new ResumeMarker[size];
+        }
+    };
+    private ResumeMarker(android.os.Parcel in) {
+        impl = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), impl);
     }
 }

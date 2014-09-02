@@ -45,26 +45,26 @@ public final class BenchmarkServiceWrapper {
 
      
     
-    public java.util.ArrayList<java.lang.Byte> echo(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.Byte> echo(final com.veyron2.ipc.ServerCall call, final java.util.List<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.echo( call , Payload  );
     }
 
     public void echoStream(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
-        final com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.util.ArrayList<java.lang.Byte>>() {
+        final com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.util.List<java.lang.Byte>> stream = new com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.util.List<java.lang.Byte>>() {
             @Override
-            public void send(java.util.ArrayList<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.util.ArrayList<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.ArrayList<java.lang.Byte> >() {
+            public java.util.List<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken< java.util.List<java.lang.Byte> >() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.util.ArrayList<java.lang.Byte>)result;
+                    return (java.util.List<java.lang.Byte>)result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }

@@ -6,7 +6,9 @@ package com.veyron2.wiretype;
  * type FieldType struct{Type veyron2/wiretype.TypeID uint64;Name string} 
  * FieldType represents a single possibly-named field in a struct.
  **/
-public final class FieldType {
+public final class FieldType implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.wiretype.TypeID type;
@@ -81,4 +83,34 @@ public final class FieldType {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, type);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    }
+	public static final android.os.Parcelable.Creator<FieldType> CREATOR
+		= new android.os.Parcelable.Creator<FieldType>() {
+		@Override
+		public FieldType createFromParcel(android.os.Parcel in) {
+			return new FieldType(in);
+		}
+		@Override
+		public FieldType[] newArray(int size) {
+			return new FieldType[size];
+		}
+	};
+	private FieldType(android.os.Parcel in) {
+		
+			this.type = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.type);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+	}
 }

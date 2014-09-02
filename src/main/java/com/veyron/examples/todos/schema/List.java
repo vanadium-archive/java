@@ -6,7 +6,9 @@ package com.veyron.examples.todos.schema;
  * type List struct{Name string} 
  * List is a list of items.
  **/
-public final class List {
+public final class List implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -58,4 +60,30 @@ public final class List {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    }
+	public static final android.os.Parcelable.Creator<List> CREATOR
+		= new android.os.Parcelable.Creator<List>() {
+		@Override
+		public List createFromParcel(android.os.Parcel in) {
+			return new List(in);
+		}
+		@Override
+		public List[] newArray(int size) {
+			return new List[size];
+		}
+	};
+	private List(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+	}
 }

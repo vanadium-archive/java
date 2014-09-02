@@ -6,7 +6,9 @@ package com.veyron2.vom2;
  * type WireNamed struct{Name string;Base veyron2/vom2.TypeID uint64} 
  * WireNamed represents a named type definition.
  **/
-public final class WireNamed {
+public final class WireNamed implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class WireNamed {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, base);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireNamed> CREATOR
+		= new android.os.Parcelable.Creator<WireNamed>() {
+		@Override
+		public WireNamed createFromParcel(android.os.Parcel in) {
+			return new WireNamed(in);
+		}
+		@Override
+		public WireNamed[] newArray(int size) {
+			return new WireNamed[size];
+		}
+	};
+	private WireNamed(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.base = (com.veyron2.vom2.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.base);
+		
+	}
 }

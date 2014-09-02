@@ -6,7 +6,9 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedMap map[string]float32 
  **/
-public final class NamedMap implements java.util.Map<java.lang.String, java.lang.Float> {
+public final class NamedMap implements java.util.Map<java.lang.String, java.lang.Float>, android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     private java.util.Map<java.lang.String, java.lang.Float> impl;
 
     public NamedMap(java.util.Map<java.lang.String, java.lang.Float> impl) {
@@ -34,7 +36,6 @@ public final class NamedMap implements java.util.Map<java.lang.String, java.lang
             return false;
         return true;
     }
-
     @Override
     public int hashCode() {
         return (impl == null) ? 0 : impl.hashCode();
@@ -44,59 +45,70 @@ public final class NamedMap implements java.util.Map<java.lang.String, java.lang
     public void clear() {
         impl.clear();
     }
-
     @Override
     public boolean containsKey(java.lang.Object key) {
         return impl.containsKey(key);
     }
-
     @Override
     public boolean containsValue(java.lang.Object value) {
         return impl.containsValue(value);
     }
-
     @Override
     public java.util.Set<java.util.Map.Entry<java.lang.String, java.lang.Float>> entrySet() {
         return impl.entrySet();
     }
-
     @Override
     public java.lang.Float get(java.lang.Object key) {
         return impl.get(key);
     }
-
     @Override
     public boolean isEmpty() {
         return impl.isEmpty();
     }
-
     @Override
     public java.util.Set<java.lang.String> keySet() {
         return impl.keySet();
     }
-
     @Override
     public java.lang.Float put(java.lang.String key, java.lang.Float value) {
         return impl.put(key, value);
     }
-
     @Override
     public void putAll(java.util.Map<? extends java.lang.String, ? extends java.lang.Float> map) {
         impl.putAll(map);
     }
-
     @Override
     public java.lang.Float remove(java.lang.Object key) {
         return impl.remove(key);
     }
-
     @Override
     public int size() {
         return impl.size();
     }
-
     @Override
     public java.util.Collection<java.lang.Float> values() {
         return impl.values();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+        com.veyron2.vdl.ParcelUtil.writeValue(out, impl);
+    }
+    public static final android.os.Parcelable.Creator<NamedMap> CREATOR = new android.os.Parcelable.Creator<NamedMap>() {
+        @Override
+        public NamedMap createFromParcel(android.os.Parcel in) {
+            return new NamedMap(in);
+        }
+        @Override
+        public NamedMap[] newArray(int size) {
+            return new NamedMap[size];
+        }
+    };
+    private NamedMap(android.os.Parcel in) {
+        impl = (java.util.Map<java.lang.String, java.lang.Float>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), impl);
     }
 }

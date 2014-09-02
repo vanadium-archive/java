@@ -7,22 +7,24 @@ package com.veyron.services.syncgroup;
  * A SyncGroupConfig contains some fields of SyncGroupInfo that
  * are passed at create time, but which can be changed later.
  **/
-public final class SyncGroupConfig {
+public final class SyncGroupConfig implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String desc;
     
-      private java.util.ArrayList<java.lang.String> pathPatterns;
+      private java.util.List<java.lang.String> pathPatterns;
     
-      private java.util.HashMap<java.lang.String, java.lang.Object> options;
+      private java.util.Map<java.lang.String, com.veyron2.vdl.Any> options;
     
       private com.veyron2.security.ACL aCL;
     
-      private java.util.ArrayList<java.lang.String> mountTables;
+      private java.util.List<java.lang.String> mountTables;
     
 
     
-    public SyncGroupConfig(final java.lang.String desc, final java.util.ArrayList<java.lang.String> pathPatterns, final java.util.HashMap<java.lang.String, java.lang.Object> options, final com.veyron2.security.ACL aCL, final java.util.ArrayList<java.lang.String> mountTables) {
+    public SyncGroupConfig(final java.lang.String desc, final java.util.List<java.lang.String> pathPatterns, final java.util.Map<java.lang.String, com.veyron2.vdl.Any> options, final com.veyron2.security.ACL aCL, final java.util.List<java.lang.String> mountTables) {
         
             this.desc = desc;
         
@@ -45,17 +47,17 @@ public final class SyncGroupConfig {
         this.desc = desc;
     }
     
-    public java.util.ArrayList<java.lang.String> getPathPatterns() {
+    public java.util.List<java.lang.String> getPathPatterns() {
         return this.pathPatterns;
     }
-    public void setPathPatterns(java.util.ArrayList<java.lang.String> pathPatterns) {
+    public void setPathPatterns(java.util.List<java.lang.String> pathPatterns) {
         this.pathPatterns = pathPatterns;
     }
     
-    public java.util.HashMap<java.lang.String, java.lang.Object> getOptions() {
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> getOptions() {
         return this.options;
     }
-    public void setOptions(java.util.HashMap<java.lang.String, java.lang.Object> options) {
+    public void setOptions(java.util.Map<java.lang.String, com.veyron2.vdl.Any> options) {
         this.options = options;
     }
     
@@ -66,10 +68,10 @@ public final class SyncGroupConfig {
         this.aCL = aCL;
     }
     
-    public java.util.ArrayList<java.lang.String> getMountTables() {
+    public java.util.List<java.lang.String> getMountTables() {
         return this.mountTables;
     }
-    public void setMountTables(java.util.ArrayList<java.lang.String> mountTables) {
+    public void setMountTables(java.util.List<java.lang.String> mountTables) {
         this.mountTables = mountTables;
     }
     
@@ -151,4 +153,46 @@ public final class SyncGroupConfig {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, desc);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, pathPatterns);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, options);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, aCL);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, mountTables);
+    	
+    }
+	public static final android.os.Parcelable.Creator<SyncGroupConfig> CREATOR
+		= new android.os.Parcelable.Creator<SyncGroupConfig>() {
+		@Override
+		public SyncGroupConfig createFromParcel(android.os.Parcel in) {
+			return new SyncGroupConfig(in);
+		}
+		@Override
+		public SyncGroupConfig[] newArray(int size) {
+			return new SyncGroupConfig[size];
+		}
+	};
+	private SyncGroupConfig(android.os.Parcel in) {
+		
+			this.desc = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.desc);
+		
+			this.pathPatterns = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.pathPatterns);
+		
+			this.options = (java.util.Map<java.lang.String, com.veyron2.vdl.Any>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.options);
+		
+			this.aCL = (com.veyron2.security.ACL) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.aCL);
+		
+			this.mountTables = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.mountTables);
+		
+	}
 }

@@ -9,16 +9,18 @@ package com.veyron2.services.mgmt.binary;
  * determing profiles is specifically not specified and left to the
  * implementation of the interface that generates the description.
  **/
-public final class Description {
+public final class Description implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
     
-      private java.util.HashMap<java.lang.String, java.lang.Boolean> profiles;
+      private java.util.Map<java.lang.String, java.lang.Boolean> profiles;
     
 
     
-    public Description(final java.lang.String name, final java.util.HashMap<java.lang.String, java.lang.Boolean> profiles) {
+    public Description(final java.lang.String name, final java.util.Map<java.lang.String, java.lang.Boolean> profiles) {
         
             this.name = name;
         
@@ -35,10 +37,10 @@ public final class Description {
         this.name = name;
     }
     
-    public java.util.HashMap<java.lang.String, java.lang.Boolean> getProfiles() {
+    public java.util.Map<java.lang.String, java.lang.Boolean> getProfiles() {
         return this.profiles;
     }
-    public void setProfiles(java.util.HashMap<java.lang.String, java.lang.Boolean> profiles) {
+    public void setProfiles(java.util.Map<java.lang.String, java.lang.Boolean> profiles) {
         this.profiles = profiles;
     }
     
@@ -84,4 +86,34 @@ public final class Description {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, profiles);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Description> CREATOR
+		= new android.os.Parcelable.Creator<Description>() {
+		@Override
+		public Description createFromParcel(android.os.Parcel in) {
+			return new Description(in);
+		}
+		@Override
+		public Description[] newArray(int size) {
+			return new Description[size];
+		}
+	};
+	private Description(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.profiles = (java.util.Map<java.lang.String, java.lang.Boolean>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.profiles);
+		
+	}
 }

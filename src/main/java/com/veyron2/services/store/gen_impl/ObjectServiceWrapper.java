@@ -118,7 +118,7 @@ public final class ObjectServiceWrapper {
          return  this.service.get( call   );
     }
 
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerCall call, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.ServerCall call, final com.veyron2.vdl.Any V) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.put( call , V  );
     }
@@ -165,7 +165,7 @@ public final class ObjectServiceWrapper {
         return  this.statableWrapper.stat(call);
     }
 
-    public java.lang.String newTransaction(final com.veyron2.ipc.ServerCall call, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.ServerCall call, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException {
         
         return  this.transactableWrapper.newTransaction(call, Options);
     }

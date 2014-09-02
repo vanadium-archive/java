@@ -7,7 +7,7 @@ package com.veyron.runtimes.google.vsync;
  * type DeviceID string 
  * DeviceID is the globally unique ID of a device.
  **/
-public final class DeviceID {
+public final class DeviceID implements android.os.Parcelable, java.io.Serializable {
     private java.lang.String value;
 
     public DeviceID(java.lang.String value) {
@@ -34,4 +34,26 @@ public final class DeviceID {
     public int hashCode() {
         return (value == null ? 0 : value.hashCode());
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<DeviceID> CREATOR
+		= new android.os.Parcelable.Creator<DeviceID>() {
+		@Override
+		public DeviceID createFromParcel(android.os.Parcel in) {
+			return new DeviceID(in);
+		}
+		@Override
+		public DeviceID[] newArray(int size) {
+			return new DeviceID[size];
+		}
+	};
+	private DeviceID(android.os.Parcel in) {
+		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -8,7 +8,7 @@ package com.veyron2.services.store;
  * NestedResult allows nested query results to be sent out-of-line.
  * See QueryResult for a full explanation.
  **/
-public final class NestedResult {
+public final class NestedResult implements android.os.Parcelable, java.io.Serializable {
     private long value;
 
     public NestedResult(long value) {
@@ -32,4 +32,26 @@ public final class NestedResult {
     public int hashCode() {
         return java.lang.Long.valueOf(value).hashCode();
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<NestedResult> CREATOR
+		= new android.os.Parcelable.Creator<NestedResult>() {
+		@Override
+		public NestedResult createFromParcel(android.os.Parcel in) {
+			return new NestedResult(in);
+		}
+		@Override
+		public NestedResult[] newArray(int size) {
+			return new NestedResult[size];
+		}
+	};
+	private NestedResult(android.os.Parcel in) {
+		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

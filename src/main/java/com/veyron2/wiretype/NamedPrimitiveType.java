@@ -6,18 +6,20 @@ package com.veyron2.wiretype;
  * type NamedPrimitiveType struct{Type veyron2/wiretype.TypeID uint64;Name string;Tags []string} 
  * NamedPrimitiveType adds name and tag meta-information to a primitive type.
  **/
-public final class NamedPrimitiveType {
+public final class NamedPrimitiveType implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.wiretype.TypeID type;
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.String> tags;
+      private java.util.List<java.lang.String> tags;
     
 
     
-    public NamedPrimitiveType(final com.veyron2.wiretype.TypeID type, final java.lang.String name, final java.util.ArrayList<java.lang.String> tags) {
+    public NamedPrimitiveType(final com.veyron2.wiretype.TypeID type, final java.lang.String name, final java.util.List<java.lang.String> tags) {
         
             this.type = type;
         
@@ -43,10 +45,10 @@ public final class NamedPrimitiveType {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.String> getTags() {
+    public java.util.List<java.lang.String> getTags() {
         return this.tags;
     }
-    public void setTags(java.util.ArrayList<java.lang.String> tags) {
+    public void setTags(java.util.List<java.lang.String> tags) {
         this.tags = tags;
     }
     
@@ -104,4 +106,38 @@ public final class NamedPrimitiveType {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, type);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, tags);
+    	
+    }
+	public static final android.os.Parcelable.Creator<NamedPrimitiveType> CREATOR
+		= new android.os.Parcelable.Creator<NamedPrimitiveType>() {
+		@Override
+		public NamedPrimitiveType createFromParcel(android.os.Parcel in) {
+			return new NamedPrimitiveType(in);
+		}
+		@Override
+		public NamedPrimitiveType[] newArray(int size) {
+			return new NamedPrimitiveType[size];
+		}
+	};
+	private NamedPrimitiveType(android.os.Parcel in) {
+		
+			this.type = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.type);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.tags = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.tags);
+		
+	}
 }

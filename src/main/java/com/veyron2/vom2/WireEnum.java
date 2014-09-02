@@ -6,16 +6,18 @@ package com.veyron2.vom2;
  * type WireEnum struct{Name string;Labels []string} 
  * WireEnum represents an enum type definition.
  **/
-public final class WireEnum {
+public final class WireEnum implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
     
-      private java.util.ArrayList<java.lang.String> labels;
+      private java.util.List<java.lang.String> labels;
     
 
     
-    public WireEnum(final java.lang.String name, final java.util.ArrayList<java.lang.String> labels) {
+    public WireEnum(final java.lang.String name, final java.util.List<java.lang.String> labels) {
         
             this.name = name;
         
@@ -32,10 +34,10 @@ public final class WireEnum {
         this.name = name;
     }
     
-    public java.util.ArrayList<java.lang.String> getLabels() {
+    public java.util.List<java.lang.String> getLabels() {
         return this.labels;
     }
-    public void setLabels(java.util.ArrayList<java.lang.String> labels) {
+    public void setLabels(java.util.List<java.lang.String> labels) {
         this.labels = labels;
     }
     
@@ -81,4 +83,34 @@ public final class WireEnum {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, labels);
+    	
+    }
+	public static final android.os.Parcelable.Creator<WireEnum> CREATOR
+		= new android.os.Parcelable.Creator<WireEnum>() {
+		@Override
+		public WireEnum createFromParcel(android.os.Parcel in) {
+			return new WireEnum(in);
+		}
+		@Override
+		public WireEnum[] newArray(int size) {
+			return new WireEnum[size];
+		}
+	};
+	private WireEnum(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.labels = (java.util.List<java.lang.String>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.labels);
+		
+	}
 }

@@ -12,7 +12,7 @@ public interface TransactionRoot  {
     // CreateTransaction creates a transaction with the given options.  It returns
 // the name of the transaction relative to this TransactionRoot's name.
 
-    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException;
-    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException;
+    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

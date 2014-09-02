@@ -6,7 +6,9 @@ package com.veyron2.ipc;
  * type MethodArgument struct{Name string;Type veyron2/wiretype.TypeID uint64} 
  * MethodArgument represents the argument to a method in a method signature.
  **/
-public final class MethodArgument {
+public final class MethodArgument implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String name;
@@ -81,4 +83,34 @@ public final class MethodArgument {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, type);
+    	
+    }
+	public static final android.os.Parcelable.Creator<MethodArgument> CREATOR
+		= new android.os.Parcelable.Creator<MethodArgument>() {
+		@Override
+		public MethodArgument createFromParcel(android.os.Parcel in) {
+			return new MethodArgument(in);
+		}
+		@Override
+		public MethodArgument[] newArray(int size) {
+			return new MethodArgument[size];
+		}
+	};
+	private MethodArgument(android.os.Parcel in) {
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.type = (com.veyron2.wiretype.TypeID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.type);
+		
+	}
 }

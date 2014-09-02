@@ -22,11 +22,11 @@ public final class TransactionRootStub implements com.veyron2.services.store.Tra
 
 
     
-    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException {
         return createTransaction(context, Options, null);
     }
     
-    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String createTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch

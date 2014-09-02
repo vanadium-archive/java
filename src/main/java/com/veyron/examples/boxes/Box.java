@@ -7,7 +7,9 @@ package com.veyron.examples.boxes;
  * Box describes the name and co-ordinates of a given box that
  * is displayed in the View of a peer device.
  **/
-public final class Box {
+public final class Box implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String deviceId;
@@ -105,4 +107,38 @@ public final class Box {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, deviceId);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, boxId);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, points);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Box> CREATOR
+		= new android.os.Parcelable.Creator<Box>() {
+		@Override
+		public Box createFromParcel(android.os.Parcel in) {
+			return new Box(in);
+		}
+		@Override
+		public Box[] newArray(int size) {
+			return new Box[size];
+		}
+	};
+	private Box(android.os.Parcel in) {
+		
+			this.deviceId = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.deviceId);
+		
+			this.boxId = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.boxId);
+		
+			this.points = (float[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.points);
+		
+	}
 }

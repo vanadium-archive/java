@@ -19,7 +19,7 @@ package com.veyron2.security;
  * that match "a/b/c" ("a", "a/b", "a/b/c") and all delegates of "a/b/c" (like
  * "a/b/c/d", "a/b/c/d/e" etc.).
  **/
-public final class BlessingPattern {
+public final class BlessingPattern implements android.os.Parcelable, java.io.Serializable {
     private java.lang.String value;
 
     public BlessingPattern(java.lang.String value) {
@@ -46,4 +46,26 @@ public final class BlessingPattern {
     public int hashCode() {
         return (value == null ? 0 : value.hashCode());
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<BlessingPattern> CREATOR
+		= new android.os.Parcelable.Creator<BlessingPattern>() {
+		@Override
+		public BlessingPattern createFromParcel(android.os.Parcel in) {
+			return new BlessingPattern(in);
+		}
+		@Override
+		public BlessingPattern[] newArray(int size) {
+			return new BlessingPattern[size];
+		}
+	};
+	private BlessingPattern(android.os.Parcel in) {
+		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

@@ -6,18 +6,20 @@ package com.veyron2.security;
  * type Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte} 
  * Signature represents an ECDSA signature.
  **/
-public final class Signature {
+public final class Signature implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.security.Hash hash;
     
-      private java.util.ArrayList<java.lang.Byte> r;
+      private java.util.List<java.lang.Byte> r;
     
-      private java.util.ArrayList<java.lang.Byte> s;
+      private java.util.List<java.lang.Byte> s;
     
 
     
-    public Signature(final com.veyron2.security.Hash hash, final java.util.ArrayList<java.lang.Byte> r, final java.util.ArrayList<java.lang.Byte> s) {
+    public Signature(final com.veyron2.security.Hash hash, final java.util.List<java.lang.Byte> r, final java.util.List<java.lang.Byte> s) {
         
             this.hash = hash;
         
@@ -36,17 +38,17 @@ public final class Signature {
         this.hash = hash;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getR() {
+    public java.util.List<java.lang.Byte> getR() {
         return this.r;
     }
-    public void setR(java.util.ArrayList<java.lang.Byte> r) {
+    public void setR(java.util.List<java.lang.Byte> r) {
         this.r = r;
     }
     
-    public java.util.ArrayList<java.lang.Byte> getS() {
+    public java.util.List<java.lang.Byte> getS() {
         return this.s;
     }
-    public void setS(java.util.ArrayList<java.lang.Byte> s) {
+    public void setS(java.util.List<java.lang.Byte> s) {
         this.s = s;
     }
     
@@ -104,4 +106,38 @@ public final class Signature {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, hash);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, r);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, s);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Signature> CREATOR
+		= new android.os.Parcelable.Creator<Signature>() {
+		@Override
+		public Signature createFromParcel(android.os.Parcel in) {
+			return new Signature(in);
+		}
+		@Override
+		public Signature[] newArray(int size) {
+			return new Signature[size];
+		}
+	};
+	private Signature(android.os.Parcel in) {
+		
+			this.hash = (com.veyron2.security.Hash) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.hash);
+		
+			this.r = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.r);
+		
+			this.s = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.s);
+		
+	}
 }

@@ -5,7 +5,9 @@ package com.veyron.tools.vrpc.test_base;
 /**
  * type Struct struct{X int32;Y int32} 
  **/
-public final class Struct {
+public final class Struct implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int x;
@@ -72,4 +74,34 @@ public final class Struct {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, x);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, y);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Struct> CREATOR
+		= new android.os.Parcelable.Creator<Struct>() {
+		@Override
+		public Struct createFromParcel(android.os.Parcel in) {
+			return new Struct(in);
+		}
+		@Override
+		public Struct[] newArray(int size) {
+			return new Struct[size];
+		}
+	};
+	private Struct(android.os.Parcel in) {
+		
+			this.x = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.x);
+		
+			this.y = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.y);
+		
+	}
 }

@@ -138,7 +138,7 @@ public final class ErrorThrowerServiceWrapper {
          this.service.throwCustomStandardError( call   );
     }
 
-    public java.util.ArrayList<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> listAllBuiltInErrorIDs(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.listAllBuiltInErrorIDs( call   );
     }

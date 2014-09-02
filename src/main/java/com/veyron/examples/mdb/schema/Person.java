@@ -7,7 +7,9 @@ package com.veyron.examples.mdb.schema;
  * Person represents a person, in any role, including producers, director,
  * actor, etc.
  **/
-public final class Person {
+public final class Person implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private java.lang.String image;
@@ -101,4 +103,38 @@ public final class Person {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, image);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, name);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, birthDate);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Person> CREATOR
+		= new android.os.Parcelable.Creator<Person>() {
+		@Override
+		public Person createFromParcel(android.os.Parcel in) {
+			return new Person(in);
+		}
+		@Override
+		public Person[] newArray(int size) {
+			return new Person[size];
+		}
+	};
+	private Person(android.os.Parcel in) {
+		
+			this.image = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.image);
+		
+			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
+		
+			this.birthDate = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.birthDate);
+		
+	}
 }

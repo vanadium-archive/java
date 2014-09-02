@@ -7,7 +7,7 @@ package com.veyron2.services.mgmt.build;
  * type Format string 
  * Format specifies the file format of a host.
  **/
-public final class Format {
+public final class Format implements android.os.Parcelable, java.io.Serializable {
     private java.lang.String value;
 
     public Format(java.lang.String value) {
@@ -34,4 +34,26 @@ public final class Format {
     public int hashCode() {
         return (value == null ? 0 : value.hashCode());
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+   		com.veyron2.vdl.ParcelUtil.writeValue(out, value);
+    }
+	public static final android.os.Parcelable.Creator<Format> CREATOR
+		= new android.os.Parcelable.Creator<Format>() {
+		@Override
+		public Format createFromParcel(android.os.Parcel in) {
+			return new Format(in);
+		}
+		@Override
+		public Format[] newArray(int size) {
+			return new Format[size];
+		}
+	};
+	private Format(android.os.Parcel in) {
+		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
 }

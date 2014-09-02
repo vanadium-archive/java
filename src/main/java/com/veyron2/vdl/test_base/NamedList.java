@@ -5,7 +5,9 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedList []uint32 
  **/
-public final class NamedList implements java.util.List<java.lang.Integer> {
+public final class NamedList implements java.util.List<java.lang.Integer>, android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     private java.util.List<java.lang.Integer> impl;
 
     public NamedList(java.util.List<java.lang.Integer> impl) {
@@ -121,5 +123,26 @@ public final class NamedList implements java.util.List<java.lang.Integer> {
     @Override
     public <T> T[] toArray(T[] array) {
         return impl.toArray(array);
+    }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+        com.veyron2.vdl.ParcelUtil.writeValue(out, impl);
+    }
+    public static final android.os.Parcelable.Creator<NamedList> CREATOR = new android.os.Parcelable.Creator<NamedList>() {
+        @Override
+        public NamedList createFromParcel(android.os.Parcel in) {
+            return new NamedList(in);
+        }
+        @Override
+        public NamedList[] newArray(int size) {
+            return new NamedList[size];
+        }
+    };
+    private NamedList(android.os.Parcel in) {
+        impl = (java.util.List<java.lang.Integer>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), impl);
     }
 }

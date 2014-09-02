@@ -114,7 +114,7 @@ public final class NodeServiceWrapper {
           this.applicationWrapper.revert(call);
     }
 
-    public java.util.ArrayList<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public java.util.List<java.lang.String> start(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationWrapper.start(call);
     }

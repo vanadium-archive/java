@@ -14,8 +14,8 @@ public interface Cache  {
     
     // Set sets a value for a key.
 
-    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value) throws com.veyron2.ipc.VeyronException;
-    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final java.lang.Object value, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.vdl.Any value) throws com.veyron2.ipc.VeyronException;
+    public void set(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.vdl.Any value, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -24,8 +24,8 @@ public interface Cache  {
     // Get returns the value for a key.  If the value is not found, returns
 // a not found error.
 
-    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
-    public java.lang.Object get(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any get(final com.veyron2.ipc.Context context, final java.lang.String key) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any get(final com.veyron2.ipc.Context context, final java.lang.String key, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -123,8 +123,8 @@ public interface Cache  {
     
     // AsMap returns the full contents of the cache as a map.
 
-    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public java.util.HashMap<java.lang.String, java.lang.Object> asMap(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> asMap(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.Map<java.lang.String, com.veyron2.vdl.Any> asMap(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -132,8 +132,8 @@ public interface Cache  {
     
     // KeyValuePairs returns the full contents of the cache as a slice of pairs.
 
-    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public java.util.ArrayList<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public java.util.List<com.veyron.examples.wspr_sample.KeyValuePair> keyValuePairs(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -179,7 +179,7 @@ public interface Cache  {
     
     // MultiGet sets up a stream that allows fetching multiple keys.
 
-    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.lang.String,java.lang.Object, java.lang.Void> multiGet(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.String,com.veyron2.vdl.Any, java.lang.Void> multiGet(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.String,com.veyron2.vdl.Any, java.lang.Void> multiGet(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

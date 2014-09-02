@@ -27,11 +27,11 @@ public final class ApplicationStub implements com.veyron.services.mgmt.repositor
 
 
     
-    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
+    public void put(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope) throws com.veyron2.ipc.VeyronException {
          put(context, Profiles, Envelope, null);
     }
     
-    public void put(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void put(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles, final com.veyron2.services.mgmt.application.Envelope Envelope, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -94,12 +94,12 @@ public final class ApplicationStub implements com.veyron.services.mgmt.repositor
 
 
     @Override
-    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles) throws com.veyron2.ipc.VeyronException {
         
         return this.applicationStub.match(context, Profiles);
     }
     @Override
-    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.String> Profiles, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.services.mgmt.application.Envelope match(final com.veyron2.ipc.Context context, final java.util.List<java.lang.String> Profiles, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.applicationStub.match(context, Profiles, veyronOpts);
     }

@@ -6,7 +6,9 @@ package com.veyron.services.syncgroup;
  * type JoinerMetaData struct{SyncPriority int32} 
  * A JoinerMetaData contains the non-name information stored per joiner.
  **/
-public final class JoinerMetaData {
+public final class JoinerMetaData implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private int syncPriority;
@@ -54,4 +56,30 @@ public final class JoinerMetaData {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, syncPriority);
+    	
+    }
+	public static final android.os.Parcelable.Creator<JoinerMetaData> CREATOR
+		= new android.os.Parcelable.Creator<JoinerMetaData>() {
+		@Override
+		public JoinerMetaData createFromParcel(android.os.Parcel in) {
+			return new JoinerMetaData(in);
+		}
+		@Override
+		public JoinerMetaData[] newArray(int size) {
+			return new JoinerMetaData[size];
+		}
+	};
+	private JoinerMetaData(android.os.Parcel in) {
+		
+			this.syncPriority = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.syncPriority);
+		
+	}
 }

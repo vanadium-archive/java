@@ -1,6 +1,7 @@
 
 package com.veyron2.vdl;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +16,9 @@ import java.util.NoSuchElementException;
  *
  * @param <T> The type of the list element.
  */
-public final class FixedLengthList<T> implements List<T> {
+public final class FixedLengthList<T> implements List<T>, Serializable {
+    static final long serialVersionUID = 0L;
+
     private final T[] backingArray;
     private final int start, end;
 

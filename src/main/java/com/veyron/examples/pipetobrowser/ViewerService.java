@@ -12,6 +12,6 @@ public interface ViewerService  {
     
     // Pipe creates a bidirectional pipe between client and viewer service, returns total number of bytes received by the service after streaming ends
 
-    public java.lang.Object pipe(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<java.util.ArrayList<java.lang.Byte>, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.Any pipe(final com.veyron2.ipc.ServerContext context, com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.lang.Void> stream) throws com.veyron2.ipc.VeyronException;
 
 }

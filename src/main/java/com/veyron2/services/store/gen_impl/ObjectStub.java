@@ -131,11 +131,11 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any V) throws com.veyron2.ipc.VeyronException {
         return put(context, V, null);
     }
     
-    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final java.lang.Object V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.storage.Stat put(final com.veyron2.ipc.Context context, final com.veyron2.vdl.Any V, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -282,12 +282,12 @@ public final class ObjectStub implements com.veyron2.services.store.Object {
     }
 
     @Override
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options) throws com.veyron2.ipc.VeyronException {
         
         return this.transactableStub.newTransaction(context, Options);
     }
     @Override
-    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.ArrayList<java.lang.Object> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public java.lang.String newTransaction(final com.veyron2.ipc.Context context, final java.util.List<com.veyron2.vdl.Any> Options, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         return  this.transactableStub.newTransaction(context, Options, veyronOpts);
     }

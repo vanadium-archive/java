@@ -7,7 +7,9 @@ package com.veyron.services.mgmt.profile;
  * Specification is how we represent a profile internally. It should
  * provide enough information to allow matching of binaries to nodes.
  **/
-public final class Specification {
+public final class Specification implements android.os.Parcelable, java.io.Serializable {
+    static final long serialVersionUID = 0L;
+
     
     
       private com.veyron2.services.mgmt.build.Architecture arch;
@@ -16,7 +18,7 @@ public final class Specification {
     
       private com.veyron2.services.mgmt.build.Format format;
     
-      private java.util.HashSet<com.veyron.services.mgmt.profile.Library> libraries;
+      private java.util.Set<com.veyron.services.mgmt.profile.Library> libraries;
     
       private java.lang.String label;
     
@@ -24,7 +26,7 @@ public final class Specification {
     
 
     
-    public Specification(final com.veyron2.services.mgmt.build.Architecture arch, final java.lang.String description, final com.veyron2.services.mgmt.build.Format format, final java.util.HashSet<com.veyron.services.mgmt.profile.Library> libraries, final java.lang.String label, final com.veyron2.services.mgmt.build.OperatingSystem oS) {
+    public Specification(final com.veyron2.services.mgmt.build.Architecture arch, final java.lang.String description, final com.veyron2.services.mgmt.build.Format format, final java.util.Set<com.veyron.services.mgmt.profile.Library> libraries, final java.lang.String label, final com.veyron2.services.mgmt.build.OperatingSystem oS) {
         
             this.arch = arch;
         
@@ -63,10 +65,10 @@ public final class Specification {
         this.format = format;
     }
     
-    public java.util.HashSet<com.veyron.services.mgmt.profile.Library> getLibraries() {
+    public java.util.Set<com.veyron.services.mgmt.profile.Library> getLibraries() {
         return this.libraries;
     }
-    public void setLibraries(java.util.HashSet<com.veyron.services.mgmt.profile.Library> libraries) {
+    public void setLibraries(java.util.Set<com.veyron.services.mgmt.profile.Library> libraries) {
         this.libraries = libraries;
     }
     
@@ -174,4 +176,50 @@ public final class Specification {
         
         return result;
     }
+    @Override
+    public int describeContents() {
+    	return 0;
+    }
+    @Override
+    public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, arch);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, description);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, format);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, libraries);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, label);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, oS);
+    	
+    }
+	public static final android.os.Parcelable.Creator<Specification> CREATOR
+		= new android.os.Parcelable.Creator<Specification>() {
+		@Override
+		public Specification createFromParcel(android.os.Parcel in) {
+			return new Specification(in);
+		}
+		@Override
+		public Specification[] newArray(int size) {
+			return new Specification[size];
+		}
+	};
+	private Specification(android.os.Parcel in) {
+		
+			this.arch = (com.veyron2.services.mgmt.build.Architecture) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.arch);
+		
+			this.description = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.description);
+		
+			this.format = (com.veyron2.services.mgmt.build.Format) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.format);
+		
+			this.libraries = (java.util.Set<com.veyron.services.mgmt.profile.Library>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.libraries);
+		
+			this.label = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.label);
+		
+			this.oS = (com.veyron2.services.mgmt.build.OperatingSystem) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.oS);
+		
+	}
 }

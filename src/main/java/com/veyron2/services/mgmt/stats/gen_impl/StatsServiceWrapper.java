@@ -57,7 +57,7 @@ public final class StatsServiceWrapper {
 
      
     
-    public java.lang.Object value(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.Any value(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.value( call   );
     }
