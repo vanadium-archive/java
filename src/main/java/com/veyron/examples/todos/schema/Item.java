@@ -62,6 +62,7 @@ public final class Item implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.text == null) {
             if (other.text != null) {
                 return false;
@@ -70,12 +71,16 @@ public final class Item implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
+        
         
         
         if (this.done != other.done) {
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -85,6 +90,7 @@ public final class Item implements android.os.Parcelable, java.io.Serializable {
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

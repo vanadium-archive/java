@@ -40,6 +40,7 @@ public final class List implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -47,6 +48,7 @@ public final class List implements android.os.Parcelable, java.io.Serializable {
         } else if (!this.name.equals(other.name)) {
             return false;
         }
+         
          
          
         return true;

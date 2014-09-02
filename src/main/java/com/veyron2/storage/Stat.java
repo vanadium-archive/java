@@ -75,6 +75,7 @@ public final class Stat implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.kind == null) {
             if (other.kind != null) {
                 return false;
@@ -83,6 +84,8 @@ public final class Stat implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
+        
         
         
         if (this.iD == null) {
@@ -93,12 +96,16 @@ public final class Stat implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
+        
         
         
         if (this.mTimeNS != other.mTimeNS) {
             return false;
         }
          
+         
+        
         
         
         if (this.attrs == null) {
@@ -108,6 +115,7 @@ public final class Stat implements android.os.Parcelable, java.io.Serializable {
         } else if (!this.attrs.equals(other.attrs)) {
             return false;
         }
+         
          
          
         return true;

@@ -15,8 +15,8 @@ public interface Builder  {
     // Build streams sources to the build server, which then attempts to
 // build the sources and streams back the compiled binaries.
 
-    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, java.util.List<java.lang.Byte>> build(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, java.util.List<java.lang.Byte>> build(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, byte[]> build(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<com.veyron2.services.mgmt.build.File,com.veyron2.services.mgmt.build.File, byte[]> build(final com.veyron2.ipc.Context context, final com.veyron2.services.mgmt.build.Architecture Arch, final com.veyron2.services.mgmt.build.OperatingSystem OS, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     

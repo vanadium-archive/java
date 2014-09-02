@@ -64,6 +64,7 @@ public final class PtrType implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.elem == null) {
             if (other.elem != null) {
                 return false;
@@ -72,6 +73,8 @@ public final class PtrType implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -82,6 +85,8 @@ public final class PtrType implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -91,6 +96,7 @@ public final class PtrType implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

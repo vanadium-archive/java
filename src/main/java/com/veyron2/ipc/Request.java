@@ -110,6 +110,7 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.suffix == null) {
             if (other.suffix != null) {
                 return false;
@@ -118,6 +119,8 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.method == null) {
@@ -128,35 +131,46 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.numPosArgs != other.numPosArgs) {
             return false;
         }
          
+         
+        
         
         
         if (this.endStreamArgs != other.endStreamArgs) {
             return false;
         }
          
+         
+        
         
         
         if (this.timeout != other.timeout) {
             return false;
         }
          
+         
+        
         
         
         if (this.hasBlessing != other.hasBlessing) {
             return false;
         }
          
+         
+        
         
         
         if (this.numDischarges != other.numDischarges) {
             return false;
         }
+         
          
          
         return true;

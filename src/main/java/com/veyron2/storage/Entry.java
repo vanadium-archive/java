@@ -51,6 +51,7 @@ public final class Entry implements android.os.Parcelable, java.io.Serializable 
 
         
         
+        
         if (this.stat == null) {
             if (other.stat != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class Entry implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -68,6 +71,7 @@ public final class Entry implements android.os.Parcelable, java.io.Serializable 
         } else if (!this.value.equals(other.value)) {
             return false;
         }
+         
          
          
         return true;

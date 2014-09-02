@@ -24,8 +24,10 @@ public final class Label implements android.os.Parcelable, java.io.Serializable 
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.security.Label other = (com.veyron2.security.Label)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

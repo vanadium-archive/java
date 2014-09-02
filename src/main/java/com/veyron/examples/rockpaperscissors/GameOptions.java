@@ -51,10 +51,13 @@ public final class GameOptions implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.numRounds != other.numRounds) {
             return false;
         }
          
+         
+        
         
         
         if (this.gameType == null) {
@@ -64,6 +67,7 @@ public final class GameOptions implements android.os.Parcelable, java.io.Seriali
         } else if (!this.gameType.equals(other.gameType)) {
             return false;
         }
+         
          
          
         return true;

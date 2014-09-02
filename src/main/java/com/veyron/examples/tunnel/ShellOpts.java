@@ -72,10 +72,13 @@ public final class ShellOpts implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.usePty != other.usePty) {
             return false;
         }
          
+         
+        
         
         
         if (this.environment == null) {
@@ -86,17 +89,22 @@ public final class ShellOpts implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.rows != other.rows) {
             return false;
         }
          
+         
+        
         
         
         if (this.cols != other.cols) {
             return false;
         }
+         
          
          
         return true;

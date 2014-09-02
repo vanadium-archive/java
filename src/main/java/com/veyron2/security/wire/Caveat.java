@@ -13,11 +13,11 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
     
       private com.veyron2.security.BlessingPattern service;
     
-      private java.util.List<java.lang.Byte> bytes;
+      private byte[] bytes;
     
 
     
-    public Caveat(final com.veyron2.security.BlessingPattern service, final java.util.List<java.lang.Byte> bytes) {
+    public Caveat(final com.veyron2.security.BlessingPattern service, final byte[] bytes) {
         
             this.service = service;
         
@@ -34,10 +34,10 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
         this.service = service;
     }
     
-    public java.util.List<java.lang.Byte> getBytes() {
+    public byte[] getBytes() {
         return this.bytes;
     }
-    public void setBytes(java.util.List<java.lang.Byte> bytes) {
+    public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
     
@@ -51,6 +51,7 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.service == null) {
             if (other.service != null) {
                 return false;
@@ -59,13 +60,10 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
         
         
-        if (this.bytes == null) {
-            if (other.bytes != null) {
-                return false;
-            }
-        } else if (!this.bytes.equals(other.bytes)) {
+        if (!java.util.Arrays.equals(this.bytes, other.bytes)) {
             return false;
         }
          
@@ -110,7 +108,7 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
 		
 			this.service = (com.veyron2.security.BlessingPattern) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.service);
 		
-			this.bytes = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.bytes);
+			this.bytes = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.bytes);
 		
 	}
 }

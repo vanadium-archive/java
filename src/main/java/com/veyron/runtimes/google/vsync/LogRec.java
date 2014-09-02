@@ -131,6 +131,7 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.devID == null) {
             if (other.devID != null) {
                 return false;
@@ -139,6 +140,8 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.gNum == null) {
@@ -149,6 +152,8 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.lSN == null) {
@@ -159,12 +164,16 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.recType != other.recType) {
             return false;
         }
          
+         
+        
         
         
         if (this.objID == null) {
@@ -175,6 +184,8 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.curVers == null) {
@@ -185,6 +196,8 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.parents == null) {
@@ -195,6 +208,8 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -204,6 +219,7 @@ public final class LogRec implements android.os.Parcelable, java.io.Serializable
         } else if (!this.value.equals(other.value)) {
             return false;
         }
+         
          
          
         return true;

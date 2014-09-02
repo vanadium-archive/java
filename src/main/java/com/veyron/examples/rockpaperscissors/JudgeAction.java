@@ -83,10 +83,13 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.playerNum != other.playerNum) {
             return false;
         }
          
+         
+        
         
         
         if (this.opponentName == null) {
@@ -97,6 +100,8 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.moveOptions == null) {
@@ -107,6 +112,8 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.roundResult == null) {
@@ -117,6 +124,8 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.score == null) {
@@ -126,6 +135,7 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
         } else if (!this.score.equals(other.score)) {
             return false;
         }
+         
          
          
         return true;

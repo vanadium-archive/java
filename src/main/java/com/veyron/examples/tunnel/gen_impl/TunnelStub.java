@@ -22,11 +22,11 @@ public final class TunnelStub implements com.veyron.examples.tunnel.Tunnel {
 
 
     
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.util.List<java.lang.Byte>, java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<byte[],byte[], java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address) throws com.veyron2.ipc.VeyronException {
         return forward(context, network, address, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.util.List<java.lang.Byte>, java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<byte[],byte[], java.lang.Void> forward(final com.veyron2.ipc.Context context, final java.lang.String network, final java.lang.String address, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -44,19 +44,19 @@ public final class TunnelStub implements com.veyron.examples.tunnel.Tunnel {
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>, java.util.List<java.lang.Byte>, java.lang.Void>() {
+        return new com.veyron2.vdl.ClientStream<byte[], byte[], java.lang.Void>() {
             @Override
-            public void send(final java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(final byte[] item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override
-            public java.util.List<java.lang.Byte> recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
-                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<java.util.List<java.lang.Byte>>() {
+            public byte[] recv() throws java.io.EOFException, com.veyron2.ipc.VeyronException {
+                final com.google.common.reflect.TypeToken<?> type = new com.google.common.reflect.TypeToken<byte[]>() {
                     private static final long serialVersionUID = 1L;
                 };
                 final java.lang.Object result = call.recv(type);
                 try {
-                    return (java.util.List<java.lang.Byte>)result;
+                    return (byte[])result;
                 } catch (java.lang.ClassCastException e) {
                     throw new com.veyron2.ipc.VeyronException("Unexpected result type: " + result.getClass().getCanonicalName());
                 }

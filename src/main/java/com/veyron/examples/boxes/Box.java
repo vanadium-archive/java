@@ -63,6 +63,7 @@ public final class Box implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.deviceId == null) {
             if (other.deviceId != null) {
                 return false;
@@ -71,6 +72,8 @@ public final class Box implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
+        
         
         
         if (this.boxId == null) {
@@ -81,13 +84,10 @@ public final class Box implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
         
         
-        if (this.points == null) {
-            if (other.points != null) {
-                return false;
-            }
-        } else if (!this.points.equals(other.points)) {
+        if (!java.util.Arrays.equals(this.points, other.points)) {
             return false;
         }
          

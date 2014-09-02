@@ -51,6 +51,7 @@ public final class KeyValuePair implements android.os.Parcelable, java.io.Serial
 
         
         
+        
         if (this.key == null) {
             if (other.key != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class KeyValuePair implements android.os.Parcelable, java.io.Serial
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -68,6 +71,7 @@ public final class KeyValuePair implements android.os.Parcelable, java.io.Serial
         } else if (!this.value.equals(other.value)) {
             return false;
         }
+         
          
          
         return true;

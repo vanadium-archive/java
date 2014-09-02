@@ -83,6 +83,7 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.a0 == null) {
             if (other.a0 != null) {
                 return false;
@@ -91,16 +92,14 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
         
         
-        if (this.a1 == null) {
-            if (other.a1 != null) {
-                return false;
-            }
-        } else if (!this.a1.equals(other.a1)) {
+        if (!java.util.Arrays.equals(this.a1, other.a1)) {
             return false;
         }
          
+        
         
         
         if (this.a2 == null) {
@@ -111,6 +110,8 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.a3 == null) {
@@ -121,6 +122,8 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.a4 == null) {
@@ -130,6 +133,7 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
         } else if (!this.a4.equals(other.a4)) {
             return false;
         }
+         
          
          
         return true;

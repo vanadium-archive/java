@@ -53,6 +53,7 @@ public final class ServiceSignature implements android.os.Parcelable, java.io.Se
 
         
         
+        
         if (this.typeDefs == null) {
             if (other.typeDefs != null) {
                 return false;
@@ -61,6 +62,8 @@ public final class ServiceSignature implements android.os.Parcelable, java.io.Se
             return false;
         }
          
+         
+        
         
         
         if (this.methods == null) {
@@ -70,6 +73,7 @@ public final class ServiceSignature implements android.os.Parcelable, java.io.Se
         } else if (!this.methods.equals(other.methods)) {
             return false;
         }
+         
          
          
         return true;

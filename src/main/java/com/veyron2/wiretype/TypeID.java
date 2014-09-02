@@ -26,8 +26,10 @@ public final class TypeID implements android.os.Parcelable, java.io.Serializable
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.wiretype.TypeID other = (com.veyron2.wiretype.TypeID)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

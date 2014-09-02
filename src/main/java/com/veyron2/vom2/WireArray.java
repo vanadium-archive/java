@@ -62,6 +62,7 @@ public final class WireArray implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -70,6 +71,8 @@ public final class WireArray implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.elem == null) {
@@ -80,11 +83,14 @@ public final class WireArray implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.len != other.len) {
             return false;
         }
+         
          
          
         return true;

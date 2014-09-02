@@ -63,6 +63,7 @@ public final class Person implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.image == null) {
             if (other.image != null) {
                 return false;
@@ -71,6 +72,8 @@ public final class Person implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -81,11 +84,14 @@ public final class Person implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.birthDate != other.birthDate) {
             return false;
         }
+         
          
          
         return true;

@@ -73,6 +73,7 @@ public final class LogValue implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.mutation == null) {
             if (other.mutation != null) {
                 return false;
@@ -81,23 +82,30 @@ public final class LogValue implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.syncTime != other.syncTime) {
             return false;
         }
          
+         
+        
         
         
         if (this.delete != other.delete) {
             return false;
         }
          
+         
+        
         
         
         if (this.continued != other.continued) {
             return false;
         }
+         
          
          
         return true;

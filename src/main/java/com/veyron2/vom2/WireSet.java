@@ -51,6 +51,7 @@ public final class WireSet implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class WireSet implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.key == null) {
@@ -68,6 +71,7 @@ public final class WireSet implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.key.equals(other.key)) {
             return false;
         }
+         
          
          
         return true;

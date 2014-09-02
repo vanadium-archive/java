@@ -12,7 +12,7 @@ public interface TunnelService  {
 // data received from that network connection is sent back in the reply
 // stream.
 
-    public void forward(final com.veyron2.ipc.ServerContext context, final java.lang.String network, final java.lang.String address, com.veyron2.vdl.Stream<java.util.List<java.lang.Byte>, java.util.List<java.lang.Byte>> stream) throws com.veyron2.ipc.VeyronException;
+    public void forward(final com.veyron2.ipc.ServerContext context, final java.lang.String network, final java.lang.String address, com.veyron2.vdl.Stream<byte[], byte[]> stream) throws com.veyron2.ipc.VeyronException;
 
     
     // The Shell method is used to either run shell commands remotely, or to open

@@ -13,11 +13,11 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
     
       private com.veyron2.security.wire.ChainPublicID publicID;
     
-      private java.util.List<java.lang.Byte> secret;
+      private byte[] secret;
     
 
     
-    public ChainPrivateID(final com.veyron2.security.wire.ChainPublicID publicID, final java.util.List<java.lang.Byte> secret) {
+    public ChainPrivateID(final com.veyron2.security.wire.ChainPublicID publicID, final byte[] secret) {
         
             this.publicID = publicID;
         
@@ -34,10 +34,10 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
         this.publicID = publicID;
     }
     
-    public java.util.List<java.lang.Byte> getSecret() {
+    public byte[] getSecret() {
         return this.secret;
     }
-    public void setSecret(java.util.List<java.lang.Byte> secret) {
+    public void setSecret(byte[] secret) {
         this.secret = secret;
     }
     
@@ -51,6 +51,7 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
 
         
         
+        
         if (this.publicID == null) {
             if (other.publicID != null) {
                 return false;
@@ -59,13 +60,10 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
             return false;
         }
          
+         
         
         
-        if (this.secret == null) {
-            if (other.secret != null) {
-                return false;
-            }
-        } else if (!this.secret.equals(other.secret)) {
+        if (!java.util.Arrays.equals(this.secret, other.secret)) {
             return false;
         }
          
@@ -110,7 +108,7 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
 		
 			this.publicID = (com.veyron2.security.wire.ChainPublicID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.publicID);
 		
-			this.secret = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.secret);
+			this.secret = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.secret);
 		
 	}
 }

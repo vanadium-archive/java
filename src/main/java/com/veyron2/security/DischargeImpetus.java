@@ -70,6 +70,7 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
 
         
         
+        
         if (this.server == null) {
             if (other.server != null) {
                 return false;
@@ -78,6 +79,8 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
             return false;
         }
          
+         
+        
         
         
         if (this.method == null) {
@@ -88,6 +91,8 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
             return false;
         }
          
+         
+        
         
         
         if (this.arguments == null) {
@@ -97,6 +102,7 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
         } else if (!this.arguments.equals(other.arguments)) {
             return false;
         }
+         
          
          
         return true;

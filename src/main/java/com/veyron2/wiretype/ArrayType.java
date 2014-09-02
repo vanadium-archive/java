@@ -73,6 +73,7 @@ public final class ArrayType implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.elem == null) {
             if (other.elem != null) {
                 return false;
@@ -81,12 +82,16 @@ public final class ArrayType implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.len != other.len) {
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -97,6 +102,8 @@ public final class ArrayType implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -106,6 +113,7 @@ public final class ArrayType implements android.os.Parcelable, java.io.Serializa
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

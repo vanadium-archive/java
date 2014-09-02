@@ -53,6 +53,7 @@ public final class NameIdentity implements android.os.Parcelable, java.io.Serial
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -61,6 +62,8 @@ public final class NameIdentity implements android.os.Parcelable, java.io.Serial
             return false;
         }
          
+         
+        
         
         
         if (this.identity == null) {
@@ -70,6 +73,7 @@ public final class NameIdentity implements android.os.Parcelable, java.io.Serial
         } else if (!this.identity.equals(other.identity)) {
             return false;
         }
+         
          
          
         return true;

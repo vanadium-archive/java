@@ -41,6 +41,7 @@ public final class Query implements android.os.Parcelable, java.io.Serializable 
 
         
         
+        
         if (this.stmt == null) {
             if (other.stmt != null) {
                 return false;
@@ -48,6 +49,7 @@ public final class Query implements android.os.Parcelable, java.io.Serializable 
         } else if (!this.stmt.equals(other.stmt)) {
             return false;
         }
+         
          
          
         return true;

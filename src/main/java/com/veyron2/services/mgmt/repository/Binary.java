@@ -60,8 +60,8 @@ public interface Binary  {
 // method is in progress, the outcome the Download() method is
 // undefined.
 
-    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.List<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.lang.Void,java.util.List<java.lang.Byte>, java.lang.Void> download(final com.veyron2.ipc.Context context, final int part, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,byte[], java.lang.Void> download(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<java.lang.Void,byte[], java.lang.Void> download(final com.veyron2.ipc.Context context, final int part, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -105,7 +105,7 @@ public interface Binary  {
 // the same binary part is being uploaded by another caller, the
 // method returns an error.
 
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<byte[],java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<byte[],java.lang.Void, java.lang.Void> upload(final com.veyron2.ipc.Context context, final int part, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

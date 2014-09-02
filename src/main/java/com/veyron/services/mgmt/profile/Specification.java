@@ -96,6 +96,7 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
 
         
         
+        
         if (this.arch == null) {
             if (other.arch != null) {
                 return false;
@@ -104,6 +105,8 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.description == null) {
@@ -114,6 +117,8 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.format == null) {
@@ -124,6 +129,8 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.libraries == null) {
@@ -134,6 +141,8 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.label == null) {
@@ -144,6 +153,8 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.oS == null) {
@@ -153,6 +164,7 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
         } else if (!this.oS.equals(other.oS)) {
             return false;
         }
+         
          
          
         return true;

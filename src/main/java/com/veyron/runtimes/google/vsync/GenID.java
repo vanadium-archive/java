@@ -24,8 +24,10 @@ public final class GenID implements android.os.Parcelable, java.io.Serializable 
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron.runtimes.google.vsync.GenID other = (com.veyron.runtimes.google.vsync.GenID)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

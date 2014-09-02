@@ -24,11 +24,13 @@ public final class Architecture implements android.os.Parcelable, java.io.Serial
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.services.mgmt.build.Architecture other = (com.veyron2.services.mgmt.build.Architecture)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

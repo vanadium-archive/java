@@ -51,6 +51,7 @@ public final class WireField implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class WireField implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.type == null) {
@@ -68,6 +71,7 @@ public final class WireField implements android.os.Parcelable, java.io.Serializa
         } else if (!this.type.equals(other.type)) {
             return false;
         }
+         
          
          
         return true;

@@ -60,15 +60,19 @@ public final class Task implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.progress != other.progress) {
             return false;
         }
          
+         
+        
         
         
         if (this.goal != other.goal) {
             return false;
         }
+         
          
          
         return true;

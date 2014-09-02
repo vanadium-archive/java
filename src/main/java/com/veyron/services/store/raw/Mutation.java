@@ -96,6 +96,7 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.iD == null) {
             if (other.iD != null) {
                 return false;
@@ -104,6 +105,8 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.priorVersion == null) {
@@ -114,6 +117,8 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.version == null) {
@@ -124,12 +129,16 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.isRoot != other.isRoot) {
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -140,6 +149,8 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.dir == null) {
@@ -149,6 +160,7 @@ public final class Mutation implements android.os.Parcelable, java.io.Serializab
         } else if (!this.dir.equals(other.dir)) {
             return false;
         }
+         
          
          
         return true;

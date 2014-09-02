@@ -62,6 +62,7 @@ public final class Library implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -70,6 +71,8 @@ public final class Library implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.majorVersion == null) {
@@ -80,6 +83,8 @@ public final class Library implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.minorVersion == null) {
@@ -89,6 +94,7 @@ public final class Library implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.minorVersion.equals(other.minorVersion)) {
             return false;
         }
+         
          
          
         return true;

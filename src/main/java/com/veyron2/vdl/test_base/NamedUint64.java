@@ -23,8 +23,10 @@ public final class NamedUint64 implements android.os.Parcelable, java.io.Seriali
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedUint64 other = (com.veyron2.vdl.test_base.NamedUint64)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

@@ -24,11 +24,13 @@ public final class Hash implements android.os.Parcelable, java.io.Serializable {
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.security.Hash other = (com.veyron2.security.Hash)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

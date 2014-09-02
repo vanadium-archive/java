@@ -23,11 +23,13 @@ public final class NamedComplex64 implements android.os.Parcelable, java.io.Seri
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedComplex64 other = (com.veyron2.vdl.test_base.NamedComplex64)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

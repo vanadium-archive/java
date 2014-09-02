@@ -40,9 +40,11 @@ public final class JoinerMetaData implements android.os.Parcelable, java.io.Seri
 
         
         
+        
         if (this.syncPriority != other.syncPriority) {
             return false;
         }
+         
          
          
         return true;

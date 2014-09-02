@@ -159,6 +159,7 @@ public final class QueryResult implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.nestedResult == null) {
             if (other.nestedResult != null) {
                 return false;
@@ -167,6 +168,8 @@ public final class QueryResult implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -177,6 +180,8 @@ public final class QueryResult implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.fields == null) {
@@ -187,6 +192,8 @@ public final class QueryResult implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -196,6 +203,7 @@ public final class QueryResult implements android.os.Parcelable, java.io.Seriali
         } else if (!this.value.equals(other.value)) {
             return false;
         }
+         
          
          
         return true;

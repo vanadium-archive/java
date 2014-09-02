@@ -23,8 +23,10 @@ public final class NamedFloat32 implements android.os.Parcelable, java.io.Serial
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedFloat32 other = (com.veyron2.vdl.test_base.NamedFloat32)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

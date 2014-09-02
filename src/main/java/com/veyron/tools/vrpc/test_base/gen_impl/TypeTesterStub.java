@@ -464,11 +464,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
+    public void inputSlice(final com.veyron2.ipc.Context context, final byte[] I1) throws com.veyron2.ipc.VeyronException {
          inputSlice(context, I1, null);
     }
     
-    public void inputSlice(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public void inputSlice(final com.veyron2.ipc.Context context, final byte[] I1, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -612,11 +612,11 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
     }
 
     
-    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public byte[] outputSlice(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return outputSlice(context, null);
     }
     
-    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public byte[] outputSlice(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -638,14 +638,14 @@ public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.Typ
          
         final com.google.common.reflect.TypeToken<?>[] resultTypes = new com.google.common.reflect.TypeToken<?>[]{
             
-            new com.google.common.reflect.TypeToken<java.util.List<java.lang.Byte>>() {
+            new com.google.common.reflect.TypeToken<byte[]>() {
                 private static final long serialVersionUID = 1L;
             },
             
         };
         final java.lang.Object[] results = call.finish(resultTypes);
          
-        return (java.util.List<java.lang.Byte>)results[0];
+        return (byte[])results[0];
          
 
          

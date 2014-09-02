@@ -84,14 +84,11 @@ public final class Round implements android.os.Parcelable, java.io.Serializable 
 
         
         
-        if (this.moves == null) {
-            if (other.moves != null) {
-                return false;
-            }
-        } else if (!this.moves.equals(other.moves)) {
+        if (!java.util.Arrays.equals(this.moves, other.moves)) {
             return false;
         }
          
+        
         
         
         if (this.comment == null) {
@@ -102,6 +99,8 @@ public final class Round implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.winner == null) {
@@ -112,17 +111,22 @@ public final class Round implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.startTimeNS != other.startTimeNS) {
             return false;
         }
          
+         
+        
         
         
         if (this.endTimeNS != other.endTimeNS) {
             return false;
         }
+         
          
          
         return true;

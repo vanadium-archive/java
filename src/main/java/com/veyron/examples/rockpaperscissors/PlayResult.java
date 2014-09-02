@@ -40,9 +40,11 @@ public final class PlayResult implements android.os.Parcelable, java.io.Serializ
 
         
         
+        
         if (this.youWon != other.youWon) {
             return false;
         }
+         
          
          
         return true;

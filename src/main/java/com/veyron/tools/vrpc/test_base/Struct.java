@@ -50,15 +50,19 @@ public final class Struct implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.x != other.x) {
             return false;
         }
          
+         
+        
         
         
         if (this.y != other.y) {
             return false;
         }
+         
          
          
         return true;

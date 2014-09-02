@@ -84,6 +84,7 @@ public final class Change implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -92,12 +93,16 @@ public final class Change implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.state != other.state) {
             return false;
         }
          
+         
+        
         
         
         if (this.value == null) {
@@ -108,6 +113,8 @@ public final class Change implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.resumeMarker == null) {
@@ -118,11 +125,14 @@ public final class Change implements android.os.Parcelable, java.io.Serializable
             return false;
         }
          
+         
+        
         
         
         if (this.continued != other.continued) {
             return false;
         }
+         
          
          
         return true;

@@ -62,16 +62,21 @@ public final class HistogramValue implements android.os.Parcelable, java.io.Seri
 
         
         
+        
         if (this.count != other.count) {
             return false;
         }
          
+         
+        
         
         
         if (this.sum != other.sum) {
             return false;
         }
          
+         
+        
         
         
         if (this.buckets == null) {
@@ -81,6 +86,7 @@ public final class HistogramValue implements android.os.Parcelable, java.io.Seri
         } else if (!this.buckets.equals(other.buckets)) {
             return false;
         }
+         
          
          
         return true;

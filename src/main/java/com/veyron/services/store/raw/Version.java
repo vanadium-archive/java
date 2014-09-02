@@ -28,8 +28,10 @@ public final class Version implements android.os.Parcelable, java.io.Serializabl
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron.services.store.raw.Version other = (com.veyron.services.store.raw.Version)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

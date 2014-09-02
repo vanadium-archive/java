@@ -347,64 +347,85 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.a0 != other.a0) {
             return false;
         }
          
+         
+        
         
         
         if (this.a1 != other.a1) {
             return false;
         }
          
+         
+        
         
         
         if (this.a2 != other.a2) {
             return false;
         }
          
+         
+        
         
         
         if (this.a3 != other.a3) {
             return false;
         }
          
+         
+        
         
         
         if (this.a4 != other.a4) {
             return false;
         }
          
+         
+        
         
         
         if (this.a5 != other.a5) {
             return false;
         }
          
+         
+        
         
         
         if (this.a6 != other.a6) {
             return false;
         }
          
+         
+        
         
         
         if (this.a7 != other.a7) {
             return false;
         }
          
+         
+        
         
         
         if (this.a8 != other.a8) {
             return false;
         }
          
+         
+        
         
         
         if (this.a9 != other.a9) {
             return false;
         }
          
+         
+        
         
         
         if (this.a10 == null) {
@@ -415,6 +436,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.a11 == null) {
@@ -425,6 +448,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.a12 == null) {
@@ -435,6 +460,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.a13 == null) {
@@ -445,6 +472,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.a14 == null) {
@@ -455,6 +484,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.a15 == null) {
@@ -465,6 +496,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b0 == null) {
@@ -475,6 +508,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b1 == null) {
@@ -485,6 +520,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b2 == null) {
@@ -495,6 +532,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b3 == null) {
@@ -505,6 +544,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b4 == null) {
@@ -515,6 +556,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b5 == null) {
@@ -525,6 +568,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b6 == null) {
@@ -535,6 +580,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b7 == null) {
@@ -545,6 +592,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b8 == null) {
@@ -555,6 +604,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b9 == null) {
@@ -565,6 +616,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b10 == null) {
@@ -575,6 +628,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b11 == null) {
@@ -585,6 +640,8 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.b12 == null) {
@@ -594,6 +651,7 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.b12.equals(other.b12)) {
             return false;
         }
+         
          
          
         return true;

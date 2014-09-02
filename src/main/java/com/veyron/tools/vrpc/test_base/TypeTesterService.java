@@ -54,7 +54,7 @@ public interface TypeTesterService  {
 
     
     
-    public void inputSlice(final com.veyron2.ipc.ServerContext context, final java.util.List<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException;
+    public void inputSlice(final com.veyron2.ipc.ServerContext context, final byte[] I1) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -70,7 +70,7 @@ public interface TypeTesterService  {
 
     
     
-    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
+    public byte[] outputSlice(final com.veyron2.ipc.ServerContext context) throws com.veyron2.ipc.VeyronException;
 
     
     

@@ -76,6 +76,7 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -84,6 +85,8 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.publicKey == null) {
@@ -94,6 +97,8 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.caveats == null) {
@@ -104,6 +109,8 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.signature == null) {
@@ -113,6 +120,7 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
         } else if (!this.signature.equals(other.signature)) {
             return false;
         }
+         
          
          
         return true;

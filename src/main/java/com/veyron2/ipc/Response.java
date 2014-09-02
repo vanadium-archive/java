@@ -65,6 +65,7 @@ public final class Response implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.error == null) {
             if (other.error != null) {
                 return false;
@@ -73,17 +74,22 @@ public final class Response implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.endStreamResults != other.endStreamResults) {
             return false;
         }
          
+         
+        
         
         
         if (this.numPosResults != other.numPosResults) {
             return false;
         }
+         
          
          
         return true;

@@ -52,6 +52,7 @@ public final class QueryRequest implements android.os.Parcelable, java.io.Serial
 
         
         
+        
         if (this.query == null) {
             if (other.query != null) {
                 return false;
@@ -60,6 +61,8 @@ public final class QueryRequest implements android.os.Parcelable, java.io.Serial
             return false;
         }
          
+         
+        
         
         
         if (this.resumeMarker == null) {
@@ -69,6 +72,7 @@ public final class QueryRequest implements android.os.Parcelable, java.io.Serial
         } else if (!this.resumeMarker.equals(other.resumeMarker)) {
             return false;
         }
+         
          
          
         return true;

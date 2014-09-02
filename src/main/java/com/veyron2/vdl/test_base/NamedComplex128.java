@@ -23,11 +23,13 @@ public final class NamedComplex128 implements android.os.Parcelable, java.io.Ser
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedComplex128 other = (com.veyron2.vdl.test_base.NamedComplex128)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

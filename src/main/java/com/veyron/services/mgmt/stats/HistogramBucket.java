@@ -51,15 +51,19 @@ public final class HistogramBucket implements android.os.Parcelable, java.io.Ser
 
         
         
+        
         if (this.lowBound != other.lowBound) {
             return false;
         }
          
+         
+        
         
         
         if (this.count != other.count) {
             return false;
         }
+         
          
          
         return true;

@@ -51,15 +51,19 @@ public final class Args implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.a != other.a) {
             return false;
         }
          
+         
+        
         
         
         if (this.b != other.b) {
             return false;
         }
+         
          
          
         return true;

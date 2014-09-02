@@ -11,8 +11,8 @@ public interface Benchmark  {
     
     // Echo returns the payload that it receives.
 
-    public java.util.List<java.lang.Byte> echo(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> Payload) throws com.veyron2.ipc.VeyronException;
-    public java.util.List<java.lang.Byte> echo(final com.veyron2.ipc.Context context, final java.util.List<java.lang.Byte> Payload, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public byte[] echo(final com.veyron2.ipc.Context context, final byte[] Payload) throws com.veyron2.ipc.VeyronException;
+    public byte[] echo(final com.veyron2.ipc.Context context, final byte[] Payload, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
     
     
@@ -20,7 +20,7 @@ public interface Benchmark  {
     
     // EchoStream returns the payload that it receives via the stream.
 
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.util.List<java.lang.Byte>, java.lang.Void> echoStream(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.util.List<java.lang.Byte>, java.lang.Void> echoStream(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<byte[],byte[], java.lang.Void> echoStream(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException;
+    public com.veyron2.vdl.ClientStream<byte[],byte[], java.lang.Void> echoStream(final com.veyron2.ipc.Context context, final com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException;
 
 }

@@ -40,6 +40,7 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.resumeMarker == null) {
             if (other.resumeMarker != null) {
                 return false;
@@ -47,6 +48,7 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.resumeMarker.equals(other.resumeMarker)) {
             return false;
         }
+         
          
          
         return true;

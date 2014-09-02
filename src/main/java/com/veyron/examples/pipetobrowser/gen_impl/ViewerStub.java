@@ -22,11 +22,11 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
 
 
     
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<byte[],java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
         return pipe(context, null);
     }
     
-    public com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>,java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+    public com.veyron2.vdl.ClientStream<byte[],java.lang.Void, com.veyron2.vdl.Any> pipe(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
         // Add VDL path option.
         // NOTE(spetrovic): this option is temporary and will be removed soon after we switch
@@ -44,9 +44,9 @@ public final class ViewerStub implements com.veyron.examples.pipetobrowser.Viewe
         // Finish the call.
         
          
-        return new com.veyron2.vdl.ClientStream<java.util.List<java.lang.Byte>, java.lang.Void, com.veyron2.vdl.Any>() {
+        return new com.veyron2.vdl.ClientStream<byte[], java.lang.Void, com.veyron2.vdl.Any>() {
             @Override
-            public void send(final java.util.List<java.lang.Byte> item) throws com.veyron2.ipc.VeyronException {
+            public void send(final byte[] item) throws com.veyron2.ipc.VeyronException {
                 call.send(item);
             }
             @Override

@@ -58,6 +58,7 @@ public final class ACL implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.in == null) {
             if (other.in != null) {
                 return false;
@@ -66,6 +67,8 @@ public final class ACL implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
+        
         
         
         if (this.notIn == null) {
@@ -75,6 +78,7 @@ public final class ACL implements android.os.Parcelable, java.io.Serializable {
         } else if (!this.notIn.equals(other.notIn)) {
             return false;
         }
+         
          
          
         return true;

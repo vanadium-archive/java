@@ -50,7 +50,7 @@ public final class CollectionServiceWrapper {
          this.service.export( call , Val, Overwrite  );
     }
 
-    public java.util.List<java.lang.Byte> lookup(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public byte[] lookup(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.lookup( call   );
     }

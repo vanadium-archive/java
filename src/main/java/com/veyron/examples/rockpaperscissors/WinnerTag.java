@@ -25,8 +25,10 @@ public final class WinnerTag implements android.os.Parcelable, java.io.Serializa
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron.examples.rockpaperscissors.WinnerTag other = (com.veyron.examples.rockpaperscissors.WinnerTag)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

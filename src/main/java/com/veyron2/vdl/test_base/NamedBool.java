@@ -23,8 +23,10 @@ public final class NamedBool implements android.os.Parcelable, java.io.Serializa
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedBool other = (com.veyron2.vdl.test_base.NamedBool)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

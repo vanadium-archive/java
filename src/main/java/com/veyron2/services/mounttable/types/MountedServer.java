@@ -51,6 +51,7 @@ public final class MountedServer implements android.os.Parcelable, java.io.Seria
 
         
         
+        
         if (this.server == null) {
             if (other.server != null) {
                 return false;
@@ -59,11 +60,14 @@ public final class MountedServer implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.tTL != other.tTL) {
             return false;
         }
+         
          
          
         return true;

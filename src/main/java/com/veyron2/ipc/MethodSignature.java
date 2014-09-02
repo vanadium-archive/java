@@ -74,6 +74,7 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
 
         
         
+        
         if (this.inArgs == null) {
             if (other.inArgs != null) {
                 return false;
@@ -82,6 +83,8 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.outArgs == null) {
@@ -92,6 +95,8 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.inStream == null) {
@@ -102,6 +107,8 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.outStream == null) {
@@ -111,6 +118,7 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
         } else if (!this.outStream.equals(other.outStream)) {
             return false;
         }
+         
          
          
         return true;

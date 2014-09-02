@@ -62,6 +62,7 @@ public final class WireMap implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -70,6 +71,8 @@ public final class WireMap implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.key == null) {
@@ -80,6 +83,8 @@ public final class WireMap implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.elem == null) {
@@ -89,6 +94,7 @@ public final class WireMap implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.elem.equals(other.elem)) {
             return false;
         }
+         
          
          
         return true;

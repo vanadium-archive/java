@@ -62,6 +62,7 @@ public final class NamedPrimitiveType implements android.os.Parcelable, java.io.
 
         
         
+        
         if (this.type == null) {
             if (other.type != null) {
                 return false;
@@ -70,6 +71,8 @@ public final class NamedPrimitiveType implements android.os.Parcelable, java.io.
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -80,6 +83,8 @@ public final class NamedPrimitiveType implements android.os.Parcelable, java.io.
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -89,6 +94,7 @@ public final class NamedPrimitiveType implements android.os.Parcelable, java.io.
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

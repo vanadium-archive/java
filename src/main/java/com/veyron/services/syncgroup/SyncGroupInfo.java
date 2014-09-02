@@ -95,6 +95,7 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -103,6 +104,8 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.config == null) {
@@ -113,6 +116,8 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.rootOID == null) {
@@ -123,6 +128,8 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.eTag == null) {
@@ -133,6 +140,8 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.sGOID == null) {
@@ -143,6 +152,8 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
             return false;
         }
          
+         
+        
         
         
         if (this.joiners == null) {
@@ -152,6 +163,7 @@ public final class SyncGroupInfo implements android.os.Parcelable, java.io.Seria
         } else if (!this.joiners.equals(other.joiners)) {
             return false;
         }
+         
          
          
         return true;

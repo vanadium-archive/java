@@ -95,11 +95,6 @@ public class Signer implements com.veyron2.security.Signer {
 		if (in.read(s, 0, b) != b) {
 			throw new VeyronException(String.format("Error reading %d bytes of S from signature", b));
 		}
-	
-		// TODO(bprosnitz) This is temporary to get the tests passing until the array type
-		// generator is fixed and we can use byte[] directly.
-		ArrayList<Byte> tempR = null;
-		ArrayList<Byte> tempS = null;
-		return new Signature(new Hash(HASH_ALGORITHM), tempR, tempS);
+		return new Signature(new Hash(HASH_ALGORITHM), r, s);
 	}
 }

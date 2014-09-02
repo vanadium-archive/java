@@ -51,6 +51,7 @@ public final class MountEntry implements android.os.Parcelable, java.io.Serializ
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class MountEntry implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.servers == null) {
@@ -68,6 +71,7 @@ public final class MountEntry implements android.os.Parcelable, java.io.Serializ
         } else if (!this.servers.equals(other.servers)) {
             return false;
         }
+         
          
          
         return true;

@@ -51,10 +51,13 @@ public final class Review implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.rating != other.rating) {
             return false;
         }
          
+         
+        
         
         
         if (this.text == null) {
@@ -64,6 +67,7 @@ public final class Review implements android.os.Parcelable, java.io.Serializable
         } else if (!this.text.equals(other.text)) {
             return false;
         }
+         
          
          
         return true;

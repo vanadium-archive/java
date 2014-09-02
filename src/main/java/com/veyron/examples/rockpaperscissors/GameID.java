@@ -40,6 +40,7 @@ public final class GameID implements android.os.Parcelable, java.io.Serializable
 
         
         
+        
         if (this.iD == null) {
             if (other.iD != null) {
                 return false;
@@ -47,6 +48,7 @@ public final class GameID implements android.os.Parcelable, java.io.Serializable
         } else if (!this.iD.equals(other.iD)) {
             return false;
         }
+         
          
          
         return true;

@@ -13,11 +13,11 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
     
       private com.veyron2.security.wire.KeyCurve curve;
     
-      private java.util.List<java.lang.Byte> xY;
+      private byte[] xY;
     
 
     
-    public PublicKey(final com.veyron2.security.wire.KeyCurve curve, final java.util.List<java.lang.Byte> xY) {
+    public PublicKey(final com.veyron2.security.wire.KeyCurve curve, final byte[] xY) {
         
             this.curve = curve;
         
@@ -34,10 +34,10 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
         this.curve = curve;
     }
     
-    public java.util.List<java.lang.Byte> getXY() {
+    public byte[] getXY() {
         return this.xY;
     }
-    public void setXY(java.util.List<java.lang.Byte> xY) {
+    public void setXY(byte[] xY) {
         this.xY = xY;
     }
     
@@ -51,6 +51,7 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.curve == null) {
             if (other.curve != null) {
                 return false;
@@ -59,13 +60,10 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
         
         
-        if (this.xY == null) {
-            if (other.xY != null) {
-                return false;
-            }
-        } else if (!this.xY.equals(other.xY)) {
+        if (!java.util.Arrays.equals(this.xY, other.xY)) {
             return false;
         }
          
@@ -110,7 +108,7 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
 		
 			this.curve = (com.veyron2.security.wire.KeyCurve) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.curve);
 		
-			this.xY = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.xY);
+			this.xY = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.xY);
 		
 	}
 }

@@ -10,13 +10,13 @@ public final class ServerShellPacket implements android.os.Parcelable, java.io.S
 
     
     
-      private java.util.List<java.lang.Byte> stdout;
+      private byte[] stdout;
     
-      private java.util.List<java.lang.Byte> stderr;
+      private byte[] stderr;
     
 
     
-    public ServerShellPacket(final java.util.List<java.lang.Byte> stdout, final java.util.List<java.lang.Byte> stderr) {
+    public ServerShellPacket(final byte[] stdout, final byte[] stderr) {
         
             this.stdout = stdout;
         
@@ -26,17 +26,17 @@ public final class ServerShellPacket implements android.os.Parcelable, java.io.S
 
     
     
-    public java.util.List<java.lang.Byte> getStdout() {
+    public byte[] getStdout() {
         return this.stdout;
     }
-    public void setStdout(java.util.List<java.lang.Byte> stdout) {
+    public void setStdout(byte[] stdout) {
         this.stdout = stdout;
     }
     
-    public java.util.List<java.lang.Byte> getStderr() {
+    public byte[] getStderr() {
         return this.stderr;
     }
-    public void setStderr(java.util.List<java.lang.Byte> stderr) {
+    public void setStderr(byte[] stderr) {
         this.stderr = stderr;
     }
     
@@ -50,21 +50,13 @@ public final class ServerShellPacket implements android.os.Parcelable, java.io.S
 
         
         
-        if (this.stdout == null) {
-            if (other.stdout != null) {
-                return false;
-            }
-        } else if (!this.stdout.equals(other.stdout)) {
+        if (!java.util.Arrays.equals(this.stdout, other.stdout)) {
             return false;
         }
          
         
         
-        if (this.stderr == null) {
-            if (other.stderr != null) {
-                return false;
-            }
-        } else if (!this.stderr.equals(other.stderr)) {
+        if (!java.util.Arrays.equals(this.stderr, other.stderr)) {
             return false;
         }
          
@@ -107,9 +99,9 @@ public final class ServerShellPacket implements android.os.Parcelable, java.io.S
 	};
 	private ServerShellPacket(android.os.Parcel in) {
 		
-			this.stdout = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdout);
+			this.stdout = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdout);
 		
-			this.stderr = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stderr);
+			this.stderr = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stderr);
 		
 	}
 }

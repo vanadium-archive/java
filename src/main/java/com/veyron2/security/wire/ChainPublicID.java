@@ -46,6 +46,7 @@ public final class ChainPublicID implements android.os.Parcelable, java.io.Seria
 
         
         
+        
         if (this.certificates == null) {
             if (other.certificates != null) {
                 return false;
@@ -53,6 +54,7 @@ public final class ChainPublicID implements android.os.Parcelable, java.io.Seria
         } else if (!this.certificates.equals(other.certificates)) {
             return false;
         }
+         
          
          
         return true;

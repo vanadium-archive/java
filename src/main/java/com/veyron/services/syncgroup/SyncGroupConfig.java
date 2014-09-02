@@ -85,6 +85,7 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
 
         
         
+        
         if (this.desc == null) {
             if (other.desc != null) {
                 return false;
@@ -93,6 +94,8 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.pathPatterns == null) {
@@ -103,6 +106,8 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.options == null) {
@@ -113,6 +118,8 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.aCL == null) {
@@ -123,6 +130,8 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
             return false;
         }
          
+         
+        
         
         
         if (this.mountTables == null) {
@@ -132,6 +141,7 @@ public final class SyncGroupConfig implements android.os.Parcelable, java.io.Ser
         } else if (!this.mountTables.equals(other.mountTables)) {
             return false;
         }
+         
          
          
         return true;

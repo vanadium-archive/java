@@ -51,10 +51,13 @@ public final class LogEntry implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.position != other.position) {
             return false;
         }
          
+         
+        
         
         
         if (this.line == null) {
@@ -64,6 +67,7 @@ public final class LogEntry implements android.os.Parcelable, java.io.Serializab
         } else if (!this.line.equals(other.line)) {
             return false;
         }
+         
          
          
         return true;

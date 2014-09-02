@@ -94,6 +94,7 @@ public final class Details implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -102,35 +103,46 @@ public final class Details implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.size != other.size) {
             return false;
         }
          
+         
+        
         
         
         if (this.mode != other.mode) {
             return false;
         }
          
+         
+        
         
         
         if (this.modUnixSecs != other.modUnixSecs) {
             return false;
         }
          
+         
+        
         
         
         if (this.modNano != other.modNano) {
             return false;
         }
          
+         
+        
         
         
         if (this.isDir != other.isDir) {
             return false;
         }
+         
          
          
         return true;

@@ -105,6 +105,7 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.opts == null) {
             if (other.opts != null) {
                 return false;
@@ -113,6 +114,8 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.judge == null) {
@@ -123,6 +126,8 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.players == null) {
@@ -133,6 +138,8 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.rounds == null) {
@@ -143,18 +150,24 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.startTimeNS != other.startTimeNS) {
             return false;
         }
          
+         
+        
         
         
         if (this.endTimeNS != other.endTimeNS) {
             return false;
         }
          
+         
+        
         
         
         if (this.winner == null) {
@@ -164,6 +177,7 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
         } else if (!this.winner.equals(other.winner)) {
             return false;
         }
+         
          
          
         return true;

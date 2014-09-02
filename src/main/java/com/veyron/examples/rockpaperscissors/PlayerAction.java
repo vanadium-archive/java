@@ -50,6 +50,7 @@ public final class PlayerAction implements android.os.Parcelable, java.io.Serial
 
         
         
+        
         if (this.move == null) {
             if (other.move != null) {
                 return false;
@@ -58,11 +59,14 @@ public final class PlayerAction implements android.os.Parcelable, java.io.Serial
             return false;
         }
          
+         
+        
         
         
         if (this.quit != other.quit) {
             return false;
         }
+         
          
          
         return true;

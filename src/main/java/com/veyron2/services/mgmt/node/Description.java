@@ -40,6 +40,7 @@ public final class Description implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.profiles == null) {
             if (other.profiles != null) {
                 return false;
@@ -47,6 +48,7 @@ public final class Description implements android.os.Parcelable, java.io.Seriali
         } else if (!this.profiles.equals(other.profiles)) {
             return false;
         }
+         
          
          
         return true;

@@ -94,6 +94,7 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
 
         
         
+        
         if (this.a0 == null) {
             if (other.a0 != null) {
                 return false;
@@ -102,16 +103,14 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
         
         
-        if (this.a1 == null) {
-            if (other.a1 != null) {
-                return false;
-            }
-        } else if (!this.a1.equals(other.a1)) {
+        if (!java.util.Arrays.equals(this.a1, other.a1)) {
             return false;
         }
          
+        
         
         
         if (this.a2 == null) {
@@ -122,6 +121,8 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.a3 == null) {
@@ -132,6 +133,8 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.a4 == null) {
@@ -142,6 +145,8 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.a5 == null) {
@@ -151,6 +156,7 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
         } else if (!this.a5.equals(other.a5)) {
             return false;
         }
+         
          
          
         return true;

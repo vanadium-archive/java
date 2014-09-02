@@ -24,11 +24,13 @@ public final class OperatingSystem implements android.os.Parcelable, java.io.Ser
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.services.mgmt.build.OperatingSystem other = (com.veyron2.services.mgmt.build.OperatingSystem)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

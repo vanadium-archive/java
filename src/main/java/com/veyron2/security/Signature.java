@@ -13,13 +13,13 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
     
       private com.veyron2.security.Hash hash;
     
-      private java.util.List<java.lang.Byte> r;
+      private byte[] r;
     
-      private java.util.List<java.lang.Byte> s;
+      private byte[] s;
     
 
     
-    public Signature(final com.veyron2.security.Hash hash, final java.util.List<java.lang.Byte> r, final java.util.List<java.lang.Byte> s) {
+    public Signature(final com.veyron2.security.Hash hash, final byte[] r, final byte[] s) {
         
             this.hash = hash;
         
@@ -38,17 +38,17 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
         this.hash = hash;
     }
     
-    public java.util.List<java.lang.Byte> getR() {
+    public byte[] getR() {
         return this.r;
     }
-    public void setR(java.util.List<java.lang.Byte> r) {
+    public void setR(byte[] r) {
         this.r = r;
     }
     
-    public java.util.List<java.lang.Byte> getS() {
+    public byte[] getS() {
         return this.s;
     }
-    public void setS(java.util.List<java.lang.Byte> s) {
+    public void setS(byte[] s) {
         this.s = s;
     }
     
@@ -62,6 +62,7 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.hash == null) {
             if (other.hash != null) {
                 return false;
@@ -70,23 +71,16 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
         
         
-        if (this.r == null) {
-            if (other.r != null) {
-                return false;
-            }
-        } else if (!this.r.equals(other.r)) {
+        if (!java.util.Arrays.equals(this.r, other.r)) {
             return false;
         }
          
         
         
-        if (this.s == null) {
-            if (other.s != null) {
-                return false;
-            }
-        } else if (!this.s.equals(other.s)) {
+        if (!java.util.Arrays.equals(this.s, other.s)) {
             return false;
         }
          
@@ -135,9 +129,9 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
 		
 			this.hash = (com.veyron2.security.Hash) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.hash);
 		
-			this.r = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.r);
+			this.r = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.r);
 		
-			this.s = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.s);
+			this.s = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.s);
 		
 	}
 }

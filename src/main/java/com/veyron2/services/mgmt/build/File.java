@@ -13,11 +13,11 @@ public final class File implements android.os.Parcelable, java.io.Serializable {
     
       private java.lang.String name;
     
-      private java.util.List<java.lang.Byte> contents;
+      private byte[] contents;
     
 
     
-    public File(final java.lang.String name, final java.util.List<java.lang.Byte> contents) {
+    public File(final java.lang.String name, final byte[] contents) {
         
             this.name = name;
         
@@ -34,10 +34,10 @@ public final class File implements android.os.Parcelable, java.io.Serializable {
         this.name = name;
     }
     
-    public java.util.List<java.lang.Byte> getContents() {
+    public byte[] getContents() {
         return this.contents;
     }
-    public void setContents(java.util.List<java.lang.Byte> contents) {
+    public void setContents(byte[] contents) {
         this.contents = contents;
     }
     
@@ -51,6 +51,7 @@ public final class File implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,13 +60,10 @@ public final class File implements android.os.Parcelable, java.io.Serializable {
             return false;
         }
          
+         
         
         
-        if (this.contents == null) {
-            if (other.contents != null) {
-                return false;
-            }
-        } else if (!this.contents.equals(other.contents)) {
+        if (!java.util.Arrays.equals(this.contents, other.contents)) {
             return false;
         }
          
@@ -110,7 +108,7 @@ public final class File implements android.os.Parcelable, java.io.Serializable {
 		
 			this.name = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.name);
 		
-			this.contents = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.contents);
+			this.contents = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.contents);
 		
 	}
 }

@@ -42,6 +42,7 @@ public final class NestedArgs implements android.os.Parcelable, java.io.Serializ
 
         
         
+        
         if (this.args == null) {
             if (other.args != null) {
                 return false;
@@ -49,6 +50,7 @@ public final class NestedArgs implements android.os.Parcelable, java.io.Serializ
         } else if (!this.args.equals(other.args)) {
             return false;
         }
+         
          
          
         return true;

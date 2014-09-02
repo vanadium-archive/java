@@ -76,6 +76,7 @@ public final class MapType implements android.os.Parcelable, java.io.Serializabl
 
         
         
+        
         if (this.key == null) {
             if (other.key != null) {
                 return false;
@@ -84,6 +85,8 @@ public final class MapType implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.elem == null) {
@@ -94,6 +97,8 @@ public final class MapType implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -104,6 +109,8 @@ public final class MapType implements android.os.Parcelable, java.io.Serializabl
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -113,6 +120,7 @@ public final class MapType implements android.os.Parcelable, java.io.Serializabl
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

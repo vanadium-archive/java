@@ -73,6 +73,7 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.title == null) {
             if (other.title != null) {
                 return false;
@@ -81,6 +82,8 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.args == null) {
@@ -91,6 +94,8 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.binary == null) {
@@ -101,6 +106,8 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.env == null) {
@@ -110,6 +117,7 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
         } else if (!this.env.equals(other.env)) {
             return false;
         }
+         
          
          
         return true;

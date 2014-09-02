@@ -51,6 +51,7 @@ public final class FieldType implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.type == null) {
             if (other.type != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class FieldType implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -68,6 +71,7 @@ public final class FieldType implements android.os.Parcelable, java.io.Serializa
         } else if (!this.name.equals(other.name)) {
             return false;
         }
+         
          
          
         return true;

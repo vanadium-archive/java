@@ -10,7 +10,7 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
 
     
     
-      private java.util.List<java.lang.Byte> stdin;
+      private byte[] stdin;
     
       private boolean eOF;
     
@@ -20,7 +20,7 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
     
 
     
-    public ClientShellPacket(final java.util.List<java.lang.Byte> stdin, final boolean eOF, final int rows, final int cols) {
+    public ClientShellPacket(final byte[] stdin, final boolean eOF, final int rows, final int cols) {
         
             this.stdin = stdin;
         
@@ -34,10 +34,10 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
 
     
     
-    public java.util.List<java.lang.Byte> getStdin() {
+    public byte[] getStdin() {
         return this.stdin;
     }
-    public void setStdin(java.util.List<java.lang.Byte> stdin) {
+    public void setStdin(byte[] stdin) {
         this.stdin = stdin;
     }
     
@@ -72,31 +72,33 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
 
         
         
-        if (this.stdin == null) {
-            if (other.stdin != null) {
-                return false;
-            }
-        } else if (!this.stdin.equals(other.stdin)) {
+        if (!java.util.Arrays.equals(this.stdin, other.stdin)) {
             return false;
         }
          
+        
         
         
         if (this.eOF != other.eOF) {
             return false;
         }
          
+         
+        
         
         
         if (this.rows != other.rows) {
             return false;
         }
          
+         
+        
         
         
         if (this.cols != other.cols) {
             return false;
         }
+         
          
          
         return true;
@@ -145,7 +147,7 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
 	};
 	private ClientShellPacket(android.os.Parcel in) {
 		
-			this.stdin = (java.util.List<java.lang.Byte>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdin);
+			this.stdin = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.stdin);
 		
 			this.eOF = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.eOF);
 		

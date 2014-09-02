@@ -117,6 +117,7 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
 
         
         
+        
         if (this.image == null) {
             if (other.image != null) {
                 return false;
@@ -125,6 +126,8 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.title == null) {
@@ -135,6 +138,8 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.summary == null) {
@@ -145,6 +150,8 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.language == null) {
@@ -155,18 +162,24 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.releaseDate != other.releaseDate) {
             return false;
         }
          
+         
+        
         
         
         if (this.runtime != other.runtime) {
             return false;
         }
          
+         
+        
         
         
         if (this.genre == null) {
@@ -177,6 +190,8 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
             return false;
         }
          
+         
+        
         
         
         if (this.director == null) {
@@ -186,6 +201,7 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
         } else if (!this.director.equals(other.director)) {
             return false;
         }
+         
          
          
         return true;

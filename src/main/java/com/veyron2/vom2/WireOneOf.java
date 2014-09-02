@@ -51,6 +51,7 @@ public final class WireOneOf implements android.os.Parcelable, java.io.Serializa
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class WireOneOf implements android.os.Parcelable, java.io.Serializa
             return false;
         }
          
+         
+        
         
         
         if (this.types == null) {
@@ -68,6 +71,7 @@ public final class WireOneOf implements android.os.Parcelable, java.io.Serializa
         } else if (!this.types.equals(other.types)) {
             return false;
         }
+         
          
          
         return true;

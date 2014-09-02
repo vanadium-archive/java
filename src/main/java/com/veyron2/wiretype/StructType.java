@@ -62,6 +62,7 @@ public final class StructType implements android.os.Parcelable, java.io.Serializ
 
         
         
+        
         if (this.fields == null) {
             if (other.fields != null) {
                 return false;
@@ -70,6 +71,8 @@ public final class StructType implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.name == null) {
@@ -80,6 +83,8 @@ public final class StructType implements android.os.Parcelable, java.io.Serializ
             return false;
         }
          
+         
+        
         
         
         if (this.tags == null) {
@@ -89,6 +94,7 @@ public final class StructType implements android.os.Parcelable, java.io.Serializ
         } else if (!this.tags.equals(other.tags)) {
             return false;
         }
+         
          
          
         return true;

@@ -23,8 +23,10 @@ public final class NamedByte implements android.os.Parcelable, java.io.Serializa
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedByte other = (com.veyron2.vdl.test_base.NamedByte)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

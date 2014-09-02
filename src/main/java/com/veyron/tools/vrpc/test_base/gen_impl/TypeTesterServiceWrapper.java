@@ -208,7 +208,7 @@ public final class TypeTesterServiceWrapper {
          this.service.inputMap( call , I1  );
     }
 
-    public void inputSlice(final com.veyron2.ipc.ServerCall call, final java.util.List<java.lang.Byte> I1) throws com.veyron2.ipc.VeyronException {
+    public void inputSlice(final com.veyron2.ipc.ServerCall call, final byte[] I1) throws com.veyron2.ipc.VeyronException {
          
          this.service.inputSlice( call , I1  );
     }
@@ -228,7 +228,7 @@ public final class TypeTesterServiceWrapper {
          return  this.service.outputMap( call   );
     }
 
-    public java.util.List<java.lang.Byte> outputSlice(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+    public byte[] outputSlice(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
          
          return  this.service.outputSlice( call   );
     }

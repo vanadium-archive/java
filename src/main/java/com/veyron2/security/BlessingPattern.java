@@ -36,11 +36,13 @@ public final class BlessingPattern implements android.os.Parcelable, java.io.Ser
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.security.BlessingPattern other = (com.veyron2.security.BlessingPattern)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

@@ -51,6 +51,7 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.fortune == null) {
             if (other.fortune != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.userName == null) {
@@ -68,6 +71,7 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
         } else if (!this.userName.equals(other.userName)) {
             return false;
         }
+         
          
          
         return true;

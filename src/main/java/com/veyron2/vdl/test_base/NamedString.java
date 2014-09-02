@@ -23,11 +23,13 @@ public final class NamedString implements android.os.Parcelable, java.io.Seriali
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron2.vdl.test_base.NamedString other = (com.veyron2.vdl.test_base.NamedString)obj;
         
+        
         if (this.value == null) {
             return other.value == null;
         }
         return this.value.equals(other.value);
-        
+         
+         
     }
     @Override
     public int hashCode() {

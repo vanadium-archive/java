@@ -52,6 +52,7 @@ public final class GlobRequest implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.pattern == null) {
             if (other.pattern != null) {
                 return false;
@@ -60,6 +61,8 @@ public final class GlobRequest implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.resumeMarker == null) {
@@ -69,6 +72,7 @@ public final class GlobRequest implements android.os.Parcelable, java.io.Seriali
         } else if (!this.resumeMarker.equals(other.resumeMarker)) {
             return false;
         }
+         
          
          
         return true;

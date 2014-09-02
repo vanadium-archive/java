@@ -23,8 +23,10 @@ public final class GameTypeTag implements android.os.Parcelable, java.io.Seriali
         if (this.getClass() != obj.getClass()) return false;
         final com.veyron.examples.rockpaperscissors.GameTypeTag other = (com.veyron.examples.rockpaperscissors.GameTypeTag)obj;
         
-        return this.value == other.value;
         
+        return this.value == other.value;
+         
+         
     }
     @Override
     public int hashCode() {

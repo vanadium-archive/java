@@ -61,10 +61,13 @@ public final class NamedStruct implements android.os.Parcelable, java.io.Seriali
 
         
         
+        
         if (this.a != other.a) {
             return false;
         }
          
+         
+        
         
         
         if (this.b == null) {
@@ -75,11 +78,14 @@ public final class NamedStruct implements android.os.Parcelable, java.io.Seriali
             return false;
         }
          
+         
+        
         
         
         if (this.c != other.c) {
             return false;
         }
+         
          
          
         return true;

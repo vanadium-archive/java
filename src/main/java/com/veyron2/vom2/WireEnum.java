@@ -51,6 +51,7 @@ public final class WireEnum implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.name == null) {
             if (other.name != null) {
                 return false;
@@ -59,6 +60,8 @@ public final class WireEnum implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.labels == null) {
@@ -68,6 +71,7 @@ public final class WireEnum implements android.os.Parcelable, java.io.Serializab
         } else if (!this.labels.equals(other.labels)) {
             return false;
         }
+         
          
          
         return true;

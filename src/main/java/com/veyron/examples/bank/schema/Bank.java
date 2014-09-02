@@ -40,6 +40,7 @@ public final class Bank implements android.os.Parcelable, java.io.Serializable {
 
         
         
+        
         if (this.accounts == null) {
             if (other.accounts != null) {
                 return false;
@@ -47,6 +48,7 @@ public final class Bank implements android.os.Parcelable, java.io.Serializable {
         } else if (!this.accounts.equals(other.accounts)) {
             return false;
         }
+         
          
          
         return true;

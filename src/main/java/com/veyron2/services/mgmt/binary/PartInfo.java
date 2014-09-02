@@ -51,6 +51,7 @@ public final class PartInfo implements android.os.Parcelable, java.io.Serializab
 
         
         
+        
         if (this.checksum == null) {
             if (other.checksum != null) {
                 return false;
@@ -59,11 +60,14 @@ public final class PartInfo implements android.os.Parcelable, java.io.Serializab
             return false;
         }
          
+         
+        
         
         
         if (this.size != other.size) {
             return false;
         }
+         
          
          
         return true;
