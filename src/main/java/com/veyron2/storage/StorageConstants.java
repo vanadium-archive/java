@@ -10,10 +10,10 @@ public final class StorageConstants {
     
     
     
-    public static final com.veyron2.storage.Kind DIR_KIND = new com.veyron2.storage.Kind(0);
+    public static final com.veyron2.storage.Kind DIR_KIND = new com.veyron2.storage.Kind((short)0);
     
     
-    public static final com.veyron2.storage.Kind OBJECT_KIND = new com.veyron2.storage.Kind(1);
+    public static final com.veyron2.storage.Kind OBJECT_KIND = new com.veyron2.storage.Kind((short)1);
     
     
     
