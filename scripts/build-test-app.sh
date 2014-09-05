@@ -29,16 +29,15 @@ main() {
 
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-  local -r JAVA_SRC_DIR="${REPO_ROOT}/src/main/java"
+  local -r JAVA_SRC_DIR="${VEYRON_ROOT}/veyron.new/java/src/main/java"
 
   set -e
   set +x
   "${ANDROID_TOOL}" create project --target "${APP_TARGET_ID}" --name "${APP_PROJECT_NAME}" --path "${OUTPUT_DIR}" --activity "${APP_ACTIVITY_NAME}" --package "${APP_PACKAGE_NAME}"
-  "${REPO_ROOT}/scripts/build-libs.sh" "${OUTPUT_DIR}/libs"
+  "${VEYRON_ROOT}/veyron.new/java/scripts/build-libs.sh" "${OUTPUT_DIR}/libs"
 
-  diff -q "${REPO_ROOT}/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
-  cp "${REPO_ROOT}/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+  diff -q "${VEYRON_ROOT}/veyron.new/java/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+  cp "${VEYRON_ROOT}/veyron.new/java/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
 
   rm -r "${OUTPUT_DIR}/src"
   cd "${OUTPUT_DIR}"

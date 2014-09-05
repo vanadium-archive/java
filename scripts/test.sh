@@ -34,12 +34,11 @@ main() {
   local -r TEST_PROJECT_NAME="test"
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-  local -r JAVA_SRC_DIR="${REPO_ROOT}/src/test/java"
+  local -r JAVA_SRC_DIR="${VEYRON_ROOT}/veyron.new/java/src/test/java"
 
   set -e
   set +x
-  "${REPO_ROOT}/scripts/build-test-app.sh" "${APP_DIR}"
+  "${VEYRON_ROOT}/veyron.new/java/scripts/build-test-app.sh" "${APP_DIR}"
 
   "${ANDROID_TOOL}" create test-project --name "${TEST_PROJECT_NAME}" --path "${TEST_DIR}" --main "${APP_DIR}"
   rm -r "${TEST_DIR}/src"
