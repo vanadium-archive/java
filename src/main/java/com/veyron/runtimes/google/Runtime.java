@@ -49,6 +49,9 @@ public class Runtime implements com.veyron2.Runtime {
 	 */
 	public static synchronized Runtime init(android.content.Context ctx, Options opts) {
 		if (Runtime.globalRuntime == null) {
+			if (opts == null) {
+				opts = new Options();
+			}
 			try {
 				setupRuntimeOptions(ctx, opts);
 				final com.veyron2.security.PrivateID privateID =
@@ -80,6 +83,9 @@ public class Runtime implements com.veyron2.Runtime {
 	 * @return      a new runtime instance.
 	 */
 	public static synchronized Runtime newRuntime(android.content.Context ctx, Options opts) {
+		if (opts == null) {
+			opts = new Options();
+		}
 		try {
 			setupRuntimeOptions(ctx, opts);
 			final com.veyron2.security.PrivateID privateID =

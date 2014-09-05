@@ -273,6 +273,9 @@ public final class VDLInvoker {
 
     private String[] prepareResults(ServiceMethod m, Object result)
             throws IllegalArgumentException, IllegalAccessException {
+        if (m.method.getReturnType() == void.class) {
+            return new String[0];
+        }
         if (m.method.getReturnType().getDeclaringClass() == m.method.getDeclaringClass()) {
             // The return type was declared in the service definition, so this
             // method has multiple out args.

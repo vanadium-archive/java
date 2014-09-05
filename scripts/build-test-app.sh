@@ -37,6 +37,9 @@ main() {
   "${ANDROID_TOOL}" create project --target "${APP_TARGET_ID}" --name "${APP_PROJECT_NAME}" --path "${OUTPUT_DIR}" --activity "${APP_ACTIVITY_NAME}" --package "${APP_PACKAGE_NAME}"
   "${REPO_ROOT}/scripts/build-libs.sh" "${OUTPUT_DIR}/libs"
 
+  diff -q "${REPO_ROOT}/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+  cp "${REPO_ROOT}/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+
   rm -r "${OUTPUT_DIR}/src"
   cd "${OUTPUT_DIR}"
   ln -s "${JAVA_SRC_DIR}" "src"

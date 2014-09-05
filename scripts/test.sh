@@ -57,7 +57,7 @@ main() {
   set -x
   set +e
 
-  RESULT=$(shell::check_result grep "\[exec\] OK [(][0-9][0-9]* test" "${temp_file}" &> /dev/null)
+  RESULT=$(shell::check_result grep "\[exec\] OK [(][0-9][0-9]* test" "${TMP_FILE}" &> /dev/null)
   if [[ "${RESULT}" -eq 0 ]]; then
     echo "PASS"
     exit 0
