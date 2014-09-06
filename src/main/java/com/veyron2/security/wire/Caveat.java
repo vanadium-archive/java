@@ -4,7 +4,8 @@ package com.veyron2.security.wire;
 
 /**
  * type Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte} 
- * Caveat represents a veyron2/security.ServiceCaveat.
+ * TODO(ataly, ashankar): Get rid of this Caveat type and use security.Caveat instead.
+ * Caveat represents a veyron2/security.Caveat.
  **/
 public final class Caveat implements android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;

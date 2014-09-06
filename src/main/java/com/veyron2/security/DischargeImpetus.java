@@ -7,7 +7,7 @@ package com.veyron2.security;
  * DischargeImpetus encapsulates the motivation for a discharge being sought.
  * 
  * These values are reported by the holder of a PublicID with ThirdPartyCaveats when
- * requesting a ThirdPartyDischarge. The third-party issuing discharges thus cannot safely
+ * requesting a Discharge. The third-party issuing discharges thus cannot safely
  * assume that all values are provided, or that they are provided honestly.
  * 
  * Implementations of services that issue discharges are encouraged to add caveats to the
