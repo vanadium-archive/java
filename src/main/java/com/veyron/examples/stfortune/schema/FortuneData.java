@@ -3,7 +3,7 @@
 package com.veyron.examples.stfortune.schema;
 
 /**
- * type FortuneData struct{Fortune string;UserName veyron2/storage.ID [16]byte} 
+ * type FortuneData struct{Fortune string;UserName veyron.io/store/veyron2/storage.ID [16]byte} 
  * FortuneData contains the information regarding a fortune.
  **/
 public final class FortuneData implements android.os.Parcelable, java.io.Serializable {
@@ -11,13 +11,15 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("Fortune")
       private java.lang.String fortune;
     
-      private com.veyron2.storage.ID userName;
+      @com.google.gson.annotations.SerializedName("UserName")
+      private com.veyron.io.store.veyron2.storage.ID userName;
     
 
     
-    public FortuneData(final java.lang.String fortune, final com.veyron2.storage.ID userName) {
+    public FortuneData(final java.lang.String fortune, final com.veyron.io.store.veyron2.storage.ID userName) {
         
             this.fortune = fortune;
         
@@ -34,10 +36,10 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
         this.fortune = fortune;
     }
     
-    public com.veyron2.storage.ID getUserName() {
+    public com.veyron.io.store.veyron2.storage.ID getUserName() {
         return this.userName;
     }
-    public void setUserName(com.veyron2.storage.ID userName) {
+    public void setUserName(com.veyron.io.store.veyron2.storage.ID userName) {
         this.userName = userName;
     }
     
@@ -114,7 +116,7 @@ public final class FortuneData implements android.os.Parcelable, java.io.Seriali
 		
 			this.fortune = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.fortune);
 		
-			this.userName = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.userName);
+			this.userName = (com.veyron.io.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.userName);
 		
 	}
 }

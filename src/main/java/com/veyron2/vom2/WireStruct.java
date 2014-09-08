@@ -11,8 +11,10 @@ public final class WireStruct implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Fields")
       private java.util.List<com.veyron2.vom2.WireField> fields;
     
 

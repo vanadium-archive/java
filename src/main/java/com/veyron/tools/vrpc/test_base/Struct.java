@@ -10,8 +10,10 @@ public final class Struct implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("X")
       private int x;
     
+      @com.google.gson.annotations.SerializedName("Y")
       private int y;
     
 

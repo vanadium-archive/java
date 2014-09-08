@@ -15,6 +15,7 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("ValidatorVOM")
       private byte[] validatorVOM;
     
 

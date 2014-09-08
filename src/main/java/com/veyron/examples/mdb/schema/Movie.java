@@ -3,7 +3,7 @@
 package com.veyron.examples.mdb.schema;
 
 /**
- * type Movie struct{Image string;Title string;Summary string;Language string;ReleaseDate int64;Runtime int64;Genre string;Director veyron2/storage.ID [16]byte} 
+ * type Movie struct{Image string;Title string;Summary string;Language string;ReleaseDate int64;Runtime int64;Genre string;Director veyron.io/store/veyron2/storage.ID [16]byte} 
  * Movie represents a movie.
  **/
 public final class Movie implements android.os.Parcelable, java.io.Serializable {
@@ -11,25 +11,33 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
 
     
     
+      @com.google.gson.annotations.SerializedName("Image")
       private java.lang.String image;
     
+      @com.google.gson.annotations.SerializedName("Title")
       private java.lang.String title;
     
+      @com.google.gson.annotations.SerializedName("Summary")
       private java.lang.String summary;
     
+      @com.google.gson.annotations.SerializedName("Language")
       private java.lang.String language;
     
+      @com.google.gson.annotations.SerializedName("ReleaseDate")
       private long releaseDate;
     
+      @com.google.gson.annotations.SerializedName("Runtime")
       private long runtime;
     
+      @com.google.gson.annotations.SerializedName("Genre")
       private java.lang.String genre;
     
-      private com.veyron2.storage.ID director;
+      @com.google.gson.annotations.SerializedName("Director")
+      private com.veyron.io.store.veyron2.storage.ID director;
     
 
     
-    public Movie(final java.lang.String image, final java.lang.String title, final java.lang.String summary, final java.lang.String language, final long releaseDate, final long runtime, final java.lang.String genre, final com.veyron2.storage.ID director) {
+    public Movie(final java.lang.String image, final java.lang.String title, final java.lang.String summary, final java.lang.String language, final long releaseDate, final long runtime, final java.lang.String genre, final com.veyron.io.store.veyron2.storage.ID director) {
         
             this.image = image;
         
@@ -100,10 +108,10 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
         this.genre = genre;
     }
     
-    public com.veyron2.storage.ID getDirector() {
+    public com.veyron.io.store.veyron2.storage.ID getDirector() {
         return this.director;
     }
-    public void setDirector(com.veyron2.storage.ID director) {
+    public void setDirector(com.veyron.io.store.veyron2.storage.ID director) {
         this.director = director;
     }
     
@@ -280,7 +288,7 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
 		
 			this.genre = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.genre);
 		
-			this.director = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.director);
+			this.director = (com.veyron.io.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.director);
 		
 	}
 }

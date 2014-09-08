@@ -13,6 +13,7 @@ public final class NestedArgs implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("Args")
       private com.veyron2.vdl.test_base.Args args;
     
 

@@ -11,10 +11,13 @@ public final class WireArray implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Elem")
       private com.veyron2.vom2.TypeID elem;
     
+      @com.google.gson.annotations.SerializedName("Len")
       private long len;
     
 

@@ -10,16 +10,22 @@ public final class Details implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Size")
       private long size;
     
+      @com.google.gson.annotations.SerializedName("Mode")
       private int mode;
     
+      @com.google.gson.annotations.SerializedName("ModUnixSecs")
       private long modUnixSecs;
     
+      @com.google.gson.annotations.SerializedName("ModNano")
       private int modNano;
     
+      @com.google.gson.annotations.SerializedName("IsDir")
       private boolean isDir;
     
 

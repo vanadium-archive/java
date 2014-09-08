@@ -12,10 +12,13 @@ public final class Box implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("DeviceId")
       private java.lang.String deviceId;
     
+      @com.google.gson.annotations.SerializedName("BoxId")
       private java.lang.String boxId;
     
+      @com.google.gson.annotations.SerializedName("Points")
       private float[] points;
     
 

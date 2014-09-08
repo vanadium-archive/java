@@ -12,12 +12,16 @@ public final class MethodSignature implements android.os.Parcelable, java.io.Ser
 
     
     
+      @com.google.gson.annotations.SerializedName("InArgs")
       private java.util.List<com.veyron2.ipc.MethodArgument> inArgs;
     
+      @com.google.gson.annotations.SerializedName("OutArgs")
       private java.util.List<com.veyron2.ipc.MethodArgument> outArgs;
     
+      @com.google.gson.annotations.SerializedName("InStream")
       private com.veyron2.wiretype.TypeID inStream;
     
+      @com.google.gson.annotations.SerializedName("OutStream")
       private com.veyron2.wiretype.TypeID outStream;
     
 

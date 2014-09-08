@@ -18,8 +18,10 @@ public final class ACL implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("In")
       private java.util.Map<com.veyron2.security.BlessingPattern, com.veyron2.security.LabelSet> in;
     
+      @com.google.gson.annotations.SerializedName("NotIn")
       private java.util.Map<java.lang.String, com.veyron2.security.LabelSet> notIn;
     
 

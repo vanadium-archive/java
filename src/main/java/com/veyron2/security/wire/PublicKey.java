@@ -11,8 +11,10 @@ public final class PublicKey implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Curve")
       private com.veyron2.security.wire.KeyCurve curve;
     
+      @com.google.gson.annotations.SerializedName("XY")
       private byte[] xY;
     
 

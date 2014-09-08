@@ -11,14 +11,19 @@ public final class Round implements android.os.Parcelable, java.io.Serializable 
 
     
     
+      @com.google.gson.annotations.SerializedName("Moves")
       private java.lang.String[] moves;
     
+      @com.google.gson.annotations.SerializedName("Comment")
       private java.lang.String comment;
     
+      @com.google.gson.annotations.SerializedName("Winner")
       private com.veyron.examples.rockpaperscissors.WinnerTag winner;
     
+      @com.google.gson.annotations.SerializedName("StartTimeNS")
       private long startTimeNS;
     
+      @com.google.gson.annotations.SerializedName("EndTimeNS")
       private long endTimeNS;
     
 

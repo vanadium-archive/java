@@ -12,8 +12,10 @@ public final class Caveat implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("Service")
       private com.veyron2.security.BlessingPattern service;
     
+      @com.google.gson.annotations.SerializedName("Bytes")
       private byte[] bytes;
     
 

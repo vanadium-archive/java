@@ -19,10 +19,13 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
 
     
     
+      @com.google.gson.annotations.SerializedName("Server")
       private com.veyron2.vdl.Any server;
     
+      @com.google.gson.annotations.SerializedName("Method")
       private java.lang.String method;
     
+      @com.google.gson.annotations.SerializedName("Arguments")
       private java.util.List<com.veyron2.vdl.Any> arguments;
     
 

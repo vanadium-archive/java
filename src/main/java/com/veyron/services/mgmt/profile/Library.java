@@ -11,10 +11,13 @@ public final class Library implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("MajorVersion")
       private java.lang.String majorVersion;
     
+      @com.google.gson.annotations.SerializedName("MinorVersion")
       private java.lang.String minorVersion;
     
 

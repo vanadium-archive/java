@@ -10,62 +10,91 @@ public final class Scalars implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("A0")
       private boolean a0;
     
+      @com.google.gson.annotations.SerializedName("A1")
       private byte a1;
     
+      @com.google.gson.annotations.SerializedName("A2")
       private short a2;
     
+      @com.google.gson.annotations.SerializedName("A3")
       private int a3;
     
+      @com.google.gson.annotations.SerializedName("A4")
       private long a4;
     
+      @com.google.gson.annotations.SerializedName("A5")
       private short a5;
     
+      @com.google.gson.annotations.SerializedName("A6")
       private int a6;
     
+      @com.google.gson.annotations.SerializedName("A7")
       private long a7;
     
+      @com.google.gson.annotations.SerializedName("A8")
       private float a8;
     
+      @com.google.gson.annotations.SerializedName("A9")
       private double a9;
     
+      @com.google.gson.annotations.SerializedName("A10")
       private org.apache.commons.math3.complex.Complex a10;
     
+      @com.google.gson.annotations.SerializedName("A11")
       private org.apache.commons.math3.complex.Complex a11;
     
+      @com.google.gson.annotations.SerializedName("A12")
       private java.lang.String a12;
     
+      @com.google.gson.annotations.SerializedName("A13")
       private com.veyron2.ipc.VeyronException a13;
     
+      @com.google.gson.annotations.SerializedName("A14")
       private com.veyron2.vdl.Any a14;
     
+      @com.google.gson.annotations.SerializedName("A15")
       private java.lang.Object a15;
     
+      @com.google.gson.annotations.SerializedName("B0")
       private com.veyron2.vdl.test_base.NamedBool b0;
     
+      @com.google.gson.annotations.SerializedName("B1")
       private com.veyron2.vdl.test_base.NamedByte b1;
     
+      @com.google.gson.annotations.SerializedName("B2")
       private com.veyron2.vdl.test_base.NamedUint16 b2;
     
+      @com.google.gson.annotations.SerializedName("B3")
       private com.veyron2.vdl.test_base.NamedUint32 b3;
     
+      @com.google.gson.annotations.SerializedName("B4")
       private com.veyron2.vdl.test_base.NamedUint64 b4;
     
+      @com.google.gson.annotations.SerializedName("B5")
       private com.veyron2.vdl.test_base.NamedInt16 b5;
     
+      @com.google.gson.annotations.SerializedName("B6")
       private com.veyron2.vdl.test_base.NamedInt32 b6;
     
+      @com.google.gson.annotations.SerializedName("B7")
       private com.veyron2.vdl.test_base.NamedInt64 b7;
     
+      @com.google.gson.annotations.SerializedName("B8")
       private com.veyron2.vdl.test_base.NamedFloat32 b8;
     
+      @com.google.gson.annotations.SerializedName("B9")
       private com.veyron2.vdl.test_base.NamedFloat64 b9;
     
+      @com.google.gson.annotations.SerializedName("B10")
       private com.veyron2.vdl.test_base.NamedComplex64 b10;
     
+      @com.google.gson.annotations.SerializedName("B11")
       private com.veyron2.vdl.test_base.NamedComplex128 b11;
     
+      @com.google.gson.annotations.SerializedName("B12")
       private com.veyron2.vdl.test_base.NamedString b12;
     
 

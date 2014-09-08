@@ -15,18 +15,25 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("Suffix")
       private java.lang.String suffix;
     
+      @com.google.gson.annotations.SerializedName("Method")
       private java.lang.String method;
     
+      @com.google.gson.annotations.SerializedName("NumPosArgs")
       private long numPosArgs;
     
+      @com.google.gson.annotations.SerializedName("EndStreamArgs")
       private boolean endStreamArgs;
     
+      @com.google.gson.annotations.SerializedName("Timeout")
       private long timeout;
     
+      @com.google.gson.annotations.SerializedName("HasBlessing")
       private boolean hasBlessing;
     
+      @com.google.gson.annotations.SerializedName("NumDischarges")
       private long numDischarges;
     
 

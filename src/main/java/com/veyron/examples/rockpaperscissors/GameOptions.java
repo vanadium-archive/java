@@ -11,8 +11,10 @@ public final class GameOptions implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("NumRounds")
       private int numRounds;
     
+      @com.google.gson.annotations.SerializedName("GameType")
       private com.veyron.examples.rockpaperscissors.GameTypeTag gameType;
     
 

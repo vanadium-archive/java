@@ -10,18 +10,25 @@ public final class ScoreCard implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Opts")
       private com.veyron.examples.rockpaperscissors.GameOptions opts;
     
+      @com.google.gson.annotations.SerializedName("Judge")
       private java.lang.String judge;
     
+      @com.google.gson.annotations.SerializedName("Players")
       private java.util.List<java.lang.String> players;
     
+      @com.google.gson.annotations.SerializedName("Rounds")
       private java.util.List<com.veyron.examples.rockpaperscissors.Round> rounds;
     
+      @com.google.gson.annotations.SerializedName("StartTimeNS")
       private long startTimeNS;
     
+      @com.google.gson.annotations.SerializedName("EndTimeNS")
       private long endTimeNS;
     
+      @com.google.gson.annotations.SerializedName("Winner")
       private com.veyron.examples.rockpaperscissors.WinnerTag winner;
     
 

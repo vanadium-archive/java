@@ -17,6 +17,7 @@ public final class ChainPublicID implements android.os.Parcelable, java.io.Seria
 
     
     
+      @com.google.gson.annotations.SerializedName("Certificates")
       private java.util.List<com.veyron2.security.wire.Certificate> certificates;
     
 

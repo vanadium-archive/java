@@ -20,8 +20,10 @@ public final class Task implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("Progress")
       private int progress;
     
+      @com.google.gson.annotations.SerializedName("Goal")
       private int goal;
     
 

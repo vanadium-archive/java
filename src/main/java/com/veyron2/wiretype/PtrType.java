@@ -13,10 +13,13 @@ public final class PtrType implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("Elem")
       private com.veyron2.wiretype.TypeID elem;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Tags")
       private java.util.List<java.lang.String> tags;
     
 

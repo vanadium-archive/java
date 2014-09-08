@@ -12,16 +12,22 @@ public final class Specification implements android.os.Parcelable, java.io.Seria
 
     
     
+      @com.google.gson.annotations.SerializedName("Arch")
       private com.veyron2.services.mgmt.build.Architecture arch;
     
+      @com.google.gson.annotations.SerializedName("Description")
       private java.lang.String description;
     
+      @com.google.gson.annotations.SerializedName("Format")
       private com.veyron2.services.mgmt.build.Format format;
     
+      @com.google.gson.annotations.SerializedName("Libraries")
       private java.util.Set<com.veyron.services.mgmt.profile.Library> libraries;
     
+      @com.google.gson.annotations.SerializedName("Label")
       private java.lang.String label;
     
+      @com.google.gson.annotations.SerializedName("OS")
       private com.veyron2.services.mgmt.build.OperatingSystem oS;
     
 

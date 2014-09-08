@@ -11,10 +11,13 @@ public final class NamedPrimitiveType implements android.os.Parcelable, java.io.
 
     
     
+      @com.google.gson.annotations.SerializedName("Type")
       private com.veyron2.wiretype.TypeID type;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Tags")
       private java.util.List<java.lang.String> tags;
     
 

@@ -11,8 +11,10 @@ public final class PartInfo implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Checksum")
       private java.lang.String checksum;
     
+      @com.google.gson.annotations.SerializedName("Size")
       private long size;
     
 

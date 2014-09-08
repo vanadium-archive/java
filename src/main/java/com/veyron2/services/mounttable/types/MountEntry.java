@@ -11,8 +11,10 @@ public final class MountEntry implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Servers")
       private java.util.List<com.veyron2.services.mounttable.types.MountedServer> servers;
     
 

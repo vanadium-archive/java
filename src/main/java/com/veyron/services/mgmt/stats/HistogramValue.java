@@ -11,10 +11,13 @@ public final class HistogramValue implements android.os.Parcelable, java.io.Seri
 
     
     
+      @com.google.gson.annotations.SerializedName("Count")
       private long count;
     
+      @com.google.gson.annotations.SerializedName("Sum")
       private long sum;
     
+      @com.google.gson.annotations.SerializedName("Buckets")
       private java.util.List<com.veyron.services.mgmt.stats.HistogramBucket> buckets;
     
 

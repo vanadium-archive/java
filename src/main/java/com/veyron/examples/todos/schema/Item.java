@@ -11,10 +11,13 @@ public final class Item implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("Text")
       private java.lang.String text;
     
+      @com.google.gson.annotations.SerializedName("Done")
       private boolean done;
     
+      @com.google.gson.annotations.SerializedName("Tags")
       private java.util.List<java.lang.String> tags;
     
 

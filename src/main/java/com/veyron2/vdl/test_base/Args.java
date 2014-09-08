@@ -11,8 +11,10 @@ public final class Args implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("A")
       private int a;
     
+      @com.google.gson.annotations.SerializedName("B")
       private int b;
     
 

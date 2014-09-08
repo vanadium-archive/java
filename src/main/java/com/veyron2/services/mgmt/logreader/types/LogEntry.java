@@ -11,8 +11,10 @@ public final class LogEntry implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Position")
       private long position;
     
+      @com.google.gson.annotations.SerializedName("Line")
       private java.lang.String line;
     
 

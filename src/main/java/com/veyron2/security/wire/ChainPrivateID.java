@@ -11,8 +11,10 @@ public final class ChainPrivateID implements android.os.Parcelable, java.io.Seri
 
     
     
+      @com.google.gson.annotations.SerializedName("PublicID")
       private com.veyron2.security.wire.ChainPublicID publicID;
     
+      @com.google.gson.annotations.SerializedName("Secret")
       private byte[] secret;
     
 

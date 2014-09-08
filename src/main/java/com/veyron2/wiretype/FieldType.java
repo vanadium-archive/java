@@ -11,8 +11,10 @@ public final class FieldType implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Type")
       private com.veyron2.wiretype.TypeID type;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
 

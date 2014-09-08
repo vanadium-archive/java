@@ -10,12 +10,16 @@ public final class ClientShellPacket implements android.os.Parcelable, java.io.S
 
     
     
+      @com.google.gson.annotations.SerializedName("Stdin")
       private byte[] stdin;
     
+      @com.google.gson.annotations.SerializedName("EOF")
       private boolean eOF;
     
+      @com.google.gson.annotations.SerializedName("Rows")
       private int rows;
     
+      @com.google.gson.annotations.SerializedName("Cols")
       private int cols;
     
 

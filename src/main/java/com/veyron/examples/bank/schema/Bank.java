@@ -11,6 +11,7 @@ public final class Bank implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("Accounts")
       private java.util.Map<java.lang.String, java.lang.Long> accounts;
     
 

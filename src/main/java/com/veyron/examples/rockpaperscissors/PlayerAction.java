@@ -10,8 +10,10 @@ public final class PlayerAction implements android.os.Parcelable, java.io.Serial
 
     
     
+      @com.google.gson.annotations.SerializedName("Move")
       private java.lang.String move;
     
+      @com.google.gson.annotations.SerializedName("Quit")
       private boolean quit;
     
 

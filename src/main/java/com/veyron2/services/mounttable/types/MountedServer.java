@@ -11,8 +11,10 @@ public final class MountedServer implements android.os.Parcelable, java.io.Seria
 
     
     
+      @com.google.gson.annotations.SerializedName("Server")
       private java.lang.String server;
     
+      @com.google.gson.annotations.SerializedName("TTL")
       private int tTL;
     
 

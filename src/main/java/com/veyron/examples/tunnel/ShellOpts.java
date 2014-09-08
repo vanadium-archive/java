@@ -10,12 +10,16 @@ public final class ShellOpts implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("UsePty")
       private boolean usePty;
     
+      @com.google.gson.annotations.SerializedName("Environment")
       private java.util.List<java.lang.String> environment;
     
+      @com.google.gson.annotations.SerializedName("Rows")
       private int rows;
     
+      @com.google.gson.annotations.SerializedName("Cols")
       private int cols;
     
 

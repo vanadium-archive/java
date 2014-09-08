@@ -11,6 +11,7 @@ public final class GameID implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("ID")
       private java.lang.String iD;
     
 

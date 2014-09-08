@@ -12,10 +12,13 @@ public final class Person implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("Image")
       private java.lang.String image;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("BirthDate")
       private long birthDate;
     
 

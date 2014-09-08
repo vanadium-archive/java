@@ -14,10 +14,13 @@ public final class Response implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Error")
       private com.veyron2.ipc.VeyronException error;
     
+      @com.google.gson.annotations.SerializedName("EndStreamResults")
       private boolean endStreamResults;
     
+      @com.google.gson.annotations.SerializedName("NumPosResults")
       private long numPosResults;
     
 

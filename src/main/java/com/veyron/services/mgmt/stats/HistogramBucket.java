@@ -11,8 +11,10 @@ public final class HistogramBucket implements android.os.Parcelable, java.io.Ser
 
     
     
+      @com.google.gson.annotations.SerializedName("LowBound")
       private long lowBound;
     
+      @com.google.gson.annotations.SerializedName("Count")
       private long count;
     
 

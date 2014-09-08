@@ -10,14 +10,19 @@ public final class JudgeAction implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("PlayerNum")
       private int playerNum;
     
+      @com.google.gson.annotations.SerializedName("OpponentName")
       private java.lang.String opponentName;
     
+      @com.google.gson.annotations.SerializedName("MoveOptions")
       private java.util.List<java.lang.String> moveOptions;
     
+      @com.google.gson.annotations.SerializedName("RoundResult")
       private com.veyron.examples.rockpaperscissors.Round roundResult;
     
+      @com.google.gson.annotations.SerializedName("Score")
       private com.veyron.examples.rockpaperscissors.ScoreCard score;
     
 

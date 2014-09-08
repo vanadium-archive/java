@@ -11,10 +11,13 @@ public final class WireMap implements android.os.Parcelable, java.io.Serializabl
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Key")
       private com.veyron2.vom2.TypeID key;
     
+      @com.google.gson.annotations.SerializedName("Elem")
       private com.veyron2.vom2.TypeID elem;
     
 

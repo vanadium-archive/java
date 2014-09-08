@@ -14,12 +14,16 @@ public final class Certificate implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("PublicKey")
       private com.veyron2.security.wire.PublicKey publicKey;
     
+      @com.google.gson.annotations.SerializedName("Caveats")
       private java.util.List<com.veyron2.security.wire.Caveat> caveats;
     
+      @com.google.gson.annotations.SerializedName("Signature")
       private com.veyron2.security.Signature signature;
     
 

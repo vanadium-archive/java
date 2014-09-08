@@ -11,6 +11,7 @@ public final class Description implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("Profiles")
       private java.util.Set<java.lang.String> profiles;
     
 

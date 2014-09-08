@@ -11,8 +11,10 @@ public final class MethodArgument implements android.os.Parcelable, java.io.Seri
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Type")
       private com.veyron2.wiretype.TypeID type;
     
 

@@ -11,8 +11,10 @@ public final class Review implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("Rating")
       private byte rating;
     
+      @com.google.gson.annotations.SerializedName("Text")
       private java.lang.String text;
     
 

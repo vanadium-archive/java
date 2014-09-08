@@ -3,7 +3,7 @@
 package com.veyron.examples.mdb.schema;
 
 /**
- * type Part struct{Actor veyron2/storage.ID [16]byte;Character string} 
+ * type Part struct{Actor veyron.io/store/veyron2/storage.ID [16]byte;Character string} 
  * Part represents the role of an actor.
  **/
 public final class Part implements android.os.Parcelable, java.io.Serializable {
@@ -11,13 +11,15 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
 
     
     
-      private com.veyron2.storage.ID actor;
+      @com.google.gson.annotations.SerializedName("Actor")
+      private com.veyron.io.store.veyron2.storage.ID actor;
     
+      @com.google.gson.annotations.SerializedName("Character")
       private java.lang.String character;
     
 
     
-    public Part(final com.veyron2.storage.ID actor, final java.lang.String character) {
+    public Part(final com.veyron.io.store.veyron2.storage.ID actor, final java.lang.String character) {
         
             this.actor = actor;
         
@@ -27,10 +29,10 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
 
     
     
-    public com.veyron2.storage.ID getActor() {
+    public com.veyron.io.store.veyron2.storage.ID getActor() {
         return this.actor;
     }
-    public void setActor(com.veyron2.storage.ID actor) {
+    public void setActor(com.veyron.io.store.veyron2.storage.ID actor) {
         this.actor = actor;
     }
     
@@ -112,7 +114,7 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
 	};
 	private Part(android.os.Parcel in) {
 		
-			this.actor = (com.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.actor);
+			this.actor = (com.veyron.io.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.actor);
 		
 			this.character = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.character);
 		

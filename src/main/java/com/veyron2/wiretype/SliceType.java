@@ -11,10 +11,13 @@ public final class SliceType implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Elem")
       private com.veyron2.wiretype.TypeID elem;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Tags")
       private java.util.List<java.lang.String> tags;
     
 

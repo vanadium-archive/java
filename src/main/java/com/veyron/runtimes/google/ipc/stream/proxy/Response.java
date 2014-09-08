@@ -11,8 +11,10 @@ public final class Response implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Error")
       private com.veyron2.ipc.VeyronException error;
     
+      @com.google.gson.annotations.SerializedName("Endpoint")
       private java.lang.String endpoint;
     
 

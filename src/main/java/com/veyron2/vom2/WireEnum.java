@@ -11,8 +11,10 @@ public final class WireEnum implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Labels")
       private java.util.List<java.lang.String> labels;
     
 

@@ -11,14 +11,19 @@ public final class Change implements android.os.Parcelable, java.io.Serializable
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("State")
       private int state;
     
+      @com.google.gson.annotations.SerializedName("Value")
       private com.veyron2.vdl.Any value;
     
+      @com.google.gson.annotations.SerializedName("ResumeMarker")
       private com.veyron2.services.watch.types.ResumeMarker resumeMarker;
     
+      @com.google.gson.annotations.SerializedName("Continued")
       private boolean continued;
     
 

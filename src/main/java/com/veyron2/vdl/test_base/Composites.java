@@ -10,16 +10,22 @@ public final class Composites implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("A0")
       private com.veyron2.vdl.test_base.Scalars a0;
     
+      @com.google.gson.annotations.SerializedName("A1")
       private com.veyron2.vdl.test_base.Scalars[] a1;
     
+      @com.google.gson.annotations.SerializedName("A2")
       private java.util.List<com.veyron2.vdl.test_base.Scalars> a2;
     
+      @com.google.gson.annotations.SerializedName("A3")
       private java.util.Set<com.veyron2.vdl.test_base.Scalars> a3;
     
+      @com.google.gson.annotations.SerializedName("A4")
       private java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Scalars> a4;
     
+      @com.google.gson.annotations.SerializedName("A5")
       private java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, org.apache.commons.math3.complex.Complex>>> a5;
     
 

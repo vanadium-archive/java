@@ -11,10 +11,13 @@ public final class StructType implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("Fields")
       private java.util.List<com.veyron2.wiretype.FieldType> fields;
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Tags")
       private java.util.List<java.lang.String> tags;
     
 

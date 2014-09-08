@@ -11,6 +11,7 @@ public final class List implements android.os.Parcelable, java.io.Serializable {
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
 

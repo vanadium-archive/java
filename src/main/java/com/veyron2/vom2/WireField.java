@@ -11,8 +11,10 @@ public final class WireField implements android.os.Parcelable, java.io.Serializa
 
     
     
+      @com.google.gson.annotations.SerializedName("Name")
       private java.lang.String name;
     
+      @com.google.gson.annotations.SerializedName("Type")
       private com.veyron2.vom2.TypeID type;
     
 

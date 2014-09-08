@@ -10,10 +10,13 @@ public final class NamedStruct implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("A")
       private boolean a;
     
+      @com.google.gson.annotations.SerializedName("B")
       private java.lang.String b;
     
+      @com.google.gson.annotations.SerializedName("C")
       private int c;
     
 

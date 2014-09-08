@@ -11,6 +11,7 @@ public final class PlayResult implements android.os.Parcelable, java.io.Serializ
 
     
     
+      @com.google.gson.annotations.SerializedName("YouWon")
       private boolean youWon;
     
 

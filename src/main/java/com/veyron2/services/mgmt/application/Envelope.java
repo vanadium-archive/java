@@ -11,12 +11,16 @@ public final class Envelope implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("Title")
       private java.lang.String title;
     
+      @com.google.gson.annotations.SerializedName("Args")
       private java.util.List<java.lang.String> args;
     
+      @com.google.gson.annotations.SerializedName("Binary")
       private java.lang.String binary;
     
+      @com.google.gson.annotations.SerializedName("Env")
       private java.util.List<java.lang.String> env;
     
 

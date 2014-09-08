@@ -12,8 +12,10 @@ public final class GlobRequest implements android.os.Parcelable, java.io.Seriali
 
     
     
+      @com.google.gson.annotations.SerializedName("Pattern")
       private java.lang.String pattern;
     
+      @com.google.gson.annotations.SerializedName("ResumeMarker")
       private com.veyron2.services.watch.types.ResumeMarker resumeMarker;
     
 

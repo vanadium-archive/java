@@ -13,8 +13,10 @@ public final class ServiceSignature implements android.os.Parcelable, java.io.Se
 
     
     
+      @com.google.gson.annotations.SerializedName("TypeDefs")
       private java.util.List<com.veyron2.vdl.Any> typeDefs;
     
+      @com.google.gson.annotations.SerializedName("Methods")
       private java.util.Map<java.lang.String, com.veyron2.ipc.MethodSignature> methods;
     
 

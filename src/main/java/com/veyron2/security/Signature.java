@@ -4,17 +4,20 @@ package com.veyron2.security;
 
 /**
  * type Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte} 
- * Signature represents an ECDSA signature.
+ * Signature represents a digital signature.
  **/
 public final class Signature implements android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;
 
     
     
+      @com.google.gson.annotations.SerializedName("Hash")
       private com.veyron2.security.Hash hash;
     
+      @com.google.gson.annotations.SerializedName("R")
       private byte[] r;
     
+      @com.google.gson.annotations.SerializedName("S")
       private byte[] s;
     
 

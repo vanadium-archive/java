@@ -10,8 +10,10 @@ public final class ServerShellPacket implements android.os.Parcelable, java.io.S
 
     
     
+      @com.google.gson.annotations.SerializedName("Stdout")
       private byte[] stdout;
     
+      @com.google.gson.annotations.SerializedName("Stderr")
       private byte[] stderr;
     
 

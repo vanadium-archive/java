@@ -10,14 +10,19 @@ public final class CompComp implements android.os.Parcelable, java.io.Serializab
 
     
     
+      @com.google.gson.annotations.SerializedName("A0")
       private com.veyron2.vdl.test_base.Composites a0;
     
+      @com.google.gson.annotations.SerializedName("A1")
       private com.veyron2.vdl.test_base.Composites[] a1;
     
+      @com.google.gson.annotations.SerializedName("A2")
       private java.util.List<com.veyron2.vdl.test_base.Composites> a2;
     
+      @com.google.gson.annotations.SerializedName("A3")
       private java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Composites> a3;
     
+      @com.google.gson.annotations.SerializedName("A4")
       private java.util.Map<com.veyron2.vdl.test_base.Scalars, java.util.List<java.util.Map<java.lang.String, com.veyron2.vdl.test_base.Composites>>> a4;
     
 
