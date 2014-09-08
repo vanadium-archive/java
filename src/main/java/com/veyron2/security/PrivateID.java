@@ -35,12 +35,10 @@ public interface PrivateID extends Signer {
 	 * @param  blessee         the public component of the identity that we are constraining.
 	 * @param  blessingName    name that is appended to PrivateID's name to create a blessing name.
 	 * @param  duration        the duration of validity of the blessed PublicID.
-	 * @param  caveats         constraints on the blessing.
 	 * @return PublicID        constrained PublicID.
 	 * @throws VeyronException if any error is encountered during the blessing.
 	 */
-	public PublicID bless(PublicID blessee, String blessingName, Duration duration,
-		ServiceCaveat[] caveats) throws VeyronException;
+	public PublicID bless(PublicID blessee, String blessingName, Duration duration) throws VeyronException;
 
 	/**
 	 * Returns a new PrivateID that has the same secret component as a existing PrivateID but with

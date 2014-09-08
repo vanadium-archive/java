@@ -1,8 +1,6 @@
 package com.veyron.runtimes.google.security;
 
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.BlessingPattern;
-import com.veyron2.security.ServiceCaveat;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -13,7 +11,6 @@ public class PublicID implements com.veyron2.security.PublicID {
 	private native byte[] nativePublicKey(long nativePtr) throws VeyronException;
 	private native long nativeAuthorize(long nativePtr, com.veyron2.security.Context context)
 		throws VeyronException;
-	private native ServiceCaveat[] nativeThirdPartyCaveats(long nativePtr);
 	private native boolean nativeEquals(long nativePtr, long otherNativePtr);
 	private native void nativeFinalize(long nativePtr);
 
@@ -39,10 +36,6 @@ public class PublicID implements com.veyron2.security.PublicID {
 	public com.veyron2.security.PublicID authorize(com.veyron2.security.Context context)
 		throws VeyronException {
 		return new PublicID(nativeAuthorize(this.nativePtr, context));
-	}
-	@Override
-	public ServiceCaveat[] thirdPartyCaveats() {
-		return nativeThirdPartyCaveats(this.nativePtr);
 	}
 	// Implements java.lang.Object.
 	@Override

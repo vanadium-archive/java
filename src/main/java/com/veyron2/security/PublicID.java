@@ -34,12 +34,4 @@ public interface PublicID {
 	 * @throws VeyronException if any error is encountered during the evaluation.
 	 */
 	public PublicID authorize(Context context) throws VeyronException;
-
-	/**
-	 * Returns the set of third-party restrictions on the scope of the identity. The returned
-	 * restrictions are wrapped in ServiceCaveats according to the services they are bound to.
-	 *
-	 * @return the set of third-party restrictions on the scope of the identity.
-	 */
-	public ServiceCaveat[] thirdPartyCaveats();
 }

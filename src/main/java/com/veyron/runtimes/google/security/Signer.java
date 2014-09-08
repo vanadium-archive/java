@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Signer implements com.veyron2.security.Signer {

@@ -2,7 +2,6 @@ package com.veyron.runtimes.google.security;
 
 
 import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.ServiceCaveat;
 import com.veyron2.security.Signature;
 
 import org.joda.time.Duration;
@@ -32,8 +31,7 @@ public class PrivateID implements com.veyron2.security.PrivateID {
 
 	private native long nativePublicID(long nativePtr);
 	private native long nativeBless(long nativePtr, com.veyron2.security.PublicID blessee,
-		String blessingName, Duration duration, ServiceCaveat[] caveats)
-		throws VeyronException;
+		String blessingName, Duration duration) throws VeyronException;
 	private native long nativeDerive(long nativePtr, com.veyron2.security.PublicID publicID)
 		throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
@@ -57,9 +55,9 @@ public class PrivateID implements com.veyron2.security.PrivateID {
 	}
 	@Override
 	public com.veyron2.security.PublicID bless(com.veyron2.security.PublicID blessee,
-		String blessingName, Duration duration,	ServiceCaveat[] caveats) throws VeyronException {
+		String blessingName, Duration duration) throws VeyronException {
 		return new PublicID(
-			nativeBless(this.nativePtr, blessee, blessingName, duration, caveats));
+			nativeBless(this.nativePtr, blessee, blessingName, duration));
 	}
 	@Override
 	public com.veyron2.security.PrivateID derive(com.veyron2.security.PublicID publicID)

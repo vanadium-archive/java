@@ -289,7 +289,7 @@ public class Runtime implements com.veyron2.Runtime {
 			method = Character.toUpperCase(method.charAt(0)) + method.substring(1);
 			final long nativeCallPtr =
 				nativeStartCall(this.nativePtr, context, name, method, jsonArgs, vdlPath,
-					timeout != null ? timeout.getMillis() : 1000);
+					timeout != null ? timeout.getMillis() : 10000);
 			return new ClientCall(nativeCallPtr);
 		}
 		@Override
