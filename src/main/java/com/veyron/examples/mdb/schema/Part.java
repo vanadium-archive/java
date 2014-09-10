@@ -12,14 +12,14 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
     
     
       @com.google.gson.annotations.SerializedName("Actor")
-      private com.veyron.io.store.veyron2.storage.ID actor;
+      private io.veyron.store.veyron2.storage.ID actor;
     
       @com.google.gson.annotations.SerializedName("Character")
       private java.lang.String character;
     
 
     
-    public Part(final com.veyron.io.store.veyron2.storage.ID actor, final java.lang.String character) {
+    public Part(final io.veyron.store.veyron2.storage.ID actor, final java.lang.String character) {
         
             this.actor = actor;
         
@@ -29,10 +29,10 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
 
     
     
-    public com.veyron.io.store.veyron2.storage.ID getActor() {
+    public io.veyron.store.veyron2.storage.ID getActor() {
         return this.actor;
     }
-    public void setActor(com.veyron.io.store.veyron2.storage.ID actor) {
+    public void setActor(io.veyron.store.veyron2.storage.ID actor) {
         this.actor = actor;
     }
     
@@ -114,7 +114,7 @@ public final class Part implements android.os.Parcelable, java.io.Serializable {
 	};
 	private Part(android.os.Parcel in) {
 		
-			this.actor = (com.veyron.io.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.actor);
+			this.actor = (io.veyron.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.actor);
 		
 			this.character = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.character);
 		

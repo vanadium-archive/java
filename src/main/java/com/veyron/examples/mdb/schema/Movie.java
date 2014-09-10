@@ -33,11 +33,11 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
       private java.lang.String genre;
     
       @com.google.gson.annotations.SerializedName("Director")
-      private com.veyron.io.store.veyron2.storage.ID director;
+      private io.veyron.store.veyron2.storage.ID director;
     
 
     
-    public Movie(final java.lang.String image, final java.lang.String title, final java.lang.String summary, final java.lang.String language, final long releaseDate, final long runtime, final java.lang.String genre, final com.veyron.io.store.veyron2.storage.ID director) {
+    public Movie(final java.lang.String image, final java.lang.String title, final java.lang.String summary, final java.lang.String language, final long releaseDate, final long runtime, final java.lang.String genre, final io.veyron.store.veyron2.storage.ID director) {
         
             this.image = image;
         
@@ -108,10 +108,10 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
         this.genre = genre;
     }
     
-    public com.veyron.io.store.veyron2.storage.ID getDirector() {
+    public io.veyron.store.veyron2.storage.ID getDirector() {
         return this.director;
     }
-    public void setDirector(com.veyron.io.store.veyron2.storage.ID director) {
+    public void setDirector(io.veyron.store.veyron2.storage.ID director) {
         this.director = director;
     }
     
@@ -288,7 +288,7 @@ public final class Movie implements android.os.Parcelable, java.io.Serializable 
 		
 			this.genre = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.genre);
 		
-			this.director = (com.veyron.io.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.director);
+			this.director = (io.veyron.store.veyron2.storage.ID) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.director);
 		
 	}
 }
