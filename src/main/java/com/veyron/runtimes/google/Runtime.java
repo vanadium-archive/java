@@ -1,9 +1,7 @@
 package com.veyron.runtimes.google;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import com.veyron.runtimes.google.android.RedirectStderr;
@@ -18,6 +16,7 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.Label;
 import com.veyron2.security.PublicID;
 import com.veyron2.vdl.Any;
+import com.veyron2.vdl.JSONUtil;
 
 import org.joda.time.Duration;
 
@@ -253,9 +252,7 @@ public class Runtime implements com.veyron2.Runtime {
 
 		Client(long nativePtr) {
 			this.nativePtr = nativePtr;
-			// TODO(bprosnitz) This case conversion should be done in VOM like we do for javascript.
-            this.gson =
-            	new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+            this.gson = JSONUtil.getGsonBuilder().create();
 		}
 		// Implement com.veyron2.ipc.Client.
 		@Override
@@ -327,8 +324,7 @@ public class Runtime implements com.veyron2.Runtime {
 
 		Stream(long nativeStreamPtr) {
 			this.nativeStreamPtr = nativeStreamPtr;
-			this.gson =
-				new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 		@Override
 		public void send(Object item) throws VeyronException {
@@ -358,8 +354,7 @@ public class Runtime implements com.veyron2.Runtime {
 		ClientCall(long nativePtr) {
 			super(nativePtr);
 			this.nativePtr = nativePtr;
-			this.gson =
-				new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 
 		@Override

@@ -7,7 +7,7 @@ package io.veyron.store.veyron2.storage;
  * type Kind int16 
  * Kind makes it possible to tell the difference between Dirs and Objects.
  **/
-public final class Kind implements android.os.Parcelable, java.io.Serializable {
+public final class Kind implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private short value;
 
     public Kind(short value) {
@@ -54,5 +54,25 @@ public final class Kind implements android.os.Parcelable, java.io.Serializable {
 	};
 	private Kind(android.os.Parcel in) {
 		value = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public Kind() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<Kind>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Short> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Short>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((Kind) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new Kind(delegate.read(in));
+			}
+		};
 	}
 }

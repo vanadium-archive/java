@@ -7,7 +7,7 @@ package com.veyron2.vom2;
  * type TypeID uint64 
  * TypeID uniquely identifies a type definition within a vom stream.
  **/
-public final class TypeID implements android.os.Parcelable, java.io.Serializable {
+public final class TypeID implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private long value;
 
     public TypeID(long value) {
@@ -54,5 +54,25 @@ public final class TypeID implements android.os.Parcelable, java.io.Serializable
 	};
 	private TypeID(android.os.Parcel in) {
 		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public TypeID() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<TypeID>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Long> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Long>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((TypeID) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new TypeID(delegate.read(in));
+			}
+		};
 	}
 }

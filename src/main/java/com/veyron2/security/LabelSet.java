@@ -7,7 +7,7 @@ package com.veyron2.security;
  * type LabelSet veyron2/security.Label uint32 
  * LabelSet is a set of access control labels, represented as a bitmask.
  **/
-public final class LabelSet implements android.os.Parcelable, java.io.Serializable {
+public final class LabelSet implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private com.veyron2.security.Label value;
 
     public LabelSet(com.veyron2.security.Label value) {
@@ -57,5 +57,25 @@ public final class LabelSet implements android.os.Parcelable, java.io.Serializab
 	};
 	private LabelSet(android.os.Parcel in) {
 		value = (com.veyron2.security.Label) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public LabelSet() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<LabelSet>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<com.veyron2.security.Label> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<com.veyron2.security.Label>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((LabelSet) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new LabelSet(delegate.read(in));
+			}
+		};
 	}
 }

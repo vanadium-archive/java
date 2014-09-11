@@ -7,7 +7,7 @@ package com.veyron2.security.wire;
  * type KeyCurve byte 
  * KeyCurve defines a namespace for elliptic curves.
  **/
-public final class KeyCurve implements android.os.Parcelable, java.io.Serializable {
+public final class KeyCurve implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private byte value;
 
     public KeyCurve(byte value) {
@@ -54,5 +54,25 @@ public final class KeyCurve implements android.os.Parcelable, java.io.Serializab
 	};
 	private KeyCurve(android.os.Parcel in) {
 		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public KeyCurve() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<KeyCurve>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Byte> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Byte>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((KeyCurve) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new KeyCurve(delegate.read(in));
+			}
+		};
 	}
 }

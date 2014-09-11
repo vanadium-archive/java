@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedByte byte 
  **/
-public final class NamedByte implements android.os.Parcelable, java.io.Serializable {
+public final class NamedByte implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private byte value;
 
     public NamedByte(byte value) {
@@ -53,5 +53,25 @@ public final class NamedByte implements android.os.Parcelable, java.io.Serializa
 	};
 	private NamedByte(android.os.Parcel in) {
 		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedByte() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedByte>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Byte> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Byte>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedByte) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedByte(delegate.read(in));
+			}
+		};
 	}
 }

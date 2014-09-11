@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedInt16 int16 
  **/
-public final class NamedInt16 implements android.os.Parcelable, java.io.Serializable {
+public final class NamedInt16 implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private short value;
 
     public NamedInt16(short value) {
@@ -53,5 +53,25 @@ public final class NamedInt16 implements android.os.Parcelable, java.io.Serializ
 	};
 	private NamedInt16(android.os.Parcel in) {
 		value = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedInt16() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedInt16>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Short> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Short>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedInt16) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedInt16(delegate.read(in));
+			}
+		};
 	}
 }

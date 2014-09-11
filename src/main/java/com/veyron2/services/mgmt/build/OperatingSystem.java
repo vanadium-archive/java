@@ -7,7 +7,7 @@ package com.veyron2.services.mgmt.build;
  * type OperatingSystem string 
  * OperatingSystem specifies the operating system of a host.
  **/
-public final class OperatingSystem implements android.os.Parcelable, java.io.Serializable {
+public final class OperatingSystem implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private java.lang.String value;
 
     public OperatingSystem(java.lang.String value) {
@@ -57,5 +57,25 @@ public final class OperatingSystem implements android.os.Parcelable, java.io.Ser
 	};
 	private OperatingSystem(android.os.Parcel in) {
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public OperatingSystem() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<OperatingSystem>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.String> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.String>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((OperatingSystem) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new OperatingSystem(delegate.read(in));
+			}
+		};
 	}
 }

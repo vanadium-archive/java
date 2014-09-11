@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedString string 
  **/
-public final class NamedString implements android.os.Parcelable, java.io.Serializable {
+public final class NamedString implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private java.lang.String value;
 
     public NamedString(java.lang.String value) {
@@ -56,5 +56,25 @@ public final class NamedString implements android.os.Parcelable, java.io.Seriali
 	};
 	private NamedString(android.os.Parcel in) {
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedString() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedString>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.String> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.String>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedString) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedString(delegate.read(in));
+			}
+		};
 	}
 }

@@ -8,7 +8,7 @@ package com.veyron.examples.rockpaperscissors;
  * WinnerTag is a type used to indicate whether a round or a game was a draw,
  * was won by player 1 or was won by player 2.
  **/
-public final class WinnerTag implements android.os.Parcelable, java.io.Serializable {
+public final class WinnerTag implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private byte value;
 
     public WinnerTag(byte value) {
@@ -55,5 +55,25 @@ public final class WinnerTag implements android.os.Parcelable, java.io.Serializa
 	};
 	private WinnerTag(android.os.Parcel in) {
 		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public WinnerTag() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<WinnerTag>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Byte> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Byte>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((WinnerTag) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new WinnerTag(delegate.read(in));
+			}
+		};
 	}
 }

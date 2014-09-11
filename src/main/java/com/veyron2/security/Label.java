@@ -7,7 +7,7 @@ package com.veyron2.security;
  * type Label uint32 
  * Label is an access control right, like Read, Write, Admin, etc.
  **/
-public final class Label implements android.os.Parcelable, java.io.Serializable {
+public final class Label implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private int value;
 
     public Label(int value) {
@@ -54,5 +54,25 @@ public final class Label implements android.os.Parcelable, java.io.Serializable 
 	};
 	private Label(android.os.Parcel in) {
 		value = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public Label() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<Label>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Integer> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Integer>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((Label) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new Label(delegate.read(in));
+			}
+		};
 	}
 }

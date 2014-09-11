@@ -7,7 +7,7 @@ package io.veyron.store.veyron.runtimes.google.vsync;
  * type DeviceID string 
  * DeviceID is the globally unique ID of a device.
  **/
-public final class DeviceID implements android.os.Parcelable, java.io.Serializable {
+public final class DeviceID implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private java.lang.String value;
 
     public DeviceID(java.lang.String value) {
@@ -57,5 +57,25 @@ public final class DeviceID implements android.os.Parcelable, java.io.Serializab
 	};
 	private DeviceID(android.os.Parcel in) {
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public DeviceID() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<DeviceID>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.String> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.String>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((DeviceID) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new DeviceID(delegate.read(in));
+			}
+		};
 	}
 }

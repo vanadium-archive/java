@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedComplex64 complex64 
  **/
-public final class NamedComplex64 implements android.os.Parcelable, java.io.Serializable {
+public final class NamedComplex64 implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private org.apache.commons.math3.complex.Complex value;
 
     public NamedComplex64(org.apache.commons.math3.complex.Complex value) {
@@ -56,5 +56,25 @@ public final class NamedComplex64 implements android.os.Parcelable, java.io.Seri
 	};
 	private NamedComplex64(android.os.Parcel in) {
 		value = (org.apache.commons.math3.complex.Complex) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedComplex64() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedComplex64>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<org.apache.commons.math3.complex.Complex> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<org.apache.commons.math3.complex.Complex>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedComplex64) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedComplex64(delegate.read(in));
+			}
+		};
 	}
 }

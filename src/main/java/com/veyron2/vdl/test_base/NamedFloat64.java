@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedFloat64 float64 
  **/
-public final class NamedFloat64 implements android.os.Parcelable, java.io.Serializable {
+public final class NamedFloat64 implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private double value;
 
     public NamedFloat64(double value) {
@@ -53,5 +53,25 @@ public final class NamedFloat64 implements android.os.Parcelable, java.io.Serial
 	};
 	private NamedFloat64(android.os.Parcel in) {
 		value = (double) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedFloat64() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedFloat64>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Double> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Double>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedFloat64) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedFloat64(delegate.read(in));
+			}
+		};
 	}
 }

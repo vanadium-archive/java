@@ -22,7 +22,7 @@ public class Any implements Parcelable, Serializable {
 
 	public Any(String data) {
 		this.data = data;
-		this.gson = new Gson();
+		this.gson = JSONUtil.getGsonBuilder().create();
 	}
 
 	/**

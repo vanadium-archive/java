@@ -6,7 +6,7 @@ package com.veyron2.vdl.test_base;
 /**
  * type NamedUint32 uint32 
  **/
-public final class NamedUint32 implements android.os.Parcelable, java.io.Serializable {
+public final class NamedUint32 implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private int value;
 
     public NamedUint32(int value) {
@@ -53,5 +53,25 @@ public final class NamedUint32 implements android.os.Parcelable, java.io.Seriali
 	};
 	private NamedUint32(android.os.Parcel in) {
 		value = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
+	}
+
+	public NamedUint32() {}  // Used for instantiating a TypeAdapterFactory.
+
+	@Override
+	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
+		if (!type.equals(new com.google.gson.reflect.TypeToken<NamedUint32>(){})) {
+			return null;
+		}
+		final com.google.gson.TypeAdapter<java.lang.Integer> delegate = gson.getAdapter(new com.google.gson.reflect.TypeToken<java.lang.Integer>() {});
+		return new com.google.gson.TypeAdapter<T>() {
+			@Override
+			public void write(com.google.gson.stream.JsonWriter out, T value) throws java.io.IOException {
+				delegate.write(out, ((NamedUint32) value).getValue());
+			}
+			@Override
+			public T read(com.google.gson.stream.JsonReader in) throws java.io.IOException {
+				return (T) new NamedUint32(delegate.read(in));
+			}
+		};
 	}
 }
