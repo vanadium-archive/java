@@ -3,7 +3,7 @@
 package com.veyron2.security.wire;
 
 /**
- * type ChainPublicID struct{Certificates []veyron2/security/wire.Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte}}} 
+ * type ChainPublicID struct{Certificates []veyron2/security/wire.Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Purpose []byte;Hash veyron2/security.Hash string;R []byte;S []byte}}} 
  * ChainPublicID represents the chain implementation of PublicIDs from veyron/runtimes/google/security.
  * It consists of a chain of certificates such that each certificate is signed using the private key
  * of the previous certificate (i.e., issuer). The certificate's signature is over its contents along

@@ -5,7 +5,7 @@ package com.veyron2.security;
 
 /**
  * type Hash string 
- * Hash identifies a cryptographic hash function.
+ * Hash identifies a cryptographic hash function approved for use in signature algorithms.
  **/
 public final class Hash implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private java.lang.String value;

@@ -3,7 +3,7 @@
 package com.veyron2.security.wire;
 
 /**
- * type Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte}} 
+ * type Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Purpose []byte;Hash veyron2/security.Hash string;R []byte;S []byte}} 
  * Certificate is a signed assertion binding a name to a public key under a certain set
  * of caveats. The issuer of a Certificate is the principal that possesses the private key
  * under which the Certificate was signed. The Certificate's signature is over the contents

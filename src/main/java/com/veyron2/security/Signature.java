@@ -3,13 +3,16 @@
 package com.veyron2.security;
 
 /**
- * type Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte} 
+ * type Signature struct{Purpose []byte;Hash veyron2/security.Hash string;R []byte;S []byte} 
  * Signature represents a digital signature.
  **/
 public final class Signature implements android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;
 
     
+    
+      @com.google.gson.annotations.SerializedName("Purpose")
+      private byte[] purpose;
     
       @com.google.gson.annotations.SerializedName("Hash")
       private com.veyron2.security.Hash hash;
@@ -22,7 +25,9 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
     
 
     
-    public Signature(final com.veyron2.security.Hash hash, final byte[] r, final byte[] s) {
+    public Signature(final byte[] purpose, final com.veyron2.security.Hash hash, final byte[] r, final byte[] s) {
+        
+            this.purpose = purpose;
         
             this.hash = hash;
         
@@ -33,6 +38,13 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
     }
 
     
+    
+    public byte[] getPurpose() {
+        return this.purpose;
+    }
+    public void setPurpose(byte[] purpose) {
+        this.purpose = purpose;
+    }
     
     public com.veyron2.security.Hash getHash() {
         return this.hash;
@@ -65,6 +77,12 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
 
         
         
+        if (!java.util.Arrays.equals(this.purpose, other.purpose)) {
+            return false;
+        }
+         
+        
+        
         
         if (this.hash == null) {
             if (other.hash != null) {
@@ -95,6 +113,8 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
         int result = 1;
         final int prime = 31;
         
+        result = prime * result + (purpose == null ? 0 : purpose.hashCode());
+        
         result = prime * result + (hash == null ? 0 : hash.hashCode());
         
         result = prime * result + (r == null ? 0 : r.hashCode());
@@ -109,6 +129,8 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
     }
     @Override
     public void writeToParcel(android.os.Parcel out, int flags) {
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, purpose);
     	
     		com.veyron2.vdl.ParcelUtil.writeValue(out, hash);
     	
@@ -129,6 +151,8 @@ public final class Signature implements android.os.Parcelable, java.io.Serializa
 		}
 	};
 	private Signature(android.os.Parcel in) {
+		
+			this.purpose = (byte[]) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.purpose);
 		
 			this.hash = (com.veyron2.security.Hash) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.hash);
 		

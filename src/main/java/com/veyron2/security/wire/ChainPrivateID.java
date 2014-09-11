@@ -3,7 +3,7 @@
 package com.veyron2.security.wire;
 
 /**
- * type ChainPrivateID struct{PublicID veyron2/security/wire.ChainPublicID struct{Certificates []veyron2/security/wire.Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Hash veyron2/security.Hash string;R []byte;S []byte}}};Secret []byte} 
+ * type ChainPrivateID struct{PublicID veyron2/security/wire.ChainPublicID struct{Certificates []veyron2/security/wire.Certificate struct{Name string;PublicKey veyron2/security/wire.PublicKey struct{Curve veyron2/security/wire.KeyCurve byte;XY []byte};Caveats []veyron2/security/wire.Caveat struct{Service veyron2/security.BlessingPattern string;Bytes []byte};Signature veyron2/security.Signature struct{Purpose []byte;Hash veyron2/security.Hash string;R []byte;S []byte}}};Secret []byte} 
  * ChainPrivateID represents the chain implementation of PrivateIDs from veyron/runtimes/google/security.
  **/
 public final class ChainPrivateID implements android.os.Parcelable, java.io.Serializable {
