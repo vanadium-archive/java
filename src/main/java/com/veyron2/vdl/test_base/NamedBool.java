@@ -55,7 +55,7 @@ public final class NamedBool implements android.os.Parcelable, java.io.Serializa
 		value = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedBool() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedBool() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

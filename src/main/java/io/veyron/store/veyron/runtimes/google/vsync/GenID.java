@@ -56,7 +56,7 @@ public final class GenID implements android.os.Parcelable, java.io.Serializable,
 		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public GenID() {}  // Used for instantiating a TypeAdapterFactory.
+	public GenID() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

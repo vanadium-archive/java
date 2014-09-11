@@ -56,7 +56,7 @@ public final class Kind implements android.os.Parcelable, java.io.Serializable, 
 		value = (short) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public Kind() {}  // Used for instantiating a TypeAdapterFactory.
+	public Kind() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

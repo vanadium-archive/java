@@ -56,7 +56,7 @@ public final class LSN implements android.os.Parcelable, java.io.Serializable, c
 		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public LSN() {}  // Used for instantiating a TypeAdapterFactory.
+	public LSN() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

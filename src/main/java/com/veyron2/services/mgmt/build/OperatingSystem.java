@@ -59,7 +59,7 @@ public final class OperatingSystem implements android.os.Parcelable, java.io.Ser
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public OperatingSystem() {}  // Used for instantiating a TypeAdapterFactory.
+	public OperatingSystem() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

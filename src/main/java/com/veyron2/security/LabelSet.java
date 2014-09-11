@@ -59,7 +59,7 @@ public final class LabelSet implements android.os.Parcelable, java.io.Serializab
 		value = (com.veyron2.security.Label) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public LabelSet() {}  // Used for instantiating a TypeAdapterFactory.
+	public LabelSet() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

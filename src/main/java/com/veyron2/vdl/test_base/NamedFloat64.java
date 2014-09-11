@@ -55,7 +55,7 @@ public final class NamedFloat64 implements android.os.Parcelable, java.io.Serial
 		value = (double) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedFloat64() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedFloat64() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

@@ -55,7 +55,7 @@ public final class NamedInt32 implements android.os.Parcelable, java.io.Serializ
 		value = (int) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedInt32() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedInt32() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

@@ -59,7 +59,7 @@ public final class Architecture implements android.os.Parcelable, java.io.Serial
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public Architecture() {}  // Used for instantiating a TypeAdapterFactory.
+	public Architecture() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

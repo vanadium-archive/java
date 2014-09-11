@@ -59,7 +59,7 @@ public final class DeviceID implements android.os.Parcelable, java.io.Serializab
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public DeviceID() {}  // Used for instantiating a TypeAdapterFactory.
+	public DeviceID() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

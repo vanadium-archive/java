@@ -55,7 +55,7 @@ public final class NamedFloat32 implements android.os.Parcelable, java.io.Serial
 		value = (float) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedFloat32() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedFloat32() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

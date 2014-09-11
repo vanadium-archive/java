@@ -55,7 +55,7 @@ public final class NamedByte implements android.os.Parcelable, java.io.Serializa
 		value = (byte) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedByte() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedByte() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

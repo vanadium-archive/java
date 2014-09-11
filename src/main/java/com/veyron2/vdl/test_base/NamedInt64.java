@@ -55,7 +55,7 @@ public final class NamedInt64 implements android.os.Parcelable, java.io.Serializ
 		value = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedInt64() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedInt64() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

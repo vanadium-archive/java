@@ -59,7 +59,7 @@ public final class Format implements android.os.Parcelable, java.io.Serializable
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public Format() {}  // Used for instantiating a TypeAdapterFactory.
+	public Format() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {

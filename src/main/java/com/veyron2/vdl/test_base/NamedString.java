@@ -58,7 +58,7 @@ public final class NamedString implements android.os.Parcelable, java.io.Seriali
 		value = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), value);
 	}
 
-	public NamedString() {}  // Used for instantiating a TypeAdapterFactory.
+	public NamedString() {}
 
 	@Override
 	public <T> com.google.gson.TypeAdapter<T> create(com.google.gson.Gson gson, com.google.gson.reflect.TypeToken<T> type) {
