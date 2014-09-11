@@ -3,7 +3,10 @@
 package com.veyron2.vdl.test_arith.exp;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.exp.gen_impl.ExpServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_arith.exp.gen_impl.ExpServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_arith/exp/ExpService"
+)
 public interface ExpService  {
 
     

@@ -3,7 +3,10 @@
 package io.veyron.examples.rockpaperscissors;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.rockpaperscissors.gen_impl.JudgeServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/rockpaperscissors/JudgeService"
+)
 public interface JudgeService  {
 
     

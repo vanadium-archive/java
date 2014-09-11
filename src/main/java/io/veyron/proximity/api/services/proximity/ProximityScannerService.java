@@ -3,7 +3,10 @@
 package io.veyron.proximity.api.services.proximity;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.proximity.api.services.proximity.gen_impl.ProximityScannerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.proximity.api.services.proximity.gen_impl.ProximityScannerServiceWrapper.class,
+	vdlPathName = "veyron.io/proximity/api/services/proximity/ProximityScannerService"
+)
 public interface ProximityScannerService  {
 
     

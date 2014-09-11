@@ -12,7 +12,10 @@ package com.veyron2.services.mgmt.stats;
  * etc.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.stats.gen_impl.StatsServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.stats.gen_impl.StatsServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/stats/StatsService"
+)
 public interface StatsService extends com.veyron2.services.mounttable.GlobbableService, com.veyron2.services.watch.GlobWatcherService {
 
     

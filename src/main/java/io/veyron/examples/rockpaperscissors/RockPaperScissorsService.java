@@ -3,7 +3,10 @@
 package io.veyron.examples.rockpaperscissors;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.rockpaperscissors.gen_impl.RockPaperScissorsServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.rockpaperscissors.gen_impl.RockPaperScissorsServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/rockpaperscissors/RockPaperScissorsService"
+)
 public interface RockPaperScissorsService extends io.veyron.examples.rockpaperscissors.JudgeService, io.veyron.examples.rockpaperscissors.PlayerService, io.veyron.examples.rockpaperscissors.ScoreKeeperService {
 
 }

@@ -3,7 +3,10 @@
 package com.veyron2.vdl.test_base;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_base.gen_impl.ServiceAServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_base.gen_impl.ServiceAServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_base/ServiceAService"
+)
 public interface ServiceAService  {
 
     

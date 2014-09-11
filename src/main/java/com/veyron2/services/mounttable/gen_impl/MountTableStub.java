@@ -4,7 +4,7 @@ package com.veyron2.services.mounttable.gen_impl;
 
 /* Client stub for interface: MountTable. */
 public final class MountTableStub implements com.veyron2.services.mounttable.MountTable {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.MountTable";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mounttable/MountTable";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -6,7 +6,10 @@ package io.veyron.store.veyron2.services.store;
  * Dir is a directory containing Objects and other Dirs.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.DirServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.DirServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/DirService"
+)
 public interface DirService extends io.veyron.store.veyron2.services.store.DirSpecificService, io.veyron.store.veyron2.services.store.DirOrObjectService {
 
 }

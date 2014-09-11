@@ -7,7 +7,10 @@ package io.veyron.store.veyron.services.store.raw;
  * via the Watcher interface, and committed via PutMutation.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron.services.store.raw.gen_impl.StoreServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron.services.store.raw.gen_impl.StoreServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron/services/store/raw/StoreService"
+)
 public interface StoreService  {
 
     

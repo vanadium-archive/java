@@ -3,7 +3,10 @@
 package io.veyron.examples.inspector;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.inspector.gen_impl.InspectorServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.inspector.gen_impl.InspectorServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/inspector/InspectorService"
+)
 public interface InspectorService  {
 
     

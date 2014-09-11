@@ -1,4 +1,4 @@
-package com.veyron.examples.fortune;
+package io.veyron.examples.fortune;
 
 import com.veyron2.OptionDefs;
 import com.veyron2.Options;

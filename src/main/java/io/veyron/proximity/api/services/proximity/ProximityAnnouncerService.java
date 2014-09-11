@@ -9,7 +9,10 @@ package io.veyron.proximity.api.services.proximity;
  * with this device.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.proximity.api.services.proximity.gen_impl.ProximityAnnouncerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.proximity.api.services.proximity.gen_impl.ProximityAnnouncerServiceWrapper.class,
+	vdlPathName = "veyron.io/proximity/api/services/proximity/ProximityAnnouncerService"
+)
 public interface ProximityAnnouncerService  {
 
     

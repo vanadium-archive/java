@@ -4,7 +4,7 @@ package io.veyron.examples.pipetobrowser.gen_impl;
 
 /* Client stub for interface: Viewer. */
 public final class ViewerStub implements io.veyron.examples.pipetobrowser.Viewer {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.pipetobrowser.Viewer";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/pipetobrowser/Viewer";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

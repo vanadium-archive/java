@@ -6,7 +6,10 @@ package com.veyron2.vdl.test_arith;
  * Trigonometry is an interface that specifies a couple trigonometric functions.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.gen_impl.TrigonometryServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_arith.gen_impl.TrigonometryServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_arith/TrigonometryService"
+)
 public interface TrigonometryService  {
 
     

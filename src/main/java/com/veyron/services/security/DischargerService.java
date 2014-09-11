@@ -6,7 +6,10 @@ package com.veyron.services.security;
  * Discharger is the interface for obtaining discharges for ThirdPartyCaveats.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.security.gen_impl.DischargerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.security.gen_impl.DischargerServiceWrapper.class,
+	vdlPathName = "veyron/services/security/DischargerService"
+)
 public interface DischargerService  {
 
     

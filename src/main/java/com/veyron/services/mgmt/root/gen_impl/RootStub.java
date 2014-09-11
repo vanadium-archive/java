@@ -4,7 +4,7 @@ package com.veyron.services.mgmt.root.gen_impl;
 
 /* Client stub for interface: Root. */
 public final class RootStub implements com.veyron.services.mgmt.root.Root {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.root.Root";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/mgmt/root/Root";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

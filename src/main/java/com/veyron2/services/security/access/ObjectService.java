@@ -6,7 +6,10 @@ package com.veyron2.services.security.access;
  * Object provides access control for Veyron objects.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper.class,
+	vdlPathName = "veyron2/services/security/access/ObjectService"
+)
 public interface ObjectService  {
 
     

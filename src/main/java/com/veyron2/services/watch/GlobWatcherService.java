@@ -7,7 +7,10 @@ package com.veyron2.services.watch;
  * that match a pattern.  See the package comments for details.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.watch.gen_impl.GlobWatcherServiceWrapper.class,
+	vdlPathName = "veyron2/services/watch/GlobWatcherService"
+)
 public interface GlobWatcherService  {
 
     

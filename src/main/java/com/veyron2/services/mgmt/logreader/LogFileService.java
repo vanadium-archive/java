@@ -6,7 +6,10 @@ package com.veyron2.services.mgmt.logreader;
  * LogFile can be used to access log files remotely.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.logreader.gen_impl.LogFileServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.logreader.gen_impl.LogFileServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/logreader/LogFileService"
+)
 public interface LogFileService  {
 
     

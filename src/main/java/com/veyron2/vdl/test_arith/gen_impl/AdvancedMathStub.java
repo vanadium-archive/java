@@ -4,7 +4,7 @@ package com.veyron2.vdl.test_arith.gen_impl;
 
 /* Client stub for interface: AdvancedMath. */
 public final class AdvancedMathStub implements com.veyron2.vdl.test_arith.AdvancedMath {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.AdvancedMath";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/vdl/test_arith/AdvancedMath";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

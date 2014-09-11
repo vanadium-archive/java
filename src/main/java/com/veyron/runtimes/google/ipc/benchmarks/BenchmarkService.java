@@ -3,7 +3,10 @@
 package com.veyron.runtimes.google.ipc.benchmarks;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.runtimes.google.ipc.benchmarks.gen_impl.BenchmarkServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.runtimes.google.ipc.benchmarks.gen_impl.BenchmarkServiceWrapper.class,
+	vdlPathName = "veyron/runtimes/google/ipc/benchmarks/BenchmarkService"
+)
 public interface BenchmarkService  {
 
     

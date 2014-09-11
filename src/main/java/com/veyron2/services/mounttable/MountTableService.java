@@ -6,7 +6,10 @@ package com.veyron2.services.mounttable;
  * MountTable defines the interface to talk to a mounttable.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.MountTableServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mounttable.gen_impl.MountTableServiceWrapper.class,
+	vdlPathName = "veyron2/services/mounttable/MountTableService"
+)
 public interface MountTableService extends com.veyron2.services.mounttable.GlobbableService {
 
     

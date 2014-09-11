@@ -4,7 +4,7 @@ package com.veyron2.vdl.test_base.gen_impl;
 
 /* Client stub for interface: ServiceA. */
 public final class ServiceAStub implements com.veyron2.vdl.test_base.ServiceA {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_base.ServiceA";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/vdl/test_base/ServiceA";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

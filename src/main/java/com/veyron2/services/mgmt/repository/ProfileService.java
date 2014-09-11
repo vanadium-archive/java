@@ -9,7 +9,10 @@ package com.veyron2.services.mgmt.repository;
  * devices, and are used to match them.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.repository.gen_impl.ProfileServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.repository.gen_impl.ProfileServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/repository/ProfileService"
+)
 public interface ProfileService  {
 
     

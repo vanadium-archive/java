@@ -6,7 +6,10 @@ package io.veyron.store.veyron2.services.store;
  * ObjectService is the interface for a value in the store.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.ObjectServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.ObjectServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/ObjectService"
+)
 public interface ObjectService extends io.veyron.store.veyron2.services.store.ObjectSpecificService, io.veyron.store.veyron2.services.store.DirOrObjectService {
 
 }

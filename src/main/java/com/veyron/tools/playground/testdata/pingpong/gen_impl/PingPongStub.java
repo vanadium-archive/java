@@ -4,7 +4,7 @@ package com.veyron.tools.playground.testdata.pingpong.gen_impl;
 
 /* Client stub for interface: PingPong. */
 public final class PingPongStub implements com.veyron.tools.playground.testdata.pingpong.PingPong {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.tools.playground.testdata.pingpong.PingPong";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/tools/playground/testdata/pingpong/PingPong";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

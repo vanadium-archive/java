@@ -4,7 +4,7 @@ package com.veyron.services.mgmt.debug.gen_impl;
 
 /* Client stub for interface: Debug. */
 public final class DebugStub implements com.veyron.services.mgmt.debug.Debug {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.debug.Debug";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/mgmt/debug/Debug";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

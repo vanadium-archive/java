@@ -7,7 +7,10 @@ package io.veyron.examples.bank;
  * Uses the client's Veyron Identity to determine account access.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.bank.gen_impl.BankServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.bank.gen_impl.BankServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/bank/BankService"
+)
 public interface BankService  {
 
     

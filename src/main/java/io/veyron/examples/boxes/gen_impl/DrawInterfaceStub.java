@@ -4,7 +4,7 @@ package io.veyron.examples.boxes.gen_impl;
 
 /* Client stub for interface: DrawInterface. */
 public final class DrawInterfaceStub implements io.veyron.examples.boxes.DrawInterface {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.boxes.DrawInterface";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/boxes/DrawInterface";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

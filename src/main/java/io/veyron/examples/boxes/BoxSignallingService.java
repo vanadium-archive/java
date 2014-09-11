@@ -6,7 +6,10 @@ package io.veyron.examples.boxes;
  * BoxSignalling allows peers to rendezvous with each other
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.boxes.gen_impl.BoxSignallingServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.boxes.gen_impl.BoxSignallingServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/boxes/BoxSignallingService"
+)
 public interface BoxSignallingService  {
 
     

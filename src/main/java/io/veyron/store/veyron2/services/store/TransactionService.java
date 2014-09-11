@@ -3,7 +3,10 @@
 package io.veyron.store.veyron2.services.store;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.TransactionServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.TransactionServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/TransactionService"
+)
 public interface TransactionService  {
 
     

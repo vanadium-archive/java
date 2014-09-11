@@ -4,7 +4,7 @@ package com.veyron2.services.mounttable.gen_impl;
 
 /* Client stub for interface: Globbable. */
 public final class GlobbableStub implements com.veyron2.services.mounttable.Globbable {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mounttable.Globbable";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mounttable/Globbable";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

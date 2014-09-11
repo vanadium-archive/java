@@ -6,7 +6,10 @@ package io.veyron.store.veyron.runtimes.google.vsync;
  * Sync allows a device to GetDeltas from another device.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron.runtimes.google.vsync.gen_impl.SyncServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron.runtimes.google.vsync.gen_impl.SyncServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron/runtimes/google/vsync/SyncService"
+)
 public interface SyncService  {
 
     

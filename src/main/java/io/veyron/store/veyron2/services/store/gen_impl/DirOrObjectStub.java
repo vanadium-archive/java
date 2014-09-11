@@ -4,7 +4,7 @@ package io.veyron.store.veyron2.services.store.gen_impl;
 
 /* Client stub for interface: DirOrObject. */
 public final class DirOrObjectStub implements io.veyron.store.veyron2.services.store.DirOrObject {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.store.veyron2.services.store.DirOrObject";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/store/veyron2/services/store/DirOrObject";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

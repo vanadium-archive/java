@@ -4,7 +4,7 @@ package io.veyron.store.veyron.services.store.server.gen_impl;
 
 /* Client stub for interface: storeThing. */
 public final class storeThingStub implements io.veyron.store.veyron.services.store.server.storeThing {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.store.veyron.services.store.server.storeThing";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/store/veyron/services/store/server/storeThing";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

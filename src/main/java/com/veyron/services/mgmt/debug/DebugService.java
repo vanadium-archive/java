@@ -9,7 +9,10 @@ package com.veyron.services.mgmt.debug;
  * resolved.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.debug.gen_impl.DebugServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mgmt.debug.gen_impl.DebugServiceWrapper.class,
+	vdlPathName = "veyron/services/mgmt/debug/DebugService"
+)
 public interface DebugService extends com.veyron2.services.mgmt.logreader.LogFileService, com.veyron2.services.mgmt.stats.StatsService {
 
 }

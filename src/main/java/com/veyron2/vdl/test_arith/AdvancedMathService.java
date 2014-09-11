@@ -9,7 +9,10 @@ package com.veyron2.vdl.test_arith;
  * different file) to verify that embedding works in all these scenarios.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.gen_impl.AdvancedMathServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_arith.gen_impl.AdvancedMathServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_arith/AdvancedMathService"
+)
 public interface AdvancedMathService extends com.veyron2.vdl.test_arith.TrigonometryService, com.veyron2.vdl.test_arith.exp.ExpService {
 
 }

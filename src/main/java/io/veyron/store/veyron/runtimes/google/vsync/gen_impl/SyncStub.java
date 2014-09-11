@@ -4,7 +4,7 @@ package io.veyron.store.veyron.runtimes.google.vsync.gen_impl;
 
 /* Client stub for interface: Sync. */
 public final class SyncStub implements io.veyron.store.veyron.runtimes.google.vsync.Sync {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.store.veyron.runtimes.google.vsync.Sync";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/store/veyron/runtimes/google/vsync/Sync";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -4,7 +4,7 @@ package io.veyron.examples.rockpaperscissors.gen_impl;
 
 /* Client stub for interface: Player. */
 public final class PlayerStub implements io.veyron.examples.rockpaperscissors.Player {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.rockpaperscissors.Player";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/rockpaperscissors/Player";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

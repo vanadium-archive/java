@@ -6,7 +6,10 @@ package com.veyron2.services.mgmt.appcycle;
  * AppCycle interfaces with the process running a veyron runtime.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.appcycle.gen_impl.AppCycleServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.appcycle.gen_impl.AppCycleServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/appcycle/AppCycleService"
+)
 public interface AppCycleService  {
 
     

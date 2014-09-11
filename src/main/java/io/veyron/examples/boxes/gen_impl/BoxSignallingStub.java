@@ -4,7 +4,7 @@ package io.veyron.examples.boxes.gen_impl;
 
 /* Client stub for interface: BoxSignalling. */
 public final class BoxSignallingStub implements io.veyron.examples.boxes.BoxSignalling {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.boxes.BoxSignalling";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/boxes/BoxSignalling";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

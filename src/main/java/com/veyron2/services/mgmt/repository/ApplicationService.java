@@ -15,7 +15,10 @@ package com.veyron2.services.mgmt.repository;
  * on either the "base" or "media" profile.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.repository.gen_impl.ApplicationServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.repository.gen_impl.ApplicationServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/repository/ApplicationService"
+)
 public interface ApplicationService  {
 
     

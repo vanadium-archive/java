@@ -3,7 +3,10 @@
 package com.veyron.lib.testutil.modules;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.lib.testutil.modules.gen_impl.EchoServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.lib.testutil.modules.gen_impl.EchoServiceWrapper.class,
+	vdlPathName = "veyron/lib/testutil/modules/EchoService"
+)
 public interface EchoService  {
 
     

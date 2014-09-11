@@ -4,7 +4,7 @@ package com.veyron.services.identity.gen_impl;
 
 /* Client stub for interface: OAuthBlesser. */
 public final class OAuthBlesserStub implements com.veyron.services.identity.OAuthBlesser {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.identity.OAuthBlesser";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/identity/OAuthBlesser";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

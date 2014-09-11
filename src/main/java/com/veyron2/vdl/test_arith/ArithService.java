@@ -8,7 +8,10 @@ package com.veyron2.vdl.test_arith;
  * * There must be at least 1 out-arg, and the last out-arg must be error.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.gen_impl.ArithServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_arith.gen_impl.ArithServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_arith/ArithService"
+)
 public interface ArithService  {
 
     

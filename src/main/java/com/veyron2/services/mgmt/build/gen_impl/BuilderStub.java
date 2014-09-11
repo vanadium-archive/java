@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.build.gen_impl;
 
 /* Client stub for interface: Builder. */
 public final class BuilderStub implements com.veyron2.services.mgmt.build.Builder {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.build.Builder";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/build/Builder";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

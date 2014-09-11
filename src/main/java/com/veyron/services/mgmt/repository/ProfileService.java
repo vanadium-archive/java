@@ -7,7 +7,10 @@ package com.veyron.services.mgmt.repository;
  * interface, it allows to add and remove profile specifications.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.repository.gen_impl.ProfileServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mgmt.repository.gen_impl.ProfileServiceWrapper.class,
+	vdlPathName = "veyron/services/mgmt/repository/ProfileService"
+)
 public interface ProfileService extends com.veyron2.services.mgmt.repository.ProfileService {
 
     

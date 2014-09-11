@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.logreader.gen_impl;
 
 /* Client stub for interface: LogFile. */
 public final class LogFileStub implements com.veyron2.services.mgmt.logreader.LogFile {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.logreader.LogFile";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/logreader/LogFile";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

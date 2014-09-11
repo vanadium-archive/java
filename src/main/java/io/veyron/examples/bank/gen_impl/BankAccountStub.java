@@ -4,7 +4,7 @@ package io.veyron.examples.bank.gen_impl;
 
 /* Client stub for interface: BankAccount. */
 public final class BankAccountStub implements io.veyron.examples.bank.BankAccount {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.bank.BankAccount";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/bank/BankAccount";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -6,7 +6,10 @@ package io.veyron.examples.boxes;
  * DrawInterface enables adding a box on another peer
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.boxes.gen_impl.DrawInterfaceServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.boxes.gen_impl.DrawInterfaceServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/boxes/DrawInterfaceService"
+)
 public interface DrawInterfaceService  {
 
     

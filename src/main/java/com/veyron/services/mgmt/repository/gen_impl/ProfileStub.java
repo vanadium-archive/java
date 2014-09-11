@@ -4,7 +4,7 @@ package com.veyron.services.mgmt.repository.gen_impl;
 
 /* Client stub for interface: Profile. */
 public final class ProfileStub implements com.veyron.services.mgmt.repository.Profile {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.repository.Profile";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/mgmt/repository/Profile";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

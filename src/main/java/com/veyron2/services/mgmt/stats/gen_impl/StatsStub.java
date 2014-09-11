@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.stats.gen_impl;
 
 /* Client stub for interface: Stats. */
 public final class StatsStub implements com.veyron2.services.mgmt.stats.Stats {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.stats.Stats";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/stats/Stats";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

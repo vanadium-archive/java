@@ -7,7 +7,10 @@ package io.veyron.store.veyron2.services.watch;
  * that match a query.  See the package comments for details.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.watch.gen_impl.QueryWatcherServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/watch/QueryWatcherService"
+)
 public interface QueryWatcherService  {
 
     

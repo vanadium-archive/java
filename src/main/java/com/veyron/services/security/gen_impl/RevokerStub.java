@@ -4,7 +4,7 @@ package com.veyron.services.security.gen_impl;
 
 /* Client stub for interface: Revoker. */
 public final class RevokerStub implements com.veyron.services.security.Revoker {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.security.Revoker";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/security/Revoker";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

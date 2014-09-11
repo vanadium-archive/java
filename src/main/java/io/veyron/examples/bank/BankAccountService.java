@@ -6,7 +6,10 @@ package io.veyron.examples.bank;
  * The BankAccount can only be accessed by blessed users
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.bank.gen_impl.BankAccountServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.bank.gen_impl.BankAccountServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/bank/BankAccountService"
+)
 public interface BankAccountService  {
 
     

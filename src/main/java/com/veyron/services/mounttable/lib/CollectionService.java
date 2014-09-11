@@ -3,7 +3,10 @@
 package com.veyron.services.mounttable.lib;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mounttable.lib.gen_impl.CollectionServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mounttable.lib.gen_impl.CollectionServiceWrapper.class,
+	vdlPathName = "veyron/services/mounttable/lib/CollectionService"
+)
 public interface CollectionService  {
 
     

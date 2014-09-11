@@ -3,7 +3,10 @@
 package com.veyron.tools.vrpc.test_base;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.tools.vrpc.test_base.gen_impl.TypeTesterServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.tools.vrpc.test_base.gen_impl.TypeTesterServiceWrapper.class,
+	vdlPathName = "veyron/tools/vrpc/test_base/TypeTesterService"
+)
 public interface TypeTesterService  {
 
     

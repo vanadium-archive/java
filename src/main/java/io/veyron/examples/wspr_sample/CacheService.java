@@ -6,7 +6,10 @@ package io.veyron.examples.wspr_sample;
  * A Cache service mimics the memcache interface.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.wspr_sample.gen_impl.CacheServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.wspr_sample.gen_impl.CacheServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/wspr_sample/CacheService"
+)
 public interface CacheService  {
 
     

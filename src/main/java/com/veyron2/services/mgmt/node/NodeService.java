@@ -7,7 +7,10 @@ package com.veyron2.services.mgmt.node;
  * will be invoked using an object name that identifies the node.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/node/NodeService"
+)
 public interface NodeService extends com.veyron2.services.mgmt.node.ApplicationService {
 
     

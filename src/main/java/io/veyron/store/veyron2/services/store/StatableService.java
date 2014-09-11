@@ -6,7 +6,10 @@ package io.veyron.store.veyron2.services.store;
  * Statable provides the Stat method.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.StatableServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.StatableServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/StatableService"
+)
 public interface StatableService  {
 
     

@@ -4,7 +4,7 @@ package com.veyron.lib.testutil.modules.gen_impl;
 
 /* Client stub for interface: Echo. */
 public final class EchoStub implements com.veyron.lib.testutil.modules.Echo {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.lib.testutil.modules.Echo";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/lib/testutil/modules/Echo";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

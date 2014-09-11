@@ -4,7 +4,7 @@ package com.veyron.services.security.gen_impl;
 
 /* Client stub for interface: Discharger. */
 public final class DischargerStub implements com.veyron.services.security.Discharger {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.security.Discharger";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/security/Discharger";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

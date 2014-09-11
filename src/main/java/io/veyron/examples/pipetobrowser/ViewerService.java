@@ -6,7 +6,10 @@ package io.veyron.examples.pipetobrowser;
  * Viewer allows clients to stream data to it and to request a particular viewer to format and display the data.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.pipetobrowser.gen_impl.ViewerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.pipetobrowser.gen_impl.ViewerServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/pipetobrowser/ViewerService"
+)
 public interface ViewerService  {
 
     

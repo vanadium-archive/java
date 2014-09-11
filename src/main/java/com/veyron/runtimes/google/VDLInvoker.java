@@ -54,15 +54,14 @@ public final class VDLInvoker {
     private final Map<String, ServiceMethod> invokableMethods = new HashMap<String, ServiceMethod>();
 
     private final Gson gson = new Gson();
-    private final Class<?> serviceClass; // Only used to make exception messages
-    // more clear.
+    private final Class<?> serviceClass; // Only used to make exception messages more clear.
     private String[] implementedServices;
 
-    // getImplementedServices gets a list of the services that are implmented by
+    // getImplementedServices gets a list of the services that are implemented by
     // the service object represented by the invoker.
     // e.g. ["veyron2/service/proximity/ProximityScanner"]
     public String[] getImplementedServices() {
-    	return implementedServices;
+    	return this.implementedServices;
     }
 
     /**
@@ -140,15 +139,6 @@ public final class VDLInvoker {
         return m.getLabel();
     }
 
-    private String serviceName(Class<?> serviceClass) {
-    	String name = serviceClass.getName();
-    	if (name.length() < 4 || !"com.".equals(name.substring(0, 4))) {
-    		// TODO(bprosnitz) Should we change this with an annotation of the service path?
-    		throw new RuntimeException("Class name expected to start with 'com.'");
-    	}
-    	return name.substring(4).replace('.', '/');
-    }
-
     /**
      * Iterate through the veyron services an object implements and generates
      * service wrappers for each.
@@ -165,7 +155,7 @@ public final class VDLInvoker {
             if (vs == null) {
             	continue;
             }
-            implementedServiceList.add(serviceName(iface));
+            implementedServiceList.add(vs.vdlPathName());
             // There should only be one constructor.
             if (vs.serviceWrapper().getConstructors().length != 1) {
                 throw new RuntimeException(
@@ -187,8 +177,8 @@ public final class VDLInvoker {
             throw new IllegalArgumentException(
                     "Object does not implement a valid generated service interface.");
         }
-        implementedServices = new String[implementedServiceList.size()];
-        implementedServiceList.toArray(implementedServices);
+        this.implementedServices = new String[implementedServiceList.size()];
+        implementedServiceList.toArray(this.implementedServices);
         return stubs;
     }
 

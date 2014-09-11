@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.repository.gen_impl;
 
 /* Client stub for interface: Binary. */
 public final class BinaryStub implements com.veyron2.services.mgmt.repository.Binary {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.Binary";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/repository/Binary";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -24,7 +24,10 @@ package com.veyron2.services.mgmt.repository;
  * To delete the binary, clients invoke the Delete() method.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.repository.gen_impl.BinaryServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.repository.gen_impl.BinaryServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/repository/BinaryService"
+)
 public interface BinaryService  {
 
     

@@ -4,7 +4,7 @@ package com.veyron2.vdl.test_arith.exp.gen_impl;
 
 /* Client stub for interface: Exp. */
 public final class ExpStub implements com.veyron2.vdl.test_arith.exp.Exp {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.exp.Exp";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/vdl/test_arith/exp/Exp";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

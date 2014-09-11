@@ -25,7 +25,10 @@ package com.veyron.services.identity;
  * import "veyron2/security/wire"
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.identity.gen_impl.OAuthBlesserServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.identity.gen_impl.OAuthBlesserServiceWrapper.class,
+	vdlPathName = "veyron/services/identity/OAuthBlesserService"
+)
 public interface OAuthBlesserService  {
 
     

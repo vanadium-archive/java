@@ -4,7 +4,7 @@ package io.veyron.examples.wspr_sample.gen_impl;
 
 /* Client stub for interface: ErrorThrower. */
 public final class ErrorThrowerStub implements io.veyron.examples.wspr_sample.ErrorThrower {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.wspr_sample.ErrorThrower";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/wspr_sample/ErrorThrower";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

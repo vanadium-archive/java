@@ -4,7 +4,7 @@ package com.veyron.tools.vrpc.test_base.gen_impl;
 
 /* Client stub for interface: TypeTester. */
 public final class TypeTesterStub implements com.veyron.tools.vrpc.test_base.TypeTester {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.tools.vrpc.test_base.TypeTester";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/tools/vrpc/test_base/TypeTester";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -4,7 +4,7 @@ package io.veyron.proximity.api.services.proximity.gen_impl;
 
 /* Client stub for interface: Proximity. */
 public final class ProximityStub implements io.veyron.proximity.api.services.proximity.Proximity {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.proximity.api.services.proximity.Proximity";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/proximity/api/services/proximity/Proximity";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

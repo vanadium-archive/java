@@ -3,7 +3,10 @@
 package io.veyron.store.veyron2.services.store;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.DirOrObjectServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.DirOrObjectServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/DirOrObjectService"
+)
 public interface DirOrObjectService extends io.veyron.store.veyron2.services.store.StatableService, io.veyron.store.veyron2.services.store.TransactableService, com.veyron2.services.mounttable.GlobbableService, com.veyron2.services.watch.GlobWatcherService, io.veyron.store.veyron2.services.watch.QueryWatcherService {
 
     

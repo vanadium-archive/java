@@ -4,7 +4,7 @@ package io.veyron.examples.tunnel.gen_impl;
 
 /* Client stub for interface: Tunnel. */
 public final class TunnelStub implements io.veyron.examples.tunnel.Tunnel {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.tunnel.Tunnel";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/tunnel/Tunnel";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

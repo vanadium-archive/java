@@ -3,7 +3,10 @@
 package com.veyron2.vdl.test_arith;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.vdl.test_arith.gen_impl.CalculatorServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.vdl.test_arith.gen_impl.CalculatorServiceWrapper.class,
+	vdlPathName = "veyron2/vdl/test_arith/CalculatorService"
+)
 public interface CalculatorService extends com.veyron2.vdl.test_arith.ArithService, com.veyron2.vdl.test_arith.AdvancedMathService {
 
     

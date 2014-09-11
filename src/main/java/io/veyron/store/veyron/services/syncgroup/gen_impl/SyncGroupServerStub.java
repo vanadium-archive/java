@@ -4,7 +4,7 @@ package io.veyron.store.veyron.services.syncgroup.gen_impl;
 
 /* Client stub for interface: SyncGroupServer. */
 public final class SyncGroupServerStub implements io.veyron.store.veyron.services.syncgroup.SyncGroupServer {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.store.veyron.services.syncgroup.SyncGroupServer";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/store/veyron/services/syncgroup/SyncGroupServer";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

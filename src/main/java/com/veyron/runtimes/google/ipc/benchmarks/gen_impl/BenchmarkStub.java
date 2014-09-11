@@ -4,7 +4,7 @@ package com.veyron.runtimes.google.ipc.benchmarks.gen_impl;
 
 /* Client stub for interface: Benchmark. */
 public final class BenchmarkStub implements com.veyron.runtimes.google.ipc.benchmarks.Benchmark {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.runtimes.google.ipc.benchmarks.Benchmark";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/runtimes/google/ipc/benchmarks/Benchmark";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -3,7 +3,10 @@
 package com.veyron2.services.mounttable;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mounttable.gen_impl.GlobbableServiceWrapper.class,
+	vdlPathName = "veyron2/services/mounttable/GlobbableService"
+)
 public interface GlobbableService  {
 
     

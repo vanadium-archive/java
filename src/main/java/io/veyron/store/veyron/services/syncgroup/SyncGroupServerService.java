@@ -12,7 +12,10 @@ package io.veyron.store.veyron.services.syncgroup;
  * the value of ETag from a recent response to Get(), Watch(), or GetACL().
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron.services.syncgroup.gen_impl.SyncGroupServerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron.services.syncgroup.gen_impl.SyncGroupServerServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron/services/syncgroup/SyncGroupServerService"
+)
 public interface SyncGroupServerService extends com.veyron2.services.security.access.ObjectService {
 
     

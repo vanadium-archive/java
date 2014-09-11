@@ -6,7 +6,10 @@ package io.veyron.store.veyron2.services.store;
  * Transactable provides the NewTransaction method.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.TransactableServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.TransactableServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/TransactableService"
+)
 public interface TransactableService  {
 
     

@@ -8,7 +8,10 @@ package com.veyron.services.mgmt.repository;
  * application envelopes.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.repository.gen_impl.ApplicationServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mgmt.repository.gen_impl.ApplicationServiceWrapper.class,
+	vdlPathName = "veyron/services/mgmt/repository/ApplicationService"
+)
 public interface ApplicationService extends com.veyron2.services.mgmt.repository.ApplicationService {
 
     

@@ -7,7 +7,10 @@ package io.veyron.store.veyron.services.store.server;
  * named 'thing'.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron.services.store.server.gen_impl.storeThingServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron.services.store.server.gen_impl.storeThingServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron/services/store/server/storeThingService"
+)
 public interface storeThingService extends io.veyron.store.veyron2.services.store.DirSpecificService, io.veyron.store.veyron2.services.store.ObjectSpecificService, io.veyron.store.veyron2.services.store.DirOrObjectService, io.veyron.store.veyron2.services.store.TransactionService {
 
 }

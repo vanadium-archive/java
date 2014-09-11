@@ -6,7 +6,10 @@ package io.veyron.store.veyron2.services.store;
  * SyncGroup is the interface to a SyncGroup in the store.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.SyncGroupServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.SyncGroupServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/SyncGroupService"
+)
 public interface SyncGroupService  {
 
     

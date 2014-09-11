@@ -93,7 +93,10 @@ package com.veyron2.services.mgmt.node;
  * installation instance as a receiver is well-defined.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/node/ApplicationService"
+)
 public interface ApplicationService  {
 
     

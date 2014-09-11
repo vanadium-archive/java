@@ -7,7 +7,10 @@ package com.veyron.services.mgmt.root;
  * privileges.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.root.gen_impl.RootServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mgmt.root.gen_impl.RootServiceWrapper.class,
+	vdlPathName = "veyron/services/mgmt/root/RootService"
+)
 public interface RootService  {
 
     

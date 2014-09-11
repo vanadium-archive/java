@@ -6,7 +6,10 @@ package io.veyron.examples.rockpaperscissors;
  * Player can receive challenges from other players.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.rockpaperscissors.gen_impl.PlayerServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/rockpaperscissors/PlayerService"
+)
 public interface PlayerService  {
 
     

@@ -3,7 +3,10 @@
 package io.veyron.store.veyron2.services.store;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.ObjectSpecificServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.ObjectSpecificServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/ObjectSpecificService"
+)
 public interface ObjectSpecificService  {
 
     

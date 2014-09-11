@@ -4,7 +4,7 @@ package com.veyron2.vdl.test_arith.gen_impl;
 
 /* Client stub for interface: Arith. */
 public final class ArithStub implements com.veyron2.vdl.test_arith.Arith {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.vdl.test_arith.Arith";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/vdl/test_arith/Arith";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

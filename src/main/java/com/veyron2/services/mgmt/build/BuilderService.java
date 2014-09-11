@@ -6,7 +6,10 @@ package com.veyron2.services.mgmt.build;
  * Builder describes an interface for building binaries from source.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron2.services.mgmt.build.gen_impl.BuilderServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron2.services.mgmt.build.gen_impl.BuilderServiceWrapper.class,
+	vdlPathName = "veyron2/services/mgmt/build/BuilderService"
+)
 public interface BuilderService  {
 
     

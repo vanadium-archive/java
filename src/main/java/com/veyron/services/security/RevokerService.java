@@ -20,7 +20,10 @@ package com.veyron.services.security;
  * performance improvements on the Discharger side.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.security.gen_impl.RevokerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.security.gen_impl.RevokerServiceWrapper.class,
+	vdlPathName = "veyron/services/security/RevokerService"
+)
 public interface RevokerService  {
 
     

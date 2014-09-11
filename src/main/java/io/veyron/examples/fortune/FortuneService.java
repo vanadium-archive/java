@@ -6,7 +6,10 @@ package io.veyron.examples.fortune;
  * Fortune allows clients to Get and Add fortune strings.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.fortune.gen_impl.FortuneServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.fortune.gen_impl.FortuneServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/fortune/FortuneService"
+)
 public interface FortuneService  {
 
     

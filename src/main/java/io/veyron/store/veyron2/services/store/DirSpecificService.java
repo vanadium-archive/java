@@ -3,7 +3,10 @@
 package io.veyron.store.veyron2.services.store;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.store.veyron2.services.store.gen_impl.DirSpecificServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.store.veyron2.services.store.gen_impl.DirSpecificServiceWrapper.class,
+	vdlPathName = "veyron.io/store/veyron2/services/store/DirSpecificService"
+)
 public interface DirSpecificService extends io.veyron.store.veyron2.services.store.SyncGroupService {
 
     

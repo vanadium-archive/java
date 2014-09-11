@@ -3,7 +3,10 @@
 package com.veyron.tools.playground.testdata.pingpong;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.tools.playground.testdata.pingpong.gen_impl.PingPongServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.tools.playground.testdata.pingpong.gen_impl.PingPongServiceWrapper.class,
+	vdlPathName = "veyron/tools/playground/testdata/pingpong/PingPongService"
+)
 public interface PingPongService  {
 
     

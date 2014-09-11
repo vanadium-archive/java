@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.appcycle.gen_impl;
 
 /* Client stub for interface: AppCycle. */
 public final class AppCycleStub implements com.veyron2.services.mgmt.appcycle.AppCycle {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.appcycle.AppCycle";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/appcycle/AppCycle";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

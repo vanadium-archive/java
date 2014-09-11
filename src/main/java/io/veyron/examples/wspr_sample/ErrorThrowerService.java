@@ -6,7 +6,10 @@ package io.veyron.examples.wspr_sample;
  * A testing interface with methods that throw various types of errors
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.wspr_sample.gen_impl.ErrorThrowerServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.wspr_sample.gen_impl.ErrorThrowerServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/wspr_sample/ErrorThrowerService"
+)
 public interface ErrorThrowerService  {
 
     

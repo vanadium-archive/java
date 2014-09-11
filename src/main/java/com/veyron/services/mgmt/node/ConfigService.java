@@ -6,7 +6,10 @@ package com.veyron.services.mgmt.node;
  * Config is an RPC API to the config service.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=com.veyron.services.mgmt.node.gen_impl.ConfigServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = com.veyron.services.mgmt.node.gen_impl.ConfigServiceWrapper.class,
+	vdlPathName = "veyron/services/mgmt/node/ConfigService"
+)
 public interface ConfigService  {
 
     

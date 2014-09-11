@@ -4,7 +4,7 @@ package io.veyron.store.veyron2.services.store.gen_impl;
 
 /* Client stub for interface: Transaction. */
 public final class TransactionStub implements io.veyron.store.veyron2.services.store.Transaction {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.store.veyron2.services.store.Transaction";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/store/veyron2/services/store/Transaction";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

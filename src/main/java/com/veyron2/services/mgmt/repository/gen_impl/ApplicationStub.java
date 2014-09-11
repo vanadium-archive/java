@@ -4,7 +4,7 @@ package com.veyron2.services.mgmt.repository.gen_impl;
 
 /* Client stub for interface: Application. */
 public final class ApplicationStub implements com.veyron2.services.mgmt.repository.Application {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron2.services.mgmt.repository.Application";
+    private static final java.lang.String vdlIfacePathOpt = "veyron2/services/mgmt/repository/Application";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

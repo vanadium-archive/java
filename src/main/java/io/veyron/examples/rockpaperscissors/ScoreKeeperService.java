@@ -6,7 +6,10 @@ package io.veyron.examples.rockpaperscissors;
  * ScoreKeeper receives the outcome of games from Judges.
  */
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.rockpaperscissors.gen_impl.ScoreKeeperServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/rockpaperscissors/ScoreKeeperService"
+)
 public interface ScoreKeeperService  {
 
     

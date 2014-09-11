@@ -4,7 +4,7 @@ package io.veyron.examples.fortune.gen_impl;
 
 /* Client stub for interface: Fortune. */
 public final class FortuneStub implements io.veyron.examples.fortune.Fortune {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.fortune.Fortune";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/fortune/Fortune";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

@@ -4,7 +4,7 @@ package com.veyron.services.mgmt.node.gen_impl;
 
 /* Client stub for interface: Config. */
 public final class ConfigStub implements com.veyron.services.mgmt.node.Config {
-    private static final java.lang.String vdlIfacePathOpt = "com.veyron.services.mgmt.node.Config";
+    private static final java.lang.String vdlIfacePathOpt = "veyron/services/mgmt/node/Config";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

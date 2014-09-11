@@ -4,7 +4,7 @@ package io.veyron.examples.inspector.gen_impl;
 
 /* Client stub for interface: Inspector. */
 public final class InspectorStub implements io.veyron.examples.inspector.Inspector {
-    private static final java.lang.String vdlIfacePathOpt = "io.veyron.examples.inspector.Inspector";
+    private static final java.lang.String vdlIfacePathOpt = "veyron.io/examples/inspector/Inspector";
     private final com.veyron2.ipc.Client client;
     private final java.lang.String veyronName;
 

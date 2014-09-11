@@ -3,7 +3,10 @@
 package io.veyron.examples.tunnel;
 
 
-@com.veyron2.vdl.VeyronService(serviceWrapper=io.veyron.examples.tunnel.gen_impl.TunnelServiceWrapper.class)
+@com.veyron2.vdl.VeyronService(
+	serviceWrapper = io.veyron.examples.tunnel.gen_impl.TunnelServiceWrapper.class,
+	vdlPathName = "veyron.io/examples/tunnel/TunnelService"
+)
 public interface TunnelService  {
 
     
