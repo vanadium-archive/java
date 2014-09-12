@@ -3,7 +3,7 @@
 package com.veyron2.ipc;
 
 /**
- * type Request struct{Suffix string;Method string;NumPosArgs uint64;EndStreamArgs bool;Timeout int64;HasBlessing bool;NumDischarges uint64} 
+ * type Request struct{Suffix string;Method string;NumPosArgs uint64;EndStreamArgs bool;Timeout int64;HasBlessing bool;NumDischarges uint64;TraceRequest veyron2/vtrace.Request struct{SpanID veyron2/uniqueid.ID [16]byte;TraceID veyron2/uniqueid.ID;Method veyron2/vtrace.TraceMethod int32}} 
  * Request describes the request header sent by the client to the server.  A
  * non-zero request header is sent at the beginning of the RPC call, followed by
  * the positional args.  Thereafter a zero request header is sent before each
@@ -36,9 +36,12 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
       @com.google.gson.annotations.SerializedName("NumDischarges")
       private long numDischarges;
     
+      @com.google.gson.annotations.SerializedName("TraceRequest")
+      private com.veyron2.vtrace.Request traceRequest;
+    
 
     
-    public Request(final java.lang.String suffix, final java.lang.String method, final long numPosArgs, final boolean endStreamArgs, final long timeout, final boolean hasBlessing, final long numDischarges) {
+    public Request(final java.lang.String suffix, final java.lang.String method, final long numPosArgs, final boolean endStreamArgs, final long timeout, final boolean hasBlessing, final long numDischarges, final com.veyron2.vtrace.Request traceRequest) {
         
             this.suffix = suffix;
         
@@ -53,6 +56,8 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
             this.hasBlessing = hasBlessing;
         
             this.numDischarges = numDischarges;
+        
+            this.traceRequest = traceRequest;
         
     }
 
@@ -105,6 +110,13 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
     }
     public void setNumDischarges(long numDischarges) {
         this.numDischarges = numDischarges;
+    }
+    
+    public com.veyron2.vtrace.Request getTraceRequest() {
+        return this.traceRequest;
+    }
+    public void setTraceRequest(com.veyron2.vtrace.Request traceRequest) {
+        this.traceRequest = traceRequest;
     }
     
 
@@ -179,6 +191,18 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
         }
          
          
+        
+        
+        
+        if (this.traceRequest == null) {
+            if (other.traceRequest != null) {
+                return false;
+            }
+        } else if (!this.traceRequest.equals(other.traceRequest)) {
+            return false;
+        }
+         
+         
          
         return true;
     }
@@ -200,6 +224,8 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
         result = prime * result + java.lang.Boolean.valueOf(hasBlessing).hashCode();
         
         result = prime * result + java.lang.Long.valueOf(numDischarges).hashCode();
+        
+        result = prime * result + (traceRequest == null ? 0 : traceRequest.hashCode());
         
         return result;
     }
@@ -223,6 +249,8 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
     		com.veyron2.vdl.ParcelUtil.writeValue(out, hasBlessing);
     	
     		com.veyron2.vdl.ParcelUtil.writeValue(out, numDischarges);
+    	
+    		com.veyron2.vdl.ParcelUtil.writeValue(out, traceRequest);
     	
     }
 	public static final android.os.Parcelable.Creator<Request> CREATOR
@@ -251,6 +279,8 @@ public final class Request implements android.os.Parcelable, java.io.Serializabl
 			this.hasBlessing = (boolean) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.hasBlessing);
 		
 			this.numDischarges = (long) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.numDischarges);
+		
+			this.traceRequest = (com.veyron2.vtrace.Request) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.traceRequest);
 		
 	}
 }
