@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceCategory android:title="@string/pref_category" />
+<Preference
+  android:title="@string/pref_veyron_subcategory" >
+  <intent 
+      android:targetPackage="net.veyron"
+      android:targetClass="net.veyron.SettingsActivity"
+      android:action="net.veyron.SETTINGS" />
+</Preference>
+</PreferenceScreen>
