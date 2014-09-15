@@ -6,6 +6,7 @@ import com.veyron2.security.Signature;
 
 import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
@@ -13,8 +14,18 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
 public class Signer implements com.veyron2.security.Signer {
+	private static final String TAG = "net.example.jnitest2";
 	private static final String HASH_ALGORITHM = "SHA256";
 	private static final String SIGN_ALGORITHM = HASH_ALGORITHM + "withECDSA";
+
+	private static byte[] join(byte[] a, byte[] b) {
+		if (a == null || a.length == 0) return b;
+		if (b == null || b.length == 0) return a;
+		final byte[] c = new byte[a.length + b.length];
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		return c;
+	}
 
 	private final PrivateKey privKey;
 	private final ECPublicKey pubKey;
@@ -25,13 +36,35 @@ public class Signer implements com.veyron2.security.Signer {
 	}
 
 	@Override
-	public Signature sign(byte[] message) throws VeyronException {
+	public Signature sign(byte[] purpose, byte[] message) throws VeyronException {
+		if (message == null || message.length == 0) {
+			throw new VeyronException("Cannot sign empty message.");
+		}
+		// Apply the first hash on the message.
+		try {
+			final MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+			md.update(message);
+			message = md.digest();
+			if (message == null || message.length == 0) {
+				throw new VeyronException(
+					"Got empty message after a hash using " + HASH_ALGORITHM);
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new VeyronException("Hashing algorithm " + HASH_ALGORITHM + " not " +
+				"supported by the runtime: " + e.getMessage());
+		}
+
+		// Append purpose to the hash.
+		message = join(message, purpose);
+
+		// Sign.  Note that the signer will first apply another hash on the message, resulting in:
+		// ECDSA.Sign(Hash(Hash(message) + purpose)).
 		try {
 			final java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGORITHM);
 			sig.initSign(this.privKey);
 			sig.update(message);
 			final byte[] encoded = sig.sign();
-			return decodeSignature(encoded);
+			return decodeSignature(purpose, encoded);
 		} catch (NoSuchAlgorithmException e) {
 			throw new VeyronException("Signing algorithm " + SIGN_ALGORITHM +
 				" not supported by the runtime: " + e.getMessage());
@@ -47,14 +80,7 @@ public class Signer implements com.veyron2.security.Signer {
 		return this.pubKey;
 	}
 
-	/**
-	 * Decodes the provided ASN1-encoded ECDSA signature.
-	 *
-	 * @param  encoded         ASN1-encoded ECDSA signature.
-	 * @return                 decoded Signature object.
-	 * @throws VeyronException if the signature couldn't be decoded.
-	 */
-	private Signature decodeSignature(byte[] encoded) throws VeyronException {
+	private Signature decodeSignature(byte[] purpose, byte[] encodedMsg) throws VeyronException {
 		byte[] r, s;
 		// The ASN.1 format of the signature should be:
 		//    Signature ::= SEQUENCE {
@@ -66,7 +92,7 @@ public class Signer implements com.veyron2.security.Signer {
 		//
 		// Note that we could have used BouncyCastle or an ASN1-decoding package to decode
 		// the byte sequence, but the encoding is simple enough that we can do it by hand.
-		final ByteArrayInputStream in = new ByteArrayInputStream(encoded);
+		final ByteArrayInputStream in = new ByteArrayInputStream(encodedMsg);
 		int b;
 		if ((b = in.read()) != 0x30) {
 			throw new VeyronException(String.format("Invalid signature type, want SEQUENCE (0x30), got 0x%02X", b));
@@ -94,6 +120,6 @@ public class Signer implements com.veyron2.security.Signer {
 		if (in.read(s, 0, b) != b) {
 			throw new VeyronException(String.format("Error reading %d bytes of S from signature", b));
 		}
-		return new Signature(new Hash(HASH_ALGORITHM), r, s);
+		return new Signature(purpose, new Hash(HASH_ALGORITHM), r, s);
 	}
 }

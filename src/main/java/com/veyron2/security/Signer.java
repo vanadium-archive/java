@@ -13,11 +13,17 @@ public interface Signer {
 	 * Signs an arbitrary length message (often the hash of a larger message) using the private
 	 * key associated with this signer.
 	 *
+	 * The provided purpose is appended to message before signing and is made available
+	 * (in cleartext) with the Signature.  Thus, a non-nil purpose can be used to avoid
+	 * "type attacks", wherein an honest entity is cheated on interpreting a field in a message
+	 * as one with a type other than the intended one.
+	 *
 	 * @param  message         a message to be signed.
+	 * @param  purpose         purpose of the message, used for preventing "type attacks".
 	 * @return                 the message signature.
 	 * @throws VeyronException if the message cannot be signed.
 	 */
-	public Signature sign(byte[] message) throws VeyronException;
+	public Signature sign(byte[] purpose, byte[] message) throws VeyronException;
 
 	/**
 	 * Returns ECDSA public key corresponding to this Signer's private key.

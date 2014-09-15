@@ -4,6 +4,8 @@ import com.veyron2.ipc.VeyronException;
 
 import org.joda.time.Duration;
 
+import java.security.interfaces.ECPublicKey;
+
 /**
  * PrivateID is the interface for the secret component of a principal's unique
  * identity.
@@ -11,7 +13,7 @@ import org.joda.time.Duration;
  * Each principal has a unique (private, public) key pair. The private key
  * is known only to the principal and is not expected to be shared.
  */
-public interface PrivateID extends Signer {
+public interface PrivateID {
 	/**
 	 * Returns the non-secret component of principal's identity (which can be encoded and
 	 * transmitted across the network perhaps).
@@ -50,4 +52,21 @@ public interface PrivateID extends Signer {
 	 * @throws VeyronException if any error is encountered
 	 */
 	public PrivateID derive(PublicID publicID) throws VeyronException;
+
+	/**
+	 * Signs an arbitrary length message (often the hash of a larger message) using the private
+	 * key associated with this PrivateID.
+	 *
+	 * @param  message         a message to be signed.
+	 * @return                 the message signature.
+	 * @throws VeyronException if the message cannot be signed.
+	 */
+	public Signature sign(byte[] message) throws VeyronException;
+
+	/**
+	 * Returns ECDSA public key corresponding to this PrivateID's private key.
+	 *
+	 * @return  an ECDSA public key corresponding to this PrivateID's private key.
+	 */
+	public ECPublicKey publicKey();
 }

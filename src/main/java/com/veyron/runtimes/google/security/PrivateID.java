@@ -47,7 +47,7 @@ public class PrivateID implements com.veyron2.security.PrivateID {
 	}
 	@Override
 	public Signature sign(byte[] message) throws VeyronException {
-		return this.signer.sign(message);
+		return this.signer.sign(null, message);
 	}
 	@Override
 	public ECPublicKey publicKey() {

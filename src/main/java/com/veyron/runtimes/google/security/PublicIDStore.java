@@ -4,41 +4,6 @@ import com.veyron2.ipc.VeyronException;
 import com.veyron2.security.BlessingPattern;
 
 public class PublicIDStore implements com.veyron2.security.PublicIDStore {
-	/**
-	 * Params specifies options used for creating a new PublicIDStore.
-	 */
-	public class Params {
-		/**
-		 * Path to a directory in which a serialized PublicIDStore can be saved and loaded.
-		 */
-		public String dir;
-		/**
-		 * Signer used for generating and verifying signatures.
-		 */
-		public com.veyron2.security.Signer signer;
-	}
-
-	private static native long nativeCreate(Params params) throws VeyronException;
-
-	/**
-	 * Returns a new instance of PrivateIDStore based on params.
-	 *  - If params is null, a new store with an empty set of PublicIDs and the default
-	 *   pattern "..." (matched by all PublicIDs) is returned. The store only lives in
-	 *   memory and is never persisted.
-	 *  - If params is non-null, then a store obtained from the serialized data present
-	 *   in params.Dir is returned if the data exists, or else a new store with an
-	 *   empty set of PublicIDs and the default pattern "..." is returned. Any subsequent
-	 *   modifications to the returned store are always signed (using params.Signer)
-	 *   and persisted in params.Dir.
-	 *
-	 * @param  params          options used for creating a new PublicIDStore.
-	 * @return                 new instance of PublicIDStore.
-	 * @throws VeyronException if the PublicIDStore couldn't be created.
-	 */
-	public static PublicIDStore create(Params params) throws VeyronException {
-		return new PublicIDStore(nativeCreate(params));
-	}
-
 	private final long nativePtr;
 
 	private native void nativeAdd(long nativePtr, com.veyron2.security.PublicID id, String peerPattern)
