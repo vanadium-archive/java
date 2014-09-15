@@ -3,16 +3,17 @@
 package com.veyron2.security;
 
 /**
- * type DischargeImpetus struct{Server any;Method string;Arguments []any} 
+ * type DischargeImpetus struct{Server []veyron2/security.BlessingPattern string;Method string;Arguments []any} 
  * DischargeImpetus encapsulates the motivation for a discharge being sought.
  * 
- * These values are reported by the holder of a PublicID with ThirdPartyCaveats when
- * requesting a Discharge. The third-party issuing discharges thus cannot safely
- * assume that all values are provided, or that they are provided honestly.
+ * These values are reported by a principal that is requesting a Discharge for
+ * a third-party caveat on one of its blessings. The third-party issues
+ * discharges cannot safely assume that all these values are provided, or that
+ * they are provided honestly.
  * 
- * Implementations of services that issue discharges are encouraged to add caveats to the
- * discharge that bind the discharge to the impetus, thereby rendering the discharge unsuable
- * for any other purpose.
+ * Implementations of services that issue discharges are encouraged to add
+ * caveats to the discharge that bind the discharge to the impetus, thereby
+ * rendering the discharge unsuable for any other purpose.
  **/
 public final class DischargeImpetus implements android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;
@@ -20,7 +21,7 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
     
     
       @com.google.gson.annotations.SerializedName("Server")
-      private com.veyron2.vdl.Any server;
+      private java.util.List<com.veyron2.security.BlessingPattern> server;
     
       @com.google.gson.annotations.SerializedName("Method")
       private java.lang.String method;
@@ -30,7 +31,7 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
     
 
     
-    public DischargeImpetus(final com.veyron2.vdl.Any server, final java.lang.String method, final java.util.List<com.veyron2.vdl.Any> arguments) {
+    public DischargeImpetus(final java.util.List<com.veyron2.security.BlessingPattern> server, final java.lang.String method, final java.util.List<com.veyron2.vdl.Any> arguments) {
         
             this.server = server;
         
@@ -42,10 +43,10 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
 
     
     
-    public com.veyron2.vdl.Any getServer() {
+    public java.util.List<com.veyron2.security.BlessingPattern> getServer() {
         return this.server;
     }
-    public void setServer(com.veyron2.vdl.Any server) {
+    public void setServer(java.util.List<com.veyron2.security.BlessingPattern> server) {
         this.server = server;
     }
     
@@ -150,7 +151,7 @@ public final class DischargeImpetus implements android.os.Parcelable, java.io.Se
 	};
 	private DischargeImpetus(android.os.Parcel in) {
 		
-			this.server = (com.veyron2.vdl.Any) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.server);
+			this.server = (java.util.List<com.veyron2.security.BlessingPattern>) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.server);
 		
 			this.method = (java.lang.String) com.veyron2.vdl.ParcelUtil.readValue(in, getClass().getClassLoader(), this.method);
 		
