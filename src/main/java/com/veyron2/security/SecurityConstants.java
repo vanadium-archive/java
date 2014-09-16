@@ -57,6 +57,12 @@ public final class SecurityConstants {
     public static final com.veyron2.security.Hash NO_HASH = new com.veyron2.security.Hash("");
     
     
+    public static final java.lang.String SIGNATURE_FOR_MESSAGE_SIGNING = "S";
+    
+    
+    public static final java.lang.String SIGNATURE_FOR_BLESSING_CERTIFICATES = "B";
+    
+    
     
 
     
