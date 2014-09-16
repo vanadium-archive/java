@@ -6,8 +6,8 @@ package com.veyron2.security;
  * type methodCaveat []string 
  * methodCaveat represents a caveat that validates iff the method being invoked
  * is included in this list. An empty list implies that no method can be
- * invoked (i.e., the holder of a blessing with this caveat cannot act as a
- * client).
+ * invoked (i.e., the holder of a blessing with this caveat could be a server
+ * but cannot act as a client).
  **/
 public final class methodCaveat implements java.util.List<java.lang.String>, android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;
