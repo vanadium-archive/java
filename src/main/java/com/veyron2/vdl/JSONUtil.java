@@ -14,19 +14,21 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 
 import android.util.Base64;
-import android.util.Log;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.veyron2.ipc.VeyronException;
+
+import org.joda.time.Duration;
 
 /**
  * JSONUtil provides various utilities for JSON encoding/decoding of VDL types.
  */
 public class JSONUtil {
-	private static GsonBuilder builder = new GsonBuilder(); 
+	private static GsonBuilder builder = new GsonBuilder();
 
 	static {
 		builder.registerTypeAdapter(byte[].class, new ByteArrayTypeAdapter());
+		builder.registerTypeAdapter(Duration.class, new DurationTypeAdapter());
+		builder.registerTypeAdapter(VeyronException.class, new VeyronExceptionTypeAdapter());
 		builder.registerTypeAdapterFactory(new CustomTypeAdapterFactory());
 	}
 
@@ -48,7 +50,8 @@ public class JSONUtil {
 			}
 			try {
 				final Class<T> c = (Class<T>) type.getRawType();
-				final TypeAdapterFactory factory = (TypeAdapterFactory) c.getConstructor().newInstance();
+				final TypeAdapterFactory factory =
+					(TypeAdapterFactory) c.getConstructor().newInstance();
 				return factory.create(gson, type);
 			} catch (Exception e) {
 				return null;
@@ -56,22 +59,55 @@ public class JSONUtil {
 		}
 	}
 
-    private static class ByteArrayTypeAdapter implements JsonSerializer<byte[]>, JsonDeserializer<byte[]>{
+    private static class ByteArrayTypeAdapter implements JsonSerializer<byte[]>,
+			JsonDeserializer<byte[]>{
 		@Override
 		public JsonElement serialize(
-			byte[] src, java.lang.reflect.Type type, JsonSerializationContext context) {
+				byte[] src, java.lang.reflect.Type type, JsonSerializationContext ctx) {
 			return new JsonPrimitive(Base64.encodeToString(src, Base64.NO_WRAP));
       	}
 		@Override
 		public byte[] deserialize(
-			JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext context)
-			throws JsonParseException {
+				JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext ctx)
+				throws JsonParseException {
 			final String encoded = json.getAsJsonPrimitive().getAsString();
 			try {
 				return Base64.decode(encoded, Base64.NO_WRAP);
 			} catch (IllegalArgumentException e) {
 				throw new JsonParseException(e.getMessage());
 			}
+		}
+	}
+
+	// TODO(spetrovic): move this one out into package "com.veyron2" as it's not VDL-specific.
+	private static class DurationTypeAdapter implements JsonSerializer<Duration>,
+			JsonDeserializer<Duration>{
+		@Override
+		public JsonElement serialize(
+				Duration src, java.lang.reflect.Type type, JsonSerializationContext ctx) {
+			return new JsonPrimitive(src.getMillis() * 1000000L);
+      	}
+		@Override
+		public Duration deserialize(
+				JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext ctx)
+				throws JsonParseException {
+			final long durationNanos = json.getAsJsonPrimitive().getAsLong();
+			return Duration.millis(durationNanos / 1000000L);
+		}
+	}
+	// TODO(spetrovic): move this one out into package "com.veyron2" as it's not VDL-specific.
+	private static class VeyronExceptionTypeAdapter implements JsonSerializer<VeyronException>,
+			JsonDeserializer<VeyronException>{
+		@Override
+		public JsonElement serialize(
+				VeyronException src, java.lang.reflect.Type type, JsonSerializationContext ctx) {
+			return new JsonPrimitive(src.getMessage());
+      	}
+		@Override
+		public VeyronException deserialize(
+				JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext ctx)
+				throws JsonParseException {
+			return new VeyronException(json.getAsJsonPrimitive().getAsString());
 		}
 	}
 }

@@ -208,7 +208,7 @@ public final class VDLInvoker {
      * @throws IllegalAccessException if a runtime access error occurs
      */
     public InvokeReply invoke(String method, ServerCall call, String[] inArgs) throws
-    IllegalArgumentException, IllegalAccessException {
+            IllegalArgumentException, IllegalAccessException {
         final ServiceMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new IllegalArgumentException(String.format(

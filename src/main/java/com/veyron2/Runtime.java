@@ -4,6 +4,7 @@ import com.veyron2.ipc.Client;
 import com.veyron2.ipc.Context;
 import com.veyron2.ipc.Server;
 import com.veyron2.ipc.VeyronException;
+import com.veyron2.naming.Namespace;
 import com.veyron2.security.PrivateID;
 import com.veyron2.security.PublicIDStore;
 
@@ -15,7 +16,7 @@ public interface Runtime {
 	/**
 	 * Creates a new Client instance.
 	 *
-	 * @return Client          the new client instance
+	 * @return                 the new client instance
 	 * @throws VeyronException if a new client cannot be created
 	 */
 	public Client newClient() throws VeyronException;
@@ -27,7 +28,7 @@ public interface Runtime {
 	 * {@link com.veyron2.OptionDefs#CALL_TIMEOUT}
 	 *
 	 * @param  opts            client options
-	 * @return Client          the new client instance
+	 * @return                 the new client instance
 	 * @throws VeyronException if a new client cannot be created
 	 */
 	public Client newClient(Options opts) throws VeyronException;
@@ -35,7 +36,7 @@ public interface Runtime {
 	/**
 	 * Creates a new Server instance.
 	 *
-	 * @return Server          the new server instance
+	 * @return                 the new server instance
 	 * @throws VeyronException if a new server cannot be created
 	 */
 	public Server newServer() throws VeyronException;
@@ -45,7 +46,7 @@ public interface Runtime {
 	 * interface chooses which options to support.
 	 *
 	 * @param  opts            server options
-	 * @return Server          the new server instance
+	 * @return                 the new server instance
 	 * @throws VeyronException if a new server cannot be created
 	 */
 	public Server newServer(Options opts) throws VeyronException;
@@ -53,7 +54,7 @@ public interface Runtime {
 	/**
 	 * Returns the pre-configured Client that is created when the Runtime is initialized.
 	 *
-	 * @return Client the pre-configured client instance.
+	 * @return the pre-configured client instance.
 	 */
 	public Client getClient();
 
@@ -86,4 +87,11 @@ public interface Runtime {
 	 * @return the store of PublicIDs held by the runtime.
 	 */
 	public PublicIDStore getPublicIDStore();
+
+	/**
+	 * Returns the pre-configured Namespace that is created when the Runtime is initialized.
+	 *
+	 * @return the pre-configured Namespace instance.
+	 */
+	public Namespace getNamespace();
 }

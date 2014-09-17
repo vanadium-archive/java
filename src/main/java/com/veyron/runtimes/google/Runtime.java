@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import com.veyron.runtimes.google.android.RedirectStderr;
+import com.veyron.runtimes.google.naming.Namespace;
 import com.veyron.runtimes.google.security.CryptoUtil;
 import com.veyron.runtimes.google.security.PrivateID;
 import com.veyron.runtimes.google.security.PublicIDStore;
@@ -132,6 +133,7 @@ public class Runtime implements com.veyron2.Runtime {
 	private native long nativeGetClient(long nativePtr);
 	private native long nativeNewContext(long nativePtr);
 	private native long nativeGetPublicIDStore(long nativePtr);
+	private native long nativeGetNamespace(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
 	private Runtime(long nativePtr, com.veyron2.security.PrivateID privateID) {
@@ -195,6 +197,10 @@ public class Runtime implements com.veyron2.Runtime {
 			this.publicIDStore = new PublicIDStore(nativeGetPublicIDStore(this.nativePtr));
 		}
 		return this.publicIDStore;
+	}
+	@Override
+	public com.veyron2.naming.Namespace getNamespace() {
+		return new Namespace(nativeGetNamespace(this.nativePtr));
 	}
 	@Override
 	protected void finalize() {
