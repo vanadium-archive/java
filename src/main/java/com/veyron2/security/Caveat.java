@@ -4,8 +4,7 @@ package com.veyron2.security;
 
 /**
  * type Caveat struct{ValidatorVOM []byte} 
- * Caveat is a condition on the applicability of a blessing (or
- * a Discharge).
+ * Caveat is a condition on the validity of a blessing/discharge.
  * 
  * These conditions are provided when asking a principal to create
  * a blessing and are verified when extracting blessings (Blessings.ForName

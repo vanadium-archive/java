@@ -5,7 +5,7 @@ package com.veyron2.security;
 /**
  * type Certificate struct{Extension string;PublicKey []byte;Caveats []veyron2/security.Caveat struct{ValidatorVOM []byte};Signature veyron2/security.Signature struct{Purpose []byte;Hash veyron2/security.Hash string;R []byte;S []byte}} 
  * Certificate represents the cryptographic proof of the binding of
- * extensions of a blessing of one principal to another (represented by
+ * extensions of a blessing held by one principal to another (represented by
  * a public key) under specific caveats.
  * 
  * For example, if a principal P1 has a blessing "alice", then it can
