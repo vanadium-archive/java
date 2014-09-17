@@ -18,6 +18,9 @@ package com.veyron2.security;
  * glob. For example, the pattern "a/b/c/..." is matched by all the patterns
  * that match "a/b/c" ("a", "a/b", "a/b/c") and all delegates of "a/b/c" (like
  * "a/b/c/d", "a/b/c/d/e" etc.).
+ * 
+ * A pattern string not having one of the above described structures is considered
+ * invalid.
  **/
 public final class BlessingPattern implements android.os.Parcelable, java.io.Serializable, com.google.gson.TypeAdapterFactory {
     private java.lang.String value;
