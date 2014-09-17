@@ -7,8 +7,9 @@ package com.veyron2.security;
  * Caveat is a condition on the applicability of a blessing (or
  * a Discharge).
  * 
- * These conditions are provided to PrivateID.Bless and are verified
- * in PublicID.Authorize.
+ * These conditions are provided when asking a principal to create
+ * a blessing and are verified when extracting blessings (Blessings.ForName
+ * in the Go API).
  **/
 public final class Caveat implements android.os.Parcelable, java.io.Serializable {
     static final long serialVersionUID = 0L;
