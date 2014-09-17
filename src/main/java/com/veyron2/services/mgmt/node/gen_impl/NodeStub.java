@@ -11,6 +11,9 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     
     
     
+    private final com.veyron2.services.security.access.gen_impl.ObjectStub objectStub;
+    
+    
     private final com.veyron2.services.mgmt.node.gen_impl.ApplicationStub applicationStub;
     
 
@@ -19,6 +22,8 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
         this.veyronName = veyronName;
         
         
+        this.objectStub = new com.veyron2.services.security.access.gen_impl.ObjectStub(client, veyronName);
+         
         this.applicationStub = new com.veyron2.services.mgmt.node.gen_impl.ApplicationStub(client, veyronName);
          
     }
@@ -296,6 +301,28 @@ public final class NodeStub implements com.veyron2.services.mgmt.node.Node {
     public void updateTo(final com.veyron2.ipc.Context context, final java.lang.String Name, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
         
           this.applicationStub.updateTo(context, Name, veyronOpts);
+    }
+
+    @Override
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.Context context) throws com.veyron2.ipc.VeyronException {
+        
+        return this.objectStub.getACL(context);
+    }
+    @Override
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.Context context, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.objectStub.getACL(context, veyronOpts);
+    }
+
+    @Override
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
+        
+         this.objectStub.setACL(context, acl, etag);
+    }
+    @Override
+    public void setACL(final com.veyron2.ipc.Context context, final com.veyron2.security.ACL acl, final java.lang.String etag, com.veyron2.Options veyronOpts) throws com.veyron2.ipc.VeyronException {
+        
+          this.objectStub.setACL(context, acl, etag, veyronOpts);
     }
 
 

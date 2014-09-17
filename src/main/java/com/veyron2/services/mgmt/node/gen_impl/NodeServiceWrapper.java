@@ -9,12 +9,17 @@ public final class NodeServiceWrapper {
 
 
     
+    private final com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper objectWrapper;
+    
+    
     private final com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper applicationWrapper;
     
 
     public NodeServiceWrapper(final com.veyron2.services.mgmt.node.NodeService service) {
         this.service = service;
         
+        
+        this.objectWrapper = new com.veyron2.services.security.access.gen_impl.ObjectServiceWrapper(service);
         
         this.applicationWrapper = new com.veyron2.services.mgmt.node.gen_impl.ApplicationServiceWrapper(service);
         
@@ -56,6 +61,10 @@ public final class NodeServiceWrapper {
             };
         }
         
+        
+        try {
+            return this.objectWrapper.getMethodTags(call, method);
+        } catch (com.veyron2.ipc.VeyronException e) {}  // method not found.
         
         try {
             return this.applicationWrapper.getMethodTags(call, method);
@@ -142,6 +151,16 @@ public final class NodeServiceWrapper {
     public void updateTo(final com.veyron2.ipc.ServerCall call, final java.lang.String Name) throws com.veyron2.ipc.VeyronException {
         
           this.applicationWrapper.updateTo(call, Name);
+    }
+
+    public com.veyron2.services.security.access.Object.GetACLOut getACL(final com.veyron2.ipc.ServerCall call) throws com.veyron2.ipc.VeyronException {
+        
+        return  this.objectWrapper.getACL(call);
+    }
+
+    public void setACL(final com.veyron2.ipc.ServerCall call, final com.veyron2.security.ACL acl, final java.lang.String etag) throws com.veyron2.ipc.VeyronException {
+        
+          this.objectWrapper.setACL(call, acl, etag);
     }
  
 

@@ -7,7 +7,7 @@ package com.veyron2.services.mgmt.node;
  * will be invoked using an object name that identifies the node.
  */
 
-public interface Node extends com.veyron2.services.mgmt.node.Application {
+public interface Node extends com.veyron2.services.security.access.Object, com.veyron2.services.mgmt.node.Application {
 
     
     

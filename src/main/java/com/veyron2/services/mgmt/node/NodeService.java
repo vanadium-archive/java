@@ -11,7 +11,7 @@ package com.veyron2.services.mgmt.node;
 	serviceWrapper = com.veyron2.services.mgmt.node.gen_impl.NodeServiceWrapper.class,
 	vdlPathName = "veyron2/services/mgmt/node/NodeService"
 )
-public interface NodeService extends com.veyron2.services.mgmt.node.ApplicationService {
+public interface NodeService extends com.veyron2.services.security.access.ObjectService, com.veyron2.services.mgmt.node.ApplicationService {
 
     
     // Claim is used to claim ownership of a Node running on a device
