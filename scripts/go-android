@@ -12,7 +12,7 @@ main() {
   export ANDROID="${VEYRON_ROOT}/environment/android"
   export GOROOT="${ANDROID}/go"
   export CC="${ANDROID}/ndk-toolchain/bin/arm-linux-androideabi-gcc"
-  export GOPATH="${GOPATH}:${VEYRON_ROOT}/veyron.new/go"
+  export GOPATH="${GOPATH}:${VEYRON_ROOT}/veyron/go"
 
   local -r SCRIPT_DIR="${VEYRON_ROOT}/scripts/build"
   source "${SCRIPT_DIR}/go-common.sh"

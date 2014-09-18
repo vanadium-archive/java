@@ -18,7 +18,7 @@ main() {
   mkdir -p "${NATIVE_DIR}"
 
   # Build the veyron android library.
-  local -r GOANDROID="${VEYRON_ROOT}/veyron.new/java/scripts/go-android"
+  local -r GOANDROID="${VEYRON_ROOT}/veyron/java/scripts/go-android"
   GOPATH="${VEYRON_ROOT}/veyron/go" "${GOANDROID}" build -o "${NATIVE_DIR}/libveyronjni.so" -v -ldflags="-android -shared -extld \"${VEYRON_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android veyron.io/jni/runtimes/google
 
   # Copy JNI Wrapper.
