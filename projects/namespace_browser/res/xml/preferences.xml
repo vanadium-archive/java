@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference
+    android:key="pref_namespace_root"
+    android:title="@string/pref_namespace_glob_root"
+    android:summary="@string/pref_namespace_glob_root_summ"
+    android:defaultValue="/proxy.envyor.com:8101" />
+</PreferenceScreen>
