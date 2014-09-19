@@ -1,8 +1,8 @@
-package com.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron.runtimes.google.security;
 
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.Hash;
-import com.veyron2.security.Signature;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.Hash;
+import io.veyron.veyron.veyron2.security.Signature;
 
 import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
@@ -13,7 +13,7 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
-public class Signer implements com.veyron2.security.Signer {
+public class Signer implements io.veyron.veyron.veyron2.security.Signer {
 	private static final String TAG = "net.example.jnitest2";
 	private static final String HASH_ALGORITHM = "SHA256";
 	private static final String SIGN_ALGORITHM = HASH_ALGORITHM + "withECDSA";

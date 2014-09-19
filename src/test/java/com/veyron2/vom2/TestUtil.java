@@ -1,6 +1,6 @@
 // TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
 
-package com.veyron2.vom2;
+package io.veyron.veyron.veyron2.vom2;
 
 import java.util.HashSet;
 import java.util.Set;

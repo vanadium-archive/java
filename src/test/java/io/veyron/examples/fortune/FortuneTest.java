@@ -1,15 +1,15 @@
 package io.veyron.examples.fortune;
 
-import com.veyron2.OptionDefs;
-import com.veyron2.Options;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.Dispatcher;
-import com.veyron2.ipc.Server;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.ServiceObjectWithAuthorizer;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.Runtime;
-import com.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.OptionDefs;
+import io.veyron.veyron.veyron2.Options;
+import io.veyron.veyron.veyron2.ipc.Context;
+import io.veyron.veyron.veyron2.ipc.Dispatcher;
+import io.veyron.veyron.veyron2.ipc.Server;
+import io.veyron.veyron.veyron2.ipc.ServerContext;
+import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.Runtime;
+import io.veyron.veyron.veyron2.RuntimeFactory;
 
 import android.test.AndroidTestCase;
 import android.util.Log;

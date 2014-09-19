@@ -1,8 +1,8 @@
-package com.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron.runtimes.google.security;
 
-import com.veyron2.security.Label;
+import io.veyron.veyron.veyron2.security.Label;
 
-public class Context implements com.veyron2.security.Context {
+public class Context implements io.veyron.veyron.veyron2.security.Context {
 	private final long nativePtr;
 
 	public native String nativeMethod(long nativePtr);
@@ -18,7 +18,7 @@ public class Context implements com.veyron2.security.Context {
 	public Context(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
-	// Implements com.veyron2.security.Context.
+	// Implements io.veyron.veyron.veyron2.security.Context.
 	@Override
 	public String method() {
 		return nativeMethod(this.nativePtr);
@@ -36,11 +36,11 @@ public class Context implements com.veyron2.security.Context {
 		return new Label(nativeLabel(this.nativePtr));
 	}
 	@Override
-	public com.veyron2.security.PublicID localID() {
+	public io.veyron.veyron.veyron2.security.PublicID localID() {
 		return new PublicID(nativeLocalID(this.nativePtr));
 	}
 	@Override
-	public com.veyron2.security.PublicID remoteID() {
+	public io.veyron.veyron.veyron2.security.PublicID remoteID() {
 		return new PublicID(nativeRemoteID(this.nativePtr));
 	}
 	@Override

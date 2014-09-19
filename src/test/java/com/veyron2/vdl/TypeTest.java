@@ -1,6 +1,6 @@
 // TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
 
-package com.veyron2.vdl;
+package io.veyron.veyron.veyron2.vdl;
 
 import junit.framework.TestCase;
 

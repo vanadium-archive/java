@@ -1,5 +1,5 @@
 
-package com.veyron.testing;
+package io.veyron.veyron.veyron.testing;
 
 import junit.framework.Assert;
 

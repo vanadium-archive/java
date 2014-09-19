@@ -1,13 +1,13 @@
-package com.veyron.runtimes.google.naming;
+package io.veyron.veyron.veyron.runtimes.google.naming;
 
 import com.google.gson.reflect.TypeToken;
 
-import com.veyron.runtimes.google.InputChannel;
-import com.veyron2.ipc.Context;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.naming.MountEntry;
+import io.veyron.veyron.veyron.runtimes.google.InputChannel;
+import io.veyron.veyron.veyron2.ipc.Context;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.naming.MountEntry;
 
-public class Namespace implements com.veyron2.naming.Namespace {
+public class Namespace implements io.veyron.veyron.veyron2.naming.Namespace {
 	private final long nativePtr;
 
 	// Returns the pointer to a *buffered* Go channel of type chan interface{}.
@@ -19,7 +19,7 @@ public class Namespace implements com.veyron2.naming.Namespace {
 		this.nativePtr = nativePtr;
 	}
 	@Override
-	public com.veyron2.InputChannel<MountEntry> glob(
+	public io.veyron.veyron.veyron2.InputChannel<MountEntry> glob(
 			Context context, String pattern) throws VeyronException {
 		final long chanPtr = nativeGlob(this.nativePtr, context, pattern);
 		return new InputChannel(chanPtr, new TypeToken<MountEntry>(){});

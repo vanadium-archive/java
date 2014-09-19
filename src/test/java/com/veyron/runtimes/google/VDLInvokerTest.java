@@ -1,21 +1,21 @@
 
-package com.veyron.runtimes.google;
+package io.veyron.veyron.veyron.runtimes.google;
 
 import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-import com.veyron.testing.TestUtil;
-import com.veyron2.ipc.ServerCall;
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.Label;
-import com.veyron2.vdl.Stream;
-import com.veyron2.vdl.test_base.CompComp;
-import com.veyron2.vdl.test_base.Composites;
-import com.veyron2.vdl.test_base.Scalars;
-import com.veyron2.vdl.test_base.ServiceAService;
-import com.veyron2.vdl.test_base.ServiceBService;
+import io.veyron.veyron.veyron.testing.TestUtil;
+import io.veyron.veyron.veyron2.ipc.ServerCall;
+import io.veyron.veyron.veyron2.ipc.ServerContext;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.Label;
+import io.veyron.veyron.veyron2.vdl.Stream;
+import io.veyron.veyron.veyron2.vdl.test_base.CompComp;
+import io.veyron.veyron.veyron2.vdl.test_base.Composites;
+import io.veyron.veyron.veyron2.vdl.test_base.Scalars;
+import io.veyron.veyron.veyron2.vdl.test_base.ServiceAService;
+import io.veyron.veyron.veyron2.vdl.test_base.ServiceBService;
 
 public class VDLInvokerTest extends TestCase {
 
@@ -66,7 +66,7 @@ public class VDLInvokerTest extends TestCase {
     public void testGetSecurityLabel() throws IllegalArgumentException, VeyronException {
         VDLInvoker invoker = new VDLInvoker(new TestServiceImpl());
         Label label = invoker.getSecurityLabel("methodA1");
-        assertEquals(com.veyron2.security.SecurityConstants.ADMIN_LABEL, label);
+        assertEquals(io.veyron.veyron.veyron2.security.SecurityConstants.ADMIN_LABEL, label);
     }
 
     public void testInvoke() throws VeyronException, IllegalArgumentException,
@@ -76,7 +76,7 @@ public class VDLInvokerTest extends TestCase {
                 "4", "Test"
         };
         ServerCall call = null;
-        com.veyron.runtimes.google.VDLInvoker.InvokeReply reply = invoker.invoke("methodA2", call, args);
+        io.veyron.veyron.veyron.runtimes.google.VDLInvoker.InvokeReply reply = invoker.invoke("methodA2", call, args);
         assertEquals(1, reply.results.length);
         assertEquals("\"Args: 4, Test\"", reply.results[0]);
         assertEquals(false, reply.hasApplicationError);

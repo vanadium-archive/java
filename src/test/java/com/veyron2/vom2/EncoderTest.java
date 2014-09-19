@@ -1,6 +1,6 @@
 // TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
 
-package com.veyron2.vom2;
+package io.veyron.veyron.veyron2.vom2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,9 +11,9 @@ import java.util.Map;
 import org.apache.commons.math3.complex.Complex;
 
 import com.google.common.collect.ImmutableMap;
-import com.veyron2.vdl.Kind;
-import com.veyron2.vdl.Type;
-import com.veyron2.vdl.Types;
+import io.veyron.veyron.veyron2.vdl.Kind;
+import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.Types;
 
 import junit.framework.TestCase;
 

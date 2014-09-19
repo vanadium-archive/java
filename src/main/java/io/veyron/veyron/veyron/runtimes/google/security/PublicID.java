@@ -1,15 +1,15 @@
-package com.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron.runtimes.google.security;
 
-import com.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
 
 import java.security.interfaces.ECPublicKey;
 
-public class PublicID implements com.veyron2.security.PublicID {
+public class PublicID implements io.veyron.veyron.veyron2.security.PublicID {
 	private final long nativePtr;
 
 	private native String[] nativeNames(long nativePtr);
 	private native byte[] nativePublicKey(long nativePtr) throws VeyronException;
-	private native long nativeAuthorize(long nativePtr, com.veyron2.security.Context context)
+	private native long nativeAuthorize(long nativePtr, io.veyron.veyron.veyron2.security.Context context)
 		throws VeyronException;
 	private native boolean nativeEquals(long nativePtr, long otherNativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -17,7 +17,7 @@ public class PublicID implements com.veyron2.security.PublicID {
 	public PublicID(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
-	// Implements com.veyron2.security.PublicID.
+	// Implements io.veyron.veyron.veyron2.security.PublicID.
 	@Override
 	public String[] names() {
 		return nativeNames(this.nativePtr);
@@ -33,7 +33,7 @@ public class PublicID implements com.veyron2.security.PublicID {
 		}
 	}
 	@Override
-	public com.veyron2.security.PublicID authorize(com.veyron2.security.Context context)
+	public io.veyron.veyron.veyron2.security.PublicID authorize(io.veyron.veyron.veyron2.security.Context context)
 		throws VeyronException {
 		return new PublicID(nativeAuthorize(this.nativePtr, context));
 	}

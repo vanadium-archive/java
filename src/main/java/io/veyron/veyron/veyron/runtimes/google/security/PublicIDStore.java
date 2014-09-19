@@ -1,14 +1,14 @@
-package com.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron.runtimes.google.security;
 
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.BlessingPattern;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.BlessingPattern;
 
-public class PublicIDStore implements com.veyron2.security.PublicIDStore {
+public class PublicIDStore implements io.veyron.veyron.veyron2.security.PublicIDStore {
 	private final long nativePtr;
 
-	private native void nativeAdd(long nativePtr, com.veyron2.security.PublicID id, String peerPattern)
+	private native void nativeAdd(long nativePtr, io.veyron.veyron.veyron2.security.PublicID id, String peerPattern)
 		throws VeyronException;
-	private native long nativeGetPeerID(long nativePtr, com.veyron2.security.PublicID peer)
+	private native long nativeGetPeerID(long nativePtr, io.veyron.veyron.veyron2.security.PublicID peer)
 		throws VeyronException;
 	private native long nativeDefaultPublicID(long nativePtr) throws VeyronException;
 	private native void nativeSetDefaultBlessingPattern(long nativePtr, BlessingPattern pattern)
@@ -18,19 +18,19 @@ public class PublicIDStore implements com.veyron2.security.PublicIDStore {
 	public PublicIDStore(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
-	// Implements com.veyron2.security.PublicIDStore.
+	// Implements io.veyron.veyron.veyron2.security.PublicIDStore.
 	@Override
-	public void add(com.veyron2.security.PublicID id, BlessingPattern peerPattern)
+	public void add(io.veyron.veyron.veyron2.security.PublicID id, BlessingPattern peerPattern)
 		throws VeyronException {
 		nativeAdd(this.nativePtr, id, peerPattern.getValue());
 	}
 	@Override
-	public com.veyron2.security.PublicID getPeerID(com.veyron2.security.PublicID peer)
+	public io.veyron.veyron.veyron2.security.PublicID getPeerID(io.veyron.veyron.veyron2.security.PublicID peer)
 		throws VeyronException {
 		return new PublicID(nativeGetPeerID(this.nativePtr, peer));
 	}
 	@Override
-	public com.veyron2.security.PublicID defaultPublicID() throws VeyronException {
+	public io.veyron.veyron.veyron2.security.PublicID defaultPublicID() throws VeyronException {
 		return new PublicID(nativeDefaultPublicID(this.nativePtr));
 	}
 	@Override

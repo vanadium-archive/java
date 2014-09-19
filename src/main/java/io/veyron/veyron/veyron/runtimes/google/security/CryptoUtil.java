@@ -1,8 +1,8 @@
-package com.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron.runtimes.google.security;
 
 import android.security.KeyPairGeneratorSpec;
 
-import com.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
 
 import java.io.IOException;
 import java.math.BigInteger;

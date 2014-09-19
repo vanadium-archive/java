@@ -1,6 +1,6 @@
 // TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
 
-package com.veyron.testing;
+package io.veyron.veyron.veyron.testing;
 
 import java.io.IOException;
 import java.io.InputStream;
