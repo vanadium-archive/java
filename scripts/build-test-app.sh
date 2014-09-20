@@ -29,7 +29,8 @@ main() {
 
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r JAVA_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/main/java"
+  local -r JAVA_MAIN_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/main/java"
+  local -r JAVA_VDL_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/vdl/java"
 
   set -e
   set +x
@@ -39,9 +40,10 @@ main() {
   diff -q "${VEYRON_ROOT}/veyron/java/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
   cp "${VEYRON_ROOT}/veyron/java/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
 
-  rm -r "${OUTPUT_DIR}/src"
+  rm -rf "${OUTPUT_DIR}/src"
+  mkdir "${OUTPUT_DIR}/src"
+  cp -r "${JAVA_MAIN_SRC_DIR}"/* "${JAVA_VDL_SRC_DIR}"/* "${OUTPUT_DIR}/src/"
   cd "${OUTPUT_DIR}"
-  ln -s "${JAVA_SRC_DIR}" "src"
   ant debug
 }
 

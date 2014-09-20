@@ -53,8 +53,8 @@ public class VDLInvokerTest extends TestCase {
 
     public void testGetImplementedServices() throws IllegalArgumentException, VeyronException {
         String[] expectedImplementedServices = new String[] {
-                "veyron2/vdl/test_base/ServiceAService",
-                "veyron2/vdl/test_base/ServiceBService"
+                "veyron.io/veyron/veyron2/vdl/test_base/ServiceAService",
+                "veyron.io/veyron/veyron2/vdl/test_base/ServiceBService"
         };
 
         VDLInvoker invoker = new VDLInvoker(new TestServiceImpl());
