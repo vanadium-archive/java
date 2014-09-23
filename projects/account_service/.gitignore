@@ -1,5 +1,6 @@
 .project
 project.properties
-bin/
-gen/
-libs/
+/bin/
+/gen/
+/libs/
+/src/io

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Veyron Service</string>
+    <string name="app_name">Veyron Account Service</string>
     <string name="title_activity_blessing">Add a Veyron Account</string>
     <string name="title_activity_settings">Veyron Settings</string>
     <string name="title_activity_main">MainActivity</string>

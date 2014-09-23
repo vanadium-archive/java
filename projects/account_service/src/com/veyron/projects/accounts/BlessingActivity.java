@@ -1,4 +1,4 @@
-package net.veyron;
+package com.veyron.projects.accounts;
 
 import com.google.common.reflect.TypeToken;
 
@@ -18,14 +18,14 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.veyron.services.identity.OAuthBlesser;
-import com.veyron.services.identity.OAuthBlesserFactory;
-import com.veyron2.Options;
-import com.veyron2.RuntimeFactory;
-import com.veyron2.ipc.VeyronException;
-import com.veyron2.security.wire.Certificate;
-import com.veyron2.security.wire.ChainPublicID;
-import com.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesser;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesserFactory;
+import io.veyron.veyron.veyron2.Options;
+import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.wire.Certificate;
+import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
+import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.io.IOException;
 
@@ -153,7 +153,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
               PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
       try {
         final OAuthBlesser blesser = OAuthBlesserFactory.bind(identityServiceName);
-        final com.veyron2.vdl.Any reply = blesser.blessUsingAccessToken(null, tokens[0]);
+        final io.veyron.veyron.veyron2.vdl.Any reply = blesser.blessUsingAccessToken(null, tokens[0]);
         final ChainPublicID blessing = (ChainPublicID) reply.decode(new TypeToken<ChainPublicID>(){});
         if (blessing == null ||
             blessing.getCertificates() == null ||

@@ -6,7 +6,7 @@
     android:onClick="onItemClick"
     android:paddingLeft="10dp"
     android:background="@drawable/item_selector"
-    android:id="@+id/items">
+    android:id="@+id/directory">
   <RelativeLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -23,6 +23,7 @@
         android:rotation="180" />
     <TextView
         android:id="@+id/name"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

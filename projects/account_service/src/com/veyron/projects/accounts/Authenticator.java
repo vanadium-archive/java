@@ -1,4 +1,4 @@
-package net.veyron;
+package com.veyron.projects.accounts;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

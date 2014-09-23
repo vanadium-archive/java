@@ -1,4 +1,4 @@
-package net.veyron;
+package com.veyron.projects.accounts;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

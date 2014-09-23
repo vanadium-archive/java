@@ -8,6 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="net.veyron.MainActivity" >
     
-    <include layout="@layout/name_item" />
+    <include layout="@layout/directory_item" />
         
 </LinearLayout>
