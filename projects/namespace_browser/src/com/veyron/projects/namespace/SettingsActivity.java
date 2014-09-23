@@ -1,4 +1,4 @@
-package net.veyron;
+package com.veyron.projects.namespace;
 
 import android.app.ActionBar;
 import android.os.Bundle;

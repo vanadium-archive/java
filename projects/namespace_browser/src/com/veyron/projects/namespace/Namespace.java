@@ -1,4 +1,4 @@
-package net.veyron;
+package com.veyron.projects.namespace;
 
 import io.veyron.veyron.veyron2.InputChannel;
 import io.veyron.veyron.veyron2.RuntimeFactory;

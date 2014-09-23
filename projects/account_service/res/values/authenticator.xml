@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="authenticator_account_type">net.veyron</string>
+    <string name="authenticator_account_type">com.veyron</string>
     <string name="authenticator_service_name">Veyron</string>
 </resources>

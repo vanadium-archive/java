@@ -1,7 +1,8 @@
-package net.veyron;
+package com.veyron.projects.namespace;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -48,6 +49,8 @@ public class MainActivity extends Activity {
     dirView.setTag(new MountEntry(root, null, null));
     final TextView nameView = (TextView) dirView.findViewById(R.id.name);
     nameView.setText(root);
+    
+    setupAccountActionView();
   }
   
   public void onItemClick(View view) {
@@ -123,6 +126,37 @@ public class MainActivity extends Activity {
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  private void setupAccountActionView() {
+    final LinearLayout accountView =
+        (LinearLayout) getLayoutInflater().inflate(R.layout.action_account, null);
+    final AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+    final Account[] veyronAccounts = accountManager.getAccountsByType(VEYRON_ACCOUNT_TYPE);
+    if (veyronAccounts == null || veyronAccounts.length <= 0) {  // No Veyron accounts on device.
+      accountView.addView(getLayoutInflater().inflate(R.layout.action_account_add, null));
+      accountView.setOnClickListener(new OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            accountManager.addAccount(
+                VEYRON_ACCOUNT_TYPE, null, null, null, MainActivity.this, null, null);
+            //Toast.makeText(MainActivity.this, "Add your account", Toast.LENGTH_LONG).show();
+          }
+      });
+    } else {
+      final LinearLayout view =
+          (LinearLayout) getLayoutInflater().inflate(R.layout.action_account_existing, null);
+      ((TextView)view.findViewById(R.id.blessing_name)).setText(veyronAccounts[0].name);
+      accountView.addView(view);
+      accountView.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          //
+        }
+      });
+    }
+    final ActionBar ab = getActionBar();
+    ab.setCustomView(accountView);
   }
   
   private class NamesFetcher extends AsyncTask<Void, Void, List<MountEntry>> {

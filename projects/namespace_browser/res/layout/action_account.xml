@@ -6,7 +6,7 @@
     android:layout_gravity="left"
     android:gravity="center_vertical"
     android:orientation="vertical"
-    android:background="@color/green" >
+    android:background="@drawable/account_selector" >
 
     <!-- placeholder for one of: action_account_add or action_account_existing --> 
 
