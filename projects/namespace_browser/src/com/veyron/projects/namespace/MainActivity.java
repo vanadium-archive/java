@@ -10,7 +10,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +31,7 @@ import java.util.List;
  
 public class MainActivity extends Activity {
   private static final String TAG = "net.veyron";
-  private static final String VEYRON_ACCOUNT_TYPE = "net.veyron";
+  private static final String VEYRON_ACCOUNT_TYPE = "com.veyron";
   private static final String PREF_NAMESPACE_GLOB_ROOT = "pref_namespace_glob_root";
   private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "/proxy.envyor.com:8101";
 
@@ -49,29 +49,39 @@ public class MainActivity extends Activity {
     dirView.setTag(new MountEntry(root, null, null));
     final TextView nameView = (TextView) dirView.findViewById(R.id.name);
     nameView.setText(root);
-    
+  }
+  
+  @Override
+  protected void onStart() {
+    super.onStart();
     setupAccountActionView();
   }
   
   public void onItemClick(View view) {
     switch (view.getId()) {
-      case R.id.object:
-        return;
       case R.id.directory:
-        handleDirClick(view);
+        handleDirectoryClick(view);
+        break;
+      case R.id.object:
+        handleObjectClick(view);
+        break;
+      case R.id.method:
+        handleMethodClick(view);
+        break;
       default:
         android.util.Log.e(
             TAG, String.format("Click on an illegal view with id: %d", view.getId()));
     }
   }
-    
-  private void handleDirClick(View view) {
+
+  private void handleDirectoryClick(View view) {
     final LinearLayout dirView = (LinearLayout)view;
     dirView.setActivated(!dirView.isActivated());  // toggle
     if (dirView.isActivated()) {
       // Add new views.
-      new NamesFetcher(dirView).execute();
-      ((TextView)view.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
+      new NameFetcher(dirView).execute();
+      // TODO(spetrovic): Do this after we have fetched the children.
+      ((TextView)dirView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
     } else {
       // Remove all but the first view.
       if (dirView.getChildCount() > 1) {
@@ -83,36 +93,31 @@ public class MainActivity extends Activity {
     arrowView.setRotation(dirView.isActivated() ? 0 : 180);
   }
   
+  private void handleObjectClick(View view) {
+    final LinearLayout objView = (LinearLayout)view;
+    objView.setActivated(!objView.isActivated());  // toggle
+    if (objView.isActivated()) {
+      // Add new views.
+      new MethodFetcher(objView).execute();
+      // TODO(spetrovic): Do this after we have fetched the methods.
+      ((ImageView)objView.findViewById(R.id.sign)).setImageResource(R.drawable.minus_sign);
+    } else {
+      // Remove all but the first view.
+      if (objView.getChildCount() > 1) {
+        objView.removeViews(1, objView.getChildCount() - 1);
+      }
+      ((ImageView)objView.findViewById(R.id.sign)).setImageResource(R.drawable.plus_sign);
+    }
+  }
+
+  private void handleMethodClick(View view) {
+    final LinearLayout methodView = (LinearLayout)view;
+  }
+  
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     final MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.main, menu);
-    // Initialize "account" menu item.
-    final AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-    final Account[] veyronAccounts = accountManager.getAccountsByType(VEYRON_ACCOUNT_TYPE);
-    final MenuItem accountItem = menu.findItem(R.id.action_account);
-    final LinearLayout accountParentView = (LinearLayout) accountItem.getActionView();
-    if (veyronAccounts == null || veyronAccounts.length <= 0) {  // No Veyron accounts on device.
-      accountParentView.addView(
-          getLayoutInflater().inflate(R.layout.action_account_add, null));
-      accountParentView.setOnClickListener(new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Toast.makeText(MainActivity.this, "Add your account", Toast.LENGTH_LONG).show();
-          }
-      });
-    } else {
-      final LinearLayout view =
-          (LinearLayout) getLayoutInflater().inflate(R.layout.action_account_existing, null);
-      ((TextView)view.findViewById(R.id.blessing_name)).setText(veyronAccounts[0].name);
-      accountParentView.addView(view);
-      accountParentView.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          //
-        }
-      });
-    }
     return super.onCreateOptionsMenu(menu);
   }
     
@@ -138,9 +143,9 @@ public class MainActivity extends Activity {
       accountView.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View v) {
-            accountManager.addAccount(
-                VEYRON_ACCOUNT_TYPE, null, null, null, MainActivity.this, null, null);
-            //Toast.makeText(MainActivity.this, "Add your account", Toast.LENGTH_LONG).show();
+            final Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
+            intent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, new String[]{ VEYRON_ACCOUNT_TYPE });
+            startActivity(intent);
           }
       });
     } else {
@@ -151,7 +156,9 @@ public class MainActivity extends Activity {
       accountView.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View v) {
-          //
+          final Intent intent = AccountManager.newChooseAccountIntent(
+              null, null, new String[]{ VEYRON_ACCOUNT_TYPE }, false, null, null, null, null);
+          startActivity(intent);
         }
       });
     }
@@ -159,11 +166,12 @@ public class MainActivity extends Activity {
     ab.setCustomView(accountView);
   }
   
-  private class NamesFetcher extends AsyncTask<Void, Void, List<MountEntry>> {
+  private class NameFetcher extends AsyncTask<Void, Void, List<MountEntry>> {
     final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
     final LinearLayout dirView;
+    String errorMsg = "";
     
-    NamesFetcher(LinearLayout dirView) {
+    NameFetcher(LinearLayout dirView) {
       this.dirView = dirView;
     }
     @Override
@@ -177,15 +185,17 @@ public class MainActivity extends Activity {
       try {
         return Namespace.glob(entry.getName());
       } catch (VeyronException e) {
-        final String msg = "Error fetching names: " + e.getMessage();
-        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+        errorMsg = "Error fetching names: " + e.getMessage();
         return null;
       }
     }
     @Override
     protected void onPostExecute(List<MountEntry> entries) {
       progressDialog.dismiss();
-      if (entries == null) return;  // error
+      if (entries == null) {
+        Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+        return;
+      }
       final MountEntry parentEntry = (MountEntry)dirView.getTag();
       for (MountEntry entry : entries) {
         if (!entry.getName().startsWith(parentEntry.getName() + "/")) {
@@ -204,6 +214,48 @@ public class MainActivity extends Activity {
         final TextView nameView = (TextView) childView.findViewById(R.id.name);
         nameView.setText(text);
         dirView.addView(childView);
+      }
+    }
+  }
+
+  private class MethodFetcher extends AsyncTask<Void, Void, List<String>> {
+    final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+    final LinearLayout objView;
+    String errorMsg = "";
+    
+    MethodFetcher(LinearLayout objView) {
+      this.objView = objView;
+    }
+    @Override
+    protected void onPreExecute() {
+      progressDialog.setMessage("Fetching Methods...");
+      progressDialog.show();
+    }
+    @Override
+    protected List<String> doInBackground(Void... args) {
+      final MountEntry entry = (MountEntry)objView.getTag();
+      try {
+        return Methods.get(entry.getName());
+      } catch (VeyronException e) {
+        errorMsg = "Error fetching methods: " + e.getMessage();
+        return null;
+      }
+    }
+    @Override
+    protected void onPostExecute(List<String> methods) {
+      progressDialog.dismiss();
+      if (methods == null) {
+        Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+        return;
+      }
+      final MountEntry parentEntry = (MountEntry)objView.getTag();
+      for (String method : methods) {
+        final LinearLayout childView =
+            (LinearLayout)getLayoutInflater().inflate(R.layout.method_item, null);
+        childView.setTag(parentEntry);
+        final TextView nameView = (TextView) childView.findViewById(R.id.name);
+        nameView.setText(method);
+        objView.addView(childView);
       }
     }
   }

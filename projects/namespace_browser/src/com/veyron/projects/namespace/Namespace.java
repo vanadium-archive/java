@@ -8,7 +8,16 @@ import io.veyron.veyron.veyron2.naming.MountEntry;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Namespace provides utility methods for Veyron namespace.
+ */
 public class Namespace {
+  /**
+   * Returns the list of entries mounted under the provided namespace root.
+   * @param root             root of the namespace
+   * @return                 list of entries mounted under the provided root.
+   * @throws VeyronException if there was an error fetching the entries.
+   */
   public static List<MountEntry> glob(String root) throws VeyronException {
     final io.veyron.veyron.veyron2.Runtime r = RuntimeFactory.defaultRuntime();
     final io.veyron.veyron.veyron2.naming.Namespace n = r.getNamespace();
