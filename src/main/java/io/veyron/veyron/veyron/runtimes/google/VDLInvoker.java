@@ -106,23 +106,32 @@ public final class VDLInvoker {
                     "Service class %s doesn't have the 'getMethodTags' method.",
                     c.getCanonicalName()));
             }
+            final Method signature = methods.get("signature");
+            if (signature == null) {
+                throw new IllegalArgumentException(String.format(
+                    "Service class %s doesn't have the 'signature' method.",
+                    c.getCanonicalName()));
+            }
             for (Entry<String, Method> m : methods.entrySet()) {
                 // Get the method label.
                 Label label = DEFAULT_LABEL;
                 try {
                     final Object[] tags =
                         (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
-                    for (Object tag : tags) {
-                        if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
-                            label = (Label)tag;
-                            break;
+                    if (tags != null) {
+                        for (Object tag : tags) {
+                            if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
+                                label = (Label)tag;
+                                break;
+                            }
                         }
                     }
                 } catch (IllegalAccessException e) {
                     // getMethodTags() not defined so use the default label.
                 } catch (InvocationTargetException e) {
-                    // getMethodTags threw an exception.
-                    throw new VeyronException(e.getTargetException().getMessage());
+                    // getMethodTags() threw an exception.
+                    throw new VeyronException(String.format("Error getting tag for method %q: %s",
+                        m.getKey(), e.getTargetException().getMessage()));
                 }
                 invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), label));
             }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
@@ -15,9 +16,9 @@ import com.google.gson.reflect.TypeToken;
 
 import android.util.Base64;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
-
 import org.joda.time.Duration;
+
+import io.veyron.veyron.veyron2.ipc.VeyronException;
 
 /**
  * JSONUtil provides various utilities for JSON encoding/decoding of VDL types.
@@ -27,6 +28,7 @@ public class JSONUtil {
 
 	static {
 		builder.registerTypeAdapter(byte[].class, new ByteArrayTypeAdapter());
+		builder.registerTypeAdapter(Any.class, new AnyTypeAdapter());
 		builder.registerTypeAdapter(Duration.class, new DurationTypeAdapter());
 		builder.registerTypeAdapter(VeyronException.class, new VeyronExceptionTypeAdapter());
 		builder.registerTypeAdapterFactory(new CustomTypeAdapterFactory());
@@ -76,6 +78,21 @@ public class JSONUtil {
 			} catch (IllegalArgumentException e) {
 				throw new JsonParseException(e.getMessage());
 			}
+		}
+	}
+
+	// TODO(spetrovic): figure out how to decode fields of type Any.
+	private static class AnyTypeAdapter implements JsonSerializer<Any>, JsonDeserializer<Any>{
+		@Override
+		public JsonElement serialize(
+		    Any src, java.lang.reflect.Type type, JsonSerializationContext ctx) {
+			return new JsonNull();
+		}
+		@Override
+		public Any deserialize(
+				JsonElement json, java.lang.reflect.Type type, JsonDeserializationContext ctx)
+				throws JsonParseException {
+			return null;
 		}
 	}
 

@@ -78,6 +78,11 @@ public class FortuneTest extends AndroidTestCase {
 	    	final String firstMessage = "First fortune";
 	    	fortune.add(context, firstMessage);
 	    	assertEquals(firstMessage, fortune.get(context));
+
+	    	try {
+	    		fortune.getSignature(context);
+	    		fail("Expected Java server's signature method to return an error");
+	    	} catch (VeyronException e) {}
     	} finally {
     		server.stop();
     	}

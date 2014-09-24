@@ -273,13 +273,12 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 				throw new VeyronException("Empty method name invoked on object %s", name);
 			}
 			// Read options.
-			final Duration timeout = opts.get(OptionDefs.CALL_TIMEOUT, Duration.class);
-			final String vdlPath = opts.get(OptionDefs.VDL_INTERFACE_PATH, String.class);
-			if (vdlPath == null) {
- 				throw new VeyronException(String.format(
-					"Must provide VDL interface path option for remote method %s on object %s",
-					method, name));
-			}
+			final Duration timeout = opts != null
+			                       ? opts.get(OptionDefs.CALL_TIMEOUT, Duration.class)
+			                       : null;
+			final String vdlPath = opts != null && opts.has(OptionDefs.VDL_INTERFACE_PATH)
+			                     ? opts.get(OptionDefs.VDL_INTERFACE_PATH, String.class)
+			                     : "";
 
 			// Encode all input arguments to JSON.
 			final String[] jsonArgs = new String[args.length];
