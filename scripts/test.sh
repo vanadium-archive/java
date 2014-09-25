@@ -6,7 +6,7 @@
 # If the output directory is not specified, a temporary directory will
 # be created and clean up upon exit.
 
-source "${VEYRON_ROOT}/environment/scripts/lib/shell.sh"
+source "${VEYRON_ROOT}/scripts/lib/shell.sh"
 
 main() {
   # Output a message if ant is not in the path.

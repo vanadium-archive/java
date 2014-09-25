@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "${VEYRON_ROOT}/environment/scripts/lib/shell.sh"
+source "${VEYRON_ROOT}/scripts/lib/shell.sh"
 
 main() {
   if [[ "$#" -eq 0 ]]; then
@@ -11,7 +11,7 @@ main() {
   local -r NATIVE_DIR="${DEST_DIR}/armeabi-v7a"
 
   # Run the mobile setup.
-  "${VEYRON_ROOT}/environment/scripts/setup/linux/mobile/setup.sh"
+  "${VEYRON_ROOT}/scripts/setup/linux/mobile/setup.sh"
 
   # Make the destination directory.
   mkdir -p "${DEST_DIR}"
