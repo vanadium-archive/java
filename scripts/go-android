@@ -14,9 +14,8 @@ main() {
   export CC="${ANDROID}/ndk-toolchain/bin/arm-linux-androideabi-gcc"
   export GOPATH="${GOPATH}:${VEYRON_ROOT}/veyron/go"
 
-  local -r SCRIPT_DIR="${VEYRON_ROOT}/scripts/build"
-  source "${SCRIPT_DIR}/go-common.sh"
-  source "${SCRIPT_DIR}/go-bluetooth.sh"
+  source "${VEYRON_ROOT}/scripts/build/go-common.sh"
+  source "${VEYRON_ROOT}/scripts/build/go-bluetooth.sh"
 
   local -r JNI_WRAPPER="${VEYRON_ROOT}/environment/cout/jni-wrapper-1.0/${ARCH}"
   if [[ -d "${JNI_WRAPPER}" ]]; then

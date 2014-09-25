@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source "${VEYRON_ROOT}/scripts/lib/shell.sh"
+source "${VEYRON_ROOT}/scripts/lib/go.sh"
 
 main() {
   if [[ "$#" -eq 0 ]]; then
@@ -17,8 +18,11 @@ main() {
   mkdir -p "${DEST_DIR}"
   mkdir -p "${NATIVE_DIR}"
 
-  # Build the veyron android library.
+  # Make sure that no stale Go object files exist.
   local -r GOANDROID="${VEYRON_ROOT}/veyron/java/scripts/go-android"
+  GOPATH=$("${GOANDROID}" env GOPATH) go::clean
+
+  # Build the veyron android library.
   GOPATH="${VEYRON_ROOT}/veyron/go" "${GOANDROID}" build -o "${NATIVE_DIR}/libveyronjni.so" -v -ldflags="-android -shared -extld \"${VEYRON_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android veyron.io/jni/runtimes/google
 
   # Copy JNI Wrapper.
