@@ -23,7 +23,7 @@ main() {
   GOPATH=$("${GOANDROID}" env GOPATH) go::clean
 
   # Build the veyron android library.
-  GOPATH="${VEYRON_ROOT}/veyron/go" "${GOANDROID}" build -o "${NATIVE_DIR}/libveyronjni.so" -v -ldflags="-android -shared -extld \"${VEYRON_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android veyron.io/jni/runtimes/google
+  GOPATH="${VEYRON_ROOT}/veyron/go" "${GOANDROID}" build -o "${NATIVE_DIR}/libveyronjni.so" -ldflags="-android -shared -extld \"${VEYRON_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android veyron.io/jni/runtimes/google
 
   # Copy JNI Wrapper.
   cp "${VEYRON_ROOT}/environment/cout/jni-wrapper-1.0/android/lib/libjniwrapper.so" "${NATIVE_DIR}/libjniwrapper.so"
