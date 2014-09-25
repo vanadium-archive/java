@@ -118,6 +118,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
           // NOTE(spetrovic): The returned intent has the wrong flag value FLAG_ACTIVITY_NEW_TASK set,
           // which results in the launched intent replying immediately with RESULE_CANCELED.
           // Hence, we clear the flag here.
+          launch.setFlags(0);
           startActivityForResult(launch, REQUEST_CODE_USER_APPROVAL);
           return;
         }

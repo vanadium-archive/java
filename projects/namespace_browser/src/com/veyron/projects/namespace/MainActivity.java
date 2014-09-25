@@ -28,7 +28,7 @@ import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 
 import java.util.List;
- 
+
 public class MainActivity extends Activity {
   private static final String TAG = "net.veyron";
   private static final String VEYRON_ACCOUNT_TYPE = "com.veyron";
@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     RuntimeFactory.init(this, new Options());  // Initializes Veyron Runtime.
-    
+
     final String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
         PREF_NAMESPACE_GLOB_ROOT, DEFAULT_NAMESPACE_GLOB_ROOT);
     final View dirView = findViewById(R.id.directory);
@@ -50,13 +50,13 @@ public class MainActivity extends Activity {
     final TextView nameView = (TextView) dirView.findViewById(R.id.name);
     nameView.setText(root);
   }
-  
+
   @Override
   protected void onStart() {
     super.onStart();
     setupAccountActionView();
   }
-  
+
   public void onItemClick(View view) {
     switch (view.getId()) {
       case R.id.directory:
@@ -80,8 +80,6 @@ public class MainActivity extends Activity {
     if (dirView.isActivated()) {
       // Add new views.
       new NameFetcher(dirView).execute();
-      // TODO(spetrovic): Do this after we have fetched the children.
-      ((TextView)dirView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
     } else {
       // Remove all but the first view.
       if (dirView.getChildCount() > 1) {
@@ -92,35 +90,36 @@ public class MainActivity extends Activity {
     final ImageView arrowView = (ImageView) dirView.findViewById(R.id.arrow);
     arrowView.setRotation(dirView.isActivated() ? 0 : 180);
   }
-  
+
   private void handleObjectClick(View view) {
     final LinearLayout objView = (LinearLayout)view;
     objView.setActivated(!objView.isActivated());  // toggle
     if (objView.isActivated()) {
       // Add new views.
       new MethodFetcher(objView).execute();
-      // TODO(spetrovic): Do this after we have fetched the methods.
-      ((ImageView)objView.findViewById(R.id.sign)).setImageResource(R.drawable.minus_sign);
     } else {
       // Remove all but the first view.
       if (objView.getChildCount() > 1) {
         objView.removeViews(1, objView.getChildCount() - 1);
       }
-      ((ImageView)objView.findViewById(R.id.sign)).setImageResource(R.drawable.plus_sign);
+      ((TextView)objView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT);
     }
+    ((ImageView)objView.findViewById(R.id.sign)).setImageResource(
+        objView.isActivated() ? R.drawable.minus_sign : R.drawable.plus_sign);
   }
 
   private void handleMethodClick(View view) {
     final LinearLayout methodView = (LinearLayout)view;
+    // Add claiming logic here.
   }
-  
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     final MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.main, menu);
     return super.onCreateOptionsMenu(menu);
   }
-    
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
@@ -165,12 +164,12 @@ public class MainActivity extends Activity {
     final ActionBar ab = getActionBar();
     ab.setCustomView(accountView);
   }
-  
+
   private class NameFetcher extends AsyncTask<Void, Void, List<MountEntry>> {
     final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
     final LinearLayout dirView;
     String errorMsg = "";
-    
+
     NameFetcher(LinearLayout dirView) {
       this.dirView = dirView;
     }
@@ -192,6 +191,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostExecute(List<MountEntry> entries) {
       progressDialog.dismiss();
+      ((TextView)dirView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
       if (entries == null) {
         Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
         return;
@@ -222,7 +222,6 @@ public class MainActivity extends Activity {
     final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
     final LinearLayout objView;
     String errorMsg = "";
-    
     MethodFetcher(LinearLayout objView) {
       this.objView = objView;
     }
@@ -244,6 +243,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostExecute(List<String> methods) {
       progressDialog.dismiss();
+      ((TextView)objView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
       if (methods == null) {
         Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
         return;
