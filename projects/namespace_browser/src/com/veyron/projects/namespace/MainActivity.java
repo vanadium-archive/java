@@ -6,18 +6,17 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,17 +29,17 @@ import io.veyron.veyron.veyron2.naming.MountEntry;
 import java.util.List;
 
 public class MainActivity extends Activity {
-  private static final String TAG = "net.veyron";
+  private static final String TAG = "com.veyron.projects.namespace";
   private static final String VEYRON_ACCOUNT_TYPE = "com.veyron";
   private static final String PREF_NAMESPACE_GLOB_ROOT = "pref_namespace_glob_root";
   private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "/proxy.envyor.com:8101";
+  private static final String SAVED_VIEW_STATE_KEY = "browser_viewstate";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     RuntimeFactory.init(this, new Options());  // Initializes Veyron Runtime.
-
     final String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
         PREF_NAMESPACE_GLOB_ROOT, DEFAULT_NAMESPACE_GLOB_ROOT);
     final View dirView = findViewById(R.id.directory);
@@ -55,6 +54,33 @@ public class MainActivity extends Activity {
   protected void onStart() {
     super.onStart();
     setupAccountActionView();
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle savedInstanceState) {
+    final Parcel parcel = Parcel.obtain();
+    ViewUtil.serializeView(findViewById(R.id.directory), parcel);
+    savedInstanceState.putByteArray(SAVED_VIEW_STATE_KEY, parcel.marshall());
+    parcel.recycle();
+    super.onSaveInstanceState(savedInstanceState);
+  }
+
+  @Override
+  public void onRestoreInstanceState(Bundle savedInstanceState) {
+    final byte[] data = savedInstanceState.getByteArray(SAVED_VIEW_STATE_KEY);
+    final Parcel parcel = Parcel.obtain();
+    parcel.unmarshall(data, 0, data.length);
+    parcel.setDataPosition(0);
+    final LinearLayout dirView =
+        (LinearLayout) ViewUtil.deserializeView(parcel, getLayoutInflater());
+    parcel.recycle();
+    // Replace old directory view with the new one.
+    final LinearLayout oldDirView = (LinearLayout) findViewById(R.id.directory);
+    final ViewGroup parent = (ViewGroup) oldDirView.getParent();
+    final int index = parent.indexOfChild(oldDirView);
+    parent.removeView(oldDirView);
+    parent.addView(dirView, index);
+    super.onRestoreInstanceState(savedInstanceState);
   }
 
   public void onItemClick(View view) {
@@ -76,36 +102,32 @@ public class MainActivity extends Activity {
 
   private void handleDirectoryClick(View view) {
     final LinearLayout dirView = (LinearLayout)view;
-    dirView.setActivated(!dirView.isActivated());  // toggle
-    if (dirView.isActivated()) {
+    if (!dirView.isActivated()) {
       // Add new views.
       new NameFetcher(dirView).execute();
+      // dirView will be updated only when the NameFetcher completes.
     } else {
       // Remove all but the first view.
       if (dirView.getChildCount() > 1) {
         dirView.removeViews(1, dirView.getChildCount() - 1);
       }
-      ((TextView)dirView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT);
+      ViewUtil.updateDirectoryView(dirView, false);
     }
-    final ImageView arrowView = (ImageView) dirView.findViewById(R.id.arrow);
-    arrowView.setRotation(dirView.isActivated() ? 0 : 180);
   }
 
   private void handleObjectClick(View view) {
     final LinearLayout objView = (LinearLayout)view;
-    objView.setActivated(!objView.isActivated());  // toggle
-    if (objView.isActivated()) {
+    if (!objView.isActivated()) {
       // Add new views.
       new MethodFetcher(objView).execute();
+      // objView will be updated only when the NameFetcher completes.
     } else {
       // Remove all but the first view.
       if (objView.getChildCount() > 1) {
         objView.removeViews(1, objView.getChildCount() - 1);
       }
-      ((TextView)objView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT);
+      ViewUtil.updateObjectView(objView, false);
     }
-    ((ImageView)objView.findViewById(R.id.sign)).setImageResource(
-        objView.isActivated() ? R.drawable.minus_sign : R.drawable.plus_sign);
   }
 
   private void handleMethodClick(View view) {
@@ -191,7 +213,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostExecute(List<MountEntry> entries) {
       progressDialog.dismiss();
-      ((TextView)dirView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
+      ViewUtil.updateDirectoryView(dirView, true);
       if (entries == null) {
         Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
         return;
@@ -204,15 +226,11 @@ public class MainActivity extends Activity {
           continue;
         }
         final String text = entry.getName().substring(parentEntry.getName().length() + 1);
-        final LayoutInflater inflater = getLayoutInflater();
+
         final LinearLayout childView =
             (entry.getServers() == null || entry.getServers().length <= 0)
-            ? (LinearLayout)inflater.inflate(R.layout.directory_item, null) // sub-directory
-            : (LinearLayout)inflater.inflate(R.layout.object_item, null);   // object
-
-        childView.setTag(entry);
-        final TextView nameView = (TextView) childView.findViewById(R.id.name);
-        nameView.setText(text);
+            ? ViewUtil.createDirectoryView(text, entry, getLayoutInflater()) // sub-directory
+            : ViewUtil.createObjectView(text, entry, getLayoutInflater());   // object
         dirView.addView(childView);
       }
     }
@@ -243,18 +261,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostExecute(List<String> methods) {
       progressDialog.dismiss();
-      ((TextView)objView.findViewById(R.id.name)).setTypeface(Typeface.DEFAULT_BOLD);
+      ViewUtil.updateObjectView(objView, true);
       if (methods == null) {
         Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
         return;
       }
-      final MountEntry parentEntry = (MountEntry)objView.getTag();
+      final MountEntry entry = (MountEntry)objView.getTag();
       for (String method : methods) {
         final LinearLayout childView =
-            (LinearLayout)getLayoutInflater().inflate(R.layout.method_item, null);
-        childView.setTag(parentEntry);
-        final TextView nameView = (TextView) childView.findViewById(R.id.name);
-        nameView.setText(method);
+            ViewUtil.createMethodView(method, entry, getLayoutInflater());
         objView.addView(childView);
       }
     }

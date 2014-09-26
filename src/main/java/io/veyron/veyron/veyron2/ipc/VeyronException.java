@@ -1,5 +1,10 @@
 package io.veyron.veyron.veyron2.ipc;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
 /**
  * VeyronException is an exception raised by the Veyron runtime in an event of
  * an unexpected error. It contains an error message and optionally a non-empty
@@ -16,7 +21,7 @@ package io.veyron.veyron.veyron2.ipc;
  * with empty IDs are equal iff their messages are equal.
  */
 // TODO(spetrovic): Move this class into package "io.veyron.veyron.veyron2".
-public class VeyronException extends Exception {
+public class VeyronException extends Exception implements Parcelable, Serializable {
     private static final long serialVersionUID = -3917496574141933784L;
 
     private final String id; // always non-null (can be empty)
@@ -68,5 +73,29 @@ public class VeyronException extends Exception {
             return ("id_" + this.id).hashCode();
         }
         return ("msg_" + this.getMessage()).hashCode();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(this.getMessage());
+        out.writeString(this.id);
+    }
+    public static final Parcelable.Creator<VeyronException> CREATOR =
+            new Parcelable.Creator<VeyronException>() {
+        @Override
+        public VeyronException createFromParcel(Parcel in) {
+            return new VeyronException(in);
+        }
+        @Override
+        public VeyronException[] newArray(int size) {
+            return new VeyronException[size];
+        }
+    };
+    private VeyronException(Parcel in) {
+        this(in.readString(), in.readString());
     }
 }
