@@ -8,6 +8,10 @@
 
 source "${VEYRON_ROOT}/scripts/lib/shell.sh"
 
+check_test_result() {
+  grep "\[exec\] OK [(][0-9][0-9]* test" "${TMP_FILE}" &> /dev/null
+}
+
 main() {
   # Output a message if ant is not in the path.
   local RESULT=$(shell::check_result which ant &> /dev/null)
@@ -56,7 +60,7 @@ main() {
   set -x
   set +e
 
-  RESULT=$(shell::check_result grep "\[exec\] OK [(][0-9][0-9]* test" "${TMP_FILE}" &> /dev/null)
+  RESULT=$(shell::check_result check_test_result)
   if [[ "${RESULT}" -eq 0 ]]; then
     echo "PASS"
     exit 0
