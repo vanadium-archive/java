@@ -1,6 +1,13 @@
 package io.veyron.veyron.veyron.runtimes.google.security;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.CryptoUtil;
+import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
+import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -11,6 +18,7 @@ public class PublicID implements io.veyron.veyron.veyron2.security.PublicID {
 	private native byte[] nativePublicKey(long nativePtr) throws VeyronException;
 	private native long nativeAuthorize(long nativePtr, io.veyron.veyron.veyron2.security.Context context)
 		throws VeyronException;
+	private native String[] nativeEncode(long nativePtr) throws VeyronException;
 	private native boolean nativeEquals(long nativePtr, long otherNativePtr);
 	private native void nativeFinalize(long nativePtr);
 
@@ -36,6 +44,21 @@ public class PublicID implements io.veyron.veyron.veyron2.security.PublicID {
 	public io.veyron.veyron.veyron2.security.PublicID authorize(io.veyron.veyron.veyron2.security.Context context)
 		throws VeyronException {
 		return new PublicID(nativeAuthorize(this.nativePtr, context));
+	}
+	@Override
+	public ChainPublicID[] encode() throws VeyronException {
+		final Gson gson = JSONUtil.getGsonBuilder().create();
+		final String[] chains = nativeEncode(this.nativePtr);
+		final ChainPublicID[] ret = new ChainPublicID[chains.length];
+		for (int i = 0; i < chains.length; ++i) {
+			try {
+				ret[i] = (ChainPublicID) gson.fromJson(
+					chains[i], new TypeToken<ChainPublicID>(){}.getType());
+			} catch (JsonSyntaxException e) {
+				throw new VeyronException("Couldn't JSON decode chain: " + chains[i]);
+			}
+		}
+		return ret;
 	}
 	// Implements java.lang.Object.
 	@Override

@@ -4,9 +4,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.joda.time.Duration;
+
 import io.veyron.veyron.veyron.runtimes.google.android.RedirectStderr;
 import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
-import io.veyron.veyron.veyron.runtimes.google.security.CryptoUtil;
 import io.veyron.veyron.veyron.runtimes.google.security.PrivateID;
 import io.veyron.veyron.veyron.runtimes.google.security.PublicIDStore;
 import io.veyron.veyron.veyron.runtimes.google.security.Signer;
@@ -14,12 +15,11 @@ import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.CryptoUtil;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.PublicID;
 import io.veyron.veyron.veyron2.vdl.Any;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
-
-import org.joda.time.Duration;
 
 import java.io.EOFException;
 import java.security.KeyPair;

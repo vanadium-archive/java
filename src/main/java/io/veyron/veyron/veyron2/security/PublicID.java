@@ -1,6 +1,7 @@
 package io.veyron.veyron.veyron2.security;
 
 import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -24,7 +25,7 @@ public interface PublicID {
 	public ECPublicKey publicKey();
 
 	/**
-	 * Determines whether the PublicID has credentials that are valid under the provided context.
+	 * Determines whether the PublicID has credentials that are valid under the provided context
 	 * If so, Authorize returns a new PublicID that carries only the valid credentials. The returned
 	 * PublicID is always non-nil in the absence of errors and has the same public key as this
 	 * PublicID.
@@ -34,4 +35,12 @@ public interface PublicID {
 	 * @throws VeyronException if any error is encountered during the evaluation.
 	 */
 	public PublicID authorize(Context context) throws VeyronException;
+
+	/**
+	 * Encodes the PublicID into the wire format.
+	 *
+	 * @return                 wire format of the PublicID.
+	 * @throws VeyronException if the PublicID couldn't be encoded.
+	 */
+	public ChainPublicID[] encode() throws VeyronException;
 }
