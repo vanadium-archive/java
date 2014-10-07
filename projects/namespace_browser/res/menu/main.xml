@@ -2,13 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="net.veyron.MainActivity" >
 
-    <!--
-    <item
-        android:id="@+id/action_account"
-        android:title="@string/action_account"
-        android:showAsAction="always"
-        android:actionLayout="@layout/action_account"/>
-    -->
     <item
         android:id="@+id/action_account"
         android:title="@string/action_account"
