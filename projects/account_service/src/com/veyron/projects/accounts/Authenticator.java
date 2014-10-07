@@ -25,7 +25,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
   public Bundle addAccount(AccountAuthenticatorResponse response, String accountType,
       String authTokenType, String[] requiredFeatures, Bundle options)
       throws NetworkErrorException {
-    final Intent intent = new Intent(mContext, BlessingActivity.class);
+    final Intent intent = new Intent(mContext, AccountActivity.class);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
     final Bundle bundle = new Bundle();
     bundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -33,9 +33,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
   }
 
   @Override
-  public Bundle confirmCredentials(
-      AccountAuthenticatorResponse response, Account account, Bundle options)
-      throws NetworkErrorException {
+  public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account,
+      Bundle options) throws NetworkErrorException {
     return null;
   }
 
@@ -45,9 +44,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
   }
 
   @Override
-  public Bundle getAuthToken(
-      AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options)
-      throws NetworkErrorException {
+  public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account,
+      String authTokenType, Bundle options) throws NetworkErrorException {
     return null;
   }
 
@@ -57,16 +55,14 @@ public class Authenticator extends AbstractAccountAuthenticator {
   }
 
   @Override
-  public Bundle hasFeatures(
-      AccountAuthenticatorResponse response, Account account, String[] features)
-      throws NetworkErrorException {
+  public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account,
+      String[] features) throws NetworkErrorException {
     return null;
   }
 
   @Override
-  public Bundle updateCredentials(
-      AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options)
-      throws NetworkErrorException {
+  public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account,
+      String authTokenType, Bundle options) throws NetworkErrorException {
     return null;
   }
 }

@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="18"
         android:targetSdkVersion="20" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -35,8 +35,15 @@
         </service>
 
         <activity
+            android:name=".AccountActivity"
+            android:label="@string/title_activity_account" >
+        </activity>
+        <activity
             android:name=".BlessingActivity"
             android:label="@string/title_activity_blessing" >
+            <intent-filter>
+                <action android:name="com.veyron.projects.accounts.BLESS" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"
