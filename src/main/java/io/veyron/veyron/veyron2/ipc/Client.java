@@ -30,7 +30,6 @@ public interface Client {
 	 * The returned Call object manages streaming args and results and finishes the call.
 	 * A particular implementation of this interface chooses which options to support,
 	 * but at the minimum it must handle the following pre-defined options:
-	 * {@link io.veyron.veyron.veyron2.OptionDefs#CALL_TIMEOUT}
 	 *
 	 * @param  name            a name of the server
 	 * @param  method          a name of the server's method to be invoked
