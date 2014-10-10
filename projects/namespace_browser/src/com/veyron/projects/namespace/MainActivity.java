@@ -25,12 +25,17 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.veyron.veyron.veyron.runtimes.google.security.Util;
+import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
+import io.veyron.veyron.veyron2.security.PrivateID;
+import io.veyron.veyron.veyron2.security.PublicID;
 import io.veyron.veyron.veyron2.security.wire.Certificate;
 import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
+import io.veyron.veyron.veyron2.security.wire.ChainPublicIDImpl;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.util.HashSet;
@@ -49,12 +54,12 @@ public class MainActivity extends Activity {
 	private static final int BLESSING_REQUEST = 2;
 
 	String mSelectedBlessing = "";
+	io.veyron.veyron.veyron2.Runtime mRuntime = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		RuntimeFactory.init(this, new Options());  // Initializes Veyron Runtime.
 		final String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
 				PREF_NAMESPACE_GLOB_ROOT, DEFAULT_NAMESPACE_GLOB_ROOT);
 		final View dirView = findViewById(R.id.directory);
@@ -63,6 +68,9 @@ public class MainActivity extends Activity {
 		dirView.setTag(new MountEntry(root, null, null));
 		final TextView nameView = (TextView) dirView.findViewById(R.id.name);
 		nameView.setText(root);
+
+		mSelectedBlessing = "";
+		mRuntime = RuntimeFactory.init(this, new Options());
 
 		updateBlessingsView();
 	}
@@ -240,6 +248,24 @@ public class MainActivity extends Activity {
 		updateBlessingsView();
 	}
 
+	private void updateSelectedBlessing(String blessing) {
+		// Decode the blessing and create a new runtime with the decoded blessing.
+		try {
+			final ChainPublicID[] chains = Util.decodeChains(new String[]{ blessing });
+			final PublicID pubID = new ChainPublicIDImpl(chains);
+			final PrivateID privID = RuntimeFactory.defaultRuntime().getIdentity();
+			final PrivateID derivedPrivID = privID.derive(pubID);
+			final Options runtimeOpts = new Options();
+			runtimeOpts.set(OptionDefs.RUNTIME_ID, derivedPrivID);
+			mRuntime = RuntimeFactory.newRuntime(this, runtimeOpts);
+			mSelectedBlessing = blessing;
+		} catch (VeyronException e) {
+			final String msg = String.format(
+					"Couldn't set blessing %s: %s", blessing, e.getMessage());
+			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+		}
+	}
+
 	private void updateBlessingsView() {
 		final LinearLayout blessingView =
 				(LinearLayout) getLayoutInflater().inflate(R.layout.action_account, null);
@@ -255,7 +281,7 @@ public class MainActivity extends Activity {
 			});
 		} else {
 			if (mSelectedBlessing.isEmpty()) {
-				mSelectedBlessing = blessings.iterator().next();
+				updateSelectedBlessing(blessings.iterator().next());
 			}
 			final LinearLayout view = (LinearLayout) getLayoutInflater().inflate(
 					R.layout.action_account_existing, null);
@@ -282,7 +308,7 @@ public class MainActivity extends Activity {
 			item.setOnMenuItemClickListener(new OnMenuItemClickListener(){
 				@Override
 				public boolean onMenuItemClick(MenuItem item) {
-					mSelectedBlessing = blessing;
+					updateSelectedBlessing(blessing);
 					updateBlessingsView();
 					return true;
 				}
@@ -335,7 +361,7 @@ public class MainActivity extends Activity {
 		protected List<MountEntry> doInBackground(Void... args) {
 			final MountEntry entry = (MountEntry)dirView.getTag();
 			try {
-				return Namespace.glob(entry.getName());
+				return Namespace.glob(entry.getName(), mRuntime);
 			} catch (VeyronException e) {
 				errorMsg = "Error fetching names: " + e.getMessage();
 				return null;
