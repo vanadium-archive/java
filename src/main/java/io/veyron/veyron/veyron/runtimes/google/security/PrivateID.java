@@ -58,31 +58,20 @@ public class PrivateID implements io.veyron.veyron.veyron2.security.PrivateID {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.security.PublicID bless(
-		io.veyron.veyron.veyron2.security.PublicID blessee,
-		String blessingName,
-		Duration duration) throws VeyronException {
-		return new PublicID(
-			nativeBless(this.nativePtr, getJSONEncodedChains(blessee), blessingName, duration));
+		io.veyron.veyron.veyron2.security.PublicID blessee, String blessingName, Duration duration)
+		throws VeyronException {
+		final String[] chainIDs = Util.encodeChains(blessee.encode());
+		return new PublicID(nativeBless(this.nativePtr, chainIDs, blessingName, duration));
 	}
 	@Override
 	public io.veyron.veyron.veyron2.security.PrivateID derive(
 		io.veyron.veyron.veyron2.security.PublicID publicID) throws VeyronException {
-		return new PrivateID(nativeDerive(this.nativePtr, getJSONEncodedChains(publicID)), this.signer);
+		final String[] chainIDs = Util.encodeChains(publicID.encode());
+		return new PrivateID(nativeDerive(this.nativePtr, chainIDs), this.signer);
 	}
 	// Implements java.lang.Object.
 	@Override
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);
-	}
-
-	private String[] getJSONEncodedChains(
-		io.veyron.veyron.veyron2.security.PublicID id) throws VeyronException {
-		final Gson gson = JSONUtil.getGsonBuilder().create();
-		final ChainPublicID[] chains = id.encode();
-		final String[] ret = new String[chains.length];
-		for (int i = 0; i < chains.length; ++i) {
-			ret[i] = gson.toJson(chains[i]);
-		}
-		return ret;
 	}
 }

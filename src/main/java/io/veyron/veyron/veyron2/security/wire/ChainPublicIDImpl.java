@@ -14,44 +14,52 @@ import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
 /**
- * ChainPublicIDImpl is an implementation of PublicID that uses ChainPublicID wire format as its
- * underlying data.
+ * ChainPublicIDImpl is an implementation of PublicID that uses credentials in the provided
+ * ChainPublicID.
  */
 public class ChainPublicIDImpl implements PublicID {
-	private final ChainPublicID id;
-	private final String name;
+	private final ChainPublicID[] ids;
+	private final String[] names;
 	private final ECPublicKey key;
 
 	/**
-	 * Creates a new PublicID using the provided ChainPublicID as its underlying data.
+	 * Creates a new PublicID using the credentials in the provided ChainPublicID.
 	 *
 	 * @param  id              wire data.
-	 * @returns                new PublicID.
+	 * @return                 new PublicID.
 	 * @throws VeyronException if the PublicID couldn't be created.
 	 */
 	public ChainPublicIDImpl(ChainPublicID id) throws VeyronException {
-		if (id.getCertificates() == null || id.getCertificates().size() == 0) {
-			throw new VeyronException("Empty certificate chain.");
-		}
-		this.id = id;
-		this.name = getName(id);
-		this.key = getKey(id);
+		this(new ChainPublicID[]{ id });
 	}
 
 	/**
-	 * Creates a new PublicID using the JSON-encoded ChainPublicID as its underlying data.
+	 * Creates a new PublicID using the combined credentials of the provided ChainPublicIDs.
 	 *
-	 * @param  jsonEncodedID   JSON-encoded ChainPublicID.
-	 * @returns                new PublicID.
+	 * @param  ids             array of ChainPublicIDs.
+	 * @return                 new PublicID.
 	 * @throws VeyronException if the PublicID couldn't be created.
 	 */
-	public ChainPublicIDImpl(String jsonEncodedID) throws VeyronException {
-		this(decodeChainID(jsonEncodedID));
+	public ChainPublicIDImpl(ChainPublicID[] ids) throws VeyronException {
+		if (ids == null || ids.length == 0) {
+			throw new VeyronException("Empty ids");
+		}
+		for (ChainPublicID id : ids) {
+			if (id == null || id.getCertificates() == null || id.getCertificates().size() == 0) {
+				throw new VeyronException("Empty certificate chain.");
+			}
+		}
+		this.ids = ids;
+		this.names = new String[ids.length];
+		for (int i = 0; i < ids.length; ++i) {
+			this.names[i] = getName(ids[i]);
+		}
+		this.key = getKey(ids[0]);
 	}
 
 	@Override
 	public String[] names() {
-		return new String[]{ this.name };
+		return this.names;
 	}
 
 	@Override
@@ -66,7 +74,7 @@ public class ChainPublicIDImpl implements PublicID {
 	}
 	@Override
 	public ChainPublicID[] encode() throws VeyronException {
-		return new ChainPublicID[]{ this.id };
+		return this.ids;
 	}
 
 	private static String getName(ChainPublicID id) throws VeyronException {
@@ -87,14 +95,5 @@ public class ChainPublicIDImpl implements PublicID {
 		final List<Certificate> certs = id.getCertificates();
 		final PublicKey key = certs.get(certs.size() - 1).getPublicKey();
 		return CryptoUtil.decodeECPublicKey(key);
-	}
-
-	private static ChainPublicID decodeChainID(String id) throws VeyronException {
-		try {
-			final Gson gson = JSONUtil.getGsonBuilder().create();
-			return gson.fromJson(id, new TypeToken<ChainPublicID>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException("Invalid chain string: " + e.getMessage());
-		}
 	}
 }

@@ -4,13 +4,12 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import org.joda.time.Duration;
-
 import io.veyron.veyron.veyron.runtimes.google.android.RedirectStderr;
 import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
 import io.veyron.veyron.veyron.runtimes.google.security.PrivateID;
 import io.veyron.veyron.veyron.runtimes.google.security.PublicIDStore;
 import io.veyron.veyron.veyron.runtimes.google.security.Signer;
+import io.veyron.veyron.veyron.runtimes.google.security.Util;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
@@ -18,6 +17,7 @@ import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.PublicID;
+import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
 import io.veyron.veyron.veyron2.vdl.Any;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
@@ -117,6 +117,21 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		}
 	}
 
+	private static void encodeLocalIDOption(Options opts) throws VeyronException {
+		if (opts == null || !opts.has(OptionDefs.LOCAL_ID)) {
+			return;
+		}
+		// Encode the id.
+		final PublicID id = opts.get(OptionDefs.LOCAL_ID, PublicID.class);
+		if (id == null) {
+			opts.remove(OptionDefs.LOCAL_ID);
+			return;
+		}
+		final ChainPublicID[] chains = id.encode();
+		final String[] encodedChains = Util.encodeChains(chains);
+		opts.set(OptionDefs.LOCAL_ID, encodedChains);
+	}
+
 	static {
 		System.loadLibrary("jniwrapper");
 		System.loadLibrary("veyronjni");
@@ -128,8 +143,8 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private final io.veyron.veyron.veyron2.security.PrivateID privateID;  // non-null.
 	private io.veyron.veyron.veyron2.security.PublicIDStore publicIDStore;
 
-	private native long nativeNewClient(long nativePtr, long timeoutMillis) throws VeyronException;
-	private native long nativeNewServer(long nativePtr) throws VeyronException;
+	private native long nativeNewClient(long nativePtr, Options opts) throws VeyronException;
+	private native long nativeNewServer(long nativePtr, Options opts) throws VeyronException;
 	private native long nativeGetClient(long nativePtr);
 	private native long nativeNewContext(long nativePtr);
 	private native long nativeGetPublicIDStore(long nativePtr);
@@ -146,9 +161,8 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Client newClient(Options opts) throws VeyronException {
-		final Duration timeout = opts.get(OptionDefs.CALL_TIMEOUT, Duration.class);
-		final long nativeClientPtr =
-			nativeNewClient(this.nativePtr, timeout != null ? timeout.getMillis() : -1);
+		encodeLocalIDOption(opts);
+		final long nativeClientPtr = nativeNewClient(this.nativePtr, opts);
 		return new Client(nativeClientPtr);
 	}
 	@Override
@@ -157,7 +171,8 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Server newServer(Options opts) throws VeyronException {
-		final long nativeServerPtr = nativeNewServer(this.nativePtr);
+		encodeLocalIDOption(opts);
+		final long nativeServerPtr = nativeNewServer(this.nativePtr, opts);
 		return new Server(nativeServerPtr);
 	}
 	@Override
@@ -183,9 +198,9 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			final KeyPair keyPair = keyGen.generateKeyPair();
 			final Signer signer = new Signer(keyPair.getPrivate(), (ECPublicKey)keyPair.getPublic());
 			return PrivateID.create(name, signer);
-        } catch (NoSuchAlgorithmException e) {
-        	throw new VeyronException("ECDSA algorithm not supported: " + e.getMessage());
-        }
+		} catch (NoSuchAlgorithmException e) {
+			throw new VeyronException("ECDSA algorithm not supported: " + e.getMessage());
+		}
 	}
 	@Override
 	public io.veyron.veyron.veyron2.security.PrivateID getIdentity() {
@@ -250,35 +265,28 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		// TODO(bprosnitz) Ensure gson is thread safe.
 		private final Gson gson;
 
-		private native long nativeStartCall(long nativePtr, io.veyron.veyron.veyron2.ipc.Context context,
-			String name, String method, String[] args, String idlPath, long timeoutMillis)
-			throws VeyronException;
+		private native long nativeStartCall(long nativePtr,
+			io.veyron.veyron.veyron2.ipc.Context context, String name, String method, String[] args,
+			Options opts) throws VeyronException;
 		private native void nativeClose(long nativePtr);
 		private native void nativeFinalize(long nativePtr);
 
 		Client(long nativePtr) {
 			this.nativePtr = nativePtr;
-            this.gson = JSONUtil.getGsonBuilder().create();
+			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 		// Implement io.veyron.veyron.veyron2.ipc.Client.
 		@Override
-		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context, String name, String method,
-			Object[] args) throws VeyronException {
+		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context,
+			String name, String method, Object[] args) throws VeyronException {
 			return startCall(context, name, method, args, null);
 		}
 		@Override
-		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context, String name, String method,
-			Object[] args, Options opts) throws VeyronException {
+		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context,
+			String name, String method, Object[] args, Options opts) throws VeyronException {
 			if (method == "") {
 				throw new VeyronException("Empty method name invoked on object %s", name);
 			}
-			// Read options.
-			final Duration timeout = opts != null
-			                       ? opts.get(OptionDefs.CALL_TIMEOUT, Duration.class)
-			                       : null;
-			final String vdlPath = opts != null && opts.has(OptionDefs.VDL_INTERFACE_PATH)
-			                     ? opts.get(OptionDefs.VDL_INTERFACE_PATH, String.class)
-			                     : "";
 
 			// Encode all input arguments to JSON.
 			final String[] jsonArgs = new String[args.length];
@@ -289,9 +297,8 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			// Invoke native method.
 			// Make sure that the method name starts with an uppercase character.
 			method = Character.toUpperCase(method.charAt(0)) + method.substring(1);
-			final long nativeCallPtr =
-				nativeStartCall(this.nativePtr, context, name, method, jsonArgs, vdlPath,
-					timeout != null ? timeout.getMillis() : 10000);
+			final long nativeCallPtr = nativeStartCall(
+				this.nativePtr, context, name, method, jsonArgs, opts);
 			return new ClientCall(nativeCallPtr);
 		}
 		@Override

@@ -21,11 +21,11 @@ public interface Runtime {
 	 */
 	public Client newClient() throws VeyronException;
 
-    /**
+	/**
 	 * Creates a new Client instance with the provided options.  A particular implementation of this
 	 * interface chooses which options to support, but at the minimum it must handle the following
 	 * options:
-	 * {@link io.veyron.veyron.veyron2.OptionDefs#CALL_TIMEOUT}
+	 * {@link io.veyron.veyron.veyron2.OptionDefs#LOCAL_ID}
 	 *
 	 * @param  opts            client options
 	 * @return                 the new client instance
@@ -43,7 +43,9 @@ public interface Runtime {
 
 	/**
 	 * Creates a new Server instance with the provided options.  A particular implementation of this
-	 * interface chooses which options to support.
+	 * interface chooses which options to support, but at the minimum it must handle the following
+	 * options:
+	 * {@link io.veyron.veyron.veyron2.OptionDefs#LOCAL_ID}
 	 *
 	 * @param  opts            server options
 	 * @return                 the new server instance

@@ -45,7 +45,8 @@ public class Options {
         final Object opt = this.options.get(key);
         if (opt == null) return null;
         if (!type.isAssignableFrom(opt.getClass())) {
-            throw new VeyronException(String.format("Expected type %s for option %s", type, key));
+            throw new RuntimeException(String.format(
+                "Expected type %s for option %s, got: %s", type, key, opt.getClass()));
         }
         return type.cast(opt);
     }
