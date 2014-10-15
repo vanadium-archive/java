@@ -22,6 +22,7 @@ main() {
 
   # Build the veyron android library.
   # TODO(bprosnitz) We shouldn't need -novdl
+  unset GOROOT
   veyron -target-go="${VEYRON_ROOT}/environment/android/go/bin/go" xgo -novdl armv7-linux-android build -o "${NATIVE_DIR}/libveyronjni.so" -ldflags="-android -shared -extld \"${VEYRON_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android veyron.io/jni/runtimes/google
 
   # Copy JNI Wrapper.
