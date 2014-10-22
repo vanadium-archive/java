@@ -14,9 +14,13 @@ import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
 import io.veyron.veyron.veyron2.security.Label;
+import io.veyron.veyron.veyron2.security.Principal;
 import io.veyron.veyron.veyron2.security.PublicID;
+import io.veyron.veyron.veyron2.security.Security;
+import io.veyron.veyron.veyron2.security.SecurityConstants;
 import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
 import io.veyron.veyron.veyron2.vdl.Any;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
@@ -37,7 +41,7 @@ import java.util.Date;
 public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private static Runtime globalRuntime = null;
 
-	private static native long nativeInit(Options opts);
+	private static native long nativeInit(Options opts) throws VeyronException;
 	private static native long nativeNewRuntime(Options opts) throws VeyronException;
 
 	/**
@@ -54,9 +58,10 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			}
 			try {
 				setupRuntimeOptions(ctx, opts);
+				final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
 				final io.veyron.veyron.veyron2.security.PrivateID privateID =
 					(io.veyron.veyron.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
-				Runtime.globalRuntime = new Runtime(nativeInit(opts), privateID);
+				Runtime.globalRuntime = new Runtime(nativeInit(opts), principal, privateID);
 			} catch (VeyronException e) {
 				throw new RuntimeException(
 					"Couldn't initialize global Veyron Runtime instance: " + e.getMessage());
@@ -88,9 +93,10 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		}
 		try {
 			setupRuntimeOptions(ctx, opts);
+			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
 			final io.veyron.veyron.veyron2.security.PrivateID privateID =
 				(io.veyron.veyron.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
-			return new Runtime(nativeNewRuntime(opts), privateID);
+			return new Runtime(nativeNewRuntime(opts), principal, privateID);
 		} catch (VeyronException e) {
 			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
 		}
@@ -115,6 +121,32 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			final PrivateID id = PrivateID.create(ctx.getPackageName(), signer);
 			opts.set(OptionDefs.RUNTIME_ID, id);
 		}
+
+		if (!opts.has(OptionDefs.RUNTIME_PRINCIPAL) ||
+			opts.get(OptionDefs.RUNTIME_PRINCIPAL) == null) {
+			// Check if the private key has already been generated for this package.
+			// (NOTE: Android package names are unique.)
+			KeyStore.PrivateKeyEntry keyEntry =
+				CryptoUtil.getKeyStorePrivateKey(ctx.getPackageName());
+			if (keyEntry == null) {
+				// Generate a new private key.
+				keyEntry = CryptoUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
+			}
+			final Signer signer = new Signer(
+				keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
+			final Principal principal = createPrincipal(ctx, signer);
+			opts.set(OptionDefs.RUNTIME_PRINCIPAL, principal);
+		}
+	}
+
+	private static Principal createPrincipal(android.content.Context ctx, Signer signer)
+		throws VeyronException {
+		final Principal principal = Security.newPrincipal(signer);
+		final Blessings blessings = principal.blessSelf(ctx.getPackageName());
+		principal.blessingStore().setDefaultBlessings(blessings);
+		principal.blessingStore().set(blessings, SecurityConstants.ALL_PRINCIPALS);
+		principal.addToRoots(blessings);
+		return principal;
 	}
 
 	private static void encodeLocalIDOption(Options opts) throws VeyronException {
@@ -140,6 +172,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 
 	private final long nativePtr;
 	private Client client;
+	private final Principal principal;  // non-null
 	private final io.veyron.veyron.veyron2.security.PrivateID privateID;  // non-null.
 	private io.veyron.veyron.veyron2.security.PublicIDStore publicIDStore;
 
@@ -151,8 +184,10 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private native long nativeGetNamespace(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
-	private Runtime(long nativePtr, io.veyron.veyron.veyron2.security.PrivateID privateID) {
+	private Runtime(long nativePtr, Principal principal,
+		io.veyron.veyron.veyron2.security.PrivateID privateID) {
 		this.nativePtr = nativePtr;
+		this.principal = principal;
 		this.privateID = privateID;
 	}
 	@Override
@@ -187,6 +222,10 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	public io.veyron.veyron.veyron2.ipc.Context newContext() {
 		final long nativeContextPtr = nativeNewContext(this.nativePtr);
 		return new Context(nativeContextPtr);
+	}
+	@Override
+	public Principal getPrincipal() {
+		return this.principal;
 	}
 	@Override
 	public io.veyron.veyron.veyron2.security.PrivateID newIdentity(String name) throws VeyronException {
@@ -457,20 +496,32 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			return this.context.label();
 		}
 		@Override
-		public PublicID localID() {
-			return this.context.localID();
-		}
-		@Override
-		public PublicID remoteID() {
-			return this.context.remoteID();
-		}
-		@Override
 		public String localEndpoint() {
 			return this.context.localEndpoint();
 		}
 		@Override
 		public String remoteEndpoint() {
 			return this.context.remoteEndpoint();
+		}
+		@Override
+		public Principal localPrincipal() {
+			return this.context.localPrincipal();
+		}
+		@Override
+		public Blessings localBlessings() {
+			return this.context.localBlessings();
+		}
+		@Override
+		public Blessings remoteBlessings() {
+			return this.context.remoteBlessings();
+		}
+		@Override
+		public PublicID localID() {
+			return this.context.localID();
+		}
+		@Override
+		public PublicID remoteID() {
+			return this.context.remoteID();
 		}
 	}
 }

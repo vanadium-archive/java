@@ -14,7 +14,6 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
 public class Signer implements io.veyron.veyron.veyron2.security.Signer {
-	private static final String TAG = "net.example.jnitest2";
 	private static final String HASH_ALGORITHM = "SHA256";
 	private static final String SIGN_ALGORITHM = HASH_ALGORITHM + "withECDSA";
 
@@ -27,6 +26,21 @@ public class Signer implements io.veyron.veyron.veyron2.security.Signer {
 		return c;
 	}
 
+	private static byte[] hash(byte[] message) throws VeyronException {
+		try {
+			final MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
+			md.update(message);
+			final byte[] ret = md.digest();
+			if (ret == null || ret.length == 0) {
+				throw new VeyronException("Got empty message after a hash using " + HASH_ALGORITHM);
+			}
+			return ret;
+		} catch (NoSuchAlgorithmException e) {
+			throw new VeyronException("Hashing algorithm " + HASH_ALGORITHM + " not " +
+				"supported by the runtime: " + e.getMessage());
+		}
+	}
+
 	private final PrivateKey privKey;
 	private final ECPublicKey pubKey;
 
@@ -37,28 +51,16 @@ public class Signer implements io.veyron.veyron.veyron2.security.Signer {
 
 	@Override
 	public Signature sign(byte[] purpose, byte[] message) throws VeyronException {
-		if (message == null || message.length == 0) {
+		if (message == null) {
 			throw new VeyronException("Cannot sign empty message.");
 		}
-		// Apply the first hash on the message.
-		try {
-			final MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-			md.update(message);
-			message = md.digest();
-			if (message == null || message.length == 0) {
-				throw new VeyronException(
-					"Got empty message after a hash using " + HASH_ALGORITHM);
-			}
-		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Hashing algorithm " + HASH_ALGORITHM + " not " +
-				"supported by the runtime: " + e.getMessage());
+		message = hash(message);
+		if (purpose != null) {
+			final byte[] purposeHash = hash(purpose);
+			message = join(message, purposeHash);
 		}
-
-		// Append purpose to the hash.
-		message = join(message, purpose);
-
 		// Sign.  Note that the signer will first apply another hash on the message, resulting in:
-		// ECDSA.Sign(Hash(Hash(message) + purpose)).
+		// ECDSA.Sign(Hash(Hash(message) + Hash(purpose))).
 		try {
 			final java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGORITHM);
 			sig.initSign(this.privKey);
@@ -75,6 +77,7 @@ public class Signer implements io.veyron.veyron.veyron2.security.Signer {
 				"Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
 		}
 	}
+
 	@Override
 	public ECPublicKey publicKey() {
 		return this.pubKey;
@@ -84,8 +87,8 @@ public class Signer implements io.veyron.veyron.veyron2.security.Signer {
 		byte[] r, s;
 		// The ASN.1 format of the signature should be:
 		//    Signature ::= SEQUENCE {
-    	//       r   INTEGER,
-    	//       s   INTEGER
+		//       r   INTEGER,
+		//       s   INTEGER
 		//    }
 		// When encoded, this translates into the following byte sequence:
 		//    0x30 len 0x02 rlen [r bytes] 0x02 slen [s bytes].

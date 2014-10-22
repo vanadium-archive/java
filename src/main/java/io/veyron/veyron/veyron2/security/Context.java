@@ -33,18 +33,25 @@ public interface Context {
 	public Label label();
 
 	/**
-	 * Returns the PublicID of the principal at the local end of the request.
+	 * Returns the principal used to authenticate to the remote end.
 	 *
-	 * @return PublicID of the principal at the local end of the request.
+	 * @return the principal used to authenticate to the remote end.
 	 */
-	public PublicID localID();
+	public Principal localPrincipal();
 
 	/**
-	 * Returns the PublicID of the principal at the remote end of the request.
+	 * Returns the blessings sent to the remote end for authentication.
 	 *
-	 * @return PublicID of the principal at the remote end of the request.
+	 * @return the blessings sent to the remote end for authentication.
 	 */
-	public PublicID remoteID();
+	public Blessings localBlessings();
+
+	/**
+	 * Returns the blessings received from the remote end during authentication.
+	 *
+	 * @return [description]
+	 */
+	public Blessings remoteBlessings();
 
 	/**
 	 * Returns the endpoint of the principal at the local end of the request.
@@ -59,4 +66,24 @@ public interface Context {
 	 * @return endpoint of the principal at the remote end of the request.
 	 */
 	public String remoteEndpoint();
+
+	/**
+	 * Returns the PublicID of the principal at the local end of the request.
+	 *
+	 * @deprecated Replace by localBlessings.
+	 *
+	 * @return PublicID of the principal at the local end of the request.
+	 */
+	@Deprecated
+	public PublicID localID();
+
+	/**
+	 * Returns the PublicID of the principal at the remote end of the request.
+	 *
+	 * @deprecated Replaced by remoteBlessings.
+	 *
+	 * @return PublicID of the principal at the remote end of the request.
+	 */
+	@Deprecated
+	public PublicID remoteID();
 }

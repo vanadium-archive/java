@@ -17,25 +17,33 @@ public class OptionDefs {
     public static String RUNTIME = "io.veyron.veyron.veyron2.RUNTIME";
 
     /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.ipc.Client} that specifies a Client.
+     * A key for an option of type {@link io.veyron.veyron.veyron2.ipc.Client} that
+     * specifies a Client.
      */
     public static String CLIENT = "io.veyron.veyron.veyron2.CLIENT";
 
     /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PublicID} that specifies the
-     * PublicID to be used by the local end of an IPC.
+     * A key for an option of type {@link io.veyron.veyron.veyron2.security.Principal} that
+     * specifies a Principal for the Runtime.
+     */
+    public static String RUNTIME_PRINCIPAL = "io.veyron.veyron.veyron2.RUNTIME_PRINCIPAL";
+
+    /**
+     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PublicID} that specifies
+     * the PublicID to be used by the local end of an IPC.
      */
     public static String LOCAL_ID = "io.veyron.veyron.veyron2.LOCAL_ID";
 
     /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PrivateID} that specifies the
-     * identity to be used by the runtime.
+     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PrivateID} that
+     * specifies the identity to be used by the runtime.
      */
     public static String RUNTIME_ID = "io.veyron.veyron.veyron2.RUNTIME_ID";
 
     /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PublicIDStore} that specifies
-     * the public id store to be used by the runtime.
+     * A key for an option of type {@link io.veyron.veyron.veyron2.security.PublicIDStore} that
+     * specifies the public id store to be used by the runtime.
      */
-    public static String RUNTIME_PUBLIC_ID_STORE = "io.veyron.veyron.veyron2.RUNTIME_PUBLIC_ID_STORE";
+    public static String RUNTIME_PUBLIC_ID_STORE =
+        "io.veyron.veyron.veyron2.RUNTIME_PUBLIC_ID_STORE";
 }

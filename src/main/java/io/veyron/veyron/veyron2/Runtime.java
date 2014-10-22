@@ -5,6 +5,7 @@ import io.veyron.veyron.veyron2.ipc.Context;
 import io.veyron.veyron.veyron2.ipc.Server;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.naming.Namespace;
+import io.veyron.veyron.veyron2.security.Principal;
 import io.veyron.veyron.veyron2.security.PrivateID;
 import io.veyron.veyron.veyron2.security.PublicIDStore;
 
@@ -66,6 +67,13 @@ public interface Runtime {
 	 * @return Context the new (client) context.
 	 */
 	public Context newContext();
+
+	/**
+	 * Returns the Principal that represents this Runtime.
+	 *
+	 * @return the Principal that represents this Runtime.
+	 */
+	public Principal getPrincipal();
 
 	/**
 	 * Creates a new PrivateID with the provided name and a newly minted private key.
