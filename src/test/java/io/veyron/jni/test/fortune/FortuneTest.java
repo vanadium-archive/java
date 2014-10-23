@@ -1,4 +1,4 @@
-package io.veyron.examples.fortune;
+package io.veyron.jni.test.fortune;
 
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
