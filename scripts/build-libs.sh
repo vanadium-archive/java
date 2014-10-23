@@ -30,7 +30,6 @@ main() {
 
   # Copy third party libraries.
   local -r THIRD_PARTY_JAVA="${VEYRON_ROOT}/third_party/java"
-  cp "${THIRD_PARTY_JAVA}/commons-lang3-3.3.2/commons-lang3-3.3.2.jar" "${DEST_DIR}"
   cp "${THIRD_PARTY_JAVA}/commons-math3-3.3/commons-math3-3.3.jar" "${DEST_DIR}"
   cp "${THIRD_PARTY_JAVA}/google-gson-2.2.4/gson-2.2.4.jar" "${DEST_DIR}"
   cp "${THIRD_PARTY_JAVA}/guava-17.0/guava-17.0.jar" "${DEST_DIR}"
