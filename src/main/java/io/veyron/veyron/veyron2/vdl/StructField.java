@@ -2,10 +2,12 @@
 
 package io.veyron.veyron.veyron2.vdl;
 
+import java.io.Serializable;
+
 /**
  * StructField represents a struct field in a VDL type.
  */
-public final class StructField {
+public final class StructField implements Serializable {
     private String name;
     private Type type;
 

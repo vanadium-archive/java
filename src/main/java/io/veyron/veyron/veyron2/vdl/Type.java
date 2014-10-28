@@ -2,6 +2,7 @@
 
 package io.veyron.veyron.veyron2.vdl;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -11,7 +12,7 @@ import java.util.Set;
  * Type represents VDL types. TODO(bprosnitz) This is currently mutable.
  * Consider adding type builders and making these objects immutable.
  */
-public final class Type {
+public final class Type implements Serializable {
     private Kind kind; // used by all kinds
     private String name; // used by all kinds
     private String[] labels; // used by enum
