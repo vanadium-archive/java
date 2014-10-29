@@ -2,7 +2,7 @@ package io.veyron.jni.test.fortune;
 
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.ipc.Context;
+import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.Server;
 import io.veyron.veyron.veyron2.ipc.ServerContext;
@@ -10,6 +10,7 @@ import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.Runtime;
 import io.veyron.veyron.veyron2.RuntimeFactory;
+import org.joda.time.Duration;
 
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -52,7 +53,7 @@ public class FortuneTest extends AndroidTestCase {
             }
         });
     	try {
-	    	Options options = new Options();
+	    	final Options options = new Options();
 	    	options.set(OptionDefs.RUNTIME, serverRuntime);
 	    	// TODO(bprosnitz) We get an ACL related error when using a different runtime than the server. Fix this.
 	    	//Runtime clientRuntime = RuntimeFactory.newRuntime(getContext(),
@@ -62,11 +63,12 @@ public class FortuneTest extends AndroidTestCase {
 
 	    	// TODO(bprosnitz) This gets around the mounttable by prefixing the endpoint by "/".
 	    	// We should start the mounttable and use it for the test in the future.
-	    	String name = "/" + endpoint + "/fortune";
+	    	final String name = "/" + endpoint + "/fortune";
 
-	    	Fortune fortune = FortuneFactory.bind(name, options);
+	    	final Fortune fortune = FortuneFactory.bind(name, options);
 
-	    	Context context = null;
+	    	final Context context = RuntimeFactory.defaultRuntime().newContext().withTimeout(
+	    		new Duration(20000)); // 20s
 
 	    	try {
 	    		fortune.get(context);

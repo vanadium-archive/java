@@ -4,6 +4,9 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+
 import io.veyron.veyron.veyron.runtimes.google.android.RedirectStderr;
 import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
 import io.veyron.veyron.veyron.runtimes.google.security.PrivateID;
@@ -12,6 +15,8 @@ import io.veyron.veyron.veyron.runtimes.google.security.Signer;
 import io.veyron.veyron.veyron.runtimes.google.security.Util;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
+import io.veyron.veyron.veyron2.context.CancelableContext;
+import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
@@ -32,13 +37,14 @@ import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
-import java.util.Date;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Runtime is an implementation of Veyron Runtime that calls to native Go code for most of its
  * functionalities.
  */
 public class Runtime implements io.veyron.veyron.veyron2.Runtime {
+	private static final String TAG = "Veyron runtime";
 	private static Runtime globalRuntime = null;
 
 	private static native long nativeInit(Options opts) throws VeyronException;
@@ -176,10 +182,10 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private final io.veyron.veyron.veyron2.security.PrivateID privateID;  // non-null.
 	private io.veyron.veyron.veyron2.security.PublicIDStore publicIDStore;
 
-	private native long nativeNewClient(long nativePtr, Options opts) throws VeyronException;
-	private native long nativeNewServer(long nativePtr, Options opts) throws VeyronException;
-	private native long nativeGetClient(long nativePtr);
-	private native long nativeNewContext(long nativePtr);
+	private native Client nativeNewClient(long nativePtr, Options opts) throws VeyronException;
+	private native Server nativeNewServer(long nativePtr, Options opts) throws VeyronException;
+	private native Client nativeGetClient(long nativePtr) throws VeyronException;
+	private native Context nativeNewContext(long nativePtr) throws VeyronException;
 	private native long nativeGetPublicIDStore(long nativePtr);
 	private native long nativeGetNamespace(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -197,8 +203,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Client newClient(Options opts) throws VeyronException {
 		encodeLocalIDOption(opts);
-		final long nativeClientPtr = nativeNewClient(this.nativePtr, opts);
-		return new Client(nativeClientPtr);
+		return nativeNewClient(this.nativePtr, opts);
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Server newServer() throws VeyronException {
@@ -207,21 +212,28 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Server newServer(Options opts) throws VeyronException {
 		encodeLocalIDOption(opts);
-		final long nativeServerPtr = nativeNewServer(this.nativePtr, opts);
-		return new Server(nativeServerPtr);
+		return nativeNewServer(this.nativePtr, opts);
 	}
 	@Override
 	public synchronized io.veyron.veyron.veyron2.ipc.Client getClient() {
 		if (this.client == null) {
-			final long nativeClientPtr = nativeGetClient(this.nativePtr);
-			this.client = new Client(nativeClientPtr);
+			try {
+				this.client = nativeGetClient(this.nativePtr);
+			} catch (VeyronException e) {
+				android.util.Log.e(TAG, "Coudln't get client: " + e.getMessage());
+				return null;
+			}
 		}
 		return this.client;
 	}
 	@Override
-	public io.veyron.veyron.veyron2.ipc.Context newContext() {
-		final long nativeContextPtr = nativeNewContext(this.nativePtr);
-		return new Context(nativeContextPtr);
+	public Context newContext() {
+		try {
+			return nativeNewContext(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get new context: " + e.getMessage());
+			return null;
+		}
 	}
 	@Override
 	public Principal getPrincipal() {
@@ -272,7 +284,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		private native void nativeStop(long nativePtr) throws VeyronException;
 		private native void nativeFinalize(long nativePtr);
 
-		Server(long nativePtr) {
+		private Server(long nativePtr) {
 			this.nativePtr = nativePtr;
 		}
 		// Implement io.veyron.veyron.veyron2.ipc.Server.
@@ -301,28 +313,26 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 
 	private static class Client implements io.veyron.veyron.veyron2.ipc.Client {
 		private final long nativePtr;
-		// TODO(bprosnitz) Ensure gson is thread safe.
 		private final Gson gson;
 
-		private native long nativeStartCall(long nativePtr,
-			io.veyron.veyron.veyron2.ipc.Context context, String name, String method, String[] args,
-			Options opts) throws VeyronException;
+		private native ClientCall nativeStartCall(long nativePtr, Context context, String name,
+			String method, String[] args, Options opts) throws VeyronException;
 		private native void nativeClose(long nativePtr);
 		private native void nativeFinalize(long nativePtr);
 
-		Client(long nativePtr) {
+		private Client(long nativePtr) {
 			this.nativePtr = nativePtr;
 			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 		// Implement io.veyron.veyron.veyron2.ipc.Client.
 		@Override
-		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context,
-			String name, String method, Object[] args) throws VeyronException {
+		public Call startCall(Context context, String name, String method, Object[] args)
+			throws VeyronException {
 			return startCall(context, name, method, args, null);
 		}
 		@Override
-		public Call startCall(io.veyron.veyron.veyron2.ipc.Context context,
-			String name, String method, Object[] args, Options opts) throws VeyronException {
+		public Call startCall(Context context, String name, String method, Object[] args,
+			Options opts) throws VeyronException {
 			if (method == "") {
 				throw new VeyronException("Empty method name invoked on object %s", name);
 			}
@@ -336,9 +346,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			// Invoke native method.
 			// Make sure that the method name starts with an uppercase character.
 			method = Character.toUpperCase(method.charAt(0)) + method.substring(1);
-			final long nativeCallPtr = nativeStartCall(
-				this.nativePtr, context, name, method, jsonArgs, opts);
-			return new ClientCall(nativeCallPtr);
+			return nativeStartCall(this.nativePtr, context, name, method, jsonArgs, opts);
 		}
 		@Override
 		public void close() {
@@ -351,40 +359,26 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		}
 	}
 
-	private static class Context implements io.veyron.veyron.veyron2.ipc.Context {
-		private final long nativePtr;
-
-		private native void nativeFinalize(long nativePtr);
-
-		Context(long nativePtr) {
-			this.nativePtr = nativePtr;
-		}
-		// Implement java.lang.Object.
-		@Override
-		protected void finalize() {
-			nativeFinalize(this.nativePtr);
-		}
-	}
-
 	private static class Stream implements io.veyron.veyron.veyron2.ipc.Stream {
-		private final long nativeStreamPtr;
+		private final long nativePtr;
 		private final Gson gson;
 
-		private native void nativeSend(long nativeStreamPtr, String item) throws VeyronException;
-		private native String nativeRecv(long nativeStreamPtr) throws EOFException, VeyronException;
+		private native void nativeSend(long nativePtr, String item) throws VeyronException;
+		private native String nativeRecv(long nativePtr) throws EOFException, VeyronException;
+		private native void nativeFinalize(long nativePtr);
 
-		Stream(long nativeStreamPtr) {
-			this.nativeStreamPtr = nativeStreamPtr;
+		private Stream(long nativePtr) {
+			this.nativePtr = nativePtr;
 			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 		@Override
 		public void send(Object item) throws VeyronException {
-			nativeSend(nativeStreamPtr, this.gson.toJson(item));
+			nativeSend(nativePtr, this.gson.toJson(item));
 		}
 
 		@Override
 		public Object recv(TypeToken<?> type) throws EOFException, VeyronException {
-			final String result = nativeRecv(nativeStreamPtr);
+			final String result = nativeRecv(nativePtr);
 			try {
 				return this.gson.fromJson(result, type.getType());
 			} catch (JsonSyntaxException e) {
@@ -392,22 +386,28 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 					"Error decoding result %s from JSON: %s", result, e.getMessage()));
 			}
 		}
+		@Override
+		protected void finalize() {
+			nativeFinalize(this.nativePtr);
+		}
 	}
 
-	private static class ClientCall extends Stream implements io.veyron.veyron.veyron2.ipc.Client.Call {
+	private static class ClientCall implements io.veyron.veyron.veyron2.ipc.Client.Call {
 		private final long nativePtr;
+		private final Stream stream;
 		private final Gson gson;
 
 		private native String[] nativeFinish(long nativePtr) throws VeyronException;
 		private native void nativeCancel(long nativePtr);
 		private native void nativeFinalize(long nativePtr);
 
-		ClientCall(long nativePtr) {
-			super(nativePtr);
+		private ClientCall(long nativePtr, Stream stream) {
 			this.nativePtr = nativePtr;
+			this.stream = stream;
 			this.gson = JSONUtil.getGsonBuilder().create();
 		}
 
+		// Implements io.veyron.veyron.veyron2.ipc.Client.Call.
 		@Override
 		public void closeSend() throws VeyronException {
 			// TODO(spetrovic): implement this.
@@ -445,6 +445,16 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		public void cancel() {
 			nativeCancel(this.nativePtr);
 		}
+		// Implements io.veyron.veyron.veyron2.ipc.Stream.
+		@Override
+		public void send(Object item) throws VeyronException {
+			this.stream.send(item);
+		}
+		@Override
+		public Object recv(TypeToken<?> type) throws EOFException, VeyronException {
+			return this.stream.recv(type);
+		}
+		// Implements java.lang.Object.
 		@Override
 		protected void finalize() {
 			nativeFinalize(this.nativePtr);
@@ -452,76 +462,119 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 
 	@SuppressWarnings("unused")
-	private static class ServerCall extends Stream implements io.veyron.veyron.veyron2.ipc.ServerCall {
+	private static class ServerCall implements io.veyron.veyron.veyron2.ipc.ServerCall {
 		private final long nativePtr;
-		private final io.veyron.veyron.veyron.runtimes.google.security.Context context;
+		private final Stream stream;
+		private final Context context;
+		private final io.veyron.veyron.veyron.runtimes.google.security.Context securityContext;
 
-		public native long nativeBlessing(long nativePtr);
-		private native long nativeDeadline(long nativePtr);
-		private native boolean nativeClosed(long nativePtr);
+		public native Blessings nativeBlessings(long nativePtr) throws VeyronException;
+		private native void nativeFinalize(long nativePtr);
 
-		public ServerCall(long nativePtr) {
-			super(nativePtr);
+		private ServerCall(long nativePtr, Stream stream, Context context,
+			io.veyron.veyron.veyron.runtimes.google.security.Context securityContext) {
 			this.nativePtr = nativePtr;
-			this.context = new io.veyron.veyron.veyron.runtimes.google.security.Context(this.nativePtr);
+			this.stream = stream;
+			this.context = context;
+			this.securityContext = securityContext;
 		}
 		// Implements io.veyron.veyron.veyron2.ipc.ServerContext.
 		@Override
-		public io.veyron.veyron.veyron2.security.PublicID blessing() {
-			return new io.veyron.veyron.veyron.runtimes.google.security.PublicID(nativeBlessing(this.nativePtr));
+		public Blessings blessings() {
+			try {
+				return nativeBlessings(this.nativePtr);
+			} catch (VeyronException e) {
+				android.util.Log.e(TAG, "Couldn't get blessings: " + e.getMessage());
+				return null;
+			}
+		}
+		// Implements io.veyron.veyron.veyron2.ipc.Stream.
+		@Override
+		public void send(Object item) throws VeyronException {
+			this.stream.send(item);
 		}
 		@Override
-		public Date deadline() {
-			return new Date(nativeDeadline(this.nativePtr));
+		public Object recv(TypeToken<?> type) throws EOFException, VeyronException {
+			return this.stream.recv(type);
+		}
+		// Implements io.veyron.veyron.veyron2.context.Context.
+		@Override
+		public DateTime deadline() {
+			return this.context.deadline();
 		}
 		@Override
-		public boolean closed() {
-			return nativeClosed(this.nativePtr);
+		public CountDownLatch done() {
+			return this.context.done();
+		}
+		@Override
+		public Object value(Object key) {
+			return this.context.value(key);
+		}
+		@Override
+		public CancelableContext withCancel() {
+			return this.context.withCancel();
+		}
+		@Override
+		public CancelableContext withDeadline(DateTime deadline) {
+			return this.context.withDeadline(deadline);
+		}
+		@Override
+		public CancelableContext withTimeout(Duration timeout) {
+			return this.context.withTimeout(timeout);
+		}
+		@Override
+		public Context withValue(Object key, Object value) {
+			return this.context.withValue(key, value);
 		}
 		// Implements io.veyron.veyron.veyron2.security.Context.
 		@Override
 		public String method() {
-			return this.context.method();
+			return this.securityContext.method();
 		}
 		@Override
 		public String name() {
-			return this.context.name();
+			return this.securityContext.name();
 		}
 		@Override
 		public String suffix() {
-			return this.context.suffix();
+			return this.securityContext.suffix();
 		}
 		@Override
 		public Label label() {
-			return this.context.label();
+			return this.securityContext.label();
 		}
 		@Override
 		public String localEndpoint() {
-			return this.context.localEndpoint();
+			return this.securityContext.localEndpoint();
 		}
 		@Override
 		public String remoteEndpoint() {
-			return this.context.remoteEndpoint();
+			return this.securityContext.remoteEndpoint();
 		}
 		@Override
 		public Principal localPrincipal() {
-			return this.context.localPrincipal();
+			return this.securityContext.localPrincipal();
 		}
 		@Override
 		public Blessings localBlessings() {
-			return this.context.localBlessings();
+			return this.securityContext.localBlessings();
 		}
 		@Override
 		public Blessings remoteBlessings() {
-			return this.context.remoteBlessings();
+			return this.securityContext.remoteBlessings();
 		}
 		@Override
 		public PublicID localID() {
-			return this.context.localID();
+			return this.securityContext.localID();
 		}
 		@Override
 		public PublicID remoteID() {
-			return this.context.remoteID();
+			return this.securityContext.remoteID();
+		}
+		// Implements java.lang.Object.
+		@Override
+		protected void finalize() {
+			nativeFinalize(this.nativePtr);
 		}
 	}
 }
