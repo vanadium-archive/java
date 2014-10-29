@@ -2,15 +2,15 @@
 
 package io.veyron.veyron.veyron2.vom2;
 
+import junit.framework.TestCase;
+
+import io.veyron.veyron.veyron.testing.BufferedPipedInputStream;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import io.veyron.veyron.veyron.testing.BufferedPipedInputStream;
-
-import junit.framework.TestCase;
 
 /**
  * Tests that low-level VOM writes can be read and recovered.
@@ -21,6 +21,7 @@ public class RawVomRecoverabilityTest extends TestCase {
 
     private OutputStream os;
 
+    @Override
     public void setUp() throws IOException {
         BufferedPipedInputStream is = new BufferedPipedInputStream();
         os = is.getOutputStream();

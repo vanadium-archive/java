@@ -2,20 +2,21 @@
 
 package io.veyron.veyron.veyron2.vom2;
 
+import com.google.common.collect.ImmutableMap;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.math3.complex.Complex;
+
+import io.veyron.veyron.veyron2.vdl.Kind;
+import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.Types;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.math3.complex.Complex;
-
-import com.google.common.collect.ImmutableMap;
-import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.Type;
-import io.veyron.veyron.veyron2.vdl.Types;
-
-import junit.framework.TestCase;
 
 /**
  * EncoderTest tests the VOM encoder against known expected outputs.
@@ -232,40 +233,31 @@ public class EncoderTest extends TestCase {
                         enc.writeBool((Boolean) val, testVal.type);
                         break;
                     case BYTE:
-                        enc.writeByte((byte) objectToLong(val),
-                                testVal.type);
+                        enc.writeByte((byte) objectToLong(val), testVal.type);
                         break;
                     case UINT16:
-                        enc.writeUint16((short) objectToLong(val),
-                                testVal.type);
+                        enc.writeUint16((short) objectToLong(val), testVal.type);
                         break;
                     case UINT32:
-                        enc.writeUint32((int) objectToLong(val),
-                                testVal.type);
+                        enc.writeUint32((int) objectToLong(val), testVal.type);
                         break;
                     case UINT64:
-                        enc.writeUint64((long) objectToLong(val),
-                                testVal.type);
+                        enc.writeUint64(objectToLong(val), testVal.type);
                         break;
                     case INT16:
-                        enc.writeInt16((short) objectToLong(val),
-                                testVal.type);
+                        enc.writeInt16((short) objectToLong(val), testVal.type);
                         break;
                     case INT32:
-                        enc.writeInt32((int) objectToLong(val),
-                                testVal.type);
+                        enc.writeInt32((int) objectToLong(val), testVal.type);
                         break;
                     case INT64:
-                        enc.writeInt64((long) objectToLong(val),
-                                testVal.type);
+                        enc.writeInt64(objectToLong(val), testVal.type);
                         break;
                     case FLOAT32:
-                        enc.writeFloat32((float) objectToFloat(val),
-                                testVal.type);
+                        enc.writeFloat32((float) objectToFloat(val), testVal.type);
                         break;
                     case FLOAT64:
-                        enc.writeFloat64((double) objectToFloat(val),
-                                testVal.type);
+                        enc.writeFloat64(objectToFloat(val), testVal.type);
                         break;
                     case COMPLEX64:
                         enc.writeComplex64((Complex) val, testVal.type);

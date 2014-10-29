@@ -1,7 +1,7 @@
 
 package io.veyron.veyron.veyron.testing;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestUtil {
     public static <T> void assertArrayEquals(T[] arr1, T[] arr2) {

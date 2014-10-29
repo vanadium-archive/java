@@ -2,12 +2,12 @@
 
 package io.veyron.veyron.veyron2.vom2;
 
+import junit.framework.TestCase;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-
-import junit.framework.TestCase;
 
 /**
  * Tests that the low-level VOM writer and writer are compatible with expected

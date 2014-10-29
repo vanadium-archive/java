@@ -2,9 +2,6 @@
 
 package io.veyron.veyron.veyron2.vom2;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import junit.framework.TestCase;
 
 import org.apache.commons.math3.complex.Complex;
@@ -16,6 +13,9 @@ import io.veyron.veyron.veyron2.vdl.Type;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vom2.Decoder.UnexpectedKindException;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * Tests VOM encoding and decoding. This only tests the Java encoding methods
  * and does not compare to known examples of the format.
@@ -24,6 +24,7 @@ public class EncodeDecodeTest extends TestCase {
     private Encoder encoder;
     private Decoder decoder;
 
+    @Override
     public void setUp() throws IOException {
         BufferedPipedInputStream is = new BufferedPipedInputStream();
         OutputStream os = is.getOutputStream();
@@ -452,7 +453,7 @@ public class EncodeDecodeTest extends TestCase {
 
         assertEquals(5, decoder.setStart());
         for (int i = 0; i < 5; i++) {
-            assertFloatEquals((double) i, decoder.readFloat64());
+            assertFloatEquals(i, decoder.readFloat64());
         }
         decoder.setEnd();
 
@@ -496,7 +497,7 @@ public class EncodeDecodeTest extends TestCase {
         assertEquals(5, decoder.mapStart());
         for (int i = 0; i < 5; i++) {
             decoder.mapStartKey();
-            assertFloatEquals((double) i, decoder.readFloat64());
+            assertFloatEquals(i, decoder.readFloat64());
             decoder.mapEndKeyStartElem();
             assertEquals("" + (char) (i + 'a'), decoder.readString());
         }
