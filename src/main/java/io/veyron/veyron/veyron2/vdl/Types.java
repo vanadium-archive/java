@@ -6,27 +6,27 @@ package io.veyron.veyron.veyron2.vdl;
  * Types provides helpers to create simple (non-recursive) types.
  */
 public final class Types {
-    private static Type createPrimitiveType(Kind kind) {
-        return new Type(kind);
+    private static VdlType createPrimitiveType(Kind kind) {
+        return new VdlType(kind);
     }
 
-    public static Type ANY = createPrimitiveType(Kind.ANY);
-    public static Type BOOL = createPrimitiveType(Kind.BOOL);
-    public static Type BYTE = createPrimitiveType(Kind.BYTE);
-    public static Type UINT16 = createPrimitiveType(Kind.UINT16);
-    public static Type UINT32 = createPrimitiveType(Kind.UINT32);
-    public static Type UINT64 = createPrimitiveType(Kind.UINT64);
-    public static Type INT16 = createPrimitiveType(Kind.INT16);
-    public static Type INT32 = createPrimitiveType(Kind.INT32);
-    public static Type INT64 = createPrimitiveType(Kind.INT64);
-    public static Type FLOAT32 = createPrimitiveType(Kind.FLOAT32);
-    public static Type FLOAT64 = createPrimitiveType(Kind.FLOAT64);
-    public static Type COMPLEX64 = createPrimitiveType(Kind.COMPLEX64);
-    public static Type COMPLEX128 = createPrimitiveType(Kind.COMPLEX128);
-    public static Type STRING = createPrimitiveType(Kind.STRING);
-    public static Type TYPEVAL = createPrimitiveType(Kind.TYPEVAL);
+    public static VdlType ANY = createPrimitiveType(Kind.ANY);
+    public static VdlType BOOL = createPrimitiveType(Kind.BOOL);
+    public static VdlType BYTE = createPrimitiveType(Kind.BYTE);
+    public static VdlType UINT16 = createPrimitiveType(Kind.UINT16);
+    public static VdlType UINT32 = createPrimitiveType(Kind.UINT32);
+    public static VdlType UINT64 = createPrimitiveType(Kind.UINT64);
+    public static VdlType INT16 = createPrimitiveType(Kind.INT16);
+    public static VdlType INT32 = createPrimitiveType(Kind.INT32);
+    public static VdlType INT64 = createPrimitiveType(Kind.INT64);
+    public static VdlType FLOAT32 = createPrimitiveType(Kind.FLOAT32);
+    public static VdlType FLOAT64 = createPrimitiveType(Kind.FLOAT64);
+    public static VdlType COMPLEX64 = createPrimitiveType(Kind.COMPLEX64);
+    public static VdlType COMPLEX128 = createPrimitiveType(Kind.COMPLEX128);
+    public static VdlType STRING = createPrimitiveType(Kind.STRING);
+    public static VdlType TYPEVAL = createPrimitiveType(Kind.TYPEVAL);
 
-    public static Type PrimitiveTypeFromKind(Kind kind) {
+    public static VdlType PrimitiveTypeFromKind(Kind kind) {
         switch (kind) {
             case ANY:
                 return ANY;
@@ -63,58 +63,58 @@ public final class Types {
         }
     }
 
-    public static Type NilableOf(Type elem) {
-        Type t = new Type(Kind.NILABLE);
+    public static VdlType NilableOf(VdlType elem) {
+        VdlType t = new VdlType(Kind.NILABLE);
         t.setElem(elem);
         return t;
     }
 
-    public static Type EnumOf(String... labels) {
-        Type t = new Type(Kind.ENUM);
+    public static VdlType EnumOf(String... labels) {
+        VdlType t = new VdlType(Kind.ENUM);
         t.setLabels(labels);
         return t;
     }
 
-    public static Type ArrayOf(int len, Type elem) {
-        Type t = new Type(Kind.ARRAY);
+    public static VdlType ArrayOf(int len, VdlType elem) {
+        VdlType t = new VdlType(Kind.ARRAY);
         t.setLength(len);
         t.setElem(elem);
         return t;
     }
 
-    public static Type ListOf(Type elem) {
-        Type t = new Type(Kind.LIST);
+    public static VdlType ListOf(VdlType elem) {
+        VdlType t = new VdlType(Kind.LIST);
         t.setElem(elem);
         return t;
     }
 
-    public static Type SetOf(Type key) {
-        Type t = new Type(Kind.SET);
+    public static VdlType SetOf(VdlType key) {
+        VdlType t = new VdlType(Kind.SET);
         t.setKey(key);
         return t;
     }
 
-    public static Type MapOf(Type key, Type elem) {
-        Type t = new Type(Kind.MAP);
+    public static VdlType MapOf(VdlType key, VdlType elem) {
+        VdlType t = new VdlType(Kind.MAP);
         t.setKey(key);
         t.setElem(elem);
         return t;
     }
 
-    public static Type StructOf(StructField... fields) {
-        Type t = new Type(Kind.STRUCT);
+    public static VdlType StructOf(StructField... fields) {
+        VdlType t = new VdlType(Kind.STRUCT);
         t.setFields(fields);
         return t;
     }
 
-    public static Type OneOfOf(Type... types) {
-        Type t = new Type(Kind.ONE_OF);
+    public static VdlType OneOfOf(VdlType... types) {
+        VdlType t = new VdlType(Kind.ONE_OF);
         t.setTypes(types);
         return t;
     }
 
-    public static Type Named(String name, Type base) {
-        Type named = base.shallowCopy();
+    public static VdlType Named(String name, VdlType base) {
+        VdlType named = base.shallowCopy();
         named.setName(name);
         return named;
     }

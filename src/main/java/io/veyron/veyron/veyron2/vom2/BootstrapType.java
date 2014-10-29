@@ -7,7 +7,7 @@ import java.util.Map;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.StructField;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 
 /**
@@ -47,9 +47,9 @@ enum BootstrapType {
     LIST_TYPEID(28, Types.ListOf(Types.Named("TypeID", Types.UINT64)));
 
     private final int id;
-    private final Type type;
+    private final VdlType type;
 
-    private BootstrapType(final int id, final Type t) {
+    private BootstrapType(final int id, final VdlType t) {
         this.id = id;
         this.type = t;
     }
@@ -58,12 +58,14 @@ enum BootstrapType {
         return id;
     }
 
-    public Type getType() {
+    public VdlType getType() {
         return type;
     }
 
-    private static final Map<Type, BootstrapType> bootstrapTypeMap = new HashMap<Type, BootstrapType>();
-    private static final Map<Long, BootstrapType> bootstrapTypeIdMap = new HashMap<Long, BootstrapType>();
+    private static final Map<VdlType, BootstrapType> bootstrapTypeMap
+            = new HashMap<VdlType, BootstrapType>();
+    private static final Map<Long, BootstrapType> bootstrapTypeIdMap
+            = new HashMap<Long, BootstrapType>();
     static {
         for (BootstrapType bt : BootstrapType.values()) {
             bootstrapTypeMap.put(bt.getType(), bt);
@@ -71,7 +73,7 @@ enum BootstrapType {
         }
     }
 
-    public static BootstrapType findBootstrapType(Type t) {
+    public static BootstrapType findBootstrapType(VdlType t) {
         return bootstrapTypeMap.get(t);
     }
 
@@ -79,8 +81,8 @@ enum BootstrapType {
         return bootstrapTypeIdMap.get(id);
     }
 
-    private static Type getNamedBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getNamedBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("base", Types.Named("TypeID", Types.UINT64));
@@ -88,8 +90,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getEnumBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getEnumBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("labels", Types.ListOf(Types.STRING));
@@ -97,8 +99,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getArrayBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getArrayBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[3];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
@@ -107,8 +109,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getListBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getListBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
@@ -116,8 +118,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getSetBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getSetBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
@@ -125,8 +127,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getMapBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getMapBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[3];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("key", Types.Named("TypeID", Types.UINT64));
@@ -135,8 +137,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getFieldBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getFieldBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("type", Types.Named("TypeID", Types.UINT64));
@@ -144,8 +146,8 @@ enum BootstrapType {
         return type;
     }
 
-    private static Type getStructBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    private static VdlType getStructBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("fields", Types.ListOf(getFieldBootstrapType()));
@@ -153,8 +155,8 @@ enum BootstrapType {
         return type;
     }
 
-    public static Type getOneOfBootstrapType() {
-        Type type = new Type(Kind.STRUCT);
+    public static VdlType getOneOfBootstrapType() {
+        VdlType type = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         fields[0] = new StructField("name", Types.STRING);
         fields[1] = new StructField("types", Types.ListOf(Types.Named("TypeID", Types.UINT64)));

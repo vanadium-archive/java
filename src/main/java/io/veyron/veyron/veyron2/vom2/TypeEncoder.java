@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.veyron.veyron.veyron2.vdl.StructField;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.wiretype.FieldType;
 import io.veyron.veyron.veyron2.wiretype.TypeID;
@@ -17,7 +17,7 @@ import io.veyron.veyron.veyron2.wiretype.TypeID;
  * types on the VOM stream.
  */
 final class TypeEncoder {
-    private final HashMap<Type, Long> typeIds = new HashMap<Type, Long>();
+    private final HashMap<VdlType, Long> typeIds = new HashMap<VdlType, Long>();
     private long nextId = 65; // First new type id
 
     public TypeEncoder() {
@@ -31,7 +31,7 @@ final class TypeEncoder {
      * @return The type id of the provided type.
      * @throws IOException
      */
-    public long encodeType(RawEncoder enc, Type t) throws IOException {
+    public long encodeType(RawEncoder enc, VdlType t) throws IOException {
         // Bootstrap type?
         BootstrapType bt = BootstrapType.findBootstrapType(t);
         if (bt != null) {
@@ -51,7 +51,7 @@ final class TypeEncoder {
         return typeId;
     }
 
-    private void encodeWireType(RawEncoder enc, Type t, long typeId) throws IOException {
+    private void encodeWireType(RawEncoder enc, VdlType t, long typeId) throws IOException {
         switch (t.getKind()) {
             case BOOL:
             case BYTE:
@@ -182,7 +182,7 @@ final class TypeEncoder {
                 break;
             case ONE_OF: {
                 ArrayList<Long> types = new ArrayList<Long>();
-                for (Type childTy : t.getTypes()) {
+                for (VdlType childTy : t.getTypes()) {
                     types.add(encodeType(enc, childTy));
                 }
 

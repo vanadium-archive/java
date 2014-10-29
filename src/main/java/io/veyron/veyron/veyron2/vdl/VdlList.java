@@ -22,7 +22,7 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
      * @param type runtime VDL type of the wrapped list
      * @param impl wrapped list
      */
-    public VdlList(Type type, java.util.List<T> impl) {
+    public VdlList(VdlType type, java.util.List<T> impl) {
         super(type);
         this.impl = impl;
     }
@@ -183,7 +183,7 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
 
     @SuppressWarnings("unchecked")
     private VdlList(Parcel in) {
-        super((Type) in.readSerializable());
+        super((VdlType) in.readSerializable());
         impl = (java.util.List<T>) in.readSerializable();
     }
 }

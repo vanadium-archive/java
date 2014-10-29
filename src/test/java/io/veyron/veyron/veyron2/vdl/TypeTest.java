@@ -9,28 +9,28 @@ import junit.framework.TestCase;
  */
 public class TypeTest extends TestCase {
     public void testEquals() {
-        Type primitive = new Type(Kind.UINT32);
+        VdlType primitive = new VdlType(Kind.UINT32);
 
-        Type list = new Type(Kind.LIST);
+        VdlType list = new VdlType(Kind.LIST);
         list.setElem(primitive);
 
-        Type recursiveSet = new Type(Kind.SET);
+        VdlType recursiveSet = new VdlType(Kind.SET);
         recursiveSet.setKey(recursiveSet);
 
-        Type recursiveStruct = new Type(Kind.STRUCT);
+        VdlType recursiveStruct = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         recursiveStruct.setFields(fields);
         fields[0] = new StructField("rec", recursiveSet);
-        Type recursiveList = new Type(Kind.LIST);
+        VdlType recursiveList = new VdlType(Kind.LIST);
         recursiveList.setElem(recursiveStruct);
         fields[1] = new StructField("rec2", recursiveList);
 
-        Type[] types = new Type[] {
+        VdlType[] types = new VdlType[] {
                 primitive, list, recursiveSet,
                 recursiveStruct, recursiveList
         };
-        for (Type type : types) {
-            for (Type other : types) {
+        for (VdlType type : types) {
+            for (VdlType other : types) {
                 if (type == other) {
                     assertEquals(type, other);
                 } else {
@@ -38,7 +38,7 @@ public class TypeTest extends TestCase {
                 }
             }
 
-            Type copy = new Type(type.getKind());
+            VdlType copy = new VdlType(type.getKind());
             copy.setName(type.getName());
             copy.setLabels(type.getLabels());
             copy.setLength(type.getLength());
@@ -51,15 +51,15 @@ public class TypeTest extends TestCase {
     }
 
     public void testHashCode() {
-        Type primitive = new Type(Kind.UINT32);
+        VdlType primitive = new VdlType(Kind.UINT32);
 
-        Type list = new Type(Kind.LIST);
+        VdlType list = new VdlType(Kind.LIST);
         list.setElem(primitive);
 
-        Type recursiveSet = new Type(Kind.SET);
+        VdlType recursiveSet = new VdlType(Kind.SET);
         recursiveSet.setKey(recursiveSet);
 
-        Type recursiveSetCopy = new Type(Kind.SET);
+        VdlType recursiveSetCopy = new VdlType(Kind.SET);
         recursiveSetCopy.setKey(recursiveSetCopy);
 
         assertEquals(recursiveSet.hashCode(), recursiveSetCopy.hashCode());
@@ -67,18 +67,18 @@ public class TypeTest extends TestCase {
     }
 
     public void testDeepCopy() {
-        Type recursiveSet = new Type(Kind.SET);
+        VdlType recursiveSet = new VdlType(Kind.SET);
         recursiveSet.setKey(recursiveSet);
 
-        Type recursiveStruct = new Type(Kind.STRUCT);
+        VdlType recursiveStruct = new VdlType(Kind.STRUCT);
         StructField[] fields = new StructField[2];
         recursiveStruct.setFields(fields);
         fields[0] = new StructField("rec", recursiveSet);
-        Type recursiveList = new Type(Kind.LIST);
+        VdlType recursiveList = new VdlType(Kind.LIST);
         recursiveList.setElem(recursiveStruct);
         fields[1] = new StructField("rec2", recursiveList);
 
-        Type copy = recursiveStruct.deepCopy();
+        VdlType copy = recursiveStruct.deepCopy();
         assertEquals(recursiveStruct.getKind(), copy.getKind());
         assertFalse(recursiveStruct.getFields()[0] == copy.getFields()[0]);
         assertEquals(recursiveStruct.getFields()[0].getName(), copy.getFields()[0].getName());
@@ -96,18 +96,18 @@ public class TypeTest extends TestCase {
      */
     public void testEqualsStructuralDifferences() {
         // Both key and elem have the same type.
-        Type stringMap = new Type(Kind.MAP);
-        Type recursiveSet = new Type(Kind.SET);
+        VdlType stringMap = new VdlType(Kind.MAP);
+        VdlType recursiveSet = new VdlType(Kind.SET);
         recursiveSet.setKey(recursiveSet);
         stringMap.setKey(recursiveSet);
         stringMap.setElem(recursiveSet);
 
         // Key and elem have different but equivalent types.
-        Type otherTypeStringMap = new Type(Kind.MAP);
-        Type recursiveSetKey = new Type(Kind.SET);
+        VdlType otherTypeStringMap = new VdlType(Kind.MAP);
+        VdlType recursiveSetKey = new VdlType(Kind.SET);
         recursiveSetKey.setKey(recursiveSetKey);
         otherTypeStringMap.setKey(recursiveSetKey);
-        Type recursiveSetElem = new Type(Kind.SET);
+        VdlType recursiveSetElem = new VdlType(Kind.SET);
         recursiveSetElem.setKey(recursiveSetElem);
         otherTypeStringMap.setElem(recursiveSetElem);
 

@@ -11,7 +11,7 @@ import java.util.Stack;
 import org.apache.commons.math3.complex.Complex;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 
 /**
  * Decodes from VOM-encoded stream.
@@ -26,7 +26,7 @@ final class Decoder {
     // based on the stack type of the parent objects. If there is no parent
     // object, this is empty.
     // Note that this differs from the Encoder.
-    private final Stack<Type> typeStack = new Stack<Type>();
+    private final Stack<VdlType> typeStack = new Stack<VdlType>();
 
     public Decoder(InputStream is) {
         reader = new RawVomReader(is);
@@ -130,7 +130,7 @@ final class Decoder {
     }
 
     public void mapStartKey() {
-        Type elemType = typeStack.pop();
+        VdlType elemType = typeStack.pop();
         if (elemType != null && typeStack.peek().getElem() != elemType) {
             throw new RuntimeException(
                     "Start key expected elem or null to be previous type");
@@ -139,7 +139,7 @@ final class Decoder {
     }
 
     public void mapEndKeyStartElem() {
-        Type keyType = typeStack.pop();
+        VdlType keyType = typeStack.pop();
         if (typeStack.peek().getKey() != keyType) {
             throw new RuntimeException(
                     "Start elem expected key to be previous type.");
@@ -165,7 +165,7 @@ final class Decoder {
             return null;
         }
         typeStack.pop();
-        Type structType = typeStack.peek();
+        VdlType structType = typeStack.peek();
         typeStack.push(structType.getFields()[index].getType());
         return structType.getFields()[index].getName();
     }
@@ -435,7 +435,7 @@ final class Decoder {
             }
             firstMessage = false;
         }
-        Type type;
+        VdlType type;
         if (typeStack.empty()) {
             long typeId = reader.readInt();
             while (typeId < 0) {
@@ -500,7 +500,7 @@ final class Decoder {
         }
     }
 
-    Type currentType() {
+    VdlType currentType() {
         return typeStack.peek();
     }
 
