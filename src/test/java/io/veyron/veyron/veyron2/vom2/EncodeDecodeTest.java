@@ -9,7 +9,7 @@ import org.apache.commons.math3.complex.Complex;
 import io.veyron.veyron.veyron.testing.BufferedPipedInputStream;
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.StructField;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vom2.Decoder.UnexpectedKindException;
 
@@ -597,7 +597,7 @@ public class EncodeDecodeTest extends TestCase {
     }
 
     public void testRecursiveTypes() throws IOException {
-        Type selfReferencingArray = new Type(Kind.ARRAY);
+        VdlType selfReferencingArray = new VdlType(Kind.ARRAY);
         selfReferencingArray.setLength(0);
         selfReferencingArray.setElem(selfReferencingArray);
         encoder.arrayStart(selfReferencingArray);
@@ -606,8 +606,8 @@ public class EncodeDecodeTest extends TestCase {
         assertEquals(selfReferencingArray, decoder.currentType());
         decoder.arrayEnd();
 
-        Type level2RecStruct = new Type(Kind.STRUCT);
-        Type level2RecList = new Type(Kind.LIST);
+        VdlType level2RecStruct = new VdlType(Kind.STRUCT);
+        VdlType level2RecList = new VdlType(Kind.LIST);
         level2RecList.setElem(level2RecStruct);
         level2RecStruct.setFields(new StructField("list", level2RecList));
         encoder.listStart(1, level2RecList);

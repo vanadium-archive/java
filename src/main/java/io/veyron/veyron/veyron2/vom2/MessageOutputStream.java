@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 
 /**
  * MessageOutputStream assists in the VOM-encoding process by handling
@@ -84,7 +84,7 @@ final class MessageOutputStream extends OutputStream {
         bos.write(oneByte);
     }
 
-    public void finishMessage(Type type) throws IOException {
+    public void finishMessage(VdlType type) throws IOException {
         if (!messageStarted) {
             throw new RuntimeException("Cannot finish before starting");
         }

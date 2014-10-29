@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 import org.apache.commons.math3.complex.Complex;
 
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 
 /**
  * RawEncoder provides an interface to encode the components of VOM messages.
@@ -31,7 +31,7 @@ final class RawEncoder {
         mos.startMessage(typeId);
     }
 
-    void endMessage(Type type) throws IOException {
+    void endMessage(VdlType type) throws IOException {
         mos.finishMessage(type);
     }
 

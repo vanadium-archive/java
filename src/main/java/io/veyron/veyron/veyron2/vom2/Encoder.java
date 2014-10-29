@@ -12,7 +12,7 @@ import org.apache.commons.math3.complex.Complex;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.StructField;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 
 /**
  * Writes VOM-encoded data to a stream.
@@ -23,91 +23,91 @@ public final class Encoder {
 
     // The top of this stack refers to the last element started or written.
     // Note that this differs from the Decoder.
-    private final Stack<Type> typeStack = new Stack<Type>();
+    private final Stack<VdlType> typeStack = new Stack<VdlType>();
 
     public Encoder(OutputStream os) {
         this.rawEnc = new RawEncoder(os);
         this.typeEnc = new TypeEncoder();
     }
 
-    public void writeBool(boolean v, Type t) throws IOException {
+    public void writeBool(boolean v, VdlType t) throws IOException {
         assertKind(t, Kind.BOOL);
         startValueLevel(t);
         rawEnc.writeBool(v);
         endLevel();
     }
 
-    public void writeByte(byte v, Type t) throws IOException {
+    public void writeByte(byte v, VdlType t) throws IOException {
         assertKind(t, Kind.BYTE);
         startValueLevel(t);
         rawEnc.writeByte(v);
         endLevel();
     }
 
-    public void writeUint16(short v, Type t) throws IOException {
+    public void writeUint16(short v, VdlType t) throws IOException {
         assertKind(t, Kind.UINT16);
         startValueLevel(t);
         rawEnc.writeUint16(v);
         endLevel();
     }
 
-    public void writeUint32(int v, Type t) throws IOException {
+    public void writeUint32(int v, VdlType t) throws IOException {
         assertKind(t, Kind.UINT32);
         startValueLevel(t);
         rawEnc.writeUint32(v);
         endLevel();
     }
 
-    public void writeUint64(long v, Type t) throws IOException {
+    public void writeUint64(long v, VdlType t) throws IOException {
         assertKind(t, Kind.UINT64);
         startValueLevel(t);
         rawEnc.writeUint64(v);
         endLevel();
     }
 
-    public void writeInt16(short v, Type t) throws IOException {
+    public void writeInt16(short v, VdlType t) throws IOException {
         assertKind(t, Kind.INT16);
         startValueLevel(t);
         rawEnc.writeInt16(v);
         endLevel();
     }
 
-    public void writeInt32(int v, Type t) throws IOException {
+    public void writeInt32(int v, VdlType t) throws IOException {
         assertKind(t, Kind.INT32);
         startValueLevel(t);
         rawEnc.writeInt32(v);
         endLevel();
     }
 
-    public void writeInt64(long v, Type t) throws IOException {
+    public void writeInt64(long v, VdlType t) throws IOException {
         assertKind(t, Kind.INT64);
         startValueLevel(t);
         rawEnc.writeInt64(v);
         endLevel();
     }
 
-    public void writeFloat32(float v, Type t) throws IOException {
+    public void writeFloat32(float v, VdlType t) throws IOException {
         assertKind(t, Kind.FLOAT32);
         startValueLevel(t);
         rawEnc.writeFloat32(v);
         endLevel();
     }
 
-    public void writeFloat64(double v, Type t) throws IOException {
+    public void writeFloat64(double v, VdlType t) throws IOException {
         assertKind(t, Kind.FLOAT64);
         startValueLevel(t);
         rawEnc.writeFloat64(v);
         endLevel();
     }
 
-    public void writeComplex64(Complex v, Type t) throws IOException {
+    public void writeComplex64(Complex v, VdlType t) throws IOException {
         assertKind(t, Kind.COMPLEX64);
         startValueLevel(t);
         rawEnc.writeComplex64(v);
         endLevel();
     }
 
-    public void writeComplex128(Complex v, Type t) throws IOException {
+    public void writeComplex128(Complex v, VdlType t) throws IOException {
         assertKind(t, Kind.COMPLEX128);
         startValueLevel(t);
         rawEnc.writeComplex128(v);
@@ -115,7 +115,7 @@ public final class Encoder {
                     // length... it is unnecessary.
     }
 
-    public void writeBytes(byte[] v, Type t) throws IOException {
+    public void writeBytes(byte[] v, VdlType t) throws IOException {
         assertKind(t, Kind.ARRAY, Kind.LIST);
         assertKind(t.getElem(), Kind.BYTE);
         startValueLevel(t);
@@ -132,18 +132,18 @@ public final class Encoder {
         endLevel();
     }
 
-    public void writeString(String v, Type t) throws IOException {
+    public void writeString(String v, VdlType t) throws IOException {
         startValueLevel(t);
         rawEnc.writeString(v);
         endLevel();
     }
 
-    public void structStart(Type type) throws IOException {
+    public void structStart(VdlType type) throws IOException {
         startValueLevel(type);
     }
 
     public void structNextField(String name) throws IOException {
-        Type type = typeStack.peek();
+        VdlType type = typeStack.peek();
         StructField[] fields = type.getFields();
         for (int i = 0; i < fields.length; i++) {
             if (fields[i].getName().equals(name)) {
@@ -158,7 +158,7 @@ public final class Encoder {
         endLevel();
     }
 
-    public void arrayStart(Type type) throws IOException {
+    public void arrayStart(VdlType type) throws IOException {
         startValueLevel(type);
     }
 
@@ -166,7 +166,7 @@ public final class Encoder {
         endLevel();
     }
 
-    public void listStart(int len, Type type) throws IOException {
+    public void listStart(int len, VdlType type) throws IOException {
         startValueLevel(type);
         rawEnc.writeListStart(len);
     }
@@ -175,7 +175,7 @@ public final class Encoder {
         endLevel();
     }
 
-    public void setStart(int len, Type type) throws IOException {
+    public void setStart(int len, VdlType type) throws IOException {
         startValueLevel(type);
         rawEnc.writeSetStart(len);
     }
@@ -184,7 +184,7 @@ public final class Encoder {
         endLevel();
     }
 
-    public void mapStart(int len, Type type) throws IOException {
+    public void mapStart(int len, VdlType type) throws IOException {
         startValueLevel(type);
         rawEnc.writeMapStart(len);
     }
@@ -193,7 +193,7 @@ public final class Encoder {
         endLevel();
     }
 
-    private void startValueLevel(Type type) throws IOException {
+    private void startValueLevel(VdlType type) throws IOException {
         // TODO(bprosnitz) For nested dynamic types, this doesn't work because
         // types can't be written to the middle of the stream. We need to either
         // have separate type and value buffers or just not buffer types.
@@ -205,13 +205,13 @@ public final class Encoder {
     }
 
     private void endLevel() throws IOException {
-        Type type = typeStack.pop();
+        VdlType type = typeStack.pop();
         if (typeStack.empty()) {
             rawEnc.endMessage(type);
         }
     }
 
-    private void assertKind(Type type, Kind... kinds) {
+    private void assertKind(VdlType type, Kind... kinds) {
         for (Kind kind : kinds) {
             if (type.getKind() == kind) {
                 return;

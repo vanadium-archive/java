@@ -12,21 +12,21 @@ import java.util.Set;
  * Type represents VDL types. TODO(bprosnitz) This is currently mutable.
  * Consider adding type builders and making these objects immutable.
  */
-public final class Type implements Serializable {
+public final class VdlType implements Serializable {
     private Kind kind; // used by all kinds
     private String name; // used by all kinds
     private String[] labels; // used by enum
     private int length; // used by array
-    private Type key; // used by set, map
-    private Type elem; // used by array, list, map
-    private Type[] types; // used by oneof
+    private VdlType key; // used by set, map
+    private VdlType elem; // used by array, list, map
+    private VdlType[] types; // used by oneof
     private StructField[] fields; // used by struct
 
-    public Type(Kind kind) {
+    public VdlType(Kind kind) {
         this.kind = kind;
     }
 
-    public Type() {
+    public VdlType() {
     }
 
     public Kind getKind() {
@@ -61,27 +61,27 @@ public final class Type implements Serializable {
         this.length = length;
     }
 
-    public Type getKey() {
+    public VdlType getKey() {
         return key;
     }
 
-    public void setKey(Type key) {
+    public void setKey(VdlType key) {
         this.key = key;
     }
 
-    public Type getElem() {
+    public VdlType getElem() {
         return elem;
     }
 
-    public void setElem(Type elem) {
+    public void setElem(VdlType elem) {
         this.elem = elem;
     }
 
-    public Type[] getTypes() {
+    public VdlType[] getTypes() {
         return types;
     }
 
-    public void setTypes(Type... types) {
+    public void setTypes(VdlType... types) {
         this.types = types;
     }
 
@@ -93,7 +93,7 @@ public final class Type implements Serializable {
         this.fields = fields;
     }
 
-    private boolean recursiveEquals(final Type other,
+    private boolean recursiveEquals(final VdlType other,
             final IdentityHashMap<Object, Set<Object>> seen) {
         Set<Object> matches;
         if (seen.containsKey(this)) {
@@ -195,7 +195,7 @@ public final class Type implements Serializable {
         if (this.getClass() != other.getClass()) {
             return false;
         }
-        return recursiveEquals((Type) other, new IdentityHashMap<Object, Set<Object>>());
+        return recursiveEquals((VdlType) other, new IdentityHashMap<Object, Set<Object>>());
     }
 
     private int recursiveHashCode(IdentityHashMap<Object, Void> seen) {
@@ -217,7 +217,7 @@ public final class Type implements Serializable {
                 + (this.elem == null ? 0 : this.elem.recursiveHashCode(seen));
         if (types != null) {
             result = prime * result + this.types.length;
-            for (Type type : types) {
+            for (VdlType type : types) {
                 result = prime * result + type.hashCode();
             }
         } else {
@@ -238,11 +238,11 @@ public final class Type implements Serializable {
         return recursiveHashCode(new IdentityHashMap<Object, Void>());
     }
 
-    private Type recursiveDeepCopy(IdentityHashMap<Object, Type> seen) {
+    private VdlType recursiveDeepCopy(IdentityHashMap<Object, VdlType> seen) {
         if (seen.get(this) != null) {
             return seen.get(this);
         }
-        Type copy = new Type(this.kind);
+        VdlType copy = new VdlType(this.kind);
         seen.put(this, copy);
 
         copy.name = this.name;
@@ -255,7 +255,7 @@ public final class Type implements Serializable {
             copy.elem = this.elem.recursiveDeepCopy(seen);
         }
         if (this.types != null) {
-            copy.types = new Type[this.types.length];
+            copy.types = new VdlType[this.types.length];
             for (int i = 0; i < this.types.length; i++) {
                 copy.types[i] = this.types[i].recursiveDeepCopy(seen);
             }
@@ -270,12 +270,12 @@ public final class Type implements Serializable {
         return copy;
     }
 
-    Type deepCopy() {
-        return recursiveDeepCopy(new IdentityHashMap<Object, Type>());
+    VdlType deepCopy() {
+        return recursiveDeepCopy(new IdentityHashMap<Object, VdlType>());
     }
 
-    public Type shallowCopy() {
-        Type copy = new Type(this.kind);
+    public VdlType shallowCopy() {
+        VdlType copy = new VdlType(this.kind);
         copy.name = this.name;
         copy.labels = this.labels;
         copy.length = this.length;

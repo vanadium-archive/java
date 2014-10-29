@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import org.apache.commons.math3.complex.Complex;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 
 import java.io.ByteArrayOutputStream;
@@ -24,9 +24,9 @@ import java.util.Map;
 public class EncoderTest extends TestCase {
     private static class VomTestValue {
         public Object val;
-        public Type type;
+        public VdlType type;
 
-        public VomTestValue(Object val, Type type) {
+        public VomTestValue(Object val, VdlType type) {
             this.val = val;
             this.type = type;
         }

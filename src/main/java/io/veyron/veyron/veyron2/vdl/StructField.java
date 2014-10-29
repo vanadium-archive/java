@@ -9,9 +9,9 @@ import java.io.Serializable;
  */
 public final class StructField implements Serializable {
     private String name;
-    private Type type;
+    private VdlType type;
 
-    public StructField(String name, Type type) {
+    public StructField(String name, VdlType type) {
         this.name = name;
         this.type = type;
     }
@@ -20,7 +20,7 @@ public final class StructField implements Serializable {
         return name;
     }
 
-    public Type getType() {
+    public VdlType getType() {
         return type;
     }
 
@@ -28,7 +28,7 @@ public final class StructField implements Serializable {
         this.name = name;
     }
 
-    public void setType(Type type) {
+    public void setType(VdlType type) {
         this.type = type;
     }
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.Type;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.StructField;
 
 /**
@@ -15,7 +15,7 @@ import io.veyron.veyron.veyron2.vdl.StructField;
  * id.
  */
 final class TypeDecoder {
-    private final HashMap<Long, Type> definedTypes = new HashMap<Long, Type>();
+    private final HashMap<Long, VdlType> definedTypes = new HashMap<Long, VdlType>();
     private final HashMap<Long, PartialType> partialTypes = new HashMap<Long, PartialType>();
 
     public TypeDecoder() {
@@ -27,7 +27,7 @@ final class TypeDecoder {
      * @param typeId The type id
      * @return The type if found or null if not defined.
      */
-    public Type lookupType(long typeId) {
+    public VdlType lookupType(long typeId) {
         BootstrapType bt = BootstrapType.findBootstrapTypeById(typeId);
         if (bt != null) {
             return bt.getType();
@@ -56,7 +56,7 @@ final class TypeDecoder {
     }
 
     private boolean allocateTypesForDependencies(long typeId,
-            Map<Long, Map.Entry<PartialType, Type>> typeDeps) {
+            Map<Long, Map.Entry<PartialType, VdlType>> typeDeps) {
         if (lookupType(typeId) != null) {
             return true;
         }
@@ -67,7 +67,7 @@ final class TypeDecoder {
         if (typeDeps.get(typeId) != null) {
             return true;
         }
-        typeDeps.put(typeId, new AbstractMap.SimpleEntry<PartialType, Type>(pt, new Type()));
+        typeDeps.put(typeId, new AbstractMap.SimpleEntry<PartialType, VdlType>(pt, new VdlType()));
 
         if (pt.baseTypeId != null) {
             if (!allocateTypesForDependencies(pt.baseTypeId, typeDeps)) {
@@ -107,26 +107,27 @@ final class TypeDecoder {
     }
 
     private boolean tryBuildPartialType(long typeId, PartialType pt) {
-        Map<Long, Map.Entry<PartialType, Type>> types = new HashMap<Long, Map.Entry<PartialType, Type>>();
+        Map<Long, Map.Entry<PartialType, VdlType>> types
+                = new HashMap<Long, Map.Entry<PartialType, VdlType>>();
         if (!allocateTypesForDependencies(typeId, types)) {
             return false;
         }
 
-        for (Map.Entry<Long, Map.Entry<PartialType, Type>> entry : types.entrySet()) {
+        for (Map.Entry<Long, Map.Entry<PartialType, VdlType>> entry : types.entrySet()) {
             long entryTypeId = entry.getKey();
             PartialType entryPt = entry.getValue().getKey();
-            Type entryType = entry.getValue().getValue();
+            VdlType entryType = entry.getValue().getValue();
 
             if (pt.baseTypeId != null) {
                 // named primitive
-                Type ty = lookupType(pt.baseTypeId);
+                VdlType ty = lookupType(pt.baseTypeId);
                 if (ty == null) {
                     ty = types.get(pt.baseTypeId).getValue();
                 }
                 if (ty == null) {
                     throw new RuntimeException("Unexpectedly failed to find type");
                 }
-                Type copy = ty.shallowCopy();
+                VdlType copy = ty.shallowCopy();
                 copy.setName(pt.name);
                 partialTypes.remove(typeId);
                 definedTypes.put(typeId, copy);
@@ -139,7 +140,7 @@ final class TypeDecoder {
             entryType.setLength(entryPt.length);
 
             if (entryPt.keyTypeId != null) {
-                Type keyTy = lookupType(entryPt.keyTypeId);
+                VdlType keyTy = lookupType(entryPt.keyTypeId);
                 if (keyTy == null) {
                     keyTy = types.get(entryPt.keyTypeId).getValue();
                 }
@@ -150,7 +151,7 @@ final class TypeDecoder {
             }
 
             if (entryPt.elemTypeId != null) {
-                Type elemTy = lookupType(entryPt.elemTypeId);
+                VdlType elemTy = lookupType(entryPt.elemTypeId);
                 if (elemTy == null) {
                     elemTy = types.get(entryPt.elemTypeId).getValue();
                 }
@@ -161,10 +162,10 @@ final class TypeDecoder {
             }
 
             if (entryPt.typeIds != null) {
-                Type[] oneOfTypes = new Type[entryPt.typeIds.length];
+                VdlType[] oneOfTypes = new VdlType[entryPt.typeIds.length];
                 for (int i = 0; i < entryPt.typeIds.length; i++) {
                     long id = entryPt.typeIds[i];
-                    Type aTy = lookupType(id);
+                    VdlType aTy = lookupType(id);
                     if (aTy == null) {
                         aTy = types.get(id).getValue();
                     }
@@ -180,7 +181,7 @@ final class TypeDecoder {
                 StructField[] fields = new StructField[entryPt.fields.length];
                 for (int i = 0; i < entryPt.fields.length; i++) {
                     PartialStructField partialFld = entryPt.fields[i];
-                    Type fieldTy = lookupType(partialFld.typeId);
+                    VdlType fieldTy = lookupType(partialFld.typeId);
                     if (fieldTy == null) {
                         fieldTy = types.get(partialFld.typeId).getValue();
                     }
