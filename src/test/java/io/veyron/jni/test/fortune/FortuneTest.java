@@ -43,7 +43,7 @@ public class FortuneTest extends AndroidTestCase {
 
     	final Runtime serverRuntime = RuntimeFactory.newRuntime(getContext(), null);
     	final Server server = serverRuntime.newServer();
-    	final String endpoint = server.listen("tcp", "127.0.0.1:0");
+    	final String endpoint = server.listen(null);
     	final FortuneService service = new FortuneServiceImpl();
     	server.serve("fortune", new Dispatcher() {
             @Override

@@ -5,27 +5,26 @@ package io.veyron.veyron.veyron2.ipc;
  */
 public interface Server {
 	/**
- 	 * Creates a listening network endpoint for the Server. This method may be called multiple times
- 	 * to listen on multiple endpoints.  The returned endpoint represents an address that will be
- 	 * published with the mount table when {@link #serve} is called.
- 	 * The protocol must be one of "tcp", "tcp4", "tcp6", "unix", "unixpacket", "bluetooth", or
- 	 * "veyron."
- 	 * For "tcp*" protocols, addresses have the form host:port. If host is a literal IPv6 address or
- 	 * host name, it must be enclosed in square brackets as in "[::1]:80", "[ipv6-host]:http" or
- 	 * "[ipv6-host%zone]:80".  Empty host name means the local host.  Port number 0 means pick the
- 	 * first available port.
- 	 * For "bluetooth" protocol, addresses have the form MAC/port.  Port number 0 means pick the
- 	 * first available port.
- 	 * For "veyron" protocol, the address can be either (1) a formatted Veyron endpoint, or (2)
- 	 * an object name which resolves to an endpoint.
- 	 * TODO(spetrovic): Return an Endpoint object instead of a string.
+	 * Creates a listening network endpoint for the Server as specified by its ListenSpec parameter.
 	 *
-	 * @param  protocol        a network protocol to be used (e.g., "tcp", "bluetooth")
-	 * @param  address         an address to be used (e.g., "192.168.8.1:12")
+	 * The endpoint is chosen as the first available address/port on the device for the ListenSpec
+	 * protocol.  The Server automatically adapts to any changes in its network configuration by
+	 * picking a different address/port on the device for the given protocol.  The call returns
+	 * the first established network endpoint.
+	 *
+	 * If the ListenSpec provides a non-empty proxy address, the Server will connect to the proxy
+	 * in order to proxy connections.
+	 *
+	 * If the provided ListenSpec is <code>null</code>, default ListenSpec is used.
+	 *
+	 * Listen returns the first established endpoint.  It is safe to call Listen multiple times.
+	 *
+	 * @param  spec        network protocol.
+	 * @param  proxy           name of a proxy to be used to proxy connections to this listener.
 	 * @return                 the endpoint string.
-	 * @throws VeyronException if the provided protocol/address can't be listened on.
+	 * @throws VeyronException if the provided protocol can't be listened on.
 	 */
-	public String listen(String protocol, String address) throws VeyronException;
+	public String listen(ListenSpec spec) throws VeyronException;
 
 	/**
 	 * Performs the following two related functions:

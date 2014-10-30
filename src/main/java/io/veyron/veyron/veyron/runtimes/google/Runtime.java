@@ -18,6 +18,7 @@ import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.context.CancelableContext;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
+import io.veyron.veyron.veyron2.ipc.ListenSpec;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
@@ -276,8 +277,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private static class Server implements io.veyron.veyron.veyron2.ipc.Server {
 		private final long nativePtr;
 
-		private native String nativeListen(long nativePtr, String protocol, String address)
-			throws VeyronException;
+		private native String nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
 		private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
 			throws VeyronException;
 		private native String[] nativeGetPublishedNames(long nativePtr) throws VeyronException;
@@ -289,8 +289,11 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		}
 		// Implement io.veyron.veyron.veyron2.ipc.Server.
 		@Override
-		public String listen(String protocol, String address) throws VeyronException {
-			return nativeListen(this.nativePtr, protocol, address);
+		public String listen(ListenSpec spec) throws VeyronException {
+			if (spec == null) {
+				spec = ListenSpec.DEFAULT;
+			}
+			return nativeListen(this.nativePtr, spec);
 		}
 		@Override
 		public void serve(String name, Dispatcher dispatcher) throws VeyronException {
