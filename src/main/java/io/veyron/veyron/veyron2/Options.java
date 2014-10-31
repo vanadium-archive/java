@@ -14,10 +14,10 @@ public class Options {
 
     /**
      * Returns true iff the option with the provided key exists.  (Note that if the option exists
-     * but its value is null, this method will return true.)
+     * but its value is {@code null}, this method will return {@code true}.)
      *
      * @param  key key of the option whose existance is checked.
-     * @return     true iff the option with the above key exists.
+     * @return     {@code true} iff the option with the above key exists.
      */
     public boolean has(String key) {
         return this.options.containsKey(key);
@@ -27,7 +27,7 @@ public class Options {
      * Returns the option with the provided key.
      *
      * @param  key key of the option we want to get.
-     * @return     an option with the provided key, or null if no such option exists.
+     * @return     an option with the provided key, or {@code null} if no such option exists.
      */
     public Object get(String key) {
         return this.options.get(key);
@@ -38,7 +38,7 @@ public class Options {
      *
      * @param key              key of the option we want to get.
      * @param type             type of the option we want to get.
-     * @return                 an option with the provided key, or null if no such option exists.
+     * @return                 an option with the provided key, or {@code null} if no such option exists.
      * @throws VeyronException if the option isn't of the provided type.
      */
     public <T> T get(String key, Class<T> type) throws VeyronException {
@@ -52,18 +52,18 @@ public class Options {
     }
 
     /**
-     * Associates option value with the provided key.  If an option with the
-     * same key already exist, its value will be overwritten.
+     * Associates option value with the provided key.  If an option with the same key already exist,
+     * its value will be overwritten.
      *
-     * @param key     key of the option we are setting.
-     * @param value   an option we are setting.
+     * @param key   key of the option we are setting.
+     * @param value an option we are setting.
      */
     public void set(String key, Object value) {
         this.options.put(key, value);
     }
 
     /**
-     * Removes the option with a given key.  A no-op if the option doesn't exist.
+     * Removes the option with a given key.  This method is a no-op if the option doesn't exist.
      *
      * @param key a key of an option to be removed.
      */

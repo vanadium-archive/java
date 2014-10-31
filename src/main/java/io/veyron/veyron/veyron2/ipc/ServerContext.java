@@ -9,11 +9,11 @@ import io.veyron.veyron.veyron2.security.Blessings;
  */
 public interface ServerContext extends Context, io.veyron.veyron.veyron2.security.Context {
 	/**
-	 * Blessings returns blessings bound to the server's private key (technically,
-	 * the server principal's private key) provided by the client of the RPC.
+	 * Returns blessings bound to the server's private key (technically, the server principal's
+	 * private key) provided by the client of the RPC.
 	 *
-	 * Blessings can return null, which indicates that the client did not
-	 * provide any blessings to the server with the request.
+	 * This method can return {@code null}, which indicates that the client did not provide any
+	 * blessings to the server with the request.
 	 *
 	 * @return blessings bound to the server's private key.
 	 */

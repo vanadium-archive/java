@@ -6,9 +6,8 @@ import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.InputChannel;
 
 /**
- * Namespace provides translation from object names to server object addresses.
- * It represents the interface to a client side library for the MountTable
- * service.
+ * Namespace provides translation from object names to server object addresses.  It represents the
+ * interface to a client side library for the MountTable service.
  */
 public interface Namespace {
 	/**

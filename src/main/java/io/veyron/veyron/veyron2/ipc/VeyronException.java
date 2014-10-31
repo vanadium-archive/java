@@ -6,19 +6,18 @@ import android.os.Parcelable;
 import java.io.Serializable;
 
 /**
- * VeyronException is an exception raised by the Veyron runtime in an event of
- * an unexpected error. It contains an error message and optionally a non-empty
- * unique error identifier which allows for stable error checking across
- * different error messages and different address spaces. By convention, the
- * format for the ID is "PKGPATH.NAME" - e.g., ErrIDFoo defined in the
- * "veyron2/verror" package has id "veyron2/verror.ErrIDFoo". (Note that dots in
- * Java package names are replaced with slashes.) All messages and ids are
- * non-null (but can be empty).
+ * VeyronException is an exception raised by the Veyron runtime in an event of an unexpected error.
+ * It contains an error message and optionally a non-empty unique error identifier which allows for
+ * stable error checking across different error messages and different address spaces.
+ * By convention, the format for the identifier is {@literal "PKGPATH.NAME"} - e.g., ERROR_ID_FOO
+ * defined in the "veyron2.verror" package has id "veyron2/verror/ERROR_ID_FOO". (Note that dots in
+ * Java package names are replaced with slashes.) All messages and ids are non-{@code null} (but can
+ * be empty).
  *
- * For comparison between VeyronExceptions, we follow the following set of
- * rules: 1) Two exceptions, at least one of which has a non-empty ID, are equal
- * iff their IDs are equal, regardless of the message strings. 2) Two exceptions
- * with empty IDs are equal iff their messages are equal.
+ * For comparison between {@code VeyronException}s, we follow the following set of rules:
+ *     1) Two exceptions, at least one of which has a non-empty id, are equal iff their ids are
+ *        equal, regardless of the message strings.
+ *     2) Two exceptions with empty IDs are equal iff their messages are equal.
  */
 // TODO(spetrovic): Move this class into package "io.veyron.veyron.veyron2".
 public class VeyronException extends Exception implements Parcelable, Serializable {
@@ -42,10 +41,9 @@ public class VeyronException extends Exception implements Parcelable, Serializab
     }
 
     /**
-     * Returns the ID associated with this exception or null if no ID has been
-     * associated.
+     * Returns the ID associated with this exception or null if no ID has been associated.
      *
-     * @return String the ID associated with the exception
+     * @return the ID associated with the exception
      */
     public String getID() {
         return this.id;

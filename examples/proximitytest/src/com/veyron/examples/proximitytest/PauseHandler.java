@@ -1,4 +1,4 @@
-package io.veyron.veyron.veyron2;
+package com.veyron2.services.proximity.scanner;
 
 import android.os.Handler;
 import android.os.Message;

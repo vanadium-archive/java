@@ -2,7 +2,7 @@ package io.veyron.veyron.veyron2.context;
 
 /**
  * CancelableContext is an extension of Context interface that allows the user to explicitly
- * cancel the Context.
+ * cancel the context.
  */
 public abstract class CancelableContext implements Context {
 	/**
@@ -12,5 +12,9 @@ public abstract class CancelableContext implements Context {
 	*/
 	public abstract void cancel();
 
+	/**
+	 * Method that restricts all implementations of CancelableContext (and therefore Context)
+	 * to the local package.
+	 */
 	abstract void implementationsOnlyInThisPackage();
 }

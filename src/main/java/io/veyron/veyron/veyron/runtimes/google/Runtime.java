@@ -9,10 +9,7 @@ import org.joda.time.Duration;
 
 import io.veyron.veyron.veyron.runtimes.google.android.RedirectStderr;
 import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
-import io.veyron.veyron.veyron.runtimes.google.security.PrivateID;
-import io.veyron.veyron.veyron.runtimes.google.security.PublicIDStore;
 import io.veyron.veyron.veyron.runtimes.google.security.Signer;
-import io.veyron.veyron.veyron.runtimes.google.security.Util;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.context.CancelableContext;
@@ -24,19 +21,13 @@ import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Principal;
-import io.veyron.veyron.veyron2.security.PublicID;
 import io.veyron.veyron.veyron2.security.Security;
 import io.veyron.veyron.veyron2.security.SecurityConstants;
-import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
 import io.veyron.veyron.veyron2.vdl.Any;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.io.EOFException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 import java.util.concurrent.CountDownLatch;
 
@@ -66,9 +57,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			try {
 				setupRuntimeOptions(ctx, opts);
 				final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-				final io.veyron.veyron.veyron2.security.PrivateID privateID =
-					(io.veyron.veyron.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
-				Runtime.globalRuntime = new Runtime(nativeInit(opts), principal, privateID);
+				Runtime.globalRuntime = new Runtime(nativeInit(opts), principal);
 			} catch (VeyronException e) {
 				throw new RuntimeException(
 					"Couldn't initialize global Veyron Runtime instance: " + e.getMessage());
@@ -78,7 +67,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 
 	/**
-	 * Returns the pre-initialized global Runtime instance.  Returns <code>null</code> if init()
+	 * Returns the pre-initialized global Runtime instance.  Returns {@code null} if init()
 	 * hasn't already been invoked.
 	 *
 	 * @return a pre-initialized runtime instance.
@@ -101,9 +90,7 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		try {
 			setupRuntimeOptions(ctx, opts);
 			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-			final io.veyron.veyron.veyron2.security.PrivateID privateID =
-				(io.veyron.veyron.veyron2.security.PrivateID)opts.get(OptionDefs.RUNTIME_ID);
-			return new Runtime(nativeNewRuntime(opts), principal, privateID);
+			return new Runtime(nativeNewRuntime(opts), principal);
 		} catch (VeyronException e) {
 			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
 		}
@@ -111,24 +98,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 
 	private static void setupRuntimeOptions(android.content.Context ctx, Options opts)
 		throws VeyronException {
-		// If the PrivateID option isn't specified, generate a new PrivateID.  Note that we
-		// choose to generate keys inside Java (instead of native code) because we can
-		// conveniently store them inside Android KeyStore.
-		if (!opts.has(OptionDefs.RUNTIME_ID) || opts.get(OptionDefs.RUNTIME_ID) == null) {
-			// Check if the private key has already been generated for this package.
-			// (NOTE: Android package names are unique.)
-			KeyStore.PrivateKeyEntry keyEntry =
-				CryptoUtil.getKeyStorePrivateKey(ctx.getPackageName());
-			if (keyEntry == null) {
-				// Generate a new private key.
-				keyEntry = CryptoUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
-			}
-			final Signer signer = new Signer(
-				keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
-			final PrivateID id = PrivateID.create(ctx.getPackageName(), signer);
-			opts.set(OptionDefs.RUNTIME_ID, id);
-		}
-
 		if (!opts.has(OptionDefs.RUNTIME_PRINCIPAL) ||
 			opts.get(OptionDefs.RUNTIME_PRINCIPAL) == null) {
 			// Check if the private key has already been generated for this package.
@@ -156,21 +125,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		return principal;
 	}
 
-	private static void encodeLocalIDOption(Options opts) throws VeyronException {
-		if (opts == null || !opts.has(OptionDefs.LOCAL_ID)) {
-			return;
-		}
-		// Encode the id.
-		final PublicID id = opts.get(OptionDefs.LOCAL_ID, PublicID.class);
-		if (id == null) {
-			opts.remove(OptionDefs.LOCAL_ID);
-			return;
-		}
-		final ChainPublicID[] chains = id.encode();
-		final String[] encodedChains = Util.encodeChains(chains);
-		opts.set(OptionDefs.LOCAL_ID, encodedChains);
-	}
-
 	static {
 		System.loadLibrary("jniwrapper");
 		System.loadLibrary("veyronjni");
@@ -180,22 +134,17 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	private final long nativePtr;
 	private Client client;
 	private final Principal principal;  // non-null
-	private final io.veyron.veyron.veyron2.security.PrivateID privateID;  // non-null.
-	private io.veyron.veyron.veyron2.security.PublicIDStore publicIDStore;
 
 	private native Client nativeNewClient(long nativePtr, Options opts) throws VeyronException;
 	private native Server nativeNewServer(long nativePtr, Options opts) throws VeyronException;
 	private native Client nativeGetClient(long nativePtr) throws VeyronException;
 	private native Context nativeNewContext(long nativePtr) throws VeyronException;
-	private native long nativeGetPublicIDStore(long nativePtr);
 	private native long nativeGetNamespace(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
-	private Runtime(long nativePtr, Principal principal,
-		io.veyron.veyron.veyron2.security.PrivateID privateID) {
+	private Runtime(long nativePtr, Principal principal) {
 		this.nativePtr = nativePtr;
 		this.principal = principal;
-		this.privateID = privateID;
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Client newClient() throws VeyronException {
@@ -203,7 +152,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Client newClient(Options opts) throws VeyronException {
-		encodeLocalIDOption(opts);
 		return nativeNewClient(this.nativePtr, opts);
 	}
 	@Override
@@ -212,7 +160,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Server newServer(Options opts) throws VeyronException {
-		encodeLocalIDOption(opts);
 		return nativeNewServer(this.nativePtr, opts);
 	}
 	@Override
@@ -239,31 +186,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	@Override
 	public Principal getPrincipal() {
 		return this.principal;
-	}
-	@Override
-	public io.veyron.veyron.veyron2.security.PrivateID newIdentity(String name) throws VeyronException {
-		try {
-			// Generate a new private key, stored in the clear in the app's memory.
-			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
-			final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-			keyGen.initialize(256, random);
-			final KeyPair keyPair = keyGen.generateKeyPair();
-			final Signer signer = new Signer(keyPair.getPrivate(), (ECPublicKey)keyPair.getPublic());
-			return PrivateID.create(name, signer);
-		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("ECDSA algorithm not supported: " + e.getMessage());
-		}
-	}
-	@Override
-	public io.veyron.veyron.veyron2.security.PrivateID getIdentity() {
-		return this.privateID;
-	}
-	@Override
-	public io.veyron.veyron.veyron2.security.PublicIDStore getPublicIDStore() {
-		if (this.publicIDStore == null) {
-			this.publicIDStore = new PublicIDStore(nativeGetPublicIDStore(this.nativePtr));
-		}
-		return this.publicIDStore;
 	}
 	@Override
 	public io.veyron.veyron.veyron2.naming.Namespace getNamespace() {
@@ -565,14 +487,6 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		@Override
 		public Blessings remoteBlessings() {
 			return this.securityContext.remoteBlessings();
-		}
-		@Override
-		public PublicID localID() {
-			return this.securityContext.localID();
-		}
-		@Override
-		public PublicID remoteID() {
-			return this.securityContext.remoteID();
 		}
 		// Implements java.lang.Object.
 		@Override

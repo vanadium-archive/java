@@ -19,8 +19,6 @@ public class Context implements io.veyron.veyron.veyron2.security.Context {
 	private native Principal nativeLocalPrincipal(long nativePtr) throws VeyronException;
 	private native Blessings nativeLocalBlessings(long nativePtr) throws VeyronException;
 	private native Blessings nativeRemoteBlessings(long nativePtr) throws VeyronException;
-	private native long nativeLocalID(long nativePtr);
-	private native long nativeRemoteID(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
 	public Context(long nativePtr) {
@@ -77,14 +75,6 @@ public class Context implements io.veyron.veyron.veyron2.security.Context {
 			android.util.Log.e(TAG, "Couldn't get remote Blessings: " + e.getMessage());
 			return null;
 		}
-	}
-	@Override
-	public io.veyron.veyron.veyron2.security.PublicID localID() {
-		return new PublicID(nativeLocalID(this.nativePtr));
-	}
-	@Override
-	public io.veyron.veyron.veyron2.security.PublicID remoteID() {
-		return new PublicID(nativeRemoteID(this.nativePtr));
 	}
 	// Implements java.lang.Object.
 	@Override

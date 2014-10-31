@@ -31,7 +31,7 @@ import java.util.Calendar;
 import javax.security.auth.x500.X500Principal;
 
 /**
- * CryptoUtil provides various cryptographic utilities.
+ * CryptoUtil implements various cryptographic utilities.
  */
 public class CryptoUtil {
 	private static final String KEYSTORE = "AndroidKeyStore";

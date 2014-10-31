@@ -66,24 +66,4 @@ public interface Context {
 	 * @return endpoint of the principal at the remote end of the request.
 	 */
 	public String remoteEndpoint();
-
-	/**
-	 * Returns the PublicID of the principal at the local end of the request.
-	 *
-	 * @deprecated Replace by localBlessings.
-	 *
-	 * @return PublicID of the principal at the local end of the request.
-	 */
-	@Deprecated
-	public PublicID localID();
-
-	/**
-	 * Returns the PublicID of the principal at the remote end of the request.
-	 *
-	 * @deprecated Replaced by remoteBlessings.
-	 *
-	 * @return PublicID of the principal at the remote end of the request.
-	 */
-	@Deprecated
-	public PublicID remoteID();
 }

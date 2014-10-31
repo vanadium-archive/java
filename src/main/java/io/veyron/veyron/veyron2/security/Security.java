@@ -2,37 +2,41 @@ package io.veyron.veyron.veyron2.security;
 
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 
+/**
+ * Security class implements various functions used for creating and managing Veyron security
+ * primitives.
+ */
 public class Security {
 	/**
-	 * Mints a new private key and generates a Principal based on this key, storing its
+	 * Mints a new private key and generates a principal based on this key, storing its
 	 * BlessingRoots and BlessingStore in memory.
 	 *
-	 * @return                 in-memory Principal using the newly minted private key.
-	 * @throws VeyronException if the Principal couldn't be created.
+	 * @return                 in-memory principal using the newly minted private key.
+	 * @throws VeyronException if the principal couldn't be created.
 	 */
 	public static Principal newPrincipal() throws VeyronException {
 		return PrincipalImpl.create();
 	}
 
 	/**
-	 * Creates a Principal using the provided signer, storing its BlessingRoots and BlessingStore
+	 * Creates a principal using the provided signer, storing its BlessingRoots and BlessingStore
 	 * in memory.
 	 *
-	 * @param  signer          Signer to be used by the new Principal.
-	 * @return                 in-memory Principal using the provided Signer.
-	 * @throws VeyronException if the Principal couldn't be created.
+	 * @param  signer          signer to be used by the new principal.
+	 * @return                 in-memory principal using the provided signer.
+	 * @throws VeyronException if the principal couldn't be created.
 	 */
 	public static Principal newPrincipal(Signer signer) throws VeyronException {
 		return PrincipalImpl.create(signer);
 	}
 
 	/**
-	 * Creates a Principal using the provided Signer, BlessingStore, and BlessingRoots.
+	 * Creates a principal using the provided signer, BlessingStore, and BlessingRoots.
 	 *
-	 * @param  signer Signer to be used by the Principal.
-	 * @param  store  BlessingStore to be used by the Principal.
-	 * @param  roots  BlessingRoots to be used by the Principal.
-	 * @return        newly created Principal.
+	 * @param  signer signer to be used by the principal.
+	 * @param  store  BlessingStore to be used by the principal.
+	 * @param  roots  BlessingRoots to be used by the principal.
+	 * @return        newly created principal.
 	 */
 	public static Principal newPrincipal(Signer signer, BlessingStore store, BlessingRoots roots)
 		throws VeyronException {
@@ -40,17 +44,17 @@ public class Security {
 	}
 
 	/**
-	 * Reads the entire state for a Principal (i.e., private key, BlessingRoots, BlessingStore) from
-	 * the provided directory <code>dir</code> and commits all state changes to the same directory.
+	 * Reads the entire state for a principal (i.e., private key, BlessingRoots, BlessingStore) from
+	 * the provided directory {@code dir} and commits all state changes to the same directory.
 	 *
 	 * If the directory does not contain state, a new private key is minted and all state of the
-	 * Principal is committed to <code>dir</code>. If the directory does not exist, it is created.
+	 * principal is committed to {@code dir}. If the directory does not exist, it is created.
 	 *
 	 * @param  passphrase      passphrase used to encrypt the private key.  If empty, no encryption
-	 *                         takes place.
+	 *                         is done.
 	 * @param  dir             directory where the state for a principal is to be persisted.
-	 * @return                 Principal whose state is persisted in the provided directory.
-	 * @throws VeyronException if the Principal couldn't be created.
+	 * @return                 principal whose state is persisted in the provided directory.
+	 * @throws VeyronException if the principal couldn't be created.
 	 */
 	public static Principal newPersistentPrincipal(String passphrase, String dir)
 			throws VeyronException {
@@ -58,20 +62,20 @@ public class Security {
 	}
 
 	/**
-	 * Creates a new principal using the provided Signer and a partial state (i.e., BlessingRoots,
-	 * BlessingStore) that is read from the provided directory <code>dir</code>.  Changes to the
-	 * partial state are persisted and commited to the same directory; the provided signer isn't
+	 * Creates a new principal using the provided signer and a partial state (i.e., BlessingRoots,
+	 * BlessingStore) that is read from the provided directory {@code dir}.  Changes to the
+	 * partial state are persisted and commited to the same directory.  The provided signer isn't
 	 * persisted: the caller is expected to persist it separately or use the
-	 * <code>newPersistentPrincipal</code> method instead.
+	 * {@code newPersistentPrincipal()} method instead.
 	 *
 	 * If the directory does not contain any partial state, a new partial state instances are
-	 * created and subsequently commited to <code>dir</code>.  If the directory does not exist, it
+	 * created and subsequently commited to {@code dir}.  If the directory does not exist, it
 	 * is created.
 	 *
-	 * @param  signer          Signer to be used by the new Principal.
+	 * @param  signer          signer to be used by the new principal.
 	 * @param  dir             directory where the partial state for a principal is to be persisted.
-	 * @return                 Principal whose partial state is persisted in the provided directory.
-	 * @throws VeyronException if the Principal couldn't be created.
+	 * @return                 principal whose partial state is persisted in the provided directory.
+	 * @throws VeyronException if the principal couldn't be created.
 	 */
 	public static Principal newPersistentPrincipal(Signer signer, String dir)
 		throws VeyronException {
@@ -81,7 +85,7 @@ public class Security {
 	// Set of all valid Labels for IPC methods.
 	public static Label[] VALID_LABELS =
 		{ SecurityConstants.READ_LABEL, SecurityConstants.WRITE_LABEL, SecurityConstants.ADMIN_LABEL,
-		  SecurityConstants.DEBUG_LABEL, SecurityConstants.MONITORING_LABEL };
+			SecurityConstants.DEBUG_LABEL, SecurityConstants.MONITORING_LABEL };
 
 	/**
 	 * Returns true iff the provided label is among the set of valid labels.
@@ -119,24 +123,7 @@ public class Security {
 
 		@Override
 		public void authorize(Context context) throws VeyronException {
-			final PublicID localID = context.localID();
-			final PublicID remoteID = context.remoteID();
-			final Label label = context.label();
-			if (localID != null && remoteID != null && localID.equals(remoteID)) {  // self-RPC.
-				return;
-			}
-			if (localID == null) throw new VeyronException("Identity being matched in null.");
-			if (this.acl == null) throw new VeyronException("ACL is null.");
-			if (label == null) throw new VeyronException("Label is null.");
-			return;
-			/*
-			for (Entry<BlessingPattern, LabelSet> e : this.acl.getValue().entrySet()) {
-				final Label other = e.getValue().getValue();
-				if (label.equals(other) && localID.match(e.getKey())) {
-					return;
-				}
-			}*/
-			//throw new VeyronException("No matching ACL entry found");
+			// TODO(spetrovic): implement this.
 		}
 	}
 }

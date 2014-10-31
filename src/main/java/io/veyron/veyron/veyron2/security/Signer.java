@@ -14,7 +14,7 @@ public interface Signer {
 	 * key associated with this signer.
 	 *
 	 * The provided purpose is appended to message before signing and is made available
-	 * (in cleartext) with the Signature.  Thus, a non-nil purpose can be used to avoid
+	 * (in cleartext) with the signature.  Thus, a non-{@code null} purpose can be used to avoid
 	 * "type attacks", wherein an honest entity is cheated on interpreting a field in a message
 	 * as one with a type other than the intended one.
 	 *
@@ -26,9 +26,9 @@ public interface Signer {
 	public Signature sign(byte[] purpose, byte[] message) throws VeyronException;
 
 	/**
-	 * Returns ECDSA public key corresponding to this Signer's private key.
+	 * Returns ECDSA public key corresponding to this signer's private key.
 	 *
-	 * @return  an ECDSA public key corresponding to this Signer's private key.
+	 * @return  an ECDSA public key corresponding to this signer's private key.
 	 */
 	public ECPublicKey publicKey();
 }

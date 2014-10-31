@@ -20,11 +20,10 @@ public class InputChannel<T> implements io.veyron.veyron.veyron2.InputChannel<T>
 
 	/**
 	 * Creates a new instance of InputChannel using the underlying Go channel as input.
-	 * The Go channel must be of type <code>chan interface{}</code> *AND* it must be buffered.
+	 * The Go channel must be of type {@code chan interface{}} *AND* it must be buffered.
 	 *
 	 * @param  nativePtr a pointer to the Go channel of type chan interface{}
 	 * @param  type      type of Java values.
-	 * @return           an instance of InputChannel.
 	 */
 	public InputChannel(long nativePtr, TypeToken<T> type) {
 		this.nativePtr = nativePtr;

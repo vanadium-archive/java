@@ -12,6 +12,7 @@ class BlessingRootsImpl implements BlessingRoots {
 	private native void nativeRecognized(long nativePtr, ECPublicKey root, String blessing)
 		throws VeyronException;
 	private native String nativeDebugString(long nativePtr);
+	private native String nativeToString(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
 	private BlessingRootsImpl(long nativePtr) {
@@ -29,6 +30,10 @@ class BlessingRootsImpl implements BlessingRoots {
 	@Override
 	public String debugString() {
 		return nativeDebugString(this.nativePtr);
+	}
+	@Override
+	public String toString() {
+		return nativeToString(this.nativePtr);
 	}
 	@Override
 	public void finalize() {

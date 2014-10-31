@@ -12,7 +12,6 @@ import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
 import com.google.common.collect.ImmutableList;
-import com.veyron2.PauseHandler;
 
 /**
  * BluetoothScanner performs periodic LE scans and collects information about

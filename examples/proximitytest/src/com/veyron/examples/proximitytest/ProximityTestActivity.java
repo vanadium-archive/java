@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.veryron.examples.proximitytest.R;
-import com.veyron2.PauseHandler;
 import com.veyron2.ipc.VeyronException;
 import com.veyron2.services.proximity.Device;
 import com.veyron2.services.proximity.ProximityFactory;

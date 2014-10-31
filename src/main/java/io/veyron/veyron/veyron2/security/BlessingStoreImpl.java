@@ -18,6 +18,7 @@ class BlessingStoreImpl implements BlessingStore {
 	private native Blessings nativeDefaultBlessings(long nativePtr) throws VeyronException;
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
 	private native String nativeDebugString(long nativePtr);
+	private native String nativeToString(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
 	private BlessingStoreImpl(long nativePtr) {
@@ -62,6 +63,10 @@ class BlessingStoreImpl implements BlessingStore {
 	@Override
 	public String debugString() {
 		return nativeDebugString(this.nativePtr);
+	}
+	@Override
+	public String toString() {
+		return nativeToString(this.nativePtr);
 	}
 	@Override
 	public void finalize() {

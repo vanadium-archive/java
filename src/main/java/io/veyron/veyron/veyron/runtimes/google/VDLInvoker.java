@@ -1,4 +1,3 @@
-
 package io.veyron.veyron.veyron.runtimes.google;
 
 import java.lang.reflect.Constructor;
@@ -68,7 +67,6 @@ public final class VDLInvoker {
      * Creates a new invoker for the given object.
      *
      * @param obj                       service object we're invoking methods on
-     * @return                          new VDL invoker instance
      * @throws IllegalArgumentException if the provided object is invalid
      *             (either null or doesn't implement exactly one VDL interface)
      */

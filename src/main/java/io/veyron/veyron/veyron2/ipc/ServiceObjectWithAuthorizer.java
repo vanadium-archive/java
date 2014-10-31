@@ -12,12 +12,11 @@ public class ServiceObjectWithAuthorizer {
 
 	/**
 	 * Class constructor specifying the Veyron service object and the authorizer that allows
-	 * control over authorization checks.  A <code>null</code> authorizer indicates that the
+	 * control over authorization checks.  A {@code null} authorizer indicates that the
 	 * default authorization policy should be used.
 	 *
 	 * @param  service  the Veyron service object.
 	 * @param  auth     the authorizer.
-	 * @return          an instance of ProtectedServiceObject class.
 	 */
 	public ServiceObjectWithAuthorizer(Object service, Authorizer auth) {
 		this.service = service;

@@ -7,7 +7,7 @@ import io.veyron.veyron.veyron2.ipc.VeyronException;
  */
 public interface CaveatValidator {
 	/**
-	 * Returns <code>null</code> iff the restriction encapsulated in the corresponding caveat has
+	 * Returns {@code null} iff the restriction encapsulated in the corresponding caveat has
 	 * been satisfied by the provided context.
 	 *
 	 * @param  context         the context matched against the caveat.

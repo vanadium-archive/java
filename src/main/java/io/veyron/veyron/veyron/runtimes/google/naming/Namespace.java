@@ -22,7 +22,7 @@ public class Namespace implements io.veyron.veyron.veyron2.naming.Namespace {
 	public io.veyron.veyron.veyron2.InputChannel<MountEntry> glob(Context context, String pattern)
 		throws VeyronException {
 		final long chanPtr = nativeGlob(this.nativePtr, context, pattern);
-		return new InputChannel(chanPtr, new TypeToken<MountEntry>(){});
+		return new InputChannel<MountEntry>(chanPtr, new TypeToken<MountEntry>(){});
 	}
 	@Override
 	protected void finalize() {
