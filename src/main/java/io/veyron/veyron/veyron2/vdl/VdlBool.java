@@ -1,11 +1,11 @@
 package io.veyron.veyron.veyron2.vdl;
 
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,18 +13,18 @@ import android.os.Parcelable;
 import java.io.IOException;
 
 /**
- * VdlUint32 is a representation of a VDL uint32.
+ * VdlBool is a representation of a VDL bool.
  */
-public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactory {
-    private final int value;
+public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory {
+    private final boolean value;
 
-    public VdlUint32(int value) {
-        super(Types.UINT32);
+    public VdlBool(boolean value) {
+        super(Types.BOOL);
         this.value = value;
     }
 
-    public int getValue() {
-        return value;
+    public boolean getValue() {
+        return this.value;
     }
 
     @Override
@@ -32,13 +32,13 @@ public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactor
         if (this == obj) return true;
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        final VdlUint32 other = (VdlUint32) obj;
+        final VdlBool other = (VdlBool) obj;
         return this.value == other.value;
     }
 
     @Override
     public int hashCode() {
-        return value;
+        return Boolean.valueOf(value).hashCode();
     }
 
     @Override
@@ -48,45 +48,45 @@ public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactor
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(value);
+        out.writeByte((byte) (value ? 1 : 0));
     }
 
-    public static final Creator<VdlUint32> CREATOR = new Creator<VdlUint32>() {
+    public static final Creator<VdlBool> CREATOR = new Creator<VdlBool>() {
         @Override
-        public VdlUint32 createFromParcel(Parcel in) {
-            return new VdlUint32(in);
+        public VdlBool createFromParcel(Parcel in) {
+            return new VdlBool(in);
         }
 
         @Override
-        public VdlUint32[] newArray(int size) {
-            return new VdlUint32[size];
+        public VdlBool[] newArray(int size) {
+            return new VdlBool[size];
         }
     };
 
-    private VdlUint32(Parcel in) {
-        this(in.readInt());
+    private VdlBool(Parcel in) {
+        this(in.readByte() == 1);
     }
 
-    public VdlUint32() {
-        this(0);
+    public VdlBool() {
+        this(false);
     }
 
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-        if (!type.equals(new TypeToken<VdlUint32>() {})) {
+        if (!type.equals(new TypeToken<VdlBool>() {})) {
             return null;
         }
-        final TypeAdapter<Integer> delegate = gson.getAdapter(new TypeToken<Integer>() {});
+        final TypeAdapter<Boolean> delegate = gson.getAdapter(new TypeToken<Boolean>() {});
         return new TypeAdapter<T>() {
             @Override
             public void write(JsonWriter out, T value) throws IOException {
-                delegate.write(out, ((VdlUint32) value).getValue());
+                delegate.write(out, ((VdlBool) value).getValue());
             }
 
             @SuppressWarnings("unchecked")
             @Override
             public T read(JsonReader in) throws IOException {
-                return (T) new VdlUint32(delegate.read(in));
+                return (T) new VdlBool(delegate.read(in));
             }
         };
     }

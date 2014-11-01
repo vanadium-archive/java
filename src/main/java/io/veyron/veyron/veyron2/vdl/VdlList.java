@@ -164,15 +164,14 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        ParcelUtil.writeValue(out, getType());
-        ParcelUtil.writeValue(out, impl);
+        out.writeSerializable(this);
     }
 
     @SuppressWarnings("rawtypes")
-    public static final Parcelable.Creator<VdlList> CREATOR = new Parcelable.Creator<VdlList>() {
+    public static final Creator<VdlList> CREATOR = new Creator<VdlList>() {
         @Override
         public VdlList createFromParcel(Parcel in) {
-            return new VdlList(in);
+            return (VdlList) in.readSerializable();
         }
 
         @Override
@@ -180,10 +179,4 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
             return new VdlList[size];
         }
     };
-
-    @SuppressWarnings("unchecked")
-    private VdlList(Parcel in) {
-        super((VdlType) in.readSerializable());
-        impl = (java.util.List<T>) in.readSerializable();
-    }
 }
