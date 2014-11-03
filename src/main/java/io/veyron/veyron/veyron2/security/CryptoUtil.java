@@ -3,8 +3,6 @@ package io.veyron.veyron.veyron2.security;
 import android.security.KeyPairGeneratorSpec;
 
 import io.veyron.veyron.veyron2.ipc.VeyronException;
-import io.veyron.veyron.veyron2.security.wire.PublicKey;
-import io.veyron.veyron.veyron2.security.wire.WireConstants;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -157,32 +155,6 @@ public class CryptoUtil {
 		} catch (InvalidKeySpecException e) {
 			throw new VeyronException("Encoded key is incompatible with " + PK_ALGORITHM +
 				" algorithm: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Decodes the provided wire-encoded ECDSA public key.
-	 *
-	 * @param  key             wire-encoded ECDSA public key.
-	 * @return                 ECDSA public key.
-	 * @throws VeyronException if the public key could not be decoded.
-	 */
-	public static ECPublicKey decodeECPublicKey(PublicKey key) throws VeyronException {
-		ECParameterSpec params = null;
-		if (key.getCurve().equals(WireConstants.KEY_CURVE_P_256)) {
-			params = EC_P256_PARAMS;
-		} else {
-			throw new VeyronException("Unknown curve: " + key.getCurve().getValue());
-		}
-		final ECPoint point = decodeECPoint(params.getCurve(), key.getXY());
-		try {
-			final ECPublicKeySpec spec = new ECPublicKeySpec(point, params);
-			final KeyFactory factory = KeyFactory.getInstance("EC");
-			return (ECPublicKey)factory.generatePublic(spec);
-		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("EC algorithm not supported.");
-		} catch (InvalidKeySpecException e) {
-			throw new VeyronException("Invalid EC key specification: " + e.getMessage());
 		}
 	}
 

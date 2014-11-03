@@ -18,8 +18,8 @@ public interface Principal {
 	 *   {@code Bless(<other principal>, <google/alice, veyron/alice>, "friend", ...)}
 	 *
 	 * To discourage unconstrained delegation of authority, the interface requires at least one
-	 * caveat to be provided. If unconstrained delegation is desired, the {@code UnconstrainedUse}
-	 * function can be used to produce this argument.
+	 * caveat to be provided. If unconstrained delegation is desired, the
+	 * {@code Security.newUnconstrainedUseCaveat()} method can be used to produce this argument.
 	 *
 	 * {@code with.publicKey()} must be the same as the principal's public key.
 	 *

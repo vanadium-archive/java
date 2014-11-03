@@ -12,20 +12,20 @@ class BlessingsImpl extends Blessings {
 
 	static BlessingsImpl create(WireBlessings wire) throws VeyronException {
 		final long nativePtr = nativeCreate(wire);
-		return new BlessingsImpl(nativePtr, Util.chainsToArray(wire.getCertificateChains()));
+		return new BlessingsImpl(nativePtr, wire);
 	}
 
 	private final long nativePtr;
-	private final Certificate[][] chains;
+	private final WireBlessings wire;  // non-null
 
 	private native String[] nativeForContext(long nativePtr, Context context)
 		throws VeyronException;
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private BlessingsImpl(long nativePtr, Certificate[][] chains) {
+	private BlessingsImpl(long nativePtr, WireBlessings wire) {
 		this.nativePtr = nativePtr;
-		this.chains = chains;
+		this.wire = wire;
 	}
 
 	@Override
@@ -49,16 +49,18 @@ class BlessingsImpl extends Blessings {
 	}
 
 	@Override
-	Certificate[][] certificateChains() {
-		return this.chains;
+	public WireBlessings wireFormat() {
+		return this.wire;
+	}
+	@Override
+	void implementationsOnlyInThisPackage() {
 	}
 	@Override
 	public String toString() {
-		return JSONUtil.getGsonBuilder().create().toJson(certificateChains());
+		return JSONUtil.getGsonBuilder().create().toJson(this.wire);
 	}
 	@Override
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);
 	}
-
 }

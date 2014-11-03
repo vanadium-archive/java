@@ -27,7 +27,7 @@ public class RuntimeFactory {
 	 * @return      a pre-initialized runtime instance.
 	 */
 	public static synchronized Runtime init(Context ctx, Options opts) {
-			return io.veyron.veyron.veyron.runtimes.google.Runtime.init(ctx, opts);
+		return io.veyron.veyron.veyron.runtimes.google.Runtime.init(ctx, opts);
 	}
 
 	/**

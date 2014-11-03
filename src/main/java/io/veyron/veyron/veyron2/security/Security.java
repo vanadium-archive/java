@@ -82,6 +82,27 @@ public class Security {
 		return PrincipalImpl.createPersistent(signer, dir);
 	}
 
+	/**
+	 * Creates new blessings using the provided wire-encoded blessings.
+	 *
+	 * @param  wire            wire-encoded blessings.
+	 * @return                 new blessings based on the wire-encoded blessings.
+	 * @throws VeyronException if the blessings couldn't be created.
+	 */
+	public static Blessings newBlessings(WireBlessings wire) throws VeyronException {
+		return BlessingsImpl.create(wire);
+	}
+
+	/**
+	 * Returns a caveat that never fails to validate. This is useful only for providing
+	 * unconstrained blessings to another principal.
+	 *
+	 * @return a caveat that never fails to validate.
+	 */
+	public static Caveat newUnconstrainedUseCaveat() {
+		return new Caveat(null);
+	}
+
 	// Set of all valid Labels for IPC methods.
 	public static Label[] VALID_LABELS =
 		{ SecurityConstants.READ_LABEL, SecurityConstants.WRITE_LABEL, SecurityConstants.ADMIN_LABEL,

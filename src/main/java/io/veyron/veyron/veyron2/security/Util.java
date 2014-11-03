@@ -7,9 +7,6 @@ import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Util provides utilities for encoding/decoding various Veyron formats.  The encoding format
@@ -26,8 +23,7 @@ class Util {
 		if (blessings == null) {
 			return "";
 		}
-		final Certificate[][] chains = blessings.certificateChains();
-		final WireBlessings wire = new WireBlessings(chainsToList(chains));
+		final WireBlessings wire = blessings.wireFormat();
 		return encodeWireBlessings(wire);
 	}
 
@@ -229,33 +225,5 @@ class Util {
 			throw new VeyronException(String.format("Invalid Caveat array encoded string %s: %s",
 				encoded, e.getMessage()));
 		}
-	}
-
-	/**
-	 * Converts the provided array of chains into a list.
-	 *
-	 * @param  chains array of chains.
-	 * @return        list of chains.
-	 */
-	static List<List<Certificate>> chainsToList(Certificate[][] chains) {
-		final List<List<Certificate>> ret = new ArrayList<List<Certificate>>();
-		for (int i = 0; i < chains.length; i++) {
-			ret.add(new ArrayList<Certificate>(Arrays.asList(chains[i])));
-		}
-		return ret;
-	}
-
-	/**
-	 * Converts the provided list of chains into an array.
-	 *
-	 * @param  chains list of chains.
-	 * @return        array of chains.
-	 */
-	static Certificate[][] chainsToArray(List<List<Certificate>> chains) {
-		final Certificate[][] ret = new Certificate[chains.size()][];
-		for (int i = 0; i < chains.size(); ++i) {
-			ret[i] = chains.get(i).toArray(new Certificate[0]);
-		}
-		return ret;
 	}
 }

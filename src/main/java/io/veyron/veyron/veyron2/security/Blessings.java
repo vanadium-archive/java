@@ -34,12 +34,15 @@ public abstract class Blessings {
 	public abstract ECPublicKey publicKey();
 
 	/**
-	 * Returns the certificate chains corresponding to the blessings stored in this object.
+	 * Returns the blessings in the wire format.
 	 *
-	 * This method is protected in order to restrict the implementations of this class to the
-	 * current package.
-	 *
-	 * @return the certificate chains corresponding to the blessings stored in this object.
+	 * @return wire format of the blessings.
 	 */
-	abstract Certificate[][] certificateChains();
+	public abstract WireBlessings wireFormat();
+
+	/**
+	 * Method that restricts all implementations of CancelableContext (and therefore Context)
+	 * to the local package.
+	 */
+	abstract void implementationsOnlyInThisPackage();
 }

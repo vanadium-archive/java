@@ -39,14 +39,17 @@ public class MountedServer implements Parcelable, Serializable {
 	 */
 	public Duration getTTL() { return this.ttl; }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeString(this.server);
-		out.writeLong(this.ttl.getMillis());
+		out.writeByte((byte)(this.ttl != null ? 1 : 0));
+		if (this.ttl != null) {
+			out.writeLong(this.ttl.getMillis());
+		}
 	}
 	public static final Parcelable.Creator<MountedServer> CREATOR =
 			new Parcelable.Creator<MountedServer>() {
@@ -60,6 +63,8 @@ public class MountedServer implements Parcelable, Serializable {
 		}
 	};
 	private MountedServer(Parcel in) {
-		this(in.readString(), Duration.millis(in.readLong()));
+		this.server = in.readString();
+		final boolean hasTTL = in.readByte() == 1;
+		this.ttl = hasTTL ? Duration.millis(in.readLong()) : null;
 	}
 }

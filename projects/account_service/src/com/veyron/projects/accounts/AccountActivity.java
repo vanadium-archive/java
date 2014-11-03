@@ -1,7 +1,5 @@
 package com.veyron.projects.accounts;
 
-import com.google.common.reflect.TypeToken;
-
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -18,19 +16,23 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import org.joda.time.Duration;
+
 import io.veyron.veyron.veyron.services.identity.OAuthBlesser;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesser.BlessUsingAccessTokenOut;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserFactory;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
-import io.veyron.veyron.veyron2.security.wire.Certificate;
-import io.veyron.veyron.veyron2.security.wire.ChainPublicID;
+import io.veyron.veyron.veyron2.security.Certificate;
+import io.veyron.veyron.veyron2.security.WireBlessings;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.io.IOException;
 
 public class AccountActivity extends AccountAuthenticatorActivity {
-	public static final String TAG = "net.veyron";
+	public static final String TAG = "com.veyron.projects.accounts";
 	private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
 	private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
@@ -134,7 +136,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		}
 	}
 
-	private class BlessingFetcher extends AsyncTask<String, Void, ChainPublicID> {
+	private class BlessingFetcher extends AsyncTask<String, Void, WireBlessings> {
 		final ProgressDialog progressDialog = new ProgressDialog(AccountActivity.this);
 		String errorMsg = null;
 		@Override
@@ -143,25 +145,28 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 			progressDialog.show();
 		}
 		@Override
-		protected ChainPublicID doInBackground(String... tokens) {
+		protected WireBlessings doInBackground(String... tokens) {
 			if (tokens.length != 1) {
 				errorMsg = "Empty OAuth token.";
 				return null;
 			}
-			RuntimeFactory.init(AccountActivity.this, new Options());
+			final io.veyron.veyron.veyron2.Runtime r =
+					RuntimeFactory.init(AccountActivity.this, new Options());
 			final String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
 					AccountActivity.this).getString(
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
 			try {
 				final OAuthBlesser blesser = OAuthBlesserFactory.bind(identityServiceName);
-				final io.veyron.veyron.veyron2.vdl.Any reply =
-						blesser.blessUsingAccessToken(null, tokens[0]);
-				final ChainPublicID blessing =
-						(ChainPublicID) reply.decode(new TypeToken<ChainPublicID>(){});
-				if (blessing == null ||
-					blessing.getCertificates() == null ||
-					blessing.getCertificates().isEmpty()) {
+				final Context ctx = r.newContext().withTimeout(new Duration(20000));  // 20s
+				final BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
+				final WireBlessings blessing = reply.blessing;
+				if (blessing == null || blessing.getCertificateChains() == null ||
+						blessing.getCertificateChains().size() <= 0) {
 					errorMsg = "Received empty blessing from Veyron identity servers.";
+					return null;
+				}
+				if (blessing.getCertificateChains().size() > 1) {
+					errorMsg = "Received more than one blessing from Veyron identity servers.";
 					return null;
 				}
 				return blessing;
@@ -171,7 +176,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 			}
 		}
 		@Override
-		protected void onPostExecute(ChainPublicID blessing) {
+		protected void onPostExecute(WireBlessings blessing) {
 			progressDialog.dismiss();
 			if (blessing == null) {  // Indicates an error
 				replyWithError("Couldn't get identity from Veyron identity servers: " + errorMsg);
@@ -190,15 +195,14 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		finish();
 	}
 
-	private void replyWithSuccess(ChainPublicID id) {
-		final String encoded = JSONUtil.getGsonBuilder().create().toJson(id);
-		final String userName = userNameFromChain(id);
-
+	private void replyWithSuccess(WireBlessings blessing) {
+		final String encoded = JSONUtil.getGsonBuilder().create().toJson(blessing);
+		final String userName = userNameFromBlessing(blessing);
 		final Account account = new Account(
 				userName, getResources().getString(R.string.authenticator_account_type));
 		final AccountManager am = AccountManager.get(this);
 		am.addAccountExplicitly(account, null, null);
-		am.setAuthToken(account, "ChainPublicID", encoded);
+		am.setAuthToken(account, "WireBlessings", encoded);
 		setAccountAuthenticatorResult(new Intent().getExtras());
 		setResult(RESULT_OK);
 		final Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);
@@ -206,13 +210,16 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		finish();
 	}
 
-	private static String userNameFromChain(ChainPublicID id) {
+	private static String userNameFromBlessing(WireBlessings blessing) {
+		if (blessing.getCertificateChains().size() != 1) {  // should never happen.
+			return "";
+		}
 		String ret = "";
-		for (Certificate c : id.getCertificates()) {
+		for (Certificate c : blessing.getCertificateChains().get(0)) {
 			if (!ret.isEmpty()) {
 				ret += "/";
 			}
-			ret += c.getName();
+			ret += c.getExtension();
 		}
 		return ret;
 	}
