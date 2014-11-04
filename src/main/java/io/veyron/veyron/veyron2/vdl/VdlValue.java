@@ -12,6 +12,12 @@ public abstract class VdlValue implements Serializable {
         this.type = type;
     }
 
+    protected void assertKind(Kind kind) {
+        if (type.getKind() != kind) {
+            throw new IllegalArgumentException("Kind of VDL type should be " + kind);
+        }
+    }
+
     /**
      * Returns the runtime vdl type of this value.
      *

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -13,8 +14,8 @@ import java.util.ListIterator;
  *
  * @param <T> The type of the list element.
  */
-public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelable {
-    private final java.util.List<T> impl;
+public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
+    private final List<T> impl;
 
     /**
      * Wraps a list with a VDL value.
@@ -22,8 +23,9 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
      * @param type runtime VDL type of the wrapped list
      * @param impl wrapped list
      */
-    public VdlList(VdlType type, java.util.List<T> impl) {
+    public VdlList(VdlType type, List<T> impl) {
         super(type);
+        assertKind(Kind.LIST);
         this.impl = impl;
     }
 
@@ -33,8 +35,7 @@ public class VdlList<T> extends VdlValue implements java.util.List<T>, Parcelabl
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
         final VdlList<?> other = (VdlList<?>)obj;
-        if (!(this.impl.equals(other.impl))) return false;
-        return true;
+        return this.impl.equals(other.impl);
     }
 
     @Override
