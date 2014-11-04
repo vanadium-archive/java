@@ -16,6 +16,7 @@ import io.veyron.veyron.veyron2.context.CancelableContext;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.ListenSpec;
+import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
@@ -197,6 +198,18 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 	}
 
 	private static class Server implements io.veyron.veyron.veyron2.ipc.Server {
+		private static class DefaultDispatcher implements Dispatcher {
+			private final Object obj;
+
+			DefaultDispatcher(Object obj) {
+				this.obj = obj;
+			}
+			@Override
+			public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
+				// TODO(spetrovic): fix ACL authorizer.
+				return new ServiceObjectWithAuthorizer(this.obj, Security.newACLAuthorizer(null));
+			}
+		}
 		private final long nativePtr;
 
 		private native String nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
@@ -218,8 +231,12 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 			return nativeListen(this.nativePtr, spec);
 		}
 		@Override
-		public void serve(String name, Dispatcher dispatcher) throws VeyronException {
-			nativeServe(this.nativePtr, name, dispatcher);
+		public void serve(String name, Object object) throws VeyronException {
+			if (object instanceof Dispatcher) {
+				nativeServe(this.nativePtr, name, (Dispatcher)object);
+			} else {
+				nativeServe(this.nativePtr, name, new DefaultDispatcher(object));
+			}
 		}
 		@Override
 		public String[] getPublishedNames() throws VeyronException {
@@ -453,8 +470,16 @@ public class Runtime implements io.veyron.veyron.veyron2.Runtime {
 		}
 		// Implements io.veyron.veyron.veyron2.security.Context.
 		@Override
+		public DateTime timestamp() {
+			return this.securityContext.timestamp();
+		}
+		@Override
 		public String method() {
 			return this.securityContext.method();
+		}
+		@Override
+		public Object[] methodTags() {
+			return this.securityContext.methodTags();
 		}
 		@Override
 		public String name() {

@@ -1,9 +1,18 @@
 package io.veyron.veyron.veyron2.security;
 
+import org.joda.time.DateTime;
+
 /**
  * Context defines the state available for authorizing a principal.
  */
 public interface Context {
+	/**
+	 * Returns the timestamp at which the authorization state is to be checked.
+	 *
+	 * @return timestamp at which the authorization state is to be checked.
+	 */
+	public DateTime timestamp();
+
 	/**
 	 * Returns the method being invoked.
 	 *
@@ -11,6 +20,13 @@ public interface Context {
 	 */
 	public String method();
 
+	/**
+	 * Returns the tags attached to the method, typically through the interface specification
+	 * in VDL.
+	 *
+	 * @return tags attached to the method.
+	 */
+	public Object[] methodTags();
 	/**
 	 * Returns the veyron name on which the method is being invoked.
 	 *

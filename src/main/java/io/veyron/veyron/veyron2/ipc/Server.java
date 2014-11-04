@@ -27,26 +27,30 @@ public interface Server {
 	public String listen(ListenSpec spec) throws VeyronException;
 
 	/**
-	 * Performs the following two related functions:
+	 * Associates object with name by publishing the address of this server with the mount table
+	 * under the supplied name.
 	 *
-	 * 1. Publishes all of the endpoints created via preceding calls to {@code listen()} to the
-	 * mount table under {@code name}.  (Thereafter, resolving {@code name} via the mount table
-	 * will return these endpoints.)
-	 * 2. Associates a dispatcher to handle RPC invocations received on those endpoints.
+	 * If the supplied object implements a {@code Dispatcher} interface, RPCs invoked on the
+	 * supplied name will be delivered to the supplied dispatcher's {@code lookup} method which will
+	 * in turn return the object and security authorizer used to serve the actual RPC call.
 	 *
-	 * Serve may be called multiple times with different names to publish the same set of endpoints
-	 * under a different name in the mount table.  The dispatcher may not be changed once it has
-	 * been set to a non-nil value.  Subsequent calls to {@code serve} should pass in either the
-	 * original value of the dispatcher or {@code null}. It is considered an error to call
-	 * {@code listen()} after {@code serve}.
-	 * If {@code name} is an empty string, no attempt will made to publish that name to a mount
-	 * table.
+	 * If the supplied object doesn't implement a {@code Dispatcher} interface, RPCs invoked on the
+	 * supplied name will be delivered directly to methods implemented by the supplied object.
+	 * In this case, default security authorizer will be used.
 	 *
-	 * @param  name            name the server should be published under.
-	 * @param  dispatcher      dispatcher to handle RPC invocations.
-	 * @throws VeyronException if the name can't be published or the dispatcher associated.
+	 * Serve may be called multiple times with different names to publish the object under different
+	 * names. The object may not be changed once it has been set to a non-{@code null} value:
+	 * subsequent calls to Serve should pass in either the original value of the object or
+	 * {@code null}.
+	 *
+	 * It is considered an error to call {@code listen} after {@code serve} If the name is an
+	 * empty string, no attempt will made to publish that name to a mount table.
+	 *
+	 * @param  name            name under which the supplied object should be published.
+	 * @param  object   object to be published under the given name.
+	 * @throws VeyronException if the object couldn't be published under the given name.
 	 */
-	public void serve(String name, Dispatcher dispatcher) throws VeyronException;
+	public void serve(String name, Object object) throws VeyronException;
 
 	/**
 	 * Returns the rooted names that this server's endpoints have been published as (via calls to

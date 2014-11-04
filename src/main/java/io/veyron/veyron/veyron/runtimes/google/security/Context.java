@@ -1,5 +1,7 @@
 package io.veyron.veyron.veyron.runtimes.google.security;
 
+import org.joda.time.DateTime;
+
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Label;
@@ -10,7 +12,9 @@ public class Context implements io.veyron.veyron.veyron2.security.Context {
 
 	private final long nativePtr;
 
+	public native DateTime nativeTimestamp(long nativePtr) throws VeyronException;
 	public native String nativeMethod(long nativePtr);
+	public native Object[] nativeMethodTags(long nativePtr) throws VeyronException;
 	private native String nativeName(long nativePtr);
 	private native String nativeSuffix(long nativePtr);
 	private native int nativeLabel(long nativePtr);
@@ -26,8 +30,26 @@ public class Context implements io.veyron.veyron.veyron2.security.Context {
 	}
 	// Implements io.veyron.veyron.veyron2.security.Context.
 	@Override
+	public DateTime timestamp() {
+		try {
+			return nativeTimestamp(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get timestamp: " + e.getMessage());
+			return null;
+		}
+	}
+	@Override
 	public String method() {
 		return nativeMethod(this.nativePtr);
+	}
+	@Override
+	public Object[] methodTags() {
+		try {
+			return nativeMethodTags(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
+			return null;
+		}
 	}
 	@Override
 	public String name() {

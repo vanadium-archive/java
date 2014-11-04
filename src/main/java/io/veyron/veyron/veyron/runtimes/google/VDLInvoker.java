@@ -34,15 +34,15 @@ public final class VDLInvoker {
     private final static class ServiceMethod {
         private final Object wrappedService;
         private final Method method;
-        private final Label label;
+        private final Object[] tags;
 
-        public ServiceMethod(Object wrappedService, Method method, Label label) {
+        public ServiceMethod(Object wrappedService, Method method, Object[] tags) {
             this.wrappedService = wrappedService;
             this.method = method;
-            this.label = label;
+            this.tags = tags;
         }
 
-        public Label getLabel() { return this.label; }
+        public Object[] getTags() { return this.tags; }
 
         public Object invoke(Object... args) throws IllegalAccessException,
         IllegalArgumentException, InvocationTargetException {
@@ -111,39 +111,38 @@ public final class VDLInvoker {
                     c.getCanonicalName()));
             }
             for (Entry<String, Method> m : methods.entrySet()) {
-                // Get the method label.
-                Label label = DEFAULT_LABEL;
+                // Get the method tags.
+                Object[] tags = null;
                 try {
-                    final Object[] tags =
-                        (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
-                    if (tags != null) {
-                        for (Object tag : tags) {
-                            if (tag instanceof Label && Security.IsValidLabel((Label)tag)) {
-                                label = (Label)tag;
-                                break;
-                            }
-                        }
-                    }
+                    tags = (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
                 } catch (IllegalAccessException e) {
-                    // getMethodTags() not defined so use the default label.
+                    // getMethodTags() not defined.
                 } catch (InvocationTargetException e) {
                     // getMethodTags() threw an exception.
                     throw new VeyronException(String.format("Error getting tag for method %q: %s",
                         m.getKey(), e.getTargetException().getMessage()));
                 }
-                invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), label));
+                invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), tags));
             }
         }
     }
 
-    public Label getSecurityLabel(String method) throws IllegalArgumentException {
+    /**
+     * Returns all the tags associated with the provided method or {@code null} if no tags have
+     * been associated with it.
+     *
+     * @param  method                   method we are retrieving tags for.
+     * @return                          tags associated with the provided method.
+     * @throws IllegalArgumentException if the method doesn't exist.
+     */
+    public Object[] getMethodTags(String method) throws IllegalArgumentException {
         final ServiceMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new IllegalArgumentException(String.format(
                     "Couldn't find method %s in class %s",
                     method, this.serviceClass.getCanonicalName()));
         }
-        return m.getLabel();
+        return m.getTags();
     }
 
     /**
