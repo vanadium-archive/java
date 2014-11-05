@@ -4,6 +4,8 @@ import android.security.KeyPairGeneratorSpec;
 
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -11,6 +13,7 @@ import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableEntryException;
@@ -19,7 +22,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
-import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -32,6 +34,7 @@ import javax.security.auth.x500.X500Principal;
  * CryptoUtil implements various cryptographic utilities.
  */
 public class CryptoUtil {
+	private static final String TAG = "Veyron runtime";
 	private static final String KEYSTORE = "AndroidKeyStore";
 	private static final String PK_ALGORITHM = "EC";
 	private static final int KEY_SIZE = 256;
@@ -204,5 +207,152 @@ public class CryptoUtil {
 		final BigInteger x = new BigInteger(Arrays.copyOfRange(xy, 1, 1 + byteLen));
 		final BigInteger y = new BigInteger(Arrays.copyOfRange(xy, 1 + byteLen, xy.length));
 		return new ECPoint(x, y);
+	}
+
+	/**
+	 * Applies the specified cryptographic hash function on the provided message.
+	 *
+	 * @param  hashAlgorithm   name of the hash algorithm to use.
+	 * @param  message         message to apply the hash function on.
+	 * @return                 hashed message.
+	 * @throws VeyronException if the message couldn't be hashed.
+	 */
+	public static byte[] hash(String hashAlgorithm, byte[] message) throws VeyronException {
+		try {
+			final MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
+			md.update(message);
+			final byte[] ret = md.digest();
+			if (ret == null || ret.length == 0) {
+				throw new VeyronException("Got empty message after a hash using " + hashAlgorithm);
+			}
+			return ret;
+		} catch (NoSuchAlgorithmException e) {
+			throw new VeyronException("Hashing algorithm " + hashAlgorithm + " not " +
+				"supported by the runtime: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Creates a digest for the following message and the specified purpose, using the provided
+	 * hash algorithm.
+	 *
+	 * @param  hashAlgorithm   name of the hash algorithm to use.
+	 * @param  message         message that is part of the digest.
+	 * @param  purpose         purpose that is part of the digest.
+	 * @return                 digest for the specified message and digest.
+	 * @throws VeyronException if there was an error creating a digest.
+	 */
+	static byte[] messageDigest(String hashAlgorithm,
+		byte[] message, byte[] purpose) throws VeyronException {
+		if (message == null) {
+			throw new VeyronException("Empty message.");
+		}
+		if (purpose == null) {
+			throw new VeyronException("Empty purpose.");
+		}
+		message = hash(hashAlgorithm, message);
+		purpose = hash(hashAlgorithm, purpose);
+		final byte[] ret = join(message, purpose);
+		return ret;
+	}
+
+	private static byte[] join(byte[] a, byte[] b) {
+		if (a == null || a.length == 0) return b;
+		if (b == null || b.length == 0) return a;
+		final byte[] c = new byte[a.length + b.length];
+		System.arraycopy(a, 0, c, 0, a.length);
+		System.arraycopy(b, 0, c, a.length, b.length);
+		return c;
+	}
+
+	/**
+	 * Converts the provided Veyron signature into the ASN.1 format (used by Java).
+	 *
+	 * @param  sig             signature in Veyron format.
+	 * @return                 signature in ASN.1 format.
+	 * @throws VeyronException if the signature couldn't be converted.
+	 */
+	public static byte[] javaSignature(Signature sig) throws VeyronException {
+		// The ASN.1 format of the signature should be:
+		//    Signature ::= SEQUENCE {
+		//       r   INTEGER,
+		//       s   INTEGER
+		//    }
+		// When encoded, this translates into the following byte sequence:
+		//    0x30 len 0x02 rlen [r bytes] 0x02 slen [s bytes].
+		//
+		// Note that we could have used BouncyCastle or an ASN1-decoding package to decode
+		// the byte sequence, but the encoding is simple enough that we can do it by hand.
+		final byte[] r = sig.getR();
+		final byte[] s = sig.getS();
+		if (r == null || r.length == 0) {
+			throw new VeyronException("Empty R component of signature.");
+		}
+		if (s == null || s.length == 0) {
+			throw new VeyronException("Empty S component of signature.");
+		}
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write(0x30);
+		out.write(4 + r.length + s.length);
+		out.write(0x02);
+		out.write(r.length);
+		out.write(r, 0, r.length);
+		out.write(0x02);
+		out.write(s.length);
+		out.write(s, 0, s.length);
+		return out.toByteArray();
+	}
+
+	/**
+	 * Converts the provided Java signature (ASN.1 format) into the Veyron format.
+	 *
+	 * @param  hashAlgorithm   hash algorithm used when generating the signature.
+	 * @param  purpose         purpose of the generated signature.
+	 * @param  sig             signature in ASN.1 format.
+	 * @return                 signature in Veyron format.
+	 * @throws VeyronException if the signature couldn't be converted.
+	 */
+	public static Signature veyronSignature(String hashAlgorithm, byte[] purpose, byte[] sig)
+		throws VeyronException {
+		byte[] r, s;
+		// The ASN.1 format of the signature should be:
+		//    Signature ::= SEQUENCE {
+		//       r   INTEGER,
+		//       s   INTEGER
+		//    }
+		// When encoded, this translates into the following byte sequence:
+		//    0x30 len 0x02 rlen [r bytes] 0x02 slen [s bytes].
+		//
+		// Note that we could have used BouncyCastle or an ASN1-decoding package to decode
+		// the byte sequence, but the encoding is simple enough that we can do it by hand.
+		final ByteArrayInputStream in = new ByteArrayInputStream(sig);
+		int b;
+		if ((b = in.read()) != 0x30) {
+			throw new VeyronException(String.format("Invalid signature type, want SEQUENCE (0x30), got 0x%02X", b));
+		}
+		if ((b = in.read()) != in.available()) {
+			throw new VeyronException(String.format("Invalid signature length, want %d, got %d", in.available(), b));
+		}
+		if ((b = in.read()) != 0x02) {
+			throw new VeyronException(String.format("Invalid type for R, want INTEGER (0x02), got 0x%02X", b));
+		}
+		if ((b = in.read()) > in.available()) {
+			throw new VeyronException(String.format("Invalid length for R, want less than %d, got %d", in.available(), b));
+		}
+		r = new byte[b];
+		if (in.read(r, 0, b) != b) {
+			throw new VeyronException(String.format("Error reading %d bytes of R from signature", b));
+		}
+		if ((b = in.read()) != 0x02) {
+			throw new VeyronException(String.format("Invalid type for S, want INTEGER (0x02), got 0x%02X", b));
+		}
+		if ((b = in.read()) > in.available()) {
+			throw new VeyronException(String.format("Invalid length for S, want less than %d, got %d", in.available(), b));
+		}
+		s = new byte[b];
+		if (in.read(s, 0, b) != b) {
+			throw new VeyronException(String.format("Error reading %d bytes of S from signature", b));
+		}
+		return new Signature(purpose, new Hash(hashAlgorithm), r, s);
 	}
 }

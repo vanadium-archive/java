@@ -8,10 +8,10 @@ import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.security.Principal;
 
 /**
- * Runtime represents the local environment allowing clients and servers to communicate
+ * VRuntime represents the local environment allowing clients and servers to communicate
  * with one another.
  */
-public interface Runtime {
+public interface VRuntime {
 	/**
 	 * Creates a new client instance.
 	 *

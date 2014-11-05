@@ -34,6 +34,8 @@ main() {
   cp "${THIRD_PARTY_JAVA}/google-gson-2.2.4/gson-2.2.4.jar" "${DEST_DIR}"
   cp "${THIRD_PARTY_JAVA}/guava-17.0/guava-17.0.jar" "${DEST_DIR}"
   cp "${THIRD_PARTY_JAVA}/joda-time-2.3/joda-time-2.3.jar" "${DEST_DIR}"
+  cp "${THIRD_PARTY_JAVA}/junit-r4.11/lib/hamcrest-core-1.3.jar" "${DEST_DIR}"
+  cp "${THIRD_PARTY_JAVA}/junit-r4.11/lib/junit-4.11.jar" "${DEST_DIR}"
 }
 
 main "$@"

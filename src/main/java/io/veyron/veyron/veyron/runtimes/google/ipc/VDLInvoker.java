@@ -1,4 +1,4 @@
-package io.veyron.veyron.veyron.runtimes.google;
+package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

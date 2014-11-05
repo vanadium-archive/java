@@ -2,11 +2,20 @@ package io.veyron.veyron.veyron2.security;
 
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+
 /**
  * Security class implements various functions used for creating and managing Veyron security
  * primitives.
  */
 public class Security {
+	private static final String TAG = "Veyron runtime";
+
 	/**
 	 * Mints a new private key and generates a principal based on this key, storing its
 	 * BlessingRoots and BlessingStore in memory.
@@ -101,6 +110,38 @@ public class Security {
 	 */
 	public static Caveat newUnconstrainedUseCaveat() {
 		return new Caveat(null);
+	}
+
+	/**
+	 * Verifies the provides signature of the given message, using the supplied public key.
+	 *
+	 * @param  sig             signature in the veyron format.
+	 * @param  key             public key.
+	 * @param  message         message whose signature is verified.
+	 * @throws VeyronException iff the signature doesn't verify.
+	 */
+	public static void verifySignature(Signature sig, ECPublicKey key, byte[] message)
+		throws VeyronException {
+		final String hashAlgorithm = sig.getHash().getValue();
+		final String verifyAlgorithm = hashAlgorithm + "withECDSA";
+		try {
+			message = CryptoUtil.messageDigest(hashAlgorithm, message, sig.getPurpose());
+			final byte[] jSig = CryptoUtil.javaSignature(sig);
+			final java.security.Signature verifier = java.security.Signature.getInstance(hashAlgorithm + "withECDSA");
+			verifier.initVerify(key);
+			verifier.update(message);
+			if (!verifier.verify(jSig)) {
+				throw new VeyronException("Signature doesn't verify.");
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new VeyronException("Verifying algorithm " + verifyAlgorithm +
+					" not supported by the runtime: " + e.getMessage());
+		} catch (InvalidKeyException e) {
+			throw new VeyronException("Invalid private key: " + e.getMessage());
+		} catch (SignatureException e) {
+			throw new VeyronException(
+				"Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
+		}
 	}
 
 	// Set of all valid Labels for IPC methods.

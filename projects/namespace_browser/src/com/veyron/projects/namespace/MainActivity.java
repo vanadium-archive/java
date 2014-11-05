@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 import io.veyron.veyron.veyron2.security.Blessings;
@@ -52,7 +53,6 @@ public class MainActivity extends Activity {
 	private static final int BLESSING_REQUEST = 2;
 
 	WireBlessings mSelectedBlessing = null;
-	io.veyron.veyron.veyron2.Runtime mRuntime = null;
 	Gson mGson = null;
 
 	@Override
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
 		nameView.setText(root);
 
 		mSelectedBlessing = null;
-		mRuntime = RuntimeFactory.init(this, new Options());
+		RuntimeFactory.initRuntime(this, new Options());
 		mGson = JSONUtil.getGsonBuilder().create();
 
 		updateBlessingsView();
@@ -366,7 +366,7 @@ public class MainActivity extends Activity {
 		protected List<MountEntry> doInBackground(Void... args) {
 			final MountEntry entry = (MountEntry)dirView.getTag();
 			try {
-				return Namespace.glob(entry.getName(), mRuntime);
+				return Namespace.glob(entry.getName());
 			} catch (VeyronException e) {
 				errorMsg = "Error fetching names: " + e.getMessage();
 				return null;

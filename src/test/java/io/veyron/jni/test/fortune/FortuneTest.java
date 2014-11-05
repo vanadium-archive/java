@@ -8,7 +8,7 @@ import io.veyron.veyron.veyron2.ipc.Server;
 import io.veyron.veyron.veyron2.ipc.ServerContext;
 import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
-import io.veyron.veyron.veyron2.Runtime;
+import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.RuntimeFactory;
 import org.joda.time.Duration;
 
@@ -39,9 +39,9 @@ public class FortuneTest extends AndroidTestCase {
     public void testFortuneJavaToJava()
         throws IllegalArgumentException, VeyronException {
     	// TODO(bprosnitz) We shouldn't have to initialize the default runtime to use non-default runtimes.
-    	RuntimeFactory.init(getContext(), new Options());
+    	RuntimeFactory.initRuntime(getContext(), new Options());
 
-    	final Runtime serverRuntime = RuntimeFactory.newRuntime(getContext(), null);
+    	final VRuntime serverRuntime = RuntimeFactory.newRuntime(getContext(), null);
     	final Server server = serverRuntime.newServer();
     	final String endpoint = server.listen(null);
     	final FortuneService service = new FortuneServiceImpl();

@@ -9,6 +9,7 @@ import android.content.Intent;
 
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.WireBlessings;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
@@ -24,7 +25,7 @@ public class Blessing {
 	private static final String REPLY = "REPLY";
 
 	public static Intent createIntent(Context ctx, String accountName) {
-		final io.veyron.veyron.veyron2.Runtime r = RuntimeFactory.init(ctx, new Options());
+		final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
 		final ECPublicKey key = r.getPrincipal().publicKey();
 		final Intent intent = new Intent();
 		intent.setComponent(new ComponentName(

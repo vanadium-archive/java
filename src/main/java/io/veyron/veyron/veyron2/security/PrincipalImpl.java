@@ -68,7 +68,8 @@ public class PrincipalImpl implements Principal {
 	@Override
 	public Signature sign(byte[] message) throws VeyronException {
 		if (this.signer != null) {
-			return this.signer.sign(null, message);
+			final byte[] purpose = SecurityConstants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
+			return this.signer.sign(purpose, message);
 		}
 		return nativeSign(this.nativePtr, message);
 	}
