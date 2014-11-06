@@ -24,7 +24,7 @@ public final class Types {
     public static VdlType COMPLEX64 = createPrimitiveType(Kind.COMPLEX64);
     public static VdlType COMPLEX128 = createPrimitiveType(Kind.COMPLEX128);
     public static VdlType STRING = createPrimitiveType(Kind.STRING);
-    public static VdlType TYPEVAL = createPrimitiveType(Kind.TYPEVAL);
+    public static VdlType TYPEOBJECT = createPrimitiveType(Kind.TYPEOBJECT);
 
     public static VdlType PrimitiveTypeFromKind(Kind kind) {
         switch (kind) {
@@ -56,17 +56,11 @@ public final class Types {
                 return COMPLEX128;
             case STRING:
                 return STRING;
-            case TYPEVAL:
-                return TYPEVAL;
+            case TYPEOBJECT:
+                return TYPEOBJECT;
             default:
                 throw new RuntimeException("Unknown primitive kind " + kind);
         }
-    }
-
-    public static VdlType NilableOf(VdlType elem) {
-        VdlType t = new VdlType(Kind.NILABLE);
-        t.setElem(elem);
-        return t;
     }
 
     public static VdlType EnumOf(String... labels) {

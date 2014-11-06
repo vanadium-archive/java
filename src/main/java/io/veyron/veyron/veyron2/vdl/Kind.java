@@ -5,7 +5,6 @@ package io.veyron.veyron.veyron2.vdl;
 public enum Kind {
     ANY,
     ONE_OF,
-    NILABLE,
 
     BOOL,
     BYTE,
@@ -21,7 +20,7 @@ public enum Kind {
     COMPLEX128,
     STRING,
     ENUM,
-    TYPEVAL,
+    TYPEOBJECT,
 
     ARRAY,
     LIST,
