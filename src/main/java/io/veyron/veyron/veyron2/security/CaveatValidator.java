@@ -1,6 +1,6 @@
 package io.veyron.veyron.veyron2.security;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 /**
  * CaveatValidator is the interface for validating the restrictions specified in a caveat.

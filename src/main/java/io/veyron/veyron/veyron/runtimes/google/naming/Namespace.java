@@ -4,7 +4,7 @@ import com.google.gson.reflect.TypeToken;
 
 import io.veyron.veyron.veyron.runtimes.google.InputChannel;
 import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 
 public class Namespace implements io.veyron.veyron.veyron2.naming.Namespace {

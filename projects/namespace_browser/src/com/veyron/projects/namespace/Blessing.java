@@ -10,7 +10,7 @@ import android.content.Intent;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
 import io.veyron.veyron.veyron2.VRuntime;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.WireBlessings;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 

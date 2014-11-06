@@ -1,6 +1,9 @@
 package io.veyron.veyron.veyron2.ipc;
 
 import com.google.common.reflect.TypeToken;
+
+import io.veyron.veyron.veyron2.VeyronException;
+
 import java.io.EOFException;
 
 /**

@@ -7,7 +7,7 @@ import com.google.gson.JsonSyntaxException;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 import java.io.Serializable;
 

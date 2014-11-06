@@ -1,13 +1,13 @@
-package io.veyron.veyron.veyron.runtimes.google.security;
+package io.veyron.veyron.veyron2.security;
 
 import org.joda.time.DateTime;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Principal;
 
-public class Context implements io.veyron.veyron.veyron2.security.Context {
+public class ContextImpl implements io.veyron.veyron.veyron2.security.Context {
 	private static final String TAG = "Veyron runtime";
 
 	private final long nativePtr;
@@ -25,7 +25,7 @@ public class Context implements io.veyron.veyron.veyron2.security.Context {
 	private native Blessings nativeRemoteBlessings(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	public Context(long nativePtr) {
+	public ContextImpl(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
 	// Implements io.veyron.veyron.veyron2.security.Context.

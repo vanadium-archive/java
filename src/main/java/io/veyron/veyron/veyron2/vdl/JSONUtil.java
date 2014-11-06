@@ -18,7 +18,7 @@ import android.util.Base64;
 
 import org.joda.time.Duration;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 /**
  * JSONUtil provides various utilities for JSON encoding/decoding of VDL types.

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.io.EOFException;

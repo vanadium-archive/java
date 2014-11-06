@@ -3,7 +3,7 @@ package io.veyron.veyron.veyron.runtimes.google.ipc;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.ListenSpec;
 import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Security;
 
 public class Server implements io.veyron.veyron.veyron2.ipc.Server {

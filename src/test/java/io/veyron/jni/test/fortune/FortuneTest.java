@@ -7,7 +7,7 @@ import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.Server;
 import io.veyron.veyron.veyron2.ipc.ServerContext;
 import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.RuntimeFactory;
 import org.joda.time.Duration;

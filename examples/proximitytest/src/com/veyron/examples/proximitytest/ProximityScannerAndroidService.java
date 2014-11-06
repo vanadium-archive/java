@@ -11,7 +11,7 @@ import android.util.Log;
 import com.veyron2.RuntimeFactory;
 import com.veyron2.ipc.Dispatcher;
 import com.veyron2.ipc.ServiceObjectWithAuthorizer;
-import com.veyron2.ipc.VeyronException;
+import com.veyron2.VeyronException;
 import com.veyron2.services.proximity.scanner.ProximityScannerVeyronService.BluetoothNotEnabledException;
 
 public class ProximityScannerAndroidService extends Service {

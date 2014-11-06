@@ -13,7 +13,7 @@ import android.bluetooth.BluetoothManager;
 import android.util.Log;
 
 import com.veyron2.ipc.ServerContext;
-import com.veyron2.ipc.VeyronException;
+import com.veyron2.VeyronException;
 import com.veyron2.services.proximity.Device;
 import com.veyron2.services.proximity.ProximityScannerService;
 

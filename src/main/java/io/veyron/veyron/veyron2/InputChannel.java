@@ -1,6 +1,6 @@
 package io.veyron.veyron.veyron2;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 import java.io.EOFException;
 

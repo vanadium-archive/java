@@ -7,7 +7,7 @@ import org.joda.time.Duration;
 
 import io.veyron.veyron.veyron2.context.CancelableContext;
 import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Principal;
@@ -21,13 +21,13 @@ public class ServerCall implements io.veyron.veyron.veyron2.ipc.ServerCall {
 	private final long nativePtr;
 	private final Stream stream;
 	private final Context context;
-	private final io.veyron.veyron.veyron.runtimes.google.security.Context securityContext;
+	private final io.veyron.veyron.veyron2.security.Context securityContext;
 
 	public native Blessings nativeBlessings(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
 	private ServerCall(long nativePtr, Stream stream, Context context,
-		io.veyron.veyron.veyron.runtimes.google.security.Context securityContext) {
+		io.veyron.veyron.veyron2.security.Context securityContext) {
 		this.nativePtr = nativePtr;
 		this.stream = stream;
 		this.context = context;

@@ -7,7 +7,7 @@ import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.ipc.Client;
 import io.veyron.veyron.veyron2.ipc.Client.Call;
 import io.veyron.veyron.veyron2.ipc.ServiceSignature;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 import java.util.ArrayList;
 import java.util.List;

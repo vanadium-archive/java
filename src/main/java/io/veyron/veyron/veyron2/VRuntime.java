@@ -3,7 +3,7 @@ package io.veyron.veyron.veyron2;
 import io.veyron.veyron.veyron2.ipc.Client;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.ipc.Server;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.security.Principal;
 

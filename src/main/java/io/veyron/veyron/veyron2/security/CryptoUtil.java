@@ -2,7 +2,7 @@ package io.veyron.veyron.veyron2.security;
 
 import android.security.KeyPairGeneratorSpec;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

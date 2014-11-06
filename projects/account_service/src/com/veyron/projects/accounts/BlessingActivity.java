@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.Principal;
@@ -51,7 +51,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blessing);
-		RuntimeFactory.init(this, new Options());
+		RuntimeFactory.initRuntime(this, new Options());
 		final Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
 			replyWithError("No extras provided.");
@@ -135,7 +135,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 			final WireBlessings wire = gson.fromJson(wireJson,
 					new TypeToken<WireBlessings>(){}.getType());
 			final Blessings with = Security.newBlessings(wire);
-			final Principal principal = RuntimeFactory.init(this, new Options()).getPrincipal();
+			final Principal principal = RuntimeFactory.defaultRuntime().getPrincipal();
 			final Blessings retBlessings = principal.bless(mBlesseePubKey,
 					with, mBlesseeName, Security.newUnconstrainedUseCaveat());
 			if (retBlessings == null) {

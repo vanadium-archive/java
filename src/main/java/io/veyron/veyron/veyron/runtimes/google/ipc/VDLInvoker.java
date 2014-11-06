@@ -16,7 +16,7 @@ import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Security;
 import io.veyron.veyron.veyron2.security.SecurityConstants;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.vdl.VeyronService;
 
 /**

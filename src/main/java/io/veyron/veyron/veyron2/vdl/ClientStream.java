@@ -1,6 +1,6 @@
 package io.veyron.veyron.veyron2.vdl;
 
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 
 /**
  * ClientStream defines a bidirectional stream with send/receive/finish arguments

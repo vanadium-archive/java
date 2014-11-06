@@ -23,8 +23,9 @@ import io.veyron.veyron.veyron.services.identity.OAuthBlesser.BlessUsingAccessTo
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserFactory;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.WireBlessings;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
@@ -150,8 +151,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 				errorMsg = "Empty OAuth token.";
 				return null;
 			}
-			final io.veyron.veyron.veyron2.Runtime r =
-					RuntimeFactory.init(AccountActivity.this, new Options());
+			final VRuntime r = RuntimeFactory.initRuntime(AccountActivity.this, new Options());
 			final String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
 					AccountActivity.this).getString(
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);

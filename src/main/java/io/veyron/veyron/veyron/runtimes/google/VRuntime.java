@@ -7,7 +7,7 @@ import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.CryptoUtil;
 import io.veyron.veyron.veyron2.security.ECDSASigner;

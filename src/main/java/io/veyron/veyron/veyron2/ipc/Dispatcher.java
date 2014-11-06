@@ -1,5 +1,7 @@
 package io.veyron.veyron.veyron2.ipc;
 
+import io.veyron.veyron.veyron2.VeyronException;
+
 /**
  * Dispatcher defines the interface that a server must implement to handle method invocations on
  * named objects.

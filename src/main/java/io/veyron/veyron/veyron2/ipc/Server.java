@@ -1,5 +1,7 @@
 package io.veyron.veyron.veyron2.ipc;
 
+import io.veyron.veyron.veyron2.VeyronException;
+
 /**
  * Server defines the interface for managing a collection of services.
  */

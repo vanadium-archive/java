@@ -1,5 +1,5 @@
 
-package io.veyron.veyron.veyron.runtimes.google;
+package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import java.util.Arrays;
 
@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 import io.veyron.veyron.veyron.testing.TestUtil;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
 import io.veyron.veyron.veyron2.ipc.ServerContext;
-import io.veyron.veyron.veyron2.ipc.VeyronException;
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.vdl.Stream;
 import io.veyron.jni.test.fortune.FortuneService;
@@ -36,10 +36,11 @@ public class VDLInvokerTest extends TestCase {
         TestUtil.assertArrayEquals(expectedImplementedServices, implementedServices);
     }
 
-    public void testGetSecurityLabel() throws IllegalArgumentException, VeyronException {
+    public void testGetMethodTags() throws IllegalArgumentException, VeyronException {
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        final Label label = invoker.getSecurityLabel("get");
-        assertEquals(io.veyron.veyron.veyron2.security.SecurityConstants.READ_LABEL, label);
+        final Object[] tags = invoker.getMethodTags("get");
+        assertEquals(1, tags.length);
+        assertEquals(io.veyron.veyron.veyron2.security.SecurityConstants.READ_LABEL, tags[0]);
     }
 
     public void testInvoke()
