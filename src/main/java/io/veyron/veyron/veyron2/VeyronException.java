@@ -19,7 +19,6 @@ import java.io.Serializable;
  *        equal, regardless of the message strings.
  *     2) Two exceptions with empty IDs are equal iff their messages are equal.
  */
-// TODO(spetrovic): Move this class into package "io.veyron.veyron.veyron2".
 public class VeyronException extends Exception implements Parcelable, Serializable {
 	private static final long serialVersionUID = -3917496574141933784L;
 
