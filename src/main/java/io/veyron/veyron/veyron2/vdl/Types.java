@@ -101,7 +101,7 @@ public final class Types {
         return t;
     }
 
-    public static VdlType StructOf(StructField... fields) {
+    public static VdlType StructOf(VdlStructField... fields) {
         VdlType t = new VdlType(Kind.STRUCT);
         t.setFields(fields);
         return t;

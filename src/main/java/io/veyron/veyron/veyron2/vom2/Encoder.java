@@ -6,12 +6,13 @@ package io.veyron.veyron.veyron2.vom2;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 import org.apache.commons.math3.complex.Complex;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.StructField;
+import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 
 /**
@@ -144,9 +145,9 @@ public final class Encoder {
 
     public void structNextField(String name) throws IOException {
         VdlType type = typeStack.peek();
-        StructField[] fields = type.getFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].getName().equals(name)) {
+        List<VdlStructField> fields = type.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+            if (fields.get(i).getName().equals(name)) {
                 rawEnc.writeNextStructFieldIndex(i + 1);
                 return;
             }

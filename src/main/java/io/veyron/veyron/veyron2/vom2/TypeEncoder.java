@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import io.veyron.veyron.veyron2.vdl.StructField;
+import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.wiretype.FieldType;
@@ -85,7 +85,7 @@ final class TypeEncoder {
                     enc.writeString(t.getName());
                 }
                 enc.writeNextStructFieldIndex(2);
-                enc.writeEnumStart(t.getLabels().length);
+                enc.writeEnumStart(t.getLabels().size());
                 for (String s : t.getLabels()) {
                     enc.writeString(s);
                 }
@@ -156,7 +156,7 @@ final class TypeEncoder {
                 break;
             case STRUCT: {
                 ArrayList<FieldType> fieldTypes = new ArrayList<FieldType>();
-                for (StructField f : t.getFields()) {
+                for (VdlStructField f : t.getFields()) {
                     long fid = encodeType(enc, f.getType());
                     fieldTypes.add(new FieldType(new TypeID(fid), f.getName()));
                 }

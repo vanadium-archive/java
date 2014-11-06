@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.StructField;
+import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 
@@ -83,83 +83,83 @@ enum BootstrapType {
 
     private static VdlType getNamedBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("base", Types.Named("TypeID", Types.UINT64));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("base", Types.Named("TypeID", Types.UINT64));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getEnumBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("labels", Types.ListOf(Types.STRING));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("labels", Types.ListOf(Types.STRING));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getArrayBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[3];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
-        fields[2] = new StructField("len", Types.UINT64);
+        VdlStructField[] fields = new VdlStructField[3];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("elem", Types.Named("TypeID", Types.UINT64));
+        fields[2] = new VdlStructField("len", Types.UINT64);
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getListBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("elem", Types.Named("TypeID", Types.UINT64));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getSetBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("elem", Types.Named("TypeID", Types.UINT64));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getMapBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[3];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("key", Types.Named("TypeID", Types.UINT64));
-        fields[2] = new StructField("elem", Types.Named("TypeID", Types.UINT64));
+        VdlStructField[] fields = new VdlStructField[3];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("key", Types.Named("TypeID", Types.UINT64));
+        fields[2] = new VdlStructField("elem", Types.Named("TypeID", Types.UINT64));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getFieldBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("type", Types.Named("TypeID", Types.UINT64));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("type", Types.Named("TypeID", Types.UINT64));
         type.setFields(fields);
         return type;
     }
 
     private static VdlType getStructBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("fields", Types.ListOf(getFieldBootstrapType()));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("fields", Types.ListOf(getFieldBootstrapType()));
         type.setFields(fields);
         return type;
     }
 
     public static VdlType getOneOfBootstrapType() {
         VdlType type = new VdlType(Kind.STRUCT);
-        StructField[] fields = new StructField[2];
-        fields[0] = new StructField("name", Types.STRING);
-        fields[1] = new StructField("types", Types.ListOf(Types.Named("TypeID", Types.UINT64)));
+        VdlStructField[] fields = new VdlStructField[2];
+        fields[0] = new VdlStructField("name", Types.STRING);
+        fields[1] = new VdlStructField("types", Types.ListOf(Types.Named("TypeID", Types.UINT64)));
         type.setFields(fields);
         return type;
     }

@@ -1,5 +1,3 @@
-// TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
-
 package io.veyron.veyron.veyron2.vom2;
 
 import com.google.common.collect.ImmutableMap;
@@ -334,7 +332,7 @@ public class EncoderTest extends TestCase {
                             enc.structStart(testVal.type);
                             enc.structNextField("A");
                             enc.writeUint64((Integer) testVal.val,
-                                    testVal.type.getFields()[0].getType());
+                                    testVal.type.getFields().get(0).getType());
                             enc.structEnd();
                         } else {
                             throw new RuntimeException("Unsupported struct "

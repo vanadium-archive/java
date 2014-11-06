@@ -1,5 +1,3 @@
-// TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
-
 package io.veyron.veyron.veyron2.vom2;
 
 import junit.framework.TestCase;
@@ -8,7 +6,7 @@ import org.apache.commons.math3.complex.Complex;
 
 import io.veyron.veyron.veyron.testing.BufferedPipedInputStream;
 import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.StructField;
+import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vom2.Decoder.UnexpectedKindException;
@@ -546,8 +544,8 @@ public class EncodeDecodeTest extends TestCase {
         decoder.structEnd();
 
         // Simple struct.
-        encoder.structStart(Types.StructOf(new StructField("A", Types.BOOL), new StructField("B",
-                Types.STRING)));
+        encoder.structStart(Types.StructOf(new VdlStructField("A", Types.BOOL),
+                new VdlStructField("B", Types.STRING)));
         encoder.structNextField("A");
         encoder.writeBool(true, Types.BOOL);
         encoder.structNextField("B");
@@ -562,8 +560,8 @@ public class EncodeDecodeTest extends TestCase {
         decoder.structEnd();
 
         // Fields out of order.
-        encoder.structStart(Types.StructOf(new StructField("A", Types.BOOL), new StructField("B",
-                Types.STRING)));
+        encoder.structStart(Types.StructOf(new VdlStructField("A", Types.BOOL),
+                new VdlStructField("B", Types.STRING)));
         encoder.structNextField("B");
         encoder.writeString("X", Types.STRING);
         encoder.structNextField("A");
@@ -578,10 +576,11 @@ public class EncodeDecodeTest extends TestCase {
         decoder.structEnd();
 
         // Struct in struct.
-        encoder.structStart(Types.StructOf(new StructField("S", Types.Named("Name",
-                Types.StructOf(new StructField("W", Types.UINT32))))));
+        encoder.structStart(Types.StructOf(new VdlStructField("S", Types.Named("Name",
+                Types.StructOf(new VdlStructField("W", Types.UINT32))))));
         encoder.structNextField("S");
-        encoder.structStart(Types.Named("Name", Types.StructOf(new StructField("W", Types.UINT32))));
+        encoder.structStart(Types.Named("Name",
+                Types.StructOf(new VdlStructField("W", Types.UINT32))));
         encoder.structNextField("W");
         encoder.writeUint32(9, Types.UINT32);
         encoder.structEnd();
@@ -609,7 +608,7 @@ public class EncodeDecodeTest extends TestCase {
         VdlType level2RecStruct = new VdlType(Kind.STRUCT);
         VdlType level2RecList = new VdlType(Kind.LIST);
         level2RecList.setElem(level2RecStruct);
-        level2RecStruct.setFields(new StructField("list", level2RecList));
+        level2RecStruct.setFields(new VdlStructField("list", level2RecList));
         encoder.listStart(1, level2RecList);
         encoder.structStart(level2RecStruct);
         encoder.structNextField("list");

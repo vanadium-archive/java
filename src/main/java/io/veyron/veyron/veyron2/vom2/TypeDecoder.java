@@ -8,7 +8,7 @@ import java.util.Map;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.VdlType;
-import io.veyron.veyron.veyron2.vdl.StructField;
+import io.veyron.veyron.veyron2.vdl.VdlStructField;
 
 /**
  * TypeDecoder handles decoding types from a VOM stream and looking up types by
@@ -136,7 +136,9 @@ final class TypeDecoder {
 
             entryType.setKind(entryPt.kind);
             entryType.setName(entryPt.name);
-            entryType.setLabels(entryPt.labels);
+            if (entryPt.labels != null) {
+                entryType.setLabels(entryPt.labels);
+            }
             entryType.setLength(entryPt.length);
 
             if (entryPt.keyTypeId != null) {
@@ -178,7 +180,7 @@ final class TypeDecoder {
             }
 
             if (entryPt.fields != null) {
-                StructField[] fields = new StructField[entryPt.fields.length];
+                VdlStructField[] fields = new VdlStructField[entryPt.fields.length];
                 for (int i = 0; i < entryPt.fields.length; i++) {
                     PartialStructField partialFld = entryPt.fields[i];
                     VdlType fieldTy = lookupType(partialFld.typeId);
@@ -188,7 +190,7 @@ final class TypeDecoder {
                     if (fieldTy == null) {
                         throw new RuntimeException("Unexpectedly failed to find type");
                     }
-                    fields[i] = new StructField(partialFld.name, fieldTy);
+                    fields[i] = new VdlStructField(partialFld.name, fieldTy);
                 }
                 entryType.setFields(fields);
             }

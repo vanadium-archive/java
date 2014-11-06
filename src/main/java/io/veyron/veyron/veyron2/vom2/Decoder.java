@@ -166,8 +166,8 @@ final class Decoder {
         }
         typeStack.pop();
         VdlType structType = typeStack.peek();
-        typeStack.push(structType.getFields()[index].getType());
-        return structType.getFields()[index].getName();
+        typeStack.push(structType.getFields().get(index).getType());
+        return structType.getFields().get(index).getName();
     }
 
     public void structEnd() {
