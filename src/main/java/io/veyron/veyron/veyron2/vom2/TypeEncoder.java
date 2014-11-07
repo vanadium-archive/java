@@ -1,5 +1,3 @@
-// TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
-
 package io.veyron.veyron.veyron2.vom2;
 
 import java.io.IOException;
@@ -66,7 +64,7 @@ final class TypeEncoder {
             case COMPLEX64:
             case COMPLEX128:
             case STRING: {
-                long primId = encodeType(enc, Types.PrimitiveTypeFromKind(t.getKind()));
+                long primId = encodeType(enc, Types.primitiveTypeFromKind(t.getKind()));
                 enc.startTypeMessage(typeId);
                 enc.writeUint64(BootstrapType.WIRE_NAMED.getId());
                 enc.writeNextStructFieldIndex(1);

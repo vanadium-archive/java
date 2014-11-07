@@ -1,4 +1,3 @@
-
 package io.veyron.veyron.veyron2.vom2;
 
 import java.io.IOException;

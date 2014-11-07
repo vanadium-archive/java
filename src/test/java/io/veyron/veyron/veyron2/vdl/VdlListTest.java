@@ -17,7 +17,7 @@ public class VdlListTest extends TestCase {
     private static class ListListUint32 extends VdlList<List<VdlUint32>> {
         public ListListUint32(List<List<VdlUint32>> impl) {
             // TODO(rogulenko): get vdl type from reflection
-            super(Types.ListOf(Types.ListOf(Types.UINT32)), impl);
+            super(Types.listOf(Types.listOf(Types.UINT32)), impl);
         }
     }
 

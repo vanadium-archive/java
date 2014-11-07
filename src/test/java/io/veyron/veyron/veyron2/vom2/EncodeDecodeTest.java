@@ -33,7 +33,7 @@ public class EncodeDecodeTest extends TestCase {
     public void testBool() throws IOException, CorruptVomStreamException {
         encoder.writeBool(true, Types.BOOL);
         assertTrue(decoder.readBool());
-        encoder.writeBool(false, Types.Named("BoolName", Types.BOOL));
+        encoder.writeBool(false, Types.named("BoolName", Types.BOOL));
         assertFalse(decoder.readBool());
         encoder.writeInt32(-1, Types.INT32);
         try {
@@ -50,7 +50,7 @@ public class EncodeDecodeTest extends TestCase {
         assertEquals("", decoder.readString());
         encoder.writeString("abcdefgh", Types.STRING);
         assertEquals("abcdefgh", decoder.readString());
-        encoder.writeString("named", Types.Named("NamedString", Types.STRING));
+        encoder.writeString("named", Types.named("NamedString", Types.STRING));
         assertEquals("named", decoder.readString());
         encoder.writeString("Unicode Chars: ซณ🜲🝮ض", Types.STRING);
         assertEquals("Unicode Chars: ซณ🜲🝮ض", decoder.readString());
@@ -153,7 +153,7 @@ public class EncodeDecodeTest extends TestCase {
         }
 
         // Named types.
-        encoder.writeComplex64(new Complex(99, 0), Types.Named("ComplexName", Types.COMPLEX64));
+        encoder.writeComplex64(new Complex(99, 0), Types.named("ComplexName", Types.COMPLEX64));
         assertEquals(99, decoder.readUint32());
     }
 
@@ -244,7 +244,7 @@ public class EncodeDecodeTest extends TestCase {
         }
 
         // Named types.
-        encoder.writeComplex64(new Complex(99, 0), Types.Named("ComplexName", Types.COMPLEX64));
+        encoder.writeComplex64(new Complex(99, 0), Types.named("ComplexName", Types.COMPLEX64));
         assertEquals(99, decoder.readInt32());
     }
 
@@ -315,7 +315,7 @@ public class EncodeDecodeTest extends TestCase {
         }
 
         // Named float.
-        encoder.writeFloat64(9.0, Types.Named("NameOfFloat", Types.FLOAT64));
+        encoder.writeFloat64(9.0, Types.named("NameOfFloat", Types.FLOAT64));
         assertFloatEquals(9.0, decoder.readFloat64());
     }
 
@@ -349,19 +349,19 @@ public class EncodeDecodeTest extends TestCase {
 
         // Named complex.
         encoder.writeComplex64(new Complex(4, 0),
-                Types.Named("Complex", Types.Named("ComplexName", Types.COMPLEX64)));
+                Types.named("Complex", Types.named("ComplexName", Types.COMPLEX64)));
         assertEquals(new Complex(4, 0), decoder.readComplex64());
     }
 
     public void testReadArray() throws IOException, ConversionException {
         // Empty array.
-        encoder.arrayStart(Types.ArrayOf(0, Types.COMPLEX64));
+        encoder.arrayStart(Types.arrayOf(0, Types.COMPLEX64));
         encoder.arrayEnd();
         decoder.arrayStart();
         decoder.arrayEnd();
 
         // Array with values.
-        encoder.arrayStart(Types.ArrayOf(5, Types.UINT32));
+        encoder.arrayStart(Types.arrayOf(5, Types.UINT32));
         for (int i = 0; i < 5; i++) {
             encoder.writeUint32(i, Types.UINT32);
         }
@@ -374,11 +374,11 @@ public class EncodeDecodeTest extends TestCase {
         decoder.arrayEnd();
 
         // Array in array (with name).
-        encoder.arrayStart(Types.ArrayOf(2, Types.Named("Name", Types.ArrayOf(1, Types.STRING))));
-        encoder.arrayStart(Types.Named("Name", Types.ArrayOf(1, Types.STRING)));
+        encoder.arrayStart(Types.arrayOf(2, Types.named("Name", Types.arrayOf(1, Types.STRING))));
+        encoder.arrayStart(Types.named("Name", Types.arrayOf(1, Types.STRING)));
         encoder.writeString("A", Types.STRING);
         encoder.arrayEnd();
-        encoder.arrayStart(Types.Named("Name", Types.ArrayOf(1, Types.STRING)));
+        encoder.arrayStart(Types.named("Name", Types.arrayOf(1, Types.STRING)));
         encoder.writeString("B", Types.STRING);
         encoder.arrayEnd();
         encoder.arrayEnd();
@@ -395,13 +395,13 @@ public class EncodeDecodeTest extends TestCase {
 
     public void testReadList() throws IOException, ConversionException {
         // Empty list.
-        encoder.listStart(0, Types.ListOf(Types.COMPLEX64));
+        encoder.listStart(0, Types.listOf(Types.COMPLEX64));
         encoder.listEnd();
         assertEquals(0, decoder.listStart());
         decoder.listEnd();
 
         // List with values.
-        encoder.listStart(5, Types.ListOf(Types.INT32));
+        encoder.listStart(5, Types.listOf(Types.INT32));
         for (int i = 0; i < 5; i++) {
             encoder.writeInt32(i, Types.INT32);
         }
@@ -414,12 +414,12 @@ public class EncodeDecodeTest extends TestCase {
         decoder.listEnd();
 
         // List in list (with name).
-        encoder.listStart(2, Types.ListOf(Types.Named("Name", Types.ListOf(Types.STRING))));
-        encoder.listStart(2, Types.Named("Name", Types.ListOf(Types.STRING)));
+        encoder.listStart(2, Types.listOf(Types.named("Name", Types.listOf(Types.STRING))));
+        encoder.listStart(2, Types.named("Name", Types.listOf(Types.STRING)));
         encoder.writeString("A", Types.STRING);
         encoder.writeString("B", Types.STRING);
         encoder.listEnd();
-        encoder.listStart(1, Types.Named("Name", Types.ListOf(Types.STRING)));
+        encoder.listStart(1, Types.named("Name", Types.listOf(Types.STRING)));
         encoder.writeString("C", Types.STRING);
         encoder.listEnd();
         encoder.listEnd();
@@ -437,13 +437,13 @@ public class EncodeDecodeTest extends TestCase {
 
     public void testReadSet() throws IOException, ConversionException {
         // Empty set.
-        encoder.setStart(0, Types.SetOf(Types.FLOAT64));
+        encoder.setStart(0, Types.setOf(Types.FLOAT64));
         encoder.setEnd();
         assertEquals(0, decoder.setStart());
         decoder.setEnd();
 
         // Set with values.
-        encoder.setStart(5, Types.SetOf(Types.COMPLEX64));
+        encoder.setStart(5, Types.setOf(Types.COMPLEX64));
         for (int i = 0; i < 5; i++) {
             encoder.writeComplex64(new Complex(i), Types.COMPLEX64);
         }
@@ -456,12 +456,12 @@ public class EncodeDecodeTest extends TestCase {
         decoder.setEnd();
 
         // Set in set (with name).
-        encoder.setStart(2, Types.SetOf(Types.Named("Name", Types.SetOf(Types.STRING))));
-        encoder.setStart(2, Types.Named("Name", Types.SetOf(Types.STRING)));
+        encoder.setStart(2, Types.setOf(Types.named("Name", Types.setOf(Types.STRING))));
+        encoder.setStart(2, Types.named("Name", Types.setOf(Types.STRING)));
         encoder.writeString("A", Types.STRING);
         encoder.writeString("B", Types.STRING);
         encoder.setEnd();
-        encoder.setStart(1, Types.Named("Name", Types.SetOf(Types.STRING)));
+        encoder.setStart(1, Types.named("Name", Types.setOf(Types.STRING)));
         encoder.writeString("C", Types.STRING);
         encoder.setEnd();
         encoder.setEnd();
@@ -479,13 +479,13 @@ public class EncodeDecodeTest extends TestCase {
 
     public void testReadMap() throws IOException, ConversionException {
         // Empty map.
-        encoder.mapStart(0, Types.MapOf(Types.FLOAT64, Types.COMPLEX128));
+        encoder.mapStart(0, Types.mapOf(Types.FLOAT64, Types.COMPLEX128));
         encoder.mapEnd();
         assertEquals(0, decoder.mapStart());
         decoder.mapEnd();
 
         // Map with values.
-        encoder.mapStart(5, Types.MapOf(Types.COMPLEX64, Types.STRING));
+        encoder.mapStart(5, Types.mapOf(Types.COMPLEX64, Types.STRING));
         for (int i = 0; i < 5; i++) {
             encoder.writeComplex64(new Complex(i), Types.COMPLEX64);
             encoder.writeString("" + (char) (i + 'a'), Types.STRING);
@@ -504,15 +504,15 @@ public class EncodeDecodeTest extends TestCase {
         // Map in map (with name).
         encoder.mapStart(
                 1,
-                Types.MapOf(Types.Named("Name", Types.MapOf(Types.STRING, Types.INT32)),
-                        Types.ArrayOf(1, Types.STRING)));
-        encoder.mapStart(2, Types.Named("Name", Types.MapOf(Types.STRING, Types.INT32)));
+                Types.mapOf(Types.named("Name", Types.mapOf(Types.STRING, Types.INT32)),
+                        Types.arrayOf(1, Types.STRING)));
+        encoder.mapStart(2, Types.named("Name", Types.mapOf(Types.STRING, Types.INT32)));
         encoder.writeString("A", Types.STRING);
         encoder.writeInt32(9, Types.INT32);
         encoder.writeString("B", Types.STRING);
         encoder.writeInt32(3, Types.INT32);
         encoder.mapEnd();
-        encoder.arrayStart(Types.ArrayOf(1, Types.STRING));
+        encoder.arrayStart(Types.arrayOf(1, Types.STRING));
         encoder.writeString("X", Types.STRING);
         encoder.arrayEnd();
         encoder.mapEnd();
@@ -538,13 +538,13 @@ public class EncodeDecodeTest extends TestCase {
 
     public void testReadStruct() throws IOException, ConversionException {
         // Empty struct
-        encoder.structStart(Types.StructOf());
+        encoder.structStart(Types.structOf());
         encoder.structEnd();
         decoder.structStart();
         decoder.structEnd();
 
         // Simple struct.
-        encoder.structStart(Types.StructOf(new VdlStructField("A", Types.BOOL),
+        encoder.structStart(Types.structOf(new VdlStructField("A", Types.BOOL),
                 new VdlStructField("B", Types.STRING)));
         encoder.structNextField("A");
         encoder.writeBool(true, Types.BOOL);
@@ -560,7 +560,7 @@ public class EncodeDecodeTest extends TestCase {
         decoder.structEnd();
 
         // Fields out of order.
-        encoder.structStart(Types.StructOf(new VdlStructField("A", Types.BOOL),
+        encoder.structStart(Types.structOf(new VdlStructField("A", Types.BOOL),
                 new VdlStructField("B", Types.STRING)));
         encoder.structNextField("B");
         encoder.writeString("X", Types.STRING);
@@ -576,11 +576,11 @@ public class EncodeDecodeTest extends TestCase {
         decoder.structEnd();
 
         // Struct in struct.
-        encoder.structStart(Types.StructOf(new VdlStructField("S", Types.Named("Name",
-                Types.StructOf(new VdlStructField("W", Types.UINT32))))));
+        encoder.structStart(Types.structOf(new VdlStructField("S", Types.named("Name",
+                Types.structOf(new VdlStructField("W", Types.UINT32))))));
         encoder.structNextField("S");
-        encoder.structStart(Types.Named("Name",
-                Types.StructOf(new VdlStructField("W", Types.UINT32))));
+        encoder.structStart(Types.named("Name",
+                Types.structOf(new VdlStructField("W", Types.UINT32))));
         encoder.structNextField("W");
         encoder.writeUint32(9, Types.UINT32);
         encoder.structEnd();

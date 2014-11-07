@@ -1,6 +1,3 @@
-// TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
-// TODO(bprosnitz) Any and one of not currently supported.
-
 package io.veyron.veyron.veyron2.vom2;
 
 import java.io.IOException;

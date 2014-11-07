@@ -48,7 +48,7 @@ public class EncoderTest extends TestCase {
                     .asList(new VomTestValue(true, Types.BOOL),
                             new VomTestValue("abc", Types.STRING),
                             new VomTestValue("def".getBytes(), Types
-                                    .ListOf(Types.BYTE))),
+                                    .listOf(Types.BYTE))),
                     "80060108036162633403646566"),
                     new EncodeTestCase("Uint", Arrays.asList(new VomTestValue(
                             1, Types.BYTE), new VomTestValue(2, Types.UINT16),
@@ -75,9 +75,9 @@ public class EncoderTest extends TestCase {
                     new EncodeTestCase(
                             "NamedBool",
                             Arrays.asList(
-                                    new VomTestValue(true, Types.Named(
+                                    new VomTestValue(true, Types.named(
                                             "veyron2/vom2.Bool", Types.BOOL)),
-                                    new VomTestValue(true, Types.Named(
+                                    new VomTestValue(true, Types.named(
                                             "veyron2/vom2.Bool", Types.BOOL))),
                             "80"
                                     + "ff8117100111766579726f6e322f766f6d322e426f6f6c020300"
@@ -86,10 +86,10 @@ public class EncoderTest extends TestCase {
                             "NamedString",
                             Arrays.asList(
                                     new VomTestValue("abc", Types
-                                            .Named("veyron2/vom2.String",
+                                            .named("veyron2/vom2.String",
                                                     Types.STRING)),
                                     new VomTestValue("abc", Types
-                                            .Named("veyron2/vom2.String",
+                                            .named("veyron2/vom2.String",
                                                     Types.STRING))),
                             "80"
                                     + "ff8119100113766579726f6e322f766f6d322e537472696e67020400"
@@ -98,11 +98,11 @@ public class EncoderTest extends TestCase {
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .ArrayOf(2, Types.UINT16)),
+                                    .arrayOf(2, Types.UINT16)),
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .ArrayOf(2, Types.UINT16))), "80"
+                                    .arrayOf(2, Types.UINT16))), "80"
                             + "ff8106120206030200" + "ff82020102ff82020102"),
                     new EncodeTestCase(
                             "Array2Uint16",
@@ -111,17 +111,17 @@ public class EncoderTest extends TestCase {
                                             new short[] {
                                                     1, 2
                                             },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.Array2Uint16",
-                                                    Types.ArrayOf(2,
+                                                    Types.arrayOf(2,
                                                             Types.UINT16))),
                                     new VomTestValue(
                                             new short[] {
                                                     1, 2
                                             },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.Array2Uint16",
-                                                    Types.ArrayOf(2,
+                                                    Types.arrayOf(2,
                                                             Types.UINT16)))),
                             "80"
                                     + "ff8121120119766579726f6e322f766f6d322e41727261793255696e7431360206030200"
@@ -130,11 +130,11 @@ public class EncoderTest extends TestCase {
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .ListOf(Types.UINT16)),
+                                    .listOf(Types.UINT16)),
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .ListOf(Types.UINT16))), "80"
+                                    .listOf(Types.UINT16))), "80"
                             + "ff810413020600" + "ff8203020102ff8203020102"),
                     new EncodeTestCase(
                             "ListUint16",
@@ -142,15 +142,15 @@ public class EncoderTest extends TestCase {
                                     new VomTestValue(new short[] {
                                             1, 2
                                     },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.ListUint16",
-                                                    Types.ListOf(Types.UINT16))),
+                                                    Types.listOf(Types.UINT16))),
                                     new VomTestValue(new short[] {
                                             1, 2
                                     },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.ListUint16",
-                                                    Types.ListOf(Types.UINT16)))),
+                                                    Types.listOf(Types.UINT16)))),
                             "80"
                                     + "ff811d130117766579726f6e322f766f6d322e4c69737455696e743136020600"
                                     + "ff8203020102ff8203020102"),
@@ -158,11 +158,11 @@ public class EncoderTest extends TestCase {
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .SetOf(Types.UINT16)),
+                                    .setOf(Types.UINT16)),
                             new VomTestValue(new short[] {
                                     1, 2
                             }, Types
-                                    .SetOf(Types.UINT16))), "80"
+                                    .setOf(Types.UINT16))), "80"
                             + "ff810414020600"
                             + "ff820302[01,02]ff820302[01,02]"),
                     new EncodeTestCase(
@@ -171,24 +171,24 @@ public class EncoderTest extends TestCase {
                                     new VomTestValue(new short[] {
                                             1, 2
                                     },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.SetUint16",
-                                                    Types.SetOf(Types.UINT16))),
+                                                    Types.setOf(Types.UINT16))),
                                     new VomTestValue(new short[] {
                                             1, 2
                                     },
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.SetUint16",
-                                                    Types.SetOf(Types.UINT16)))),
+                                                    Types.setOf(Types.UINT16)))),
                             "80"
                                     + "ff811c140116766579726f6e322f766f6d322e53657455696e743136020600"
                                     + "ff820302[01,02]ff820302[01,02]"),
                     new EncodeTestCase("UnnamedMap", Arrays.asList(
                             new VomTestValue(ImmutableMap.of((short) 1, "abc",
-                                    (short) 2, "def"), Types.MapOf(
+                                    (short) 2, "def"), Types.mapOf(
                                     Types.UINT16, Types.STRING)),
                             new VomTestValue(ImmutableMap.of((short) 1, "abc",
-                                    (short) 2, "def"), Types.MapOf(
+                                    (short) 2, "def"), Types.mapOf(
                                     Types.UINT16, Types.STRING))), "80"
                             + "ff8106150206030400"
                             + "ff820b02[0103616263,0203646566]"
@@ -199,23 +199,23 @@ public class EncoderTest extends TestCase {
                                     new VomTestValue(
                                             ImmutableMap.of((short) 1, "abc",
                                                     (short) 2, "def"),
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.MapUint16String",
-                                                    Types.MapOf(Types.UINT16,
+                                                    Types.mapOf(Types.UINT16,
                                                             Types.STRING))),
                                     new VomTestValue(
                                             ImmutableMap.of((short) 1, "abc",
                                                     (short) 2, "def"),
-                                            Types.Named(
+                                            Types.named(
                                                     "veyron2/vom2.MapUint16String",
-                                                    Types.MapOf(Types.UINT16,
+                                                    Types.mapOf(Types.UINT16,
                                                             Types.STRING)))),
                             "80"
                                     + "ff812415011c766579726f6e322f766f6d322e4d617055696e743136537472696e670206030400"
                                     + "ff820b02[0103616263,0203646566]"
                                     + "ff820b02[0103616263,0203646566]"),
                     new EncodeTestCase("EmptyStruct", Arrays
-                            .asList(new VomTestValue(null, Types.StructOf())),
+                            .asList(new VomTestValue(null, Types.structOf())),
                             "80ff810416020000ff8200")
 
             );

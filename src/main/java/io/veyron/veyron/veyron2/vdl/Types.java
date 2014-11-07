@@ -1,5 +1,3 @@
-// TODO(bprosnitz) Either finish this or remove it before the 0.1 release.
-
 package io.veyron.veyron.veyron2.vdl;
 
 /**
@@ -26,7 +24,7 @@ public final class Types {
     public static VdlType STRING = createPrimitiveType(Kind.STRING);
     public static VdlType TYPEOBJECT = createPrimitiveType(Kind.TYPEOBJECT);
 
-    public static VdlType PrimitiveTypeFromKind(Kind kind) {
+    public static VdlType primitiveTypeFromKind(Kind kind) {
         switch (kind) {
             case ANY:
                 return ANY;
@@ -63,51 +61,51 @@ public final class Types {
         }
     }
 
-    public static VdlType EnumOf(String... labels) {
+    public static VdlType enumOf(String... labels) {
         VdlType t = new VdlType(Kind.ENUM);
         t.setLabels(labels);
         return t;
     }
 
-    public static VdlType ArrayOf(int len, VdlType elem) {
+    public static VdlType arrayOf(int len, VdlType elem) {
         VdlType t = new VdlType(Kind.ARRAY);
         t.setLength(len);
         t.setElem(elem);
         return t;
     }
 
-    public static VdlType ListOf(VdlType elem) {
+    public static VdlType listOf(VdlType elem) {
         VdlType t = new VdlType(Kind.LIST);
         t.setElem(elem);
         return t;
     }
 
-    public static VdlType SetOf(VdlType key) {
+    public static VdlType setOf(VdlType key) {
         VdlType t = new VdlType(Kind.SET);
         t.setKey(key);
         return t;
     }
 
-    public static VdlType MapOf(VdlType key, VdlType elem) {
+    public static VdlType mapOf(VdlType key, VdlType elem) {
         VdlType t = new VdlType(Kind.MAP);
         t.setKey(key);
         t.setElem(elem);
         return t;
     }
 
-    public static VdlType StructOf(VdlStructField... fields) {
+    public static VdlType structOf(VdlStructField... fields) {
         VdlType t = new VdlType(Kind.STRUCT);
         t.setFields(fields);
         return t;
     }
 
-    public static VdlType OneOfOf(VdlType... types) {
+    public static VdlType oneOfOf(VdlType... types) {
         VdlType t = new VdlType(Kind.ONE_OF);
         t.setTypes(types);
         return t;
     }
 
-    public static VdlType Named(String name, VdlType base) {
+    public static VdlType named(String name, VdlType base) {
         VdlType named = base.shallowCopy();
         named.setName(name);
         return named;
