@@ -1,8 +1,12 @@
 package io.veyron.veyron.veyron2.security;
 
-import io.veyron.veyron.veyron2.VeyronException;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonSyntaxException;
 
-import java.math.BigInteger;
+import io.veyron.veyron.veyron.security.acl.TaggedACLMap;
+import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.vdl.JSONUtil;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -113,6 +117,101 @@ public class Security {
 	}
 
 	/**
+	 * Returns an authorizer that subscribes to an authorization policy where access is granted if
+	 * the remote end presents blessings included in the Access Control Lists (ACLs) associated with
+	 * the set of relevant tags.
+	 *
+	 * The set of relevant tags is the subset of tags associated with the method
+	 * ({@link io.veyron.veyron.veyron2.security.Context#methodTags()}) that have the same type as
+	 * the provided one.
+	 * Currently, tagType.Kind must be reflect.String, i.e., only tags that are
+	 * named string types are supported.
+	 *
+	 * If multiple tags of the provided type are associated with the method, then access is granted
+	 * if the peer presents blessings that match the ACLs of each one of those tags. If no tags of
+	 * the provided are associated with the method, then access is denied.
+	 *
+	 * If the TaggedACLMap provided is {@code null}, then an authorizer that rejects all remote
+	 * ends is returned.
+	 *
+	 * Sample usage:
+	 *
+	 * (1) Attach tags to methods in the VDL (eg. myservice.vdl)
+	 * <code>
+	 *   package myservice
+	 *
+	 *   type MyTag string
+	 *   const (
+	 *     ReadAccess  = MyTag("R")
+	 *     WriteAccess = MyTag("W")
+	 *   )
+	 *
+	 *   type MyService interface {
+	 *     Get() ([]string, error)       {ReadAccess}
+	 *     GetIndex(int) (string, error) {ReadAccess}
+	 *
+	 *     Set([]string) error           {WriteAccess}
+	 *     SetIndex(int, string) error   {WriteAccess}
+	 *
+	 *     GetAndSet([]string) ([]string, error) {ReadAccess, WriteAccess}
+	 *   }
+	 * </code>
+	 * (2) Setup the dispatcher to use the {@code TaggedACLAuthorizer}
+	 * <code>
+	 *   public class MyDispatcher implements io.veyron.veyron.veyron2.ipc.Dispatcher {
+	 *     @Override
+	 *     public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
+	 *       final TaggedACLMap acls = new TaggedACLMap(ImmutableMap.of(
+	 *         "R", new ACL(ImmutableList.of(new BlessingPattern("alice/friends/..."),
+	 *                                       new BlessingPattern("alice/family/...")),
+	 *                      null),
+	 *           "W", new ACL(ImmutableList.of(new BlessingPattern("alice/family/..."),
+	 *                                         new BlessingPattern("alice/colleagues/...")),
+	 *                      null)));
+	 *       return new ServiceObjectWithAuthorizer(
+	 *          newInvoker(), Security.newTaggedACLAuthorizer(acls, MyTag.class));
+	 *   }
+	 * </code>
+	 *
+	 * With the above dispatcher, the server will grant access to a peer with the blessing
+	 * {@code "alice/friend/bob"} access only to the {@code Get} and {@code GetIndex} methods.
+	 * A peer presenting the blessing "alice/colleague/carol" will get access only to the
+	 * {@code Set} and {@code SetIndex} methods. A peer presenting {@code "alice/family/mom"} will
+	 * get access to all methods, even {@code GetAndSet} - which requires that the blessing appear
+	 * in the ACLs for both the {@code ReadAccess} and {@code WriteAccess} tags.
+	 *
+	 * @param  acls            ACLs containing authorization rules.
+	 * @param  type            type of the method tags this authorizer checks.
+	 * @return                 an above-described authorizer.
+	 * @throws VeyronException if the authorizer couldn't be created.
+	 */
+	public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Class<?> type)
+		throws VeyronException {
+		return new TaggedACLAuthorizer(acls, type);
+	}
+
+	/**
+	 * Same as {@code newTaggedACLAuthorizer(TaggedACLMap, Class<?>)} but the ACLs are provided as
+	 * a JSON-encoded string.
+	 *
+	 * @param  aclsJson        JSON-encoded ACLs containing authorization rules.
+	 * @param  type            type of the method tags this authorizer checks.
+	 * @return                 an above-described authorizer.
+	 * @throws VeyronException if the authorizer couldn't be created.
+	 */
+	public static Authorizer newTaggedACLAuthorizer(String aclsJson, Class<?> type)
+		throws VeyronException {
+		try {
+			final TaggedACLMap acls = JSONUtil.getGsonBuilder().create().fromJson(aclsJson,
+				new TypeToken<TaggedACLMap>(){}.getType());
+			return newTaggedACLAuthorizer(acls, type);
+		} catch (JsonSyntaxException e) {
+			throw new VeyronException(String.format("Invalid ACLs JSON string %s: %s",
+				aclsJson, e.getMessage()));
+		}
+	}
+
+	/**
 	 * Verifies the provides signature of the given message, using the supplied public key.
 	 *
 	 * @param  sig             signature in the veyron format.
@@ -162,30 +261,5 @@ public class Security {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Creates an authorizer for the provided ACL. The authorizer authorizes a request iff the
-	 * identity at the remote end has a name authorized by the provided ACL for the request's label,
-	 * or the request corresponds to a self-RPC.
-	 *
-	 * @param  acl ACL used for authorization checks.
-	 * @return     Authorizer that performs authorization checks.
-	 */
-	public static Authorizer newACLAuthorizer(ACL acl) {
-		return new ACLAuthorizer(acl);
-	}
-
-	private static class ACLAuthorizer implements Authorizer {
-		private final ACL acl;
-
-		ACLAuthorizer(ACL acl) {
-			this.acl = acl;
-		}
-
-		@Override
-		public void authorize(Context context) throws VeyronException {
-			// TODO(spetrovic): implement this.
-		}
 	}
 }

@@ -1,9 +1,10 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.ListenSpec;
 import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
-import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.security.ACL;
 import io.veyron.veyron.veyron2.security.Security;
 
 public class Server implements io.veyron.veyron.veyron2.ipc.Server {
@@ -57,8 +58,7 @@ public class Server implements io.veyron.veyron.veyron2.ipc.Server {
 		}
 		@Override
 		public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
-			// TODO(spetrovic): fix ACL authorizer.
-			return new ServiceObjectWithAuthorizer(this.obj, Security.newACLAuthorizer(null));
+			return new ServiceObjectWithAuthorizer(this.obj, null);
 		}
 	}
 }

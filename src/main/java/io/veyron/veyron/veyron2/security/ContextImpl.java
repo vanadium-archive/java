@@ -17,7 +17,6 @@ public class ContextImpl implements io.veyron.veyron.veyron2.security.Context {
 	public native Object[] nativeMethodTags(long nativePtr) throws VeyronException;
 	private native String nativeName(long nativePtr);
 	private native String nativeSuffix(long nativePtr);
-	private native int nativeLabel(long nativePtr);
 	private native String nativeLocalEndpoint(long nativePtr);
 	private native String nativeRemoteEndpoint(long nativePtr);
 	private native Principal nativeLocalPrincipal(long nativePtr) throws VeyronException;
@@ -45,10 +44,11 @@ public class ContextImpl implements io.veyron.veyron.veyron2.security.Context {
 	@Override
 	public Object[] methodTags() {
 		try {
-			return nativeMethodTags(this.nativePtr);
+			final Object[] tags = nativeMethodTags(this.nativePtr);
+			return tags != null ? tags : new Object[0];
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
-			return null;
+			return new Object[0];
 		}
 	}
 	@Override
@@ -58,10 +58,6 @@ public class ContextImpl implements io.veyron.veyron.veyron2.security.Context {
 	@Override
 	public String suffix() {
 		return nativeSuffix(this.nativePtr);
-	}
-	@Override
-	public Label label() {
-		return new Label(nativeLabel(this.nativePtr));
 	}
 	@Override
 	public String localEndpoint() {

@@ -103,10 +103,6 @@ public class ServerCall implements io.veyron.veyron.veyron2.ipc.ServerCall {
 		return this.securityContext.suffix();
 	}
 	@Override
-	public Label label() {
-		return this.securityContext.label();
-	}
-	@Override
 	public String localEndpoint() {
 		return this.securityContext.localEndpoint();
 	}

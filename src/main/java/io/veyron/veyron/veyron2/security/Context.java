@@ -22,7 +22,7 @@ public interface Context {
 
 	/**
 	 * Returns the tags attached to the method, typically through the interface specification
-	 * in VDL.
+	 * in VDL.  Returns empty array if no tags are attached.
 	 *
 	 * @return tags attached to the method.
 	 */
@@ -40,13 +40,6 @@ public interface Context {
 	 * @return veyron name suffix for the request.
 	 */
 	public String suffix();
-
-	/**
-	 * Returns the method's security label.
-	 *
-	 * @return method's security label.
-	 */
-	public Label label();
 
 	/**
 	 * Returns the principal used to authenticate to the remote end.
