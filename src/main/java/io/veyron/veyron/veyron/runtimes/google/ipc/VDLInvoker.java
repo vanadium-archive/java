@@ -17,7 +17,7 @@ import io.veyron.veyron.veyron2.security.Security;
 import io.veyron.veyron.veyron2.security.SecurityConstants;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.vdl.VeyronService;
+import io.veyron.veyron.veyron2.vdl.VeyronServer;
 
 /**
  * VDLInvoker is a helper class that uses reflection to invoke VDL interface
@@ -29,15 +29,16 @@ public final class VDLInvoker {
 
 	// A cache of ClassInfo objects, aiming to reduce the cost of expensive
 	// reflection operations.
-	private static Map<Class<?>, ClassInfo> serviceWrapperClasses = new HashMap<Class<?>, ClassInfo>();
+	private static Map<Class<?>, ClassInfo> serverWrapperClasses =
+		new HashMap<Class<?>, ClassInfo>();
 
-	private final static class ServiceMethod {
-		private final Object wrappedService;
+	private final static class ServerMethod {
+		private final Object wrappedServer;
 		private final Method method;
 		private final Object[] tags;
 
-		public ServiceMethod(Object wrappedService, Method method, Object[] tags) {
-			this.wrappedService = wrappedService;
+		public ServerMethod(Object wrappedServer, Method method, Object[] tags) {
+			this.wrappedServer = wrappedServer;
 			this.method = method;
 			this.tags = tags;
 		}
@@ -46,27 +47,30 @@ public final class VDLInvoker {
 
 		public Object invoke(Object... args) throws IllegalAccessException,
 		IllegalArgumentException, InvocationTargetException {
-			return method.invoke(wrappedService, args);
+			return method.invoke(wrappedServer, args);
 		}
 	}
 
-	private final Map<String, ServiceMethod> invokableMethods = new HashMap<String, ServiceMethod>();
+	private final Map<String, ServerMethod> invokableMethods = new HashMap<String, ServerMethod>();
 
 	private final Gson gson = new Gson();
-	private final Class<?> serviceClass; // Only used to make exception messages more clear.
-	private String[] implementedServices;
+	private final Class<?> serverClass; // Only used to make exception messages more clear.
+	private String[] implementedServers;
 
-	// getImplementedServices gets a list of the services that are implemented by
-	// the service object represented by the invoker.
-	// e.g. ["veyron2/service/proximity/ProximityScanner"]
-	public String[] getImplementedServices() {
-		return this.implementedServices;
+	/**
+	 * Returns a list of the servers that are implemented by the server object represented by
+	 * the invoker. e.g. ["veyron2/service/proximity/ProximityScanner"]
+	 *
+	 * @return list of servers implemented by the server object represented by the invoker.
+	 */
+	public String[] getImplementedServers() {
+		return this.implementedServers;
 	}
 
 	/**
 	 * Creates a new invoker for the given object.
 	 *
-	 * @param obj                       service object we're invoking methods on
+	 * @param obj                       server object we're invoking methods on
 	 * @throws IllegalArgumentException if the provided object is invalid
 	 *             (either null or doesn't implement exactly one VDL interface)
 	 */
@@ -76,14 +80,14 @@ public final class VDLInvoker {
 		if (obj == null) {
 			throw new IllegalArgumentException("Can't create VDLInvoker with a null object.");
 		}
-		this.serviceClass = obj.getClass();
+		this.serverClass = obj.getClass();
 
-		List<Object> serviceWrappers = wrapService(obj);
-		for (Object wrapper : serviceWrappers) {
+		List<Object> serverWrappers = wrapServer(obj);
+		for (Object wrapper : serverWrappers) {
 			final Class<?> c = wrapper.getClass();
 			ClassInfo cInfo;
 			synchronized (VDLInvoker.this) {
-				cInfo = VDLInvoker.serviceWrapperClasses.get(c);
+				cInfo = VDLInvoker.serverWrapperClasses.get(c);
 			}
 			if (cInfo == null) {
 				cInfo = new ClassInfo(c);
@@ -93,7 +97,7 @@ public final class VDLInvoker {
 				// into the cache, but that's just wasted work and not a race
 				// condition.
 				synchronized (VDLInvoker.this) {
-					VDLInvoker.serviceWrapperClasses.put(c, cInfo);
+					VDLInvoker.serverWrapperClasses.put(c, cInfo);
 				}
 			}
 
@@ -101,13 +105,13 @@ public final class VDLInvoker {
 			final Method tagGetter = methods.get("getMethodTags");
 			if (tagGetter == null) {
 				throw new IllegalArgumentException(String.format(
-					"Service class %s doesn't have the 'getMethodTags' method.",
+					"Server class %s doesn't have the 'getMethodTags' method.",
 					c.getCanonicalName()));
 			}
 			final Method signature = methods.get("signature");
 			if (signature == null) {
 				throw new IllegalArgumentException(String.format(
-					"Service class %s doesn't have the 'signature' method.",
+					"Server class %s doesn't have the 'signature' method.",
 					c.getCanonicalName()));
 			}
 			for (Entry<String, Method> m : methods.entrySet()) {
@@ -122,7 +126,7 @@ public final class VDLInvoker {
 					throw new VeyronException(String.format("Error getting tag for method %q: %s",
 						m.getKey(), e.getTargetException().getMessage()));
 				}
-				invokableMethods.put(m.getKey(), new ServiceMethod(wrapper, m.getValue(), tags));
+				invokableMethods.put(m.getKey(), new ServerMethod(wrapper, m.getValue(), tags));
 			}
 		}
 	}
@@ -136,38 +140,38 @@ public final class VDLInvoker {
 	 * @throws IllegalArgumentException if the method doesn't exist.
 	 */
 	public Object[] getMethodTags(String method) throws IllegalArgumentException {
-		final ServiceMethod m = this.invokableMethods.get(method);
+		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
 			throw new IllegalArgumentException(String.format(
 					"Couldn't find method %s in class %s",
-					method, this.serviceClass.getCanonicalName()));
+					method, this.serverClass.getCanonicalName()));
 		}
 		return m.getTags();
 	}
 
 	/**
-	 * Iterate through the veyron services an object implements and generates
-	 * service wrappers for each.
+	 * Iterate through the veyron servers an object implements and generates
+	 * server wrappers for each.
 	 *
-	 * @param srv                       the service object
-	 * @return                          a list of service wrappers
-	 * @throws IllegalArgumentException if the input service is invalid.
+	 * @param srv                       the server object
+	 * @return                          a list of server wrappers
+	 * @throws IllegalArgumentException if the input server is invalid.
 	 */
-	private List<Object> wrapService(Object srv) throws IllegalArgumentException {
+	private List<Object> wrapServer(Object srv) throws IllegalArgumentException {
 		List<Object> stubs = new ArrayList<Object>();
-		List<String> implementedServiceList = new ArrayList<String>();
+		List<String> implementedServerList = new ArrayList<String>();
 		for (Class<?> iface : srv.getClass().getInterfaces()) {
-			VeyronService vs = iface.getAnnotation(VeyronService.class);
+			final VeyronServer vs = iface.getAnnotation(VeyronServer.class);
 			if (vs == null) {
 				continue;
 			}
-			implementedServiceList.add(vs.vdlPathName());
+			implementedServerList.add(vs.vdlPathName());
 			// There should only be one constructor.
-			if (vs.serviceWrapper().getConstructors().length != 1) {
+			if (vs.serverWrapper().getConstructors().length != 1) {
 				throw new RuntimeException(
-						"Expected ServiceWrapper to only have a single constructor");
+						"Expected ServerWrapper to only have a single constructor");
 			}
-			Constructor<?> constructor = vs.serviceWrapper().getConstructors()[0];
+			final Constructor<?> constructor = vs.serverWrapper().getConstructors()[0];
 
 			try {
 				stubs.add(constructor.newInstance(srv));
@@ -181,10 +185,10 @@ public final class VDLInvoker {
 		}
 		if (stubs.size() == 0) {
 			throw new IllegalArgumentException(
-					"Object does not implement a valid generated service interface.");
+					"Object does not implement a valid generated server interface.");
 		}
-		this.implementedServices = new String[implementedServiceList.size()];
-		implementedServiceList.toArray(this.implementedServices);
+		this.implementedServers = new String[implementedServerList.size()];
+		implementedServerList.toArray(this.implementedServers);
 		return stubs;
 	}
 
@@ -215,11 +219,11 @@ public final class VDLInvoker {
 	 */
 	public InvokeReply invoke(String method, ServerCall call, String[] inArgs) throws
 			IllegalArgumentException, IllegalAccessException {
-		final ServiceMethod m = this.invokableMethods.get(method);
+		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
 			throw new IllegalArgumentException(String.format(
 					"Couldn't find method %s in class %s",
-					method, this.serviceClass.getCanonicalName()));
+					method, this.serverClass.getCanonicalName()));
 		}
 
 		// Decode JSON arguments.
@@ -252,7 +256,7 @@ public final class VDLInvoker {
 		return reply;
 	}
 
-	private Object[] prepareArgs(ServiceMethod m, ServerCall call, String[] inArgs)
+	private Object[] prepareArgs(ServerMethod m, ServerCall call, String[] inArgs)
 			throws JsonSyntaxException {
 		final Class<?>[] inTypes = m.method.getParameterTypes();
 		assert inArgs.length == inTypes.length;
@@ -267,13 +271,13 @@ public final class VDLInvoker {
 		return ret;
 	}
 
-	private String[] prepareResults(ServiceMethod m, Object result)
+	private String[] prepareResults(ServerMethod m, Object result)
 			throws IllegalArgumentException, IllegalAccessException {
 		if (m.method.getReturnType() == void.class) {
 			return new String[0];
 		}
 		if (m.method.getReturnType().getDeclaringClass() == m.method.getDeclaringClass()) {
-			// The return type was declared in the service definition, so this
+			// The return type was declared in the server definition, so this
 			// method has multiple out args.
 			final Field[] fields = m.method.getReturnType().getFields();
 			final String[] reply = new String[fields.length];
@@ -301,7 +305,7 @@ public final class VDLInvoker {
 				} // method not an VDL method.
 				if (oldval != null) {
 					throw new IllegalArgumentException("Overloading of method " + method.getName()
-							+ " not allowed on service wrapper");
+							+ " not allowed on server wrapper");
 				}
 			}
 		}

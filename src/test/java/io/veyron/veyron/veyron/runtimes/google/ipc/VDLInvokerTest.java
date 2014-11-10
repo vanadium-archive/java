@@ -11,10 +11,10 @@ import io.veyron.veyron.veyron2.ipc.ServerContext;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.vdl.Stream;
-import io.veyron.jni.test.fortune.FortuneService;
+import io.veyron.jni.test.fortune.FortuneServer;
 
 public class VDLInvokerTest extends TestCase {
-    private static class TestFortuneImpl implements FortuneService {
+    private static class TestFortuneImpl implements FortuneServer {
         String fortune = "";
         @Override
         public String get(ServerContext context) throws VeyronException {
@@ -26,14 +26,14 @@ public class VDLInvokerTest extends TestCase {
         }
     }
 
-    public void testGetImplementedServices() throws IllegalArgumentException, VeyronException {
-        final String[] expectedImplementedServices = new String[] {
-                "veyron.io/jni/test/fortune/FortuneService"
+    public void testGetImplementedServers() throws IllegalArgumentException, VeyronException {
+        final String[] expectedImplementedServers = new String[] {
+                "veyron.io/jni/test/fortune/FortuneServer"
         };
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        final String[] implementedServices = invoker.getImplementedServices();
-        Arrays.sort(implementedServices);
-        TestUtil.assertArrayEquals(expectedImplementedServices, implementedServices);
+        final String[] implementedServers = invoker.getImplementedServers();
+        Arrays.sort(implementedServers);
+        TestUtil.assertArrayEquals(expectedImplementedServers, implementedServers);
     }
 
     public void testGetMethodTags() throws IllegalArgumentException, VeyronException {

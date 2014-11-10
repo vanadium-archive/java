@@ -18,7 +18,7 @@ import android.util.Log;
 public class FortuneTest extends AndroidTestCase {
 	private static VeyronException noneAdded = new VeyronException("no fortunes added");
 
-	public static class FortuneServiceImpl implements FortuneService {
+	public static class FortuneServerImpl implements FortuneServer {
 		private String lastAddedFortune;
 
 		@Override
@@ -42,16 +42,10 @@ public class FortuneTest extends AndroidTestCase {
     	RuntimeFactory.initRuntime(getContext(), new Options());
 
     	final VRuntime serverRuntime = RuntimeFactory.newRuntime(getContext(), null);
-    	final Server server = serverRuntime.newServer();
-    	final String endpoint = server.listen(null);
-    	final FortuneService service = new FortuneServiceImpl();
-    	server.serve("fortune", new Dispatcher() {
-            @Override
-            public ServiceObjectWithAuthorizer lookup(String suffix)
-                throws VeyronException {
-            	return new ServiceObjectWithAuthorizer(service, null);
-            }
-        });
+    	final Server s = serverRuntime.newServer();
+    	final String endpoint = s.listen(null);
+    	final FortuneServer server = new FortuneServerImpl();
+    	s.serve("fortune", server);
     	try {
 	    	final Options options = new Options();
 	    	options.set(OptionDefs.RUNTIME, serverRuntime);
@@ -65,28 +59,28 @@ public class FortuneTest extends AndroidTestCase {
 	    	// We should start the mounttable and use it for the test in the future.
 	    	final String name = "/" + endpoint + "/fortune";
 
-	    	final Fortune fortune = FortuneFactory.bind(name, options);
+	    	final FortuneClient client = FortuneClientFactory.bind(name, options);
 
 	    	final Context context = RuntimeFactory.defaultRuntime().newContext().withTimeout(
 	    		new Duration(20000)); // 20s
 
 	    	try {
-	    		fortune.get(context);
+	    		client.get(context);
 	    		fail("Expected exception during call to get() before call to add()");
 	    	} catch (VeyronException e) {
 	    		assertEquals(e, noneAdded);
 	    	}
 
 	    	final String firstMessage = "First fortune";
-	    	fortune.add(context, firstMessage);
-	    	assertEquals(firstMessage, fortune.get(context));
+	    	client.add(context, firstMessage);
+	    	assertEquals(firstMessage, client.get(context));
 
 	    	try {
-	    		fortune.getSignature(context);
+	    		client.getSignature(context);
 	    		fail("Expected Java server's signature method to return an error");
 	    	} catch (VeyronException e) {}
     	} finally {
-    		server.stop();
+    		s.stop();
     	}
     }
 

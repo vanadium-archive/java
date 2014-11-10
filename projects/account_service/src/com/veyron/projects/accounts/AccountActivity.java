@@ -18,9 +18,9 @@ import android.widget.Toast;
 
 import org.joda.time.Duration;
 
-import io.veyron.veyron.veyron.services.identity.OAuthBlesser;
-import io.veyron.veyron.veyron.services.identity.OAuthBlesser.BlessUsingAccessTokenOut;
-import io.veyron.veyron.veyron.services.identity.OAuthBlesserFactory;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
+import io.veyron.veyron.veyron.services.identity.OAuthBlesserClientFactory;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.RuntimeFactory;
 import io.veyron.veyron.veyron2.VRuntime;
@@ -156,7 +156,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 					AccountActivity.this).getString(
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
 			try {
-				final OAuthBlesser blesser = OAuthBlesserFactory.bind(identityServiceName);
+				final OAuthBlesserClient blesser = OAuthBlesserClientFactory.bind(identityServiceName);
 				final Context ctx = r.newContext().withTimeout(new Duration(20000));  // 20s
 				final BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
 				final WireBlessings blessing = reply.blessing;
