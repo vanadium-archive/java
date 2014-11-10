@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> The type of the array element.
  */
-public final class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
+public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
     private final T[] backingArray;
     private final int start, end;
 
@@ -227,10 +227,11 @@ public final class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
 
     @Override
     public List<T> subList(int start, int end) {
-        VdlType subListType = new VdlType(Kind.ARRAY);
-        subListType.setLength(end - start);
-        subListType.setElem(getType().getElem());
-        return new VdlArray<T>(subListType, backingArray, start, end);
+        VdlType.Builder builder = new VdlType.Builder();
+        VdlType.PendingType subListType = builder.newPending(Kind.ARRAY)
+                .setLength(end - start).setElem(getType().getElem());
+        builder.build();
+        return new VdlArray<T>(subListType.built(), backingArray, start, end);
     }
 
     @Override
