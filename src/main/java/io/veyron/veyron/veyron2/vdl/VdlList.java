@@ -150,7 +150,7 @@ public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
 
     @Override
     public VdlList<T> subList(int start, int end) {
-        return new VdlList<T>(getType(), impl.subList(start, end));
+        return new VdlList<T>(vdlType(), impl.subList(start, end));
     }
 
     @Override

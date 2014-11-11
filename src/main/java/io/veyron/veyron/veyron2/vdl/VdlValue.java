@@ -19,12 +19,12 @@ public abstract class VdlValue implements Serializable {
     }
 
     /**
-     * Returns the runtime vdl type of this value.
+     * Returns the runtime VDL type of this value.
      *
      * @return The {@code Type} object that represents the runtime
-     *         vdl type of this vdl value.
+     *         VDL type of this VDL value.
      */
-    public VdlType getType() {
+    public VdlType vdlType() {
         return type;
     }
 }

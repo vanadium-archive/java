@@ -234,7 +234,7 @@ public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
     public List<T> subList(int start, int end) {
         VdlType.Builder builder = new VdlType.Builder();
         VdlType.PendingType subListType = builder.newPending(Kind.ARRAY)
-                .setLength(end - start).setElem(getType().getElem());
+                .setLength(end - start).setElem(vdlType().getElem());
         builder.build();
         return new VdlArray<T>(subListType.built(), backingArray, start, end);
     }

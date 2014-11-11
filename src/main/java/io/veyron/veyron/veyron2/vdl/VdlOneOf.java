@@ -17,7 +17,7 @@ public class VdlOneOf extends VdlValue implements Parcelable {
     }
 
     private boolean assignValue(VdlType valueType, Serializable value) {
-        for (VdlType type : getType().getTypes()) {
+        for (VdlType type : vdlType().getTypes()) {
             if (type.equals(valueType)) {
                 this.value = value;
                 return true;
@@ -28,7 +28,7 @@ public class VdlOneOf extends VdlValue implements Parcelable {
     }
 
     public boolean assignValue(VdlValue value) {
-        return assignValue(value.getType(), value);
+        return assignValue(value.vdlType(), value);
     }
 
     public Serializable getValue() {

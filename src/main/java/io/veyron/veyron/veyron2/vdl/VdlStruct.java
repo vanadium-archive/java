@@ -32,7 +32,7 @@ public class VdlStruct extends AbstractVdlStruct implements Parcelable {
      */
     public boolean assignField(String name, VdlValue value) {
         VdlType expectedType = fieldTypes.get(name);
-        if (expectedType == null || !expectedType.equals(value.getType())) {
+        if (expectedType == null || !expectedType.equals(value.vdlType())) {
             return false;
         }
         fields.put(name, value);
