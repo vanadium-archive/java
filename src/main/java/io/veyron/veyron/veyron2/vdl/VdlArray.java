@@ -99,6 +99,11 @@ public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
     }
 
     @Override
+    public String toString() {
+        return Arrays.deepToString(backingArray);
+    }
+
+    @Override
     public void add(int location, T object) {
         throw new UnsupportedOperationException("add() not supported");
     }

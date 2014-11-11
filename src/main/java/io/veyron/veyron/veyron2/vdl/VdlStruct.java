@@ -64,6 +64,11 @@ public class VdlStruct extends AbstractVdlStruct implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return fields.toString();
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

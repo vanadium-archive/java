@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlFloat32 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final float value;
 
-    public VdlFloat32(float value) {
-        super(Types.FLOAT32);
+    protected VdlFloat32(VdlType type, float value) {
+        super(type);
+        assertKind(Kind.FLOAT32);
         this.value = value;
+    }
+
+    public VdlFloat32(float value) {
+        this(Types.FLOAT32, value);
     }
 
     public float getValue() {
@@ -42,6 +47,11 @@ public class VdlFloat32 extends VdlValue implements Parcelable, TypeAdapterFacto
     }
 
     @Override
+    public String toString() {
+        return Float.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlFloat32 extends VdlValue implements Parcelable, TypeAdapterFacto
     public static final Creator<VdlFloat32> CREATOR = new Creator<VdlFloat32>() {
         @Override
         public VdlFloat32 createFromParcel(Parcel in) {
-            return new VdlFloat32(in);
+            return new VdlFloat32(in.readFloat());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlFloat32 extends VdlValue implements Parcelable, TypeAdapterFacto
         }
     };
 
-    private VdlFloat32(Parcel in) {
-        this(in.readFloat());
+    protected VdlFloat32(VdlType type) {
+        this(type, 0);
     }
 
     public VdlFloat32() {

@@ -44,6 +44,11 @@ public class VdlMap<K, V> extends VdlValue implements Map<K, V>, Parcelable {
     }
 
     @Override
+    public String toString() {
+        return impl.toString();
+    }
+
+    @Override
     public void clear() {
         impl.clear();
     }

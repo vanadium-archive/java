@@ -10,10 +10,15 @@ public class VdlComplex64 extends VdlValue implements Parcelable {
     private final float real;
     private final float imag;
 
-    public VdlComplex64(float real, float imag) {
-        super(Types.COMPLEX64);
+    protected VdlComplex64(VdlType type, float real, float imag) {
+        super(type);
+        assertKind(Kind.COMPLEX64);
         this.real = real;
         this.imag = imag;
+    }
+
+    public VdlComplex64(float real, float imag) {
+        this(Types.COMPLEX64, real, imag);
     }
 
     public VdlComplex64(float real) {
@@ -40,6 +45,11 @@ public class VdlComplex64 extends VdlValue implements Parcelable {
     @Override
     public int hashCode() {
         return Float.valueOf(real).hashCode() ^ Float.valueOf(imag).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "{real=" + Float.toString(real) + ", imag=" + Float.toString(imag) + "}";
     }
 
     @Override

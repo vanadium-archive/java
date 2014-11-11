@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final boolean value;
 
-    public VdlBool(boolean value) {
-        super(Types.BOOL);
+    protected VdlBool(VdlType type, boolean value) {
+        super(type);
+        assertKind(Kind.BOOL);
         this.value = value;
+    }
+
+    public VdlBool(boolean value) {
+        this(Types.BOOL, value);
     }
 
     public boolean getValue() {
@@ -42,6 +47,11 @@ public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory 
     }
 
     @Override
+    public String toString() {
+        return Boolean.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory 
     public static final Creator<VdlBool> CREATOR = new Creator<VdlBool>() {
         @Override
         public VdlBool createFromParcel(Parcel in) {
-            return new VdlBool(in);
+            return new VdlBool(in.readByte() == 1);
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory 
         }
     };
 
-    private VdlBool(Parcel in) {
-        this(in.readByte() == 1);
+    protected VdlBool(VdlType type) {
+        this(type, false);
     }
 
     public VdlBool() {

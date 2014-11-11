@@ -214,6 +214,12 @@ public final class VdlType implements Serializable {
         return recursiveHashCode(new IdentityHashMap<Object, Void>());
     }
 
+    @Override
+    public String toString() {
+        // TODO(rogulenko): write recursive type structure
+        return "{name=" + name + ", kind=" + kind + "}";
+    }
+
     public VdlType shallowCopy() {
         VdlType copy = new VdlType();
         copy.kind = this.kind;

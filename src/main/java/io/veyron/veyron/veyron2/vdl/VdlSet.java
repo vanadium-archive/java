@@ -43,6 +43,11 @@ public class VdlSet<T> extends VdlValue implements Set<T>, Parcelable {
     }
 
     @Override
+    public String toString() {
+        return impl.toString();
+    }
+
+    @Override
     public void clear() {
         impl.clear();
     }

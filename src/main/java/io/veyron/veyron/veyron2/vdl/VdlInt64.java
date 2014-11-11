@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlInt64 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final long value;
 
-    public VdlInt64(long value) {
-        super(Types.INT64);
+    protected VdlInt64(VdlType type, long value) {
+        super(type);
+        assertKind(Kind.INT64);
         this.value = value;
+    }
+
+    public VdlInt64(long value) {
+        this(Types.INT64, value);
     }
 
     public long getValue() {
@@ -42,6 +47,11 @@ public class VdlInt64 extends VdlValue implements Parcelable, TypeAdapterFactory
     }
 
     @Override
+    public String toString() {
+        return Long.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlInt64 extends VdlValue implements Parcelable, TypeAdapterFactory
     public static final Creator<VdlInt64> CREATOR = new Creator<VdlInt64>() {
         @Override
         public VdlInt64 createFromParcel(Parcel in) {
-            return new VdlInt64(in);
+            return new VdlInt64(in.readLong());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlInt64 extends VdlValue implements Parcelable, TypeAdapterFactory
         }
     };
 
-    private VdlInt64(Parcel in) {
-        this(in.readLong());
+    protected VdlInt64(VdlType type) {
+        this(type, 0);
     }
 
     public VdlInt64() {

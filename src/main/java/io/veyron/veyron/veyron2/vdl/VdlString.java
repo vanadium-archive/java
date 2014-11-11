@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final String value;
 
-    public VdlString(String value) {
-        super(Types.STRING);
+    protected VdlString(VdlType type, String value) {
+        super(type);
+        assertKind(Kind.STRING);
         this.value = value;
+    }
+
+    public VdlString(String value) {
+        this(Types.STRING, value);
     }
 
     public String getValue() {
@@ -42,6 +47,11 @@ public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactor
     }
 
     @Override
+    public String toString() {
+        return value;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactor
     public static final Creator<VdlString> CREATOR = new Creator<VdlString>() {
         @Override
         public VdlString createFromParcel(Parcel in) {
-            return new VdlString(in);
+            return new VdlString(in.readString());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactor
         }
     };
 
-    private VdlString(Parcel in) {
-        this(in.readString());
+    protected VdlString(VdlType type) {
+        this(type, "");
     }
 
     public VdlString() {

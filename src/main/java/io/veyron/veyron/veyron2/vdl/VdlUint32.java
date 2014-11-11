@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final int value;
 
-    public VdlUint32(int value) {
-        super(Types.UINT32);
+    protected VdlUint32(VdlType type, int value) {
+        super(type);
+        assertKind(Kind.UINT32);
         this.value = value;
+    }
+
+    public VdlUint32(int value) {
+        this(Types.UINT32, value);
     }
 
     public int getValue() {
@@ -42,6 +47,11 @@ public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactor
     }
 
     @Override
+    public String toString() {
+        return Integer.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactor
     public static final Creator<VdlUint32> CREATOR = new Creator<VdlUint32>() {
         @Override
         public VdlUint32 createFromParcel(Parcel in) {
-            return new VdlUint32(in);
+            return new VdlUint32(in.readInt());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlUint32 extends VdlValue implements Parcelable, TypeAdapterFactor
         }
     };
 
-    private VdlUint32(Parcel in) {
-        this(in.readInt());
+    protected VdlUint32(VdlType type) {
+        this(type, 0);
     }
 
     public VdlUint32() {

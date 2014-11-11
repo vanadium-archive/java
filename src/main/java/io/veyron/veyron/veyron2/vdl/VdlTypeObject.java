@@ -33,6 +33,11 @@ public final class VdlTypeObject extends VdlValue implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return typeObject.toString();
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

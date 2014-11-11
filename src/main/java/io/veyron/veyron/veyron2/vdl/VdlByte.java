@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final byte value;
 
-    public VdlByte(byte value) {
-        super(Types.BYTE);
+    protected VdlByte(VdlType type, byte value) {
+        super(type);
+        assertKind(Kind.BYTE);
         this.value = value;
+    }
+
+    public VdlByte(byte value) {
+        this(Types.BYTE, value);
     }
 
     public byte getValue() {
@@ -42,6 +47,11 @@ public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory 
     }
 
     @Override
+    public String toString() {
+        return Byte.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory 
     public static final Creator<VdlByte> CREATOR = new Creator<VdlByte>() {
         @Override
         public VdlByte createFromParcel(Parcel in) {
-            return new VdlByte(in);
+            return new VdlByte(in.readByte());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory 
         }
     };
 
-    private VdlByte(Parcel in) {
-        this(in.readByte());
+    protected VdlByte(VdlType type) {
+        this(type, (byte) 0);
     }
 
     public VdlByte() {

@@ -44,6 +44,11 @@ public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
     }
 
     @Override
+    public String toString() {
+        return impl.toString();
+    }
+
+    @Override
     public void add(int location, T object) {
         impl.add(location, object);
     }

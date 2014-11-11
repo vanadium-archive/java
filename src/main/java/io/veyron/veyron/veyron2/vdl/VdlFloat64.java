@@ -18,9 +18,14 @@ import java.io.IOException;
 public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final double value;
 
-    public VdlFloat64(double value) {
-        super(Types.FLOAT64);
+    protected VdlFloat64(VdlType type, double value) {
+        super(type);
+        assertKind(Kind.FLOAT64);
         this.value = value;
+    }
+
+    public VdlFloat64(double value) {
+        this(Types.FLOAT64, value);
     }
 
     public double getValue() {
@@ -42,6 +47,11 @@ public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFacto
     }
 
     @Override
+    public String toString() {
+        return Double.toString(value);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -54,7 +64,7 @@ public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFacto
     public static final Creator<VdlFloat64> CREATOR = new Creator<VdlFloat64>() {
         @Override
         public VdlFloat64 createFromParcel(Parcel in) {
-            return new VdlFloat64(in);
+            return new VdlFloat64(in.readDouble());
         }
 
         @Override
@@ -63,8 +73,8 @@ public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFacto
         }
     };
 
-    private VdlFloat64(Parcel in) {
-        this(in.readDouble());
+    protected VdlFloat64(VdlType type) {
+        this(type, 0);
     }
 
     public VdlFloat64() {

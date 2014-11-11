@@ -10,10 +10,15 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
     private final double real;
     private final double imag;
 
-    public VdlComplex128(double real, double imag) {
-        super(Types.COMPLEX128);
+    protected VdlComplex128(VdlType type, double real, double imag) {
+        super(type);
+        assertKind(Kind.COMPLEX128);
         this.real = real;
         this.imag = imag;
+    }
+
+    public VdlComplex128(double real, double imag) {
+        this(Types.COMPLEX128, real, imag);
     }
 
     public VdlComplex128(double real) {
@@ -40,6 +45,11 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
     @Override
     public int hashCode() {
         return Double.valueOf(real).hashCode() ^ Double.valueOf(imag).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "{real=" + Double.toString(real) + ", imag=" + Double.toString(imag) + "}";
     }
 
     @Override
