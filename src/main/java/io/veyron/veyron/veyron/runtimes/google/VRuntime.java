@@ -1,6 +1,5 @@
 package io.veyron.veyron.veyron.runtimes.google;
 
-import io.veyron.veyron.veyron.runtimes.google.android.RedirectStderr;
 import io.veyron.veyron.veyron.runtimes.google.ipc.Client;
 import io.veyron.veyron.veyron.runtimes.google.ipc.Server;
 import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
@@ -33,23 +32,14 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	/**
 	 * Returns the initialized global instance of the runtime.
 	 *
-	 * @param  ctx  android context.
 	 * @param  opts runtime options.
 	 * @return      a pre-initialized runtime instance.
 	 */
-	public static synchronized VRuntime initRuntime(android.content.Context ctx, Options opts) {
+	public static synchronized VRuntime initRuntime(Options opts) throws VeyronException {
 		if (VRuntime.globalRuntime == null) {
-			if (opts == null) {
-				opts = new Options();
-			}
-			try {
-				setupRuntimeOptions(ctx, opts);
-				final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-				VRuntime.globalRuntime = new VRuntime(nativeInit(opts), principal);
-			} catch (VeyronException e) {
-				throw new RuntimeException(
-					"Couldn't initialize global Veyron Runtime instance: " + e.getMessage());
-			}
+			// TODO(spetrovic): remove this.
+			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
+			VRuntime.globalRuntime = new VRuntime(nativeInit(opts), principal);
 		}
 		return VRuntime.globalRuntime;
 	}
@@ -67,56 +57,17 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	/**
 	 * Creates and initializes a new Runtime instance.
 	 *
-	 * @param  ctx  android context.
 	 * @param  opts runtime options.
 	 * @return      a new runtime instance.
 	 */
-	public static synchronized VRuntime newRuntime(android.content.Context ctx, Options opts) {
-		if (opts == null) {
-			opts = new Options();
-		}
+	public static synchronized VRuntime newRuntime(Options opts) throws VeyronException {
 		try {
-			setupRuntimeOptions(ctx, opts);
+			// TODO(spetrovic): remove this.
 			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
 			return new VRuntime(nativeNewRuntime(opts), principal);
 		} catch (VeyronException e) {
 			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
 		}
-	}
-
-	private static void setupRuntimeOptions(android.content.Context ctx, Options opts)
-		throws VeyronException {
-		if (!opts.has(OptionDefs.RUNTIME_PRINCIPAL) ||
-			opts.get(OptionDefs.RUNTIME_PRINCIPAL) == null) {
-			// Check if the private key has already been generated for this package.
-			// (NOTE: Android package names are unique.)
-			KeyStore.PrivateKeyEntry keyEntry =
-				CryptoUtil.getKeyStorePrivateKey(ctx.getPackageName());
-			if (keyEntry == null) {
-				// Generate a new private key.
-				keyEntry = CryptoUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
-			}
-			final Signer signer = new ECDSASigner(
-				keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
-			final Principal principal = createPrincipal(ctx, signer);
-			opts.set(OptionDefs.RUNTIME_PRINCIPAL, principal);
-		}
-	}
-
-	private static Principal createPrincipal(android.content.Context ctx, Signer signer)
-		throws VeyronException {
-		final Principal principal = Security.newPrincipal(signer);
-		final Blessings blessings = principal.blessSelf(ctx.getPackageName());
-		principal.blessingStore().setDefaultBlessings(blessings);
-		principal.blessingStore().set(blessings, SecurityConstants.ALL_PRINCIPALS);
-		principal.addToRoots(blessings);
-		return principal;
-	}
-
-	static {
-		System.loadLibrary("jniwrapper");
-		System.loadLibrary("veyronjni");
-		RedirectStderr.Start();
 	}
 
 	private final long nativePtr;

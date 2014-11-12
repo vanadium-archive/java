@@ -1,11 +1,23 @@
 package io.veyron.veyron.veyron2;
 
-import android.content.Context;
+import go.Go;
+import io.veyron.veyron.veyron2.OptionDefs;
+import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.security.Blessings;
+import io.veyron.veyron.veyron2.security.ECDSASigner;
+import io.veyron.veyron.veyron2.security.Principal;
+import io.veyron.veyron.veyron2.security.Security;
+import io.veyron.veyron.veyron2.security.SecurityConstants;
+import io.veyron.veyron.veyron2.security.Signer;
+
+import java.security.KeyStore;
+import java.security.interfaces.ECPublicKey;
 
 /**
- * RuntimeFactory creates new runtimes.  It represents an entry point into the Veyron codebase.
- * The expected usage pattern of this class goes something like this:
+ * RuntimeFactory creates new Java runtimes.  It represents an entry point into the Veyron
+ * codebase.  The expected usage pattern of this class goes something like this:
  *
  *    RuntimeFactory.initRuntime(...);
  *    ...
@@ -17,17 +29,31 @@ import io.veyron.veyron.veyron2.VRuntime;
  */
 public class RuntimeFactory {
 	/**
+	 * Initializes the Veyron native runtime code.
+	 */
+	private static native void nativeInit();
+
+	static {
+		System.loadLibrary("jniwrapper");
+		System.loadLibrary("veyronjni");
+		Go.init();
+		nativeInit();
+	}
+
+	/**
 	 * Initializes the global instance of the runtime.  Calling this method multiple times
 	 * will always return the result of the first call to {@code init()} (ignoring subsequently
 	 * provided options). All Veyron apps should call {@code init()} as the first thing in their
 	 * execution flow.
 	 *
-	 * @param ctx   android context.
 	 * @param opts  runtime options.
 	 * @return      a pre-initialized runtime instance.
 	 */
-	public static synchronized VRuntime initRuntime(Context ctx, Options opts) {
-		return io.veyron.veyron.veyron.runtimes.google.VRuntime.initRuntime(ctx, opts);
+	public static synchronized VRuntime initRuntime(Options opts) throws VeyronException {
+		if (opts == null) {
+			opts = new Options();
+		}
+		return io.veyron.veyron.veyron.runtimes.google.VRuntime.initRuntime(opts);
 	}
 
 	/**
@@ -37,19 +63,25 @@ public class RuntimeFactory {
 	 *
 	 * @return default runtime instance.
 	 */
-	public static synchronized VRuntime defaultRuntime() {
-		return io.veyron.veyron.veyron.runtimes.google.VRuntime.defaultRuntime();
+	public static synchronized VRuntime defaultRuntime() throws VeyronException {
+		final VRuntime r = io.veyron.veyron.veyron.runtimes.google.VRuntime.defaultRuntime();
+		if (r == null) {
+			throw new VeyronException("Must call RuntimeFactory:initRuntime() first.");
+		}
+		return r;
 	}
 
 	/**
 	 * Creates and initializes a new runtime instance.  This method should be used in unit tests
 	 * and any situation where a single global runtime instance is inappropriate.
 	 *
-	 * @param ctx   android context.
 	 * @param opts  runtime options.
 	 * @return      a new runtime instance.
 	 */
-	public static VRuntime newRuntime(Context ctx, Options opts) {
-		return io.veyron.veyron.veyron.runtimes.google.VRuntime.newRuntime(ctx, opts);
+	public static VRuntime newRuntime(Options opts) throws VeyronException {
+		if (opts == null) {
+			opts = new Options();
+		}
+		return io.veyron.veyron.veyron.runtimes.google.VRuntime.newRuntime(opts);
 	}
 }

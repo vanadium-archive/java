@@ -1,5 +1,5 @@
 
-package io.veyron.veyron.veyron.runtimes.google.android;
+package io.veyron.veyron.veyron2.android;
 
 import java.io.BufferedReader;
 import java.io.FileDescriptor;
