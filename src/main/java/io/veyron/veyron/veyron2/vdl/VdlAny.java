@@ -3,19 +3,36 @@ package io.veyron.veyron.veyron2.vdl;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
+
 /**
  * VdlAny is a representation of a VDL any.
  */
 public final class VdlAny extends VdlValue implements Parcelable {
-    private final VdlValue value;
+    private final Serializable value;
+    private VdlType elemType;
 
-    public VdlAny(VdlValue value) {
+    private VdlAny(VdlType type, Serializable value) {
         super(Types.ANY);
         this.value = value;
+        elemType = type;
     }
 
-    public VdlValue getValue() {
+    public VdlAny(Type type, Serializable value) {
+        this(Types.getVdlTypeFromReflection(type), value);
+    }
+
+    public VdlAny(VdlValue value) {
+        this(value.vdlType(), value);
+    }
+
+    public Serializable getValue() {
         return value;
+    }
+
+    public VdlType getElemType() {
+        return elemType;
     }
 
     @Override

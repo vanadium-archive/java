@@ -3,6 +3,8 @@ package io.veyron.veyron.veyron2.vdl;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Type;
+
 /**
  * VdlTypeObject is a representation of a VDL typeObject.
  */
@@ -12,6 +14,10 @@ public final class VdlTypeObject extends VdlValue implements Parcelable {
     public VdlTypeObject(VdlType typeObject) {
         super(Types.TYPEOBJECT);
         this.typeObject = typeObject;
+    }
+
+    public VdlTypeObject(Type type) {
+        this(Types.getVdlTypeFromReflection(type));
     }
 
     public VdlType getTypeObject() {

@@ -4,35 +4,60 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 
 /**
  * VdlOneOf is a representation of a VDL oneOf.
  */
 public class VdlOneOf extends VdlValue implements Parcelable {
     private Serializable value;
+    private VdlType elemType;
 
     public VdlOneOf(VdlType type) {
         super(type);
         assertKind(Kind.ONE_OF);
     }
 
-    private boolean assignValue(VdlType valueType, Serializable value) {
+    private VdlOneOf assignValue(VdlType elemType, Serializable value) {
         for (VdlType type : vdlType().getTypes()) {
-            if (type.equals(valueType)) {
+            if (type.equals(elemType)) {
                 this.value = value;
-                return true;
+                this.elemType = type;
+                return this;
             }
         }
-        this.value = null;
-        return false;
+        return null;
     }
 
-    public boolean assignValue(VdlValue value) {
+    /**
+     * Tries to assign a value to the {@code VdlOneOf} object. Doesn't modify this object if
+     * provided type is incompatible.
+     *
+     * @param type the runtime type of the value
+     * @param value the value to assign
+     * @return this {@code VdlOneOf} object or null if the value has incompatible type
+     */
+    public VdlOneOf assignValue(Type type, Serializable value) {
+        return assignValue(Types.getVdlTypeFromReflection(type), value);
+    }
+
+    /**
+     * Tries to assign a value to the {@code VdlOneOf} object. Doesn't modify this object if
+     * provided type is incompatible.
+     *
+     * @param value the value to assign
+     * @return this {@code VdlOneOf} object or null if the value has incompatible type
+     */
+    public VdlOneOf assignValue(VdlValue value) {
         return assignValue(value.vdlType(), value);
     }
 
     public Serializable getValue() {
         return value;
+    }
+
+    public VdlType getElemType() {
+        return elemType;
     }
 
     @Override
