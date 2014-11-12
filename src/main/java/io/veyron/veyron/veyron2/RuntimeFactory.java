@@ -28,9 +28,6 @@ import java.security.interfaces.ECPublicKey;
  *    ...
  */
 public class RuntimeFactory {
-	/**
-	 * Initializes the Veyron native runtime code.
-	 */
 	private static native void nativeInit();
 
 	static {

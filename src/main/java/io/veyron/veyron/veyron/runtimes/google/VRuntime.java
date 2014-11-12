@@ -2,7 +2,7 @@ package io.veyron.veyron.veyron.runtimes.google;
 
 import io.veyron.veyron.veyron.runtimes.google.ipc.Client;
 import io.veyron.veyron.veyron.runtimes.google.ipc.Server;
-import io.veyron.veyron.veyron.runtimes.google.naming.Namespace;
+import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.context.Context;
@@ -37,7 +37,7 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	 */
 	public static synchronized VRuntime initRuntime(Options opts) throws VeyronException {
 		if (VRuntime.globalRuntime == null) {
-			// TODO(spetrovic): remove this.
+			// Use principal passed-in through options, if available.
 			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
 			VRuntime.globalRuntime = new VRuntime(nativeInit(opts), principal);
 		}
@@ -62,7 +62,7 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	 */
 	public static synchronized VRuntime newRuntime(Options opts) throws VeyronException {
 		try {
-			// TODO(spetrovic): remove this.
+			// Use principal passed-in through options, if available.
 			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
 			return new VRuntime(nativeNewRuntime(opts), principal);
 		} catch (VeyronException e) {
@@ -72,13 +72,14 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 
 	private final long nativePtr;
 	private Client client;
-	private final Principal principal;  // non-null
+	private final Principal principal;
 
 	private native Client nativeNewClient(long nativePtr, Options opts) throws VeyronException;
 	private native Server nativeNewServer(long nativePtr, Options opts) throws VeyronException;
 	private native Client nativeGetClient(long nativePtr) throws VeyronException;
 	private native Context nativeNewContext(long nativePtr) throws VeyronException;
-	private native long nativeGetNamespace(long nativePtr);
+	private native Principal nativeGetPrincipal(long nativePtr) throws VeyronException;
+	private native Namespace nativeGetNamespace(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
 	private VRuntime(long nativePtr, Principal principal) {
@@ -124,11 +125,24 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	}
 	@Override
 	public Principal getPrincipal() {
-		return this.principal;
+		if (this.principal != null) {
+			return this.principal;
+		}
+		try {
+			return nativeGetPrincipal(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get principal: " + e.getMessage());
+			return null;
+		}
 	}
 	@Override
-	public io.veyron.veyron.veyron2.naming.Namespace getNamespace() {
-		return new Namespace(nativeGetNamespace(this.nativePtr));
+	public Namespace getNamespace() {
+		try {
+			return nativeGetNamespace(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get namespace: " + e.getMessage());
+			return null;
+		}
 	}
 	@Override
 	protected void finalize() {
