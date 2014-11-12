@@ -299,7 +299,7 @@ public final class Types {
 
         public ReflectToVdlTypeBuilder() {
             builder = new Builder();
-            pendingTypes = new HashMap<>();
+            pendingTypes = new HashMap<Type, PendingType>();
         }
 
         public void buildAndCache() {

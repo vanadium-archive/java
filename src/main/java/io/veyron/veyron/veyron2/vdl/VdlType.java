@@ -244,7 +244,7 @@ public final class VdlType implements Serializable {
         private final List<PendingType> pendingTypes;
 
         public Builder() {
-            pendingTypes = new ArrayList<>();
+            pendingTypes = new ArrayList<PendingType>();
         }
 
         public PendingType newPending() {
@@ -298,9 +298,9 @@ public final class VdlType implements Serializable {
 
         private PendingType() {
             vdlType = new VdlType();
-            labels = new ArrayList<>();
-            types = new ArrayList<>();
-            fields = new ArrayList<>();
+            labels = new ArrayList<String>();
+            types = new ArrayList<VdlType>();
+            fields = new ArrayList<VdlStructField>();
             built = false;
         }
 
