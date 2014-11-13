@@ -382,7 +382,12 @@ public final class Types {
             } else {
                 pending.assignBase(lookupOrBuildPending(klass.getGenericSuperclass()));
             }
-            pending.setName(klass.getName());
+            GeneratedFromVdlType vdlName = klass.getAnnotation(GeneratedFromVdlType.class);
+            if (vdlName != null) {
+                pending.setName(vdlName.value());
+            } else {
+                pending.setName(klass.getName());
+            }
             return pending;
         }
 
