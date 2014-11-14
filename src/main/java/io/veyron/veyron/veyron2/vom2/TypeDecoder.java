@@ -27,9 +27,9 @@ final class TypeDecoder {
      * @return The type if found or null if not defined.
      */
     public VdlType lookupType(long typeId) {
-        BootstrapType bt = BootstrapType.findBootstrapTypeById(typeId);
+        VdlType bt = BootstrapType.getBootstrapType(new TypeID(typeId));
         if (bt != null) {
-            return bt.getType();
+            return bt;
         }
 
         return definedTypes.get(typeId);
@@ -215,170 +215,162 @@ final class TypeDecoder {
     // defined out of order!
     private PartialType readType(RawVomReader reader) throws CorruptVomStreamException, IOException {
         int wiretypeKind = (int) reader.readUint();
-        switch (BootstrapType.findBootstrapTypeById(wiretypeKind)) {
-            case WIRE_NAMED: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                long baseTypeId = 0;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            baseTypeId = reader.readUint();
-                            break;
-                    }
-                    nextIndex = reader.readUint();
+        if (wiretypeKind == Vom2Constants.WIRE_NAMED_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            long baseTypeId = 0;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        baseTypeId = reader.readUint();
+                        break;
                 }
-                PartialType pt = new PartialType();
-                pt.name = name;
-                pt.baseTypeId = baseTypeId;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_ENUM: {
-                throw new RuntimeException("Not yet implemented");
-            }
-            case WIRE_ARRAY: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                Long elemTypeId = null;
-                long length = 0;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            elemTypeId = reader.readUint();
-                            break;
-                        case 3:
-                            length = reader.readUint();
-                    }
-                    nextIndex = reader.readUint();
+            PartialType pt = new PartialType();
+            pt.name = name;
+            pt.baseTypeId = baseTypeId;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_ENUM_ID.getValue()) {
+            throw new RuntimeException("Not yet implemented");
+        } else if (wiretypeKind == Vom2Constants.WIRE_ARRAY_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            Long elemTypeId = null;
+            long length = 0;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        elemTypeId = reader.readUint();
+                        break;
+                    case 3:
+                        length = reader.readUint();
                 }
-                PartialType pt = new PartialType();
-                pt.kind = Kind.ARRAY;
-                pt.length = (int) length;
-                pt.elemTypeId = elemTypeId;
-                pt.name = name;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_LIST: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                Long elemTypeId = null;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            elemTypeId = reader.readUint();
-                            break;
-                    }
-                    nextIndex = reader.readUint();
+            PartialType pt = new PartialType();
+            pt.kind = Kind.ARRAY;
+            pt.length = (int) length;
+            pt.elemTypeId = elemTypeId;
+            pt.name = name;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_LIST_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            Long elemTypeId = null;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        elemTypeId = reader.readUint();
+                        break;
                 }
-                PartialType pt = new PartialType();
-                pt.kind = Kind.LIST;
-                pt.elemTypeId = elemTypeId;
-                pt.name = name;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_SET: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                Long elemTypeId = null;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            elemTypeId = reader.readUint();
-                            break;
-                    }
-                    nextIndex = reader.readUint();
+            PartialType pt = new PartialType();
+            pt.kind = Kind.LIST;
+            pt.elemTypeId = elemTypeId;
+            pt.name = name;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_SET_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            Long elemTypeId = null;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        elemTypeId = reader.readUint();
+                        break;
                 }
-                PartialType pt = new PartialType();
-                pt.kind = Kind.SET;
-                pt.keyTypeId = elemTypeId;
-                pt.name = name;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_MAP: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                Long keyTypeId = null;
-                Long elemTypeId = null;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            keyTypeId = reader.readUint();
-                            break;
-                        case 3:
-                            elemTypeId = reader.readUint();
-                            break;
-                    }
-                    nextIndex = reader.readUint();
+            PartialType pt = new PartialType();
+            pt.kind = Kind.SET;
+            pt.keyTypeId = elemTypeId;
+            pt.name = name;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_MAP_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            Long keyTypeId = null;
+            Long elemTypeId = null;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        keyTypeId = reader.readUint();
+                        break;
+                    case 3:
+                        elemTypeId = reader.readUint();
+                        break;
                 }
-                PartialType pt = new PartialType();
-                pt.kind = Kind.MAP;
-                pt.keyTypeId = keyTypeId;
-                pt.elemTypeId = elemTypeId;
-                pt.name = name;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_STRUCT: {
-                long nextIndex = reader.readUint();
-                String name = null;
-                PartialStructField[] fields = null;
-                while (nextIndex != 0) {
-                    switch ((int) nextIndex) {
-                        case 1:
-                            name = reader.readString();
-                            break;
-                        case 2:
-                            int numFields = (int) reader.readUint();
-                            fields = new PartialStructField[numFields];
-                            for (int i = 0; i < numFields; i++) {
-                                String fieldName = null;
-                                Long fieldTypeId = null;
-                                long nextFieldIndex = reader.readUint();
-                                while (nextFieldIndex != 0) {
-                                    switch ((int) nextFieldIndex) {
-                                        case 1:
-                                            fieldName = reader.readString();
-                                            break;
-                                        case 2:
-                                            fieldTypeId = reader.readUint();
-                                            break;
-                                    }
-                                    nextFieldIndex = reader.readUint();
+            PartialType pt = new PartialType();
+            pt.kind = Kind.MAP;
+            pt.keyTypeId = keyTypeId;
+            pt.elemTypeId = elemTypeId;
+            pt.name = name;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_STRUCT_ID.getValue()) {
+            long nextIndex = reader.readUint();
+            String name = null;
+            PartialStructField[] fields = null;
+            while (nextIndex != 0) {
+                switch ((int) nextIndex) {
+                    case 1:
+                        name = reader.readString();
+                        break;
+                    case 2:
+                        int numFields = (int) reader.readUint();
+                        fields = new PartialStructField[numFields];
+                        for (int i = 0; i < numFields; i++) {
+                            String fieldName = null;
+                            Long fieldTypeId = null;
+                            long nextFieldIndex = reader.readUint();
+                            while (nextFieldIndex != 0) {
+                                switch ((int) nextFieldIndex) {
+                                    case 1:
+                                        fieldName = reader.readString();
+                                        break;
+                                    case 2:
+                                        fieldTypeId = reader.readUint();
+                                        break;
                                 }
-                                fields[i] = new PartialStructField(fieldName, fieldTypeId);
+                                nextFieldIndex = reader.readUint();
                             }
-                            break;
-                    }
-                    nextIndex = reader.readUint();
+                            fields[i] = new PartialStructField(fieldName, fieldTypeId);
+                        }
+                        break;
                 }
-                PartialType pt = new PartialType();
-                pt.kind = Kind.STRUCT;
-                pt.fields = fields;
-                pt.name = name;
-                return pt;
+                nextIndex = reader.readUint();
             }
-            case WIRE_ONE_OF:
-                throw new RuntimeException("Not yet implemented");
-            default:
-                throw new CorruptVomStreamException("Unknown wiretype kind: " + wiretypeKind);
+            PartialType pt = new PartialType();
+            pt.kind = Kind.STRUCT;
+            pt.fields = fields;
+            pt.name = name;
+            return pt;
+        } else if (wiretypeKind == Vom2Constants.WIRE_ONE_OF_ID.getValue()) {
+            throw new RuntimeException("Not yet implemented");
+        } else {
+            throw new CorruptVomStreamException("Unknown wiretype kind: " + wiretypeKind);
         }
     }
 
-    private static final class PartialType {
+    final class PartialType {
         public Long baseTypeId; // used by named
 
         public Kind kind; // used by all kinds
@@ -394,7 +386,7 @@ final class TypeDecoder {
         }
     }
 
-    private static final class PartialStructField {
+    final class PartialStructField {
         String name;
         long typeId;
 

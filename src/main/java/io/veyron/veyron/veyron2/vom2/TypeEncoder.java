@@ -7,8 +7,6 @@ import java.util.HashMap;
 import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
-import io.veyron.veyron.veyron2.wiretype.FieldType;
-import io.veyron.veyron.veyron2.wiretype.TypeID;
 
 /**
  * TypeEncoder maintains a mapping of types to type ids and assists in encoding
@@ -31,9 +29,9 @@ final class TypeEncoder {
      */
     public long encodeType(RawEncoder enc, VdlType t) throws IOException {
         // Bootstrap type?
-        BootstrapType bt = BootstrapType.findBootstrapType(t);
+        TypeID bt = BootstrapType.getBootstrapTypeId(t);
         if (bt != null) {
-            return bt.getId();
+            return bt.getValue();
         }
 
         // Already sent type?
@@ -66,18 +64,18 @@ final class TypeEncoder {
             case STRING: {
                 long primId = encodeType(enc, Types.primitiveTypeFromKind(t.getKind()));
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_NAMED.getId());
+                enc.writeUint64(Vom2Constants.WIRE_NAMED_ID.getValue());
                 enc.writeNextStructFieldIndex(1);
                 enc.writeString(t.getName());
                 enc.writeNextStructFieldIndex(2);
                 enc.writeTypeId(primId);
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_NAMED.getType());
+                enc.endMessage(WireNamed.VDL_TYPE);
                 break;
             }
             case ENUM: {
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_ENUM.getId());
+                enc.writeUint64(Vom2Constants.WIRE_ENUM_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -88,13 +86,13 @@ final class TypeEncoder {
                     enc.writeString(s);
                 }
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_ENUM.getType());
+                enc.endMessage(WireEnum.VDL_TYPE);
                 break;
             }
             case ARRAY: {
                 long elemid = encodeType(enc, t.getElem());
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_ARRAY.getId());
+                enc.writeUint64(Vom2Constants.WIRE_ARRAY_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -104,13 +102,13 @@ final class TypeEncoder {
                 enc.writeNextStructFieldIndex(3);
                 enc.writeUint64(t.getLength());
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_ARRAY.getType());
+                enc.endMessage(WireArray.VDL_TYPE);
                 break;
             }
             case LIST: {
                 long elemid = encodeType(enc, t.getElem());
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_LIST.getId());
+                enc.writeUint64(Vom2Constants.WIRE_LIST_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -118,13 +116,13 @@ final class TypeEncoder {
                 enc.writeNextStructFieldIndex(2);
                 enc.writeTypeId(elemid);
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_LIST.getType());
+                enc.endMessage(WireList.VDL_TYPE);
             }
                 break;
             case SET: {
                 long keyid = encodeType(enc, t.getKey());
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_SET.getId());
+                enc.writeUint64(Vom2Constants.WIRE_SET_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -132,14 +130,14 @@ final class TypeEncoder {
                 enc.writeNextStructFieldIndex(2);
                 enc.writeTypeId(keyid);
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_SET.getType());
+                enc.endMessage(WireSet.VDL_TYPE);
             }
                 break;
             case MAP: {
                 long keyid = encodeType(enc, t.getKey());
                 long elemid = encodeType(enc, t.getElem());
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_MAP.getId());
+                enc.writeUint64(Vom2Constants.WIRE_MAP_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -149,25 +147,25 @@ final class TypeEncoder {
                 enc.writeNextStructFieldIndex(3);
                 enc.writeTypeId(elemid);
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_MAP.getType());
+                enc.endMessage(WireMap.VDL_TYPE);
             }
                 break;
             case STRUCT: {
-                ArrayList<FieldType> fieldTypes = new ArrayList<FieldType>();
+                ArrayList<WireField> fieldTypes = new ArrayList<WireField>();
                 for (VdlStructField f : t.getFields()) {
                     long fid = encodeType(enc, f.getType());
-                    fieldTypes.add(new FieldType(new TypeID(fid), f.getName()));
+                    fieldTypes.add(new WireField(f.getName(), new TypeID(fid)));
                 }
 
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_STRUCT.getId());
+                enc.writeUint64(Vom2Constants.WIRE_STRUCT_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
                 }
                 enc.writeNextStructFieldIndex(2);
                 enc.writeUint64(fieldTypes.size());
-                for (FieldType ft : fieldTypes) {
+                for (WireField ft : fieldTypes) {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(ft.getName());
                     enc.writeNextStructFieldIndex(2);
@@ -175,7 +173,7 @@ final class TypeEncoder {
                     enc.writeStructEnd();
                 }
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_STRUCT.getType());
+                enc.endMessage(WireStruct.VDL_TYPE);
             }
                 break;
             case ONE_OF: {
@@ -185,7 +183,7 @@ final class TypeEncoder {
                 }
 
                 enc.startTypeMessage(typeId);
-                enc.writeUint64(BootstrapType.WIRE_ONE_OF.getId());
+                enc.writeUint64(Vom2Constants.WIRE_ONE_OF_ID.getValue());
                 if (t.getName() != null && t.getName() != "") {
                     enc.writeNextStructFieldIndex(1);
                     enc.writeString(t.getName());
@@ -196,7 +194,7 @@ final class TypeEncoder {
                     enc.writeUint64(l);
                 }
                 enc.writeStructEnd();
-                enc.endMessage(BootstrapType.WIRE_ONE_OF.getType());
+                enc.endMessage(WireOneOf.VDL_TYPE);
             }
                 break;
             default:
