@@ -1,5 +1,6 @@
 package io.veyron.veyron.veyron2.vdl;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
 import java.io.Serializable;
@@ -104,6 +105,52 @@ public final class VdlType implements Serializable {
 
     public void setFields(List<VdlStructField> fields) {
         this.fields = ImmutableList.copyOf(fields);
+    }
+
+    private static String typeString(VdlType type,
+            final java.util.IdentityHashMap<VdlType, Boolean> seen) {
+        if (seen.containsKey(type) && type.name != null) {
+            return type.name;
+        }
+        seen.put(type, true);
+        String result = "";
+        if (type.name != null) {
+            result = type.name + " ";
+        }
+        switch (type.kind) {
+            case ENUM:
+                return result + "enum{" + Joiner.on(";").join(type.labels) + "}";
+            case ARRAY:
+                return result + "[" + type.length + "]" + typeString(type.elem, seen);
+            case LIST:
+                return result + "[]" + typeString(type.elem, seen);
+            case SET:
+                return result + "set[" + typeString(type.key, seen) + "]";
+            case MAP:
+                return result + "map[" + typeString(type.key, seen) + "]"
+                        + typeString(type.elem, seen);
+            case STRUCT:
+                result += "struct{";
+                for (int i = 0; i < type.fields.size(); i++) {
+                    if (i > 0) {
+                        result += ";";
+                    }
+                    VdlStructField field = type.fields.get(i);
+                    result += field.getName() + " " + typeString(field.getType(), seen);
+                }
+                return result + "}";
+            case ONE_OF:
+                result += "oneof{";
+                for (int i = 0; i < type.types.size(); i++) {
+                    if (i > 0) {
+                        result += ";";
+                    }
+                    result += typeString(type.types.get(i), seen);
+                }
+                return result + "}";
+            default:
+                return result + type.kind.name().toLowerCase();
+            }
     }
 
     private boolean equal(Object a, Object b) {
@@ -216,8 +263,7 @@ public final class VdlType implements Serializable {
 
     @Override
     public String toString() {
-        // TODO(rogulenko): write recursive type structure
-        return "{name=" + name + ", kind=" + kind + "}";
+        return typeString(this, new IdentityHashMap<VdlType, Boolean>());
     }
 
     public VdlType shallowCopy() {
@@ -308,14 +354,18 @@ public final class VdlType implements Serializable {
             if (built) {
                 return;
             }
-            if (labels.size() > 0) {
-                vdlType.labels = ImmutableList.copyOf(labels);
-            }
-            if (types.size() > 0) {
-                vdlType.types = ImmutableList.copyOf(types);
-            }
-            if (fields.size() > 0) {
-                vdlType.fields = ImmutableList.copyOf(fields);
+            switch (vdlType.kind) {
+                case ENUM:
+                    vdlType.labels = ImmutableList.copyOf(labels);
+                    break;
+                case ONE_OF:
+                    vdlType.types = ImmutableList.copyOf(types);
+                    break;
+                case STRUCT:
+                    vdlType.fields = ImmutableList.copyOf(fields);
+                    break;
+                default:
+                    // do nothing
             }
             built = true;
         }
@@ -391,14 +441,24 @@ public final class VdlType implements Serializable {
         }
 
         public PendingType assignBase(VdlType type) {
+            assertNotBuilt();
             this.vdlType.kind = type.kind;
             this.vdlType.name = type.name;
-            this.vdlType.labels = type.labels;
             this.vdlType.length = type.length;
             this.vdlType.key = type.key;
             this.vdlType.elem = type.elem;
-            this.vdlType.types = type.types;
-            this.vdlType.fields = type.fields;
+            labels.clear();
+            if (type.labels != null) {
+                labels.addAll(type.labels);
+            }
+            types.clear();
+            if (type.types != null) {
+                types.addAll(type.types);
+            }
+            fields.clear();
+            if (type.fields != null) {
+                fields.addAll(type.fields);
+            }
             return this;
         }
 

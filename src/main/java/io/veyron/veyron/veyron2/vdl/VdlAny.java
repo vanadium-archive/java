@@ -10,12 +10,12 @@ import java.lang.reflect.Type;
  * VdlAny is a representation of a VDL any.
  */
 public final class VdlAny extends VdlValue implements Parcelable {
-    private final Serializable value;
+    private final Serializable elem;
     private VdlType elemType;
 
     private VdlAny(VdlType type, Serializable value) {
         super(Types.ANY);
-        this.value = value;
+        elem = value;
         elemType = type;
     }
 
@@ -27,8 +27,8 @@ public final class VdlAny extends VdlValue implements Parcelable {
         this(value.vdlType(), value);
     }
 
-    public Serializable getValue() {
-        return value;
+    public Serializable getElem() {
+        return elem;
     }
 
     public VdlType getElemType() {
@@ -41,17 +41,17 @@ public final class VdlAny extends VdlValue implements Parcelable {
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
         final VdlAny other = (VdlAny) obj;
-        return value.equals(other.value);
+        return elem.equals(other.elem);
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return elem.hashCode();
     }
 
     @Override
     public String toString() {
-        return value.toString();
+        return elem.toString();
     }
 
     @Override

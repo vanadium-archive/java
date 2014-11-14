@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * VdlOneOf is a representation of a VDL oneOf.
  */
 public class VdlOneOf extends VdlValue implements Parcelable {
-    private Serializable value;
+    private Serializable elem;
     private VdlType elemType;
 
     public VdlOneOf(VdlType type) {
@@ -21,7 +21,7 @@ public class VdlOneOf extends VdlValue implements Parcelable {
     private VdlOneOf assignValue(VdlType elemType, Serializable value) {
         for (VdlType type : vdlType().getTypes()) {
             if (type.equals(elemType)) {
-                this.value = value;
+                this.elem = value;
                 this.elemType = type;
                 return this;
             }
@@ -52,8 +52,8 @@ public class VdlOneOf extends VdlValue implements Parcelable {
         return assignValue(value.vdlType(), value);
     }
 
-    public Serializable getValue() {
-        return value;
+    public Serializable getElem() {
+        return elem;
     }
 
     public VdlType getElemType() {
@@ -66,17 +66,17 @@ public class VdlOneOf extends VdlValue implements Parcelable {
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
         final VdlOneOf other = (VdlOneOf) obj;
-        return value.equals(other.value);
+        return elem.equals(other.elem);
     }
 
     @Override
     public int hashCode() {
-        return value == null ? 0 : value.hashCode();
+        return elem == null ? 0 : elem.hashCode();
     }
 
     @Override
     public String toString() {
-        return value.toString();
+        return elem.toString();
     }
 
     @Override

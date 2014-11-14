@@ -96,8 +96,8 @@ public class TypeTest extends TestCase {
     private static final class MyStruct extends AbstractVdlStruct {
         @SerializedName("ByteArray")
         private byte[][] byteArray;
-        @SerializedName("List")
-        private Set<MyMap> list;
+        @SerializedName("Set")
+        private Set<MyMap> set;
         @SerializedName("Cycle")
         private List<MyStruct> cycle;
 
@@ -138,7 +138,7 @@ public class TypeTest extends TestCase {
         PendingType pendingStruct = builder.newPending(Kind.STRUCT)
                 .setName(MyStruct.class.getName());
         pendingStruct.addField("ByteArray", Types.listOf(Types.listOf(Types.BYTE)))
-                .addField("List", Types.setOf(myMap))
+                .addField("Set", Types.setOf(myMap))
                 .addField("Cycle", builder.listOf(pendingStruct));
         builder.build();
         VdlType myStruct = pendingStruct.built();
@@ -172,6 +172,28 @@ public class TypeTest extends TestCase {
             assertEquals("Type for class: " + entry.getValue(),
                     entry.getKey(), Types.getVdlTypeFromReflection(entry.getValue()));
         }
+    }
+
+    public void testTypeString() {
+        String myInt16 = MyInt16.class.getName() + " int16";
+        String myOneOf = String.format("%s oneof{%s;int32;int64}",
+                MyOneOf.class.getName(), myInt16);
+        String myEnum = String.format("%s enum{LABEL1;LABEL2;LABEL3}", MyEnum.class.getName());
+        String myArray12 = String.format("%s [12]set[%s]", MyArray12.class.getName(), myOneOf);
+        String myList = String.format("%s [][]%s", MyList.class.getName(), myArray12);
+        String mySet = String.format("%s set[set[%s]]", MySet.class.getName(), myList);
+        String myMap = String.format("%s map[%s]map[%s]%s",
+                MyMap.class.getName(), myEnum, mySet, MySet.class.getName());
+        String myStruct = String.format("%s struct{ByteArray [][]byte;Set set[%s];Cycle []%s}",
+                MyStruct.class.getName(), myMap, MyStruct.class.getName());
+
+        assertEquals(myOneOf, Types.getVdlTypeFromReflection(MyOneOf.class).toString());
+        assertEquals(myEnum, Types.getVdlTypeFromReflection(MyEnum.class).toString());
+        assertEquals(myArray12, Types.getVdlTypeFromReflection(MyArray12.class).toString());
+        assertEquals(myList, Types.getVdlTypeFromReflection(MyList.class).toString());
+        assertEquals(mySet, Types.getVdlTypeFromReflection(MySet.class).toString());
+        assertEquals(myMap, Types.getVdlTypeFromReflection(MyMap.class).toString());
+        assertEquals(myStruct, Types.getVdlTypeFromReflection(MyStruct.class).toString());
     }
 
     public void testEquals() {

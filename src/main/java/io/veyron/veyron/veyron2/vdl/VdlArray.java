@@ -271,7 +271,7 @@ public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
 
         @Override
         public boolean hasNext() {
-            return position < end - 1;
+            return position < end;
         }
 
         @Override
