@@ -1,10 +1,9 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 
-import io.veyron.veyron.veyron2.vdl.Kind;
-import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.Types;
 
@@ -12,153 +11,70 @@ import io.veyron.veyron.veyron2.vdl.Types;
  * BootstrapType provides the set of known bootstrap type ids and their
  * corresponding VDL Type.
  */
-enum BootstrapType {
-    ANY(1, Types.ANY),
-    TYPEID(2, Types.named("TypeID", Types.UINT64)),
-    BOOL(3, Types.BOOL),
-    STRING(4, Types.STRING),
-    BYTE(5, Types.BYTE),
-    UINT16(6, Types.UINT16),
-    UINT32(7, Types.UINT32),
-    UINT64(8, Types.UINT64),
-    INT16(9, Types.INT16),
-    INT32(10, Types.INT32),
-    INT64(11, Types.INT64),
-    FLOAT32(12, Types.FLOAT32),
-    FLOAT64(13, Types.FLOAT64),
-    COMPLEX64(14, Types.COMPLEX64),
-    COMPLEX128(15, Types.COMPLEX128),
+public final class BootstrapType {
+    private static final Map<VdlType, TypeID> typeToId;
+    private static final Map<TypeID, VdlType> idToType;
 
-    WIRE_NAMED(16, getNamedBootstrapType()),
-    WIRE_ENUM(17, getEnumBootstrapType()),
-    WIRE_ARRAY(18, getArrayBootstrapType()),
-    WIRE_LIST(19, getListBootstrapType()),
-    WIRE_SET(20, getSetBootstrapType()),
-    WIRE_MAP(21, getMapBootstrapType()),
-    WIRE_STRUCT(22, getStructBootstrapType()),
-    WIRE_FIELD(23, getFieldBootstrapType()),
-    WIRE_FIELD_LIST(24, Types.listOf(getFieldBootstrapType())),
-    WIRE_ONE_OF(25, getOneOfBootstrapType()),
-
-    LIST_BYTE(26, Types.listOf(Types.BYTE)),
-    LIST_STRING(27, Types.listOf(Types.STRING)),
-    LIST_TYPEID(28, Types.listOf(Types.named("TypeID", Types.UINT64)));
-
-    private final int id;
-    private final VdlType type;
-
-    private BootstrapType(final int id, final VdlType t) {
-        this.id = id;
-        this.type = t;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public VdlType getType() {
-        return type;
-    }
-
-    private static final Map<VdlType, BootstrapType> bootstrapTypeMap
-            = new HashMap<VdlType, BootstrapType>();
-    private static final Map<Long, BootstrapType> bootstrapTypeIdMap
-            = new HashMap<Long, BootstrapType>();
     static {
-        for (BootstrapType bt : BootstrapType.values()) {
-            bootstrapTypeMap.put(bt.getType(), bt);
-            bootstrapTypeIdMap.put((long) bt.getId(), bt);
+        typeToId = ImmutableMap.<VdlType, TypeID>builder()
+                // Primitive types
+                .put(Types.ANY, Vom2Constants.WIRE_ANY_ID)
+                .put(Types.TYPEOBJECT, Vom2Constants.WIRE_TYPE_ID)
+                .put(Types.BOOL, Vom2Constants.WIRE_BOOL_ID)
+                .put(Types.STRING, Vom2Constants.WIRE_STRING_ID)
+                .put(Types.BYTE, Vom2Constants.WIRE_BYTE_ID)
+                .put(Types.UINT16, Vom2Constants.WIRE_UINT_16_ID)
+                .put(Types.UINT32, Vom2Constants.WIRE_UINT_32_ID)
+                .put(Types.UINT64, Vom2Constants.WIRE_UINT_64_ID)
+                .put(Types.INT16, Vom2Constants.WIRE_INT_16_ID)
+                .put(Types.INT32, Vom2Constants.WIRE_INT_32_ID)
+                .put(Types.INT64, Vom2Constants.WIRE_INT_64_ID)
+                .put(Types.FLOAT32, Vom2Constants.WIRE_FLOAT_32_ID)
+                .put(Types.FLOAT64, Vom2Constants.WIRE_FLOAT_64_ID)
+                .put(Types.COMPLEX64, Vom2Constants.WIRE_COMPLEX_64_ID)
+                .put(Types.COMPLEX128, Vom2Constants.WIRE_COMPLEX_128_ID)
+
+                // Generic types
+                .put(WireNamed.VDL_TYPE, Vom2Constants.WIRE_NAMED_ID)
+                .put(WireEnum.VDL_TYPE, Vom2Constants.WIRE_ENUM_ID)
+                .put(WireArray.VDL_TYPE, Vom2Constants.WIRE_ARRAY_ID)
+                .put(WireList.VDL_TYPE, Vom2Constants.WIRE_LIST_ID)
+                .put(WireSet.VDL_TYPE, Vom2Constants.WIRE_SET_ID)
+                .put(WireMap.VDL_TYPE, Vom2Constants.WIRE_MAP_ID)
+                .put(WireStruct.VDL_TYPE, Vom2Constants.WIRE_STRUCT_ID)
+                .put(WireField.VDL_TYPE, Vom2Constants.WIRE_FIELD_ID)
+                .put(Types.listOf(WireField.VDL_TYPE), Vom2Constants.WIRE_FIELD_LIST_ID)
+                .put(WireOneOf.VDL_TYPE, Vom2Constants.WIRE_ONE_OF_ID)
+                .put(Types.listOf(Types.BYTE), Vom2Constants.WIRE_BYTE_LIST_ID)
+                .put(Types.listOf(Types.STRING), Vom2Constants.WIRE_STRING_LIST_ID)
+                .put(Types.listOf(TypeID.VDL_TYPE), Vom2Constants.WIRE_TYPE_LIST_ID)
+                .build();
+
+        ImmutableMap.Builder<TypeID, VdlType> idToTypeBuilder =
+                ImmutableMap.<TypeID, VdlType>builder();
+        for (Map.Entry<VdlType, TypeID> typeToIdEntry : typeToId.entrySet()) {
+            idToTypeBuilder.put(typeToIdEntry.getValue(), typeToIdEntry.getKey());
         }
+        idToType = idToTypeBuilder.build();
     }
 
-    public static BootstrapType findBootstrapType(VdlType t) {
-        return bootstrapTypeMap.get(t);
+    /**
+     * Returns type corresponding to provided bootstrap type id
+     *
+     * @param typeId the typeId whose type is to be returned
+     * @return a {@code VdlType} object or null if provided type id has no associated bootstrap type
+     */
+    public static VdlType getBootstrapType(TypeID typeId) {
+        return idToType.get(typeId);
     }
 
-    public static BootstrapType findBootstrapTypeById(long id) {
-        return bootstrapTypeIdMap.get(id);
-    }
-
-    private static VdlType getNamedBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("base", Types.named("TypeID", Types.UINT64));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getEnumBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("labels", Types.listOf(Types.STRING));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getArrayBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[3];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("elem", Types.named("TypeID", Types.UINT64));
-        fields[2] = new VdlStructField("len", Types.UINT64);
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getListBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("elem", Types.named("TypeID", Types.UINT64));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getSetBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("elem", Types.named("TypeID", Types.UINT64));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getMapBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[3];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("key", Types.named("TypeID", Types.UINT64));
-        fields[2] = new VdlStructField("elem", Types.named("TypeID", Types.UINT64));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getFieldBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("type", Types.named("TypeID", Types.UINT64));
-        type.setFields(fields);
-        return type;
-    }
-
-    private static VdlType getStructBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("fields", Types.listOf(getFieldBootstrapType()));
-        type.setFields(fields);
-        return type;
-    }
-
-    public static VdlType getOneOfBootstrapType() {
-        VdlType type = new VdlType(Kind.STRUCT);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("name", Types.STRING);
-        fields[1] = new VdlStructField("types", Types.listOf(Types.named("TypeID", Types.UINT64)));
-        type.setFields(fields);
-        return type;
+    /**
+     * Returns type id corresponding to provided bootstrap type.
+     *
+     * @param type the type whose type id is to be returned
+     * @return a {@code TypeID} object or null if provided type is not a bootstrap type
+     */
+    public static TypeID getBootstrapTypeId(VdlType type) {
+        return typeToId.get(type);
     }
 }
