@@ -26,8 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.RuntimeFactory;
-import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 import io.veyron.veyron.veyron2.security.Blessings;
@@ -69,7 +68,11 @@ public class MainActivity extends Activity {
 		nameView.setText(root);
 
 		mSelectedBlessing = null;
-		RuntimeFactory.initRuntime(this, new Options());
+		try {
+		    RuntimeFactory.initRuntime(this, new Options());
+		} catch (VeyronException e) {
+		    throw new RuntimeException("Couldn't init veyron runtime: " + e.getMessage());
+		}
 		mGson = JSONUtil.getGsonBuilder().create();
 
 		updateBlessingsView();

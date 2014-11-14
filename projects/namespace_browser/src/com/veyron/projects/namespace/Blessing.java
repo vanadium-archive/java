@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.WireBlessings;
@@ -25,14 +25,18 @@ public class Blessing {
 	private static final String REPLY = "REPLY";
 
 	public static Intent createIntent(Context ctx, String accountName) {
-		final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
-		final ECPublicKey key = r.getPrincipal().publicKey();
-		final Intent intent = new Intent();
-		intent.setComponent(new ComponentName(
-				BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
-		intent.putExtra(ACCOUNT_NAME_KEY, accountName);
-		intent.putExtra(BLESSEE_PUBKEY_KEY, key);
-		return intent;
+		try {
+		    final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
+		    final ECPublicKey key = r.getPrincipal().publicKey();
+		    final Intent intent = new Intent();
+		    intent.setComponent(new ComponentName(
+		            BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
+		    intent.putExtra(ACCOUNT_NAME_KEY, accountName);
+		    intent.putExtra(BLESSEE_PUBKEY_KEY, key);
+		    return intent;
+		} catch (VeyronException e) {
+		    throw new RuntimeException("Couldn't create veyron runtime: " + e.getMessage());
+		}
 	}
 
 	public static WireBlessings getBlessings(int resultCode, Intent data) throws VeyronException {

@@ -20,7 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Certificate;
@@ -51,7 +51,12 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blessing);
-		RuntimeFactory.initRuntime(this, new Options());
+		try {
+			RuntimeFactory.initRuntime(this, new Options());
+		} catch (VeyronException e) {
+			replyWithError("Couldn't initialize Veyron runtime.");
+			return;
+		}
 		final Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
 			replyWithError("No extras provided.");

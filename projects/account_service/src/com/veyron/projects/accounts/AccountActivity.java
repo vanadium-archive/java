@@ -22,7 +22,7 @@ import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClientFactory;
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.RuntimeFactory;
+import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.context.Context;
@@ -151,11 +151,11 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 				errorMsg = "Empty OAuth token.";
 				return null;
 			}
-			final VRuntime r = RuntimeFactory.initRuntime(AccountActivity.this, new Options());
 			final String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
 					AccountActivity.this).getString(
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
 			try {
+				final VRuntime r = RuntimeFactory.initRuntime(AccountActivity.this, new Options());
 				final OAuthBlesserClient blesser = OAuthBlesserClientFactory.bind(identityServiceName);
 				final Context ctx = r.newContext().withTimeout(new Duration(20000));  // 20s
 				final BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
