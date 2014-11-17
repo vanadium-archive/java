@@ -46,7 +46,7 @@ public class RuntimeFactory {
 	 * @param opts  runtime options.
 	 * @return      a pre-initialized runtime instance.
 	 */
-	public static synchronized VRuntime initRuntime(Options opts) throws VeyronException {
+	public static synchronized VRuntime initRuntime(Options opts) {
 		if (opts == null) {
 			opts = new Options();
 		}
