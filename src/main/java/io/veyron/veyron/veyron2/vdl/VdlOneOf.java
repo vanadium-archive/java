@@ -38,7 +38,7 @@ public class VdlOneOf extends VdlValue implements Parcelable {
      * @return this {@code VdlOneOf} object or null if the value has incompatible type
      */
     public VdlOneOf assignValue(Type type, Serializable value) {
-        return assignValue(Types.getVdlTypeFromReflection(type), value);
+        return assignValue(Types.getVdlTypeFromReflect(type), value);
     }
 
     /**

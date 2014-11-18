@@ -49,7 +49,7 @@ public class TypeTest extends TestCase {
                 new TypeToken<Long>() {});
 
         public MyOneOf() {
-            super(Types.getVdlTypeFromReflection(MyOneOf.class));
+            super(Types.getVdlTypeFromReflect(MyOneOf.class));
         }
     }
 
@@ -62,7 +62,7 @@ public class TypeTest extends TestCase {
         public static final MyEnum LABEL3 = new MyEnum("LABEL3");
 
         private MyEnum(String name) {
-            super(Types.getVdlTypeFromReflection(MyEnum.class), name);
+            super(Types.getVdlTypeFromReflect(MyEnum.class), name);
         }
     }
 
@@ -71,25 +71,25 @@ public class TypeTest extends TestCase {
         public static final int LENGTH = 12;
 
         public MyArray12(Set<MyOneOf>[] value) {
-            super(Types.getVdlTypeFromReflection(MyArray12.class), value);
+            super(Types.getVdlTypeFromReflect(MyArray12.class), value);
         }
     }
 
     private static final class MyList extends VdlList<List<MyArray12>> {
         public MyList(List<List<MyArray12>> impl) {
-            super(Types.getVdlTypeFromReflection(MyList.class), impl);
+            super(Types.getVdlTypeFromReflect(MyList.class), impl);
         }
     }
 
     private static final class MySet extends VdlSet<Set<MyList>> {
         public MySet(Set<Set<MyList>> impl) {
-            super(Types.getVdlTypeFromReflection(MySet.class), impl);
+            super(Types.getVdlTypeFromReflect(MySet.class), impl);
         }
     }
 
     private static final class MyMap extends VdlMap<MyEnum, Map<MySet, MySet>> {
         public MyMap(Map<MyEnum, Map<MySet, MySet>> impl) {
-            super(Types.getVdlTypeFromReflection(MyMap.class), impl);
+            super(Types.getVdlTypeFromReflect(MyMap.class), impl);
         }
     }
 
@@ -102,7 +102,7 @@ public class TypeTest extends TestCase {
         private List<MyStruct> cycle;
 
         public MyStruct() {
-            super(Types.getVdlTypeFromReflection(MyStruct.class));
+            super(Types.getVdlTypeFromReflect(MyStruct.class));
         }
     }
 
@@ -170,7 +170,7 @@ public class TypeTest extends TestCase {
     public void testGetVdlTypeFromReflection() {
         for (Map.Entry<VdlType, Class<?>> entry : myTypes.entrySet()) {
             assertEquals("Type for class: " + entry.getValue(),
-                    entry.getKey(), Types.getVdlTypeFromReflection(entry.getValue()));
+                    entry.getKey(), Types.getVdlTypeFromReflect(entry.getValue()));
         }
     }
 
@@ -187,13 +187,13 @@ public class TypeTest extends TestCase {
         String myStruct = String.format("%s struct{ByteArray [][]byte;Set set[%s];Cycle []%s}",
                 MyStruct.class.getName(), myMap, MyStruct.class.getName());
 
-        assertEquals(myOneOf, Types.getVdlTypeFromReflection(MyOneOf.class).toString());
-        assertEquals(myEnum, Types.getVdlTypeFromReflection(MyEnum.class).toString());
-        assertEquals(myArray12, Types.getVdlTypeFromReflection(MyArray12.class).toString());
-        assertEquals(myList, Types.getVdlTypeFromReflection(MyList.class).toString());
-        assertEquals(mySet, Types.getVdlTypeFromReflection(MySet.class).toString());
-        assertEquals(myMap, Types.getVdlTypeFromReflection(MyMap.class).toString());
-        assertEquals(myStruct, Types.getVdlTypeFromReflection(MyStruct.class).toString());
+        assertEquals(myOneOf, Types.getVdlTypeFromReflect(MyOneOf.class).toString());
+        assertEquals(myEnum, Types.getVdlTypeFromReflect(MyEnum.class).toString());
+        assertEquals(myArray12, Types.getVdlTypeFromReflect(MyArray12.class).toString());
+        assertEquals(myList, Types.getVdlTypeFromReflect(MyList.class).toString());
+        assertEquals(mySet, Types.getVdlTypeFromReflect(MySet.class).toString());
+        assertEquals(myMap, Types.getVdlTypeFromReflect(MyMap.class).toString());
+        assertEquals(myStruct, Types.getVdlTypeFromReflect(MyStruct.class).toString());
     }
 
     public void testEquals() {

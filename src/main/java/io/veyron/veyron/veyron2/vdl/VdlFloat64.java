@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final double value;
 
-    protected VdlFloat64(VdlType type, double value) {
+    public VdlFloat64(VdlType type, double value) {
         super(type);
         assertKind(Kind.FLOAT64);
         this.value = value;

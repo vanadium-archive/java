@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlBool extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final boolean value;
 
-    protected VdlBool(VdlType type, boolean value) {
+    public VdlBool(VdlType type, boolean value) {
         super(type);
         assertKind(Kind.BOOL);
         this.value = value;

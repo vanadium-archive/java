@@ -2,6 +2,9 @@ package io.veyron.veyron.veyron2.vom2;
 
 import org.junit.Assert;
 
+import io.veyron.veyron.veyron2.vdl.VdlType;
+
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,5 +73,12 @@ public class TestUtil {
                     + actual.substring(0, actual.length() - remainder.length()) + ". Remainder: "
                     + remainder);
         }
+    }
+
+    static String encode(VdlType type, Object value) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BinaryEncoder encoder = new BinaryEncoder(out);
+        encoder.encodeValue(type, value);
+        return TestUtil.bytesToHexString(out.toByteArray());
     }
 }

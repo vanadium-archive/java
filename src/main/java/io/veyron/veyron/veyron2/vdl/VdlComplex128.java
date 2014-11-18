@@ -10,7 +10,7 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
     private final double real;
     private final double imag;
 
-    protected VdlComplex128(VdlType type, double real, double imag) {
+    public VdlComplex128(VdlType type, double real, double imag) {
         super(type);
         assertKind(Kind.COMPLEX128);
         this.real = real;

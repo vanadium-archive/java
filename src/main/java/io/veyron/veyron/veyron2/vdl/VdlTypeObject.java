@@ -17,7 +17,7 @@ public final class VdlTypeObject extends VdlValue implements Parcelable {
     }
 
     public VdlTypeObject(Type type) {
-        this(Types.getVdlTypeFromReflection(type));
+        this(Types.getVdlTypeFromReflect(type));
     }
 
     public VdlType getTypeObject() {

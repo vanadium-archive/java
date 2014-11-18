@@ -269,11 +269,11 @@ public final class Types {
     }
 
     /**
-     * Creates a {@code VdlType} object corresponding a {@code java.lang.reflect.Type} object.
+     * Creates a {@code VdlType} object corresponding to a {@code java.lang.reflect.Type} object.
      * Resolves maps, sets, lists, arrays, primitives and classes generated from *.vdl files.
      * All results are statically cached.
      */
-    public static VdlType getVdlTypeFromReflection(Type type) {
+    public static VdlType getVdlTypeFromReflect(Type type) {
         if (typeCache.containsKey(type)) {
             return typeCache.get(type);
         }

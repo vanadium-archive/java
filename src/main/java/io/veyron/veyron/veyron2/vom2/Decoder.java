@@ -235,7 +235,7 @@ final class Decoder {
                     case UINT16:
                     case UINT32:
                     case UINT64: {
-                        if (NumericConvertability.hasOverflowUint(val,
+                        if (ConvertUtil.hasOverflowUint(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -246,7 +246,7 @@ final class Decoder {
                     case INT16:
                     case INT32:
                     case INT64: {
-                        if (!NumericConvertability.canConvertUintToInt(val,
+                        if (!ConvertUtil.canConvertUintToInt(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -256,7 +256,7 @@ final class Decoder {
                     }
                     case FLOAT32:
                     case FLOAT64: {
-                        if (!NumericConvertability.canConvertUintToFloat(val,
+                        if (!ConvertUtil.canConvertUintToFloat(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -266,7 +266,7 @@ final class Decoder {
                     }
                     case COMPLEX64:
                     case COMPLEX128: {
-                        if (!NumericConvertability.canConvertUintToFloat(val,
+                        if (!ConvertUtil.canConvertUintToFloat(val,
                                 kindToBits(targetKind) / 2)) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -287,7 +287,7 @@ final class Decoder {
                     case UINT16:
                     case UINT32:
                     case UINT64: {
-                        if (!NumericConvertability.canConvertIntToUint(val,
+                        if (!ConvertUtil.canConvertIntToUint(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -298,7 +298,7 @@ final class Decoder {
                     case INT16:
                     case INT32:
                     case INT64: {
-                        if (NumericConvertability.hasOverflowInt(val,
+                        if (ConvertUtil.hasOverflowInt(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -308,7 +308,7 @@ final class Decoder {
                     }
                     case FLOAT32:
                     case FLOAT64: {
-                        if (!NumericConvertability.canConvertIntToFloat(val,
+                        if (!ConvertUtil.canConvertIntToFloat(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -318,7 +318,7 @@ final class Decoder {
                     }
                     case COMPLEX64:
                     case COMPLEX128: {
-                        if (!NumericConvertability.canConvertIntToFloat(val,
+                        if (!ConvertUtil.canConvertIntToFloat(val,
                                 kindToBits(targetKind) / 2)) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -338,7 +338,7 @@ final class Decoder {
                     case UINT16:
                     case UINT32:
                     case UINT64: {
-                        if (!NumericConvertability.canConvertFloatToUint(val,
+                        if (!ConvertUtil.canConvertFloatToUint(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -349,7 +349,7 @@ final class Decoder {
                     case INT16:
                     case INT32:
                     case INT64: {
-                        if (!NumericConvertability.canConvertFloatToInt(val,
+                        if (!ConvertUtil.canConvertFloatToInt(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -379,7 +379,7 @@ final class Decoder {
                     case UINT16:
                     case UINT32:
                     case UINT64: {
-                        if (!NumericConvertability.canConvertComplexToUint(val,
+                        if (!ConvertUtil.canConvertComplexToUint(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -390,7 +390,7 @@ final class Decoder {
                     case INT16:
                     case INT32:
                     case INT64: {
-                        if (!NumericConvertability.canConvertComplexToInt(val,
+                        if (!ConvertUtil.canConvertComplexToInt(val,
                                 kindToBits(targetKind))) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
@@ -400,7 +400,7 @@ final class Decoder {
                     }
                     case FLOAT32:
                     case FLOAT64: {
-                        if (!NumericConvertability.canConvertComplexToFloat(val)) {
+                        if (!ConvertUtil.canConvertComplexToFloat(val)) {
                             throw new ConversionException("Failed to convert value "
                                     + val + " of kind " + actualKind + " to "
                                     + targetKind);

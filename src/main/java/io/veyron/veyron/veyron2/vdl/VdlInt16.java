@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlInt16 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final short value;
 
-    protected VdlInt16(VdlType type, short value) {
+    public VdlInt16(VdlType type, short value) {
         super(type);
         assertKind(Kind.INT16);
         this.value = value;

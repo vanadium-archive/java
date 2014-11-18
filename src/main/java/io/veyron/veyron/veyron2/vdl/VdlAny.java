@@ -11,20 +11,26 @@ import java.lang.reflect.Type;
  */
 public final class VdlAny extends VdlValue implements Parcelable {
     private final Serializable elem;
-    private VdlType elemType;
+    private final VdlType elemType;
+    private final Type elemReflectType;
 
-    private VdlAny(VdlType type, Serializable value) {
+    private VdlAny(VdlType vdlType, Type reflectType, Serializable value) {
         super(Types.ANY);
         elem = value;
-        elemType = type;
+        elemType = vdlType;
+        elemReflectType = reflectType;
     }
 
     public VdlAny(Type type, Serializable value) {
-        this(Types.getVdlTypeFromReflection(type), value);
+        this(Types.getVdlTypeFromReflect(type), type, value);
     }
 
     public VdlAny(VdlValue value) {
-        this(value.vdlType(), value);
+        this(value.vdlType(), VdlValue.class, value);
+    }
+
+    public VdlAny() {
+        this(null, null, null);
     }
 
     public Serializable getElem() {
@@ -33,6 +39,10 @@ public final class VdlAny extends VdlValue implements Parcelable {
 
     public VdlType getElemType() {
         return elemType;
+    }
+
+    public Type getElemReflectType() {
+        return elemReflectType;
     }
 
     @Override

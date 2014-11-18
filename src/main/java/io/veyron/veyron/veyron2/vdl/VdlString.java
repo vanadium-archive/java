@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final String value;
 
-    protected VdlString(VdlType type, String value) {
+    public VdlString(VdlType type, String value) {
         super(type);
         assertKind(Kind.STRING);
         this.value = value;

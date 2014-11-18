@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final byte value;
 
-    protected VdlByte(VdlType type, byte value) {
+    public VdlByte(VdlType type, byte value) {
         super(type);
         assertKind(Kind.BYTE);
         this.value = value;

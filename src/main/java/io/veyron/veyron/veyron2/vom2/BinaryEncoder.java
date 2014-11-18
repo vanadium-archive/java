@@ -83,7 +83,7 @@ public class BinaryEncoder {
      * @throws IOException
      */
     public void encodeValue(Type type, Object value) throws IOException {
-        encodeValue(Types.getVdlTypeFromReflection(type), value);
+        encodeValue(Types.getVdlTypeFromReflect(type), value);
     }
 
     /**

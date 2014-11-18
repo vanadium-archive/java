@@ -443,7 +443,6 @@ public final class VdlType implements Serializable {
         public PendingType assignBase(VdlType type) {
             assertNotBuilt();
             this.vdlType.kind = type.kind;
-            this.vdlType.name = type.name;
             this.vdlType.length = type.length;
             this.vdlType.key = type.key;
             this.vdlType.elem = type.elem;

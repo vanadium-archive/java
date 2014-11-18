@@ -14,6 +14,7 @@ import io.veyron.veyron.veyron2.vdl.Types;
 public final class BootstrapType {
     private static final Map<VdlType, TypeID> typeToId;
     private static final Map<TypeID, VdlType> idToType;
+    private static final Map<VdlType, Class<?>> typeToClass;
 
     static {
         typeToId = ImmutableMap.<VdlType, TypeID>builder()
@@ -56,6 +57,18 @@ public final class BootstrapType {
             idToTypeBuilder.put(typeToIdEntry.getValue(), typeToIdEntry.getKey());
         }
         idToType = idToTypeBuilder.build();
+
+        typeToClass = ImmutableMap.<VdlType, Class<?>>builder()
+                .put(WireNamed.VDL_TYPE, WireNamed.class)
+                .put(WireEnum.VDL_TYPE, WireEnum.class)
+                .put(WireArray.VDL_TYPE, WireArray.class)
+                .put(WireList.VDL_TYPE, WireList.class)
+                .put(WireSet.VDL_TYPE, WireSet.class)
+                .put(WireMap.VDL_TYPE, WireMap.class)
+                .put(WireStruct.VDL_TYPE, WireStruct.class)
+                .put(WireField.VDL_TYPE, WireField.class)
+                .put(WireOneOf.VDL_TYPE, WireOneOf.class)
+                .build();
     }
 
     /**
@@ -76,5 +89,15 @@ public final class BootstrapType {
      */
     public static TypeID getBootstrapTypeId(VdlType type) {
         return typeToId.get(type);
+    }
+
+    /**
+     * Returns java class corresponding to provided bootstrap type.
+     *
+     * @param type the wire type whose class is to be returned
+     * @return a class object or null if provided type is not a bootstrap type
+     */
+    public static Class<?> getBootstrapClass(VdlType type) {
+        return typeToClass.get(type);
     }
 }

@@ -10,7 +10,7 @@ public class VdlComplex64 extends VdlValue implements Parcelable {
     private final float real;
     private final float imag;
 
-    protected VdlComplex64(VdlType type, float real, float imag) {
+    public VdlComplex64(VdlType type, float real, float imag) {
         super(type);
         assertKind(Kind.COMPLEX64);
         this.real = real;

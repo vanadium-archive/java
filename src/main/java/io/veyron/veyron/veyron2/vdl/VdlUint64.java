@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VdlUint64 extends VdlValue implements Parcelable, TypeAdapterFactory {
     private final long value;
 
-    protected VdlUint64(VdlType type, long value) {
+    public VdlUint64(VdlType type, long value) {
         super(type);
         assertKind(Kind.UINT64);
         this.value = value;

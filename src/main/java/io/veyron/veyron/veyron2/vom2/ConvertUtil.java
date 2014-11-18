@@ -3,9 +3,9 @@ package io.veyron.veyron.veyron2.vom2;
 import org.apache.commons.math3.complex.Complex;
 
 /**
- * Methods to test for convertability of numeric types
+ * ConvertUtil provides helpers to convert VDL values.
  */
-final class NumericConvertability {
+final class ConvertUtil {
 
     // IEEE 754 represents float64 using 52 bits to represent the mantissa, with
     // an extra implied leading bit. That gives us 53 bits to store integers
@@ -69,8 +69,8 @@ final class NumericConvertability {
     static boolean canConvertFloatToInt(double x, long bitlen) {
         long intPart = (long) x;
         double fracPart = x - intPart;
-        return fracPart == 0 && x >= (double) (Long.MIN_VALUE)
-                && x <= (double) (Long.MAX_VALUE)
+        return fracPart == 0 && x >= Long.MIN_VALUE
+                && x <= Long.MAX_VALUE
                 && !hasOverflowInt(intPart, bitlen);
     }
 
@@ -87,5 +87,4 @@ final class NumericConvertability {
     static boolean canConvertComplexToFloat(Complex x) {
         return x.getImaginary() == 0;
     }
-
 }
