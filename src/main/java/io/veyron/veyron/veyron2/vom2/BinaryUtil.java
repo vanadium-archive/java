@@ -18,6 +18,7 @@ final class BinaryUtil {
      * encoding.
      */
     public static final byte BINARY_MAGIC_BYTE = (byte) 0x80;
+    static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
     /**
      * Unsigned integers are the basis for all other primitive values. This is a two-state encoding.
@@ -42,11 +43,11 @@ final class BinaryUtil {
     }
 
     public static void encodeUint(OutputStream out, final int value) throws IOException {
-        encodeUint(out, ((long) value) & 0xffffffff);
+        encodeUint(out, value & 0xffffffffL);
     }
 
     public static void encodeUint(OutputStream out, final short value) throws IOException {
-        encodeUint(out, ((long) value) & 0xffff);
+        encodeUint(out, value & 0xffffL);
     }
 
     /**
@@ -82,17 +83,24 @@ final class BinaryUtil {
         if (value == null) {
             value = "";
         }
-        byte[] data = value.getBytes(Charset.forName("UTF-8"));
+        byte[] data = value.getBytes(UTF8_CHARSET);
         encodeUint(out, data.length);
         out.write(data);
+    }
+
+    /**
+     * Returns true iff the kind of type is []byte or [N]byte.
+     */
+    public static boolean isBytes(VdlType type) {
+        return (type.getKind() == Kind.ARRAY || type.getKind() == Kind.LIST)
+                && type.getElem().getKind() == Kind.BYTE;
     }
 
     /**
      * Returns true iff the type is encoded with a top-level message length.
      */
     public static boolean hasBinaryMsgLen(VdlType type) {
-        if ((type.getKind() == Kind.ARRAY || type.getKind() == Kind.LIST)
-                && type.getElem().getKind() == Kind.BYTE) {
+        if (isBytes(type)) {
             return false;
         }
 
