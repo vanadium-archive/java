@@ -1,7 +1,5 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import io.veyron.veyron.veyron2.vdl.VdlType;
-
 import java.lang.reflect.Type;
 
 /**
@@ -14,11 +12,11 @@ public class ConversionException extends Exception {
         super(msg);
     }
 
-    public ConversionException(VdlType actualType, Type targetType) {
-        this("Can't convert from " + actualType + " to " + targetType);
-    }
-
     public ConversionException(Object value, Type targetType) {
         this("Can't convert from " + value + " to " + targetType);
+    }
+
+    public ConversionException(Object value, Type targetType, String cause) {
+        this("Can't convert from " + value + " to " + targetType + " : " + cause);
     }
 }

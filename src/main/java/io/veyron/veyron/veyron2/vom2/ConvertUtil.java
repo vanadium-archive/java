@@ -2,6 +2,16 @@ package io.veyron.veyron.veyron2.vom2;
 
 import org.apache.commons.math3.complex.Complex;
 
+import io.veyron.veyron.veyron2.vdl.Kind;
+
+import io.veyron.veyron.veyron2.vdl.VdlArray;
+import io.veyron.veyron.veyron2.vdl.VdlEnum;
+import io.veyron.veyron.veyron2.vdl.VdlString;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ConvertUtil provides helpers to convert VDL values.
  */
@@ -190,14 +200,23 @@ final class ConvertUtil {
         return ReflectUtil.createComplex(target, real, imag);
     }
 
+    /**
+     * Converts from uint to number, one of uint, int, float or complex.
+     */
     static Object convertFromUint(long value, ConversionTarget target) throws ConversionException {
         return convertUint(value, target);
     }
 
+    /**
+     * Converts from byte to number, one of uint, int, float or complex.
+     */
     static Object convertFromByte(byte value, ConversionTarget target) throws ConversionException {
         return convertUint(value & 0xffL, target);
     }
 
+    /**
+     * Converts from int to number, one of uint, int, float or complex.
+     */
     static Object convertFromInt(long value, ConversionTarget target) throws ConversionException {
         if (canConvertIntToUint(value, 64)) {
             return convertFromUint(value, target);
@@ -206,6 +225,9 @@ final class ConvertUtil {
         }
     }
 
+    /**
+     * Converts from float to number, one of uint, int, float or complex.
+     */
     static Object convertFromDouble(double value, ConversionTarget target)
             throws ConversionException {
         switch (target.getKind()) {
@@ -227,12 +249,53 @@ final class ConvertUtil {
         return convertDouble(value, target);
     }
 
+    /**
+     * Converts from complex to number, one of uint, int, float or complex.
+     */
     static Object convertFromComplex(double real, double imag, ConversionTarget target)
             throws ConversionException {
         if (imag == 0) {
             return convertFromDouble(real, target);
         } else {
             return convertComplex(real, imag, target);
+        }
+    }
+
+    /**
+     * Converts from []byte to []number, [N]number, string or enum.
+     */
+    static Object convertFromBytes(byte[] bytes, ConversionTarget target)
+            throws ConversionException {
+        Class<?> targetClass = target.getTargetClass();
+        if (targetClass == String.class || VdlString.class.isAssignableFrom(targetClass)) {
+            return ReflectUtil.createPrimitive(target, new String(bytes), String.class);
+        } else if (VdlEnum.class.isAssignableFrom(targetClass)) {
+            return ReflectUtil.createEnum(target, new String(bytes));
+        }
+        int len = bytes.length;
+        if (target.getKind() == Kind.ARRAY) {
+            if (bytes.length > target.getVdlType().getLength()) {
+                throw new ConversionException(bytes, target.getTargetType(),
+                        "target array is too short");
+            }
+            len = target.getVdlType().getLength();
+        }
+
+        ConversionTarget element = new ConversionTarget(
+                ReflectUtil.getElementTypes(target.getTargetType())[0]);
+        if (targetClass.isArray() || VdlArray.class.isAssignableFrom(targetClass)) {
+            Object data = Array.newInstance(element.getTargetClass(), len);
+            for (int i = 0; i < bytes.length; i++) {
+                ReflectUtil.setArrayValue(data, i, convertFromByte(bytes[i], element),
+                        element.getTargetClass());
+            }
+            return ReflectUtil.createGeneric(target, data);
+        } else {
+            List<Object> list = new ArrayList<Object>();
+            for (int i = 0; i < bytes.length; i++) {
+                list.add(convertFromByte(bytes[i], element));
+            }
+            return ReflectUtil.createGeneric(target, list);
         }
     }
 }

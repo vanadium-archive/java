@@ -1,9 +1,10 @@
 package io.veyron.veyron.veyron2.vom2;
 
+import com.google.common.reflect.TypeToken;
+
 import junit.framework.TestCase;
 
 import io.veyron.veyron.veyron2.vdl.Types;
-
 import io.veyron.veyron.veyron2.vdl.VdlByte;
 import io.veyron.veyron.veyron2.vdl.VdlComplex128;
 import io.veyron.veyron.veyron2.vdl.VdlComplex64;
@@ -12,22 +13,28 @@ import io.veyron.veyron.veyron2.vdl.VdlFloat64;
 import io.veyron.veyron.veyron2.vdl.VdlInt16;
 import io.veyron.veyron.veyron2.vdl.VdlInt32;
 import io.veyron.veyron.veyron2.vdl.VdlInt64;
+import io.veyron.veyron.veyron2.vdl.VdlString;
 import io.veyron.veyron.veyron2.vdl.VdlUint16;
 import io.veyron.veyron.veyron2.vdl.VdlUint32;
 import io.veyron.veyron.veyron2.vdl.VdlUint64;
+import io.veyron.veyron.veyron2.vom2.testdata.NArray2Uint64;
 import io.veyron.veyron.veyron2.vom2.testdata.NByte;
 import io.veyron.veyron.veyron2.vom2.testdata.NComplex128;
 import io.veyron.veyron.veyron2.vom2.testdata.NComplex64;
+import io.veyron.veyron.veyron2.vom2.testdata.NEnum;
 import io.veyron.veyron.veyron2.vom2.testdata.NFloat32;
 import io.veyron.veyron.veyron2.vom2.testdata.NFloat64;
 import io.veyron.veyron.veyron2.vom2.testdata.NInt16;
 import io.veyron.veyron.veyron2.vom2.testdata.NInt32;
 import io.veyron.veyron.veyron2.vom2.testdata.NInt64;
+import io.veyron.veyron.veyron2.vom2.testdata.NString;
 import io.veyron.veyron.veyron2.vom2.testdata.NUint16;
 import io.veyron.veyron.veyron2.vom2.testdata.NUint32;
 import io.veyron.veyron.veyron2.vom2.testdata.NUint64;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Test cases for conversion rules.
@@ -39,6 +46,17 @@ public class ConvertUtilTest extends TestCase {
 
         public NumericConversionTestCase(Object value, String typeMask) {
             assert(typeMask.length() == numericTypes.length);
+            this.value = value;
+            this.typeMask = typeMask;
+        }
+    }
+
+    private static class BytesConversionTestCase {
+        public final String value;
+        public final String typeMask;
+
+        public BytesConversionTestCase(String value, String typeMask) {
+            assert(typeMask.length() == bytesTypes.length);
             this.value = value;
             this.typeMask = typeMask;
         }
@@ -58,7 +76,7 @@ public class ConvertUtilTest extends TestCase {
         {NComplex128.class, VdlComplex128.class}
     };
 
-    private static final NumericConversionTestCase[] tests = {
+    private static final NumericConversionTestCase[] numericTests = {
         // bytes
         new NumericConversionTestCase((byte) 0,                                 "11111111111"),
         new NumericConversionTestCase((byte) 0xf,                               "11111111111"),
@@ -133,6 +151,30 @@ public class ConvertUtilTest extends TestCase {
         new NumericConversionTestCase(new VdlComplex128(-1e20f),                "00000001111"),
         new NumericConversionTestCase(new VdlComplex128(-1.1e0f),               "00000001111"),
         new NumericConversionTestCase(new VdlComplex128(0f, 1f),                "00000000011"),
+    };
+
+    private static final Type[][] bytesTypes = {
+        {byte[].class, int[].class, Byte[].class, Integer[].class, VdlUint16[].class, String.class,
+                VdlString.class, NString.class,
+                new TypeToken<List<Byte>>(){}.getType(), new TypeToken<List<Integer>>(){}.getType(),
+                new TypeToken<List<VdlUint16>>(){}.getType()},
+        {NArray2Uint64.class},
+        {NEnum.class},
+    };
+
+    private static final BytesConversionTestCase[] bytesTests = {
+        new BytesConversionTestCase("A",         "111"),
+        new BytesConversionTestCase("B",         "111"),
+        new BytesConversionTestCase("C",         "111"),
+        new BytesConversionTestCase("D",         "110"),
+        new BytesConversionTestCase("AA",        "110"),
+        new BytesConversionTestCase("BB",        "110"),
+        new BytesConversionTestCase("CC",        "110"),
+        new BytesConversionTestCase("DD",        "110"),
+        new BytesConversionTestCase("AAA",       "100"),
+        new BytesConversionTestCase("BBB",       "100"),
+        new BytesConversionTestCase("CCC",       "100"),
+        new BytesConversionTestCase("DDD",       "100")
     };
 
     private Object convertValue(Object value, ConversionTarget target) {
@@ -235,7 +277,7 @@ public class ConvertUtilTest extends TestCase {
     }
 
     public void testNumericConversion() {
-        for (NumericConversionTestCase test : tests) {
+        for (NumericConversionTestCase test : numericTests) {
             for (int i = 0; i < numericTypes.length; i++) {
                 for (Class<?> numericType : numericTypes[i]) {
                     Object result = convertValue(test.value, new ConversionTarget(numericType));
@@ -247,6 +289,29 @@ public class ConvertUtilTest extends TestCase {
                     } else {
                         assertNumbersEqual(test.value, result);
                         assertNumbersEqual(test.value, vdlTypeResult);
+                    }
+                }
+            }
+        }
+    }
+
+    private Object convertString(String value, ConversionTarget target) {
+        try {
+            return ConvertUtil.convertFromBytes(value.getBytes(), target);
+        } catch (ConversionException e) {
+            return null;
+        }
+    }
+
+    public void testBytesConversion() {
+        for (BytesConversionTestCase test : bytesTests) {
+            for (int i = 0; i < bytesTypes.length; i++) {
+                for (Type bytesType : bytesTypes[i]) {
+                    Object result = convertString(test.value, new ConversionTarget(bytesType));
+                    if (test.typeMask.charAt(i) == '0') {
+                        assertNull(result);
+                    } else {
+                        assertNotNull(result);
                     }
                 }
             }
