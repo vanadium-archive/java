@@ -25,18 +25,14 @@ public class Blessing {
 	private static final String REPLY = "REPLY";
 
 	public static Intent createIntent(Context ctx, String accountName) {
-		try {
-		    final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
-		    final ECPublicKey key = r.getPrincipal().publicKey();
-		    final Intent intent = new Intent();
-		    intent.setComponent(new ComponentName(
-		            BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
-		    intent.putExtra(ACCOUNT_NAME_KEY, accountName);
-		    intent.putExtra(BLESSEE_PUBKEY_KEY, key);
-		    return intent;
-		} catch (VeyronException e) {
-		    throw new RuntimeException("Couldn't create veyron runtime: " + e.getMessage());
-		}
+	    final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
+	    final ECPublicKey key = r.getPrincipal().publicKey();
+	    final Intent intent = new Intent();
+	    intent.setComponent(new ComponentName(
+	            BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
+	    intent.putExtra(ACCOUNT_NAME_KEY, accountName);
+	    intent.putExtra(BLESSEE_PUBKEY_KEY, key);
+	    return intent;
 	}
 
 	public static WireBlessings getBlessings(int resultCode, Intent data) throws VeyronException {

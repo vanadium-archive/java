@@ -52,7 +52,11 @@ public class RuntimeFactory {
 		if (opts == null) {
 			opts = new Options();
 		}
-		setupRuntimeOptions(ctx, opts);
+		try {
+		    setupRuntimeOptions(ctx, opts);
+		} catch (VeyronException e) {
+		    throw new RuntimeException("Couldn't setup Veyron Runtime options: " + e.getMessage());
+		}
 		return io.veyron.veyron.veyron2.RuntimeFactory.initRuntime(opts);
 	}
 

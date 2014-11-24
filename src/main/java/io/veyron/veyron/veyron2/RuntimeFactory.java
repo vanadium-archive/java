@@ -50,7 +50,11 @@ public class RuntimeFactory {
 		if (opts == null) {
 			opts = new Options();
 		}
-		return io.veyron.veyron.veyron.runtimes.google.VRuntime.initRuntime(opts);
+		try {
+		    return io.veyron.veyron.veyron.runtimes.google.VRuntime.initRuntime(opts);
+		} catch (VeyronException e) {
+		    throw new RuntimeException("Couldn't initialize Veyron Runtime: " + e.getMessage());
+		}
 	}
 
 	/**

@@ -22,15 +22,17 @@ import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClientFactory;
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.WireBlessings;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountActivity extends AccountAuthenticatorActivity {
 	public static final String TAG = "com.veyron.projects.accounts";
@@ -45,6 +47,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 			"/proxy.envyor.com:8101/identity/veyron-test/google";
 
 	String mAccountName = "", mAccountType = "";
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

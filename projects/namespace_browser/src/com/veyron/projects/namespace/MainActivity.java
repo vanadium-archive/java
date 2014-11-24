@@ -68,11 +68,7 @@ public class MainActivity extends Activity {
 		nameView.setText(root);
 
 		mSelectedBlessing = null;
-		try {
-		    RuntimeFactory.initRuntime(this, new Options());
-		} catch (VeyronException e) {
-		    throw new RuntimeException("Couldn't init veyron runtime: " + e.getMessage());
-		}
+	    RuntimeFactory.initRuntime(this, new Options());
 		mGson = JSONUtil.getGsonBuilder().create();
 
 		updateBlessingsView();

@@ -22,21 +22,23 @@ import java.io.Serializable;
 public class VeyronException extends Exception implements Parcelable, Serializable {
 	private static final long serialVersionUID = -3917496574141933784L;
 
+	@com.google.gson.annotations.SerializedName("Id")
 	private final String id; // always non-null (can be empty)
+	@com.google.gson.annotations.SerializedName("Msg")
+	private final String msg;  // always non-null (can be empty)
 
 	public VeyronException() {
-		super("");
-		this.id = "";
+		this(null, null);
 	}
 
 	public VeyronException(String msg) {
-		super(msg == null ? "" : msg);
-		this.id = "";
+		this(msg, null);
 	}
 
 	public VeyronException(String msg, String id) {
 		super(msg == null ? "" : msg);
 		this.id = id == null ? "" : id;
+		this.msg = msg == null ? "" : msg;
 	}
 
 	/**
@@ -59,7 +61,7 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 			return this.id.equals(other.id);
 		}
 		// Compare messages.
-		return this.getMessage().equals(other.getMessage());
+		return this.msg.equals(other.msg());
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 		if (!this.id.isEmpty()) {
 			return ("id_" + this.id).hashCode();
 		}
-		return ("msg_" + this.getMessage()).hashCode();
+		return ("msg_" + this.msg()).hashCode();
 	}
 
 	@Override
@@ -78,7 +80,7 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 	}
 	@Override
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(this.getMessage());
+		out.writeString(this.msg);
 		out.writeString(this.id);
 	}
 	public static final Parcelable.Creator<VeyronException> CREATOR =

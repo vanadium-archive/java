@@ -51,12 +51,8 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blessing);
-		try {
-			RuntimeFactory.initRuntime(this, new Options());
-		} catch (VeyronException e) {
-			replyWithError("Couldn't initialize Veyron runtime.");
-			return;
-		}
+		RuntimeFactory.initRuntime(this, new Options());
+
 		final Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
 			replyWithError("No extras provided.");
