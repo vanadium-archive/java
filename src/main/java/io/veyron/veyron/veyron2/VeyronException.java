@@ -61,7 +61,7 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 			return this.id.equals(other.id);
 		}
 		// Compare messages.
-		return this.msg.equals(other.msg());
+		return this.msg.equals(other.msg);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 		if (!this.id.isEmpty()) {
 			return ("id_" + this.id).hashCode();
 		}
-		return ("msg_" + this.msg()).hashCode();
+		return ("msg_" + this.msg).hashCode();
 	}
 
 	@Override
