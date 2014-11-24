@@ -379,14 +379,16 @@ public class BinaryEncoder {
     }
 
     private void writeVdlString(OutputStream out, Object value) throws IOException {
+        String stringValue;
         if (value instanceof VdlString) {
-            BinaryUtil.encodeString(out, ((VdlString) value).getValue());
+            stringValue = ((VdlString) value).getValue();
         } else if (value instanceof String ){
-            BinaryUtil.encodeString(out, (String) value);
+            stringValue = (String) value;
         } else {
             throw new IOException("Unsupported VDL string value (type " + value.getClass()
                     + ", value " + value + ")");
         }
+        BinaryUtil.encodeBytes(out, BinaryUtil.getBytes(stringValue));
     }
 
     private void writeVdlStruct(OutputStream out, Object value) throws IOException {

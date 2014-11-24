@@ -1,12 +1,15 @@
 package io.veyron.veyron.veyron2.vom2;
 
+import io.veyron.veyron.veyron2.vdl.AbstractVdlStruct;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
 import io.veyron.veyron.veyron2.vdl.VdlComplex128;
 import io.veyron.veyron.veyron2.vdl.VdlComplex64;
 import io.veyron.veyron.veyron2.vdl.VdlEnum;
 import io.veyron.veyron.veyron2.vdl.VdlList;
 import io.veyron.veyron.veyron2.vdl.VdlMap;
+import io.veyron.veyron.veyron2.vdl.VdlOneOf;
 import io.veyron.veyron.veyron2.vdl.VdlSet;
+import io.veyron.veyron.veyron2.vdl.VdlStruct;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlValue;
 
@@ -33,8 +36,8 @@ final class ReflectUtil {
      *         is inherited from {@code VdlValue}; returns provided value otherwise
      * @throws ConversionException if the instance of the target class can't be created
      */
-    static Object createPrimitive(ConversionTarget target, Object value,
-            Class<?> valueType) throws ConversionException {
+    static Object createPrimitive(ConversionTarget target, Object value, Class<?> valueType)
+            throws ConversionException {
         Class<?> targetClass = target.getTargetClass();
         try {
             if (targetClass.getSuperclass() == VdlValue.class) {
@@ -79,8 +82,7 @@ final class ReflectUtil {
     /**
      * Creates an instance of VDL enum. The target class should be inherited from {@code VdlEnum}.
      */
-    static VdlEnum createEnum(ConversionTarget target, String label)
-            throws ConversionException {
+    static VdlEnum createEnum(ConversionTarget target, String label) throws ConversionException {
         Class<?> targetClass = target.getTargetClass();
         if (targetClass == VdlEnum.class) {
             return new VdlEnum(target.getVdlType(), label);
@@ -122,8 +124,7 @@ final class ReflectUtil {
      * @throws ConversionException if the instance of the target class can't be created
      */
     @SuppressWarnings("unchecked")
-    static Object createGeneric(ConversionTarget target, Object impl)
-            throws ConversionException {
+    static Object createGeneric(ConversionTarget target, Object impl) throws ConversionException {
         Class<?> targetClass = target.getTargetClass();
         if (targetClass == VdlArray.class) {
             return new VdlArray<Object>(target.getVdlType(), (Object[]) impl);
@@ -137,6 +138,37 @@ final class ReflectUtil {
             return createNamedGeneric(targetClass, impl);
         } else {
             return impl;
+        }
+    }
+
+    /**
+     * Creates an instance of VDL oneOf. The target class should be inherited from {@code VdlOneOf}.
+     */
+    static VdlOneOf createOneOf(ConversionTarget target) throws ConversionException {
+        Class<?> targetClass = target.getTargetClass();
+        if (targetClass == VdlOneOf.class) {
+            return new VdlOneOf(target.getVdlType());
+        }
+        try {
+            return (VdlOneOf) targetClass.newInstance();
+        } catch (Exception e) {
+            throw new ConversionException(target.getVdlType(), targetClass, e.getMessage());
+        }
+    }
+
+    /**
+     * Creates an instance of VDL struct. The target class should be inherited from
+     * {@code AbstractVdlStruct}.
+     */
+    static AbstractVdlStruct createStruct(ConversionTarget target) throws ConversionException {
+        Class<?> targetClass = target.getTargetClass();
+        if (targetClass == VdlStruct.class) {
+            return new VdlStruct(target.getVdlType());
+        }
+        try {
+            return (AbstractVdlStruct) targetClass.newInstance();
+        } catch (Exception e) {
+            throw new ConversionException(target.getVdlType(), targetClass, e.getMessage());
         }
     }
 
@@ -157,31 +189,31 @@ final class ReflectUtil {
     }
 
     /**
-     * Returns types of elements for provided generic or array type.
+     * Returns type of element at provided index for generic or array type.
      *
      * @param type the generic type
+     * @throws ConversionException if the type has no element at index
      * @returns an array of element types; the returned array is empty if the provided type
      *          is not generic or array
      */
-    static Type[] getElementTypes(Type type) {
-        Type[] types;
+    static Type getElementType(Type type, int index) throws ConversionException {
+        Type[] types = new Type[0];
         if (type instanceof Class) {
             Class<?> klass = (Class<?>) type;
             if (klass.isArray()) {
-                types = new Type[1];
-                types[0] = klass.getComponentType();
-                return types;
+                types = new Type[]{klass.getComponentType()};
             } else {
-                return getElementTypes(klass.getGenericSuperclass());
+                return getElementType(klass.getGenericSuperclass(), index);
             }
         } else if (type instanceof ParameterizedType) {
-            return ((ParameterizedType) type).getActualTypeArguments();
+            types = ((ParameterizedType) type).getActualTypeArguments();
         } else if (type instanceof GenericArrayType) {
-            types = new Type[1];
-            types[0] = ((GenericArrayType) type).getGenericComponentType();
-            return types;
+            types = new Type[]{((GenericArrayType) type).getGenericComponentType()};
         }
-        return new Type[0];
+        if (index < 0 || index >= types.length) {
+            throw new ConversionException("Type " + type + " has no element at index " + index);
+        }
+        return types[index];
     }
 
     /**

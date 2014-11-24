@@ -282,7 +282,7 @@ final class ConvertUtil {
         }
 
         ConversionTarget element = new ConversionTarget(
-                ReflectUtil.getElementTypes(target.getTargetType())[0]);
+                ReflectUtil.getElementType(target.getTargetType(), 0));
         if (targetClass.isArray() || VdlArray.class.isAssignableFrom(targetClass)) {
             Object data = Array.newInstance(element.getTargetClass(), len);
             for (int i = 0; i < bytes.length; i++) {

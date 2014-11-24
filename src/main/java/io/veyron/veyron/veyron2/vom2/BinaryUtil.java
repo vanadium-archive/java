@@ -4,6 +4,7 @@ import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
@@ -19,6 +20,7 @@ final class BinaryUtil {
      */
     public static final byte BINARY_MAGIC_BYTE = (byte) 0x80;
     static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    private static final String END_OF_STREAM_MESSAGE = "End of stream prematurely reached.";
 
     /**
      * Unsigned integers are the basis for all other primitive values. This is a two-state encoding.
@@ -50,6 +52,31 @@ final class BinaryUtil {
         encodeUint(out, value & 0xffffL);
     }
 
+    public static long decodeUint(InputStream in) throws IOException {
+        final int firstByte = in.read();
+        if (firstByte == -1) {
+            // EOF.
+            throw new CorruptVomStreamException(END_OF_STREAM_MESSAGE);
+        }
+        if ((firstByte & 0x7f) == firstByte) {
+            return firstByte;
+        }
+        int len = -(byte) firstByte;
+        if (len > 8) {
+            throw new CorruptVomStreamException("Invalid long byte length");
+        }
+        long value = 0;
+        while (len > 0) {
+            len--;
+            int nextByte = in.read();
+            if (nextByte == -1) {
+                throw new CorruptVomStreamException(END_OF_STREAM_MESSAGE);
+            }
+            value = (value << 8) | nextByte;
+        }
+        return value;
+    }
+
     /**
      * Signed integers are encoded as unsigned integers, where the low bit says whether to
      * complement the other bits to recover the int.
@@ -62,11 +89,24 @@ final class BinaryUtil {
         }
     }
 
+    public static long decodeInt(InputStream in) throws IOException {
+        final long uint = decodeUint(in);
+        if ((uint & 1) == 1) {
+            return ~(uint >>> 1);
+        } else {
+            return uint >>> 1;
+        }
+    }
+
     /**
      * Floating point numbers are encoded as byte-reversed ieee754.
      */
     public static void encodeDouble(OutputStream out, final double value) throws IOException {
         encodeUint(out, Long.reverseBytes(Double.doubleToLongBits(value)));
+    }
+
+    public static double decodeDouble(InputStream in) throws IOException {
+        return Double.longBitsToDouble(Long.reverseBytes(decodeUint(in)));
     }
 
     /**
@@ -76,16 +116,31 @@ final class BinaryUtil {
         out.write(value ? 1 : 0);
     }
 
-    /**
-     * Strings are encoded as the byte count followed by uninterpreted bytes.
-     */
-    public static void encodeString(OutputStream out, String value) throws IOException {
-        if (value == null) {
-            value = "";
+    public static boolean decodeBoolean(InputStream in) throws IOException {
+        int nextByte = in.read();
+        if (nextByte == -1) {
+            throw new CorruptVomStreamException(END_OF_STREAM_MESSAGE);
         }
-        byte[] data = value.getBytes(UTF8_CHARSET);
+        return nextByte != 0;
+    }
+
+    /**
+     * Encodes an array of bytes as byte count followed by byte values.
+     */
+    public static void encodeBytes(OutputStream out, byte[] data) throws IOException {
         encodeUint(out, data.length);
         out.write(data);
+    }
+
+    public static byte[] decodeBytes(InputStream in, int len) throws IOException {
+        if (len == 0) {
+            return new byte[0];
+        }
+        byte[] bytes = new byte[len];
+        if (in.read(bytes) != bytes.length) {
+            throw new CorruptVomStreamException(END_OF_STREAM_MESSAGE);
+        }
+        return bytes;
     }
 
     /**
@@ -118,5 +173,15 @@ final class BinaryUtil {
             default:
                 return false;
         }
+    }
+
+    /**
+     * Converts a string to byte array, null string is treated as empty string.
+     */
+    public static byte[] getBytes(String value) {
+        if (value == null) {
+            value = "";
+        }
+        return value.getBytes(UTF8_CHARSET);
     }
 }

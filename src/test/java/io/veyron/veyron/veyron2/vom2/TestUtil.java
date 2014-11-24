@@ -4,7 +4,9 @@ import org.junit.Assert;
 
 import io.veyron.veyron.veyron2.vdl.VdlType;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,6 +75,11 @@ public class TestUtil {
                     + actual.substring(0, actual.length() - remainder.length()) + ". Remainder: "
                     + remainder);
         }
+    }
+
+    static Object decode(byte[] bytes, Type targetType) throws Exception {
+        BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(bytes));
+        return decoder.decodeValue(targetType);
     }
 
     static String encode(VdlType type, Object value) throws Exception {
