@@ -33,9 +33,7 @@ public class VdlMap<K, V> extends VdlValue implements Map<K, V>, Parcelable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        final VdlMap<?, ?> other = (VdlMap<?, ?>)obj;
-        return this.impl.equals(other.impl);
+        return impl.equals(obj);
     }
 
     @Override

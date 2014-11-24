@@ -36,8 +36,7 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VdlComplex128)) return false;
         final VdlComplex128 other = (VdlComplex128) obj;
         return real == other.real && imag == other.imag;
     }

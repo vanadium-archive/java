@@ -35,10 +35,9 @@ public class VdlFloat32 extends VdlValue implements Parcelable, TypeAdapterFacto
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VdlFloat32)) return false;
         final VdlFloat32 other = (VdlFloat32) obj;
-        return this.value == other.value;
+        return value == other.value;
     }
 
     @Override

@@ -32,9 +32,7 @@ public class VdlSet<T> extends VdlValue implements Set<T>, Parcelable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        final VdlSet<?> other = (VdlSet<?>)obj;
-        return this.impl.equals(other.impl);
+        return impl.equals(obj);
     }
 
     @Override

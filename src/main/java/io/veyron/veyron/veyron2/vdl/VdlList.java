@@ -33,9 +33,7 @@ public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        final VdlList<?> other = (VdlList<?>)obj;
-        return this.impl.equals(other.impl);
+        return impl.equals(obj);
     }
 
     @Override

@@ -35,8 +35,7 @@ public class VdlString extends VdlValue implements Parcelable, TypeAdapterFactor
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VdlString)) return false;
         final VdlString other = (VdlString) obj;
         return value.equals(other.value);
     }

@@ -35,10 +35,9 @@ public class VdlByte extends VdlValue implements Parcelable, TypeAdapterFactory 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VdlByte)) return false;
         final VdlByte other = (VdlByte) obj;
-        return this.value == other.value;
+        return value == other.value;
     }
 
     @Override

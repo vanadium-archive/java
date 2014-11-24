@@ -35,10 +35,9 @@ public class VdlInt32 extends VdlValue implements Parcelable, TypeAdapterFactory
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VdlInt32)) return false;
         final VdlInt32 other = (VdlInt32) obj;
-        return this.value == other.value;
+        return value == other.value;
     }
 
     @Override

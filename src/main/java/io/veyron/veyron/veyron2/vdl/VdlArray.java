@@ -80,8 +80,6 @@ public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
         if (!(obj instanceof List))
             return false;
         List<?> other = (List<?>) obj;
