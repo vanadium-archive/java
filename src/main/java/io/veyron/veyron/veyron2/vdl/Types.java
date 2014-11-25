@@ -1,10 +1,9 @@
 package io.veyron.veyron.veyron2.vdl;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.annotations.SerializedName;
 
-import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
+import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -235,10 +234,10 @@ public final class Types {
     /**
      * A helper used to create a single VDL struct type.
      */
-    public static VdlType structOf(VdlStructField... fields) {
+    public static VdlType structOf(VdlField... fields) {
         Builder builder = new Builder();
         PendingType pending = builder.newPending(Kind.STRUCT);
-        for (VdlStructField field : fields) {
+        for (VdlField field : fields) {
             pending.addField(field.getName(), field.getType());
         }
         builder.build();
@@ -248,11 +247,11 @@ public final class Types {
     /**
      * A helper used to create a single VDL oneOf type.
      */
-    public static VdlType oneOfOf(VdlType... types) {
+    public static VdlType oneOfOf(VdlField... fields) {
         Builder builder = new Builder();
         PendingType pending = builder.newPending(Kind.ONE_OF);
-        for (VdlType type : types) {
-            pending.addType(type);
+        for (VdlField field : fields) {
+            pending.addField(field.getName(), field.getType());
         }
         builder.build();
         return pending.built();
@@ -413,14 +412,17 @@ public final class Types {
 
         private void populateOneOf(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.ONE_OF);
-            try {
-                @SuppressWarnings("unchecked")
-                List<TypeToken<?>> types = (List<TypeToken<?>>) klass.getField("TYPES").get(null);
-                for (TypeToken<?> typeToken : types) {
-                    pending.addType(lookupOrBuildPending(typeToken.getType()));
+            for (Class<?> oneOfClass : klass.getDeclaredClasses()) {
+                String name = oneOfClass.getName();
+                name = name.substring(name.lastIndexOf('$') + 1);
+                Type type;
+                try {
+                    type = oneOfClass.getDeclaredField("elem").getGenericType();
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(
+                            "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
                 }
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Unable to create VDL Type for type " + klass);
+                pending.addField(name, lookupOrBuildPending(type));
             }
         }
 
@@ -432,7 +434,8 @@ public final class Types {
             try {
                 pending.setLength(klass.getField("LENGTH").getInt(null));
             } catch (Exception e) {
-                throw new IllegalArgumentException("Unable to create VDL Type for type " + klass);
+                throw new IllegalArgumentException(
+                        "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
             }
         }
     }

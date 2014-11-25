@@ -7,7 +7,6 @@ import io.veyron.veyron.veyron2.vdl.VdlComplex64;
 import io.veyron.veyron.veyron2.vdl.VdlEnum;
 import io.veyron.veyron.veyron2.vdl.VdlList;
 import io.veyron.veyron.veyron2.vdl.VdlMap;
-import io.veyron.veyron.veyron2.vdl.VdlOneOf;
 import io.veyron.veyron.veyron2.vdl.VdlSet;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
 import io.veyron.veyron.veyron2.vdl.VdlType;
@@ -138,21 +137,6 @@ final class ReflectUtil {
             return createNamedGeneric(targetClass, impl);
         } else {
             return impl;
-        }
-    }
-
-    /**
-     * Creates an instance of VDL oneOf. The target class should be inherited from {@code VdlOneOf}.
-     */
-    static VdlOneOf createOneOf(ConversionTarget target) throws ConversionException {
-        Class<?> targetClass = target.getTargetClass();
-        if (targetClass == VdlOneOf.class) {
-            return new VdlOneOf(target.getVdlType());
-        }
-        try {
-            return (VdlOneOf) targetClass.newInstance();
-        } catch (Exception e) {
-            throw new ConversionException(target.getVdlType(), targetClass, e.getMessage());
         }
     }
 

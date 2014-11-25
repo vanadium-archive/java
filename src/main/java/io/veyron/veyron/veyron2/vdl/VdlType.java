@@ -12,7 +12,6 @@ import java.util.Set;
 
 /**
  * Type represents VDL types.
- * TODO(rogulenko): make this immutable
  */
 public final class VdlType implements Serializable {
     private Kind kind; // used by all kinds
@@ -21,90 +20,36 @@ public final class VdlType implements Serializable {
     private int length; // used by array
     private VdlType key; // used by set, map
     private VdlType elem; // used by array, list, map
-    private ImmutableList<VdlType> types; // used by oneof
-    private ImmutableList<VdlStructField> fields; // used by struct
+    private ImmutableList<VdlField> fields; // used by struct and oneof
 
-    public VdlType(Kind kind) {
-        this.kind = kind;
-    }
-
-    public VdlType() {
-    }
+    private VdlType() {}
 
     public Kind getKind() {
         return kind;
-    }
-
-    public void setKind(Kind kind) {
-        this.kind = kind;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public List<String> getLabels() {
         return labels;
-    }
-
-    public void setLabels(String... labels) {
-        this.labels = ImmutableList.copyOf(labels);
-    }
-
-    public void setLabels(List<String> labels) {
-        this.labels = ImmutableList.copyOf(labels);
     }
 
     public int getLength() {
         return length;
     }
 
-    public void setLength(int length) {
-        this.length = length;
-    }
-
     public VdlType getKey() {
         return key;
-    }
-
-    public void setKey(VdlType key) {
-        this.key = key;
     }
 
     public VdlType getElem() {
         return elem;
     }
 
-    public void setElem(VdlType elem) {
-        this.elem = elem;
-    }
-
-    public List<VdlType> getTypes() {
-        return types;
-    }
-
-    public void setTypes(VdlType... types) {
-        this.types = ImmutableList.copyOf(types);
-    }
-
-    public void setTypes(List<VdlType> types) {
-        this.types = ImmutableList.copyOf(types);
-    }
-
-    public List<VdlStructField> getFields() {
+    public List<VdlField> getFields() {
         return fields;
-    }
-
-    public void setFields(VdlStructField... fields) {
-        this.fields = ImmutableList.copyOf(fields);
-    }
-
-    public void setFields(List<VdlStructField> fields) {
-        this.fields = ImmutableList.copyOf(fields);
     }
 
     private static String typeString(VdlType type,
@@ -129,23 +74,19 @@ public final class VdlType implements Serializable {
             case MAP:
                 return result + "map[" + typeString(type.key, seen) + "]"
                         + typeString(type.elem, seen);
+            case ONE_OF:
             case STRUCT:
-                result += "struct{";
+                if (type.kind == Kind.STRUCT) {
+                    result += "struct{";
+                } else {
+                    result += "oneof{";
+                }
                 for (int i = 0; i < type.fields.size(); i++) {
                     if (i > 0) {
                         result += ";";
                     }
-                    VdlStructField field = type.fields.get(i);
+                    VdlField field = type.fields.get(i);
                     result += field.getName() + " " + typeString(field.getType(), seen);
-                }
-                return result + "}";
-            case ONE_OF:
-                result += "oneof{";
-                for (int i = 0; i < type.types.size(); i++) {
-                    if (i > 0) {
-                        result += ";";
-                    }
-                    result += typeString(type.types.get(i), seen);
                 }
                 return result + "}";
             default:
@@ -182,24 +123,13 @@ public final class VdlType implements Serializable {
             return false;
         }
 
-        if (types != other.types) {
-            if (types == null || types.size() != other.types.size()) {
-                return false;
-            }
-            for (int i = 0; i < this.types.size(); i++) {
-                if (!this.types.get(i).recursiveEquals(other.types.get(i), seen)) {
-                    return false;
-                }
-            }
-        }
-
         if (fields != other.fields) {
             if (fields == null || this.fields.size() != other.fields.size()) {
                 return false;
             }
             for (int i = 0; i < this.fields.size(); i++) {
-                VdlStructField thisField = this.fields.get(i);
-                VdlStructField otherField = other.fields.get(i);
+                VdlField thisField = this.fields.get(i);
+                VdlField otherField = other.fields.get(i);
                 if (!thisField.getName().equals(otherField.getName())
                         || !thisField.getType().recursiveEquals(otherField.getType(), seen)) {
                     return false;
@@ -238,17 +168,9 @@ public final class VdlType implements Serializable {
                 + (this.key == null ? 0 : this.key.recursiveHashCode(seen));
         result = prime * result
                 + (this.elem == null ? 0 : this.elem.recursiveHashCode(seen));
-        if (types != null) {
-            result = prime * result + this.types.size();
-            for (VdlType type : types) {
-                result = prime * result + type.recursiveHashCode(seen);
-            }
-        } else {
-            result = prime * result;
-        }
         if (fields != null) {
             result = prime * result + this.fields.size();
-            for (VdlStructField field : this.fields) {
+            for (VdlField field : this.fields) {
                 result = prime * result + field.getName().hashCode();
                 result = prime * result + field.getType().recursiveHashCode(seen);
             }
@@ -274,7 +196,6 @@ public final class VdlType implements Serializable {
         copy.length = this.length;
         copy.key = this.key;
         copy.elem = this.elem;
-        copy.types = this.types;
         copy.fields = this.fields;
         return copy;
     }
@@ -330,14 +251,12 @@ public final class VdlType implements Serializable {
     public static final class PendingType {
         private final VdlType vdlType;
         private final List<String> labels;
-        private final List<VdlType> types;
-        private final List<VdlStructField> fields;
+        private final List<VdlField> fields;
         private boolean built;
 
         private PendingType(VdlType vdlType) {
             this.vdlType = vdlType;
             labels = null;
-            types = null;
             fields = null;
             built = true;
         }
@@ -345,8 +264,7 @@ public final class VdlType implements Serializable {
         private PendingType() {
             vdlType = new VdlType();
             labels = new ArrayList<String>();
-            types = new ArrayList<VdlType>();
-            fields = new ArrayList<VdlStructField>();
+            fields = new ArrayList<VdlField>();
             built = false;
         }
 
@@ -359,8 +277,6 @@ public final class VdlType implements Serializable {
                     vdlType.labels = ImmutableList.copyOf(labels);
                     break;
                 case ONE_OF:
-                    vdlType.types = ImmutableList.copyOf(types);
-                    break;
                 case STRUCT:
                     vdlType.fields = ImmutableList.copyOf(fields);
                     break;
@@ -418,21 +334,10 @@ public final class VdlType implements Serializable {
             return setElem(elem.vdlType);
         }
 
-        public PendingType addType(VdlType type) {
-            assertNotBuilt();
-            assertOneOfKind(Kind.ONE_OF);
-            types.add(type);
-            return this;
-        }
-
-        public PendingType addType(PendingType type) {
-            return addType(type.vdlType);
-        }
-
         public PendingType addField(String name, VdlType type) {
             assertNotBuilt();
-            assertOneOfKind(Kind.STRUCT);
-            fields.add(new VdlStructField(name, type));
+            assertOneOfKind(Kind.ONE_OF, Kind.STRUCT);
+            fields.add(new VdlField(name, type));
             return this;
         }
 
@@ -449,10 +354,6 @@ public final class VdlType implements Serializable {
             labels.clear();
             if (type.labels != null) {
                 labels.addAll(type.labels);
-            }
-            types.clear();
-            if (type.types != null) {
-                types.addAll(type.types);
             }
             fields.clear();
             if (type.fields != null) {

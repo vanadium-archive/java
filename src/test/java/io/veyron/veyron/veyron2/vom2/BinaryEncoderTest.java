@@ -3,8 +3,8 @@ package io.veyron.veyron.veyron2.vom2;
 import junit.framework.TestCase;
 
 import io.veyron.veyron.veyron2.vdl.Types;
-import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
+import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vom2.testdata.TestdataConstants;
 
 public class BinaryEncoderTest extends TestCase {

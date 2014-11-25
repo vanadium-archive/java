@@ -1,15 +1,14 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.annotations.SerializedName;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
+import io.veyron.veyron.veyron2.vdl.VdlField;
 import io.veyron.veyron.veyron2.vdl.VdlOneOf;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
-import io.veyron.veyron.veyron2.vdl.VdlStructField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
 import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
@@ -18,7 +17,6 @@ import io.veyron.veyron.veyron2.vdl.VdlValue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -137,7 +135,7 @@ public class BinaryDecoder {
             target = new ConversionTarget(targetType);
         }
 
-        // TODO(rogulenko): check compatibility and handle OneOf correctly
+        // TODO(rogulenko): check compatibility
         if (actualType.getKind() != Kind.ANY && target.getKind() == Kind.ANY) {
             return new VdlAny((VdlValue) readValue(actualType, VdlValue.class));
         }
@@ -169,7 +167,7 @@ public class BinaryDecoder {
             case STRUCT:
                 return readVdlStruct(actualType, target);
             case ONE_OF:
-                return readVdlOneOf(target);
+                return readVdlOneOf(actualType, target);
             case STRING:
                 return readVdlString(target);
             case TYPEOBJECT:
@@ -359,7 +357,7 @@ public class BinaryDecoder {
             if (index == 0) {
                 break;
             }
-            VdlStructField field = actualType.getFields().get(index - 1);
+            VdlField field = actualType.getFields().get(index - 1);
             Type targetElemType = getMapElemOrStructFieldType(target, field.getName());
             Object key = ConvertUtil.convertFromBytes(BinaryUtil.getBytes(field.getName()),
                     new ConversionTarget(targetKeyType));
@@ -368,33 +366,43 @@ public class BinaryDecoder {
         }
         return data;
     }
-    private Object readVdlOneOf(ConversionTarget target) throws IOException, ConversionException {
-        VdlOneOf result = ReflectUtil.createOneOf(target);
-        TypeID typeId = new TypeID(BinaryUtil.decodeUint(in));
-        if (typeId.getValue() == 0) {
-            return result;
+    private Object readVdlOneOf(VdlType actualType, ConversionTarget target) throws IOException,
+            ConversionException {
+        int index = (int) BinaryUtil.decodeUint(in);
+        if (index <= 0 || index > actualType.getFields().size()) {
+            throw new CorruptVomStreamException("One of index " + index + " is out of range " + 1 +
+                    "..." + actualType.getFields().size());
         }
-        VdlType elemType = getType(typeId);
-        Type elemReflectType = null;
-        try {
-            @SuppressWarnings("unchecked")
-            List<TypeToken<?>> types =
-                    (List<TypeToken<?>>) target.getTargetClass().getField("TYPES").get(null);
-            for (TypeToken<?> typeToken : types) {
-                Type type = typeToken.getType();
-                if (Types.getVdlTypeFromReflect(typeToken.getType()).equals(elemType)) {
-                    elemReflectType = type;
-                    break;
-                }
+        index--;
+        VdlField actualField = actualType.getFields().get(index);
+        VdlType actualElemType = actualField.getType();
+        // Solve vdl.Value case.
+        if (target.getTargetClass() == VdlOneOf.class) {
+            return new VdlOneOf(actualType, index, actualElemType,
+                    (VdlValue) readValue(actualElemType, VdlValue.class));
+        }
+        Class<?> targetClass = target.getTargetClass();
+        // This can happen if targetClass is NamedOneOf.A.
+        if (targetClass.getSuperclass() != VdlOneOf.class) {
+            targetClass = targetClass.getSuperclass();
+        }
+        // Look-up field class in target.
+        Class<?> fieldClass = null;
+        for (Class<?> klass : targetClass.getDeclaredClasses()) {
+            if (klass.getName().equals(targetClass.getName() + "$" + actualField.getName())) {
+                fieldClass = klass;
+                break;
             }
-        } catch (Exception e) {
-            // fall through
         }
-        if (elemReflectType != null) {
-            return result.assignValue(elemReflectType,
-                    (Serializable) readValue(elemType, elemReflectType));
-        } else {
-            return result.assignValue((VdlValue) readValue(elemType, VdlValue.class));
+        if (fieldClass == null) {
+            throw new ConversionException(actualType, target.getTargetType());
+        }
+        try {
+            Type elemType = fieldClass.getDeclaredField("elem").getGenericType();
+            return fieldClass.getConstructor(ReflectUtil.getRawClass(elemType)).newInstance(
+                    readValue(actualElemType, elemType));
+        } catch (Exception e) {
+            throw new ConversionException(actualType, target.getTargetType(), e.getMessage());
         }
     }
 
@@ -485,8 +493,8 @@ public class BinaryDecoder {
             } else if (wireType instanceof WireOneOf) {
                 WireOneOf wireOneOf = (WireOneOf) wireType;
                 pending.setName(wireOneOf.getName()).setKind(Kind.ONE_OF);
-                for (TypeID oneOfTypeId : wireOneOf.getTypes()) {
-                    pending.addType(lookupOrBuildPending(oneOfTypeId));
+                for (WireField field : wireOneOf.getFields()) {
+                    pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
                 }
                 return pending;
             } else if (wireType instanceof WireSet) {

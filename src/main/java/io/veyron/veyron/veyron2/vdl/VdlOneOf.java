@@ -4,60 +4,43 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 
 /**
  * VdlOneOf is a representation of a VDL oneOf.
  */
 public class VdlOneOf extends VdlValue implements Parcelable {
     private Serializable elem;
-    private VdlType elemType;
+    private int index;
 
-    public VdlOneOf(VdlType type) {
+    protected VdlOneOf(VdlType type, int index, Serializable elem) {
         super(type);
         assertKind(Kind.ONE_OF);
-    }
-
-    private VdlOneOf assignValue(VdlType elemType, Serializable value) {
-        for (VdlType type : vdlType().getTypes()) {
-            if (type.equals(elemType)) {
-                this.elem = value;
-                this.elemType = type;
-                return this;
-            }
+        if (index < 0 || index > type.getFields().size()) {
+            throw new IllegalArgumentException("One of index " + index + " is out of range " + 0 +
+                    "..." + (type.getFields().size() - 1));
         }
-        return null;
+        this.index = index;
+        this.elem = elem;
     }
 
-    /**
-     * Tries to assign a value to the {@code VdlOneOf} object. Doesn't modify this object if
-     * provided type is incompatible.
-     *
-     * @param type the runtime type of the value
-     * @param value the value to assign
-     * @return this {@code VdlOneOf} object or null if the value has incompatible type
-     */
-    public VdlOneOf assignValue(Type type, Serializable value) {
-        return assignValue(Types.getVdlTypeFromReflect(type), value);
-    }
-
-    /**
-     * Tries to assign a value to the {@code VdlOneOf} object. Doesn't modify this object if
-     * provided type is incompatible.
-     *
-     * @param value the value to assign
-     * @return this {@code VdlOneOf} object or null if the value has incompatible type
-     */
-    public VdlOneOf assignValue(VdlValue value) {
-        return assignValue(value.vdlType(), value);
+    public VdlOneOf(VdlType type, int index, VdlType elemType, Serializable elem) {
+        this(type, index, elem);
+        if (!vdlType().getFields().get(index).getType().equals(elemType)) {
+            throw new IllegalArgumentException("Illegal type " + elemType + " of elem: it should"
+                    + "be " + vdlType().getFields().get(index).getType());
+        }
     }
 
     public Serializable getElem() {
         return elem;
     }
 
-    public VdlType getElemType() {
-        return elemType;
+    public int getIndex() {
+        return index;
+    }
+
+    public String getName() {
+        return vdlType().getFields().get(index).getName();
     }
 
     @Override
@@ -65,7 +48,7 @@ public class VdlOneOf extends VdlValue implements Parcelable {
         if (this == obj) return true;
         if (!(obj instanceof VdlOneOf)) return false;
         final VdlOneOf other = (VdlOneOf) obj;
-        return elem.equals(other.elem);
+        return getElem().equals(other.getElem());
     }
 
     @Override

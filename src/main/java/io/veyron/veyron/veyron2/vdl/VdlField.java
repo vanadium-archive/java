@@ -3,13 +3,13 @@ package io.veyron.veyron.veyron2.vdl;
 import java.io.Serializable;
 
 /**
- * StructField represents a struct field in a VDL type.
+ * VdlField represents a struct or oneOf field in a VDL type.
  */
-public final class VdlStructField implements Serializable {
+public final class VdlField implements Serializable {
     private final String name;
     private final VdlType type;
 
-    public VdlStructField(String name, VdlType type) {
+    public VdlField(String name, VdlType type) {
         this.name = name;
         this.type = type;
     }

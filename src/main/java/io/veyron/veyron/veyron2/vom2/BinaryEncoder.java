@@ -18,7 +18,7 @@ import io.veyron.veyron.veyron2.vdl.VdlInt64;
 import io.veyron.veyron.veyron2.vdl.VdlOneOf;
 import io.veyron.veyron.veyron2.vdl.VdlString;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
-import io.veyron.veyron.veyron2.vdl.VdlStructField;
+import io.veyron.veyron.veyron2.vdl.VdlField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlTypeObject;
 import io.veyron.veyron.veyron2.vdl.VdlUint16;
@@ -155,19 +155,18 @@ public class BinaryEncoder {
             case MAP:
                 return new WireMap(type.getName(), getType(type.getKey()), getType(type.getElem()));
             case ONE_OF:
-                List<TypeID> typeIds = new ArrayList<TypeID>();
-                for (VdlType oneOfType : type.getTypes()) {
-                    typeIds.add(getType(oneOfType));
-                }
-                return new WireOneOf(type.getName(), typeIds);
-            case SET:
-                return new WireSet(type.getName(), getType(type.getKey()));
             case STRUCT:
                 List<WireField> wireFields = new ArrayList<WireField>();
-                for (VdlStructField field : type.getFields()) {
+                for (VdlField field : type.getFields()) {
                     wireFields.add(new WireField(field.getName(), getType(field.getType())));
                 }
-                return new WireStruct(type.getName(), wireFields);
+                if (type.getKind() == Kind.ONE_OF) {
+                    return new WireOneOf(type.getName(), wireFields);
+                } else {
+                    return new WireStruct(type.getName(), wireFields);
+                }
+            case SET:
+                return new WireSet(type.getName(), getType(type.getKey()));
             default:
                 throw new RuntimeException("Unknown wiretype for kind: " + type.getKind());
         }
@@ -361,11 +360,13 @@ public class BinaryEncoder {
         expectClass(Kind.ONE_OF, value, VdlOneOf.class);
         VdlOneOf oneOfValue = (VdlOneOf) value;
         Object elem = oneOfValue.getElem();
+        int index = oneOfValue.getIndex();
         if (elem != null) {
-            BinaryUtil.encodeUint(out, getType(oneOfValue.getElemType()).getValue());
-            writeValue(out, elem, oneOfValue.getElemType());
+            BinaryUtil.encodeUint(out, index + 1);
+            writeValue(out, elem, oneOfValue.vdlType().getFields().get(index).getType());
         } else {
             BinaryUtil.encodeUint(out, 0);
+            // TODO(rogulenko): write zero value
         }
     }
 
@@ -393,9 +394,9 @@ public class BinaryEncoder {
 
     private void writeVdlStruct(OutputStream out, Object value) throws IOException {
         expectClass(Kind.STRUCT, value, AbstractVdlStruct.class);
-        List<VdlStructField> fields = ((AbstractVdlStruct) value).vdlType().getFields();
+        List<VdlField> fields = ((AbstractVdlStruct) value).vdlType().getFields();
         for (int i = 0; i < fields.size(); i++) {
-            VdlStructField field = fields.get(i);
+            VdlField field = fields.get(i);
             Object fieldValue = null;
             if (value instanceof VdlStruct) {
                 fieldValue = ((VdlStruct) value).getField(field.getName());

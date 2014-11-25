@@ -17,7 +17,7 @@ public class VdlStruct extends AbstractVdlStruct implements Parcelable {
         super(type);
         fields = new HashMap<String, VdlValue>();
         fieldTypes = new HashMap<String, VdlType>();
-        for (VdlStructField structField : type.getFields()) {
+        for (VdlField structField : type.getFields()) {
             fieldTypes.put(structField.getName(), structField.getType());
         }
     }

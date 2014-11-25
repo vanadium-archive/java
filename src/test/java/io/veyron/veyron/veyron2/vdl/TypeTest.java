@@ -1,8 +1,6 @@
 package io.veyron.veyron.veyron2.vdl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.annotations.SerializedName;
 
 import junit.framework.TestCase;
@@ -42,14 +40,20 @@ public class TypeTest extends TestCase {
         }
     }
 
-    private static final class MyOneOf extends VdlOneOf {
-        @SuppressWarnings("unused")
-        public static final ImmutableList<TypeToken<?>> TYPES = ImmutableList.<TypeToken<?>>of(
-                new TypeToken<MyInt16>() {}, new TypeToken<VdlInt32>() {},
-                new TypeToken<Long>() {});
+    @SuppressWarnings("unused")
+    private static class MyOneOf extends VdlOneOf {
+        public static class A extends MyOneOf {
+            private MyInt16 elem;
+        }
+        public static class B extends MyOneOf {
+            private VdlInt32 elem;
+        }
+        public static class C extends MyOneOf {
+            private Long elem;
+        }
 
-        public MyOneOf() {
-            super(Types.getVdlTypeFromReflect(MyOneOf.class));
+        private MyOneOf() {
+            super(Types.getVdlTypeFromReflect(MyOneOf.class), 0, null);
         }
     }
 
@@ -124,7 +128,8 @@ public class TypeTest extends TestCase {
         VdlType myComplex128 = Types.named(MyComplex128.class.getName(), Types.COMPLEX128);
 
         VdlType myOneOf = Types.named(MyOneOf.class.getName(),
-                Types.oneOfOf(myInt16, Types.INT32, Types.INT64));
+                Types.oneOfOf(new VdlField("A", myInt16), new VdlField("B", Types.INT32),
+                        new VdlField("C", Types.INT64)));
         VdlType myEnum = Types.named(MyEnum.class.getName(),
                 Types.enumOf("LABEL1", "LABEL2", "LABEL3"));
         VdlType myArray12 = Types.named(MyArray12.class.getName(),
@@ -176,7 +181,7 @@ public class TypeTest extends TestCase {
 
     public void testTypeString() {
         String myInt16 = MyInt16.class.getName() + " int16";
-        String myOneOf = String.format("%s oneof{%s;int32;int64}",
+        String myOneOf = String.format("%s oneof{A %s;B int32;C int64}",
                 MyOneOf.class.getName(), myInt16);
         String myEnum = String.format("%s enum{LABEL1;LABEL2;LABEL3}", MyEnum.class.getName());
         String myArray12 = String.format("%s [12]set[%s]", MyArray12.class.getName(), myOneOf);
@@ -197,25 +202,23 @@ public class TypeTest extends TestCase {
     }
 
     public void testEquals() {
-        VdlType primitive = new VdlType(Kind.UINT32);
+        VdlType.Builder builder = new Builder();
+        VdlType primitive = Types.UINT32;
+        VdlType list = Types.listOf(primitive);
 
-        VdlType list = new VdlType(Kind.LIST);
-        list.setElem(primitive);
-
-        VdlType recursiveSet = new VdlType(Kind.SET);
+        PendingType recursiveSet = builder.newPending(Kind.SET);
         recursiveSet.setKey(recursiveSet);
 
-        VdlType recursiveList = new VdlType(Kind.LIST);
-        VdlType recursiveStruct = new VdlType(Kind.STRUCT);
+        PendingType recursiveList = builder.newPending(Kind.LIST);
+        PendingType recursiveStruct = builder.newPending(Kind.STRUCT);
         recursiveList.setElem(recursiveStruct);
-        VdlStructField[] fields = new VdlStructField[2];
-        fields[0] = new VdlStructField("rec", recursiveSet);
-        fields[1] = new VdlStructField("rec2", recursiveList);
-        recursiveStruct.setFields(fields);
+        recursiveStruct.addField("rec", recursiveSet);
+        recursiveStruct.addField("rec2", recursiveList);
+        builder.build();
 
         VdlType[] types = new VdlType[] {
-                primitive, list, recursiveSet,
-                recursiveStruct, recursiveList
+                primitive, list, recursiveSet.built(),
+                recursiveStruct.built(), recursiveList.built()
         };
         for (VdlType type : types) {
             for (VdlType other : types) {
@@ -232,19 +235,20 @@ public class TypeTest extends TestCase {
     }
 
     public void testHashCode() {
-        VdlType primitive = new VdlType(Kind.UINT32);
+        VdlType.Builder builder = new Builder();
+        VdlType primitive = Types.UINT32;
+        VdlType list = Types.listOf(primitive);
 
-        VdlType list = new VdlType(Kind.LIST);
-        list.setElem(primitive);
-
-        VdlType recursiveSet = new VdlType(Kind.SET);
+        PendingType recursiveSet = builder.newPending(Kind.SET);
         recursiveSet.setKey(recursiveSet);
 
-        VdlType recursiveSetCopy = new VdlType(Kind.SET);
+        PendingType recursiveSetCopy = builder.newPending(Kind.SET);
         recursiveSetCopy.setKey(recursiveSetCopy);
 
-        assertEquals(recursiveSet.hashCode(), recursiveSetCopy.hashCode());
-        assertFalse(list.hashCode() == recursiveSet.hashCode());
+        builder.build();
+
+        assertEquals(recursiveSet.built().hashCode(), recursiveSetCopy.built().hashCode());
+        assertFalse(list.hashCode() == recursiveSet.built().hashCode());
     }
 
     /**
@@ -253,23 +257,26 @@ public class TypeTest extends TestCase {
      * but equivalent types for the other map.
      */
     public void testEqualsStructuralDifferences() {
+        VdlType.Builder builder = new Builder();
         // Both key and elem have the same type.
-        VdlType stringMap = new VdlType(Kind.MAP);
-        VdlType recursiveSet = new VdlType(Kind.SET);
+        PendingType stringMap = builder.newPending(Kind.MAP);
+        PendingType recursiveSet = builder.newPending(Kind.SET);
         recursiveSet.setKey(recursiveSet);
         stringMap.setKey(recursiveSet);
         stringMap.setElem(recursiveSet);
 
         // Key and elem have different but equivalent types.
-        VdlType otherTypeStringMap = new VdlType(Kind.MAP);
-        VdlType recursiveSetKey = new VdlType(Kind.SET);
+        PendingType otherTypeStringMap = builder.newPending(Kind.MAP);
+        PendingType recursiveSetKey = builder.newPending(Kind.SET);
         recursiveSetKey.setKey(recursiveSetKey);
         otherTypeStringMap.setKey(recursiveSetKey);
-        VdlType recursiveSetElem = new VdlType(Kind.SET);
+        PendingType recursiveSetElem = builder.newPending(Kind.SET);
         recursiveSetElem.setKey(recursiveSetElem);
         otherTypeStringMap.setElem(recursiveSetElem);
 
-        assertEquals(stringMap, otherTypeStringMap);
-        assertEquals(otherTypeStringMap, stringMap);
+        builder.build();
+
+        assertEquals(stringMap.built(), otherTypeStringMap.built());
+        assertEquals(otherTypeStringMap.built(), stringMap.built());
     }
 }
