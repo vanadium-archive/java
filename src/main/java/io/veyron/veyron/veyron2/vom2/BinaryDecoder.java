@@ -2,6 +2,8 @@ package io.veyron.veyron.veyron2.vom2;
 
 import com.google.gson.annotations.SerializedName;
 
+import io.veyron.veyron.veyron2.vdl.VdlOptional;
+
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
@@ -136,8 +138,12 @@ public class BinaryDecoder {
         }
 
         // TODO(rogulenko): check compatibility
-        if (actualType.getKind() != Kind.ANY && target.getKind() == Kind.ANY) {
-            return new VdlAny((VdlValue) readValue(actualType, VdlValue.class));
+        if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
+            if (target.getKind() == Kind.ANY) {
+                return new VdlAny((VdlValue) readValue(actualType, VdlValue.class));
+            } else if (target.getKind() == Kind.OPTIONAL) {
+                return readValue(actualType, ReflectUtil.getElementType(target.getTargetType(), 0));
+            }
         }
         switch (actualType.getKind()) {
             case ANY:
@@ -168,6 +174,8 @@ public class BinaryDecoder {
                 return readVdlStruct(actualType, target);
             case ONE_OF:
                 return readVdlOneOf(actualType, target);
+            case OPTIONAL:
+                return readVdlOptional(actualType, target);
             case STRING:
                 return readVdlString(target);
             case TYPEOBJECT:
@@ -181,10 +189,20 @@ public class BinaryDecoder {
         }
     }
 
-    private VdlAny readVdlAny(ConversionTarget target) throws IOException, ConversionException {
+    private Object createNullValue(ConversionTarget target) throws ConversionException {
+        if (target.getKind() == Kind.ANY) {
+            return new VdlAny();
+        } else if (target.getKind() == Kind.OPTIONAL) {
+            return new VdlOptional<VdlValue>(target.getVdlType());
+        } else {
+            throw new ConversionException("Can't create a null value of " + target.getTargetType());
+        }
+    }
+
+    private Object readVdlAny(ConversionTarget target) throws IOException, ConversionException {
         TypeID typeId = new TypeID(BinaryUtil.decodeUint(in));
         if (typeId.getValue() == 0) {
-            return new VdlAny();
+            return createNullValue(target);
         }
         Type targetType;
         if (target.getKind() != Kind.ANY) {
@@ -366,6 +384,7 @@ public class BinaryDecoder {
         }
         return data;
     }
+
     private Object readVdlOneOf(VdlType actualType, ConversionTarget target) throws IOException,
             ConversionException {
         int index = (int) BinaryUtil.decodeUint(in);
@@ -403,6 +422,19 @@ public class BinaryDecoder {
                     readValue(actualElemType, elemType));
         } catch (Exception e) {
             throw new ConversionException(actualType, target.getTargetType(), e.getMessage());
+        }
+    }
+
+    private Object readVdlOptional(VdlType actualType, ConversionTarget target) throws IOException,
+            ConversionException {
+        if (BinaryUtil.decodeUint(in) == 0) {
+            return createNullValue(target);
+        } else {
+            Type type = target.getTargetType();
+            if (target.getKind() == Kind.OPTIONAL) {
+                type = ReflectUtil.getElementType(target.getTargetType(), 0);
+            }
+            return new VdlOptional<VdlValue>((VdlValue) readValue(actualType.getElem(), type));
         }
     }
 
@@ -482,7 +514,7 @@ public class BinaryDecoder {
                 }
                 return pending;
             } else if (wireType instanceof WireList) {
-                WireList wireList= (WireList) wireType;
+                WireList wireList = (WireList) wireType;
                 return pending.setName(wireList.getName()).setKind(Kind.LIST)
                         .setElem(lookupOrBuildPending(wireList.getElem()));
             } else if (wireType instanceof WireMap) {
@@ -508,6 +540,10 @@ public class BinaryDecoder {
                     pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
                 }
                 return pending;
+            } else if (wireType instanceof WireOptional) {
+                WireOptional wireOptional = (WireOptional) wireType;
+                return pending.setName(wireOptional.getName()).setKind(Kind.OPTIONAL)
+                        .setElem(lookupOrBuildPending(wireOptional.getElem()));
             } else {
                 throw new CorruptVomStreamException("Unknown wire type: " + wireType.vdlType());
             }

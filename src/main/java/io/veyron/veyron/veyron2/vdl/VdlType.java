@@ -19,7 +19,7 @@ public final class VdlType implements Serializable {
     private ImmutableList<String> labels; // used by enum
     private int length; // used by array
     private VdlType key; // used by set, map
-    private VdlType elem; // used by array, list, map
+    private VdlType elem; // used by array, list, map, optional
     private ImmutableList<VdlField> fields; // used by struct and oneof
 
     private VdlType() {}
@@ -89,6 +89,8 @@ public final class VdlType implements Serializable {
                     result += field.getName() + " " + typeString(field.getType(), seen);
                 }
                 return result + "}";
+            case OPTIONAL:
+                return result + "?" + typeString(type.elem, seen);
             default:
                 return result + type.kind.name().toLowerCase();
             }
@@ -236,6 +238,10 @@ public final class VdlType implements Serializable {
             return newPending(Kind.MAP).setKey(key).setElem(elem);
         }
 
+        public PendingType optionalOf(PendingType elem) {
+            return newPending(Kind.OPTIONAL).setElem(elem);
+        }
+
         public PendingType builtPendingFromType(VdlType vdlType) {
             return new PendingType(vdlType);
         }
@@ -325,7 +331,7 @@ public final class VdlType implements Serializable {
 
         public PendingType setElem(VdlType elem) {
             assertNotBuilt();
-            assertOneOfKind(Kind.ARRAY, Kind.LIST, Kind.MAP);
+            assertOneOfKind(Kind.ARRAY, Kind.LIST, Kind.MAP, Kind.OPTIONAL);
             vdlType.elem = elem;
             return this;
         }

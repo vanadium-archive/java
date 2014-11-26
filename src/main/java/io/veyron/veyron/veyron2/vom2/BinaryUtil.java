@@ -167,6 +167,7 @@ final class BinaryUtil {
             case LIST:
             case MAP:
             case ONE_OF:
+            case OPTIONAL:
             case SET:
             case STRUCT:
                 return true;

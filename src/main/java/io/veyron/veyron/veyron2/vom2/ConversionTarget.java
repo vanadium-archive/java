@@ -2,8 +2,9 @@ package io.veyron.veyron.veyron2.vom2;
 
 import com.google.common.reflect.TypeToken;
 
-import io.veyron.veyron.veyron2.vdl.Types;
+import io.veyron.veyron.veyron2.vdl.VdlOptional;
 
+import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
 import io.veyron.veyron.veyron2.vdl.VdlBool;
@@ -72,6 +73,8 @@ public class ConversionTarget {
                 return new TypeToken<VdlMap<VdlValue, VdlValue>>(){}.getType();
             case ONE_OF:
                 return VdlOneOf.class;
+            case OPTIONAL:
+                return new TypeToken<VdlOptional<VdlValue>>(){}.getType();
             case SET:
                 return new TypeToken<VdlSet<VdlValue>>(){}.getType();
             case STRING:

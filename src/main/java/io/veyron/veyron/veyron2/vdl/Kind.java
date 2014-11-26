@@ -3,6 +3,7 @@ package io.veyron.veyron.veyron2.vdl;
 public enum Kind {
     ANY,
     ONE_OF,
+    OPTIONAL,
 
     BOOL,
     BYTE,

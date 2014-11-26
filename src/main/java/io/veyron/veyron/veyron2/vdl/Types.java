@@ -258,6 +258,16 @@ public final class Types {
     }
 
     /**
+     * A helper used to create a single VDL optional type.
+     */
+    public static VdlType optionalOf(VdlType elem) {
+        Builder builder = new Builder();
+        PendingType pending = builder.newPending(Kind.OPTIONAL).setElem(elem);
+        builder.build();
+        return pending.built();
+    }
+
+    /**
      * A helper used to create a single named VDL type based on another VDL type.
      */
     public static VdlType named(String name, VdlType base) {
@@ -351,6 +361,8 @@ public final class Types {
             } else if (Map.class.isAssignableFrom(klass)) {
                 pending = builder.mapOf(lookupOrBuildPending(elementTypes[0]),
                         lookupOrBuildPending(elementTypes[1]));
+            } else if (VdlOptional.class.isAssignableFrom(klass)) {
+                pending = builder.optionalOf(lookupOrBuildPending(elementTypes[0]));
             } else {
                 throw new IllegalArgumentException("Unable to create VDL Type for type " + type);
             }

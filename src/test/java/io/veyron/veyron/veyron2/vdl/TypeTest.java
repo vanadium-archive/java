@@ -1,6 +1,7 @@
 package io.veyron.veyron.veyron2.vdl;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.annotations.SerializedName;
 
 import junit.framework.TestCase;
@@ -8,6 +9,7 @@ import junit.framework.TestCase;
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
 import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,7 +112,7 @@ public class TypeTest extends TestCase {
         }
     }
 
-    private static final Map<VdlType, Class<?>> myTypes;
+    private static final Map<VdlType, Type> myTypes;
 
     static {
         VdlType myBool = Types.named(MyBool.class.getName(), Types.BOOL);
@@ -147,8 +149,9 @@ public class TypeTest extends TestCase {
                 .addField("Cycle", builder.listOf(pendingStruct));
         builder.build();
         VdlType myStruct = pendingStruct.built();
+        VdlType myOptional = Types.optionalOf(myStruct);
 
-        myTypes = new ImmutableMap.Builder<VdlType, Class<?>>()
+        myTypes = new ImmutableMap.Builder<VdlType, Type>()
                 .put(myBool, MyBool.class)
                 .put(myByte, MyByte.class)
                 .put(myUint16, MyUint16.class)
@@ -169,12 +172,13 @@ public class TypeTest extends TestCase {
                 .put(mySet, MySet.class)
                 .put(myMap, MyMap.class)
                 .put(myStruct, MyStruct.class)
+                .put(myOptional, new TypeToken<VdlOptional<MyStruct>>(){}.getType())
                 .build();
     }
 
     public void testGetVdlTypeFromReflection() {
-        for (Map.Entry<VdlType, Class<?>> entry : myTypes.entrySet()) {
-            assertEquals("Type for class: " + entry.getValue(),
+        for (Map.Entry<VdlType, Type> entry : myTypes.entrySet()) {
+            assertEquals("VDL type for reflect type: " + entry.getValue(),
                     entry.getKey(), Types.getVdlTypeFromReflect(entry.getValue()));
         }
     }
@@ -191,6 +195,7 @@ public class TypeTest extends TestCase {
                 MyMap.class.getName(), myEnum, mySet, MySet.class.getName());
         String myStruct = String.format("%s struct{ByteArray [][]byte;Set set[%s];Cycle []%s}",
                 MyStruct.class.getName(), myMap, MyStruct.class.getName());
+        String myOptional = "?" + myStruct;
 
         assertEquals(myOneOf, Types.getVdlTypeFromReflect(MyOneOf.class).toString());
         assertEquals(myEnum, Types.getVdlTypeFromReflect(MyEnum.class).toString());
@@ -199,6 +204,8 @@ public class TypeTest extends TestCase {
         assertEquals(mySet, Types.getVdlTypeFromReflect(MySet.class).toString());
         assertEquals(myMap, Types.getVdlTypeFromReflect(MyMap.class).toString());
         assertEquals(myStruct, Types.getVdlTypeFromReflect(MyStruct.class).toString());
+        assertEquals(myOptional, Types.getVdlTypeFromReflect(
+                new TypeToken<VdlOptional<MyStruct>>(){}.getType()).toString());
     }
 
     public void testEquals() {

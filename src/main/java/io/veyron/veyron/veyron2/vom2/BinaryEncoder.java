@@ -1,5 +1,7 @@
 package io.veyron.veyron.veyron2.vom2;
 
+import io.veyron.veyron.veyron2.vdl.VdlOptional;
+
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.AbstractVdlStruct;
 import io.veyron.veyron.veyron2.vdl.Types;
@@ -167,6 +169,8 @@ public class BinaryEncoder {
                 }
             case SET:
                 return new WireSet(type.getName(), getType(type.getKey()));
+            case OPTIONAL:
+                return new WireOptional(type.getName(), getType(type.getElem()));
             default:
                 throw new RuntimeException("Unknown wiretype for kind: " + type.getKind());
         }
@@ -211,6 +215,9 @@ public class BinaryEncoder {
             case ONE_OF:
                 writeVdlOneOf(out, value);
                 break;
+            case OPTIONAL:
+                writeVdlOptional(out, value);
+                break;
             case SET:
                 writeVdlSet(out, value, type);
                 break;
@@ -228,6 +235,8 @@ public class BinaryEncoder {
             case TYPEOBJECT:
                 writeVdlTypeObject(out, value);
                 break;
+            default:
+                throw new RuntimeException("Unknown kind: " + type.getKind());
         }
     }
 
@@ -367,6 +376,17 @@ public class BinaryEncoder {
         } else {
             BinaryUtil.encodeUint(out, 0);
             // TODO(rogulenko): write zero value
+        }
+    }
+
+    private void writeVdlOptional(OutputStream out, Object value) throws IOException {
+        expectClass(Kind.OPTIONAL, value, VdlOptional.class);
+        VdlOptional<?> optionalValue = (VdlOptional<?>) value;
+        if (optionalValue.isNull()) {
+            BinaryUtil.encodeUint(out, 0);
+        } else {
+            BinaryUtil.encodeUint(out, 1);
+            writeValue(out, optionalValue.getElem(), optionalValue.vdlType().getElem());
         }
     }
 

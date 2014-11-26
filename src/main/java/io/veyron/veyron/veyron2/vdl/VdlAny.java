@@ -51,17 +51,17 @@ public final class VdlAny extends VdlValue implements Parcelable {
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
         final VdlAny other = (VdlAny) obj;
-        return elem.equals(other.elem);
+        return elem == null ? other.elem == null : elem.equals(other.elem);
     }
 
     @Override
     public int hashCode() {
-        return elem.hashCode();
+        return elem == null ? 0 : elem.hashCode();
     }
 
     @Override
     public String toString() {
-        return elem.toString();
+        return elem == null ? null : elem.toString();
     }
 
     @Override

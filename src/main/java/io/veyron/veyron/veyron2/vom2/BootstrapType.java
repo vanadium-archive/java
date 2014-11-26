@@ -46,6 +46,7 @@ public final class BootstrapType {
                 .put(WireField.VDL_TYPE, Vom2Constants.WIRE_FIELD_ID)
                 .put(Types.listOf(WireField.VDL_TYPE), Vom2Constants.WIRE_FIELD_LIST_ID)
                 .put(WireOneOf.VDL_TYPE, Vom2Constants.WIRE_ONE_OF_ID)
+                .put(WireOptional.VDL_TYPE, Vom2Constants.WIRE_OPTIONAL_ID)
                 .put(Types.listOf(Types.BYTE), Vom2Constants.WIRE_BYTE_LIST_ID)
                 .put(Types.listOf(Types.STRING), Vom2Constants.WIRE_STRING_LIST_ID)
                 .put(Types.listOf(TypeID.VDL_TYPE), Vom2Constants.WIRE_TYPE_LIST_ID)
@@ -68,6 +69,7 @@ public final class BootstrapType {
                 .put(WireStruct.VDL_TYPE, WireStruct.class)
                 .put(WireField.VDL_TYPE, WireField.class)
                 .put(WireOneOf.VDL_TYPE, WireOneOf.class)
+                .put(WireOptional.VDL_TYPE, WireOptional.class)
                 .build();
     }
 
