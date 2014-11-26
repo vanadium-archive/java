@@ -75,14 +75,12 @@ public class VdlStruct extends AbstractVdlStruct implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        // TODO(rogulenko): replace this with vom encoding
         out.writeSerializable(this);
     }
 
     public static final Creator<VdlStruct> CREATOR = new Creator<VdlStruct>() {
         @Override
         public VdlStruct createFromParcel(Parcel in) {
-            // TODO(rogulenko): replace this with vom decoding
             return (VdlStruct) in.readSerializable();
         }
 
