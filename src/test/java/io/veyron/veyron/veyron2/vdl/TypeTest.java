@@ -213,11 +213,11 @@ public class TypeTest extends TestCase {
         VdlType primitive = Types.UINT32;
         VdlType list = Types.listOf(primitive);
 
-        PendingType recursiveSet = builder.newPending(Kind.SET);
+        PendingType recursiveSet = builder.newPending(Kind.SET).setName("recursiveSet");
         recursiveSet.setKey(recursiveSet);
 
         PendingType recursiveList = builder.newPending(Kind.LIST);
-        PendingType recursiveStruct = builder.newPending(Kind.STRUCT);
+        PendingType recursiveStruct = builder.newPending(Kind.STRUCT).setName("recursiveStruct");
         recursiveList.setElem(recursiveStruct);
         recursiveStruct.addField("rec", recursiveSet);
         recursiveStruct.addField("rec2", recursiveList);
@@ -235,55 +235,6 @@ public class TypeTest extends TestCase {
                     assertFalse(type.equals(other));
                 }
             }
-
-            VdlType copy = type.shallowCopy();
-            assertEquals(type, copy);
         }
-    }
-
-    public void testHashCode() {
-        VdlType.Builder builder = new Builder();
-        VdlType primitive = Types.UINT32;
-        VdlType list = Types.listOf(primitive);
-
-        PendingType recursiveSet = builder.newPending(Kind.SET);
-        recursiveSet.setKey(recursiveSet);
-
-        PendingType recursiveSetCopy = builder.newPending(Kind.SET);
-        recursiveSetCopy.setKey(recursiveSetCopy);
-
-        builder.build();
-
-        assertEquals(recursiveSet.built().hashCode(), recursiveSetCopy.built().hashCode());
-        assertFalse(list.hashCode() == recursiveSet.built().hashCode());
-    }
-
-    /**
-     * Tests equals on equivalent types that have structural differences.
-     * Here, the key and value of one map are the same type while they are different
-     * but equivalent types for the other map.
-     */
-    public void testEqualsStructuralDifferences() {
-        VdlType.Builder builder = new Builder();
-        // Both key and elem have the same type.
-        PendingType stringMap = builder.newPending(Kind.MAP);
-        PendingType recursiveSet = builder.newPending(Kind.SET);
-        recursiveSet.setKey(recursiveSet);
-        stringMap.setKey(recursiveSet);
-        stringMap.setElem(recursiveSet);
-
-        // Key and elem have different but equivalent types.
-        PendingType otherTypeStringMap = builder.newPending(Kind.MAP);
-        PendingType recursiveSetKey = builder.newPending(Kind.SET);
-        recursiveSetKey.setKey(recursiveSetKey);
-        otherTypeStringMap.setKey(recursiveSetKey);
-        PendingType recursiveSetElem = builder.newPending(Kind.SET);
-        recursiveSetElem.setKey(recursiveSetElem);
-        otherTypeStringMap.setElem(recursiveSetElem);
-
-        builder.build();
-
-        assertEquals(stringMap.built(), otherTypeStringMap.built());
-        assertEquals(otherTypeStringMap.built(), stringMap.built());
     }
 }

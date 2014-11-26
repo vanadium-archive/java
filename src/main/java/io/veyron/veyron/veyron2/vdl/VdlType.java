@@ -1,14 +1,15 @@
 package io.veyron.veyron.veyron2.vdl;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Type represents VDL types.
@@ -21,45 +22,34 @@ public final class VdlType implements Serializable {
     private VdlType key; // used by set, map
     private VdlType elem; // used by array, list, map, optional
     private ImmutableList<VdlField> fields; // used by struct and oneof
+    private String typeString; // used by all kinds, filled in by getUniqueType
 
-    private VdlType() {}
+    /**
+     * Stores a mapping from type string to VDL type instance. This is used to make sure that
+     * vdlTypeA.typeString == vdlTypeB.typeString => vdlTypeA == vdlTypeB.
+     */
+    private static final Map<String, VdlType> uniqueTypes =
+            new ConcurrentHashMap<String, VdlType>();
 
-    public Kind getKind() {
-        return kind;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getLabels() {
-        return labels;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public VdlType getKey() {
-        return key;
-    }
-
-    public VdlType getElem() {
-        return elem;
-    }
-
-    public List<VdlField> getFields() {
-        return fields;
-    }
-
-    private static String typeString(VdlType type,
-            final java.util.IdentityHashMap<VdlType, Boolean> seen) {
-        if (seen.containsKey(type) && type.name != null) {
-            return type.name;
+    /**
+     * Generated a type string representing type, which also is its human-readable representation.
+     * To brake loops we cache named types only, as you can't define an unnamed cyclic type in VDL.
+     * We also ensure that there is at most one VDL type instance for each name. These two
+     * assumptions make VDL type graph isomorphism check based on type strings straightforward.
+     */
+    private static String typeString(VdlType type, final Map<String, VdlType> seen) {
+        if (!Strings.isNullOrEmpty(type.name)) {
+            VdlType seenType = seen.get(type.name);
+            if (seenType != null) {
+                if (seenType != type) {
+                    throw new IllegalArgumentException("Duplicate type name " + type.name);
+                }
+                return type.name;
+            }
+            seen.put(type.name, type);
         }
-        seen.put(type, true);
         String result = "";
-        if (type.name != null) {
+        if (!Strings.isNullOrEmpty(type.name)) {
             result = type.name + " ";
         }
         switch (type.kind) {
@@ -96,110 +86,58 @@ public final class VdlType implements Serializable {
             }
     }
 
-    private boolean equal(Object a, Object b) {
-        return a == b || (a != null && a.equals(b));
-    }
-
-    private boolean recursiveEquals(final VdlType other,
-            final IdentityHashMap<Object, Set<Object>> seen) {
-        Set<Object> matches;
-        if (seen.containsKey(this)) {
-            matches = seen.get(this);
-            if (matches.contains(other)) {
-                return true;
-            }
+    private static VdlType getUniqueType(VdlType type) {
+        type.typeString = typeString(type, new HashMap<String, VdlType>());
+        VdlType uniqueType = uniqueTypes.get(type.typeString);
+        if (uniqueType != null) {
+            return uniqueType;
         } else {
-            matches = new HashSet<Object>();
-            seen.put(this, matches);
+            return addUniqueType(type);
         }
-        matches.add(other);
-
-        if (!equal(kind, other.kind) || !equal(name, other.name) || !equal(labels, other.labels)
-                || length != other.length) {
-            return false;
-        }
-        if (key != other.key && (key == null || !key.recursiveEquals(other.key, seen))) {
-            return false;
-        }
-        if (elem != other.elem && (elem == null || !elem.recursiveEquals(other.elem, seen))) {
-            return false;
-        }
-
-        if (fields != other.fields) {
-            if (fields == null || this.fields.size() != other.fields.size()) {
-                return false;
-            }
-            for (int i = 0; i < this.fields.size(); i++) {
-                VdlField thisField = this.fields.get(i);
-                VdlField otherField = other.fields.get(i);
-                if (!thisField.getName().equals(otherField.getName())
-                        || !thisField.getType().recursiveEquals(otherField.getType(), seen)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == null) {
-            return false;
+    private static synchronized VdlType addUniqueType(VdlType type) {
+        VdlType uniqueType = uniqueTypes.get(type.typeString);
+        if (uniqueType == null) {
+            uniqueTypes.put(type.typeString, type);
+            uniqueType = type;
         }
-        if (this.getClass() != other.getClass()) {
-            return false;
-        }
-        return recursiveEquals((VdlType) other, new IdentityHashMap<Object, Set<Object>>());
+        return uniqueType;
     }
 
-    private int recursiveHashCode(IdentityHashMap<Object, Void> seen) {
-        if (seen.containsKey(this)) {
-            return 0;
-        }
-        seen.put(this, null);
-        int result = 1;
-        final int prime = 31;
-        result = prime * result + this.kind.hashCode();
-        result = prime * result
-                + (this.name == null ? 0 : this.name.hashCode());
-        result = prime * result
-                + (this.labels == null ? 0 : this.labels.hashCode());
-        result = prime * result + this.length;
-        result = prime * result
-                + (this.key == null ? 0 : this.key.recursiveHashCode(seen));
-        result = prime * result
-                + (this.elem == null ? 0 : this.elem.recursiveHashCode(seen));
-        if (fields != null) {
-            result = prime * result + this.fields.size();
-            for (VdlField field : this.fields) {
-                result = prime * result + field.getName().hashCode();
-                result = prime * result + field.getType().recursiveHashCode(seen);
-            }
-        }
-        return result;
+    private VdlType() {}
+
+    public Kind getKind() {
+        return kind;
     }
 
-    @Override
-    public int hashCode() {
-        return recursiveHashCode(new IdentityHashMap<Object, Void>());
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public VdlType getKey() {
+        return key;
+    }
+
+    public VdlType getElem() {
+        return elem;
+    }
+
+    public List<VdlField> getFields() {
+        return fields;
     }
 
     @Override
     public String toString() {
-        return typeString(this, new IdentityHashMap<VdlType, Boolean>());
-    }
-
-    public VdlType shallowCopy() {
-        VdlType copy = new VdlType();
-        copy.kind = this.kind;
-        copy.name = this.name;
-        copy.labels = this.labels;
-        copy.length = this.length;
-        copy.key = this.key;
-        copy.elem = this.elem;
-        copy.fields = this.fields;
-        return copy;
+        return typeString;
     }
 
     /**
@@ -248,6 +186,9 @@ public final class VdlType implements Serializable {
 
         public void build() {
             for (PendingType type : pendingTypes) {
+                type.prepare();
+            }
+            for (PendingType type : pendingTypes) {
                 type.build();
             }
             pendingTypes.clear();
@@ -255,7 +196,7 @@ public final class VdlType implements Serializable {
     }
 
     public static final class PendingType {
-        private final VdlType vdlType;
+        private VdlType vdlType;
         private final List<String> labels;
         private final List<VdlField> fields;
         private boolean built;
@@ -274,7 +215,7 @@ public final class VdlType implements Serializable {
             built = false;
         }
 
-        private void build() {
+        private void prepare() {
             if (built) {
                 return;
             }
@@ -289,6 +230,13 @@ public final class VdlType implements Serializable {
                 default:
                     // do nothing
             }
+        }
+
+        private void build() {
+            if (built) {
+                return;
+            }
+            vdlType = getUniqueType(vdlType);
             built = true;
         }
 
