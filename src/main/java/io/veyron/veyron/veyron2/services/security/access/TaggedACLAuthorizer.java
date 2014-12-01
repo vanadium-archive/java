@@ -1,16 +1,18 @@
-package io.veyron.veyron.veyron2.security;
+package io.veyron.veyron.veyron2.services.security.access;
 
-import io.veyron.veyron.veyron.security.acl.TaggedACLMap;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.security.Authorizer;
+import io.veyron.veyron.veyron2.security.Blessings;
+import io.veyron.veyron.veyron2.security.Context;
 
 import java.util.Arrays;
 
-class TaggedACLAuthorizer implements Authorizer {
+public class TaggedACLAuthorizer implements Authorizer {
 	public static final String TAG = "Veyron runtime";
 	private final TaggedACLMap acls;
 	private final Class<?> type;
 
-	TaggedACLAuthorizer(TaggedACLMap acls, Class<?> type) {
+	public TaggedACLAuthorizer(TaggedACLMap acls, Class<?> type) {
 		this.acls = acls;
 		this.type = type;
 	}
@@ -39,7 +41,7 @@ class TaggedACLAuthorizer implements Authorizer {
 			if (tag == null || !tag.getClass().equals(this.type)) {
 				continue;
 			}
-			final io.veyron.veyron.veyron.security.acl.ACL acl = this.acls.get(tag.toString());
+			final ACL acl = this.acls.get(tag.toString());
 			if (acl == null || !ACLWrapper.wrap(acl).includes(blessings)) {
 				errorACLMatch(blessings);
 			}

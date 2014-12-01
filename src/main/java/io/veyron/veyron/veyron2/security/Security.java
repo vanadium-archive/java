@@ -3,8 +3,9 @@ package io.veyron.veyron.veyron2.security;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonSyntaxException;
 
-import io.veyron.veyron.veyron.security.acl.TaggedACLMap;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.services.security.access.TaggedACLAuthorizer;
+import io.veyron.veyron.veyron2.services.security.access.TaggedACLMap;
 import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.InvalidKeyException;

@@ -12,9 +12,6 @@ import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import io.veyron.veyron.veyron2.security.Label;
-import io.veyron.veyron.veyron2.security.Security;
-import io.veyron.veyron.veyron2.security.SecurityConstants;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.vdl.VeyronServer;
@@ -25,8 +22,6 @@ import io.veyron.veyron.veyron2.vdl.VeyronServer;
  * provided objects implement exactly one VDL interface.
  */
 public final class VDLInvoker {
-	private static final Label DEFAULT_LABEL = SecurityConstants.ADMIN_LABEL;
-
 	// A cache of ClassInfo objects, aiming to reduce the cost of expensive
 	// reflection operations.
 	private static Map<Class<?>, ClassInfo> serverWrapperClasses =

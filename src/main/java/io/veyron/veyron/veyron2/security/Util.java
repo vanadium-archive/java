@@ -226,38 +226,4 @@ class Util {
 				encoded, e.getMessage()));
 		}
 	}
-
-	/**
-	 * JSON-encodes the provided ACL.
-	 *
-	 * @param  acl  ACL to be encoded.
-	 * @return      JSON-encoded ACL.
-	 */
-	static String encodeACL(io.veyron.veyron.veyron.security.acl.ACL acl) {
-		if (acl == null) {
-			return "";
-		}
-		return JSONUtil.getGsonBuilder().create().toJson(acl);
-	}
-
-	/**
-	 * Decodes the provided JSON-encoded ACL.
-	 *
-	 * @param  encoded         JSON-encoded ACL.
-	 * @return                 decoded ACL.
-	 * @throws VeyronException if the provided ACL couldn't be decoded.
-	 */
-	static io.veyron.veyron.veyron.security.acl.ACL decodeACL(String encoded)
-		throws VeyronException {
-		if (encoded.isEmpty()) {
-			return null;
-		}
-		try {
-			return JSONUtil.getGsonBuilder().create().fromJson(encoded,
-				new TypeToken<io.veyron.veyron.veyron.security.acl.ACL>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid ACL encoded string %s: %s",
-				encoded, e.getMessage()));
-		}
-	}
 }

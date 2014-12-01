@@ -9,7 +9,6 @@ import io.veyron.veyron.veyron2.context.CancelableContext;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Principal;
 
 import java.io.EOFException;

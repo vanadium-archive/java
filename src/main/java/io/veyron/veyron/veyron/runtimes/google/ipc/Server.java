@@ -4,8 +4,6 @@ import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.ipc.Dispatcher;
 import io.veyron.veyron.veyron2.ipc.ListenSpec;
 import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
-import io.veyron.veyron.veyron2.security.ACL;
-import io.veyron.veyron.veyron2.security.Security;
 
 public class Server implements io.veyron.veyron.veyron2.ipc.Server {
 	private final long nativePtr;
