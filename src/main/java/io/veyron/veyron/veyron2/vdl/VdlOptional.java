@@ -79,7 +79,6 @@ public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcela
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        // TODO(rogulenko): replace this with vom encoding
         out.writeSerializable(this);
     }
 
@@ -87,7 +86,6 @@ public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcela
     public static final Creator<VdlOptional> CREATOR = new Creator<VdlOptional>() {
         @Override
         public VdlOptional createFromParcel(Parcel in) {
-            // TODO(rogulenko): replace this with vom decoding
             return (VdlOptional) in.readSerializable();
         }
 

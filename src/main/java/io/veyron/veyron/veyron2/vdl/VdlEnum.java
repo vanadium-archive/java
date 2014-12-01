@@ -47,14 +47,12 @@ public class VdlEnum extends VdlValue implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        // TODO(rogulenko): replace this with vom encoding
         out.writeSerializable(this);
     }
 
     public static final Creator<VdlEnum> CREATOR = new Creator<VdlEnum>() {
         @Override
         public VdlEnum createFromParcel(Parcel in) {
-            // TODO(rogulenko): replace this with vom decoding
             return (VdlEnum) in.readSerializable();
         }
 

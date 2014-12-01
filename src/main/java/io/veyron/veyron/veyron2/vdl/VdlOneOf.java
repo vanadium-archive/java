@@ -68,14 +68,12 @@ public class VdlOneOf extends VdlValue implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        // TODO(rogulenko): replace this with vom encoding
         out.writeSerializable(this);
     }
 
     public static final Creator<VdlOneOf> CREATOR = new Creator<VdlOneOf>() {
         @Override
         public VdlOneOf createFromParcel(Parcel in) {
-            // TODO(rogulenko): replace this with vom decoding
             return (VdlOneOf) in.readSerializable();
         }
 
