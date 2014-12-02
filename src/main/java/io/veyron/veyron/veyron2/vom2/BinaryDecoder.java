@@ -63,6 +63,7 @@ public class BinaryDecoder {
             binaryMagicByteRead = true;
         }
         VdlType actualType = decodeType();
+        assertTypesCompatible(actualType, targetType);
         return readValueMessage(actualType, targetType);
     }
 
@@ -75,6 +76,14 @@ public class BinaryDecoder {
      */
     public Object decodeValue() throws IOException, ConversionException {
         return decodeValue(VdlValue.class);
+    }
+
+    private void assertTypesCompatible(VdlType actualType, Type targetType)
+            throws ConversionException {
+        if (targetType != VdlValue.class && !TypeCompatibility.compatible(actualType,
+                Types.getVdlTypeFromReflect(targetType))) {
+            throw new ConversionException(actualType, targetType, "types are incompatible");
+        }
     }
 
     private Object readValueMessage(VdlType actualType, Type targetType) throws IOException,
@@ -137,7 +146,6 @@ public class BinaryDecoder {
             target = new ConversionTarget(targetType);
         }
 
-        // TODO(rogulenko): check compatibility
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {
                 return new VdlAny((VdlValue) readValue(actualType, VdlValue.class));
@@ -210,7 +218,9 @@ public class BinaryDecoder {
         } else {
             targetType = VdlValue.class;
         }
-        return new VdlAny((VdlValue) readValue(getType(typeId), targetType));
+        VdlType actualType = getType(typeId);
+        assertTypesCompatible(actualType, targetType);
+        return new VdlAny((VdlValue) readValue(actualType, targetType));
     }
 
     private Object readVdlArrayOrVdlList(VdlType actualType, ConversionTarget target)
