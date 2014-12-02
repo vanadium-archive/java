@@ -177,6 +177,9 @@ public class BinaryEncoder {
     }
 
     private void writeValue(OutputStream out, Object value, VdlType type) throws IOException {
+        if (value == null) {
+            value = VdlValue.zeroValue(type);
+        }
         switch (type.getKind()) {
             case ANY:
                 writeVdlAny(out, value);
@@ -370,13 +373,8 @@ public class BinaryEncoder {
         VdlOneOf oneOfValue = (VdlOneOf) value;
         Object elem = oneOfValue.getElem();
         int index = oneOfValue.getIndex();
-        if (elem != null) {
-            BinaryUtil.encodeUint(out, index + 1);
-            writeValue(out, elem, oneOfValue.vdlType().getFields().get(index).getType());
-        } else {
-            BinaryUtil.encodeUint(out, 0);
-            // TODO(rogulenko): write zero value
-        }
+        BinaryUtil.encodeUint(out, index + 1);
+        writeValue(out, elem, oneOfValue.vdlType().getFields().get(index).getType());
     }
 
     private void writeVdlOptional(OutputStream out, Object value) throws IOException {
@@ -428,10 +426,8 @@ public class BinaryEncoder {
                             + ", value " + value + ")");
                 }
             }
-            if (fieldValue != null) {
-                BinaryUtil.encodeUint(out, i + 1);
-                writeValue(out, fieldValue, field.getType());
-            }
+            BinaryUtil.encodeUint(out, i + 1);
+            writeValue(out, fieldValue, field.getType());
         }
         BinaryUtil.encodeUint(out, 0);
     }

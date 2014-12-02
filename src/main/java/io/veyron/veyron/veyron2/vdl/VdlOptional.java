@@ -14,17 +14,21 @@ public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcela
     private final T elem;
 
     /**
-     * Creates an instance of VdlOptional wrapping a provided element of provided VDL type.
+     * Creates a VdlOptional of provided VDL type that wraps a provided element.
+     *
+     * @param vdlType the runtime VDL type of VdlOptional
+     * @param element the wrapped element
      */
-    public VdlOptional(VdlType type, T element) {
-        super(type);
+    public VdlOptional(VdlType vdlType, T element) {
+        super(vdlType);
         assertKind(Kind.OPTIONAL);
         this.elem = element;
     }
 
     /**
-     * Creates an instance of VdlOptional wrapping a provided non-null element.
+     * Creates a VdlOptional that wraps a provided non-null element.
      *
+     * @param element the wrapped element
      * @throws NullPointerException is the element is null
      */
     public VdlOptional(T element) {
@@ -32,14 +36,18 @@ public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcela
     }
 
     /**
-     * Creates an instance of VdlOptional wrapping a null of provided VDL type.
+     * Creates a VdlOptional of provided VDL type that wraps null.
+     *
+     * @param vdlType the runtime VDL type of VdlOptional
      */
     public VdlOptional(VdlType vdlType) {
         this(vdlType, null);
     }
 
     /**
-     * Creates an instance of VdlOptional wrapping a null of provided type.
+     * Creates a VdlOptional of provided type that wraps null.
+     *
+     * @param type the runtime type of VdlOptional
      */
     public VdlOptional(Type type) {
         this(Types.getVdlTypeFromReflect(type));

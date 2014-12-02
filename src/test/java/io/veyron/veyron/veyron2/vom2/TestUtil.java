@@ -1,6 +1,7 @@
 package io.veyron.veyron.veyron2.vom2;
 
 import io.veyron.veyron.veyron2.vdl.VdlType;
+import io.veyron.veyron.veyron2.vdl.VdlValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,5 +38,9 @@ public class TestUtil {
         BinaryEncoder encoder = new BinaryEncoder(out);
         encoder.encodeValue(type, value);
         return TestUtil.bytesToHexString(out.toByteArray());
+    }
+
+    static String encode(VdlValue value) throws Exception {
+        return encode(value.vdlType(), value);
     }
 }
