@@ -7,16 +7,7 @@ import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.CryptoUtil;
-import io.veyron.veyron.veyron2.security.ECDSASigner;
 import io.veyron.veyron.veyron2.security.Principal;
-import io.veyron.veyron.veyron2.security.Security;
-import io.veyron.veyron.veyron2.security.SecurityConstants;
-import io.veyron.veyron.veyron2.security.Signer;
-
-import java.security.KeyStore;
-import java.security.interfaces.ECPublicKey;
 
 /**
  * VRuntime is an implementation of VRuntime that calls to native Go code for most of its

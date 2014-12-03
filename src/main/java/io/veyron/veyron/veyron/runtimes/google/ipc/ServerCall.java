@@ -1,17 +1,16 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
-import com.google.common.reflect.TypeToken;
-
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.context.CancelableContext;
 import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Principal;
 
 import java.io.EOFException;
+import java.lang.reflect.Type;
 import java.util.concurrent.CountDownLatch;
 
 public class ServerCall implements io.veyron.veyron.veyron2.ipc.ServerCall {
@@ -44,11 +43,11 @@ public class ServerCall implements io.veyron.veyron.veyron2.ipc.ServerCall {
 	}
 	// Implements io.veyron.veyron.veyron2.ipc.Stream.
 	@Override
-	public void send(Object item) throws VeyronException {
-		this.stream.send(item);
+	public void send(Object item, Type type) throws VeyronException {
+		this.stream.send(item, type);
 	}
 	@Override
-	public Object recv(TypeToken<?> type) throws EOFException, VeyronException {
+	public Object recv(Type type) throws EOFException, VeyronException {
 		return this.stream.recv(type);
 	}
 	// Implements io.veyron.veyron.veyron2.context.Context.

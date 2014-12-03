@@ -5,14 +5,7 @@ package io.veyron.veyron.veyron2;
  */
 public class OptionDefs {
     /**
-     * A key for an option of type {@link java.lang.String} that specifies the VDL interface path.
-     * NOTE(spetrovic): This option is temporary and will be removed soon after we switch
-     * Java to encoding/decoding from vom.Value objects.
-     */
-    public static String VDL_INTERFACE_PATH = "io.veyron.veyron.veyron2.VDL_INTERFACE_PATH";
-
-    /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.Runtime} that
+     * A key for an option of type {@link io.veyron.veyron.veyron2.VRuntime} that
      * specifies a Runtime.
      */
     public static String RUNTIME = "io.veyron.veyron.veyron2.RUNTIME";

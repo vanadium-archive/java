@@ -1,20 +1,19 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
+import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.ipc.ServerCall;
+import io.veyron.veyron.veyron2.vdl.VeyronServer;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import io.veyron.veyron.veyron2.ipc.ServerCall;
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.vdl.VeyronServer;
 
 /**
  * VDLInvoker is a helper class that uses reflection to invoke VDL interface
@@ -48,19 +47,7 @@ public final class VDLInvoker {
 
 	private final Map<String, ServerMethod> invokableMethods = new HashMap<String, ServerMethod>();
 
-	private final Gson gson = new Gson();
 	private final Class<?> serverClass; // Only used to make exception messages more clear.
-	private String[] implementedServers;
-
-	/**
-	 * Returns a list of the servers that are implemented by the server object represented by
-	 * the invoker. e.g. ["veyron2/service/proximity/ProximityScanner"]
-	 *
-	 * @return list of servers implemented by the server object represented by the invoker.
-	 */
-	public String[] getImplementedServers() {
-		return this.implementedServers;
-	}
 
 	/**
 	 * Creates a new invoker for the given object.
@@ -154,13 +141,11 @@ public final class VDLInvoker {
 	 */
 	private List<Object> wrapServer(Object srv) throws IllegalArgumentException {
 		List<Object> stubs = new ArrayList<Object>();
-		List<String> implementedServerList = new ArrayList<String>();
 		for (Class<?> iface : srv.getClass().getInterfaces()) {
 			final VeyronServer vs = iface.getAnnotation(VeyronServer.class);
 			if (vs == null) {
 				continue;
 			}
-			implementedServerList.add(vs.vdlPathName());
 			// There should only be one constructor.
 			if (vs.serverWrapper().getConstructors().length != 1) {
 				throw new RuntimeException(
@@ -182,107 +167,110 @@ public final class VDLInvoker {
 			throw new IllegalArgumentException(
 					"Object does not implement a valid generated server interface.");
 		}
-		this.implementedServers = new String[implementedServerList.size()];
-		implementedServerList.toArray(this.implementedServers);
 		return stubs;
 	}
 
 	/**
 	 * InvokeReply stores the replies for the {@link #invoke} method. The
-	 * replies are JSON-encoded. In addition to replies, this class also stores
+	 * replies are VOM-encoded. In addition to replies, this class also stores
 	 * application error, if any.
 	 */
-	public class InvokeReply {
-		public String[] results; // can be null, e.g., if an error occurred.
+	public static class InvokeReply {
+		public byte[][] results = null; // can be null, e.g., if an error occurred.
 		public boolean hasApplicationError = false;
-		public String errorID;
-		public String errorMsg;
+		public String errorID = null;
+		public String errorMsg = null;
 	}
 
 	/**
-	 * Converts the provided arguments from JSON and invokes the given method
-	 * using reflection. JSON-encodes the reply. Application errors are returned
-	 * along with the reply, while any other encountered errors are thrown as
-	 * exceptions.
+	 * VOM-decodes the provided arguments and invokes the given method using reflection.
+	 * VOM-encodes the reply. Application errors are returned along with the reply, while any other
+	 * encountered errors are thrown as exceptions.
 	 *
-	 * @param method name of the method to be invoked
-	 * @param call in-flight call information
-	 * @param inArgs JSON encoded arguments to the method
-	 * @return InvokeReply JSON-encoded invocation reply and application errors
-	 * @throws IllegalArgumentException if invalid arguments are passed
-	 * @throws IllegalAccessException if a runtime access error occurs
+	 * @param  method                   name of the method to be invoked
+	 * @param  call                     in-flight call information
+	 * @param  vomArgs                  VOM-encoded arguments to the method
+	 * @return InvokeReply              VOM-encoded invocation reply and application errors
+	 * @throws VeyronException          if the method couldn't be invoked
 	 */
-	public InvokeReply invoke(String method, ServerCall call, String[] inArgs) throws
-			IllegalArgumentException, IllegalAccessException {
+	public InvokeReply invoke(String method, ServerCall call, byte[][] vomArgs) throws VeyronException {
 		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
-			throw new IllegalArgumentException(String.format(
-					"Couldn't find method %s in class %s",
+			throw new VeyronException(String.format("Couldn't find method %s in class %s",
 					method, this.serverClass.getCanonicalName()));
 		}
 
-		// Decode JSON arguments.
-		final Object[] args = this.prepareArgs(m, call, inArgs);
+		// VOM-decode arguments.
+		final Object[] args = prepareArgs(m, call, vomArgs);
 
 		// Invoke the method and process results.
-		final InvokeReply reply = new InvokeReply();
+		Object result = null;
+		VeyronException appError = null;
 		try {
-			final Object result = m.invoke(args);
-			reply.results = this.prepareResults(m, result);
-		} catch (InvocationTargetException e) { // The underlying method threw
-			// an exception.
-			VeyronException ve;
+			result = m.invoke(args);
+		} catch (InvocationTargetException e) { // The underlying method threw an exception.
 			if ((e.getCause() instanceof VeyronException)) {
-				ve = (VeyronException) e.getTargetException();
+				appError = (VeyronException) e.getTargetException();
 			} else {
 				// Dump the stack trace locally.
 				e.getTargetException().printStackTrace();
-
-				ve = new VeyronException(
-						String.format(
-								"Remote invocations of java methods may only throw VeyronException, but call to %s threw %s",
-								method, e.getTargetException().getClass()));
+				throw new VeyronException(String.format(
+					"Remote invocations of java methods may only throw VeyronException, but call " +
+					"to %s threw %s", method, e.getTargetException().getClass()));
 			}
-			reply.hasApplicationError = true;
-			reply.errorID = ve.getID();
-			reply.errorMsg = ve.getMessage();
+		} catch (IllegalAccessException e) {
+		    throw new VeyronException(String.format("Couldn't invoke method %s: %s",
+		            m.method.getName(), e.getMessage()));
 		}
-
-		return reply;
+		return prepareReply(m, result, appError);
 	}
 
-	private Object[] prepareArgs(ServerMethod m, ServerCall call, String[] inArgs)
-			throws JsonSyntaxException {
-		final Class<?>[] inTypes = m.method.getParameterTypes();
-		assert inArgs.length == inTypes.length;
-
+	private static Object[] prepareArgs(ServerMethod m, ServerCall call, byte[][] vomArgs)
+			throws VeyronException {
 		// The first argument is always context, so we add it.
-		final int argsLength = inArgs.length + 1;
+		final int argsLength = vomArgs.length + 1;
+		final Type[] types = m.method.getGenericParameterTypes();
+		if (argsLength != types.length) {
+			throw new VeyronException(String.format(
+				"Mismatch in number of arguments for method %s: want %d, have %d",
+				m.method.getName(), types.length, argsLength));
+		}
+
 		final Object[] ret = new Object[argsLength];
 		ret[0] = call;
-		for (int i = 0; i < inArgs.length; i++) {
-			ret[i + 1] = this.gson.fromJson(inArgs[i], inTypes[i + 1]);
+		for (int i = 0; i < vomArgs.length; i++) {
+			ret[i + 1] = Util.VomDecode(vomArgs[i], types[i + 1]);
 		}
 		return ret;
 	}
 
-	private String[] prepareResults(ServerMethod m, Object result)
-			throws IllegalArgumentException, IllegalAccessException {
+	private static InvokeReply prepareReply(ServerMethod m, Object result, VeyronException appError)
+			throws VeyronException {
+		final InvokeReply reply = new InvokeReply();
+		if (appError != null) {
+			reply.hasApplicationError = true;
+			reply.errorID = appError.getID();
+			reply.errorMsg = appError.getMessage();
+		}
 		if (m.method.getReturnType() == void.class) {
-			return new String[0];
-		}
-		if (m.method.getReturnType().getDeclaringClass() == m.method.getDeclaringClass()) {
-			// The return type was declared in the server definition, so this
-			// method has multiple out args.
+			reply.results = new byte[0][];
+		} else if (m.method.getReturnType().getDeclaringClass() == m.method.getDeclaringClass()) {
+			// The return type was declared in the server definition, so this method has multiple
+			// out args.
 			final Field[] fields = m.method.getReturnType().getFields();
-			final String[] reply = new String[fields.length];
+			reply.results = new byte[fields.length][];
 			for (int i = 0; i < fields.length; i++) {
-				reply[i] = this.gson.toJson(fields[i].get(result));
+			    try {
+			        final Object value = result != null ? fields[i].get(result) : null;
+			        reply.results[i] = Util.VomEncode(value, fields[i].getGenericType());
+			    } catch (IllegalAccessException e) {
+			        throw new VeyronException("Couldn't get field: " + e.getMessage());
+			    }
 			}
-			return reply;
+		} else {
+			reply.results = new byte[1][];
+			reply.results[0] = Util.VomEncode(result, m.method.getGenericReturnType());
 		}
-		final String[] reply = new String[1];
-		reply[0] = this.gson.toJson(result);
 		return reply;
 	}
 

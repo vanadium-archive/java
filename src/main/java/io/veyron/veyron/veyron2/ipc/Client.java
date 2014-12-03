@@ -1,10 +1,10 @@
 package io.veyron.veyron.veyron2.ipc;
 
-import com.google.common.reflect.TypeToken;
-
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.context.Context;
+
+import java.lang.reflect.Type;
 
 /**
  * Client represents the interface for making RPC calls.  There may be multiple outstanding calls
@@ -20,11 +20,12 @@ public interface Client {
 	 * @param  name            name of the server.
 	 * @param  method          name of the server's method to be invoked.
 	 * @param  args            array of arguments to the server's method.
+	 * @param  argTypes        array of types of the provided arguments.
 	 * @return                 call object that manages streaming args and results.
 	 * @throws VeyronException if the call cannot be started.
 	 */
-	public Call startCall(Context context, String name, String method, Object[] args)
-		throws VeyronException;
+	public Call startCall(Context context, String name, String method,
+		Object[] args, Type[] argTypes) throws VeyronException;
 
 	/**
 	 * Starts an asynchronous call of the method on the server instance identified by name, with the
@@ -35,15 +36,16 @@ public interface Client {
 	 *    CURRENTLY NO OPTIONS ARE MANDATED
 	 *
 	 * @param  context         client context.
-	 * @param  name            a name of the server.
-	 * @param  method          a name of the server's method to be invoked.
-	 * @param  args            an array of arguments to the server's method.
+	 * @param  name            name of the server.
+	 * @param  method          name of the server's method to be invoked.
+	 * @param  args            array of arguments to the server's method.
+	 * @param  argTypes        array of types of the provided arguments.
 	 * @param  opts            call options.
-	 * @return                 a call object that manages streaming args and results.
+	 * @return                 call object that manages streaming args and results.
 	 * @throws VeyronException if the call cannot be started.
 	 */
-	public Call startCall(Context context, String name, String method, Object[] args,
-		Options opts) throws VeyronException;
+	public Call startCall(Context context, String name, String method,
+		Object[] args, Type[] argTypes, Options opts) throws VeyronException;
 
 	/**
 	 * Discards all the state associated with this client.  In-flight calls may be terminated with
@@ -74,7 +76,7 @@ public interface Client {
 		 * @return                 an array of output arguments.
 		 * @throws VeyronException if there was an error executing the call.
 		 */
-		public Object[] finish(TypeToken<?>[] types) throws VeyronException;
+		public Object[] finish(Type[] types) throws VeyronException;
 
 		/**
 		 * Cancels the call.  The server will stop processing, if possible.  Calls to

@@ -1,19 +1,10 @@
 package io.veyron.veyron.veyron2;
 
 import go.Go;
-import io.veyron.veyron.veyron2.OptionDefs;
+
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.ECDSASigner;
-import io.veyron.veyron.veyron2.security.Principal;
-import io.veyron.veyron.veyron2.security.Security;
-import io.veyron.veyron.veyron2.security.SecurityConstants;
-import io.veyron.veyron.veyron2.security.Signer;
-
-import java.security.KeyStore;
-import java.security.interfaces.ECPublicKey;
 
 /**
  * RuntimeFactory creates new Java runtimes.  It represents an entry point into the Veyron
