@@ -5,7 +5,6 @@ import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.context.Context;
 
 import java.lang.reflect.Type;
-import java.math.BigInteger;
 
 public class Client implements io.veyron.veyron.veyron2.ipc.Client {
 	private final long nativePtr;
