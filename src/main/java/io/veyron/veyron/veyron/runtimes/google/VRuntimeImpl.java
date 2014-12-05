@@ -10,15 +10,13 @@ import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Principal;
 
 /**
- * VRuntime is an implementation of VRuntime that calls to native Go code for most of its
- * functionalities.
+ * VRuntimeImpl is an implementation of {@code io.veyron.veyron.veyron2.VRuntimeImpl}
+ * that calls to native Go code for most of its functionalities.
  */
-public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
+public class VRuntimeImpl extends io.veyron.veyron.veyron2.VRuntimeImpl {
 	private static final String TAG = "Veyron runtime";
-	private static VRuntime globalRuntime = null;
 
 	private static native long nativeInit(Options opts) throws VeyronException;
-	private static native long nativeNewRuntime(Options opts) throws VeyronException;
 
 	/**
 	 * Returns the initialized global instance of the runtime.
@@ -26,39 +24,10 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	 * @param  opts runtime options.
 	 * @return      a pre-initialized runtime instance.
 	 */
-	public static synchronized VRuntime initRuntime(Options opts) throws VeyronException {
-		if (VRuntime.globalRuntime == null) {
-			// Use principal passed-in through options, if available.
-			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-			VRuntime.globalRuntime = new VRuntime(nativeInit(opts), principal);
-		}
-		return VRuntime.globalRuntime;
-	}
-
-	/**
-	 * Returns the pre-initialized global runtime instance.  Returns {@code null} if init()
-	 * hasn't already been invoked.
-	 *
-	 * @return a pre-initialized runtime instance.
-	 */
-	public static synchronized VRuntime defaultRuntime() {
-		return VRuntime.globalRuntime;
-	}
-
-	/**
-	 * Creates and initializes a new Runtime instance.
-	 *
-	 * @param  opts runtime options.
-	 * @return      a new runtime instance.
-	 */
-	public static synchronized VRuntime newRuntime(Options opts) throws VeyronException {
-		try {
-			// Use principal passed-in through options, if available.
-			final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-			return new VRuntime(nativeNewRuntime(opts), principal);
-		} catch (VeyronException e) {
-			throw new RuntimeException("Couldn't create Veyron Runtime: " + e.getMessage());
-		}
+	public static VRuntimeImpl create(Options opts) throws VeyronException {
+		// Use principal passed-in through options, if available.
+		final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
+		return new VRuntimeImpl(nativeInit(opts), principal);
 	}
 
 	private final long nativePtr;
@@ -73,7 +42,7 @@ public class VRuntime implements io.veyron.veyron.veyron2.VRuntime {
 	private native Namespace nativeGetNamespace(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private VRuntime(long nativePtr, Principal principal) {
+	private VRuntimeImpl(long nativePtr, Principal principal) {
 		this.nativePtr = nativePtr;
 		this.principal = principal;
 	}

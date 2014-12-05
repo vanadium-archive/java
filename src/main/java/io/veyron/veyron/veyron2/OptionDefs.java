@@ -5,20 +5,20 @@ package io.veyron.veyron.veyron2;
  */
 public class OptionDefs {
     /**
-     * A key for an option of type {@link io.veyron.veyron.veyron2.VRuntime} that
-     * specifies a Runtime.
+     * A key for an option of type {@link io.veyron.veyron.veyron2.VRuntimeImpl} that
+     * specifies a runtime implementation.
      */
     public static String RUNTIME = "io.veyron.veyron.veyron2.RUNTIME";
 
     /**
      * A key for an option of type {@link io.veyron.veyron.veyron2.ipc.Client} that
-     * specifies a Client.
+     * specifies a client.
      */
     public static String CLIENT = "io.veyron.veyron.veyron2.CLIENT";
 
     /**
      * A key for an option of type {@link io.veyron.veyron.veyron2.security.Principal} that
-     * specifies a Principal for the Runtime.
+     * specifies a principal to be assigned to the runtime.
      */
     public static String RUNTIME_PRINCIPAL = "io.veyron.veyron.veyron2.RUNTIME_PRINCIPAL";
 }

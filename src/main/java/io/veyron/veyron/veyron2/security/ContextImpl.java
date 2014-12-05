@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.Label;
 import io.veyron.veyron.veyron2.security.Principal;
 
 public class ContextImpl implements io.veyron.veyron.veyron2.security.Context {

@@ -2,7 +2,6 @@ package io.veyron.veyron.veyron2.security;
 
 import io.veyron.veyron.veyron2.VeyronException;
 
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -11,19 +10,8 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
 public class ECDSASigner implements io.veyron.veyron.veyron2.security.Signer {
-	private static final String TAG = "Veyron runtime";
 	private static final String HASH_ALGORITHM = "SHA256";
 	private static final String SIGN_ALGORITHM = HASH_ALGORITHM + "withECDSA";
-
-	private static byte[] join(byte[] a, byte[] b) {
-		if (a == null || a.length == 0) return b;
-		if (b == null || b.length == 0) return a;
-		final byte[] c = new byte[a.length + b.length];
-		System.arraycopy(a, 0, c, 0, a.length);
-		System.arraycopy(b, 0, c, a.length, b.length);
-		return c;
-	}
-
 
 	private final PrivateKey privKey;
 	private final ECPublicKey pubKey;

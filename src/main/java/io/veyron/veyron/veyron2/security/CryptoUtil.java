@@ -1,23 +1,15 @@
 package io.veyron.veyron.veyron2.security;
 
-import android.security.KeyPairGeneratorSpec;
-
 import io.veyron.veyron.veyron2.VeyronException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
@@ -26,26 +18,25 @@ import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Calendar;
-
-import javax.security.auth.x500.X500Principal;
 
 /**
  * CryptoUtil implements various cryptographic utilities.
  */
 public class CryptoUtil {
-	private static final String TAG = "Veyron runtime";
-	private static final String KEYSTORE = "AndroidKeyStore";
 	private static final String PK_ALGORITHM = "EC";
-	private static final int KEY_SIZE = 256;
 
 	// NIST-192
-	private static final ECParameterSpec EC_P192_PARAMS = getParameterSpec("prime192v1");
-	private static final ECParameterSpec EC_P224_PARAMS = getParameterSpec("secp224r1"); // NIST-224
+	@SuppressWarnings("unused")
+    private static final ECParameterSpec EC_P192_PARAMS = getParameterSpec("prime192v1");
+	@SuppressWarnings("unused")
+    private static final ECParameterSpec EC_P224_PARAMS = getParameterSpec("secp224r1"); // NIST-224
 	// NIST-256
-	private static final ECParameterSpec EC_P256_PARAMS = getParameterSpec("prime256v1");
-	private static final ECParameterSpec EC_P384_PARAMS = getParameterSpec("secp384r1"); // NIST-384
-	private static final ECParameterSpec EC_P521_PARAMS = getParameterSpec("secp521r1"); // NIST-521
+	@SuppressWarnings("unused")
+    private static final ECParameterSpec EC_P256_PARAMS = getParameterSpec("prime256v1");
+	@SuppressWarnings("unused")
+    private static final ECParameterSpec EC_P384_PARAMS = getParameterSpec("secp384r1"); // NIST-384
+	@SuppressWarnings("unused")
+    private static final ECParameterSpec EC_P521_PARAMS = getParameterSpec("secp521r1"); // NIST-521
 
 	private static ECParameterSpec getParameterSpec(String algorithm) {
 		try {

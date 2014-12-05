@@ -19,7 +19,6 @@ import java.util.Arrays;
  * primitives.
  */
 public class Security {
-	private static final String TAG = "Veyron runtime";
 
 	/**
 	 * Mints a new private key and generates a principal based on this key, storing its
