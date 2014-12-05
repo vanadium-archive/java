@@ -1,8 +1,7 @@
 package io.veyron.veyron.veyron2.vom2;
 
+import com.google.common.base.Strings;
 import com.google.gson.annotations.SerializedName;
-
-import io.veyron.veyron.veyron2.vdl.VdlOptional;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.Types;
@@ -10,6 +9,7 @@ import io.veyron.veyron.veyron2.vdl.VdlAny;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
 import io.veyron.veyron.veyron2.vdl.VdlField;
 import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlOptional;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
@@ -69,6 +69,11 @@ public class BinaryDecoder {
 
     /**
      * Decodes a VDL value. Returns an instance of {@code VdlValue}.
+     * The decoder also tries to match named VDL types with Java classes generated from VDL by
+     * translating VDL type name to Java class name, initializing class and calling
+     * {@code Types.getReflectTypeForVdl}. If the decoder fails to find a matching class for VDL
+     * type it will construct a general {@code VdlValue}. Prefer to use {@code decodeValue(Type)}
+     * over this method.
      *
      * @return the decoded value
      * @throws IOException
@@ -136,7 +141,7 @@ public class BinaryDecoder {
             ConversionException {
         ConversionTarget target;
         if (targetType == VdlValue.class) {
-            Type bootstrapClass = BootstrapType.getBootstrapClass(actualType);
+            Type bootstrapClass = Types.getReflectTypeForVdl(actualType);
             if (bootstrapClass != null) {
                 target = new ConversionTarget(bootstrapClass);
             } else {
@@ -477,7 +482,11 @@ public class BinaryDecoder {
         public void build() {
             builder.build();
             for (Map.Entry<TypeID, PendingType> entry : pendingTypes.entrySet()) {
-                BinaryDecoder.this.decodedTypes.put(entry.getKey(), entry.getValue().built());
+                VdlType vdlType = entry.getValue().built();
+                if (!Strings.isNullOrEmpty(vdlType.getName())) {
+                    Types.loadClassForVdlName(vdlType.getName());
+                }
+                BinaryDecoder.this.decodedTypes.put(entry.getKey(), vdlType);
             }
         }
 

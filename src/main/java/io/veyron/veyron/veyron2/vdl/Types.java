@@ -1,5 +1,7 @@
 package io.veyron.veyron.veyron2.vdl;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.gson.annotations.SerializedName;
 
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
@@ -10,6 +12,8 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +100,7 @@ public final class Types {
     public static final VdlType TYPEOBJECT = createPrimitiveType(Kind.TYPEOBJECT);
 
     private static final Map<Type, VdlType> typeCache = new ConcurrentHashMap<Type, VdlType>();
+    private static final Map<VdlType, Type> typeRegistry = new ConcurrentHashMap<VdlType, Type>();
 
     static {
         typeCache.put(VdlAny.class, ANY);
@@ -280,13 +285,48 @@ public final class Types {
     /**
      * Creates a {@code VdlType} object corresponding to a {@code java.lang.reflect.Type} object.
      * Resolves maps, sets, lists, arrays, primitives and classes generated from *.vdl files.
-     * All results are statically cached.
+     * All results are statically cached. All named VDL types are also registered so that the
+     * corresponding {@code Type} object can be retrieved by calling {@code getReflectTypeForVdl}.
      */
     public static VdlType getVdlTypeFromReflect(Type type) {
         if (typeCache.containsKey(type)) {
             return typeCache.get(type);
         }
         return synchronizedLookupOrBuildType(type);
+    }
+
+    /**
+     * Returns a {@code java.lang.reflect.Type} object corresponding to a named VDL type that was
+     * built by calling {@code getVdlTypeFromReflect}.
+     *
+     * @param vdlType the VDL type
+     * @return the {@code Type} object or null if this is an unnamed or unknown VDL type
+     */
+    public static Type getReflectTypeForVdl(VdlType vdlType) {
+        return typeRegistry.get(vdlType);
+    }
+
+    /**
+     * Tries to load a Java class that was generated from named VDL type.
+     *
+     * @param name the name of VDL type
+     * @return true iff the class was found
+     */
+    public static boolean loadClassForVdlName(String name) {
+        String[] parts = name.split("/");
+        for (int i = 0; i < parts.length - 1; i++) {
+            List<String> subparts = Arrays.asList(parts[i].split("\\."));
+            Collections.reverse(subparts);
+            parts[i] = Joiner.on(".").join(subparts);
+        }
+        String className = Joiner.on(".").join(parts);
+        try {
+            // lookup and load class
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     private static synchronized VdlType synchronizedLookupOrBuildType(Type type) {
@@ -314,7 +354,12 @@ public final class Types {
         public void buildAndCache() {
             builder.build();
             for (Map.Entry<Type, PendingType> entry : pendingTypes.entrySet()) {
-                typeCache.put(entry.getKey(), entry.getValue().built());
+                Type reflectType = entry.getKey();
+                VdlType vdlType = entry.getValue().built();
+                typeCache.put(reflectType, vdlType);
+                if (!Strings.isNullOrEmpty(vdlType.getName())) {
+                    typeRegistry.put(vdlType, reflectType);
+                }
             }
         }
 
@@ -396,8 +441,6 @@ public final class Types {
             GeneratedFromVdlType vdlName = klass.getAnnotation(GeneratedFromVdlType.class);
             if (vdlName != null) {
                 pending.setName(vdlName.value());
-            } else {
-                pending.setName(klass.getName());
             }
             return pending;
         }

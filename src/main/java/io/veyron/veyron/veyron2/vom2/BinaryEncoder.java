@@ -1,9 +1,7 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import io.veyron.veyron.veyron2.vdl.VdlOptional;
-
-import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.AbstractVdlStruct;
+import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
@@ -12,15 +10,16 @@ import io.veyron.veyron.veyron2.vdl.VdlByte;
 import io.veyron.veyron.veyron2.vdl.VdlComplex128;
 import io.veyron.veyron.veyron2.vdl.VdlComplex64;
 import io.veyron.veyron.veyron2.vdl.VdlEnum;
+import io.veyron.veyron.veyron2.vdl.VdlField;
 import io.veyron.veyron.veyron2.vdl.VdlFloat32;
 import io.veyron.veyron.veyron2.vdl.VdlFloat64;
 import io.veyron.veyron.veyron2.vdl.VdlInt16;
 import io.veyron.veyron.veyron2.vdl.VdlInt32;
 import io.veyron.veyron.veyron2.vdl.VdlInt64;
 import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlOptional;
 import io.veyron.veyron.veyron2.vdl.VdlString;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
-import io.veyron.veyron.veyron2.vdl.VdlField;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlTypeObject;
 import io.veyron.veyron.veyron2.vdl.VdlUint16;

@@ -18,24 +18,37 @@ import java.util.Set;
  * Tests methods on VDL Types.
  */
 public class TypeTest extends TestCase {
+    @GeneratedFromVdlType("MyBool")
     private static final class MyBool extends VdlBool {}
+    @GeneratedFromVdlType("MyByte")
     private static final class MyByte extends VdlByte {}
+    @GeneratedFromVdlType("MyUint16")
     private static final class MyUint16 extends VdlUint16 {}
+    @GeneratedFromVdlType("MyUint32")
     private static final class MyUint32 extends VdlUint32 {}
+    @GeneratedFromVdlType("MyUint64")
     private static final class MyUint64 extends VdlUint64 {}
+    @GeneratedFromVdlType("MyInt16")
     private static final class MyInt16 extends VdlInt16 {}
+    @GeneratedFromVdlType("MyInt32")
     private static final class MyInt32 extends VdlInt32 {}
+    @GeneratedFromVdlType("MyInt64")
     private static final class MyInt64 extends VdlInt64 {}
+    @GeneratedFromVdlType("MyFloat32")
     private static final class MyFloat32 extends VdlFloat32 {}
+    @GeneratedFromVdlType("MyFloat64")
     private static final class MyFloat64 extends VdlFloat64 {}
+    @GeneratedFromVdlType("MyString")
     private static final class MyString extends VdlString {}
 
+    @GeneratedFromVdlType("MyComplex64")
     private static final class MyComplex64 extends VdlComplex64 {
         public MyComplex64() {
             super(0);
         }
     }
 
+    @GeneratedFromVdlType("MyComplex128")
     private static final class MyComplex128 extends VdlComplex128 {
         public MyComplex128() {
             super(0);
@@ -43,6 +56,7 @@ public class TypeTest extends TestCase {
     }
 
     @SuppressWarnings("unused")
+    @GeneratedFromVdlType("MyOneOf")
     private static class MyOneOf extends VdlOneOf {
         public static class A extends MyOneOf {
             private MyInt16 elem;
@@ -59,6 +73,7 @@ public class TypeTest extends TestCase {
         }
     }
 
+    @GeneratedFromVdlType("MyEnum")
     private static final class MyEnum extends VdlEnum {
         @SuppressWarnings("unused")
         public static final MyEnum LABEL1 = new MyEnum("LABEL1");
@@ -72,6 +87,7 @@ public class TypeTest extends TestCase {
         }
     }
 
+    @GeneratedFromVdlType("MyArray12")
     private static final class MyArray12 extends VdlArray<Set<MyOneOf>> {
         @SuppressWarnings("unused")
         public static final int LENGTH = 12;
@@ -81,24 +97,28 @@ public class TypeTest extends TestCase {
         }
     }
 
+    @GeneratedFromVdlType("MyList")
     private static final class MyList extends VdlList<List<MyArray12>> {
         public MyList(List<List<MyArray12>> impl) {
             super(Types.getVdlTypeFromReflect(MyList.class), impl);
         }
     }
 
+    @GeneratedFromVdlType("MySet")
     private static final class MySet extends VdlSet<Set<MyList>> {
         public MySet(Set<Set<MyList>> impl) {
             super(Types.getVdlTypeFromReflect(MySet.class), impl);
         }
     }
 
+    @GeneratedFromVdlType("MyMap")
     private static final class MyMap extends VdlMap<MyEnum, Map<MySet, MySet>> {
         public MyMap(Map<MyEnum, Map<MySet, MySet>> impl) {
             super(Types.getVdlTypeFromReflect(MyMap.class), impl);
         }
     }
 
+    @GeneratedFromVdlType("MyStruct")
     private static final class MyStruct extends AbstractVdlStruct {
         @SerializedName("ByteArray")
         private byte[][] byteArray;
@@ -115,35 +135,30 @@ public class TypeTest extends TestCase {
     private static final Map<VdlType, Type> myTypes;
 
     static {
-        VdlType myBool = Types.named(MyBool.class.getName(), Types.BOOL);
-        VdlType myByte = Types.named(MyByte.class.getName(), Types.BYTE);
-        VdlType myUint16 = Types.named(MyUint16.class.getName(), Types.UINT16);
-        VdlType myUint32 = Types.named(MyUint32.class.getName(), Types.UINT32);
-        VdlType myUint64 = Types.named(MyUint64.class.getName(), Types.UINT64);
-        VdlType myInt16 = Types.named(MyInt16.class.getName(), Types.INT16);
-        VdlType myInt32 = Types.named(MyInt32.class.getName(), Types.INT32);
-        VdlType myInt64 = Types.named(MyInt64.class.getName(), Types.INT64);
-        VdlType myFloat32 = Types.named(MyFloat32.class.getName(), Types.FLOAT32);
-        VdlType myFloat64 = Types.named(MyFloat64.class.getName(), Types.FLOAT64);
-        VdlType myString = Types.named(MyString.class.getName(), Types.STRING);
-        VdlType myComplex64 = Types.named(MyComplex64.class.getName(), Types.COMPLEX64);
-        VdlType myComplex128 = Types.named(MyComplex128.class.getName(), Types.COMPLEX128);
+        VdlType myBool = Types.named("MyBool", Types.BOOL);
+        VdlType myByte = Types.named("MyByte", Types.BYTE);
+        VdlType myUint16 = Types.named("MyUint16", Types.UINT16);
+        VdlType myUint32 = Types.named("MyUint32", Types.UINT32);
+        VdlType myUint64 = Types.named("MyUint64", Types.UINT64);
+        VdlType myInt16 = Types.named("MyInt16", Types.INT16);
+        VdlType myInt32 = Types.named("MyInt32", Types.INT32);
+        VdlType myInt64 = Types.named("MyInt64", Types.INT64);
+        VdlType myFloat32 = Types.named("MyFloat32", Types.FLOAT32);
+        VdlType myFloat64 = Types.named("MyFloat64", Types.FLOAT64);
+        VdlType myString = Types.named("MyString", Types.STRING);
+        VdlType myComplex64 = Types.named("MyComplex64", Types.COMPLEX64);
+        VdlType myComplex128 = Types.named("MyComplex128", Types.COMPLEX128);
 
-        VdlType myOneOf = Types.named(MyOneOf.class.getName(),
-                Types.oneOfOf(new VdlField("A", myInt16), new VdlField("B", Types.INT32),
-                        new VdlField("C", Types.INT64)));
-        VdlType myEnum = Types.named(MyEnum.class.getName(),
-                Types.enumOf("LABEL1", "LABEL2", "LABEL3"));
-        VdlType myArray12 = Types.named(MyArray12.class.getName(),
-                Types.arrayOf(12, Types.setOf(myOneOf)));
-        VdlType myList = Types.named(MyList.class.getName(), Types.listOf(Types.listOf(myArray12)));
-        VdlType mySet = Types.named(MySet.class.getName(), Types.setOf(Types.setOf(myList)));
-        VdlType myMap = Types.named(MyMap.class.getName(),
-                Types.mapOf(myEnum, Types.mapOf(mySet, mySet)));
+        VdlType myOneOf = Types.named("MyOneOf", Types.oneOfOf(new VdlField("A", myInt16),
+                new VdlField("B", Types.INT32), new VdlField("C", Types.INT64)));
+        VdlType myEnum = Types.named("MyEnum", Types.enumOf("LABEL1", "LABEL2", "LABEL3"));
+        VdlType myArray12 = Types.named("MyArray12", Types.arrayOf(12, Types.setOf(myOneOf)));
+        VdlType myList = Types.named("MyList", Types.listOf(Types.listOf(myArray12)));
+        VdlType mySet = Types.named("MySet", Types.setOf(Types.setOf(myList)));
+        VdlType myMap = Types.named("MyMap", Types.mapOf(myEnum, Types.mapOf(mySet, mySet)));
 
         Builder builder = new Builder();
-        PendingType pendingStruct = builder.newPending(Kind.STRUCT)
-                .setName(MyStruct.class.getName());
+        PendingType pendingStruct = builder.newPending(Kind.STRUCT).setName("MyStruct");
         pendingStruct.addField("ByteArray", Types.listOf(Types.listOf(Types.BYTE)))
                 .addField("Set", Types.setOf(myMap))
                 .addField("Cycle", builder.listOf(pendingStruct));
@@ -184,17 +199,15 @@ public class TypeTest extends TestCase {
     }
 
     public void testTypeString() {
-        String myInt16 = MyInt16.class.getName() + " int16";
-        String myOneOf = String.format("%s oneof{A %s;B int32;C int64}",
-                MyOneOf.class.getName(), myInt16);
-        String myEnum = String.format("%s enum{LABEL1;LABEL2;LABEL3}", MyEnum.class.getName());
-        String myArray12 = String.format("%s [12]set[%s]", MyArray12.class.getName(), myOneOf);
-        String myList = String.format("%s [][]%s", MyList.class.getName(), myArray12);
-        String mySet = String.format("%s set[set[%s]]", MySet.class.getName(), myList);
-        String myMap = String.format("%s map[%s]map[%s]%s",
-                MyMap.class.getName(), myEnum, mySet, MySet.class.getName());
-        String myStruct = String.format("%s struct{ByteArray [][]byte;Set set[%s];Cycle []%s}",
-                MyStruct.class.getName(), myMap, MyStruct.class.getName());
+        String myInt16 = "MyInt16 int16";
+        String myOneOf = String.format("MyOneOf oneof{A %s;B int32;C int64}", myInt16);
+        String myEnum = "MyEnum enum{LABEL1;LABEL2;LABEL3}";
+        String myArray12 = String.format("MyArray12 [12]set[%s]", myOneOf);
+        String myList = String.format("MyList [][]%s", myArray12);
+        String mySet = String.format("MySet set[set[%s]]", myList);
+        String myMap = String.format("MyMap map[%s]map[%s]MySet", myEnum, mySet);
+        String myStruct = String.format("MyStruct struct{ByteArray [][]byte;Set set[%s];"
+                + "Cycle []MyStruct}", myMap);
         String myOptional = "?" + myStruct;
 
         assertEquals(myOneOf, Types.getVdlTypeFromReflect(MyOneOf.class).toString());
