@@ -8,7 +8,6 @@ import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -437,38 +437,50 @@ public final class Types {
             } else {
                 pending.assignBase(lookupOrBuildPending(klass.getGenericSuperclass()));
             }
-            GeneratedFromVdlName vdlName = klass.getAnnotation(GeneratedFromVdlName.class);
-            if (vdlName != null) {
-                pending.setName(vdlName.value());
+            GeneratedFromVdl annotation = klass.getAnnotation(GeneratedFromVdl.class);
+            if (annotation != null) {
+                pending.setName(annotation.name());
             }
             return pending;
         }
 
         private void populateEnum(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.ENUM);
+            TreeMap<Integer, String> labels = new TreeMap<Integer, String>();
             for (Field field : klass.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers())
-                        && field.getType() == klass) {
-                    pending.addLabel(field.getName());
+                GeneratedFromVdl annotation = field.getAnnotation(GeneratedFromVdl.class);
+                if (annotation != null) {
+                    labels.put(annotation.index(), annotation.name());
                 }
+            }
+            for (Map.Entry<Integer, String> entry : labels.entrySet()) {
+                pending.addLabel(entry.getValue());
             }
         }
 
         private void populateStruct(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.STRUCT);
+            TreeMap<Integer, PendingVdlField> fields = new TreeMap<Integer, PendingVdlField>();
             for (Field field : klass.getDeclaredFields()) {
-                GeneratedFromVdlName name = field.getAnnotation(GeneratedFromVdlName.class);
-                if (name != null) {
-                    pending.addField(name.value(), lookupOrBuildPending(field.getGenericType()));
+                GeneratedFromVdl annotation = field.getAnnotation(GeneratedFromVdl.class);
+                if (annotation != null) {
+                    fields.put(annotation.index(), new PendingVdlField(annotation.name(),
+                            lookupOrBuildPending(field.getGenericType())));
                 }
+            }
+            for (Map.Entry<Integer, PendingVdlField> entry : fields.entrySet()) {
+                pending.addField(entry.getValue().name, entry.getValue().type);
             }
         }
 
         private void populateOneOf(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.ONE_OF);
+            TreeMap<Integer, PendingVdlField> fields = new TreeMap<Integer, PendingVdlField>();
             for (Class<?> oneOfClass : klass.getDeclaredClasses()) {
-                String name = oneOfClass.getName();
-                name = name.substring(name.lastIndexOf('$') + 1);
+                GeneratedFromVdl annotation = oneOfClass.getAnnotation(GeneratedFromVdl.class);
+                if (annotation == null) {
+                    continue;
+                }
                 Type type;
                 try {
                     type = oneOfClass.getDeclaredField("elem").getGenericType();
@@ -476,7 +488,12 @@ public final class Types {
                     throw new IllegalArgumentException(
                             "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
                 }
-                pending.addField(name, lookupOrBuildPending(type));
+                String name = annotation.name().substring(annotation.name().lastIndexOf('$') + 1);
+                fields.put(annotation.index(),
+                        new PendingVdlField(name, lookupOrBuildPending(type)));
+            }
+            for (Map.Entry<Integer, PendingVdlField> entry : fields.entrySet()) {
+                pending.addField(entry.getValue().name, entry.getValue().type);
             }
         }
 
@@ -490,6 +507,15 @@ public final class Types {
             } catch (Exception e) {
                 throw new IllegalArgumentException(
                         "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
+            }
+        }
+
+        private static final class PendingVdlField {
+            final String name;
+            final PendingType type;
+            public PendingVdlField(String name, PendingType type) {
+                this.name = name;
+                this.type = type;
             }
         }
     }

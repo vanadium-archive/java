@@ -17,37 +17,37 @@ import java.util.Set;
  * Tests methods on VDL Types.
  */
 public class TypeTest extends TestCase {
-    @GeneratedFromVdlName("MyBool")
+    @GeneratedFromVdl(name = "MyBool")
     private static final class MyBool extends VdlBool {}
-    @GeneratedFromVdlName("MyByte")
+    @GeneratedFromVdl(name = "MyByte")
     private static final class MyByte extends VdlByte {}
-    @GeneratedFromVdlName("MyUint16")
+    @GeneratedFromVdl(name = "MyUint16")
     private static final class MyUint16 extends VdlUint16 {}
-    @GeneratedFromVdlName("MyUint32")
+    @GeneratedFromVdl(name = "MyUint32")
     private static final class MyUint32 extends VdlUint32 {}
-    @GeneratedFromVdlName("MyUint64")
+    @GeneratedFromVdl(name = "MyUint64")
     private static final class MyUint64 extends VdlUint64 {}
-    @GeneratedFromVdlName("MyInt16")
+    @GeneratedFromVdl(name = "MyInt16")
     private static final class MyInt16 extends VdlInt16 {}
-    @GeneratedFromVdlName("MyInt32")
+    @GeneratedFromVdl(name = "MyInt32")
     private static final class MyInt32 extends VdlInt32 {}
-    @GeneratedFromVdlName("MyInt64")
+    @GeneratedFromVdl(name = "MyInt64")
     private static final class MyInt64 extends VdlInt64 {}
-    @GeneratedFromVdlName("MyFloat32")
+    @GeneratedFromVdl(name = "MyFloat32")
     private static final class MyFloat32 extends VdlFloat32 {}
-    @GeneratedFromVdlName("MyFloat64")
+    @GeneratedFromVdl(name = "MyFloat64")
     private static final class MyFloat64 extends VdlFloat64 {}
-    @GeneratedFromVdlName("MyString")
+    @GeneratedFromVdl(name = "MyString")
     private static final class MyString extends VdlString {}
 
-    @GeneratedFromVdlName("MyComplex64")
+    @GeneratedFromVdl(name = "MyComplex64")
     private static final class MyComplex64 extends VdlComplex64 {
         public MyComplex64() {
             super(0);
         }
     }
 
-    @GeneratedFromVdlName("MyComplex128")
+    @GeneratedFromVdl(name = "MyComplex128")
     private static final class MyComplex128 extends VdlComplex128 {
         public MyComplex128() {
             super(0);
@@ -55,14 +55,17 @@ public class TypeTest extends TestCase {
     }
 
     @SuppressWarnings("unused")
-    @GeneratedFromVdlName("MyOneOf")
+    @GeneratedFromVdl(name = "MyOneOf")
     private static class MyOneOf extends VdlOneOf {
+        @GeneratedFromVdl(name = "A", index = 0)
         public static class A extends MyOneOf {
             private MyInt16 elem;
         }
+        @GeneratedFromVdl(name = "B", index = 1)
         public static class B extends MyOneOf {
             private VdlInt32 elem;
         }
+        @GeneratedFromVdl(name = "C", index = 2)
         public static class C extends MyOneOf {
             private Long elem;
         }
@@ -72,13 +75,16 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlName("MyEnum")
+    @GeneratedFromVdl(name = "MyEnum")
     private static final class MyEnum extends VdlEnum {
         @SuppressWarnings("unused")
+        @GeneratedFromVdl(name = "LABEL1", index = 0)
         public static final MyEnum LABEL1 = new MyEnum("LABEL1");
         @SuppressWarnings("unused")
+        @GeneratedFromVdl(name = "LABEL2", index = 1)
         public static final MyEnum LABEL2 = new MyEnum("LABEL2");
         @SuppressWarnings("unused")
+        @GeneratedFromVdl(name = "LABEL3", index = 2)
         public static final MyEnum LABEL3 = new MyEnum("LABEL3");
 
         private MyEnum(String name) {
@@ -86,7 +92,7 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlName("MyArray12")
+    @GeneratedFromVdl(name = "MyArray12")
     private static final class MyArray12 extends VdlArray<Set<MyOneOf>> {
         @SuppressWarnings("unused")
         public static final int LENGTH = 12;
@@ -96,34 +102,34 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlName("MyList")
+    @GeneratedFromVdl(name = "MyList")
     private static final class MyList extends VdlList<List<MyArray12>> {
         public MyList(List<List<MyArray12>> impl) {
             super(Types.getVdlTypeFromReflect(MyList.class), impl);
         }
     }
 
-    @GeneratedFromVdlName("MySet")
+    @GeneratedFromVdl(name = "MySet")
     private static final class MySet extends VdlSet<Set<MyList>> {
         public MySet(Set<Set<MyList>> impl) {
             super(Types.getVdlTypeFromReflect(MySet.class), impl);
         }
     }
 
-    @GeneratedFromVdlName("MyMap")
+    @GeneratedFromVdl(name = "MyMap")
     private static final class MyMap extends VdlMap<MyEnum, Map<MySet, MySet>> {
         public MyMap(Map<MyEnum, Map<MySet, MySet>> impl) {
             super(Types.getVdlTypeFromReflect(MyMap.class), impl);
         }
     }
 
-    @GeneratedFromVdlName("MyStruct")
+    @GeneratedFromVdl(name = "MyStruct")
     private static final class MyStruct extends AbstractVdlStruct {
-        @GeneratedFromVdlName("ByteArray")
+        @GeneratedFromVdl(name = "ByteArray", index = 0)
         private byte[][] byteArray;
-        @GeneratedFromVdlName("Set")
+        @GeneratedFromVdl(name = "Set", index = 1)
         private Set<MyMap> set;
-        @GeneratedFromVdlName("Cycle")
+        @GeneratedFromVdl(name = "Cycle", index = 2)
         private List<MyStruct> cycle;
 
         public MyStruct() {

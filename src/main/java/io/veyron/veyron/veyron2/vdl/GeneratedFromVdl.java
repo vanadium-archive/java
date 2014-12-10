@@ -6,13 +6,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates the VDL name this entity is generated from.
+ * Stores VDL information about the given entity.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
-public @interface GeneratedFromVdlName {
+public @interface GeneratedFromVdl {
     /**
      * The name of the VDL entity from which this entity was generated.
      */
-    String value();
+    String name();
+    /**
+     * The index of VDL struct or oneof field or enum as defined in VDL.
+     */
+    int index() default 0;
 }
