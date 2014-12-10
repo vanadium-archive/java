@@ -1,21 +1,12 @@
 package io.veyron.veyron.veyron2.vdl;
 
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.IOException;
 
 /**
  * VdlFloat64 is a representation of a VDL float64.
  */
-public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFactory {
+public class VdlFloat64 extends VdlValue implements Parcelable {
     private final double value;
 
     public VdlFloat64(VdlType type, double value) {
@@ -78,25 +69,5 @@ public class VdlFloat64 extends VdlValue implements Parcelable, TypeAdapterFacto
 
     public VdlFloat64() {
         this(0);
-    }
-
-    @Override
-    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-        if (!type.equals(new TypeToken<VdlFloat64>() {})) {
-            return null;
-        }
-        final TypeAdapter<Double> delegate = gson.getAdapter(new TypeToken<Double>() {});
-        return new TypeAdapter<T>() {
-            @Override
-            public void write(JsonWriter out, T value) throws IOException {
-                delegate.write(out, ((VdlFloat64) value).getValue());
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public T read(JsonReader in) throws IOException {
-                return (T) new VdlFloat64(delegate.read(in));
-            }
-        };
     }
 }

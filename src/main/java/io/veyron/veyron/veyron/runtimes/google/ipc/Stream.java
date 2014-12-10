@@ -1,6 +1,8 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.VomUtil;
+
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
@@ -16,14 +18,14 @@ public class Stream implements io.veyron.veyron.veyron2.ipc.Stream {
 	}
 	@Override
 	public void send(Object item, Type type) throws VeyronException {
-		final byte[] vomItem = Util.VomEncode(item, type);
+		final byte[] vomItem = VomUtil.encode(item, type);
 		nativeSend(nativePtr, vomItem);
 	}
 
 	@Override
 	public Object recv(Type type) throws EOFException, VeyronException {
 		final byte[] result = nativeRecv(nativePtr);
-		return Util.VomDecode(result, type);
+		return VomUtil.decode(result, type);
 	}
 	@Override
 	protected void finalize() {

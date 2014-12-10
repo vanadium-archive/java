@@ -1,11 +1,10 @@
 package io.veyron.veyron.veyron2.naming;
 
-import com.google.gson.annotations.SerializedName;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName;
 
 import java.io.Serializable;
 
@@ -15,11 +14,11 @@ import java.io.Serializable;
 public class MountEntry implements Parcelable, Serializable {
 	static final long serialVersionUID = 0L;
 
-	@SerializedName("Name")
+	@GeneratedFromVdlName("Name")
 	private final String name;
-	@SerializedName("Servers")
+	@GeneratedFromVdlName("Servers")
 	private final MountedServer[] servers;
-	@SerializedName("Error")
+	@GeneratedFromVdlName("Error")
 	private final VeyronException error;
 
 	public MountEntry(String name, MountedServer[] servers, VeyronException error) {

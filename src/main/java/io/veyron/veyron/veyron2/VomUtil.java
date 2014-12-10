@@ -1,4 +1,4 @@
-package io.veyron.veyron.veyron.runtimes.google.ipc;
+package io.veyron.veyron.veyron2;
 
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.vom2.BinaryDecoder;
@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * Util contains various utilities used by the ipc package.
+ * VomUtil contains utilities used by the ipc package.
  */
-class Util {
+public class VomUtil {
 	/**
 	 * VOM-encodes the provided value using a new VOM-encoder.
 	 */
-	static byte[] VomEncode(Object value, Type type) throws VeyronException {
+	public static byte[] encode(Object value, Type type) throws VeyronException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final BinaryEncoder encoder = new BinaryEncoder(out);
 		try {
@@ -31,7 +31,7 @@ class Util {
 	/**
 	 * VOM-decodes the provided data using a new VOM-decoder.
 	 */
-	static Object VomDecode(byte[] data, Type type) throws VeyronException {
+	public static Object decode(byte[] data, Type type) throws VeyronException {
 		final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
 		try {
 			return decoder.decodeValue(type);

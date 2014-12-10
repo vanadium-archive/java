@@ -10,12 +10,6 @@ import java.util.concurrent.CountDownLatch;
 public class ContextImpl extends CancelableContext {
 	private static final String TAG = "Veyron runtime";
 
-	private static native Context nativeCreate() throws VeyronException;
-
-	public static Context create() throws VeyronException {
-		return nativeCreate();
-	}
-
 	private long nativePtr;
 	private long nativeCancelPtr;  // zero for non-cancelable contexts.
 

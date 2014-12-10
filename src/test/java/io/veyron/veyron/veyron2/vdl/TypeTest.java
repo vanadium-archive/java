@@ -2,7 +2,6 @@ package io.veyron.veyron.veyron2.vdl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.annotations.SerializedName;
 
 import junit.framework.TestCase;
 
@@ -18,37 +17,37 @@ import java.util.Set;
  * Tests methods on VDL Types.
  */
 public class TypeTest extends TestCase {
-    @GeneratedFromVdlType("MyBool")
+    @GeneratedFromVdlName("MyBool")
     private static final class MyBool extends VdlBool {}
-    @GeneratedFromVdlType("MyByte")
+    @GeneratedFromVdlName("MyByte")
     private static final class MyByte extends VdlByte {}
-    @GeneratedFromVdlType("MyUint16")
+    @GeneratedFromVdlName("MyUint16")
     private static final class MyUint16 extends VdlUint16 {}
-    @GeneratedFromVdlType("MyUint32")
+    @GeneratedFromVdlName("MyUint32")
     private static final class MyUint32 extends VdlUint32 {}
-    @GeneratedFromVdlType("MyUint64")
+    @GeneratedFromVdlName("MyUint64")
     private static final class MyUint64 extends VdlUint64 {}
-    @GeneratedFromVdlType("MyInt16")
+    @GeneratedFromVdlName("MyInt16")
     private static final class MyInt16 extends VdlInt16 {}
-    @GeneratedFromVdlType("MyInt32")
+    @GeneratedFromVdlName("MyInt32")
     private static final class MyInt32 extends VdlInt32 {}
-    @GeneratedFromVdlType("MyInt64")
+    @GeneratedFromVdlName("MyInt64")
     private static final class MyInt64 extends VdlInt64 {}
-    @GeneratedFromVdlType("MyFloat32")
+    @GeneratedFromVdlName("MyFloat32")
     private static final class MyFloat32 extends VdlFloat32 {}
-    @GeneratedFromVdlType("MyFloat64")
+    @GeneratedFromVdlName("MyFloat64")
     private static final class MyFloat64 extends VdlFloat64 {}
-    @GeneratedFromVdlType("MyString")
+    @GeneratedFromVdlName("MyString")
     private static final class MyString extends VdlString {}
 
-    @GeneratedFromVdlType("MyComplex64")
+    @GeneratedFromVdlName("MyComplex64")
     private static final class MyComplex64 extends VdlComplex64 {
         public MyComplex64() {
             super(0);
         }
     }
 
-    @GeneratedFromVdlType("MyComplex128")
+    @GeneratedFromVdlName("MyComplex128")
     private static final class MyComplex128 extends VdlComplex128 {
         public MyComplex128() {
             super(0);
@@ -56,7 +55,7 @@ public class TypeTest extends TestCase {
     }
 
     @SuppressWarnings("unused")
-    @GeneratedFromVdlType("MyOneOf")
+    @GeneratedFromVdlName("MyOneOf")
     private static class MyOneOf extends VdlOneOf {
         public static class A extends MyOneOf {
             private MyInt16 elem;
@@ -73,7 +72,7 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlType("MyEnum")
+    @GeneratedFromVdlName("MyEnum")
     private static final class MyEnum extends VdlEnum {
         @SuppressWarnings("unused")
         public static final MyEnum LABEL1 = new MyEnum("LABEL1");
@@ -87,7 +86,7 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlType("MyArray12")
+    @GeneratedFromVdlName("MyArray12")
     private static final class MyArray12 extends VdlArray<Set<MyOneOf>> {
         @SuppressWarnings("unused")
         public static final int LENGTH = 12;
@@ -97,34 +96,34 @@ public class TypeTest extends TestCase {
         }
     }
 
-    @GeneratedFromVdlType("MyList")
+    @GeneratedFromVdlName("MyList")
     private static final class MyList extends VdlList<List<MyArray12>> {
         public MyList(List<List<MyArray12>> impl) {
             super(Types.getVdlTypeFromReflect(MyList.class), impl);
         }
     }
 
-    @GeneratedFromVdlType("MySet")
+    @GeneratedFromVdlName("MySet")
     private static final class MySet extends VdlSet<Set<MyList>> {
         public MySet(Set<Set<MyList>> impl) {
             super(Types.getVdlTypeFromReflect(MySet.class), impl);
         }
     }
 
-    @GeneratedFromVdlType("MyMap")
+    @GeneratedFromVdlName("MyMap")
     private static final class MyMap extends VdlMap<MyEnum, Map<MySet, MySet>> {
         public MyMap(Map<MyEnum, Map<MySet, MySet>> impl) {
             super(Types.getVdlTypeFromReflect(MyMap.class), impl);
         }
     }
 
-    @GeneratedFromVdlType("MyStruct")
+    @GeneratedFromVdlName("MyStruct")
     private static final class MyStruct extends AbstractVdlStruct {
-        @SerializedName("ByteArray")
+        @GeneratedFromVdlName("ByteArray")
         private byte[][] byteArray;
-        @SerializedName("Set")
+        @GeneratedFromVdlName("Set")
         private Set<MyMap> set;
-        @SerializedName("Cycle")
+        @GeneratedFromVdlName("Cycle")
         private List<MyStruct> cycle;
 
         public MyStruct() {

@@ -22,9 +22,9 @@ import java.io.Serializable;
 public class VeyronException extends Exception implements Parcelable, Serializable {
 	private static final long serialVersionUID = -3917496574141933784L;
 
-	@com.google.gson.annotations.SerializedName("Id")
+	@io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName("Id")
 	private final String id; // always non-null (can be empty)
-	@com.google.gson.annotations.SerializedName("Msg")
+	@io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName("Msg")
 	private final String msg;  // always non-null (can be empty)
 
 	public VeyronException() {

@@ -1,12 +1,8 @@
 package io.veyron.veyron.veyron2.security;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonSyntaxException;
-
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.veyron.veyron.veyron2.services.security.access.TaggedACLMap;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -188,27 +184,6 @@ public class Security {
 	public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Class<?> type)
 		throws VeyronException {
 		return new TaggedACLAuthorizer(acls, type);
-	}
-
-	/**
-	 * Same as {@code newTaggedACLAuthorizer(TaggedACLMap, Class<?>)} but the ACLs are provided as
-	 * a JSON-encoded string.
-	 *
-	 * @param  aclsJson        JSON-encoded ACLs containing authorization rules.
-	 * @param  type            type of the method tags this authorizer checks.
-	 * @return                 an above-described authorizer.
-	 * @throws VeyronException if the authorizer couldn't be created.
-	 */
-	public static Authorizer newTaggedACLAuthorizer(String aclsJson, Class<?> type)
-		throws VeyronException {
-		try {
-			final TaggedACLMap acls = JSONUtil.getGsonBuilder().create().fromJson(aclsJson,
-				new TypeToken<TaggedACLMap>(){}.getType());
-			return newTaggedACLAuthorizer(acls, type);
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid ACLs JSON string %s: %s",
-				aclsJson, e.getMessage()));
-		}
 	}
 
 	/**

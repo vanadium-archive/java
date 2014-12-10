@@ -1,10 +1,10 @@
 package io.veyron.veyron.veyron.runtimes.google.naming;
 
-import com.google.gson.reflect.TypeToken;
+import com.google.common.reflect.TypeToken;
 
 import io.veyron.veyron.veyron.runtimes.google.InputChannel;
-import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 
 public class Namespace implements io.veyron.veyron.veyron2.naming.Namespace {
@@ -22,7 +22,7 @@ public class Namespace implements io.veyron.veyron.veyron2.naming.Namespace {
 	public io.veyron.veyron.veyron2.InputChannel<MountEntry> glob(Context context, String pattern)
 		throws VeyronException {
 		final long chanPtr = nativeGlob(this.nativePtr, context, pattern);
-		return new InputChannel<MountEntry>(chanPtr, new TypeToken<MountEntry>(){});
+		return new InputChannel<MountEntry>(chanPtr, new TypeToken<MountEntry>(){}.getType());
 	}
 	@Override
 	protected void finalize() {

@@ -1,21 +1,17 @@
 package io.veyron.veyron.veyron.runtimes.google;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron2.VomUtil;
 
 import java.io.EOFException;
+import java.lang.reflect.Type;
 
 public class InputChannel<T> implements io.veyron.veyron.veyron2.InputChannel<T> {
 	private final long nativePtr;
-	private final TypeToken<T> type;
-	private final Gson gson;
+	private final Type type;
 
 	private native boolean nativeAvailable(long nativePtr);
-	private native String nativeReadValue(long nativePtr) throws EOFException, VeyronException;
+	private native byte[] nativeReadValue(long nativePtr) throws EOFException, VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
 	/**
@@ -25,10 +21,9 @@ public class InputChannel<T> implements io.veyron.veyron.veyron2.InputChannel<T>
 	 * @param  nativePtr a pointer to the Go channel of type chan interface{}
 	 * @param  type      type of Java values.
 	 */
-	public InputChannel(long nativePtr, TypeToken<T> type) {
+	public InputChannel(long nativePtr, Type type) {
 		this.nativePtr = nativePtr;
 		this.type = type;
-		this.gson = JSONUtil.getGsonBuilder().create();
 	}
 
 	@Override
@@ -38,13 +33,8 @@ public class InputChannel<T> implements io.veyron.veyron.veyron2.InputChannel<T>
 
 	@Override
 	public T readValue() throws EOFException, VeyronException {
-		final String value = nativeReadValue(this.nativePtr);
-		try {
-			return this.gson.fromJson(value, this.type.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format(
-				"Illegal format for value of type %s: %s", type.toString(), value));
-		}
+		final byte[] value = nativeReadValue(this.nativePtr);
+		return (T) VomUtil.decode(value, this.type);
 	}
 	@Override
 	protected void finalize() {

@@ -2,6 +2,7 @@ package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.VomUtil;
 import io.veyron.veyron.veyron2.context.Context;
 
 import java.lang.reflect.Type;
@@ -41,7 +42,7 @@ public class Client implements io.veyron.veyron.veyron2.ipc.Client {
 		// VOM-encode all input arguments, individually.
 		final byte[][] vomArgs = new byte[args.length][];
 		for (int i = 0; i < args.length; ++i) {
-			vomArgs[i] = Util.VomEncode(args[i], argTypes[i]);
+			vomArgs[i] = VomUtil.encode(args[i], argTypes[i]);
 		}
 
 		// Invoke native method, making sure that the method name starts with an

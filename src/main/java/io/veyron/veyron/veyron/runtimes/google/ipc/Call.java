@@ -1,6 +1,8 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.VomUtil;
+
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
@@ -8,6 +10,7 @@ public class Call implements io.veyron.veyron.veyron2.ipc.Client.Call {
 	private final long nativePtr;
 	private final io.veyron.veyron.veyron2.ipc.Stream stream;
 
+	private native void nativeCloseSend() throws VeyronException;
 	private native byte[][] nativeFinish(long nativePtr, int numResults) throws VeyronException;
 	private native void nativeCancel(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -20,7 +23,7 @@ public class Call implements io.veyron.veyron.veyron2.ipc.Client.Call {
 	// Implements io.veyron.veyron.veyron2.ipc.Client.Call.
 	@Override
 	public void closeSend() throws VeyronException {
-		// TODO(spetrovic): implement this.
+		nativeCloseSend();
 	}
 	@Override
 	public Object[] finish(Type[] types) throws VeyronException {
@@ -33,7 +36,7 @@ public class Call implements io.veyron.veyron.veyron2.ipc.Client.Call {
 		// VOM-decode results.
 		final Object[] ret = new Object[types.length];
 		for (int i = 0; i < types.length; i++) {
-			ret[i] = Util.VomDecode(vomResults[i], types[i]);
+			ret[i] = VomUtil.decode(vomResults[i], types[i]);
 		}
 		return ret;
 	}

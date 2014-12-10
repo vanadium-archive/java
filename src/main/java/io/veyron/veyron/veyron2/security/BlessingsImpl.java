@@ -1,7 +1,6 @@
 package io.veyron.veyron.veyron2.security;
 
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -57,7 +56,7 @@ class BlessingsImpl extends Blessings {
 	}
 	@Override
 	public String toString() {
-		return JSONUtil.getGsonBuilder().create().toJson(this.wire);
+		return this.wire.toString();
 	}
 	@Override
 	protected void finalize() {

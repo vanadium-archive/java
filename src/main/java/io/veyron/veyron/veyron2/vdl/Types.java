@@ -2,7 +2,6 @@ package io.veyron.veyron.veyron2.vdl;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.gson.annotations.SerializedName;
 
 import io.veyron.veyron.veyron2.vdl.VdlType.Builder;
 import io.veyron.veyron.veyron2.vdl.VdlType.PendingType;
@@ -438,7 +437,7 @@ public final class Types {
             } else {
                 pending.assignBase(lookupOrBuildPending(klass.getGenericSuperclass()));
             }
-            GeneratedFromVdlType vdlName = klass.getAnnotation(GeneratedFromVdlType.class);
+            GeneratedFromVdlName vdlName = klass.getAnnotation(GeneratedFromVdlName.class);
             if (vdlName != null) {
                 pending.setName(vdlName.value());
             }
@@ -458,7 +457,7 @@ public final class Types {
         private void populateStruct(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.STRUCT);
             for (Field field : klass.getDeclaredFields()) {
-                SerializedName name = field.getAnnotation(SerializedName.class);
+                GeneratedFromVdlName name = field.getAnnotation(GeneratedFromVdlName.class);
                 if (name != null) {
                     pending.addField(name.value(), lookupOrBuildPending(field.getGenericType()));
                 }

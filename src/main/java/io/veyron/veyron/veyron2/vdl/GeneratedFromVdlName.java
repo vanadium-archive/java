@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that this class is generated from VDL.
+ * Indicates the VDL name this entity is generated from.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface GeneratedFromVdlType {
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface GeneratedFromVdlName {
     /**
-     * The name of the type in VDL from which this class was generated.
+     * The name of the VDL entity from which this entity was generated.
      */
     String value();
 }

@@ -1,6 +1,7 @@
 package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.VomUtil;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
 import io.veyron.veyron.veyron2.vdl.VeyronServer;
 
@@ -40,7 +41,7 @@ public final class VDLInvoker {
 		public Object[] getTags() { return this.tags; }
 
 		public Object invoke(Object... args) throws IllegalAccessException,
-		IllegalArgumentException, InvocationTargetException {
+				IllegalArgumentException, InvocationTargetException {
 			return method.invoke(wrappedServer, args);
 		}
 	}
@@ -52,15 +53,13 @@ public final class VDLInvoker {
 	/**
 	 * Creates a new invoker for the given object.
 	 *
-	 * @param obj                       server object we're invoking methods on
-	 * @throws IllegalArgumentException if the provided object is invalid
-	 *             (either null or doesn't implement exactly one VDL interface)
+	 * @param  obj             server object we're invoking methods on
+	 * @throws VeyronException if the provided object is invalid (either null or doesn't implement
+	 *                         exactly one VDL interface)
 	 */
-	// TODO(bprosnitz) We need to throw better exception types in the final
-	// release.
-	public VDLInvoker(Object obj) throws IllegalArgumentException, VeyronException {
+	public VDLInvoker(Object obj) throws VeyronException {
 		if (obj == null) {
-			throw new IllegalArgumentException("Can't create VDLInvoker with a null object.");
+			throw new VeyronException("Can't create VDLInvoker with a null object.");
 		}
 		this.serverClass = obj.getClass();
 
@@ -86,13 +85,13 @@ public final class VDLInvoker {
 			final Map<String, Method> methods = cInfo.getMethods();
 			final Method tagGetter = methods.get("getMethodTags");
 			if (tagGetter == null) {
-				throw new IllegalArgumentException(String.format(
+				throw new VeyronException(String.format(
 					"Server class %s doesn't have the 'getMethodTags' method.",
 					c.getCanonicalName()));
 			}
 			final Method signature = methods.get("signature");
 			if (signature == null) {
-				throw new IllegalArgumentException(String.format(
+				throw new VeyronException(String.format(
 					"Server class %s doesn't have the 'signature' method.",
 					c.getCanonicalName()));
 			}
@@ -119,12 +118,12 @@ public final class VDLInvoker {
 	 *
 	 * @param  method                   method we are retrieving tags for.
 	 * @return                          tags associated with the provided method.
-	 * @throws IllegalArgumentException if the method doesn't exist.
+	 * @throws VeyronException if the method doesn't exist.
 	 */
-	public Object[] getMethodTags(String method) throws IllegalArgumentException {
+	public Object[] getMethodTags(String method) throws VeyronException {
 		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
-			throw new IllegalArgumentException(String.format(
+			throw new VeyronException(String.format(
 					"Couldn't find method %s in class %s",
 					method, this.serverClass.getCanonicalName()));
 		}
@@ -137,9 +136,9 @@ public final class VDLInvoker {
 	 *
 	 * @param srv                       the server object
 	 * @return                          a list of server wrappers
-	 * @throws IllegalArgumentException if the input server is invalid.
+	 * @throws VeyronException if the input server is invalid.
 	 */
-	private List<Object> wrapServer(Object srv) throws IllegalArgumentException {
+	private List<Object> wrapServer(Object srv) throws VeyronException {
 		List<Object> stubs = new ArrayList<Object>();
 		for (Class<?> iface : srv.getClass().getInterfaces()) {
 			final VeyronServer vs = iface.getAnnotation(VeyronServer.class);
@@ -164,7 +163,7 @@ public final class VDLInvoker {
 			}
 		}
 		if (stubs.size() == 0) {
-			throw new IllegalArgumentException(
+			throw new VeyronException(
 					"Object does not implement a valid generated server interface.");
 		}
 		return stubs;
@@ -239,7 +238,7 @@ public final class VDLInvoker {
 		final Object[] ret = new Object[argsLength];
 		ret[0] = call;
 		for (int i = 0; i < vomArgs.length; i++) {
-			ret[i + 1] = Util.VomDecode(vomArgs[i], types[i + 1]);
+			ret[i + 1] = VomUtil.decode(vomArgs[i], types[i + 1]);
 		}
 		return ret;
 	}
@@ -262,14 +261,14 @@ public final class VDLInvoker {
 			for (int i = 0; i < fields.length; i++) {
 			    try {
 			        final Object value = result != null ? fields[i].get(result) : null;
-			        reply.results[i] = Util.VomEncode(value, fields[i].getGenericType());
+			        reply.results[i] = VomUtil.encode(value, fields[i].getGenericType());
 			    } catch (IllegalAccessException e) {
 			        throw new VeyronException("Couldn't get field: " + e.getMessage());
 			    }
 			}
 		} else {
 			reply.results = new byte[1][];
-			reply.results[0] = Util.VomEncode(result, m.method.getGenericReturnType());
+			reply.results[0] = VomUtil.encode(result, m.method.getGenericReturnType());
 		}
 		return reply;
 	}
@@ -277,7 +276,7 @@ public final class VDLInvoker {
 	private static class ClassInfo {
 		final Map<String, Method> methods = new HashMap<String, Method>();
 
-		ClassInfo(Class<?> c) throws IllegalArgumentException {
+		ClassInfo(Class<?> c) throws VeyronException {
 			final Method[] methodList = c.getDeclaredMethods();
 			for (int i = 0; i < methodList.length; i++) {
 				final Method method = methodList[i];
@@ -287,7 +286,7 @@ public final class VDLInvoker {
 				} catch (IllegalArgumentException e) {
 				} // method not an VDL method.
 				if (oldval != null) {
-					throw new IllegalArgumentException("Overloading of method " + method.getName()
+					throw new VeyronException("Overloading of method " + method.getName()
 							+ " not allowed on server wrapper");
 				}
 			}

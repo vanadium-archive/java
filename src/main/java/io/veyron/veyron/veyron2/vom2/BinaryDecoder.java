@@ -1,5 +1,6 @@
 package io.veyron.veyron.veyron2.vom2;
 
+import io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.SerializedName;
 
@@ -308,7 +309,7 @@ public class BinaryDecoder {
         } else {
             String fieldName = (String) key;
             for (Field field : targetClass.getDeclaredFields()) {
-                SerializedName name = field.getAnnotation(SerializedName.class);
+                GeneratedFromVdlName name = field.getAnnotation(GeneratedFromVdlName.class);
                 if (name != null && name.value().equals(fieldName)) {
                     return field.getGenericType();
                 }

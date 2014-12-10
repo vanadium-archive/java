@@ -1,11 +1,11 @@
 package io.veyron.veyron.veyron2.naming;
 
-import com.google.gson.annotations.SerializedName;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.joda.time.Duration;
+
+import io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName;
 
 import java.io.Serializable;
 
@@ -15,9 +15,9 @@ import java.io.Serializable;
 public class MountedServer implements Parcelable, Serializable {
 	static final long serialVersionUID = 0L;
 
-	@SerializedName("Server")
+	@GeneratedFromVdlName("Server")
 	private final String server;
-	@SerializedName("TTL")
+	@GeneratedFromVdlName("TTL")
 	private final Duration ttl;
 
 	public MountedServer(String server, Duration ttl) {

@@ -19,7 +19,7 @@ public class VRuntimeImpl extends io.veyron.veyron.veyron2.VRuntimeImpl {
 	private static native long nativeInit(Options opts) throws VeyronException;
 
 	/**
-	 * Returns the initialized global instance of the runtime.
+	 * Returns a new runtime implementation instance.
 	 *
 	 * @param  opts runtime options.
 	 * @return      a pre-initialized runtime instance.

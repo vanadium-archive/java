@@ -1,11 +1,11 @@
 package io.veyron.veyron.veyron2.security;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonSyntaxException;
 
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron2.VomUtil;
 
+import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 
 /**
@@ -14,28 +14,28 @@ import java.security.interfaces.ECPublicKey;
  */
 class Util {
 	/**
-	 * Encodes the provided Blessings as JSON-encoded WireBlessings.
+	 * Encodes the provided Blessings as VOM-encoded WireBlessings.
 	 *
-	 * @param blessings        Blessings to be encoded.
-	 * @return                 JSON-encoded WireBlessings.
+	 * @param  blessings       Blessings to be encoded.
+	 * @return                 VOM-encoded WireBlessings.
 	 */
-	static String encodeBlessings(Blessings blessings) {
+	static byte[] encodeBlessings(Blessings blessings) throws VeyronException {
 		if (blessings == null) {
-			return "";
+			return new byte[0];
 		}
 		final WireBlessings wire = blessings.wireFormat();
 		return encodeWireBlessings(wire);
 	}
 
 	/**
-	 * Decodes the provided Blessings encoded as JSON-encoded WireBlessings.
+	 * Decodes the provided Blessings encoded as VOM-encoded WireBlessings.
 	 *
-	 * @param encoded          Blessings encoded as JSON-encoded WireBlessings.
+	 * @param  encoded         Blessings encoded as VOM-encoded WireBlessings.
 	 * @return                 decoded Blessings.
 	 * @throws VeyronException if the provided Blessings couldn't be decoded.
 	 */
-	static Blessings decodeBlessings(String encoded) throws VeyronException {
-		if (encoded.isEmpty()) {
+	static Blessings decodeBlessings(byte[] encoded) throws VeyronException {
+		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
 		final WireBlessings wire = decodeWireBlessings(encoded);
@@ -43,36 +43,24 @@ class Util {
 	}
 
 	/**
-	 * JSON-encodes the provided WireBlessings.
+	 * VOM-encodes the provided WireBlessings.
 	 *
 	 * @param  wire WireBlessings to be encoded.
-	 * @return      JSON-encoded WireBlessings.
+	 * @return      VOM-encoded WireBlessings.
 	 */
-	static String encodeWireBlessings(WireBlessings wire) {
-		if (wire == null) {
-			return "";
-		}
-		return JSONUtil.getGsonBuilder().create().toJson(wire);
+	static byte[] encodeWireBlessings(WireBlessings wire) throws VeyronException {
+		return VomUtil.encode(wire, new TypeToken<WireBlessings>(){}.getType());
 	}
 
 	/**
-	 * Decodes the provided JSON-encoded WireBlessings.
+	 * VOM-decodes the provided VOM-encoded WireBlessings.
 	 *
-	 * @param  encoded         JSON-encoded WireBlessings.
+	 * @param  encoded         VOM-encoded WireBlessings.
 	 * @return                 decoded WireBlessings.
 	 * @throws VeyronException if the provided WireBlessings couldn't be decoded.
 	 */
-	static WireBlessings decodeWireBlessings(String encoded) throws VeyronException {
-		if (encoded.isEmpty()) {
-			return null;
-		}
-		try {
-			return JSONUtil.getGsonBuilder().create().fromJson(encoded,
-				new TypeToken<WireBlessings>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid WireBlessings encoded string %s: %s",
-				encoded, e.getMessage()));
-		}
+	static WireBlessings decodeWireBlessings(byte[] encoded) throws VeyronException {
+		return (WireBlessings) VomUtil.decode(encoded, new TypeToken<WireBlessings>(){}.getType());
 	}
 
 	/**
@@ -95,43 +83,34 @@ class Util {
 	 * @return                 decoded BlessingPattern.
 	 */
 	static BlessingPattern decodeBlessingPattern(String encoded) {
-		if (encoded.isEmpty()) {
+		if (encoded == null || encoded.isEmpty()) {
 			return null;
 		}
 		return new BlessingPattern(encoded);
 	}
 
 	/**
-	 * JSON-encodes the provided Signature.
+	 * VOM-encodes the provided Signature.
 	 *
 	 * @param  signature Signature to be encoded.
 	 * @return           the encoded Signature.
 	 */
-	static String encodeSignature(Signature signature) {
-		if (signature == null) {
-			return "";
-		}
-		return JSONUtil.getGsonBuilder().create().toJson(signature);
+	static byte[] encodeSignature(Signature signature) throws VeyronException {
+		return VomUtil.encode(signature, new TypeToken<Signature>(){}.getType());
 	}
 
 	/**
-	 * Decodes the JSON-encoded Signature.
+	 * VOM-decodes the VOM-encoded Signature.
 	 *
-	 * @param  encoded         JSON-encoded Signature.
+	 * @param  encoded         VOM-encoded Signature.
 	 * @return                 decoded Signature.
 	 * @throws VeyronException if the provided Signature couldn't be decoded.
 	 */
-	static Signature decodeSignature(String encoded) throws VeyronException {
-		if (encoded.isEmpty()) {
+	static Signature decodeSignature(byte[] encoded) throws VeyronException {
+		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
-		try {
-			return JSONUtil.getGsonBuilder().create().fromJson(encoded,
-				new TypeToken<Signature>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid Signature encoded string %s: %s",
-				encoded, e.getMessage()));
-		}
+		return (Signature) VomUtil.decode(encoded, new TypeToken<Signature>(){}.getType());
 	}
 
 	/**
@@ -155,75 +134,57 @@ class Util {
 	 * @throws VeyronException if the provided ECPublicKey couldn't be decoded.
 	 */
 	static ECPublicKey decodePublicKey(byte[] encoded) throws VeyronException {
-		if (encoded.length == 0) {
+		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
 		return CryptoUtil.decodeECPublicKey(encoded);
 	}
 
 	/**
-	 * JSON-encodes the provided Caveat.
+	 * VOM-encodes the provided Caveat.
 	 *
 	 * @param  caveat Caveat to be encoded.
 	 * @return        the encoded Caveat.
 	 */
-	static String encodeCaveat(Caveat caveat) {
-		if (caveat == null) {
-			return "";
-		}
-		return JSONUtil.getGsonBuilder().create().toJson(caveat);
+	static byte[] encodeCaveat(Caveat caveat) throws VeyronException {
+		return VomUtil.encode(caveat, new TypeToken<Caveat>(){}.getType());
 	}
 
 	/**
-	 * Decodes the JSON-encoded Caveat.
+	 * VOM-decodes the VOM-encoded Caveat.
 	 *
-	 * @param  encoded         JSON-encoded Caveat.
+	 * @param  encoded         VOM-encoded Caveat.
 	 * @return                 decoded Caveat.
 	 * @throws VeyronException if the provided Caveat couldn't be decoded.
 	 */
-	static Caveat decodeCaveat(String encoded) throws VeyronException {
-		if (encoded.isEmpty()) {
+	static Caveat decodeCaveat(byte[] encoded) throws VeyronException {
+		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
-		try {
-			return JSONUtil.getGsonBuilder().create().fromJson(encoded,
-				new TypeToken<Caveat>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid Caveat encoded string %s: %s",
-				encoded, e.getMessage()));
-		}
+		return (Caveat) VomUtil.decode(encoded, new TypeToken<Caveat>(){}.getType());
 	}
 
 	/**
-	 * JSON-encodes the provided Caveat array.
+	 * VOM-encodes the provided Caveat array.
 	 *
 	 * @param  caveats Caveat array to be encoded.
 	 * @return         the encoded Caveat array.
 	 */
-	static String encodeCaveats(Caveat[] caveats) {
-		if (caveats == null) {
-			return "";
-		}
-		return JSONUtil.getGsonBuilder().create().toJson(caveats);
+	static byte[] encodeCaveats(Caveat[] caveats) throws VeyronException {
+		return VomUtil.encode(caveats, new TypeToken<Caveat[]>(){}.getType());
 	}
 
 	/**
-	 * Decodes the JSON-encoded Caveat array.
+	 * VOM-decodes the VOM-encoded Caveat array.
 	 *
-	 * @param  encoded         JSON-encoded Caveat array.
+	 * @param  encoded         VOM-encoded Caveat array.
 	 * @return                 decoded Caveat array.
 	 * @throws VeyronException if the provided Caveat array couldn't be decoded.
 	 */
-	static Caveat[] decodeCaveats(String encoded) throws VeyronException {
-		if (encoded.isEmpty()) {
+	static Caveat[] decodeCaveats(byte[] encoded) throws VeyronException {
+		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
-		try {
-			return JSONUtil.getGsonBuilder().create().fromJson(encoded,
-				new TypeToken<Caveat[]>(){}.getType());
-		} catch (JsonSyntaxException e) {
-			throw new VeyronException(String.format("Invalid Caveat array encoded string %s: %s",
-				encoded, e.getMessage()));
-		}
+		return (Caveat[]) VomUtil.decode(encoded, new TypeToken<Caveat[]>(){}.getType());
 	}
 }
