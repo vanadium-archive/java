@@ -1,5 +1,7 @@
 package com.veyron.projects.accounts;
 
+import com.google.common.reflect.TypeToken;
+
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -22,17 +24,14 @@ import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
 import io.veyron.veyron.veyron.services.identity.OAuthBlesserClientFactory;
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.android.RuntimeFactory;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AccountActivity extends AccountAuthenticatorActivity {
 	public static final String TAG = "com.veyron.projects.accounts";
@@ -56,6 +55,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		final Intent intent = AccountManager.newChooseAccountIntent(
 				null, null, new String[]{"com.google" }, true, null, null, null, null);
 		startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+        VRuntime.init(AccountActivity.this, new Options());
 	}
 
 	@Override
@@ -158,9 +158,8 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 					AccountActivity.this).getString(
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
 			try {
-				final VRuntime r = RuntimeFactory.initRuntime(AccountActivity.this, new Options());
 				final OAuthBlesserClient blesser = OAuthBlesserClientFactory.bind(identityServiceName);
-				final Context ctx = r.newContext().withTimeout(new Duration(20000));  // 20s
+				final Context ctx = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
 				final BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
 				final WireBlessings blessing = reply.blessing;
 				if (blessing == null || blessing.getCertificateChains() == null ||
@@ -185,7 +184,15 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 				replyWithError("Couldn't get identity from Veyron identity servers: " + errorMsg);
 				return;
 			}
-			replyWithSuccess(blessing);
+			// VOM-encode the blessing.
+			try {
+			    final byte[] encoded =
+			            VomUtil.encode(blessing, new TypeToken<WireBlessings>(){}.getType());
+			    replyWithSuccess(blessing, encoded);
+			} catch (VeyronException e) {
+			    replyWithError("Couldn't encode identity obtained from Veyron identity servers: " +
+			            e.getMessage());
+			}
 		}
 	}
 
@@ -198,14 +205,13 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		finish();
 	}
 
-	private void replyWithSuccess(WireBlessings blessing) {
-		final String encoded = JSONUtil.getGsonBuilder().create().toJson(blessing);
+	private void replyWithSuccess(WireBlessings blessing, byte[] encoded) {
 		final String userName = userNameFromBlessing(blessing);
 		final Account account = new Account(
 				userName, getResources().getString(R.string.authenticator_account_type));
 		final AccountManager am = AccountManager.get(this);
 		am.addAccountExplicitly(account, null, null);
-		am.setAuthToken(account, "WireBlessings", encoded);
+		am.setAuthToken(account, "WireBlessings", new String(encoded));
 		setAccountAuthenticatorResult(new Intent().getExtras());
 		setResult(RESULT_OK);
 		final Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);

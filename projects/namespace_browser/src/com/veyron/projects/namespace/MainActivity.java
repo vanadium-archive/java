@@ -1,8 +1,6 @@
 package com.veyron.projects.namespace;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -26,15 +24,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.naming.MountEntry;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.Principal;
 import io.veyron.veyron.veyron2.security.Security;
 import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -52,8 +50,7 @@ public class MainActivity extends Activity {
 	private static final int BLESSING_REQUEST = 2;
 
 	WireBlessings mSelectedBlessing = null;
-	Gson mGson = null;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -68,8 +65,7 @@ public class MainActivity extends Activity {
 		nameView.setText(root);
 
 		mSelectedBlessing = null;
-	    RuntimeFactory.initRuntime(this, new Options());
-		mGson = JSONUtil.getGsonBuilder().create();
+	    VRuntime.init(this, new Options());
 
 		updateBlessingsView();
 	}
@@ -217,7 +213,7 @@ public class MainActivity extends Activity {
 		startActivityForResult(intent, BLESSING_REQUEST);  // Continues in addBlessing.
 	}
 
-	private void addBlessing(WireBlessings blessing) {
+	private void addBlessing(WireBlessings blessing) throws VeyronException {
 		final String name = getBlessingName(blessing);
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		final Set<String> blessings = prefs.getStringSet(BLESSINGS_KEY, null);
@@ -225,12 +221,12 @@ public class MainActivity extends Activity {
 		if (blessings != null) {
 			// Remove a blessing (if any) whose name is the same as the new blessing.
 			for (String b : blessings) {
-				if (!getBlessingName(jsonDecodeBlessing(b)).equals(name)) {
+				if (!getBlessingName(vomDecodeBlessing(b)).equals(name)) {
 					newBlessings.add(b);
 				}
 			}
 		}
-		newBlessings.add(jsonEncodeBlessing(blessing));
+		newBlessings.add(vomEncodeBlessing(blessing));
 
 		// Update preferences.
 		final SharedPreferences.Editor editor = prefs.edit();
@@ -247,12 +243,12 @@ public class MainActivity extends Activity {
 		}
 		try {
 			final Blessings blessings = Security.newBlessings(wire);
-			final Principal p = RuntimeFactory.defaultRuntime().getPrincipal();
+			final Principal p = VRuntime.getPrincipal();
 			p.blessingStore().setDefaultBlessings(blessings);
 			mSelectedBlessing = wire;
 		} catch (VeyronException e) {
 			final String msg = String.format(
-					"Couldn't set blessing %s: %s", jsonEncodeBlessing(wire), e.getMessage());
+			        "Couldn't set blessing %s: %s", wire.toString(), e.getMessage());
 			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		}
 	}
@@ -272,7 +268,7 @@ public class MainActivity extends Activity {
 			});
 		} else {
 			if (mSelectedBlessing == null) {
-				updateSelectedBlessing(jsonDecodeBlessing(blessings.iterator().next()));
+				updateSelectedBlessing(vomDecodeBlessing(blessings.iterator().next()));
 			}
 			final LinearLayout view = (LinearLayout) getLayoutInflater().inflate(
 					R.layout.action_account_existing, null);
@@ -294,7 +290,7 @@ public class MainActivity extends Activity {
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		final Set<String> blessings = prefs.getStringSet(BLESSINGS_KEY, null);
 		for (String blessingStr : blessings) {
-			final WireBlessings blessing = jsonDecodeBlessing(blessingStr);
+			final WireBlessings blessing = vomDecodeBlessing(blessingStr);
 			final String itemName = getBlessingName(blessing);
 			final MenuItem item = popup.getMenu().add(itemName);
 			item.setOnMenuItemClickListener(new OnMenuItemClickListener(){
@@ -332,18 +328,18 @@ public class MainActivity extends Activity {
 		return ret;
 	}
 
-	private static String jsonEncodeBlessing(WireBlessings wire) {
-		return JSONUtil.getGsonBuilder().create().toJson(wire);
+	private static String vomEncodeBlessing(WireBlessings wire) throws VeyronException {
+	    final byte[] encoded = VomUtil.encode(wire, new TypeToken<WireBlessings>(){}.getType());
+	    return new String(encoded); 
 	}
 
-	private static WireBlessings jsonDecodeBlessing(String json) {
+	private static WireBlessings vomDecodeBlessing(String encoded) {
 		try {
-			return (WireBlessings) JSONUtil.getGsonBuilder().create().fromJson(json,
-					new TypeToken<WireBlessings>(){}.getType());
-		} catch (JsonSyntaxException e) {
+			return (WireBlessings) VomUtil.decode(
+			        encoded.getBytes(),	new TypeToken<WireBlessings>(){}.getType());
+		} catch (VeyronException e) {
 			android.util.Log.e(TAG, String.format(
-					"Couldn't convert JSON string %s to WireBlessing format: %s",
-					json, e.getMessage()));
+					"Couldn't convert VOM string %s to WireBlessing : %s", encoded, e.getMessage()));
 			return null;
 		}
 	}

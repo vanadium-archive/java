@@ -10,7 +10,7 @@ import java.io.EOFException;
 
 import io.veyron.jni.test.fortune.FortuneServer;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.VomUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 import io.veyron.veyron.veyron2.ipc.ServerCall;
 import io.veyron.veyron.veyron2.ipc.ServerContext;
 

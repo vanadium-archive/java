@@ -1,8 +1,6 @@
 package com.veyron.projects.accounts;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -19,15 +17,14 @@ import android.os.Parcelable;
 import android.view.View;
 import android.widget.TextView;
 
-import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.android.RuntimeFactory;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.Principal;
 import io.veyron.veyron.veyron2.security.Security;
 import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 
 import java.io.IOException;
 import java.security.interfaces.ECPublicKey;
@@ -51,7 +48,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blessing);
-		RuntimeFactory.initRuntime(this, new Options());
+		VRuntime.init(this, null);
 
 		final Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
@@ -114,12 +111,12 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 		public void run(AccountManagerFuture<Bundle> result) {
 			try {
 				final Bundle bundle = result.getResult();
-				final String wireJson = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-				if (wireJson == null || wireJson.isEmpty()) {
+				final String wireVom = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+				if (wireVom == null || wireVom.isEmpty()) {
 					replyWithError("Empty auth token.");
 					return;
 				}
-				bless(wireJson);
+				bless(wireVom.getBytes());
 			} catch (AuthenticatorException e){
 				replyWithError("Couldn't authorize: " + e.getMessage());
 			} catch (OperationCanceledException e) {
@@ -130,13 +127,12 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 		}
 	}
 
-	private void bless(String wireJson) {
-		final Gson gson = JSONUtil.getGsonBuilder().create();
+	private void bless(byte[] wireVom) {
 		try {
-			final WireBlessings wire = gson.fromJson(wireJson,
-					new TypeToken<WireBlessings>(){}.getType());
+			final WireBlessings wire = (WireBlessings) VomUtil.decode(
+			        wireVom, new TypeToken<WireBlessings>(){}.getType());
 			final Blessings with = Security.newBlessings(wire);
-			final Principal principal = RuntimeFactory.defaultRuntime().getPrincipal();
+			final Principal principal = VRuntime.getPrincipal();
 			final Blessings retBlessings = principal.bless(mBlesseePubKey,
 					with, mBlesseeName, Security.newUnconstrainedUseCaveat());
 			if (retBlessings == null) {
@@ -153,7 +149,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 				return;
 			}
 			if (retWire.getCertificateChains().size() > 1) {
-				replyWithError("Expected single certificate chain, got: " + gson.toJson(retWire));
+				replyWithError("Expected single certificate chain, got: " + retWire.toString());
 				return;
 			}
 			final List<Certificate> chain = retWire.getCertificateChains().get(0);
@@ -162,8 +158,6 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 				return;
 			}
 			replyWithSuccess(retWire);
-		} catch (JsonSyntaxException e) {
-			replyWithError("Couldn't decode auth token: " + e.getMessage());
 		} catch (VeyronException e) {
 			replyWithError("Couldn't bless: " + e.getMessage());
 		}

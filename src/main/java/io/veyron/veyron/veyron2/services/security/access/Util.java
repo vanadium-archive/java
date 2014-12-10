@@ -2,7 +2,7 @@ package io.veyron.veyron.veyron2.services.security.access;
 
 import com.google.common.reflect.TypeToken;
 
-import io.veyron.veyron.veyron2.VomUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 import io.veyron.veyron.veyron2.VeyronException;
 
 /**

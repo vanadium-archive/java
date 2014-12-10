@@ -2,7 +2,6 @@ package io.veyron.veyron.veyron2.vom2;
 
 import io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName;
 import com.google.common.base.Strings;
-import com.google.gson.annotations.SerializedName;
 
 import io.veyron.veyron.veyron2.vdl.Kind;
 import io.veyron.veyron.veyron2.vdl.Types;

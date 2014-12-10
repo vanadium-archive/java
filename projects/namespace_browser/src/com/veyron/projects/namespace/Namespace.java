@@ -3,8 +3,7 @@ package com.veyron.projects.namespace;
 import org.joda.time.Duration;
 
 import io.veyron.veyron.veyron2.InputChannel;
-import io.veyron.veyron.veyron2.RuntimeFactory;
-import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.naming.MountEntry;
@@ -23,9 +22,8 @@ public class Namespace {
 	 * @throws VeyronException if there was an error fetching the entries.
 	 */
 	public static List<MountEntry> glob(String root) throws VeyronException {
-		final VRuntime r = RuntimeFactory.defaultRuntime();
-		final io.veyron.veyron.veyron2.naming.Namespace n = r.getNamespace();
-		final Context ctx = r.newContext().withTimeout(new Duration(20000));  // 20s
+		final io.veyron.veyron.veyron2.naming.Namespace n = VRuntime.getNamespace();
+		final Context ctx = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
 		final InputChannel<MountEntry> chan = n.glob(ctx, root + "/*");
 		final ArrayList<MountEntry> entries = new ArrayList<MountEntry>();
 		try {

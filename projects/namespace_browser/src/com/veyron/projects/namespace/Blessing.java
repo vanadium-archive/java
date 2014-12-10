@@ -1,18 +1,14 @@
 package com.veyron.projects.namespace;
 
-import com.google.gson.Gson;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.android.RuntimeFactory;
-import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.vdl.JSONUtil;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -25,8 +21,8 @@ public class Blessing {
 	private static final String REPLY = "REPLY";
 
 	public static Intent createIntent(Context ctx, String accountName) {
-	    final VRuntime r = RuntimeFactory.initRuntime(ctx, new Options());
-	    final ECPublicKey key = r.getPrincipal().publicKey();
+	    VRuntime.init(ctx, new Options());
+	    final ECPublicKey key = VRuntime.getPrincipal().publicKey();
 	    final Intent intent = new Intent();
 	    intent.setComponent(new ComponentName(
 	            BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
@@ -36,7 +32,6 @@ public class Blessing {
 	}
 
 	public static WireBlessings getBlessings(int resultCode, Intent data) throws VeyronException {
-		final Gson gson = JSONUtil.getGsonBuilder().create();
 		if (data == null) {
 			throw new VeyronException("NULL blessing response");
 		}
@@ -51,7 +46,7 @@ public class Blessing {
 			throw new VeyronException("Got empty blessings.");
 		}
 		if (wire.getCertificateChains().size() > 1) {
-			throw new VeyronException("Got multiple certificate chains: " + gson.toJson(wire));
+			throw new VeyronException("Got multiple certificate chains: " + wire.toString());
 		}
 		if (wire.getCertificateChains().get(0).size() <= 0) {
 			throw new VeyronException("Got empty certificate chain");

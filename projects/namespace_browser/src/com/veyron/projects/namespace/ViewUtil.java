@@ -167,6 +167,7 @@ public class ViewUtil {
 	private static LinearLayout deserializeMethodView(Parcel parcel, LayoutInflater inflater) {
 		// Restore own view state.
 		final String text = parcel.readString();
+		@SuppressWarnings("unused")
 		final boolean isActivated = (parcel.readByte() == 1);
 		final int numChildren = parcel.readInt();
 		final MountEntry entry = (MountEntry) parcel.readParcelable(MountEntry.class.getClassLoader());
