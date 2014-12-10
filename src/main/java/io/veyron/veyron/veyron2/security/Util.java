@@ -3,9 +3,8 @@ package io.veyron.veyron.veyron2.security;
 import com.google.common.reflect.TypeToken;
 
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.VomUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 
-import java.math.BigInteger;
 import java.security.interfaces.ECPublicKey;
 
 /**

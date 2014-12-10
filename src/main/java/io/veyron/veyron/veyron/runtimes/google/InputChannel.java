@@ -1,7 +1,7 @@
 package io.veyron.veyron.veyron.runtimes.google;
 
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.VomUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;

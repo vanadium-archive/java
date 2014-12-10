@@ -2,8 +2,7 @@ package com.veyron.projects.namespace;
 
 import com.google.common.reflect.TypeToken;
 
-import io.veyron.veyron.veyron2.RuntimeFactory;
-import io.veyron.veyron.veyron2.VRuntime;
+import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.ipc.Client;
 import io.veyron.veyron.veyron2.ipc.Client.Call;
@@ -25,8 +24,7 @@ public class Methods {
    * @throws VeyronException if there was an error getting the list of names.
    */
 	public static List<String> get(String name) throws VeyronException {
-		final VRuntime r = RuntimeFactory.defaultRuntime();
-		final Client client = r.getClient();
+		final Client client = VRuntime.getClient();
 		final Call call = client.startCall(null, name, "signature", new Object[0], new Type[0]);
 		final Type[] resultTypes = new Type[]{ new TypeToken<ServiceSignature>() {}.getType() };
 		final ServiceSignature sSign = (ServiceSignature)call.finish(resultTypes)[0];

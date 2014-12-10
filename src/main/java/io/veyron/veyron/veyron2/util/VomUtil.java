@@ -1,4 +1,4 @@
-package io.veyron.veyron.veyron2;
+package io.veyron.veyron.veyron2.util;
 
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.vom2.BinaryDecoder;

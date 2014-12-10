@@ -2,7 +2,7 @@ package io.veyron.veyron.veyron.runtimes.google.ipc;
 
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.VomUtil;
+import io.veyron.veyron.veyron2.util.VomUtil;
 import io.veyron.veyron.veyron2.context.Context;
 
 import java.lang.reflect.Type;
