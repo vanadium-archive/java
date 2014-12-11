@@ -33,7 +33,7 @@ final class BinaryUtil {
             return;
         }
         int len = 0;
-        while ((value >>> (len * 8)) > 0xff) {
+        while (((value >>> (len * 8)) | 0xff) != 0xff) {
             len++;
         }
         len++;
