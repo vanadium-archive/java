@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "${VEYRON_ROOT}/scripts/lib/shell.sh"
+source "$(go list -f {{.Dir}} veyron.io/veyron/shell/lib)/shell.sh"
 
 main() {
   if [[ "$#" -eq 0 ]]; then

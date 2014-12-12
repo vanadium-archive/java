@@ -7,7 +7,7 @@
 # If the output directory is not specified, a temporary directory will
 # be created and cleaned up upon exit.
 
-source "${VEYRON_ROOT}/scripts/lib/shell.sh"
+source "$(go list -f {{.Dir}} veyron.io/veyron/shell/lib)/shell.sh"
 
 main() {
   # Output a message if ant is not in the path.
