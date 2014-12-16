@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import io.veyron.veyron.veyron2.naming.MountEntry;
+import io.veyron.veyron.veyron2.naming.VDLMountEntry;
 
 
 /**
@@ -17,7 +17,7 @@ import io.veyron.veyron.veyron2.naming.MountEntry;
 public class ViewUtil {
 	private static final String TAG = "com.veyron.projects.namespace";
 
-	public static LinearLayout createDirectoryView(String text, MountEntry entry,
+	public static LinearLayout createDirectoryView(String text, VDLMountEntry entry,
 			LayoutInflater inflater) {
 		final LinearLayout dirView = (LinearLayout) inflater.inflate(R.layout.directory_item, null);
 		dirView.setTag(entry);
@@ -26,7 +26,7 @@ public class ViewUtil {
 		return dirView;
 	}
 
-	public static LinearLayout createObjectView(String text, MountEntry entry,
+	public static LinearLayout createObjectView(String text, VDLMountEntry entry,
 			LayoutInflater inflater) {
 		final LinearLayout objView = (LinearLayout) inflater.inflate(R.layout.object_item, null);
 		objView.setTag(entry);
@@ -35,7 +35,7 @@ public class ViewUtil {
 		return objView;
 	}
 
-	public static LinearLayout createMethodView(String text, MountEntry entry,
+	public static LinearLayout createMethodView(String text, VDLMountEntry entry,
 			LayoutInflater inflater) {
 		final LinearLayout methodView = (LinearLayout) inflater.inflate(R.layout.method_item, null);
 		methodView.setTag(entry);
@@ -95,7 +95,7 @@ public class ViewUtil {
 		parcel.writeString(((TextView) dirView.findViewById(R.id.name)).getText().toString());
 		parcel.writeByte((byte) (dirView.isActivated() ? 1 : 0));
 		parcel.writeInt(dirView.getChildCount());
-		final MountEntry entry = (MountEntry) dirView.getTag();
+		final VDLMountEntry entry = (VDLMountEntry) dirView.getTag();
 		parcel.writeParcelable(entry, 0);
 
 		// Save child view state.
@@ -109,7 +109,7 @@ public class ViewUtil {
 		parcel.writeString(((TextView) objView.findViewById(R.id.name)).getText().toString());
 		parcel.writeByte((byte) (objView.isActivated() ? 1 : 0));
 		parcel.writeInt(objView.getChildCount());
-		final MountEntry entry = (MountEntry) objView.getTag();
+		final VDLMountEntry entry = (VDLMountEntry) objView.getTag();
 		parcel.writeParcelable(entry, 0);
 
 		// Save child view state.
@@ -123,7 +123,7 @@ public class ViewUtil {
 		parcel.writeString(((TextView) methodView.findViewById(R.id.name)).getText().toString());
 		parcel.writeByte((byte) (methodView.isActivated() ? 1 : 0));
 		parcel.writeInt(methodView.getChildCount());
-		final MountEntry entry = (MountEntry) methodView.getTag();
+		final VDLMountEntry entry = (VDLMountEntry) methodView.getTag();
 		parcel.writeParcelable(entry, 0);
 
 		// Save child view state.
@@ -137,7 +137,8 @@ public class ViewUtil {
 		final String text = parcel.readString();
 		final boolean isActivated = (parcel.readByte() == 1);
 		final int numChildren = parcel.readInt();
-		final MountEntry entry = (MountEntry) parcel.readParcelable(MountEntry.class.getClassLoader());
+		final VDLMountEntry entry =
+		        (VDLMountEntry) parcel.readParcelable(VDLMountEntry.class.getClassLoader());
 		final LinearLayout dirView = createDirectoryView(text, entry, inflater);
 		updateDirectoryView(dirView, isActivated);
 
@@ -153,7 +154,8 @@ public class ViewUtil {
 		final String text = parcel.readString();
 		final boolean isActivated = (parcel.readByte() == 1);
 		final int numChildren = parcel.readInt();
-		final MountEntry entry = (MountEntry) parcel.readParcelable(MountEntry.class.getClassLoader());
+		final VDLMountEntry entry =
+		        (VDLMountEntry) parcel.readParcelable(VDLMountEntry.class.getClassLoader());
 		final LinearLayout objView = createObjectView(text, entry, inflater);
 		updateObjectView(objView, isActivated);
 
@@ -170,7 +172,8 @@ public class ViewUtil {
 		@SuppressWarnings("unused")
 		final boolean isActivated = (parcel.readByte() == 1);
 		final int numChildren = parcel.readInt();
-		final MountEntry entry = (MountEntry) parcel.readParcelable(MountEntry.class.getClassLoader());
+		final VDLMountEntry entry =
+		        (VDLMountEntry) parcel.readParcelable(VDLMountEntry.class.getClassLoader());
 		final LinearLayout methodView = createMethodView(text, entry, inflater);
 
 		// Restore child view state.

@@ -1,7 +1,5 @@
 package com.veyron.projects.accounts;
 
-import com.google.common.reflect.TypeToken;
-
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -52,10 +50,10 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_account);
+		VRuntime.init(this, new Options());
 		final Intent intent = AccountManager.newChooseAccountIntent(
 				null, null, new String[]{"com.google" }, true, null, null, null, null);
 		startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-        VRuntime.init(AccountActivity.this, new Options());
 	}
 
 	@Override
@@ -186,8 +184,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 			}
 			// VOM-encode the blessing.
 			try {
-			    final byte[] encoded =
-			            VomUtil.encode(blessing, new TypeToken<WireBlessings>(){}.getType());
+				final String encoded = VomUtil.encodeToString(blessing, WireBlessings.class);
 			    replyWithSuccess(blessing, encoded);
 			} catch (VeyronException e) {
 			    replyWithError("Couldn't encode identity obtained from Veyron identity servers: " +
@@ -205,13 +202,13 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 		finish();
 	}
 
-	private void replyWithSuccess(WireBlessings blessing, byte[] encoded) {
+	private void replyWithSuccess(WireBlessings blessing, String encoded) {
 		final String userName = userNameFromBlessing(blessing);
 		final Account account = new Account(
 				userName, getResources().getString(R.string.authenticator_account_type));
 		final AccountManager am = AccountManager.get(this);
 		am.addAccountExplicitly(account, null, null);
-		am.setAuthToken(account, "WireBlessings", new String(encoded));
+		am.setAuthToken(account, "WireBlessings", encoded);
 		setAccountAuthenticatorResult(new Intent().getExtras());
 		setResult(RESULT_OK);
 		final Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);

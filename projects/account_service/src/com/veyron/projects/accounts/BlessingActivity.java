@@ -116,7 +116,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 					replyWithError("Empty auth token.");
 					return;
 				}
-				bless(wireVom.getBytes());
+				bless(wireVom);
 			} catch (AuthenticatorException e){
 				replyWithError("Couldn't authorize: " + e.getMessage());
 			} catch (OperationCanceledException e) {
@@ -127,19 +127,19 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 		}
 	}
 
-	private void bless(byte[] wireVom) {
+	private void bless(String wireVom) {
 		try {
-			final WireBlessings wire = (WireBlessings) VomUtil.decode(
-			        wireVom, new TypeToken<WireBlessings>(){}.getType());
+			final WireBlessings wire = (WireBlessings) VomUtil.decodeFromString(
+					wireVom, new TypeToken<WireBlessings>(){}.getType());
 			final Blessings with = Security.newBlessings(wire);
 			final Principal principal = VRuntime.getPrincipal();
-			final Blessings retBlessings = principal.bless(mBlesseePubKey,
+			final Blessings retBlessing = principal.bless(mBlesseePubKey,
 					with, mBlesseeName, Security.newUnconstrainedUseCaveat());
-			if (retBlessings == null) {
+			if (retBlessing == null) {
 				replyWithError("Got null blessings after bless().");
 				return;
 			}
-			final WireBlessings retWire = retBlessings.wireFormat();
+			final WireBlessings retWire = retBlessing.wireFormat();
 			if (retWire == null) {
 				replyWithError("Got null wire blessings even though blessings are non-null");
 				return;
@@ -171,6 +171,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	}
 
 	private void replyWithError(String error) {
+		android.util.Log.e(TAG, "Blessing error: " + error);
 		final Intent intent = new Intent();
 		intent.putExtra(ERROR, error);
 		setResult(RESULT_CANCELED, intent);

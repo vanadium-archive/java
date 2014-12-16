@@ -3,6 +3,8 @@ package io.veyron.veyron.veyron2;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import io.veyron.veyron.veyron2.vdl.GeneratedFromVdl;
+
 import java.io.Serializable;
 
 /**
@@ -22,9 +24,9 @@ import java.io.Serializable;
 public class VeyronException extends Exception implements Parcelable, Serializable {
 	private static final long serialVersionUID = -3917496574141933784L;
 
-	@io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName("Id")
+	@GeneratedFromVdl(name = "Id")
 	private final String id; // always non-null (can be empty)
-	@io.veyron.veyron.veyron2.vdl.GeneratedFromVdlName("Msg")
+	@GeneratedFromVdl(name = "Msg")
 	private final String msg;  // always non-null (can be empty)
 
 	public VeyronException() {

@@ -6,7 +6,7 @@ import io.veyron.veyron.veyron2.InputChannel;
 import io.veyron.veyron.veyron2.android.VRuntime;
 import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.naming.MountEntry;
+import io.veyron.veyron.veyron2.naming.VDLMountEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,11 @@ public class Namespace {
 	 * @return                 list of entries mounted under the provided root.
 	 * @throws VeyronException if there was an error fetching the entries.
 	 */
-	public static List<MountEntry> glob(String root) throws VeyronException {
+	public static List<VDLMountEntry> glob(String root) throws VeyronException {
 		final io.veyron.veyron.veyron2.naming.Namespace n = VRuntime.getNamespace();
 		final Context ctx = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
-		final InputChannel<MountEntry> chan = n.glob(ctx, root + "/*");
-		final ArrayList<MountEntry> entries = new ArrayList<MountEntry>();
+		final InputChannel<VDLMountEntry> chan = n.glob(ctx, root + "/*");
+		final ArrayList<VDLMountEntry> entries = new ArrayList<VDLMountEntry>();
 		try {
 			while (true) {
 				entries.add(chan.readValue());

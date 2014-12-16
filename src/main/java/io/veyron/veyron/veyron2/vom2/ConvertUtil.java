@@ -1,9 +1,6 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import org.apache.commons.math3.complex.Complex;
-
 import io.veyron.veyron.veyron2.vdl.Kind;
-
 import io.veyron.veyron.veyron2.vdl.VdlArray;
 import io.veyron.veyron.veyron2.vdl.VdlEnum;
 import io.veyron.veyron.veyron2.vdl.VdlString;
@@ -94,20 +91,6 @@ final class ConvertUtil {
         return fracPart == 0 && x >= Long.MIN_VALUE
                 && x <= Long.MAX_VALUE
                 && !hasOverflowInt(intPart, bitlen);
-    }
-
-    static boolean canConvertComplexToUint(Complex x, long bitlen) {
-        return x.getImaginary() == 0
-                && canConvertFloatToUint(x.getReal(), bitlen);
-    }
-
-    static boolean canConvertComplexToInt(Complex x, long bitlen) {
-        return x.getImaginary() == 0
-                && canConvertFloatToInt(x.getReal(), bitlen);
-    }
-
-    static boolean canConvertComplexToFloat(Complex x) {
-        return x.getImaginary() == 0;
     }
 
     /**

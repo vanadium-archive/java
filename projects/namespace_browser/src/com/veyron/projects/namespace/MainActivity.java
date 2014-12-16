@@ -1,6 +1,6 @@
 package com.veyron.projects.namespace;
 
-import com.google.common.reflect.TypeToken;
+import com.google.common.collect.ImmutableList;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -26,7 +26,8 @@ import android.widget.Toast;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.naming.MountEntry;
+import io.veyron.veyron.veyron2.naming.VDLMountEntry;
+import io.veyron.veyron.veyron2.naming.VDLMountedServer;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.Certificate;
 import io.veyron.veyron.veyron2.security.Principal;
@@ -50,7 +51,7 @@ public class MainActivity extends Activity {
 	private static final int BLESSING_REQUEST = 2;
 
 	WireBlessings mSelectedBlessing = null;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,7 +61,7 @@ public class MainActivity extends Activity {
 		final View dirView = findViewById(R.id.directory);
 		dirView.setPadding(  // remove left padding for the root.
 				0, dirView.getPaddingTop(), dirView.getPaddingRight(), dirView.getPaddingBottom());
-		dirView.setTag(new MountEntry(root, null, null));
+		dirView.setTag(new VDLMountEntry(root, ImmutableList.<VDLMountedServer>of(), true));
 		final TextView nameView = (TextView) dirView.findViewById(R.id.name);
 		nameView.setText(root);
 
@@ -329,14 +330,12 @@ public class MainActivity extends Activity {
 	}
 
 	private static String vomEncodeBlessing(WireBlessings wire) throws VeyronException {
-	    final byte[] encoded = VomUtil.encode(wire, new TypeToken<WireBlessings>(){}.getType());
-	    return new String(encoded); 
+		return VomUtil.encodeToString(wire, WireBlessings.class);
 	}
 
 	private static WireBlessings vomDecodeBlessing(String encoded) {
 		try {
-			return (WireBlessings) VomUtil.decode(
-			        encoded.getBytes(),	new TypeToken<WireBlessings>(){}.getType());
+			return (WireBlessings) VomUtil.decodeFromString(encoded, WireBlessings.class);
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG, String.format(
 					"Couldn't convert VOM string %s to WireBlessing : %s", encoded, e.getMessage()));
@@ -344,7 +343,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private class NameFetcher extends AsyncTask<Void, Void, List<MountEntry>> {
+	private class NameFetcher extends AsyncTask<Void, Void, List<VDLMountEntry>> {
 		final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
 		final LinearLayout dirView;
 		String errorMsg = "";
@@ -358,8 +357,8 @@ public class MainActivity extends Activity {
 			progressDialog.show();
 		}
 		@Override
-		protected List<MountEntry> doInBackground(Void... args) {
-			final MountEntry entry = (MountEntry)dirView.getTag();
+		protected List<VDLMountEntry> doInBackground(Void... args) {
+			final VDLMountEntry entry = (VDLMountEntry)dirView.getTag();
 			try {
 				return Namespace.glob(entry.getName());
 			} catch (VeyronException e) {
@@ -368,15 +367,15 @@ public class MainActivity extends Activity {
 			}
 		}
 		@Override
-		protected void onPostExecute(List<MountEntry> entries) {
+		protected void onPostExecute(List<VDLMountEntry> entries) {
 			progressDialog.dismiss();
 			ViewUtil.updateDirectoryView(dirView, true);
 			if (entries == null) {
 				Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
 				return;
 			}
-			final MountEntry parentEntry = (MountEntry)dirView.getTag();
-			for (MountEntry entry : entries) {
+			final VDLMountEntry parentEntry = (VDLMountEntry)dirView.getTag();
+			for (VDLMountEntry entry : entries) {
 				if (!entry.getName().startsWith(parentEntry.getName() + "/")) {
 					android.util.Log.e(TAG, String.format(
 							"Entry %q doesn't start with parent prefix %q",
@@ -386,7 +385,7 @@ public class MainActivity extends Activity {
 				final String text = entry.getName().substring(parentEntry.getName().length() + 1);
 
 				final LinearLayout childView =
-						(entry.getServers() == null || entry.getServers().length <= 0)
+						(entry.getServers() == null || entry.getServers().size() <= 0)
 						? ViewUtil.createDirectoryView(text, entry, getLayoutInflater()) // sub-dir
 						: ViewUtil.createObjectView(text, entry, getLayoutInflater());   // object
 				dirView.addView(childView);
@@ -408,7 +407,7 @@ public class MainActivity extends Activity {
 		}
 		@Override
 		protected List<String> doInBackground(Void... args) {
-			final MountEntry entry = (MountEntry)objView.getTag();
+			final VDLMountEntry entry = (VDLMountEntry)objView.getTag();
 			try {
 				return Methods.get(entry.getName());
 			} catch (VeyronException e) {
@@ -424,7 +423,7 @@ public class MainActivity extends Activity {
 				Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
 				return;
 			}
-			final MountEntry entry = (MountEntry)objView.getTag();
+			final VDLMountEntry entry = (VDLMountEntry)objView.getTag();
 			for (String method : methods) {
 				final LinearLayout childView =
 						ViewUtil.createMethodView(method, entry, getLayoutInflater());

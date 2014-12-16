@@ -18,5 +18,5 @@ public interface Namespace {
 	 * @return                 an input channel of MountEntry objects matching the provided pattern.
 	 * @throws VeyronException if an error is encountered.
 	 */
-	public InputChannel<MountEntry> glob(Context context, String pattern) throws VeyronException;
+	public InputChannel<VDLMountEntry> glob(Context context, String pattern) throws VeyronException;
 }

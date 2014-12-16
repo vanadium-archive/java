@@ -187,6 +187,20 @@ public class Security {
 	}
 
 	/**
+	 * Returns an authorizer that accepts all requests.
+	 *
+	 * @return an authorizer that accepts all requests.
+	 */
+	public static Authorizer newAcceptAllAuthorizer() {
+		return new Authorizer() {
+			@Override
+			public void authorize(Context context) throws VeyronException {
+				// do nothing
+			}
+		};
+	}
+
+	/**
 	 * Verifies the provides signature of the given message, using the supplied public key.
 	 *
 	 * @param  sig             signature in the veyron format.
