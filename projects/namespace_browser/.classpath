@@ -7,10 +7,7 @@
 	<classpathentry kind="src" path="vdl"/>
 	<classpathentry kind="src" path="main"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="/usr/local/google/home/spetrovic/veyron/third_party/java/google-gson-2.2.4/gson-2.2.4.jar"/>
-	<classpathentry kind="lib" path="/usr/local/google/home/spetrovic/veyron/third_party/java/commons-math3-3.3/commons-math3-3.3.jar"/>
 	<classpathentry kind="lib" path="/usr/local/google/home/spetrovic/veyron/third_party/java/guava-17.0/guava-17.0.jar"/>
 	<classpathentry kind="lib" path="/usr/local/google/home/spetrovic/veyron/third_party/java/joda-time-2.3/joda-time-2.3.jar"/>
-	<classpathentry kind="lib" path="/usr/local/google/home/spetrovic/veyron/third_party/java/junit-r4.11/lib/junit-4.11.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
