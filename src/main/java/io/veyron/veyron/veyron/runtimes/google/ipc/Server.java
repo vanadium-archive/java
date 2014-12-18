@@ -8,7 +8,7 @@ import io.veyron.veyron.veyron2.ipc.ServiceObjectWithAuthorizer;
 public class Server implements io.veyron.veyron.veyron2.ipc.Server {
 	private final long nativePtr;
 
-	private native String nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
+	private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
 	private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
 		throws VeyronException;
 	private native String[] nativeGetPublishedNames(long nativePtr) throws VeyronException;
@@ -20,10 +20,7 @@ public class Server implements io.veyron.veyron.veyron2.ipc.Server {
 	}
 	// Implement io.veyron.veyron.veyron2.ipc.Server.
 	@Override
-	public String listen(ListenSpec spec) throws VeyronException {
-		if (spec == null) {
-			spec = ListenSpec.DEFAULT;
-		}
+	public String[] listen(ListenSpec spec) throws VeyronException {
 		return nativeListen(this.nativePtr, spec);
 	}
 	@Override

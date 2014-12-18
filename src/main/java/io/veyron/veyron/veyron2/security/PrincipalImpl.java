@@ -17,9 +17,9 @@ public class PrincipalImpl implements Principal {
 	private static native PrincipalImpl nativeCreateForAll(Signer signer, BlessingStore store,
 		BlessingRoots roots) throws VeyronException;
 	private static native PrincipalImpl nativeCreatePersistent(String passphrase, String dir)
-		throws VeyronException;
+			throws VeyronException;
 	private static native PrincipalImpl nativeCreatePersistentForSigner(Signer signer, String dir)
-		throws VeyronException;
+			throws VeyronException;
 
 	static PrincipalImpl create() throws VeyronException {
 		return nativeCreate();
@@ -41,12 +41,17 @@ public class PrincipalImpl implements Principal {
 	private native Blessings nativeBless(long nativePtr, ECPublicKey key, Blessings with,
 		String extension, Caveat caveat, Caveat[] additionalCaveats) throws VeyronException;
 	private native Blessings nativeBlessSelf(long nativePtr, String name, Caveat[] caveats)
-		throws VeyronException;
+			throws VeyronException;
 	private native Signature nativeSign(long nativePtr, byte[] message) throws VeyronException;
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
+	private native Blessings[] nativeBlessingsByName(long nativePtr, BlessingPattern name)
+			throws VeyronException;
+	private native String[] nativeBlessingsInfo(long nativePtr, Blessings blessings)
+			throws VeyronException;
 	private native BlessingStore nativeBlessingStore(long nativePtr) throws VeyronException;
 	private native BlessingRoots nativeRoots(long nativePtr) throws VeyronException;
-	private native void nativeAddToRoots(long nativePtr, Blessings blessings) throws VeyronException;
+	private native void nativeAddToRoots(long nativePtr, Blessings blessings)
+			throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
 	private PrincipalImpl(long nativePtr, Signer signer, BlessingStore store, BlessingRoots roots) {
@@ -83,6 +88,25 @@ public class PrincipalImpl implements Principal {
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
 			return null;
+		}
+	}
+	@Override
+	public Blessings[] blessingsByName(BlessingPattern name) {
+		try {
+			return nativeBlessingsByName(this.nativePtr, name);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get blessings for name: " + e.getMessage());
+			return new Blessings[0];
+		}
+	}
+	@Override
+	public String[] blessingsInfo(Blessings blessings) {
+		try {
+			return nativeBlessingsInfo(this.nativePtr, blessings);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG,
+				"Couldn't get human-readable strings for blessings: " + e.getMessage());
+			return new String[0];
 		}
 	}
 	@Override

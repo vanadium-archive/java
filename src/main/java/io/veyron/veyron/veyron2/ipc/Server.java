@@ -7,26 +7,23 @@ import io.veyron.veyron.veyron2.VeyronException;
  */
 public interface Server {
 	/**
-	 * Creates a listening network endpoint for the server as specified by its ListenSpec parameter.
+	 * Creates a listening network endpoint for the server as specified by the provided
+	 * {@code ListenSpec} parameter.
 	 *
-	 * The endpoint is chosen as the first available address/port on the device for the protocol
-	 * specified in the ListenSpec.  The server automatically adapts to any changes in its network
-	 * configuration by picking a different address/port on the device for the given protocol.
-	 * The call returns the first established network endpoint.
+	 * Returns the set of endpoints that can be used to reach this server.  A single listen
+	 * address in the listen spec can lead to multiple such endpoints (e.g. :0 on a device with
+	 * multiple interfaces or that is being proxied). In the case where multiple listen addresses
+	 * are used it is not possible to tell which listen address supports which endpoint; if there
+	 * is need to associate endpoints with specific listen addresses then {@code listen} should be
+	 * called separately for each one.
 	 *
-	 * If the ListenSpec provides a non-empty proxy address, the server will connect to the proxy
-	 * in order to proxy connections.
+	 * If the provided listen spec is {@code null}, default listen spec is used.
 	 *
-	 * If the provided ListenSpec is {@code null}, default ListenSpec is used.
-	 *
-	 * Method {@code listen} returns the first established endpoint.  It is safe to call
-	 * {@code listen} multiple times.
-	 *
-	 * @param  spec            information on how to create the network endpoint.
-	 * @return                 the endpoint string.
-	 * @throws VeyronException if the provided protocol can't be listened on.
+	 * @param  spec            information on how to create the network endpoint(s).
+	 * @return                 array of endpoint strings.
+	 * @throws VeyronException if the server couldn't listen  provided protocol can't be listened on.
 	 */
-	public String listen(ListenSpec spec) throws VeyronException;
+	public String[] listen(ListenSpec spec) throws VeyronException;
 
 	/**
 	 * Associates object with name by publishing the address of this server with the mount table

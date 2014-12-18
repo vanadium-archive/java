@@ -62,6 +62,28 @@ public interface Principal {
 	public ECPublicKey publicKey();
 
 	/**
+	 * Returns blessings granted to this principal from recognized authorities
+	 * (i.e., blessing roots) whose human-readable strings match a given name pattern.
+	 * This method does not check the validity of the caveats in the returned blessings.
+	 *
+	 * @param  name a pattern against which blessings are matched.
+	 * @return      blessings whose human-readable strings match a given name pattern.
+	 */
+	public Blessings[] blessingsByName(BlessingPattern name);
+
+	/**
+	 * Returns human-readable strings for the provided blessings, which must belong to this
+	 * principal and must have been granted to it from recognized authorities (i.e., blessing
+	 * roots). This method does not validate caveats on the provided blessings and thus may NOT be
+	 * valid in certain contexts.  (Use {@code Blessings.forContext(ctx)} to determine the set of
+	 * valid blessing strings in a particular context.)
+	 *
+	 * @param blessings blessings whose human-readable strings are to be returned.
+	 * @return          human-readable strings of the provided blessings.
+	 */
+	public String[] blessingsInfo(Blessings blessings);
+
+	/**
 	 * Provides access to the BlessingStore containing blessings that have been granted to this
 	 * principal.
 	 *
@@ -71,7 +93,7 @@ public interface Principal {
 
 	/**
 	 * Returns the set of recognized authorities (identified by their public keys) on blessings that
-	 * match specific patterns
+	 * match specific patterns.
 	 *
 	 * @return set of recognized authorities on blessings that match specific patterns.
 	 */

@@ -3,6 +3,7 @@ package io.veyron.veyron.veyron2.security;
 import io.veyron.veyron.veyron2.VeyronException;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.Map;
 
 class BlessingStoreImpl implements BlessingStore {
 	private static final String TAG = "Veyron runtime";
@@ -12,11 +13,13 @@ class BlessingStoreImpl implements BlessingStore {
 	private native Blessings nativeSet(
 		long nativePtr, Blessings blessings, BlessingPattern forPeers) throws VeyronException;
 	private native Blessings nativeForPeer(long nativePtr, String[] peerBlessings)
-		throws VeyronException;
+			throws VeyronException;
 	private native void nativeSetDefaultBlessings(long nativePtr, Blessings blessings)
-		throws VeyronException;
+			throws VeyronException;
 	private native Blessings nativeDefaultBlessings(long nativePtr) throws VeyronException;
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
+	private native Map<BlessingPattern, Blessings> nativePeerBlessings(long nativePtr)
+			throws VeyronException;
 	private native String nativeDebugString(long nativePtr);
 	private native String nativeToString(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -57,6 +60,15 @@ class BlessingStoreImpl implements BlessingStore {
 			return nativePublicKey(this.nativePtr);
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
+			return null;
+		}
+	}
+	@Override
+	public Map<BlessingPattern, Blessings> peerBlessings() {
+		try {
+			return nativePeerBlessings(this.nativePtr);
+		} catch (VeyronException e) {
+			android.util.Log.e(TAG, "Couldn't get peer blessings: " + e.getMessage());
 			return null;
 		}
 	}

@@ -3,6 +3,7 @@ package io.veyron.veyron.veyron2.security;
 import io.veyron.veyron.veyron2.VeyronException;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.Map;
 
 /**
  * BlessingStore is the interface for storing blessings bound to a principal and managing the subset
@@ -81,6 +82,13 @@ public interface BlessingStore {
 	 * @return public key of the principal for which this store hosts blessings.
 	 */
 	public ECPublicKey publicKey();
+
+	/**
+	 * Returns all the blessings that the store currently holds for various peers.
+	 *
+	 * @return all the blessings that the store currently holds for various peers
+	 */
+	public Map<BlessingPattern, Blessings> peerBlessings();
 
 	/**
 	 * Return a human-readable string description of the store.  This description is detailed and

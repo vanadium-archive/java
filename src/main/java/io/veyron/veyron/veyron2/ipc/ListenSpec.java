@@ -5,26 +5,54 @@ package io.veyron.veyron.veyron2.ipc;
  * and, optionally, the name of a proxy to use in conjunction with that listener.
  */
 public class ListenSpec {
-	public static ListenSpec DEFAULT = new ListenSpec("tcp", "proxy.envyor.com:8100");
-	private final String protocol;
+	/**
+	 * Address is a pair of (network protocol, address) that the server should listen on.
+	 * For TCP, the address must be in {@code ip:port} format. The {@code ip} may be omitted, but
+	 * the {@code port} can not (choose a port of {@code 0} to have the system allocate one).
+	 */
+	public class Address {
+		private final String protocol;
+		private final String address;
+
+		public Address(String protocol, String address) {
+			this.protocol = protocol;
+			this.address = address;
+		}
+
+		/**
+		 * Returns the network protocol.
+	 	 *
+	 	 * @return the network protocol.
+	 	 */
+		public String getProtocol() { return this.protocol; }
+
+		/**
+		 * Returns the network address.
+		 *
+		 * @return the network address.
+		 */
+		public String getAddress() { return this.address; }
+	}
+
+	private final Address[] addrs;
 	private final String proxy;
 
-	public ListenSpec(String protocol, String proxy) {
-		this.protocol = protocol;
+	public ListenSpec(Address[] addrs, String proxy) {
+		this.addrs = addrs;
 		this.proxy = proxy;
 	}
 
 	/**
-	 * Returns the network protocol.
+	 * Returns the addresses the server should listen on.
 	 *
-	 * @return the network protocol.
+	 * @return addresses the server should listen on.
 	 */
-	public String getProtocol() { return this.protocol; }
+	public Address[] getAddresses() { return this.addrs; }
 
 	/**
-	 * Returns the address of the proxy.  If empty, the server isn't proxied.
+	 * Returns the name of the proxy.  If empty, the server isn't proxied.
 	 *
-	 * @return the address of the proxy.
+	 * @return the name of the proxy.
 	 */
 	public String getProxy() { return this.proxy; }
 }
