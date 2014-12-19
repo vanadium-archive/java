@@ -1,7 +1,5 @@
 package io.veyron.veyron.veyron2.vom2;
 
-import com.google.common.base.Strings;
-
 import junit.framework.TestCase;
 
 import io.veyron.veyron.veyron2.vdl.Types;
@@ -45,10 +43,10 @@ public class BinaryDecoderTest extends TestCase {
             }
             byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
             Object value;
-            if (Strings.isNullOrEmpty(test.getValue().getElemType().getName())) {
-                value = TestUtil.decode(bytes, test.getValue().getElemReflectType());
+            if (test.getValue().getElem().getClass().isArray()) {
+                value = TestUtil.decode(bytes, test.getValue().getElem().getClass());
             } else {
-                value = TestUtil.decode(bytes, VdlValue.class);
+                value = TestUtil.decode(bytes);
             }
             assertEqual(test.getValue().getElem(), value);
         }
@@ -65,7 +63,7 @@ public class BinaryDecoderTest extends TestCase {
                 TestdataConstants.class.getDeclaredField("TESTS").getGenericType());
         String encoded = TestUtil.encode(testsType, TestdataConstants.TESTS);
         VdlValue decoded = (VdlValue) TestUtil.decode(
-                TestUtil.hexStringToBytes(encoded), VdlValue.class);
+                TestUtil.hexStringToBytes(encoded));
         assertEquals(encoded, TestUtil.encode(decoded.vdlType(), decoded));
     }
 }

@@ -33,6 +33,11 @@ public class TestUtil {
         return decoder.decodeValue(targetType);
     }
 
+    static Object decode(byte[] bytes) throws Exception {
+        BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(bytes));
+        return decoder.decodeValue();
+    }
+
     static String encode(VdlType type, Object value) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BinaryEncoder encoder = new BinaryEncoder(out);
