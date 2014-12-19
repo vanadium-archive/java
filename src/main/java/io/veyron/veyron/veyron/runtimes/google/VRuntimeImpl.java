@@ -2,11 +2,12 @@ package io.veyron.veyron.veyron.runtimes.google;
 
 import io.veyron.veyron.veyron.runtimes.google.ipc.Client;
 import io.veyron.veyron.veyron.runtimes.google.ipc.Server;
-import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.context.Context;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.context.Context;
+import io.veyron.veyron.veyron2.ipc.ListenSpec;
+import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.security.Principal;
 
 /**
@@ -25,14 +26,16 @@ public class VRuntimeImpl extends io.veyron.veyron.veyron2.VRuntimeImpl {
 	 * @return      a pre-initialized runtime instance.
 	 */
 	public static VRuntimeImpl create(Options opts) throws VeyronException {
+		final ListenSpec listenSpec = (ListenSpec) opts.get(OptionDefs.DEFAULT_LISTEN_SPEC);
 		// Use principal passed-in through options, if available.
-		final Principal principal = (Principal)opts.get(OptionDefs.RUNTIME_PRINCIPAL);
-		return new VRuntimeImpl(nativeInit(opts), principal);
+		final Principal principal = (Principal) opts.get(OptionDefs.RUNTIME_PRINCIPAL);
+		return new VRuntimeImpl(nativeInit(opts), listenSpec, principal);
 	}
 
 	private final long nativePtr;
-	private Client client;
+	private final ListenSpec listenSpec;
 	private final Principal principal;
+	private Client client;
 
 	private native Client nativeNewClient(long nativePtr, Options opts) throws VeyronException;
 	private native Server nativeNewServer(long nativePtr, Options opts) throws VeyronException;
@@ -42,8 +45,9 @@ public class VRuntimeImpl extends io.veyron.veyron.veyron2.VRuntimeImpl {
 	private native Namespace nativeGetNamespace(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private VRuntimeImpl(long nativePtr, Principal principal) {
+	private VRuntimeImpl(long nativePtr, ListenSpec listenSpec, Principal principal) {
 		this.nativePtr = nativePtr;
+		this.listenSpec = listenSpec;
 		this.principal = principal;
 	}
 	@Override
@@ -60,6 +64,9 @@ public class VRuntimeImpl extends io.veyron.veyron.veyron2.VRuntimeImpl {
 	}
 	@Override
 	public io.veyron.veyron.veyron2.ipc.Server newServer(Options opts) throws VeyronException {
+		if (this.listenSpec != null && opts.get(OptionDefs.DEFAULT_LISTEN_SPEC) == null) {
+			opts.set(OptionDefs.DEFAULT_LISTEN_SPEC, this.listenSpec);
+		}
 		return nativeNewServer(this.nativePtr, opts);
 	}
 	@Override

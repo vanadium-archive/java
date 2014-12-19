@@ -1,11 +1,9 @@
 package io.veyron.veyron.veyron2;
 
 import go.Go;
-
-import io.veyron.veyron.veyron2.ipc.Client;
 import io.veyron.veyron.veyron2.context.Context;
+import io.veyron.veyron.veyron2.ipc.Client;
 import io.veyron.veyron.veyron2.ipc.Server;
-import io.veyron.veyron.veyron2.VeyronException;
 import io.veyron.veyron.veyron2.naming.Namespace;
 import io.veyron.veyron.veyron2.security.Principal;
 
@@ -45,12 +43,13 @@ public class VRuntime {
 	 * options on a first call to another method.
 	 *
 	 * A caller may pass the following option that specifies the runtime implementation to be used:
-	 *   {@code OptionDefs.RUNTIME}
+	 *     {@code OptionDefs.RUNTIME}
 	 *
 	 * If this option isn't provided, the default runtime implementation is used.  The rest of
 	 * the options are passed on to this runtime.  Currently, only the following options are
 	 * recognized:
-	 *   {@code OptionDefs.RUNTIME_PRINCIPAL}
+	 *     {@code OptionDefs.RUNTIME_PRINCIPAL}
+	 *     {@code OptionDefs.DEFAULT_LISTEN_SPEC}
 	 *
 	 * @param  opts runtime options.
 	 */
@@ -61,12 +60,7 @@ public class VRuntime {
 			if (opts == null) opts = new Options();
 			// See if a runtime was provided as an option.
 			if (opts.get(OptionDefs.RUNTIME) != null) {
-				try {
-					runtime = opts.get(OptionDefs.RUNTIME, VRuntimeImpl.class);
-				} catch (VeyronException e) {
-					throw new RuntimeException(String.format(
-						"Option %s must be of type VRuntimeImpl", OptionDefs.RUNTIME));
-				}
+				runtime = opts.get(OptionDefs.RUNTIME, VRuntimeImpl.class);
 				return;
 			}
 			// Use the default runtime implementation.
@@ -100,6 +94,7 @@ public class VRuntime {
 	 * @throws VeyronException if a new client cannot be created
 	 */
 	public static Client newClient(Options opts) throws VeyronException {
+		if (opts == null) opts = new Options();
 		return getImpl().newClient(opts);
 	}
 
@@ -117,13 +112,14 @@ public class VRuntime {
 	 * Creates a new server instance with the provided options.  A particular runtime
 	 * implementation chooses which options to support, but at the minimum it must handle
 	 * the following options:
-	 *     CURRENTLY NO OPTIONS ARE MANDATED
+	 *     {@code OptionDefs.DEFAULT_LISTEN_SPEC}
 	 *
 	 * @param  opts            server options
 	 * @return                 the new server instance
 	 * @throws VeyronException if a new server cannot be created
 	 */
 	public static Server newServer(Options opts) throws VeyronException {
+		if (opts == null) opts = new Options();
 		return getImpl().newServer(opts);
 	}
 

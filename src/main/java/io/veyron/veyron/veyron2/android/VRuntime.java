@@ -5,6 +5,7 @@ import android.content.Context;
 import io.veyron.veyron.veyron2.OptionDefs;
 import io.veyron.veyron.veyron2.Options;
 import io.veyron.veyron.veyron2.VeyronException;
+import io.veyron.veyron.veyron2.ipc.ListenSpec;
 import io.veyron.veyron.veyron2.security.Blessings;
 import io.veyron.veyron.veyron2.security.ECDSASigner;
 import io.veyron.veyron.veyron2.security.Principal;
@@ -35,6 +36,10 @@ public class VRuntime extends io.veyron.veyron.veyron2.VRuntime {
 		RedirectStderr.Start();
 	}
 	private static volatile boolean initialized = false;
+	private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
+			new ListenSpec.Address[] { new ListenSpec.Address("tcp", ":0")},
+			"/ns.dev.v.io:8101/proxy",
+			true);
 
 	/**
 	 * Initializes the (singleton) runtime instance.  Calling this method multiple times will
@@ -68,6 +73,9 @@ public class VRuntime extends io.veyron.veyron.veyron2.VRuntime {
 		    		throw new RuntimeException(
 		    			"Couldn't setup Google Veyron Runtime options: " + e.getMessage());
 				}
+			}
+			if (opts.get(OptionDefs.DEFAULT_LISTEN_SPEC) == null) {
+				opts.set(OptionDefs.DEFAULT_LISTEN_SPEC, DEFAULT_LISTEN_SPEC);
 			}
 			io.veyron.veyron.veyron2.VRuntime.init(opts);
 		}

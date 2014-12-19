@@ -62,11 +62,11 @@ public class FortuneTest extends AndroidTestCase {
     public void testFortuneJavaToJava() throws VeyronException {
     	VRuntime.init(getContext(), new Options());
     	final Server s = VRuntime.newServer();
-    	final String endpoint = s.listen(null);
+    	final String[] endpoints = s.listen(null);
     	final FortuneServer server = new FortuneServerImpl();
     	s.serve("fortune", server);
     	try {
-	    	final String name = "/" + endpoint + "/fortune";
+	    	final String name = "/" + endpoints[0] + "/fortune";
 	    	final FortuneClient client = FortuneClientFactory.bind(name);
 	    	final Context context = VRuntime.newContext().withTimeout(new Duration(20000)); // 20s
 	    	try {

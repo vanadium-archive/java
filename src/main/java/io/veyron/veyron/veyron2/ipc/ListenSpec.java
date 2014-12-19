@@ -10,7 +10,7 @@ public class ListenSpec {
 	 * For TCP, the address must be in {@code ip:port} format. The {@code ip} may be omitted, but
 	 * the {@code port} can not (choose a port of {@code 0} to have the system allocate one).
 	 */
-	public class Address {
+	public static class Address {
 		private final String protocol;
 		private final String address;
 
@@ -36,10 +36,12 @@ public class ListenSpec {
 
 	private final Address[] addrs;
 	private final String proxy;
+	private final boolean roaming;
 
-	public ListenSpec(Address[] addrs, String proxy) {
+	public ListenSpec(Address[] addrs, String proxy, boolean roaming) {
 		this.addrs = addrs;
 		this.proxy = proxy;
+		this.roaming = roaming;
 	}
 
 	/**
@@ -55,4 +57,12 @@ public class ListenSpec {
 	 * @return the name of the proxy.
 	 */
 	public String getProxy() { return this.proxy; }
+
+	/**
+	 * Returns true iff the spec supports roaming, i.e., if the server should pick the
+	 * first available IP address should the underlying network stack change.
+	 *
+	 * @return true iff the spec supports roaming.
+	 */
+	public boolean isRoaming() { return this.roaming; }
 }

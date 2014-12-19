@@ -1,7 +1,5 @@
 package io.veyron.veyron.veyron2;
 
-import io.veyron.veyron.veyron2.VeyronException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,10 +36,10 @@ public class Options {
      *
      * @param key              key of the option we want to get.
      * @param type             type of the option we want to get.
-     * @return                 an option with the provided key, or {@code null} if no such option exists.
-     * @throws VeyronException if the option isn't of the provided type.
+     * @return                 an option with the provided key, or {@code null} if no such
+     *                         option exists.
      */
-    public <T> T get(String key, Class<T> type) throws VeyronException {
+    public <T> T get(String key, Class<T> type) {
         final Object opt = this.options.get(key);
         if (opt == null) return null;
         if (!type.isAssignableFrom(opt.getClass())) {

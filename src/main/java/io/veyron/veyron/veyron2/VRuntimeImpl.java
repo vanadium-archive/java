@@ -44,7 +44,7 @@ public abstract class VRuntimeImpl {
 	/**
 	 * Creates a new server instance with the provided options.  A particular implementation chooses
 	 * which options to support, but at the minimum it must handle the following options:
-	 *     CURRENTLY NO OPTIONS ARE MANDATED
+	 *     {@code OptionDefs.DEFAULT_LISTEN_SPEC}
 	 *
 	 * @param  opts            server options
 	 * @return                 the new server instance

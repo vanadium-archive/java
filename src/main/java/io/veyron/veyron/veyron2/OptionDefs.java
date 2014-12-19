@@ -21,4 +21,11 @@ public class OptionDefs {
      * specifies a principal to be assigned to the runtime.
      */
     public static String RUNTIME_PRINCIPAL = "io.veyron.veyron.veyron2.RUNTIME_PRINCIPAL";
+
+    /**
+     * A key for an option of type {@link io.veyron.veyron.veyron2.ipc.ListenSpec} that specifies
+     * a default listen spec to be used by the servers when the client passes in a {@code null}
+     * listen spec to their {@code listen()} calls.
+     */
+    public static String DEFAULT_LISTEN_SPEC = "io.veyron.veyron.veyron2.DEFAULT_LISTEN_SPEC";
 }
