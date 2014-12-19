@@ -249,11 +249,11 @@ public final class Types {
     }
 
     /**
-     * A helper used to create a single VDL oneOf type.
+     * A helper used to create a single VDL union type.
      */
-    public static VdlType oneOfOf(VdlField... fields) {
+    public static VdlType unionOf(VdlField... fields) {
         Builder builder = new Builder();
-        PendingType pending = builder.newPending(Kind.ONE_OF);
+        PendingType pending = builder.newPending(Kind.UNION);
         for (VdlField field : fields) {
             pending.addField(field.getName(), field.getType());
         }
@@ -430,8 +430,8 @@ public final class Types {
                 populateEnum(pending, klass);
             } else if (superClass == AbstractVdlStruct.class) {
                 populateStruct(pending, klass);
-            } else if (superClass == VdlOneOf.class) {
-                populateOneOf(pending, klass);
+            } else if (superClass == VdlUnion.class) {
+                populateUnion(pending, klass);
             } else if (superClass == VdlArray.class) {
                 populateArray(pending, klass);
             } else {
@@ -473,17 +473,17 @@ public final class Types {
             }
         }
 
-        private void populateOneOf(PendingType pending, Class<?> klass) {
-            pending.setKind(Kind.ONE_OF);
+        private void populateUnion(PendingType pending, Class<?> klass) {
+            pending.setKind(Kind.UNION);
             TreeMap<Integer, PendingVdlField> fields = new TreeMap<Integer, PendingVdlField>();
-            for (Class<?> oneOfClass : klass.getDeclaredClasses()) {
-                GeneratedFromVdl annotation = oneOfClass.getAnnotation(GeneratedFromVdl.class);
+            for (Class<?> unionClass : klass.getDeclaredClasses()) {
+                GeneratedFromVdl annotation = unionClass.getAnnotation(GeneratedFromVdl.class);
                 if (annotation == null) {
                     continue;
                 }
                 Type type;
                 try {
-                    type = oneOfClass.getDeclaredField("elem").getGenericType();
+                    type = unionClass.getDeclaredField("elem").getGenericType();
                 } catch (Exception e) {
                     throw new IllegalArgumentException(
                             "Unable to create VDL Type for type " + klass + " : " + e.getMessage());

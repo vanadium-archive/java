@@ -13,7 +13,7 @@ import io.veyron.veyron.veyron2.vdl.VdlComplex128;
 import io.veyron.veyron.veyron2.vdl.VdlComplex64;
 import io.veyron.veyron.veyron2.vdl.VdlEnum;
 import io.veyron.veyron.veyron2.vdl.VdlField;
-import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlUnion;
 import io.veyron.veyron.veyron2.vdl.VdlOptional;
 import io.veyron.veyron.veyron2.vdl.VdlType;
 import io.veyron.veyron.veyron2.vdl.VdlTypeObject;
@@ -43,8 +43,8 @@ public class BinaryEncoderTest extends TestCase {
             .put(Types.INT64, 0L)
             .put(Types.listOf(Types.INT32), ImmutableList.of())
             .put(Types.mapOf(Types.INT32, Types.INT32), ImmutableMap.of())
-            .put(Types.oneOfOf(new VdlField("A", Types.STRING), new VdlField("B", Types.UINT16)),
-                    new VdlOneOf(Types.oneOfOf(new VdlField("A", Types.STRING),
+            .put(Types.unionOf(new VdlField("A", Types.STRING), new VdlField("B", Types.UINT16)),
+                    new VdlUnion(Types.unionOf(new VdlField("A", Types.STRING),
                             new VdlField("B", Types.UINT16)), 0, Types.STRING, ""))
             .put(Types.optionalOf(NStruct.VDL_TYPE), new VdlOptional<VdlValue>(
                     Types.optionalOf(NStruct.VDL_TYPE)))

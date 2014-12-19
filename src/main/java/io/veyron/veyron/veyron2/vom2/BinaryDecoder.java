@@ -8,7 +8,7 @@ import io.veyron.veyron.veyron2.vdl.Types;
 import io.veyron.veyron.veyron2.vdl.VdlAny;
 import io.veyron.veyron.veyron2.vdl.VdlArray;
 import io.veyron.veyron.veyron2.vdl.VdlField;
-import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlUnion;
 import io.veyron.veyron.veyron2.vdl.VdlOptional;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
 import io.veyron.veyron.veyron2.vdl.VdlType;
@@ -185,8 +185,8 @@ public class BinaryDecoder {
                 return readVdlMapOrSet(actualType, target);
             case STRUCT:
                 return readVdlStruct(actualType, target);
-            case ONE_OF:
-                return readVdlOneOf(actualType, target);
+            case UNION:
+                return readVdlUnion(actualType, target);
             case OPTIONAL:
                 return readVdlOptional(actualType, target);
             case STRING:
@@ -400,7 +400,7 @@ public class BinaryDecoder {
         return data;
     }
 
-    private Object readVdlOneOf(VdlType actualType, ConversionTarget target) throws IOException,
+    private Object readVdlUnion(VdlType actualType, ConversionTarget target) throws IOException,
             ConversionException {
         int index = (int) BinaryUtil.decodeUint(in);
         if (index <= 0 || index > actualType.getFields().size()) {
@@ -411,13 +411,13 @@ public class BinaryDecoder {
         VdlField actualField = actualType.getFields().get(index);
         VdlType actualElemType = actualField.getType();
         // Solve vdl.Value case.
-        if (target.getTargetClass() == VdlOneOf.class) {
-            return new VdlOneOf(actualType, index, actualElemType,
+        if (target.getTargetClass() == VdlUnion.class) {
+            return new VdlUnion(actualType, index, actualElemType,
                     (VdlValue) readValue(actualElemType, VdlValue.class));
         }
         Class<?> targetClass = target.getTargetClass();
-        // This can happen if targetClass is NamedOneOf.A.
-        if (targetClass.getSuperclass() != VdlOneOf.class) {
+        // This can happen if targetClass is NamedUnion.A.
+        if (targetClass.getSuperclass() != VdlUnion.class) {
             targetClass = targetClass.getSuperclass();
         }
         // Look-up field class in target.
@@ -541,10 +541,10 @@ public class BinaryDecoder {
                 return pending.setName(wireMap.getName()).setKind(Kind.MAP)
                         .setKey(lookupOrBuildPending(wireMap.getKey()))
                         .setElem(lookupOrBuildPending(wireMap.getElem()));
-            } else if (wireType instanceof WireOneOf) {
-                WireOneOf wireOneOf = (WireOneOf) wireType;
-                pending.setName(wireOneOf.getName()).setKind(Kind.ONE_OF);
-                for (WireField field : wireOneOf.getFields()) {
+            } else if (wireType instanceof WireUnion) {
+                WireUnion wireUnion = (WireUnion) wireType;
+                pending.setName(wireUnion.getName()).setKind(Kind.UNION);
+                for (WireField field : wireUnion.getFields()) {
                     pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
                 }
                 return pending;

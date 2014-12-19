@@ -69,9 +69,9 @@ public abstract class VdlValue implements Serializable {
                 return new VdlList<VdlValue>(type, new ArrayList<VdlValue>());
             case MAP:
                 return new VdlMap<VdlValue, VdlValue>(type, new HashMap<VdlValue, VdlValue>());
-            case ONE_OF:
+            case UNION:
                 VdlField zeroField = type.getFields().get(0);
-                return new VdlOneOf(type, 0, zeroField.getType(), zeroValue(zeroField.getType()));
+                return new VdlUnion(type, 0, zeroField.getType(), zeroValue(zeroField.getType()));
             case OPTIONAL:
                 return new VdlOptional<VdlValue>(type);
             case SET:

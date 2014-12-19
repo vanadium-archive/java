@@ -6,24 +6,24 @@ import android.os.Parcelable;
 import java.io.Serializable;
 
 /**
- * VdlOneOf is a representation of a VDL oneOf.
+ * VdlUnion is a representation of a VDL union.
  */
-public class VdlOneOf extends VdlValue implements Parcelable {
+public class VdlUnion extends VdlValue implements Parcelable {
     private Serializable elem;
     private int index;
 
-    protected VdlOneOf(VdlType type, int index, Serializable elem) {
+    protected VdlUnion(VdlType type, int index, Serializable elem) {
         super(type);
-        assertKind(Kind.ONE_OF);
+        assertKind(Kind.UNION);
         if (index < 0 || index > type.getFields().size()) {
-            throw new IllegalArgumentException("One of index " + index + " is out of range " + 0 +
+            throw new IndexOutOfBoundsException("Union index " + index + " is out of range " + 0 +
                     "..." + (type.getFields().size() - 1));
         }
         this.index = index;
         this.elem = elem;
     }
 
-    public VdlOneOf(VdlType type, int index, VdlType elemType, Serializable elem) {
+    public VdlUnion(VdlType type, int index, VdlType elemType, Serializable elem) {
         this(type, index, elem);
         if (!vdlType().getFields().get(index).getType().equals(elemType)) {
             throw new IllegalArgumentException("Illegal type " + elemType + " of elem: it should"
@@ -46,8 +46,8 @@ public class VdlOneOf extends VdlValue implements Parcelable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof VdlOneOf)) return false;
-        final VdlOneOf other = (VdlOneOf) obj;
+        if (!(obj instanceof VdlUnion)) return false;
+        final VdlUnion other = (VdlUnion) obj;
         return getElem().equals(other.getElem());
     }
 
@@ -71,15 +71,15 @@ public class VdlOneOf extends VdlValue implements Parcelable {
         out.writeSerializable(this);
     }
 
-    public static final Creator<VdlOneOf> CREATOR = new Creator<VdlOneOf>() {
+    public static final Creator<VdlUnion> CREATOR = new Creator<VdlUnion>() {
         @Override
-        public VdlOneOf createFromParcel(Parcel in) {
-            return (VdlOneOf) in.readSerializable();
+        public VdlUnion createFromParcel(Parcel in) {
+            return (VdlUnion) in.readSerializable();
         }
 
         @Override
-        public VdlOneOf[] newArray(int size) {
-            return new VdlOneOf[size];
+        public VdlUnion[] newArray(int size) {
+            return new VdlUnion[size];
         }
     };
 }

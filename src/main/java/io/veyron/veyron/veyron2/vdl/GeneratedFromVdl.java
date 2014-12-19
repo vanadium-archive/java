@@ -16,7 +16,7 @@ public @interface GeneratedFromVdl {
      */
     String name();
     /**
-     * The index of VDL struct or oneof field or enum as defined in VDL.
+     * The index of VDL struct or union field or enum as defined in VDL.
      */
     int index() default 0;
 }

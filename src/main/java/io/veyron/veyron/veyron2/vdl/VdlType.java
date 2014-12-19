@@ -22,7 +22,7 @@ public final class VdlType implements Serializable {
     private int length; // used by array
     private VdlType key; // used by set, map
     private VdlType elem; // used by array, list, map, optional
-    private ImmutableList<VdlField> fields; // used by struct and oneof
+    private ImmutableList<VdlField> fields; // used by struct and union
     private String typeString; // used by all kinds, filled in by getUniqueType
 
     /**
@@ -65,12 +65,12 @@ public final class VdlType implements Serializable {
             case MAP:
                 return result + "map[" + typeString(type.key, seen) + "]"
                         + typeString(type.elem, seen);
-            case ONE_OF:
             case STRUCT:
+            case UNION:
                 if (type.kind == Kind.STRUCT) {
                     result += "struct{";
                 } else {
-                    result += "oneof{";
+                    result += "union{";
                 }
                 for (int i = 0; i < type.fields.size(); i++) {
                     if (i > 0) {
@@ -228,8 +228,8 @@ public final class VdlType implements Serializable {
                 case ENUM:
                     vdlType.labels = ImmutableList.copyOf(labels);
                     break;
-                case ONE_OF:
                 case STRUCT:
+                case UNION:
                     vdlType.fields = ImmutableList.copyOf(fields);
                     break;
                 default:
@@ -295,7 +295,7 @@ public final class VdlType implements Serializable {
 
         public PendingType addField(String name, VdlType type) {
             assertNotBuilt();
-            assertOneOfKind(Kind.ONE_OF, Kind.STRUCT);
+            assertOneOfKind(Kind.STRUCT, Kind.UNION);
             fields.add(new VdlField(name, type));
             return this;
         }

@@ -36,7 +36,7 @@ public final class TypeCompatibility {
      *     - Two struct types are compatible if all fields with the same name are
      *       compatible, and at least one field has the same name, or one of the
      *       types is an empty struct.
-     *   o Two oneof types are compatible if all fields with the same name are
+     *   o Two union types are compatible if all fields with the same name are
      *     compatible, and at least one field has the same name.
      */
     public static boolean compatible(VdlType a, VdlType b) {
@@ -123,8 +123,8 @@ public final class TypeCompatibility {
                     default:
                         return false;
                 }
-            case ONE_OF:
-                if (b.getKind() == Kind.ONE_OF) {
+            case UNION:
+                if (b.getKind() == Kind.UNION) {
                     return fieldsCompatible(a, b, seen);
                 }
                 return false;

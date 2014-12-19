@@ -166,10 +166,10 @@ final class BinaryUtil {
             case COMPLEX128:
             case LIST:
             case MAP:
-            case ONE_OF:
             case OPTIONAL:
             case SET:
             case STRUCT:
+            case UNION:
                 return true;
             default:
                 return false;

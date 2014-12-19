@@ -2,7 +2,6 @@ package io.veyron.veyron.veyron2.vdl;
 
 public enum Kind {
     ANY,
-    ONE_OF,
     OPTIONAL,
 
     BOOL,
@@ -25,5 +24,6 @@ public enum Kind {
     LIST,
     SET,
     MAP,
-    STRUCT
+    STRUCT,
+    UNION
 }

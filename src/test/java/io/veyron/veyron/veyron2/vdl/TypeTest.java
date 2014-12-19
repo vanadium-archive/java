@@ -55,23 +55,23 @@ public class TypeTest extends TestCase {
     }
 
     @SuppressWarnings("unused")
-    @GeneratedFromVdl(name = "MyOneOf")
-    private static class MyOneOf extends VdlOneOf {
+    @GeneratedFromVdl(name = "MyUnion")
+    private static class MyUnion extends VdlUnion {
         @GeneratedFromVdl(name = "A", index = 0)
-        public static class A extends MyOneOf {
+        public static class A extends MyUnion {
             private MyInt16 elem;
         }
         @GeneratedFromVdl(name = "B", index = 1)
-        public static class B extends MyOneOf {
+        public static class B extends MyUnion {
             private VdlInt32 elem;
         }
         @GeneratedFromVdl(name = "C", index = 2)
-        public static class C extends MyOneOf {
+        public static class C extends MyUnion {
             private Long elem;
         }
 
-        private MyOneOf() {
-            super(Types.getVdlTypeFromReflect(MyOneOf.class), 0, null);
+        private MyUnion() {
+            super(Types.getVdlTypeFromReflect(MyUnion.class), 0, null);
         }
     }
 
@@ -93,11 +93,11 @@ public class TypeTest extends TestCase {
     }
 
     @GeneratedFromVdl(name = "MyArray12")
-    private static final class MyArray12 extends VdlArray<Set<MyOneOf>> {
+    private static final class MyArray12 extends VdlArray<Set<MyUnion>> {
         @SuppressWarnings("unused")
         public static final int LENGTH = 12;
 
-        public MyArray12(Set<MyOneOf>[] value) {
+        public MyArray12(Set<MyUnion>[] value) {
             super(Types.getVdlTypeFromReflect(MyArray12.class), value);
         }
     }
@@ -154,10 +154,10 @@ public class TypeTest extends TestCase {
         VdlType myComplex64 = Types.named("MyComplex64", Types.COMPLEX64);
         VdlType myComplex128 = Types.named("MyComplex128", Types.COMPLEX128);
 
-        VdlType myOneOf = Types.named("MyOneOf", Types.oneOfOf(new VdlField("A", myInt16),
+        VdlType myUnion = Types.named("MyUnion", Types.unionOf(new VdlField("A", myInt16),
                 new VdlField("B", Types.INT32), new VdlField("C", Types.INT64)));
         VdlType myEnum = Types.named("MyEnum", Types.enumOf("LABEL1", "LABEL2", "LABEL3"));
-        VdlType myArray12 = Types.named("MyArray12", Types.arrayOf(12, Types.setOf(myOneOf)));
+        VdlType myArray12 = Types.named("MyArray12", Types.arrayOf(12, Types.setOf(myUnion)));
         VdlType myList = Types.named("MyList", Types.listOf(Types.listOf(myArray12)));
         VdlType mySet = Types.named("MySet", Types.setOf(Types.setOf(myList)));
         VdlType myMap = Types.named("MyMap", Types.mapOf(myEnum, Types.mapOf(mySet, mySet)));
@@ -185,7 +185,7 @@ public class TypeTest extends TestCase {
                 .put(myString, MyString.class)
                 .put(myComplex64, MyComplex64.class)
                 .put(myComplex128, MyComplex128.class)
-                .put(myOneOf, MyOneOf.class)
+                .put(myUnion, MyUnion.class)
                 .put(myEnum, MyEnum.class)
                 .put(myArray12, MyArray12.class)
                 .put(myList, MyList.class)
@@ -205,9 +205,9 @@ public class TypeTest extends TestCase {
 
     public void testTypeString() {
         String myInt16 = "MyInt16 int16";
-        String myOneOf = String.format("MyOneOf oneof{A %s;B int32;C int64}", myInt16);
+        String myUnion = String.format("MyUnion union{A %s;B int32;C int64}", myInt16);
         String myEnum = "MyEnum enum{LABEL1;LABEL2;LABEL3}";
-        String myArray12 = String.format("MyArray12 [12]set[%s]", myOneOf);
+        String myArray12 = String.format("MyArray12 [12]set[%s]", myUnion);
         String myList = String.format("MyList [][]%s", myArray12);
         String mySet = String.format("MySet set[set[%s]]", myList);
         String myMap = String.format("MyMap map[%s]map[%s]MySet", myEnum, mySet);
@@ -215,7 +215,7 @@ public class TypeTest extends TestCase {
                 + "Cycle []MyStruct}", myMap);
         String myOptional = "?" + myStruct;
 
-        assertEquals(myOneOf, Types.getVdlTypeFromReflect(MyOneOf.class).toString());
+        assertEquals(myUnion, Types.getVdlTypeFromReflect(MyUnion.class).toString());
         assertEquals(myEnum, Types.getVdlTypeFromReflect(MyEnum.class).toString());
         assertEquals(myArray12, Types.getVdlTypeFromReflect(MyArray12.class).toString());
         assertEquals(myList, Types.getVdlTypeFromReflect(MyList.class).toString());

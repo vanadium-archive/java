@@ -19,7 +19,7 @@ import io.veyron.veyron.veyron2.vdl.VdlInt32;
 import io.veyron.veyron.veyron2.vdl.VdlInt64;
 import io.veyron.veyron.veyron2.vdl.VdlList;
 import io.veyron.veyron.veyron2.vdl.VdlMap;
-import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlUnion;
 import io.veyron.veyron.veyron2.vdl.VdlSet;
 import io.veyron.veyron.veyron2.vdl.VdlString;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
@@ -71,8 +71,8 @@ public class ConversionTarget {
                 return new TypeToken<VdlList<VdlValue>>(){}.getType();
             case MAP:
                 return new TypeToken<VdlMap<VdlValue, VdlValue>>(){}.getType();
-            case ONE_OF:
-                return VdlOneOf.class;
+            case UNION:
+                return VdlUnion.class;
             case OPTIONAL:
                 return new TypeToken<VdlOptional<VdlValue>>(){}.getType();
             case SET:

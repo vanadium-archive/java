@@ -16,7 +16,7 @@ import io.veyron.veyron.veyron2.vdl.VdlFloat64;
 import io.veyron.veyron.veyron2.vdl.VdlInt16;
 import io.veyron.veyron.veyron2.vdl.VdlInt32;
 import io.veyron.veyron.veyron2.vdl.VdlInt64;
-import io.veyron.veyron.veyron2.vdl.VdlOneOf;
+import io.veyron.veyron.veyron2.vdl.VdlUnion;
 import io.veyron.veyron.veyron2.vdl.VdlOptional;
 import io.veyron.veyron.veyron2.vdl.VdlString;
 import io.veyron.veyron.veyron2.vdl.VdlStruct;
@@ -155,14 +155,14 @@ public class BinaryEncoder {
                 return new WireList(type.getName(), getType(type.getElem()));
             case MAP:
                 return new WireMap(type.getName(), getType(type.getKey()), getType(type.getElem()));
-            case ONE_OF:
             case STRUCT:
+            case UNION:
                 List<WireField> wireFields = new ArrayList<WireField>();
                 for (VdlField field : type.getFields()) {
                     wireFields.add(new WireField(field.getName(), getType(field.getType())));
                 }
-                if (type.getKind() == Kind.ONE_OF) {
-                    return new WireOneOf(type.getName(), wireFields);
+                if (type.getKind() == Kind.UNION) {
+                    return new WireUnion(type.getName(), wireFields);
                 } else {
                     return new WireStruct(type.getName(), wireFields);
                 }
@@ -214,8 +214,8 @@ public class BinaryEncoder {
             case MAP:
                 writeVdlMap(out, value, type);
                 break;
-            case ONE_OF:
-                writeVdlOneOf(out, value);
+            case UNION:
+                writeVdlUnion(out, value);
                 break;
             case OPTIONAL:
                 writeVdlOptional(out, value);
@@ -367,13 +367,13 @@ public class BinaryEncoder {
         }
     }
 
-    private void writeVdlOneOf(OutputStream out, Object value) throws IOException {
-        expectClass(Kind.ONE_OF, value, VdlOneOf.class);
-        VdlOneOf oneOfValue = (VdlOneOf) value;
-        Object elem = oneOfValue.getElem();
-        int index = oneOfValue.getIndex();
+    private void writeVdlUnion(OutputStream out, Object value) throws IOException {
+        expectClass(Kind.UNION, value, VdlUnion.class);
+        VdlUnion unionValue = (VdlUnion) value;
+        Object elem = unionValue.getElem();
+        int index = unionValue.getIndex();
         BinaryUtil.encodeUint(out, index + 1);
-        writeValue(out, elem, oneOfValue.vdlType().getFields().get(index).getType());
+        writeValue(out, elem, unionValue.vdlType().getFields().get(index).getType());
     }
 
     private void writeVdlOptional(OutputStream out, Object value) throws IOException {
