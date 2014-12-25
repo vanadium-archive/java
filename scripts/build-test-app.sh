@@ -17,7 +17,7 @@ main() {
     exit 1
   fi
 
-  local -r DEFAULT_SDK_LOC="${VEYRON_ROOT}/environment/android/android-sdk-linux"
+  local -r DEFAULT_SDK_LOC="${VANADIUM_ROOT}/environment/android/android-sdk-linux"
   local -r SDK_LOC="${ANDROID_SDK_HOME-$DEFAULT_SDK_LOC}"
   local -r ANDROID_TOOL="${SDK_LOC}/tools/android"
 
@@ -29,16 +29,16 @@ main() {
 
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r JAVA_MAIN_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/main/java"
-  local -r JAVA_VDL_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/vdl/java"
+  local -r JAVA_MAIN_SRC_DIR="${VANADIUM_ROOT}/veyron/java/src/main/java"
+  local -r JAVA_VDL_SRC_DIR="${VANADIUM_ROOT}/veyron/java/src/vdl/java"
 
   set -e
   set +x
   "${ANDROID_TOOL}" create project --target "${APP_TARGET_ID}" --name "${APP_PROJECT_NAME}" --path "${OUTPUT_DIR}" --activity "${APP_ACTIVITY_NAME}" --package "${APP_PACKAGE_NAME}"
-  "${VEYRON_ROOT}/veyron/java/scripts/build-libs.sh" "${OUTPUT_DIR}/libs"
+  "${VANADIUM_ROOT}/veyron/java/scripts/build-libs.sh" "${OUTPUT_DIR}/libs"
 
-  diff -q "${VEYRON_ROOT}/veyron/java/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
-  cp "${VEYRON_ROOT}/veyron/java/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+  diff -q "${VANADIUM_ROOT}/veyron/java/scripts/ExpectedAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
+  cp "${VANADIUM_ROOT}/veyron/java/scripts/ReplacementAndroidManifest.xml" "${OUTPUT_DIR}/AndroidManifest.xml"
 
   rm -rf "${OUTPUT_DIR}/src"
   mkdir "${OUTPUT_DIR}/src"

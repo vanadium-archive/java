@@ -20,7 +20,7 @@ main() {
     exit 1
   fi
 
-  local -r DEFAULT_SDK_LOC="${VEYRON_ROOT}/environment/android/android-sdk-linux"
+  local -r DEFAULT_SDK_LOC="${VANADIUM_ROOT}/environment/android/android-sdk-linux"
   local -r SDK_LOC="${ANDROID_SDK_HOME-$DEFAULT_SDK_LOC}"
   local -r ANDROID_TOOL="${SDK_LOC}/tools/android"
 
@@ -38,11 +38,11 @@ main() {
   local -r TEST_PROJECT_NAME="test"
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r JAVA_SRC_DIR="${VEYRON_ROOT}/veyron/java/src/test/java"
+  local -r JAVA_SRC_DIR="${VANADIUM_ROOT}/veyron/java/src/test/java"
 
   set -e
   set +x
-  "${VEYRON_ROOT}/veyron/java/scripts/build-test-app.sh" "${APP_DIR}"
+  "${VANADIUM_ROOT}/veyron/java/scripts/build-test-app.sh" "${APP_DIR}"
 
   "${ANDROID_TOOL}" create test-project --name "${TEST_PROJECT_NAME}" --path "${TEST_DIR}" --main "${APP_DIR}"
   rm -r "${TEST_DIR}/src"
