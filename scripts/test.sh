@@ -6,7 +6,7 @@
 # If the output directory is not specified, a temporary directory will
 # be created and clean up upon exit.
 
-source "$(go list -f {{.Dir}} veyron.io/veyron/shell/lib)/shell.sh"
+source "$(go list -f {{.Dir}} v.io/veyron/shell/lib)/shell.sh"
 
 check_test_result() {
   grep "\[exec\] OK [(][0-9][0-9]* test" "${TMP_FILE}" &> /dev/null
