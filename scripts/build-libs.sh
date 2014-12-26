@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "$(go list -f {{.Dir}} v.io/veyron/shell/lib)/shell.sh"
+source "$(go list -f {{.Dir}} v.io/core/shell/lib)/shell.sh"
 
 main() {
   if [[ "$#" -eq 0 ]]; then
@@ -11,18 +11,18 @@ main() {
   local -r NATIVE_DIR="${DEST_DIR}/armeabi-v7a"
 
   # Run the mobile setup.
-  veyron profile setup mobile
+  v23 profile setup mobile
 
   # Make the destination directory.
   mkdir -p "${DEST_DIR}"
   mkdir -p "${NATIVE_DIR}"
 
   # Make sure that no stale Go object files exist.
-  veyron goext distclean
+  v23 goext distclean
 
-  # Build the veyron android library.
+  # Build the vanadium android library.
   unset GOROOT
-  veyron xgo armv7-linux-android build -o "${NATIVE_DIR}/libveyronjni.so" -ldflags="-android -shared -extld \"${VANADIUM_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android v.io/jni
+  v23 xgo armv7-linux-android build -o "${NATIVE_DIR}/libveyronjni.so" -ldflags="-android -shared -extld \"${VANADIUM_ROOT}/environment/android/ndk-toolchain/bin/arm-linux-androideabi-gcc\" -extldflags '-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16'" -tags android v.io/jni
 
   # Copy JNI Wrapper.
   cp "${VANADIUM_ROOT}/environment/cout/jni-wrapper-1.0/android/lib/libjniwrapper.so" "${NATIVE_DIR}/libjniwrapper.so"

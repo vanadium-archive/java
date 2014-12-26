@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Runs java-language veyron tests.
+# Runs java-language vanadium tests.
 #
 # Usage: test.sh [OUTPUT_DIR]
 # If the output directory is not specified, a temporary directory will
 # be created and clean up upon exit.
 
-source "$(go list -f {{.Dir}} v.io/veyron/shell/lib)/shell.sh"
+source "$(go list -f {{.Dir}} v.io/core/shell/lib)/shell.sh"
 
 check_test_result() {
   grep "\[exec\] OK [(][0-9][0-9]* test" "${TMP_FILE}" &> /dev/null
@@ -38,11 +38,11 @@ main() {
   local -r TEST_PROJECT_NAME="test"
   local -r SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
   cd "${SCRIPT_DIR}"
-  local -r JAVA_SRC_DIR="${VANADIUM_ROOT}/veyron/java/src/test/java"
+  local -r JAVA_SRC_DIR="${VANADIUM_ROOT}/release/java/src/test/java"
 
   set -e
   set +x
-  "${VANADIUM_ROOT}/veyron/java/scripts/build-test-app.sh" "${APP_DIR}"
+  "${VANADIUM_ROOT}/release/java/scripts/build-test-app.sh" "${APP_DIR}"
 
   "${ANDROID_TOOL}" create test-project --name "${TEST_PROJECT_NAME}" --path "${TEST_DIR}" --main "${APP_DIR}"
   rm -r "${TEST_DIR}/src"
