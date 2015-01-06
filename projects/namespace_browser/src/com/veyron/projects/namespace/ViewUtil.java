@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import io.veyron.veyron.veyron2.naming.VDLMountEntry;
+import io.v.core.veyron2.naming.VDLMountEntry;
 
 
 /**

@@ -17,14 +17,14 @@ import android.os.Parcelable;
 import android.view.View;
 import android.widget.TextView;
 
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.Certificate;
-import io.veyron.veyron.veyron2.security.Principal;
-import io.veyron.veyron.veyron2.security.Security;
-import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.util.VomUtil;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.security.Blessings;
+import io.v.core.veyron2.security.Certificate;
+import io.v.core.veyron2.security.Principal;
+import io.v.core.veyron2.security.Security;
+import io.v.core.veyron2.security.WireBlessings;
+import io.v.core.veyron2.util.VomUtil;
 
 import java.io.IOException;
 import java.security.interfaces.ECPublicKey;

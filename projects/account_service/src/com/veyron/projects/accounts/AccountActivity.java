@@ -18,16 +18,16 @@ import android.widget.Toast;
 
 import org.joda.time.Duration;
 
-import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient;
-import io.veyron.veyron.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
-import io.veyron.veyron.veyron.services.identity.OAuthBlesserClientFactory;
-import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.context.Context;
-import io.veyron.veyron.veyron2.security.Certificate;
-import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.util.VomUtil;
+import io.v.core.veyron.services.identity.OAuthBlesserClient;
+import io.v.core.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
+import io.v.core.veyron.services.identity.OAuthBlesserClientFactory;
+import io.v.core.veyron2.Options;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.security.Certificate;
+import io.v.core.veyron2.security.WireBlessings;
+import io.v.core.veyron2.util.VomUtil;
 
 import java.io.IOException;
 

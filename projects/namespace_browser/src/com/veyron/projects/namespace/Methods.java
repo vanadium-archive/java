@@ -2,11 +2,11 @@ package com.veyron.projects.namespace;
 
 import com.google.common.reflect.TypeToken;
 
-import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.ipc.Client;
-import io.veyron.veyron.veyron2.ipc.Client.Call;
-import io.veyron.veyron.veyron2.ipc.ServiceSignature;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.ipc.Client;
+import io.v.core.veyron2.ipc.Client.Call;
+import io.v.core.veyron2.ipc.ServiceSignature;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

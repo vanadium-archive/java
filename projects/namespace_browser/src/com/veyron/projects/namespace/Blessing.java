@@ -5,10 +5,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
-import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.security.WireBlessings;
+import io.v.core.veyron2.Options;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.security.WireBlessings;
 
 import java.security.interfaces.ECPublicKey;
 

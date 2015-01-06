@@ -23,17 +23,17 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.veyron.veyron.veyron2.Options;
-import io.veyron.veyron.veyron2.VeyronException;
-import io.veyron.veyron.veyron2.android.VRuntime;
-import io.veyron.veyron.veyron2.naming.VDLMountEntry;
-import io.veyron.veyron.veyron2.naming.VDLMountedServer;
-import io.veyron.veyron.veyron2.security.Blessings;
-import io.veyron.veyron.veyron2.security.Certificate;
-import io.veyron.veyron.veyron2.security.Principal;
-import io.veyron.veyron.veyron2.security.Security;
-import io.veyron.veyron.veyron2.security.WireBlessings;
-import io.veyron.veyron.veyron2.util.VomUtil;
+import io.v.core.veyron2.Options;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.naming.VDLMountEntry;
+import io.v.core.veyron2.naming.VDLMountedServer;
+import io.v.core.veyron2.security.Blessings;
+import io.v.core.veyron2.security.Certificate;
+import io.v.core.veyron2.security.Principal;
+import io.v.core.veyron2.security.Security;
+import io.v.core.veyron2.security.WireBlessings;
+import io.v.core.veyron2.util.VomUtil;
 
 import java.util.HashSet;
 import java.util.List;

@@ -62,6 +62,7 @@ public class PrincipalTest extends AndroidTestCase {
 					public int compare(Blessings b1, Blessings b2) {
 						final int h1 = b1.hashCode(),  h2 = b2.hashCode();
 						return h1 < h2 ? -1 : (h1 == h2 ? 0 : 1);
+					}
 				};
 				Arrays.sort(want, comp);
 				Arrays.sort(got, comp);

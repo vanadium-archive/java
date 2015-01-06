@@ -29,8 +29,9 @@ public class ParcelTest extends AndroidTestCase {
 			final Parcel parcelR = Parcel.obtain();
 			parcelR.unmarshall(b, 0, b.length);
 			parcelR.setDataPosition(0);
-			assertEquals(
-					value, ParcelUtil.readValue(parcelR, value.getClass().getClassLoader(), type));
+			final Object copy = ParcelUtil.readValue(parcelR, value.getClass().getClassLoader(), type); 
+			assertEquals(value, copy);
+			assertEquals(value.hashCode(), copy.hashCode());
         }
     }
 }
