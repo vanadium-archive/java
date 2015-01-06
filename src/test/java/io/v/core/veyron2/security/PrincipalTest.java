@@ -16,6 +16,35 @@ import java.util.Map;
  * Tests the default {@code Principal} implementation.
  */
 public class PrincipalTest extends AndroidTestCase {
+	public void testBlessingsInfo() {
+		try {
+			VRuntime.init(getContext(), null);
+			final Principal p1 = Security.newPrincipal();
+			final Principal p2 = Security.newPrincipal();
+			final Blessings alice = p1.blessSelf("alice");
+			p2.addToRoots(alice);
+
+			final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
+					alice, "work/friend", Security.newUnconstrainedUseCaveat());
+			final Blessings aliceGymFriend = p1.bless(p2.publicKey(),
+					alice, "gym/friend", Security.newUnconstrainedUseCaveat());
+			final Blessings aliceAllFriends = Security.unionOfBlessings(
+				aliceWorkFriend, aliceGymFriend);
+			assertTrue(Arrays.equals(
+					new String[]{ "alice/work/friend" }, p2.blessingsInfo(aliceWorkFriend)));
+			assertTrue(Arrays.equals(
+					new String[]{ "alice/gym/friend" }, p2.blessingsInfo(aliceGymFriend)));
+			{
+				final String[] want = { "alice/gym/friend", "alice/work/friend"};
+				final String[] got = p2.blessingsInfo(aliceAllFriends);
+				Arrays.sort(got);
+				assertTrue(Arrays.equals(want, got));
+			}
+		} catch (VeyronException e) {
+			fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
 	public void testBlessingsByName() {
 		try {
 			VRuntime.init(getContext(), null);
@@ -72,5 +101,4 @@ public class PrincipalTest extends AndroidTestCase {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
-	// TODO(spetrovic): Test blessingsInfo() method.
 }
