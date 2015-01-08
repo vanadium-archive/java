@@ -25,9 +25,9 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 	private static final long serialVersionUID = -3917496574141933784L;
 
 	@GeneratedFromVdl(name = "Id")
-	private final String id; // always non-null (can be empty)
+	private final String id; // non-null
 	@GeneratedFromVdl(name = "Msg")
-	private final String msg;  // always non-null (can be empty)
+	private final String msg;  // non-null
 
 	public VeyronException() {
 		this(null, null);
@@ -53,10 +53,14 @@ public class VeyronException extends Exception implements Parcelable, Serializab
 	}
 
 	@Override
+	public String toString() {
+		return String.format("%s(%s)", this.msg, this.id);
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof VeyronException))
 			return false;
-
 		final VeyronException other = (VeyronException) obj;
 		// Compare ids.
 		if (!this.id.isEmpty() || !other.id.isEmpty()) {

@@ -1,30 +1,30 @@
 package io.v.jni.test.fortune;
 
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.context.Context;
-import io.v.core.veyron2.ipc.Server;
-import io.v.core.veyron2.ipc.ServerContext;
-import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import android.test.AndroidTestCase;
+import android.util.Log;
 
 import org.joda.time.Duration;
 
+import io.v.core.veyron2.vdl.ClientStream;
+import io.v.core.veyron2.Options;
+import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.ipc.Server;
+import io.v.core.veyron2.ipc.ServerContext;
 import io.v.core.veyron2.vdl.Stream;
 
 import java.io.EOFException;
-
-import android.test.AndroidTestCase;
+import java.util.Arrays;
 
 public class FortuneTest extends AndroidTestCase {
-	private static VeyronException noneAdded = new VeyronException("no fortunes added");
-
 	public static class FortuneServerImpl implements FortuneServer {
 		private String lastAddedFortune;
 
 		@Override
 		public String get(ServerContext context) throws VeyronException {
 			if (lastAddedFortune == null) {
-				throw noneAdded;
+				throw new VeyronException("No fortunes added");
 			}
 			return lastAddedFortune;
 		}
@@ -59,32 +59,51 @@ public class FortuneTest extends AndroidTestCase {
 	    }
 	}
 
-    public void testFortuneJavaToJava() throws VeyronException {
-    	VRuntime.init(getContext(), new Options());
-    	final Server s = VRuntime.newServer();
-    	final String[] endpoints = s.listen(null);
-    	final FortuneServer server = new FortuneServerImpl();
-    	s.serve("fortune", server);
-    	try {
-	    	final String name = "/" + endpoints[0] + "/fortune";
-	    	final FortuneClient client = FortuneClientFactory.bind(name);
-	    	final Context context = VRuntime.newContext().withTimeout(new Duration(20000)); // 20s
-	    	try {
-	    		client.get(context);
-	    		fail("Expected exception during call to get() before call to add()");
-	    	} catch (VeyronException e) {
-	    		assertEquals(e, noneAdded);
-	    	}
-	    	final String firstMessage = "First fortune";
-	    	client.add(context, firstMessage);
-	    	assertEquals(firstMessage, client.get(context));
-	    	try {
-	    		client.getSignature(context);
-	    		fail("Expected Java server's signature method to return an error");
-	    	} catch (VeyronException e) {}
-    	} finally {
-    		s.stop();
-    	}
-    }
+	public void testFortune() throws VeyronException {
+		VRuntime.init(getContext(), new Options());
+		final Server s = VRuntime.newServer();
+		final String[] endpoints = s.listen(null);
+		final FortuneServer server = new FortuneServerImpl();
+		s.serve("fortune", server);
 
+		final String name = "/" + endpoints[0];
+		final FortuneClient client = FortuneClientFactory.bind(name);
+		final Context context = VRuntime.newContext().withTimeout(new Duration(20000)); // 20s
+		try {
+			client.get(context);
+			fail("Expected exception during call to get() before call to add()");
+		} catch (VeyronException e) {
+			// OK
+		}
+		final String firstMessage = "First fortune";
+		client.add(context, firstMessage);
+		assertEquals(firstMessage, client.get(context));
+		s.stop();
+	}
+   
+	public void testStreaming() throws VeyronException {
+		VRuntime.init(getContext(), new Options());
+		final Server s = VRuntime.newServer();
+		final String[] endpoints = s.listen(null);
+		final FortuneServer server = new FortuneServerImpl();
+		s.serve("fortune", server);
+
+		final String name = "/" + endpoints[0];
+		final FortuneClient client = FortuneClientFactory.bind(name);
+		final Context context = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
+		final ClientStream<Boolean, String, Integer> stream = client.streamingGet(context);
+		final String msg = "The only fortune";
+		client.add(context, msg);
+		try {
+			for (int i = 0; i < 5; ++i) {
+				stream.send(true);
+				assertEquals(msg, stream.recv());
+			}
+		} catch (EOFException e) {
+			fail("Reached unexpected stream EOF: " + e.getMessage());
+		}
+		final int total = stream.finish();
+		assertEquals(5, total);
+		s.stop();
+	}
 }
