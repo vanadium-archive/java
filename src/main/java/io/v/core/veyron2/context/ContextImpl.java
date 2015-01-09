@@ -12,6 +12,8 @@ public class ContextImpl extends CancelableContext {
 
 	private long nativePtr;
 	private long nativeCancelPtr;  // zero for non-cancelable contexts.
+	// Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.
+	private volatile CountDownLatch doneLatch = null;
 
 	private native DateTime nativeDeadline(long nativePtr) throws VeyronException;
 	private native CountDownLatch nativeDone(long nativePtr) throws VeyronException;
@@ -41,11 +43,18 @@ public class ContextImpl extends CancelableContext {
 	}
 	@Override
 	public CountDownLatch done() {
-		try {
-				return nativeDone(this.nativePtr);
-		} catch (VeyronException e) {
+		// NOTE(spetrovic): We may have to lock needlessly if nativeDone() returns a null
+		// CountDownLatch, but that's OK for now.
+		if (this.doneLatch != null) return this.doneLatch;
+		synchronized (this) {
+			if (this.doneLatch != null) return this.doneLatch;
+			try {
+				this.doneLatch = nativeDone(this.nativePtr);
+				return this.doneLatch;
+			} catch (VeyronException e) {
 				android.util.Log.e(TAG, "Couldn't invoke done: " + e.getMessage());
 				return null;
+			}
 		}
 	}
 	@Override
