@@ -3,6 +3,7 @@ package io.v.core.veyron2.security;
 import io.v.core.veyron2.VeyronException;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.Map;
 
 /**
  * Principal represents an entity capable of making or receiving RPCs.  Principals have a unique
@@ -81,7 +82,7 @@ public interface Principal {
 	 * @param blessings blessings whose human-readable strings are to be returned.
 	 * @return          human-readable strings of the provided blessings.
 	 */
-	public String[] blessingsInfo(Blessings blessings);
+	public Map<String, Caveat[]> blessingsInfo(Blessings blessings);
 
 	/**
 	 * Provides access to the BlessingStore containing blessings that have been granted to this

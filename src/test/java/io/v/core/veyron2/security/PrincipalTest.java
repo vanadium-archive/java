@@ -30,18 +30,33 @@ public class PrincipalTest extends AndroidTestCase {
 					alice, "gym/friend", Security.newUnconstrainedUseCaveat());
 			final Blessings aliceAllFriends = Security.unionOfBlessings(
 				aliceWorkFriend, aliceGymFriend);
-			assertTrue(Arrays.equals(
-					new String[]{ "alice/work/friend" }, p2.blessingsInfo(aliceWorkFriend)));
-			assertTrue(Arrays.equals(
-					new String[]{ "alice/gym/friend" }, p2.blessingsInfo(aliceGymFriend)));
-			{
-				final String[] want = { "alice/gym/friend", "alice/work/friend"};
-				final String[] got = p2.blessingsInfo(aliceAllFriends);
-				Arrays.sort(got);
-				assertTrue(Arrays.equals(want, got));
-			}
+			assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
+					.put("alice/work/friend", new Caveat[0])
+					.build(), p2.blessingsInfo(aliceWorkFriend));
+			assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
+					.put("alice/gym/friend", new Caveat[0])
+					.build(), p2.blessingsInfo(aliceGymFriend));
+			assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
+					.put("alice/work/friend", new Caveat[0])
+					.put("alice/gym/friend", new Caveat[0])
+					.build(), p2.blessingsInfo(aliceAllFriends));
 		} catch (VeyronException e) {
 			fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	private void assertInfoMapsEqual(Map<String, Caveat[]> want, Map<String, Caveat[]> got) {
+		assertEquals(want.size(), got.size());
+		final String[] keysWant = want.keySet().toArray(new String[0]);
+		final String[] keysGot = got.keySet().toArray(new String[0]);
+		Arrays.sort(keysWant);
+		Arrays.sort(keysGot);
+		android.util.Log.e("Test", String.format("Comparing %s with %s", Arrays.toString(keysWant), Arrays.toString(keysGot)));
+		assertTrue(Arrays.equals(keysWant, keysGot));
+		for (String key : keysWant) {
+			final Caveat[] caveatsWant = want.get(key);
+			final Caveat[] caveatsGot = got.get(key);
+			assertTrue(Arrays.equals(caveatsWant, caveatsGot));
 		}
 	}
 

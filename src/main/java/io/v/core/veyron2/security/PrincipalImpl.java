@@ -3,6 +3,8 @@ package io.v.core.veyron2.security;
 import io.v.core.veyron2.VeyronException;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PrincipalImpl implements Principal {
 	private static final String TAG = "Veyron runtime";
@@ -46,7 +48,7 @@ public class PrincipalImpl implements Principal {
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
 	private native Blessings[] nativeBlessingsByName(long nativePtr, BlessingPattern name)
 			throws VeyronException;
-	private native String[] nativeBlessingsInfo(long nativePtr, Blessings blessings)
+	private native Map<String, Caveat[]> nativeBlessingsInfo(long nativePtr, Blessings blessings)
 			throws VeyronException;
 	private native BlessingStore nativeBlessingStore(long nativePtr) throws VeyronException;
 	private native BlessingRoots nativeRoots(long nativePtr) throws VeyronException;
@@ -100,13 +102,13 @@ public class PrincipalImpl implements Principal {
 		}
 	}
 	@Override
-	public String[] blessingsInfo(Blessings blessings) {
+	public Map<String, Caveat[]> blessingsInfo(Blessings blessings) {
 		try {
 			return nativeBlessingsInfo(this.nativePtr, blessings);
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG,
 				"Couldn't get human-readable strings for blessings: " + e.getMessage());
-			return new String[0];
+			return new HashMap<String, Caveat[]>();
 		}
 	}
 	@Override
