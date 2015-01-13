@@ -1,3 +1,6 @@
 /src/vdl/
 /bin/
 /vdl_bin/
+
+# Vanadium
+/.v23
