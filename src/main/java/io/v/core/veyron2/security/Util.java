@@ -19,7 +19,7 @@ class Util {
 	 * @return      VOM-encoded WireBlessings.
 	 */
 	static byte[] encodeWireBlessings(WireBlessings wire) throws VeyronException {
-		return VomUtil.encode(wire, new TypeToken<WireBlessings>(){}.getType());
+		return VomUtil.encode(wire, WireBlessings.class);
 	}
 
 	/**
@@ -30,7 +30,7 @@ class Util {
 	 * @throws VeyronException if the provided WireBlessings couldn't be decoded.
 	 */
 	static WireBlessings decodeWireBlessings(byte[] encoded) throws VeyronException {
-		return (WireBlessings) VomUtil.decode(encoded, new TypeToken<WireBlessings>(){}.getType());
+		return (WireBlessings) VomUtil.decode(encoded, WireBlessings.class);
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Util {
 	 * @return           the encoded Signature.
 	 */
 	static byte[] encodeSignature(Signature signature) throws VeyronException {
-		return VomUtil.encode(signature, new TypeToken<Signature>(){}.getType());
+		return VomUtil.encode(signature, Signature.class);
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Util {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
-		return (Signature) VomUtil.decode(encoded, new TypeToken<Signature>(){}.getType());
+		return (Signature) VomUtil.decode(encoded, Signature.class);
 	}
 
 	/**
@@ -117,7 +117,7 @@ class Util {
 	 * @return        the encoded Caveat.
 	 */
 	static byte[] encodeCaveat(Caveat caveat) throws VeyronException {
-		return VomUtil.encode(caveat, new TypeToken<Caveat>(){}.getType());
+		return VomUtil.encode(caveat, Caveat.class);
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Util {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
-		return (Caveat) VomUtil.decode(encoded, new TypeToken<Caveat>(){}.getType());
+		return (Caveat) VomUtil.decode(encoded, Caveat.class);
 	}
 
 	/**

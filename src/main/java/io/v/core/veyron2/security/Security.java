@@ -1,5 +1,9 @@
 package io.v.core.veyron2.security;
 
+import com.google.common.collect.ImmutableList;
+
+import org.joda.time.DateTime;
+
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.v.core.veyron2.services.security.access.TaggedACLMap;
@@ -12,6 +16,7 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Security class implements various functions used for creating and managing Veyron security
@@ -40,8 +45,8 @@ public class Security {
 	 * Mints a new private key and generates a principal based on this key, storing its
 	 * BlessingRoots and BlessingStore in memory.
 	 *
-	 * @return                 in-memory principal using the newly minted private key.
-	 * @throws VeyronException if the principal couldn't be created.
+	 * @return                 in-memory principal using the newly minted private key
+	 * @throws VeyronException if the principal couldn't be created
 	 */
 	public static Principal newPrincipal() throws VeyronException {
 		return PrincipalImpl.create();
@@ -123,8 +128,6 @@ public class Security {
 	}
 
 	/**
-*/
-	/**
 	 * Returns a {@code Blessings} object that carries the union of the provided blessings.
 	 * All provided blessings must have the same public key.  Returns {@code null} if invoked
 	 * without arguments.
@@ -135,6 +138,48 @@ public class Security {
 	 */
 	public static Blessings unionOfBlessings(Blessings... blessings) throws VeyronException {
 		return BlessingsImpl.createUnion(blessings);
+	}
+
+	/**
+	 * Returns a caveat that requires validation by the provided validator.
+	 *
+	 * @param  validator       caveat validator
+	 * @return                 caveat that requires validation by the provided validator
+	 * @throws VeyronException if the caveat couldn't be created
+	 */
+	public static Caveat newCaveat(CaveatValidator validator) throws VeyronException {
+		return CaveatCoder.encode(validator);
+	}
+
+	/**
+	 * Returns a caveat that validates iff the current time is before the provided time.
+	 *
+	 * @param  time            time before which the caveat validates
+	 * @return                 caveat that validates if the current time is before the provided time
+	 * @throws VeyronException if the caveat couldn't be created
+	 */
+	public static Caveat newExpiryCaveat(DateTime time) throws VeyronException {
+		return newCaveat(new UnixTimeExpiryCaveatValidator(
+			new UnixTimeExpiryCaveat(time.getMillis())));
+	}
+
+	/**
+	 * Returns a caveat that validates iff the method being invoked by the peer is listed in an
+	 * argument to this function.
+	 *
+	 * @param  method            name of the method for which this caveat should validate
+	 * @param  additionalMethods additional method names for which this caveat should validate
+	 * @return                   caveat that validates iff the method being invoked by the peer is
+	 *                           one of the provided methods
+	 * @throws VeyronException   if the caveat couldn't be created
+	 */
+	public static Caveat newMethodCaveat(String method, String... additionalMethods)
+			throws VeyronException {
+		final List<String> methods = ImmutableList.<String>builder()
+				.add(method)
+				.add(additionalMethods)
+				.build();
+		return newCaveat(new MethodCaveatValidator(new MethodCaveat(methods)));
 	}
 
 	/**
@@ -153,7 +198,7 @@ public class Security {
 	 * the set of relevant tags.
 	 *
 	 * The set of relevant tags is the subset of tags associated with the method
-	 * ({@link io.v.core.veyron2.security.Context#methodTags()}) that have the same type as
+	 * ({@link io.v.core.veyron2.security.VContext#methodTags()}) that have the same type as
 	 * the provided one.
 	 * Currently, tagType.Kind must be reflect.String, i.e., only tags that are
 	 * named string types are supported.
@@ -229,7 +274,7 @@ public class Security {
 	public static Authorizer newAcceptAllAuthorizer() {
 		return new Authorizer() {
 			@Override
-			public void authorize(Context context) throws VeyronException {
+			public void authorize(VContext context) throws VeyronException {
 				// do nothing
 			}
 		};

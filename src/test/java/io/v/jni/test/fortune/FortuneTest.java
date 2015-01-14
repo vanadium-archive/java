@@ -1,21 +1,19 @@
 package io.v.jni.test.fortune;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.vdl.ClientStream;
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.ipc.ServerContext;
+import io.v.core.veyron2.vdl.ClientStream;
 import io.v.core.veyron2.vdl.Stream;
 
 import java.io.EOFException;
-import java.util.Arrays;
 
 public class FortuneTest extends AndroidTestCase {
 	public static class FortuneServerImpl implements FortuneServer {
@@ -60,40 +58,40 @@ public class FortuneTest extends AndroidTestCase {
 	}
 
 	public void testFortune() throws VeyronException {
-		VRuntime.init(getContext(), new Options());
-		final Server s = VRuntime.newServer();
+		final VContext ctx = V.init(getContext(), new Options());
+		final Server s = V.newServer(ctx);
 		final String[] endpoints = s.listen(null);
 		final FortuneServer server = new FortuneServerImpl();
 		s.serve("fortune", server);
 
 		final String name = "/" + endpoints[0];
 		final FortuneClient client = FortuneClientFactory.bind(name);
-		final Context context = VRuntime.newContext().withTimeout(new Duration(20000)); // 20s
+		final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
 		try {
-			client.get(context);
+			client.get(ctxT);
 			fail("Expected exception during call to get() before call to add()");
 		} catch (VeyronException e) {
 			// OK
 		}
 		final String firstMessage = "First fortune";
-		client.add(context, firstMessage);
-		assertEquals(firstMessage, client.get(context));
+		client.add(ctxT, firstMessage);
+		assertEquals(firstMessage, client.get(ctxT));
 		s.stop();
 	}
-   
+
 	public void testStreaming() throws VeyronException {
-		VRuntime.init(getContext(), new Options());
-		final Server s = VRuntime.newServer();
+		final VContext ctx = V.init(getContext(), new Options());
+		final Server s = V.newServer(ctx);
 		final String[] endpoints = s.listen(null);
 		final FortuneServer server = new FortuneServerImpl();
 		s.serve("fortune", server);
 
 		final String name = "/" + endpoints[0];
 		final FortuneClient client = FortuneClientFactory.bind(name);
-		final Context context = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
-		final ClientStream<Boolean, String, Integer> stream = client.streamingGet(context);
+		final VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+		final ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
 		final String msg = "The only fortune";
-		client.add(context, msg);
+		client.add(ctxT, msg);
 		try {
 			for (int i = 0; i < 5; ++i) {
 				stream.send(true);

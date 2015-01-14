@@ -6,7 +6,7 @@ import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
 
-public class ContextImpl implements io.v.core.veyron2.security.Context {
+public class VContextImpl implements io.v.core.veyron2.security.VContext {
 	private static final String TAG = "Veyron runtime";
 
 	private final long nativePtr;
@@ -23,10 +23,10 @@ public class ContextImpl implements io.v.core.veyron2.security.Context {
 	private native Blessings nativeRemoteBlessings(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	public ContextImpl(long nativePtr) {
+	public VContextImpl(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
-	// Implements io.v.core.veyron2.security.Context.
+	// Implements io.v.core.veyron2.security.VContext.
 	@Override
 	public DateTime timestamp() {
 		try {

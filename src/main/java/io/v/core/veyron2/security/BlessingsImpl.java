@@ -21,7 +21,7 @@ class BlessingsImpl extends Blessings {
 	private final long nativePtr;
 	private final WireBlessings wire;  // non-null
 
-	private native String[] nativeForContext(long nativePtr, Context context)
+	private native String[] nativeForContext(long nativePtr, VContext context)
 		throws VeyronException;
 	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
@@ -32,7 +32,7 @@ class BlessingsImpl extends Blessings {
 	}
 
 	@Override
-	public String[] forContext(Context context) {
+	public String[] forContext(VContext context) {
 		try {
 			return nativeForContext(this.nativePtr, context);
 		} catch (VeyronException e) {

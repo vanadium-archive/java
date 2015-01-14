@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import android.test.AndroidTestCase;
 
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
 
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class BlessingRootsTest extends AndroidTestCase {
 	public void testRecognized() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal principal = Security.newPrincipal();
 			final BlessingRoots roots = principal.roots();
 			final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };

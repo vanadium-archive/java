@@ -1,6 +1,7 @@
 package io.v.core.veyron2.util;
 
 import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom2.BinaryDecoder;
 import io.v.core.veyron2.vom2.BinaryEncoder;
 import io.v.core.veyron2.vom2.ConversionException;
@@ -17,10 +18,10 @@ public class VomUtil {
 	/**
 	 * VOM-encodes the provided value using a new VOM-encoder.
 	 *
-	 * @param  value           value to be encoded.
-	 * @param  type            type of the provided value.
-	 * @return                 VOM-encoded value as a byte array.
-	 * @throws VeyronException if there was an error encoding the value.
+	 * @param  value           value to be encoded
+	 * @param  type            type of the provided value
+	 * @return                 VOM-encoded value as a byte array
+	 * @throws VeyronException if there was an error encoding the value
 	 */
 	public static byte[] encode(Object value, Type type) throws VeyronException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -36,10 +37,10 @@ public class VomUtil {
 	/**
 	 * VOM-encodes the provided value using a new VOM-encoder, returning a hex-encoded string.
 	 *
-	 * @param  value           value to be encoded.
-	 * @param  type            type of the provided value.
-	 * @return                 VOM-encoded value in a hex-string format.
-	 * @throws VeyronException if there was an error encoding the value.
+	 * @param  value           value to be encoded
+	 * @param  type            type of the provided value
+	 * @return                 VOM-encoded value in a hex-string format
+	 * @throws VeyronException if there was an error encoding the value
 	 */
 	public static String encodeToString(Object value, Type type) throws VeyronException {
 		final byte[] data = encode(value, type);
@@ -47,12 +48,31 @@ public class VomUtil {
 	}
 
 	/**
+	 * VOM-encodes the provided VDL value using a new VOM-encoder.
+	 *
+	 * @param  value           VDL value to be encoded
+	 * @return                 VOM-encoded value as a byte array
+	 * @throws VeyronException if there was an error encoding the value
+	 */
+	public static byte[] encode(VdlValue value) throws VeyronException {
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final BinaryEncoder encoder = new BinaryEncoder(out);
+		try {
+			encoder.encodeValue(value);
+		} catch (IOException e) {
+			throw new VeyronException(e.getMessage());
+		}
+		return out.toByteArray();
+	}
+
+
+	/**
 	 * VOM-decodes the provided data using a new VOM-decoder.
 	 *
 	 * @param  data            VOM-encoded data
 	 * @param  type            type of the object that the data should be decoded into
-	 * @return                 VOM-decoded object.
-	 * @throws VeyronException if there was an error decoding the data.
+	 * @return                 VOM-decoded object
+	 * @throws VeyronException if there was an error decoding the data
 	 */
 	public static Object decode(byte[] data, Type type) throws VeyronException {
 		final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
@@ -66,12 +86,31 @@ public class VomUtil {
 	}
 
 	/**
+	 * VOM-decodes the provided data using a new VOM-decoder.  A best effort is made to deduce the
+	 * type of the encoded data.
+	 *
+	 * @param  data            VOM-encoded data
+	 * @return                 VOM-decoded object
+	 * @throws VeyronException if there was an error decoding the data
+	 */
+	public static Object decode(byte[] data) throws VeyronException {
+		final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
+		try {
+			return decoder.decodeValue();
+		} catch (IOException e) {
+			throw new VeyronException(e.getMessage());
+		} catch (ConversionException e) {
+			throw new VeyronException(e.getMessage());
+		}
+	}
+
+	/**
 	 * VOM-decodes the provided data (stored as a hex string) using a new VOM-decoder.
 	 *
 	 * @param  hex             VOM-encoded data, stored as a hex string
 	 * @param  type            type of the object that the data should be decoded into
-	 * @return                 VOM-decoded object.
-	 * @throws VeyronException if there was an error decoding the data.
+	 * @return                 VOM-decoded object
+	 * @throws VeyronException if there was an error decoding the data
 	 */
 	public static Object decodeFromString(String hex, Type type) throws VeyronException {
 		final byte[] data = hexStringToBytes(hex);

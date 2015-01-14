@@ -5,7 +5,7 @@ import android.test.AndroidTestCase;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -14,28 +14,30 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ContextTest extends AndroidTestCase {
 	public void testWithValue() {
-		VRuntime.init(getContext(), null);
-		final Context ctx = VRuntime.newContext();
+		final VContext ctx = V.init(getContext(), null);
 		assertEquals(null, ctx.value("A"));
-		final Context ctxA = ctx.withValue("A", 1);
+		final VContext ctxA = ctx.withValue("A", 1);
 		assertEquals(null, ctx.value("A"));
 		assertEquals(1, ctxA.value("A"));
 		assertEquals(null, ctx.value("B"));
 		assertEquals(null, ctxA.value("B"));
-		final Context ctxAB = ctxA.withValue("B", 2);
+		final VContext ctxAB = ctxA.withValue("B", 2);
 		assertEquals(null, ctx.value("A"));
 		assertEquals(1, ctxA.value("A"));
 		assertEquals(null, ctx.value("B"));
 		assertEquals(null, ctxA.value("B"));
 		assertEquals(1, ctxAB.value("A"));
 		assertEquals(2, ctxAB.value("B"));
+		final VContext ctxNull = ctxAB.withValue("C", null);
+		assertEquals(null, ctxNull.value("C"));
+		assertEquals(1, ctxAB.value("A"));
+		assertEquals(2, ctxAB.value("B"));
 	}
 
 	public void testWithCancel() {
-		VRuntime.init(getContext(), null);
-		final Context ctx = VRuntime.newContext();
+		final VContext ctx = V.init(getContext(), null);
 		assertEquals(null, ctx.done());
-		final CancelableContext ctxCancel = ctx.withCancel();
+		final CancelableVContext ctxCancel = ctx.withCancel();
 		final CountDownLatch done = ctxCancel.done();
 		assertTrue(done != null);
 		assertEquals(done, ctxCancel.done());  // same value returned
@@ -50,11 +52,10 @@ public class ContextTest extends AndroidTestCase {
 	}
 
 	public void testWithDeadline() {
-		VRuntime.init(getContext(), null);
+		final VContext ctx = V.init(getContext(), null);
 		{
-			final CancelableContext ctx =
-					VRuntime.newContext().withDeadline(DateTime.now().plus(500));
-			final CountDownLatch done = ctx.done();
+			final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
+			final CountDownLatch done = ctxD.done();
 			assertTrue(done != null);
 			try {
 				done.await();
@@ -64,11 +65,10 @@ public class ContextTest extends AndroidTestCase {
 			assertEquals(0, done.getCount());
 		}
 		{
-			final CancelableContext ctx =
-					VRuntime.newContext().withDeadline(DateTime.now().plus(100000));
-			final CountDownLatch done = ctx.done();
+			final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(100000));
+			final CountDownLatch done = ctxD.done();
 			assertTrue(done != null);
-			ctx.cancel();
+			ctxD.cancel();
 			try {
 				done.await();
 			} catch (InterruptedException e) {
@@ -79,11 +79,10 @@ public class ContextTest extends AndroidTestCase {
 	}
 
 	public void testWithTimeout() {
-		VRuntime.init(getContext(), null);
+		final VContext ctx = V.init(getContext(), null);
 		{
-			final CancelableContext ctx =
-					VRuntime.newContext().withTimeout(new Duration(500));
-			final CountDownLatch done = ctx.done();
+			final CancelableVContext ctxT = ctx.withTimeout(new Duration(500));
+			final CountDownLatch done = ctxT.done();
 			assertTrue(done != null);
 			try {
 				done.await();
@@ -93,11 +92,10 @@ public class ContextTest extends AndroidTestCase {
 			assertEquals(0, done.getCount());
 		}
 		{
-			final CancelableContext ctx =
-					VRuntime.newContext().withTimeout(new Duration(100000));
-			final CountDownLatch done = ctx.done();
+			final CancelableVContext ctxT = ctx.withTimeout(new Duration(100000));
+			final CountDownLatch done = ctxT.done();
 			assertTrue(done != null);
-			ctx.cancel();
+			ctxT.cancel();
 			try {
 				done.await();
 			} catch (InterruptedException e) {

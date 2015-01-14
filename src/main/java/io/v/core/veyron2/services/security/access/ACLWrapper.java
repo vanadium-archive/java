@@ -2,7 +2,7 @@ package io.v.core.veyron2.services.security.access;
 
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.security.Authorizer;
-import io.v.core.veyron2.security.Context;
+import io.v.core.veyron2.security.VContext;
 
 public class ACLWrapper implements Authorizer {
 	private static final String TAG = "Veyron runtime";
@@ -21,7 +21,7 @@ public class ACLWrapper implements Authorizer {
 	}
 
     private native boolean nativeIncludes(long nativePtr, String[] blessings);
-    private native void nativeAuthorize(long nativePtr, Context ctx);
+    private native void nativeAuthorize(long nativePtr, VContext ctx);
 	private native void nativeFinalize(long nativePtr);
 
 	private long nativePtr;
@@ -51,7 +51,7 @@ public class ACLWrapper implements Authorizer {
 	 * @throws VeyronException if the request is not authorized.
 	 */
 	@Override
-	public void authorize(Context ctx) throws VeyronException {
+	public void authorize(VContext ctx) throws VeyronException {
 	    nativeAuthorize(this.nativePtr, ctx);
 	}
 

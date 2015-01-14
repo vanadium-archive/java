@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import android.test.AndroidTestCase;
 
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
 
 import java.util.Map;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 public class BlessingStoreTest extends AndroidTestCase {
 	public void testSet() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal principal = Security.newPrincipal();
 			final BlessingStore store = principal.blessingStore();
 			final Blessings blessingA = newBlessing(principal, "root", "A");
@@ -56,7 +56,7 @@ public class BlessingStoreTest extends AndroidTestCase {
 
 	public void testSetDefault() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal principal = Security.newPrincipal();
 			final BlessingStore store = principal.blessingStore();
 			final Blessings blessingA = newBlessing(principal, "root", "A");
@@ -73,7 +73,7 @@ public class BlessingStoreTest extends AndroidTestCase {
 
 	public void testForPeer() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal principal = Security.newPrincipal();
 			final BlessingStore store = principal.blessingStore();
 			final Blessings blessingFoo = newBlessing(principal, "foo", "A");

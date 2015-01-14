@@ -1,29 +1,26 @@
 package io.v.core.veyron2.security;
 
 import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.vdl.VdlValue;
 
 import java.util.Arrays;
 
-class PeerBlessingCaveatWrapper implements CaveatValidator {
-	private final PeerBlessingsCaveat caveat;
+class PeerBlessingCaveatValidator implements CaveatValidator {
+	private final PeerBlessingsCaveat wire;
 
-	static PeerBlessingCaveatWrapper wrap(PeerBlessingsCaveat caveat) {
-		return new PeerBlessingCaveatWrapper(caveat);
-	}
-
-	private PeerBlessingCaveatWrapper(PeerBlessingsCaveat caveat) {
-		this.caveat = caveat;
+	PeerBlessingCaveatValidator(PeerBlessingsCaveat wire) {
+		this.wire = wire;
 	}
 
 	@Override
-	public void validate(Context context) throws VeyronException {
+	public void validate(VContext context) throws VeyronException {
 		if (context.localBlessings() == null) {
 			throw new VeyronException(String.format(
 				"PeerBlessingCaveat(%s) failed validation since context.localBlessings() is null",
 				this));
 		}
 		final String[] self = context.localBlessings().forContext(context);
-		for (BlessingPattern pattern : this.caveat) {
+		for (BlessingPattern pattern : this.wire) {
 			if (BlessingPatternWrapper.wrap(pattern).isMatchedBy(self)) {
 				return;
 			}
@@ -34,11 +31,13 @@ class PeerBlessingCaveatWrapper implements CaveatValidator {
 	}
 
 	@Override
-	public String toString() {
-		return Arrays.toString(this.caveat.toArray());
+	public VdlValue getWire() {
+		return this.wire;
 	}
 
-	public PeerBlessingsCaveat getCaveat() {
-		return this.caveat;
+	@Override
+	public String toString() {
+		return Arrays.toString(this.wire.toArray());
 	}
+
 }

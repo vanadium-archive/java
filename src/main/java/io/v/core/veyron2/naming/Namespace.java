@@ -1,6 +1,6 @@
 package io.v.core.veyron2.naming;
 
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.VeyronException;
 
 import io.v.core.veyron2.InputChannel;
@@ -18,5 +18,5 @@ public interface Namespace {
 	 * @return                 an input channel of MountEntry objects matching the provided pattern.
 	 * @throws VeyronException if an error is encountered.
 	 */
-	public InputChannel<VDLMountEntry> glob(Context context, String pattern) throws VeyronException;
+	public InputChannel<VDLMountEntry> glob(VContext context, String pattern) throws VeyronException;
 }

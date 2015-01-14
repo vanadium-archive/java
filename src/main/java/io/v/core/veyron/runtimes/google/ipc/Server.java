@@ -55,6 +55,17 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	}
 	// Implement java.lang.Object.
 	@Override
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		if (other == null) return false;
+		if (this.getClass() != other.getClass()) return false;
+		return this.nativePtr == ((Server) other).nativePtr;
+	}
+	@Override
+	public int hashCode() {
+		return Long.valueOf(this.nativePtr).hashCode();
+	}
+	@Override
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);
 	}

@@ -3,7 +3,7 @@ package io.v.core.veyron.runtimes.google.ipc;
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.util.VomUtil;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.context.VContext;
 
 import java.lang.reflect.Type;
 
@@ -11,7 +11,7 @@ public class Client implements io.v.core.veyron2.ipc.Client {
 	private final long nativePtr;
 
 	private native io.v.core.veyron2.ipc.Client.Call nativeStartCall(long nativePtr,
-		Context context, String name, String method, byte[][] vomArgs, Options opts)
+		VContext context, String name, String method, byte[][] vomArgs, Options opts)
 		throws VeyronException;
 	private native void nativeClose(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -21,12 +21,12 @@ public class Client implements io.v.core.veyron2.ipc.Client {
 	}
 	// Implement io.v.core.veyron2.ipc.Client.
 	@Override
-	public io.v.core.veyron2.ipc.Client.Call startCall(Context context, String name,
+	public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
 	        String method, Object[] args, Type[] argTypes) throws VeyronException {
 		return startCall(context, name, method, args, argTypes, null);
 	}
 	@Override
-	public io.v.core.veyron2.ipc.Client.Call startCall(Context context, String name,
+	public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
 	        String method, Object[] args, Type[] argTypes, Options opts) throws VeyronException {
 		if (opts == null) {
 			opts = new Options();
@@ -55,6 +55,17 @@ public class Client implements io.v.core.veyron2.ipc.Client {
 		nativeClose(this.nativePtr);
 	}
 	// Implement java.lang.Object.
+	@Override
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		if (other == null) return false;
+		if (this.getClass() != other.getClass()) return false;
+		return this.nativePtr == ((Client) other).nativePtr;
+	}
+	@Override
+	public int hashCode() {
+		return Long.valueOf(this.nativePtr).hashCode();
+	}
 	@Override
 	protected void finalize() {
 		nativeFinalize(this.nativePtr);

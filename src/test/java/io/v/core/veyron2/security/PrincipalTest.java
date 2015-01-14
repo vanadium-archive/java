@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import android.test.AndroidTestCase;
 
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class PrincipalTest extends AndroidTestCase {
 	public void testBlessingsInfo() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal p1 = Security.newPrincipal();
 			final Principal p2 = Security.newPrincipal();
 			final Blessings alice = p1.blessSelf("alice");
@@ -62,7 +62,7 @@ public class PrincipalTest extends AndroidTestCase {
 
 	public void testBlessingsByName() {
 		try {
-			VRuntime.init(getContext(), null);
+			V.init(getContext(), null);
 			final Principal p1 = Security.newPrincipal();
 			final Principal p2 = Security.newPrincipal();
 			final Principal p3 = Security.newPrincipal();

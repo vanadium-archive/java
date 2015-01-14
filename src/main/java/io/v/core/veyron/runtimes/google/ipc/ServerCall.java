@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.context.CancelableContext;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.context.CancelableVContext;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
 
@@ -18,14 +18,14 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 
 	private final long nativePtr;
 	private final Stream stream;
-	private final Context context;
-	private final io.v.core.veyron2.security.Context securityContext;
+	private final VContext context;
+	private final io.v.core.veyron2.security.VContext securityContext;
 
 	public native Blessings nativeBlessings(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private ServerCall(long nativePtr, Stream stream, Context context,
-		io.v.core.veyron2.security.Context securityContext) {
+	private ServerCall(long nativePtr, Stream stream, VContext context,
+		io.v.core.veyron2.security.VContext securityContext) {
 		this.nativePtr = nativePtr;
 		this.stream = stream;
 		this.context = context;
@@ -50,7 +50,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 	public Object recv(Type type) throws EOFException, VeyronException {
 		return this.stream.recv(type);
 	}
-	// Implements io.v.core.veyron2.context.Context.
+	// Implements io.v.core.veyron2.context.VContext.
 	@Override
 	public DateTime deadline() {
 		return this.context.deadline();
@@ -64,22 +64,22 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 		return this.context.value(key);
 	}
 	@Override
-	public CancelableContext withCancel() {
+	public CancelableVContext withCancel() {
 		return this.context.withCancel();
 	}
 	@Override
-	public CancelableContext withDeadline(DateTime deadline) {
+	public CancelableVContext withDeadline(DateTime deadline) {
 		return this.context.withDeadline(deadline);
 	}
 	@Override
-	public CancelableContext withTimeout(Duration timeout) {
+	public CancelableVContext withTimeout(Duration timeout) {
 		return this.context.withTimeout(timeout);
 	}
 	@Override
-	public Context withValue(Object key, Object value) {
+	public VContext withValue(Object key, Object value) {
 		return this.context.withValue(key, value);
 	}
-	// Implements io.v.core.veyron2.security.Context.
+	// Implements io.v.core.veyron2.security.VContext.
 	@Override
 	public DateTime timestamp() {
 		return this.securityContext.timestamp();

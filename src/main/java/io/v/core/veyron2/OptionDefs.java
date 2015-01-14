@@ -5,8 +5,8 @@ package io.v.core.veyron2;
  */
 public class OptionDefs {
     /**
-     * A key for an option of type {@link io.v.core.veyron2.VRuntimeImpl} that
-     * specifies a runtime implementation.
+     * A key for an option of type {@link io.v.core.veyron2.VRuntime} that specifies a runtime
+     * implementation.
      */
     public static String RUNTIME = "io.v.core.veyron2.RUNTIME";
 
@@ -15,12 +15,6 @@ public class OptionDefs {
      * specifies a client.
      */
     public static String CLIENT = "io.v.core.veyron2.CLIENT";
-
-    /**
-     * A key for an option of type {@link io.v.core.veyron2.security.Principal} that
-     * specifies a principal to be assigned to the runtime.
-     */
-    public static String RUNTIME_PRINCIPAL = "io.v.core.veyron2.RUNTIME_PRINCIPAL";
 
     /**
      * A key for an option of type {@link io.v.core.veyron2.ipc.ListenSpec} that specifies

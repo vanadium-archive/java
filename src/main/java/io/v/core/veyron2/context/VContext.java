@@ -6,23 +6,20 @@ import org.joda.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Context is an interface for carrying deadlines, cancellation, and data across API
+ * VContext is an interface for carrying deadlines, cancellation, and data across API
  * boundaries.
  *
- * Server method implementations receive a context as their first argument and should generally
- * pass this context (or a derivitive) on to dependant operations.  You should allocate new
- * context objects only for operations that are semantically unrelated to any ongoing calls.
+ * Applications receive a context when they initialize the veyron environment and should generally
+ * pass this context (or a derivitive) on to dependant operations.  Further contexts can be derived
+ * from the original context to refine the environment.  For example if part of your operation
+ * requires a finer deadline you can create a new context to handle that part:
  *
- * New contexts are created via the runtime with {@code Runtime.newContext()}.
- * New contexts represent a fresh operation that's unrelated to any other ongoing work.  Further
- * contexts can be derived from the original context to refine the environment.  For example if part
- * of your operation requires a finer deadline you can create a new context to handle that part:
  * <code>
- *    final Context ctx = runtime.newContext();
+ *    final VContext ctx = V.init(null);
  *    // We'll use cacheCtx to lookup data in memcache; if it takes more than a
  *    // second to get data from memcache we should just skip the cache and
  *    // perform the slow operation.
- *    final Context cacheCtx = ctx.withTimeout(Duration.standardSeconds(1));
+ *    final VContext cacheCtx = ctx.withTimeout(Duration.standardSeconds(1));
  *    try {
  *    	fetchDataFromMemcache(cacheCtx, key);
  *    } catch (VeyronException e) {
@@ -31,34 +28,37 @@ import java.util.concurrent.CountDownLatch;
  *      }
  *    }
  * </code>
- * Contexts form a tree where derived contexts are children of the contexts from which they were
+ *
+ * VContexts form a tree where derived contexts are children of the contexts from which they were
  * derived.  Children inherit all the properties of their parent except for the property being
  * replaced (the deadline in the example above).
  *
- * Contexts are extensible.  The {@code value}/{@code withValue} methods allow you to
+ * VContexts are extensible.  The {@code value}/{@code withValue} methods allow you to
  * attach new information to the context and extend its capabilities. In the same way we derive
- * new contexts via the 'with' family of functions you can create methods to attach new data:
+ * new contexts via the {@code with} family of functions you can create methods to attach new data:
+ *
  * <code>
  *    public class Auth {
  *        private class AuthKey {}
  *
  *        private static final AuthKey KEY = new AuthKey();
  *
- *        public Context withAuth(Context parent, Auth data) {
+ *        public VContext withAuth(VContext parent, Auth data) {
  *          return parent.withValue(KEY, data);
  *        }
  *
- *        public Auth fromContext(Context ctx) {
+ *        public Auth fromContext(VContext ctx) {
  *        	return (Auth)ctx.Value(KEY);
  *        }
  *    }
  * </code>
+ *
  * Note that any type can be used as a key but the caller should preferrably use a private or
  * protected type to prevent collisions (i.e., to prevent somebody else instantiating a key of the
  * same type).  Keys are tested for equality by comparing their value pairs
  * {@code (getClass(), hashCode())}.
  */
-public interface Context {
+public interface VContext {
 	/**
 	 * Returns the time at which this context will be automatically canceled, or {@code null}
 	 * if this context doesn't have a deadline.
@@ -96,12 +96,12 @@ public interface Context {
 	 * contexts further derived from it) will be set to zero.
 	 *
 	 * It is expected that the new context will be canceled only by the caller that created it.
-	 * This is the reason that the extended interface {@code CancelableContext} exists:
+	 * This is the reason that the extended interface {@code CancelableVContext} exists:
 	 * to discourage {@code cancel()} from being invoked by anybody other than the creator.
 	 *
 	 * @return a child of the current context that can be canceled.
 	 */
-	public CancelableContext withCancel();
+	public CancelableVContext withCancel();
 
 	/**
 	 * Returns a child of the current context that is automatically canceled after the provided
@@ -109,7 +109,7 @@ public interface Context {
 	 * encouraged when the context is no longer needed in order to free up the timer resources.
 	 *
 	 * It is expected that the new context will be (explicitly) canceled only by the caller that
-	 * created it.  This is the reason that the extended interface {@code CancelableContext}
+	 * created it.  This is the reason that the extended interface {@code CancelableVContext}
 	 * exists: to discourage {@code cancel()} from being invoked by anybody other than the
 	 * creator.
 	 *
@@ -117,7 +117,7 @@ public interface Context {
 	 * @return          a child of the current context that is automatically canceled after the
 	 *                  provided deadline is reached.
 	 */
-	public CancelableContext withDeadline(DateTime deadline);
+	public CancelableVContext withDeadline(DateTime deadline);
 
 	/**
 	 * Returns a child of the current context that is automatically canceled after the provided
@@ -125,7 +125,7 @@ public interface Context {
 	 * encouraged when the context is no longer needed in order to free up the timer resources.
 	 *
 	 * It is expected that the new context will be (explicitly) canceled only by the caller that
-	 * created it.  This is the reason that the extended interface {@code CancelableContext}
+	 * created it.  This is the reason that the extended interface {@code CancelableVContext}
 	 * exists: to discourage {@code cancel()} from being invoked by anybody other than the
 	 * creator.
 	 *
@@ -133,7 +133,7 @@ public interface Context {
 	 * @return         a child of the current context that is automatically canceled after the
 	 *                 provided duration of time.
 	 */
-	public CancelableContext withTimeout(Duration timeout);
+	public CancelableVContext withTimeout(Duration timeout);
 
 	/**
 	 * Returns a child of the current context that additionally contains the given key and its
@@ -152,5 +152,5 @@ public interface Context {
 	 * @return       a child of the current context that additionally contains the given key and its
 	 *               associated value
 	 */
-	public Context withValue(Object key, Object value);
+	public VContext withValue(Object key, Object value);
 }

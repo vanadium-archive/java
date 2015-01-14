@@ -2,7 +2,7 @@ package io.v.core.veyron2.ipc;
 
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.context.VContext;
 
 import java.lang.reflect.Type;
 
@@ -24,7 +24,7 @@ public interface Client {
 	 * @return                 call object that manages streaming args and results.
 	 * @throws VeyronException if the call cannot be started.
 	 */
-	public Call startCall(Context context, String name, String method,
+	public Call startCall(VContext context, String name, String method,
 		Object[] args, Type[] argTypes) throws VeyronException;
 
 	/**
@@ -44,7 +44,7 @@ public interface Client {
 	 * @return                 call object that manages streaming args and results.
 	 * @throws VeyronException if the call cannot be started.
 	 */
-	public Call startCall(Context context, String name, String method,
+	public Call startCall(VContext context, String name, String method,
 		Object[] args, Type[] argTypes, Options opts) throws VeyronException;
 
 	/**

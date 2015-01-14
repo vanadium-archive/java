@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 /**
  * Context defines the state available for authorizing a principal.
  */
-public interface Context {
+public interface VContext {
 	/**
 	 * Returns the timestamp at which the authorization state is to be checked.
 	 *

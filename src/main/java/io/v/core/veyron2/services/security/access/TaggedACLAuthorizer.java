@@ -3,7 +3,7 @@ package io.v.core.veyron2.services.security.access;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.security.Authorizer;
 import io.v.core.veyron2.security.Blessings;
-import io.v.core.veyron2.security.Context;
+import io.v.core.veyron2.security.VContext;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ public class TaggedACLAuthorizer implements Authorizer {
 	}
 
 	@Override
-	public void authorize(Context context) throws VeyronException {
+	public void authorize(VContext context) throws VeyronException {
 		final Blessings local = context.localBlessings();
 		final Blessings remote = context.remoteBlessings();
 		final String[] blessings = remote != null ? remote.forContext(context) : new String[0];

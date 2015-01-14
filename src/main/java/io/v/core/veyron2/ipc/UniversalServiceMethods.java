@@ -2,7 +2,7 @@ package io.v.core.veyron2.ipc;
 
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.context.VContext;
 
 /**
  * UniversalServiceMethods defines the set of methods that are implemented on all services.
@@ -15,7 +15,7 @@ public interface UniversalServiceMethods {
 	 * @return                 description of the service.
 	 * @throws VeyronException if the description couldn't be fetched.
 	 */
-	public ServiceSignature getSignature(Context context) throws VeyronException;
+	public ServiceSignature getSignature(VContext context) throws VeyronException;
 
 
 	/**
@@ -26,5 +26,5 @@ public interface UniversalServiceMethods {
 	 * @return                 description of the service.
 	 * @throws VeyronException if the description couldn't be fetched.
 	 */
-	public ServiceSignature getSignature(Context context, Options opts) throws VeyronException;
+	public ServiceSignature getSignature(VContext context, Options opts) throws VeyronException;
 }

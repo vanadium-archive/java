@@ -24,7 +24,7 @@ public abstract class Blessings {
 	 * @param  context         the security context used to restrict the set of returned blessings.
 	 * @return                 blessings satisfying the provided security context.
 	 */
-	public abstract String[] forContext(Context context);
+	public abstract String[] forContext(VContext context);
 
 	/**
 	 * Returns the public key of the principal to which blessings in this object are bound.

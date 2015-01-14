@@ -140,6 +140,17 @@ public class PrincipalImpl implements Principal {
 		nativeAddToRoots(this.nativePtr, blessings);
 	}
 	@Override
+	public boolean equals(Object other) {
+		if (this == other) return true;
+		if (other == null) return false;
+		if (this.getClass() != other.getClass()) return false;
+		return this.nativePtr == ((PrincipalImpl) other).nativePtr;
+	}
+	@Override
+	public int hashCode() {
+		return Long.valueOf(this.nativePtr).hashCode();
+	}
+	@Override
 	public void finalize() {
 		nativeFinalize(this.nativePtr);
 	}
