@@ -5,10 +5,10 @@ import org.joda.time.DateTime;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.vdl.VdlValue;
 
-class UnixTimeExpiryCaveatValidator implements CaveatValidator {
+public class UnixTimeExpiryCaveatValidator implements CaveatValidator {
 	private final UnixTimeExpiryCaveat wire;
 
-	UnixTimeExpiryCaveatValidator(UnixTimeExpiryCaveat wire) {
+	public UnixTimeExpiryCaveatValidator(UnixTimeExpiryCaveat wire) {
 		this.wire = wire;
 	}
 

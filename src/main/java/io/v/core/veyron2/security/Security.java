@@ -193,6 +193,16 @@ public class Security {
 	}
 
 	/**
+	 * Returns a new security context that uses the provided params.
+	 *
+	 * @param params context params
+	 * @return       new security context that uses the provided params.
+	 */
+	public static VContext newContext(VContextParams params) {
+		return new VContextParamImpl(params);
+	}
+
+	/**
 	 * Returns an authorizer that subscribes to an authorization policy where access is granted if
 	 * the remote end presents blessings included in the Access Control Lists (ACLs) associated with
 	 * the set of relevant tags.
@@ -310,25 +320,5 @@ public class Security {
 			throw new VeyronException(
 				"Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
 		}
-	}
-
-	// Set of all valid Labels for IPC methods.
-	public static Label[] VALID_LABELS =
-		{ SecurityConstants.READ_LABEL, SecurityConstants.WRITE_LABEL, SecurityConstants.ADMIN_LABEL,
-			SecurityConstants.DEBUG_LABEL, SecurityConstants.MONITORING_LABEL };
-
-	/**
-	 * Returns true iff the provided label is among the set of valid labels.
-	 *
-	 * @param  label the label being checked for validity.
-	 * @return       true iff the label is valid.
-	 */
-	public static boolean IsValidLabel(Label label) {
-		for (Label validLabel : VALID_LABELS) {
-			if (validLabel.equals(label)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

@@ -5,10 +5,10 @@ import io.v.core.veyron2.vdl.VdlValue;
 
 import java.util.Arrays;
 
-class MethodCaveatValidator implements CaveatValidator {
+public class MethodCaveatValidator implements CaveatValidator {
 	private MethodCaveat wire;
 
-	MethodCaveatValidator(MethodCaveat wire) {
+	public MethodCaveatValidator(MethodCaveat wire) {
 		this.wire = wire;
 	}
 

@@ -6,7 +6,7 @@ import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
 
-public class VContextImpl implements io.v.core.veyron2.security.VContext {
+class VContextImpl implements io.v.core.veyron2.security.VContext {
 	private static final String TAG = "Veyron runtime";
 
 	private final long nativePtr;
@@ -23,7 +23,7 @@ public class VContextImpl implements io.v.core.veyron2.security.VContext {
 	private native Blessings nativeRemoteBlessings(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	public VContextImpl(long nativePtr) {
+	VContextImpl(long nativePtr) {
 		this.nativePtr = nativePtr;
 	}
 	// Implements io.v.core.veyron2.security.VContext.

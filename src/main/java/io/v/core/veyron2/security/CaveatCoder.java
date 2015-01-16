@@ -31,7 +31,7 @@ public class CaveatCoder {
 		if (validatorClass == null) {
 			throw new VeyronException("Couldn't find validator class: " + validatorClassName);
 		}
-		if (!validatorClass.isAssignableFrom(CaveatValidator.class)) {
+		if (!CaveatValidator.class.isAssignableFrom(validatorClass)) {
 			throw new VeyronException(String.format(
 				"Class %s doesn't implement CaveatValidator interface", validatorClass.getName()));
 		}

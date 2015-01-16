@@ -50,13 +50,6 @@ public class VDLInvokerTest extends TestCase {
         }
     }
 
-    public void testGetMethodTags() throws IllegalArgumentException, VeyronException {
-        final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        final Object[] tags = invoker.getMethodTags("get");
-        assertEquals(1, tags.length);
-        assertEquals(io.v.core.veyron2.security.SecurityConstants.READ_LABEL, tags[0]);
-    }
-
     public void testInvoke() throws VeyronException {
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
         final ServerCall call = null;

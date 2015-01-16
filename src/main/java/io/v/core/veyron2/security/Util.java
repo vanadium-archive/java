@@ -133,28 +133,4 @@ class Util {
 		}
 		return (Caveat) VomUtil.decode(encoded, Caveat.class);
 	}
-
-	/**
-	 * VOM-encodes the provided Caveat array.
-	 *
-	 * @param  caveats Caveat array to be encoded.
-	 * @return         the encoded Caveat array.
-	 */
-	static byte[] encodeCaveats(Caveat[] caveats) throws VeyronException {
-		return VomUtil.encode(caveats, new TypeToken<Caveat[]>(){}.getType());
-	}
-
-	/**
-	 * VOM-decodes the VOM-encoded Caveat array.
-	 *
-	 * @param  encoded         VOM-encoded Caveat array.
-	 * @return                 decoded Caveat array.
-	 * @throws VeyronException if the provided Caveat array couldn't be decoded.
-	 */
-	static Caveat[] decodeCaveats(byte[] encoded) throws VeyronException {
-		if (encoded == null || encoded.length == 0) {
-			return null;
-		}
-		return (Caveat[]) VomUtil.decode(encoded, new TypeToken<Caveat[]>(){}.getType());
-	}
 }
