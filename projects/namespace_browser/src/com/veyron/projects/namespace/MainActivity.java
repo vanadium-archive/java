@@ -23,9 +23,9 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.naming.VDLMountEntry;
 import io.v.core.veyron2.naming.VDLMountedServer;
 import io.v.core.veyron2.security.Blessings;
@@ -43,13 +43,14 @@ public class MainActivity extends Activity {
 	private static final String TAG = "com.veyron.projects.namespace";
 	private static final String VEYRON_ACCOUNT_TYPE = "com.veyron";
 	private static final String PREF_NAMESPACE_GLOB_ROOT = "pref_namespace_glob_root";
-	private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "/proxy.envyor.com:8101";
+	private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "";
 	private static final String SAVED_VIEW_STATE_KEY = "browser_viewstate";
 	private static final String BLESSINGS_KEY = "blessings";
 
 	private static final int ACCOUNT_CHOOSING_REQUEST = 1;
 	private static final int BLESSING_REQUEST = 2;
 
+	VContext mBaseContext = null;
 	WireBlessings mSelectedBlessing = null;
 
 	@Override
@@ -63,10 +64,10 @@ public class MainActivity extends Activity {
 				0, dirView.getPaddingTop(), dirView.getPaddingRight(), dirView.getPaddingBottom());
 		dirView.setTag(new VDLMountEntry(root, ImmutableList.<VDLMountedServer>of(), true));
 		final TextView nameView = (TextView) dirView.findViewById(R.id.name);
-		nameView.setText(root);
+		nameView.setText("/");
 
+	    mBaseContext = V.init(this);
 		mSelectedBlessing = null;
-	    VRuntime.init(this, new Options());
 
 		updateBlessingsView();
 	}
@@ -244,7 +245,7 @@ public class MainActivity extends Activity {
 		}
 		try {
 			final Blessings blessings = Security.newBlessings(wire);
-			final Principal p = VRuntime.getPrincipal();
+			final Principal p = V.getPrincipal(mBaseContext);
 			p.blessingStore().setDefaultBlessings(blessings);
 			mSelectedBlessing = wire;
 		} catch (VeyronException e) {
@@ -360,7 +361,7 @@ public class MainActivity extends Activity {
 		protected List<VDLMountEntry> doInBackground(Void... args) {
 			final VDLMountEntry entry = (VDLMountEntry)dirView.getTag();
 			try {
-				return Namespace.glob(entry.getName());
+				return Namespace.glob(entry.getName(), mBaseContext);
 			} catch (VeyronException e) {
 				errorMsg = "Error fetching names: " + e.getMessage();
 				return null;
@@ -376,14 +377,18 @@ public class MainActivity extends Activity {
 			}
 			final VDLMountEntry parentEntry = (VDLMountEntry)dirView.getTag();
 			for (VDLMountEntry entry : entries) {
-				if (!entry.getName().startsWith(parentEntry.getName() + "/")) {
-					android.util.Log.e(TAG, String.format(
-							"Entry %q doesn't start with parent prefix %q",
-							entry.getName(), parentEntry.getName() + "/"));
-					continue;
+				String text = "";
+				if (parentEntry.getName().isEmpty()) {
+					text = entry.getName();
+				} else {
+					if (!entry.getName().startsWith(parentEntry.getName() + "/")) {
+						android.util.Log.e(TAG, String.format(
+								"Entry %s doesn't start with parent prefix %s",
+								entry.getName(), parentEntry.getName() + "/"));
+						continue;
+					}
+					text = entry.getName().substring(parentEntry.getName().length() + 1);
 				}
-				final String text = entry.getName().substring(parentEntry.getName().length() + 1);
-
 				final LinearLayout childView =
 						(entry.getServers() == null || entry.getServers().size() <= 0)
 						? ViewUtil.createDirectoryView(text, entry, getLayoutInflater()) // sub-dir
@@ -409,7 +414,7 @@ public class MainActivity extends Activity {
 		protected List<String> doInBackground(Void... args) {
 			final VDLMountEntry entry = (VDLMountEntry)objView.getTag();
 			try {
-				return Methods.get(entry.getName());
+				return Methods.get(entry.getName(), mBaseContext);
 			} catch (VeyronException e) {
 				errorMsg = "Error fetching methods: " + e.getMessage();
 				return null;

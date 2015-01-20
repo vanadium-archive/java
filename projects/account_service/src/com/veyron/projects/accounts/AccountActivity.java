@@ -21,10 +21,9 @@ import org.joda.time.Duration;
 import io.v.core.veyron.services.identity.OAuthBlesserClient;
 import io.v.core.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
 import io.v.core.veyron.services.identity.OAuthBlesserClientFactory;
-import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
-import io.v.core.veyron2.context.Context;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Certificate;
 import io.v.core.veyron2.security.WireBlessings;
 import io.v.core.veyron2.util.VomUtil;
@@ -40,9 +39,9 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 	private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
 	private static final String PREF_VEYRON_IDENTITY_SERVICE = "pref_identity_service_name";
-	private static final String DEFAULT_IDENTITY_SERVICE_NAME =
-			"/proxy.envyor.com:8101/identity/veyron-test/google";
+	private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/google";
 
+	VContext mBaseContext = null;
 	String mAccountName = "", mAccountType = "";
 
 
@@ -50,7 +49,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_account);
-		VRuntime.init(this, new Options());
+		mBaseContext = V.init(this);
 		final Intent intent = AccountManager.newChooseAccountIntent(
 				null, null, new String[]{"com.google" }, true, null, null, null, null);
 		startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
@@ -157,7 +156,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 							PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
 			try {
 				final OAuthBlesserClient blesser = OAuthBlesserClientFactory.bind(identityServiceName);
-				final Context ctx = VRuntime.newContext().withTimeout(new Duration(20000));  // 20s
+				final VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
 				final BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
 				final WireBlessings blessing = reply.blessing;
 				if (blessing == null || blessing.getCertificateChains() == null ||

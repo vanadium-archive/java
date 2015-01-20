@@ -18,7 +18,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.VRuntime;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Certificate;
 import io.v.core.veyron2.security.Principal;
@@ -40,6 +41,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 
 	private static final String ACCOUNT_TYPE = "com.veyron";
 
+	VContext mBaseContext = null;
 	Account mAccount = null;
 	String mBlesseeName = "";
 	ECPublicKey mBlesseePubKey = null;
@@ -48,7 +50,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_blessing);
-		VRuntime.init(this, null);
+		mBaseContext = V.init(this);
 
 		final Intent intent = getIntent();
 		if (intent == null || intent.getExtras() == null) {
@@ -132,9 +134,10 @@ public class BlessingActivity extends AccountAuthenticatorActivity {
 			final WireBlessings wire = (WireBlessings) VomUtil.decodeFromString(
 					wireVom, new TypeToken<WireBlessings>(){}.getType());
 			final Blessings with = Security.newBlessings(wire);
-			final Principal principal = VRuntime.getPrincipal();
+			final Principal principal = V.getPrincipal(mBaseContext);
 			final Blessings retBlessing = principal.bless(mBlesseePubKey,
 					with, mBlesseeName, Security.newUnconstrainedUseCaveat());
+
 			if (retBlessing == null) {
 				replyWithError("Got null blessings after bless().");
 				return;

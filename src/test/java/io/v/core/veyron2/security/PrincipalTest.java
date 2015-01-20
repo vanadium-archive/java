@@ -51,7 +51,6 @@ public class PrincipalTest extends AndroidTestCase {
 		final String[] keysGot = got.keySet().toArray(new String[0]);
 		Arrays.sort(keysWant);
 		Arrays.sort(keysGot);
-		android.util.Log.e("Test", String.format("Comparing %s with %s", Arrays.toString(keysWant), Arrays.toString(keysGot)));
 		assertTrue(Arrays.equals(keysWant, keysGot));
 		for (String key : keysWant) {
 			final Caveat[] caveatsWant = want.get(key);

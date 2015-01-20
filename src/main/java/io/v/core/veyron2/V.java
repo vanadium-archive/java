@@ -70,6 +70,16 @@ public class V {
 	}
 
 	/**
+	 * Initializes the Veyron environment without options.  See {@code init(Options)} for more
+	 * information.
+	 *
+	 * @return base context
+	 */
+	public static VContext init() {
+		return V.init(null);
+	}
+
+	/**
 	 * Creates a new client instance and attaches it to a new context.
 	 *
 	 * @param  ctx             current context

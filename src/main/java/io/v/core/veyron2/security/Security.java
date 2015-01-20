@@ -160,7 +160,7 @@ public class Security {
 	 */
 	public static Caveat newExpiryCaveat(DateTime time) throws VeyronException {
 		return newCaveat(new UnixTimeExpiryCaveatValidator(
-			new UnixTimeExpiryCaveat(time.getMillis())));
+			new UnixTimeExpiryCaveat(time.getMillis() / 1000L)));
 	}
 
 	/**

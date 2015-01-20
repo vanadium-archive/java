@@ -5,9 +5,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.android.VRuntime;
 import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.WireBlessings;
 
 import java.security.interfaces.ECPublicKey;
@@ -21,8 +21,8 @@ public class Blessing {
 	private static final String REPLY = "REPLY";
 
 	public static Intent createIntent(Context ctx, String accountName) {
-	    VRuntime.init(ctx, new Options());
-	    final ECPublicKey key = VRuntime.getPrincipal().publicKey();
+	    final VContext vCtx = V.init(ctx);
+	    final ECPublicKey key = V.getPrincipal(vCtx).publicKey();
 	    final Intent intent = new Intent();
 	    intent.setComponent(new ComponentName(
 	            BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));

@@ -2,8 +2,11 @@ package com.veyron.projects.namespace;
 
 import com.google.common.reflect.TypeToken;
 
-import io.v.core.veyron2.android.VRuntime;
+import org.joda.time.Duration;
+
 import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Client;
 import io.v.core.veyron2.ipc.Client.Call;
 import io.v.core.veyron2.ipc.ServiceSignature;
@@ -23,9 +26,10 @@ public class Methods {
    * @return                 list of method names of the provided object.
    * @throws VeyronException if there was an error getting the list of names.
    */
-	public static List<String> get(String name) throws VeyronException {
-		final Client client = VRuntime.getClient();
-		final Call call = client.startCall(null, name, "signature", new Object[0], new Type[0]);
+	public static List<String> get(String name, VContext ctx) throws VeyronException {
+		final Client client = V.getClient(ctx);
+		final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+		final Call call = client.startCall(ctxT, name, "signature", new Object[0], new Type[0]);
 		final Type[] resultTypes = new Type[]{ new TypeToken<ServiceSignature>() {}.getType() };
 		final ServiceSignature sSign = (ServiceSignature)call.finish(resultTypes)[0];
 		final List<String> ret = new ArrayList<String>();

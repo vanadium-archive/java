@@ -77,6 +77,16 @@ public class V extends io.v.core.veyron2.V {
 		}
 	}
 
+	/**
+	 * Initializes the Veyron environment without options.  See {@code init(Options)} for more
+	 * information.
+	 *
+	 * @return base context
+	 */
+	public static VContext init(android.content.Context ctx) {
+		return V.init(ctx, null);
+	}
+
 	private static Principal createPrincipal(android.content.Context ctx, Options opts)
 			throws VeyronException {
 		// Check if the private key has already been generated for this package.
