@@ -38,8 +38,12 @@
 			android:name=".AccountActivity"
 			android:label="@string/title_activity_account" >
 		</activity>
+
+		<!-- android:windowSoftInputMode="adjustPan" below is necessary to prevent
+		     the keyboard input from moving layout views around. -->
 		<activity
 			android:name=".BlessingActivity"
+			android:windowSoftInputMode="adjustPan"
 			android:label="@string/title_activity_blessing" >
 			<intent-filter>
 				<action android:name="com.veyron.projects.accounts.BLESS" />

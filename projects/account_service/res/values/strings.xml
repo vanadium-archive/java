@@ -9,5 +9,7 @@
 	<string name="blessing_text_blessing">Above application wants a blessing from Veyron account: </string>
 	<string name="blessing_button_accept">Accept</string>
 	<string name="blessing_button_deny">Deny</string>
+	<string name="blessing_text_caveat">Apply the following caveats to the blessing: </string>
+	<string name="expiry_caveat_default_number_units">1</string>
 
 </resources>
