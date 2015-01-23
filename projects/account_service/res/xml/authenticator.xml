@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- TODO(spetrovic): Change icon! -->
-<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="@string/authenticator_account_type"
-    android:icon="@drawable/ic_launcher"
-    android:smallIcon="@drawable/ic_launcher"
-    android:label="@string/authenticator_service_name"
-    android:accountPreferences="@xml/preferences"
-/>

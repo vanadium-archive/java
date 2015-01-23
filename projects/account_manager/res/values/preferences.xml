@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_category">Settings</string>
+    <string name="pref_vanadium_subcategory">Vanadium</string>
+    <string name="pref_identity_service_name">Identity Service</string>
+    <string name="pref_identity_service_name_summ">Name of the Vanadium Identity Service</string>
+</resources>

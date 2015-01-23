@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <EditTextPreference
-    android:key="pref_identity_service_name"
-    android:title="@string/pref_identity_service_name"
-    android:summary="@string/pref_identity_service_name_summ"
-    android:defaultValue="/proxy.envyor.com:8101/identity/veyron-test/google" />
-</PreferenceScreen>

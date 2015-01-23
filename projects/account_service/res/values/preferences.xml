@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="pref_category">Settings</string>
-    <string name="pref_veyron_subcategory">Veyron</string>
-    <string name="pref_identity_service_name">Identity Service</string>
-    <string name="pref_identity_service_name_summ">Name of the Veyron Identity Service</string>
-</resources>

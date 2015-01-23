@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceCategory android:title="@string/pref_category" />
+<Preference
+  android:title="@string/pref_vanadium_subcategory" >
+  <intent
+      android:targetPackage="io.v.android.apps.account_manager"
+      android:targetClass="io.v.android.apps.account_manager.SettingsActivity"
+      android:action="io.v.android.apps.account_manager.SETTINGS" />
+</Preference>
+</PreferenceScreen>
