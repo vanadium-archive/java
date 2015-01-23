@@ -190,8 +190,7 @@ public class BlessingsManager {
 		}
 		final List<Certificate> chain = blessing.getCertificateChains().get(0);
 		String ret = "";
-		// Ignore last name (should be this package name).
-		for (int i = 0; i < chain.size() - 1; ++i) {
+		for (int i = 0; i < chain.size(); ++i) {
 			ret += chain.get(i).getExtension();
 			ret += "/";
 		}
