@@ -15,7 +15,7 @@ import io.v.core.veyron2.security.Principal;
 public class VRuntime implements io.v.core.veyron2.VRuntime {
 	private static final String TAG = "Veyron runtime";
 
-	private static native VContext nativeInit(Options opts) throws VeyronException;
+	private static native VContext nativeInit() throws VeyronException;
 
 	/**
 	 * Returns a new runtime instance.
@@ -25,7 +25,7 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
 	 */
 	public static VRuntime create(Options opts) throws VeyronException {
 		final ListenSpec listenSpec = (ListenSpec) opts.get(OptionDefs.DEFAULT_LISTEN_SPEC);
-		return new VRuntime(nativeInit(opts), listenSpec);
+		return new VRuntime(nativeInit(), listenSpec);
 	}
 
 	private final VContext ctx;  // non-null
