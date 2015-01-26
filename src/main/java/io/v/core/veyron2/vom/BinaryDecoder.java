@@ -94,13 +94,13 @@ public class BinaryDecoder {
      * @throws ConversionException
      */
     public Object decodeValue() throws IOException, ConversionException {
-        return decodeValue(VdlValue.class, DecodingMode.JAVA_OBJECT);
+        return decodeValue(Object.class, DecodingMode.JAVA_OBJECT);
     }
 
     private void assertTypesCompatible(VdlType actualType, Type targetType)
             throws ConversionException {
-        if (targetType != VdlValue.class && !TypeCompatibility.compatible(actualType,
-                Types.getVdlTypeFromReflect(targetType))) {
+        if (targetType != Object.class && targetType != VdlValue.class && !TypeCompatibility.
+                compatible(actualType, Types.getVdlTypeFromReflect(targetType))) {
             throw new ConversionException(actualType, targetType, "types are incompatible");
         }
     }
@@ -156,13 +156,13 @@ public class BinaryDecoder {
             throws IOException, ConversionException {
         ConversionTarget target;
         if (mode == DecodingMode.VDL_VALUE) {
-            target = new ConversionTarget(actualType, mode);
-        } else if (targetType == VdlValue.class) {
+            target = new ConversionTarget(actualType, VdlValue.class, mode);
+        } else if (targetType == Object.class || targetType == VdlValue.class) {
             Type bootstrapClass = Types.getReflectTypeForVdl(actualType);
             if (bootstrapClass != null) {
                 target = new ConversionTarget(bootstrapClass);
             } else {
-                target = new ConversionTarget(actualType, mode);
+                target = new ConversionTarget(actualType, (Class<?>)targetType, mode);
             }
         } else {
             target = new ConversionTarget(targetType);
@@ -170,7 +170,8 @@ public class BinaryDecoder {
 
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {
-                return new VdlAny((VdlValue) readValue(actualType, VdlValue.class, mode));
+                return new VdlAny(actualType,
+                        (Serializable) readValue(actualType, Object.class, mode));
             } else if (target.getKind() == Kind.OPTIONAL) {
                 return readValue(actualType,
                         ReflectUtil.getElementType(target.getTargetType(), 0), mode);
@@ -239,7 +240,7 @@ public class BinaryDecoder {
         if (target.getKind() != Kind.ANY) {
             targetType = target.getTargetType();
         } else {
-            targetType = VdlValue.class;
+            targetType = Object.class;
         }
         VdlType actualType = getType(typeId);
         assertTypesCompatible(actualType, targetType);
@@ -332,7 +333,7 @@ public class BinaryDecoder {
                     return field.getGenericType();
                 }
             }
-            return VdlValue.class;
+            return Object.class;
         }
     }
 
@@ -348,7 +349,7 @@ public class BinaryDecoder {
         } else if (data instanceof VdlStruct) {
             ((VdlStruct) data).assignField((String) key, (VdlValue) elem);
         } else {
-            if (elemType == VdlValue.class) {
+            if (elemType == Object.class) {
                 // no such field, just skip it
                 return;
             }
@@ -432,7 +433,7 @@ public class BinaryDecoder {
         // Solve vdl.Value case.
         if (target.getTargetClass() == VdlUnion.class) {
             return new VdlUnion(actualType, index, actualElemType,
-                    (VdlValue) readValue(actualElemType, VdlValue.class, target.getMode()));
+                    (Serializable) readValue(actualElemType, Object.class, target.getMode()));
         }
         Class<?> targetClass = target.getTargetClass();
         // This can happen if targetClass is NamedUnion.A.

@@ -42,20 +42,20 @@ public class ConversionTarget {
     private final VdlType vdlType;
     private final DecodingMode mode;
 
-    private static Type getDefaultReflectType(VdlType type, DecodingMode mode) {
+    private static Type getDefaultReflectType(VdlType type, Class<?> targetClass) {
         switch (type.getKind()) {
             case ANY:
                 return VdlAny.class;
             case ARRAY:
-                return new TypeToken<VdlArray<VdlValue>>(){}.getType();
+                return new TypeToken<VdlArray<Object>>(){}.getType();
             case BOOL:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Boolean.class;
                 } else {
                     return VdlBool.class;
                 }
             case BYTE:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Byte.class;
                 } else {
                     return VdlByte.class;
@@ -67,47 +67,47 @@ public class ConversionTarget {
             case ENUM:
                 return VdlEnum.class;
             case FLOAT32:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Float.class;
                 } else {
                     return VdlFloat32.class;
                 }
             case FLOAT64:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Double.class;
                 } else {
                     return VdlFloat64.class;
                 }
             case INT16:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Short.class;
                 } else {
                     return VdlInt16.class;
                 }
             case INT32:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Integer.class;
                 } else {
                     return VdlInt32.class;
                 }
             case INT64:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return Long.class;
                 } else {
                     return VdlInt64.class;
                 }
             case LIST:
-                return new TypeToken<VdlList<VdlValue>>(){}.getType();
+                return new TypeToken<VdlList<Object>>(){}.getType();
             case MAP:
-                return new TypeToken<VdlMap<VdlValue, VdlValue>>(){}.getType();
+                return new TypeToken<VdlMap<Object, Object>>(){}.getType();
             case UNION:
                 return VdlUnion.class;
             case OPTIONAL:
                 return new TypeToken<VdlOptional<VdlValue>>(){}.getType();
             case SET:
-                return new TypeToken<VdlSet<VdlValue>>(){}.getType();
+                return new TypeToken<VdlSet<Object>>(){}.getType();
             case STRING:
-                if (mode == DecodingMode.JAVA_OBJECT) {
+                if (targetClass == Object.class) {
                     return String.class;
                 } else {
                     return VdlString.class;
@@ -138,8 +138,8 @@ public class ConversionTarget {
         this(targetType, Types.getVdlTypeFromReflect(targetType), DecodingMode.JAVA_OBJECT);
     }
 
-    public ConversionTarget(VdlType vdlType, DecodingMode mode) {
-        this(getDefaultReflectType(vdlType, mode), vdlType, mode);
+    public ConversionTarget(VdlType vdlType, Class<?> targetClass, DecodingMode mode) {
+        this(getDefaultReflectType(vdlType, targetClass), vdlType, mode);
     }
 
     public Class<?> getTargetClass() {

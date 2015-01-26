@@ -3,6 +3,7 @@ package io.v.core.veyron2.vom;
 import junit.framework.TestCase;
 
 import io.v.core.veyron2.vdl.Types;
+import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom.testdata.TestdataConstants;
@@ -65,5 +66,12 @@ public class BinaryDecoderTest extends TestCase {
         VdlValue decoded = (VdlValue) TestUtil.decode(
                 TestUtil.hexStringToBytes(encoded));
         assertEquals(encoded, TestUtil.encode(decoded.vdlType(), decoded));
+    }
+
+    public void testDecodeVdlArray() throws Exception {
+        VdlArray<?> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(v));
+        Object decoded = TestUtil.decode(encoded);
+        assertNotNull(decoded);
     }
 }

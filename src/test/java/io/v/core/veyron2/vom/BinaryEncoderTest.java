@@ -25,6 +25,7 @@ import io.v.core.veyron2.vom.testdata.NStruct;
 import io.v.core.veyron2.vom.testdata.TestdataConstants;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class BinaryEncoderTest extends TestCase {
     private static final Map<VdlType, Object> zeroValues = ImmutableMap.<VdlType, Object>builder()
@@ -60,7 +61,7 @@ public class BinaryEncoderTest extends TestCase {
     public void testEncode() throws Exception {
         for (io.v.core.veyron2.vom.testdata.TestCase test : TestdataConstants.TESTS) {
             // TODO(rogulenko): remove this after disallowing unnamed arrays
-            if (test.getName().contains("[2]")) {
+            if (Pattern.compile("\\[\\d+\\]").matcher(test.getName()).find()) {
                 continue;
             }
             VdlAny value = test.getValue();
