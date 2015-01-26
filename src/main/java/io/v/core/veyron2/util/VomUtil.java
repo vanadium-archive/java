@@ -2,9 +2,9 @@ package io.v.core.veyron2.util;
 
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vom2.BinaryDecoder;
-import io.v.core.veyron2.vom2.BinaryEncoder;
-import io.v.core.veyron2.vom2.ConversionException;
+import io.v.core.veyron2.vom.BinaryDecoder;
+import io.v.core.veyron2.vom.BinaryEncoder;
+import io.v.core.veyron2.vom.ConversionException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

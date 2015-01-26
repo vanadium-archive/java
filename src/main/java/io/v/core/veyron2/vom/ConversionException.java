@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import java.lang.reflect.Type;
 

@@ -1,11 +1,11 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import junit.framework.TestCase;
 
 import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlBool;
 import io.v.core.veyron2.vdl.VdlType;
-import io.v.core.veyron2.vom2.testdata.NBool;
+import io.v.core.veyron2.vom.testdata.NBool;
 
 /**
  * These tests test that BinaryDecoder automatically registers type generated from VDL.

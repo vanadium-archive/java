@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import io.v.core.veyron2.vdl.Kind;
 import io.v.core.veyron2.vdl.VdlType;

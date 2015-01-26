@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import com.google.common.reflect.TypeToken;
 
@@ -17,21 +17,21 @@ import io.v.core.veyron2.vdl.VdlString;
 import io.v.core.veyron2.vdl.VdlUint16;
 import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
-import io.v.core.veyron2.vom2.BinaryDecoder.DecodingMode;
-import io.v.core.veyron2.vom2.testdata.NArray2Uint64;
-import io.v.core.veyron2.vom2.testdata.NByte;
-import io.v.core.veyron2.vom2.testdata.NComplex128;
-import io.v.core.veyron2.vom2.testdata.NComplex64;
-import io.v.core.veyron2.vom2.testdata.NEnum;
-import io.v.core.veyron2.vom2.testdata.NFloat32;
-import io.v.core.veyron2.vom2.testdata.NFloat64;
-import io.v.core.veyron2.vom2.testdata.NInt16;
-import io.v.core.veyron2.vom2.testdata.NInt32;
-import io.v.core.veyron2.vom2.testdata.NInt64;
-import io.v.core.veyron2.vom2.testdata.NString;
-import io.v.core.veyron2.vom2.testdata.NUint16;
-import io.v.core.veyron2.vom2.testdata.NUint32;
-import io.v.core.veyron2.vom2.testdata.NUint64;
+import io.v.core.veyron2.vom.BinaryDecoder.DecodingMode;
+import io.v.core.veyron2.vom.testdata.NArray2Uint64;
+import io.v.core.veyron2.vom.testdata.NByte;
+import io.v.core.veyron2.vom.testdata.NComplex128;
+import io.v.core.veyron2.vom.testdata.NComplex64;
+import io.v.core.veyron2.vom.testdata.NEnum;
+import io.v.core.veyron2.vom.testdata.NFloat32;
+import io.v.core.veyron2.vom.testdata.NFloat64;
+import io.v.core.veyron2.vom.testdata.NInt16;
+import io.v.core.veyron2.vom.testdata.NInt32;
+import io.v.core.veyron2.vom.testdata.NInt64;
+import io.v.core.veyron2.vom.testdata.NString;
+import io.v.core.veyron2.vom.testdata.NUint16;
+import io.v.core.veyron2.vom.testdata.NUint32;
+import io.v.core.veyron2.vom.testdata.NUint64;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;

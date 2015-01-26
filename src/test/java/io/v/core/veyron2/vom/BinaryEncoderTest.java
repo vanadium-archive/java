@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -13,16 +13,16 @@ import io.v.core.veyron2.vdl.VdlComplex128;
 import io.v.core.veyron2.vdl.VdlComplex64;
 import io.v.core.veyron2.vdl.VdlEnum;
 import io.v.core.veyron2.vdl.VdlField;
-import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlOptional;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlTypeObject;
 import io.v.core.veyron2.vdl.VdlUint16;
 import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
+import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vom2.testdata.NStruct;
-import io.v.core.veyron2.vom2.testdata.TestdataConstants;
+import io.v.core.veyron2.vom.testdata.NStruct;
+import io.v.core.veyron2.vom.testdata.TestdataConstants;
 
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class BinaryEncoderTest extends TestCase {
             .build();
 
     public void testEncode() throws Exception {
-        for (io.v.core.veyron2.vom2.testdata.TestCase test : TestdataConstants.TESTS) {
+        for (io.v.core.veyron2.vom.testdata.TestCase test : TestdataConstants.TESTS) {
             // TODO(rogulenko): remove this after disallowing unnamed arrays
             if (test.getName().contains("[2]")) {
                 continue;

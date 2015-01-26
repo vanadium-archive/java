@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import com.google.common.base.Strings;
 
@@ -8,13 +8,13 @@ import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlField;
-import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlOptional;
 import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.vdl.VdlTypeObject;
+import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
 
 import java.io.IOException;

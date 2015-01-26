@@ -3,8 +3,8 @@ package io.v.core.veyron2.vdl;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.vom2.testdata.TestCase;
-import io.v.core.veyron2.vom2.testdata.TestdataConstants;
+import io.v.core.veyron2.vom.testdata.TestCase;
+import io.v.core.veyron2.vom.testdata.TestdataConstants;
 
 import java.lang.reflect.Type;
 

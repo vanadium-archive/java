@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import com.google.common.reflect.TypeToken;
 
@@ -29,7 +29,7 @@ import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vom2.BinaryDecoder.DecodingMode;
+import io.v.core.veyron2.vom.BinaryDecoder.DecodingMode;
 
 import java.lang.reflect.Type;
 

@@ -1,4 +1,4 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
 import io.v.core.veyron2.vdl.AbstractVdlStruct;
 import io.v.core.veyron2.vdl.Kind;
@@ -16,7 +16,6 @@ import io.v.core.veyron2.vdl.VdlFloat64;
 import io.v.core.veyron2.vdl.VdlInt16;
 import io.v.core.veyron2.vdl.VdlInt32;
 import io.v.core.veyron2.vdl.VdlInt64;
-import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlOptional;
 import io.v.core.veyron2.vdl.VdlString;
 import io.v.core.veyron2.vdl.VdlStruct;
@@ -25,6 +24,7 @@ import io.v.core.veyron2.vdl.VdlTypeObject;
 import io.v.core.veyron2.vdl.VdlUint16;
 import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
+import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +54,7 @@ public class BinaryEncoder {
         this.typeBuffer = new ByteArrayOutputStream();
         this.out = out;
         this.visitedTypes = new HashMap<VdlType, TypeID>();
-        this.nextTypeId = Vom2Constants.WIRE_TYPE_FIRST_USER_ID;
+        this.nextTypeId = VomConstants.WIRE_TYPE_FIRST_USER_ID;
         this.binaryMagicByteWritten = false;
     }
 

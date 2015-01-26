@@ -1,16 +1,14 @@
-package io.v.core.veyron2.vom2;
+package io.v.core.veyron2.vom;
 
-import io.v.core.veyron2.vdl.VdlField;
-
+import io.v.core.veyron2.vdl.Kind;
 import io.v.core.veyron2.vdl.Types;
+import io.v.core.veyron2.vdl.VdlField;
+import io.v.core.veyron2.vdl.VdlType;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import io.v.core.veyron2.vdl.Kind;
-import io.v.core.veyron2.vdl.VdlType;
 
 /**
  * TypeCompatibility provides helpers to check compatibility of VDL types.
