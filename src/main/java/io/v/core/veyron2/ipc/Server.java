@@ -19,9 +19,9 @@ public interface Server {
 	 *
 	 * If the provided listen spec is {@code null}, default listen spec is used.
 	 *
-	 * @param  spec            information on how to create the network endpoint(s).
-	 * @return                 array of endpoint strings.
-	 * @throws VeyronException if the server couldn't listen  provided protocol can't be listened on.
+	 * @param  spec            information on how to create the network endpoint(s)
+	 * @return                 array of endpoint strings
+	 * @throws VeyronException if the server couldn't listen  provided protocol can't be listened on
 	 */
 	public String[] listen(ListenSpec spec) throws VeyronException;
 
@@ -45,28 +45,45 @@ public interface Server {
 	 * It is considered an error to call {@code listen} after {@code serve} If the name is an
 	 * empty string, no attempt will made to publish that name to a mount table.
 	 *
-	 * @param  name            name under which the supplied object should be published.
-	 * @param  object   object to be published under the given name.
-	 * @throws VeyronException if the object couldn't be published under the given name.
+	 * @param  name            name under which the supplied object should be published
+	 * @param  object   object to be published under the given name
+	 * @throws VeyronException if the object couldn't be published under the given name
 	 */
 	public void serve(String name, Object object) throws VeyronException;
 
 	/**
-	 * Returns the rooted names that this server's endpoints have been published as (via calls to
-	 * {@code serve()}).
+	 * Adds the specified name to the mount table for the object or {@code Dispatcher} served by
+	 * this server.
 	 *
-	 * @return                 an array of rooted names that this server's endpoints have been
-	 *                         published as.
-	 * @throws VeyronException if an error occurs (e.g., {@code stop()} has already been invoked).
+	 * This method may be called multiple times but only after {@code serve} has been called.
+	 *
+	 * @param  name            name to be added to the mount table
+	 * @throws VeyronException if the name couldn't be added to the mount table
 	 */
-	public String[] getPublishedNames() throws VeyronException;
+	public void addName(String name) throws VeyronException;
+
+	/**
+	 * Removes the specified name from the mount table.
+	 *
+	 * This method may be called multiple times but only after {@code serve} has been called.
+	 *
+	 * @param name name to be removed from the mount table
+	 */
+	public void removeName(String name);
+
+	/**
+	 * Returns the current status of the server, see {@code ServerStatus} for details.
+	 *
+	 * @return the current status of the server
+	 */
+	public ServerStatus getStatus();
 
 	/**
 	 * Gracefully stops all services on this server.  New calls are rejected, but any in-flight
 	 * calls are allowed to complete.  All published mountpoints are unmounted.  This call waits for
 	 * this process to complete, and returns once the server has been shut down.
 	 *
-	 * @throws VeyronException if there was an error stopping the server.
+	 * @throws VeyronException if there was an error stopping the server
 	 */
 	public void stop() throws VeyronException;
 }

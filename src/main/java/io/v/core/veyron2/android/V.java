@@ -34,11 +34,11 @@ public class V extends io.v.core.veyron2.V {
 	static {
 		RedirectStderr.Start();
 	}
-	private static volatile VContext context = null;
 	private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
 			new ListenSpec.Address[] { new ListenSpec.Address("tcp", ":0")},
 			"/ns.dev.v.io:8101/proxy",
 			true);
+	private static volatile VContext context = null;
 
 	/**
 	 * Initializes the Veyron environment, returning the base context.  Calling this method multiple
@@ -61,17 +61,14 @@ public class V extends io.v.core.veyron2.V {
 		if (context != null) return context;
 		synchronized (V.class) {
 			if (context != null) return context;
-			if (opts == null) opts = new Options();
-			if (opts.get(OptionDefs.DEFAULT_LISTEN_SPEC) == null) {
-				opts.set(OptionDefs.DEFAULT_LISTEN_SPEC, DEFAULT_LISTEN_SPEC);
-			}
 			context = io.v.core.veyron2.V.init(opts);
-			// Attach principal to the context.
+			// Attach principal and listen spec to the context.
 			try {
 				context = V.setPrincipal(context, createPrincipal(ctx, opts));
+				context = V.setListenSpec(context, DEFAULT_LISTEN_SPEC);
 			} catch (VeyronException e) {
 				throw new RuntimeException(
-		    			"Couldn't setup Google Veyron Runtime options: " + e.getMessage());
+		    			"Couldn't setup Vanadium Runtime options: " + e.getMessage());
 			}
 			return context;
 		}

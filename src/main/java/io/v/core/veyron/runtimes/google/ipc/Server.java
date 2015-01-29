@@ -5,29 +5,25 @@ import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.ipc.Dispatcher;
 import io.v.core.veyron2.ipc.ListenSpec;
+import io.v.core.veyron2.ipc.ServerStatus;
 import io.v.core.veyron2.ipc.ServiceObjectWithAuthorizer;
 
 public class Server implements io.v.core.veyron2.ipc.Server {
-	private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
-			new ListenSpec.Address[] { new ListenSpec.Address("tcp", ":0") },
-			"/ns.dev.v.io:8101/proxy",
-			false);
-
 	private final long nativePtr;
 	private final ListenSpec listenSpec;  // non-null.
 
 	private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
 	private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
 		throws VeyronException;
-	private native String[] nativeGetPublishedNames(long nativePtr) throws VeyronException;
+	private native void nativeAddName(long nativePtr, String name) throws VeyronException;
+	private native void nativeRemoveName(long nativePtr, String name);
+	private native ServerStatus nativeGetStatus(long nativePtr) throws VeyronException;
 	private native void nativeStop(long nativePtr) throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
-	private Server(long nativePtr, Options opts) {
+	private Server(long nativePtr, ListenSpec spec) {
 		this.nativePtr = nativePtr;
-		this.listenSpec = opts.get(OptionDefs.DEFAULT_LISTEN_SPEC) != null
-				? opts.get(OptionDefs.DEFAULT_LISTEN_SPEC, ListenSpec.class)
-				: DEFAULT_LISTEN_SPEC;
+		this.listenSpec = spec;
 	}
 	// Implement io.v.core.veyron2.ipc.Server.
 	@Override
@@ -46,8 +42,20 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 		}
 	}
 	@Override
-	public String[] getPublishedNames() throws VeyronException {
-		return nativeGetPublishedNames(this.nativePtr);
+	public void addName(String name) throws VeyronException {
+		nativeAddName(this.nativePtr, name);
+	}
+	@Override
+	public void removeName(String name) {
+		nativeRemoveName(this.nativePtr, name);
+	}
+	@Override
+	public ServerStatus getStatus() {
+		try {
+			return nativeGetStatus(this.nativePtr);
+		} catch (VeyronException e) {
+			throw new RuntimeException("Couldn't get status: " + e.getMessage());
+		}
 	}
 	@Override
 	public void stop() throws VeyronException {

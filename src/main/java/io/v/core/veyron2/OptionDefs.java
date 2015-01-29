@@ -15,11 +15,4 @@ public class OptionDefs {
      * specifies a client.
      */
     public static String CLIENT = "io.v.core.veyron2.CLIENT";
-
-    /**
-     * A key for an option of type {@link io.v.core.veyron2.ipc.ListenSpec} that specifies
-     * a default listen spec to be used by the servers when the client passes in a {@code null}
-     * listen spec to their {@code listen()} calls.
-     */
-    public static String DEFAULT_LISTEN_SPEC = "io.v.core.veyron2.DEFAULT_LISTEN_SPEC";
 }

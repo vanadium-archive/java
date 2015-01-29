@@ -2,6 +2,7 @@ package io.v.core.veyron2;
 
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Client;
+import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.naming.Namespace;
 import io.v.core.veyron2.security.Principal;
@@ -83,6 +84,24 @@ public interface VRuntime {
 	 * @return     the namespace attached to the given context.
 	 */
 	public Namespace getNamespace(VContext ctx);
+
+	/**
+	 * Attaches the given {@code ListenSpec} to a new context (that is derived from the given
+	 * context).
+	 *
+	 * @param  ctx  current context
+	 * @param  spec {@code ListenSpec} to be attached
+	 * @return      child context to which the {@code ListenSpec} is attached
+	 */
+	public VContext setListenSpec(VContext ctx, ListenSpec spec);
+
+	/**
+	 * Returns the {@code ListenSpec} attached to the given context.
+	 *
+	 * @param  ctx current context
+	 * @return     the {@code ListenSpec} attached to the given context
+	 */
+	public ListenSpec getListenSpec(VContext ctx);
 
 	/**
 	 * Returns the base context associated with the runtime.

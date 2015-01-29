@@ -3,6 +3,7 @@ package io.v.core.veyron2;
 import go.Go;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Client;
+import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.naming.Namespace;
 import io.v.core.veyron2.security.Principal;
@@ -39,12 +40,9 @@ public class V {
 	 * A caller may pass the following option that specifies the runtime implementation to be used:
 	 *     {@code OptionDefs.RUNTIME}
 	 *
-	 * If this option isn't provided, the default runtime implementation is used.  The rest of
-	 * the options are passed on to this runtime.  Currently, only the following options are
-	 * recognized:
-	 *     {@code OptionDefs.DEFAULT_LISTEN_SPEC}
+	 * If this option isn't provided, the default runtime implementation is used.
 	 *
-	 * @param  opts options for the default runtime
+	 * @param  opts options
 	 * @return      base context
 	 */
 	public static VContext init(Options opts) {
@@ -58,7 +56,7 @@ public class V {
 			} else {
 				// Use the default runtime implementation.
 				try {
-					runtime = io.v.core.veyron.runtimes.google.VRuntime.create(opts);
+					runtime = io.v.core.veyron.runtimes.google.VRuntime.create();
 				} catch (VeyronException e) {
 	    			throw new RuntimeException(
 	    				"Couldn't initialize Google Veyron Runtime: " + e.getMessage());
@@ -186,6 +184,28 @@ public class V {
 	 */
 	public static Namespace getNamespace(VContext ctx) {
 		return getRuntime().getNamespace(ctx);
+	}
+
+	/**
+	 * Attaches the given {@code ListenSpec} to a new context (that is derived from the given
+	 * context).
+	 *
+	 * @param  ctx  current context
+	 * @param  spec {@code ListenSpec} to be attached
+	 * @return      child context to which the {@code ListenSpec} is attached
+	 */
+	public static VContext setListenSpec(VContext ctx, ListenSpec spec) {
+		return getRuntime().setListenSpec(ctx, spec);
+	}
+
+	/**
+	 * Returns the {@code ListenSpec} attached to the given context.
+	 *
+	 * @param  ctx current context
+	 * @return     the {@code ListenSpec} attached to the given context
+	 */
+	public static ListenSpec getListenSpec(VContext ctx) {
+		return getRuntime().getListenSpec(ctx);
 	}
 
 	private static VRuntime getRuntime() {
