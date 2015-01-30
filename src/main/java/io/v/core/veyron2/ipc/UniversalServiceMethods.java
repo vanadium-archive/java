@@ -15,7 +15,8 @@ public interface UniversalServiceMethods {
 	 * @return                 description of the service.
 	 * @throws VeyronException if the description couldn't be fetched.
 	 */
-	public ServiceSignature getSignature(VContext context) throws VeyronException;
+	// TODO(spetrovic): Re-enable once we can import the new Signature classes.
+	//public ServiceSignature getSignature(VContext context) throws VeyronException;
 
 
 	/**
@@ -26,5 +27,6 @@ public interface UniversalServiceMethods {
 	 * @return                 description of the service.
 	 * @throws VeyronException if the description couldn't be fetched.
 	 */
-	public ServiceSignature getSignature(VContext context, Options opts) throws VeyronException;
+	// TODO(spetrovic): Re-enable once we can import the new Signature classes.
+	//public ServiceSignature getSignature(VContext context, Options opts) throws VeyronException;
 }
