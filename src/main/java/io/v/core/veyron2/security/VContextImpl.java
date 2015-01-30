@@ -14,7 +14,6 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 	public native DateTime nativeTimestamp(long nativePtr) throws VeyronException;
 	public native String nativeMethod(long nativePtr);
 	public native Object[] nativeMethodTags(long nativePtr) throws VeyronException;
-	private native String nativeName(long nativePtr);
 	private native String nativeSuffix(long nativePtr);
 	private native String nativeLocalEndpoint(long nativePtr);
 	private native String nativeRemoteEndpoint(long nativePtr);
@@ -49,10 +48,6 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 			android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
 			return new Object[0];
 		}
-	}
-	@Override
-	public String name() {
-		return nativeName(this.nativePtr);
 	}
 	@Override
 	public String suffix() {

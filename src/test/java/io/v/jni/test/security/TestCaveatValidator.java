@@ -6,8 +6,8 @@ import io.v.core.veyron2.security.VContext;
 import io.v.core.veyron2.vdl.VdlValue;
 
 /**
- * Validator for {@code TestCaveat} that validates the context if its veyron name
- * matches the provided name.
+ * Validator for {@code TestCaveat} that validates the context if its veyron suffix
+ * matches the provided suffix.
  */
 public class TestCaveatValidator implements CaveatValidator {
 	private final TestCaveat wire;
@@ -18,9 +18,9 @@ public class TestCaveatValidator implements CaveatValidator {
 
 	@Override
 	public void validate(VContext context) throws VeyronException {
-		if (!this.wire.getValue().equals(context.name())) {
+		if (!this.wire.getValue().equals(context.suffix())) {
 			throw new VeyronException(String.format("Got name %s, want %s",
-					context.name(), this.wire.getValue()));
+					context.suffix(), this.wire.getValue()));
 		}
 	}
 

@@ -22,10 +22,6 @@ class VContextParamImpl implements io.v.core.veyron2.security.VContext {
 		return this.params.getMethodTags();
 	}
 	@Override
-	public String name() {
-		return this.params.getName();
-	}
-	@Override
 	public String suffix() {
 		return this.params.getSuffix();
 	}

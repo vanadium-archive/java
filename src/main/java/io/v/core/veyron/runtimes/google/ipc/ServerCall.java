@@ -93,10 +93,6 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 		return this.securityContext.methodTags();
 	}
 	@Override
-	public String name() {
-		return this.securityContext.name();
-	}
-	@Override
 	public String suffix() {
 		return this.securityContext.suffix();
 	}

@@ -189,7 +189,7 @@ public class Security {
 	 * @return a caveat that never fails to validate.
 	 */
 	public static Caveat newUnconstrainedUseCaveat() {
-		return new Caveat(null);
+		return new Caveat(null, null, null);
 	}
 
 	/**

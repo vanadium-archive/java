@@ -89,12 +89,14 @@ public final class VDLInvoker {
 					"Server class %s doesn't have the 'getMethodTags' method.",
 					c.getCanonicalName()));
 			}
-			final Method signature = methods.get("signature");
-			if (signature == null) {
-				throw new VeyronException(String.format(
-					"Server class %s doesn't have the 'signature' method.",
-					c.getCanonicalName()));
-			}
+			//TODO(spetrovic): Uncomment this code once we have the signature support back
+			//in the VDL.
+			//final Method signature = methods.get("signature");
+			//if (signature == null) {
+			//	throw new VeyronException(String.format(
+			//		"Server class %s doesn't have the 'signature' method.",
+			//		c.getCanonicalName()));
+			//}
 			for (Entry<String, Method> m : methods.entrySet()) {
 				// Get the method tags.
 				Object[] tags = null;

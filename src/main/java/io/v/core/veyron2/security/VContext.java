@@ -27,12 +27,6 @@ public interface VContext {
 	 * @return tags attached to the method.
 	 */
 	public Object[] methodTags();
-	/**
-	 * Returns the veyron name on which the method is being invoked.
-	 *
-	 * @return veyron name on which the method is being invoked.
-	 */
-	public String name();
 
 	/**
 	 * Returns the veyron name suffix for the request.

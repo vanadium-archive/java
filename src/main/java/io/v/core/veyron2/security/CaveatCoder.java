@@ -12,7 +12,7 @@ public class CaveatCoder {
 	public static Caveat encode(CaveatValidator validator) throws VeyronException {
 		final VdlValue wire = validator.getWire();
 		final byte[] data = VomUtil.encode(wire);
-		return new Caveat(data);
+		return new Caveat(data, null, null);
 	}
 
 	public static CaveatValidator decode(Caveat caveat) throws VeyronException {
