@@ -54,7 +54,7 @@ public class BinaryEncoder {
         this.typeBuffer = new ByteArrayOutputStream();
         this.out = out;
         this.visitedTypes = new HashMap<VdlType, TypeID>();
-        this.nextTypeId = VomConstants.WIRE_TYPE_FIRST_USER_ID;
+        this.nextTypeId = Constants.WIRE_TYPE_FIRST_USER_ID;
         this.binaryMagicByteWritten = false;
     }
 

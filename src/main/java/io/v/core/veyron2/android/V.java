@@ -1,6 +1,5 @@
 package io.v.core.veyron2.android;
 
-import io.v.core.veyron2.OptionDefs;
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.context.VContext;
@@ -9,7 +8,7 @@ import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.ECDSASigner;
 import io.v.core.veyron2.security.Principal;
 import io.v.core.veyron2.security.Security;
-import io.v.core.veyron2.security.SecurityConstants;
+import io.v.core.veyron2.security.Constants;
 import io.v.core.veyron2.security.Signer;
 
 import java.security.KeyStore;
@@ -18,7 +17,7 @@ import java.security.interfaces.ECPublicKey;
 /**
  * Class {@code V} represents the local android environment allowing clients and servers to
  * communicate with one another. The expected usage pattern of this class goes something like this:
- *
+ * <code>
  *    ...
  *    final VContext ctx = V.init(getApplicationContext(), opts);
  *    ...
@@ -26,7 +25,7 @@ import java.security.interfaces.ECPublicKey;
  *    ...
  *    final Client c = V.getClient(ctx);
  *    ...
- *
+ * </code>
  * This class is a convenience wrapper for android users.  It provides Android-related setup
  * and then delegates to the Java {@code V} methods.
  */
@@ -99,7 +98,7 @@ public class V extends io.v.core.veyron2.V {
 		final Principal principal = Security.newPrincipal(signer);
 		final Blessings blessings = principal.blessSelf(ctx.getPackageName());
 		principal.blessingStore().setDefaultBlessings(blessings);
-		principal.blessingStore().set(blessings, SecurityConstants.ALL_PRINCIPALS);
+		principal.blessingStore().set(blessings, Constants.ALL_PRINCIPALS);
 		principal.addToRoots(blessings);
 		return principal;
 	}

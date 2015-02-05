@@ -22,7 +22,7 @@ import io.v.core.veyron2.vdl.VdlUint64;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom.testdata.NStruct;
-import io.v.core.veyron2.vom.testdata.TestdataConstants;
+import io.v.core.veyron2.vom.testdata.Constants;
 
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -59,7 +59,7 @@ public class BinaryEncoderTest extends TestCase {
             .build();
 
     public void testEncode() throws Exception {
-        for (io.v.core.veyron2.vom.testdata.TestCase test : TestdataConstants.TESTS) {
+        for (io.v.core.veyron2.vom.testdata.TestCase test : Constants.TESTS) {
             // TODO(rogulenko): remove this after disallowing unnamed arrays
             if (Pattern.compile("\\[\\d+\\]").matcher(test.getName()).find()) {
                 continue;
@@ -70,8 +70,8 @@ public class BinaryEncoderTest extends TestCase {
 
         // TODO(rogulenko): ensure compatibility with go after vdl.Any issue is solved
         VdlType testsType = Types.getVdlTypeFromReflect(
-                TestdataConstants.class.getDeclaredField("TESTS").getGenericType());
-        assertNotNull(TestUtil.encode(testsType, TestdataConstants.TESTS));
+                Constants.class.getDeclaredField("TESTS").getGenericType());
+        assertNotNull(TestUtil.encode(testsType, Constants.TESTS));
     }
 
     public void testZeroValue() throws Exception {

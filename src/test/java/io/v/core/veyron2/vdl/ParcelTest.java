@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.test.AndroidTestCase;
 
 import io.v.core.veyron2.vom.testdata.TestCase;
-import io.v.core.veyron2.vom.testdata.TestdataConstants;
+import io.v.core.veyron2.vom.testdata.Constants;
 
 import java.lang.reflect.Type;
 
@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
  */
 public class ParcelTest extends AndroidTestCase {
 	public void testParcelable() {
-		for (TestCase test : TestdataConstants.TESTS) {
+		for (TestCase test : Constants.TESTS) {
  			final Object value = test.getValue().getElem();
  			if (!(value instanceof VdlValue)) continue;
 

@@ -11,7 +11,7 @@ import io.v.core.veyron2.security.Principal;
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate
  * with one another.  The expected usage pattern of this class goes something like this:
- *
+ * <code>
  *    ...
  *    final VContext ctx = V.init(opts);
  *    ...
@@ -19,6 +19,7 @@ import io.v.core.veyron2.security.Principal;
  *    ...
  *    final Client c = V.getClient(ctx);
  *    ...
+ * </code>
  */
 public class V {
 	private static native void nativeInit();

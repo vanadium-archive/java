@@ -10,6 +10,24 @@ import java.util.concurrent.CountDownLatch;
 public class VContextImpl extends CancelableVContext {
 	private static final String TAG = "Veyron runtime";
 
+	private static native CancelableVContext nativeCreate() throws VeyronException;
+
+	/**
+	 * Creates a new context with no data attached.
+	 *
+	 * This function is meant for use in tests only - the preferred way of obtaining a fully
+	 * initialized context is through the Vanadium runtime.
+	 *
+	 * @return a new root context with no data attached
+	 */
+	public static CancelableVContext create() {
+		try {
+			return nativeCreate();
+		} catch (VeyronException e) {
+			throw new RuntimeException("Couldn't create new context: " + e.getMessage());
+		}
+	}
+
 	private long nativePtr;
 	private long nativeCancelPtr;  // zero for non-cancelable contexts.
 	// Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.

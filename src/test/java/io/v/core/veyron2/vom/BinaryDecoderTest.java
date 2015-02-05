@@ -6,7 +6,7 @@ import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vom.testdata.TestdataConstants;
+import io.v.core.veyron2.vom.testdata.Constants;
 
 import java.util.Arrays;
 
@@ -37,7 +37,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecode() throws Exception {
-        for (io.v.core.veyron2.vom.testdata.TestCase test : TestdataConstants.TESTS) {
+        for (io.v.core.veyron2.vom.testdata.TestCase test : Constants.TESTS) {
             // TODO(rogulenko): remove this after disallowing unnamed arrays
             if (test.getName().contains("[2]")) {
                 continue;
@@ -54,15 +54,15 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeEncode() throws Exception {
-        for (io.v.core.veyron2.vom.testdata.TestCase test : TestdataConstants.TESTS) {
+        for (io.v.core.veyron2.vom.testdata.TestCase test : Constants.TESTS) {
             byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
             VdlValue value = (VdlValue) TestUtil.decode(bytes, VdlValue.class);
             assertEquals(test.getHex(), TestUtil.encode(value.vdlType(), value));
         }
 
         VdlType testsType = Types.getVdlTypeFromReflect(
-                TestdataConstants.class.getDeclaredField("TESTS").getGenericType());
-        String encoded = TestUtil.encode(testsType, TestdataConstants.TESTS);
+                Constants.class.getDeclaredField("TESTS").getGenericType());
+        String encoded = TestUtil.encode(testsType, Constants.TESTS);
         VdlValue decoded = (VdlValue) TestUtil.decode(
                 TestUtil.hexStringToBytes(encoded));
         assertEquals(encoded, TestUtil.encode(decoded.vdlType(), decoded));
