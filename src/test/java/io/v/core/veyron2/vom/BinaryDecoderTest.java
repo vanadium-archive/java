@@ -38,10 +38,6 @@ public class BinaryDecoderTest extends TestCase {
 
     public void testDecode() throws Exception {
         for (io.v.core.veyron2.vom.testdata.TestCase test : Constants.TESTS) {
-            // TODO(rogulenko): remove this after disallowing unnamed arrays
-            if (test.getName().contains("[2]")) {
-                continue;
-            }
             byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
             Object value;
             if (test.getValue().getElem().getClass().isArray()) {
