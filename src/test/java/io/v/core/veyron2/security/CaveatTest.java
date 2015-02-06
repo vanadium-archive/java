@@ -6,9 +6,8 @@ import org.joda.time.DateTime;
 
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.android.V;
-import io.v.jni.test.security.TestCaveat;
+import io.v.core.veyron2.verror2.VException;
 import io.v.jni.test.security.TestCaveatValidator;
-
 
 import java.util.Arrays;
 
@@ -25,7 +24,12 @@ public class CaveatTest extends AndroidTestCase {
 			{
 				final VContext ctx = Security.newContext(
 						new VContextParams().withLocalPrincipal(p1).withMethod("succeed"));
-				assertTrue(Arrays.equals(new String[]{ "alice" }, alice.forContext(ctx)));
+				final String[] want = { "alice" };
+				final String[] got = alice.forContext(ctx);
+				if (!Arrays.equals(want, got)) {
+					fail(String.format("Blessings differ, want %s, got %s",
+							Arrays.toString(want), Arrays.toString(got)));
+				}
 			}
 			{
 				final VContext ctx = Security.newContext(
@@ -48,7 +52,12 @@ public class CaveatTest extends AndroidTestCase {
 				final VContext ctx = Security.newContext(new VContextParams()
 						.withLocalPrincipal(p1)
 						.withTimestamp(DateTime.now()));
-				assertTrue(Arrays.equals(new String[]{ "alice" }, alice.forContext(ctx)));
+				final String[] want = { "alice" };
+				final String[] got = alice.forContext(ctx);
+				if (!Arrays.equals(want, got)) {
+					fail(String.format("Blessings differ, want %s, got %s",
+							Arrays.toString(want), Arrays.toString(got)));
+				}
 			}
 			{
 				final VContext ctx = Security.newContext(new VContextParams()
@@ -64,23 +73,32 @@ public class CaveatTest extends AndroidTestCase {
 	public void testCustomCaveat() {
 		try {
 			V.init(getContext(), null);
+			CaveatRegistry.register(io.v.jni.test.security.Constants.TEST_CAVEAT,
+					new TestCaveatValidator());
 			final Principal p1 = Security.newPrincipal();
-			final Blessings alice = p1.blessSelf(
-				"alice", Security.newCaveat(new TestCaveatValidator(new TestCaveat("succeed"))));
+			final Blessings alice = p1.blessSelf("alice",
+					Security.newCaveat(io.v.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
 			p1.addToRoots(alice);
 			{
 				final VContext ctx = Security.newContext(new VContextParams()
 						.withLocalPrincipal(p1)
-						.withName("succeed"));
-				assertTrue(Arrays.equals(new String[]{ "alice" }, alice.forContext(ctx)));
+						.withSuffix("succeed"));
+				final String[] want = { "alice" };
+				final String[] got = alice.forContext(ctx);
+				if (!Arrays.equals(want, got)) {
+					fail(String.format("Blessings differ, want %s, got %s",
+							Arrays.toString(want), Arrays.toString(got)));
+				}
 			}
 			{
 				final VContext ctx = Security.newContext(new VContextParams()
 						.withLocalPrincipal(p1)
-						.withName("fail"));
+						.withSuffix("fail"));
 				assertEquals(null, alice.forContext(ctx));
 			}
 		} catch (VeyronException e) {
+			fail("Unexpected exception: " + e.getMessage());
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}

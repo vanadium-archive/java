@@ -24,7 +24,6 @@ public class VContextParams {
 	private DateTime timestamp;
 	private String method;
 	private Object[] methodTags;
-	private String name;
 	private String suffix;
 	private String localEndpoint;
 	private String remoteEndpoint;
@@ -71,17 +70,6 @@ public class VContextParams {
 	public VContextParams withMethodTags(Object[] tags) {
 		final VContextParams ret = new VContextParams(this);
 		ret.methodTags = tags;
-		return ret;
-	}
-	/**
-	 * Returns a child of the current params with the given veyron name attached.
-	 *
-	 * @param  name veyron name
-	 * @return      a child of the current params with the given veyron name attached.
-	 */
-	public VContextParams withName(String name) {
-		final VContextParams ret = new VContextParams(this);
-		ret.name = name;
 		return ret;
 	}
 	/**
@@ -178,16 +166,6 @@ public class VContextParams {
 	public Object[] getMethodTags() {
 		if (this.methodTags != null) return this.methodTags;
 		if (this.parent != null) return this.parent.getMethodTags();
-		return null;
-	}
-	/**
-	 * Returns a veyron name attached to the params, or {@code null} if no veyron name is attached.
-	 *
-	 * @return veyron name attached to the params
-	 */
-	public String getName() {
-		if (this.name != null) return this.name;
-		if (this.parent != null) return this.parent.getName();
 		return null;
 	}
 	/**

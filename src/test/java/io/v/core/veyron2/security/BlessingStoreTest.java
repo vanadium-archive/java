@@ -80,8 +80,8 @@ public class BlessingStoreTest extends AndroidTestCase {
 			final Blessings blessingBar = newBlessing(principal, "bar", "B");
 			final Blessings blessingAll = newBlessing(principal, "all", "C");
 			store.set(blessingAll, new BlessingPattern("..."));
-			store.set(blessingFoo, new BlessingPattern("foo/..."));
-			store.set(blessingBar, new BlessingPattern("bar"));
+			store.set(blessingFoo, new BlessingPattern("foo"));
+			store.set(blessingBar, new BlessingPattern("bar/$"));
 
 			final Map<String[], Blessings> testdata =
 					ImmutableMap.<String[], Blessings>builder()

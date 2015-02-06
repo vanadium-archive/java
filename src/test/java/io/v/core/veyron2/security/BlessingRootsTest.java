@@ -22,9 +22,9 @@ public class BlessingRootsTest extends AndroidTestCase {
 			final Principal principal = Security.newPrincipal();
 			final BlessingRoots roots = principal.roots();
 			final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };
-			roots.add(keys[0], new BlessingPattern("veyron/..."));
-			roots.add(keys[1], new BlessingPattern("google/foo/..."));
-			roots.add(keys[0], new BlessingPattern("google"));
+			roots.add(keys[0], new BlessingPattern("veyron"));
+			roots.add(keys[1], new BlessingPattern("google/foo"));
+			roots.add(keys[0], new BlessingPattern("google/$"));
 
 			final Map<ECPublicKey, String[]> recognized =
 					ImmutableMap.<ECPublicKey, String[]>builder()

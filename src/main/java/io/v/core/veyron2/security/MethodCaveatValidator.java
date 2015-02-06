@@ -1,40 +1,36 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.verror2.VException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MethodCaveatValidator implements CaveatValidator {
-	private MethodCaveat wire;
-
-	public MethodCaveatValidator(MethodCaveat wire) {
-		this.wire = wire;
-	}
-
 	@Override
-	public void validate(VContext context) throws VeyronException {
-		if (context.method().isEmpty() && this.wire.isEmpty()) {
+	public void validate(VContext context, Object param) throws VException {
+		if (param == null) {
+			param = new ArrayList<String>();
+		}
+		if (!(param instanceof List<?>)) {
+			throw new VException(String.format(
+					"Caveat param %s of wrong type: want List<?>", param));
+		}
+		final List<?> methods = (List<?>) param;
+		if (context.method().isEmpty() && methods.size() == 0) {
 			return;
 		}
-		for (String method : this.wire) {
+		for (Object method : methods) {
+			if (!(method instanceof String)) {
+				throw new VException(String.format(
+						"Caveat param %s element %s of wrong type: want String", param, method)); 
+						
+			}
 			if (context.method().equals(method)) {
 				return;
 			}
 		}
-		throw new VeyronException(String.format(
-			"MethodCaveat(%s) failed validation for method %s", this, context.method()));
+		throw new VException(String.format(
+			"MethodCaveat(%s) failed validation for method %s", param, context.method()));
 	}
-
-	@Override
-	public VdlValue getWire() {
-		return this.wire;
-	}
-
-	@Override
-	public String toString() {
-		return Arrays.toString(this.wire.toArray());
-	}
-
 }
 

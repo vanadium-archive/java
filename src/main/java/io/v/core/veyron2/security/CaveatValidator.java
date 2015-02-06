@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.vdl.VdlValue;
 
 /**
@@ -8,19 +8,12 @@ import io.v.core.veyron2.vdl.VdlValue;
  */
 public interface CaveatValidator {
 	/**
-	 * Returns {@code null} iff the restriction encapsulated in the corresponding caveat has
-	 * been satisfied by the provided context.
+	 * Throws an exception iff the restriction encapsulated in the corresponding caveat parameter
+	 * hasn't been satisfied by the provided context.
 	 *
 	 * @param  context         the context matched against the caveat
-	 * @throws VeyronException
+	 * @param  param           the (sole) caveat parameter 
+	 * @throws VException      if the caveat couldn't be validated
 	 */
-	public void validate(VContext context) throws VeyronException;
-
-	/**
-	 * Returns the wire format for the validator.  This is the data that will be encoded
-	 * in the {@code Caveat}.
-	 *
-	 * @return wire format for the caveat validator
-	 */
-	public VdlValue getWire();
+	public void validate(VContext context, Object param) throws VException;
 }

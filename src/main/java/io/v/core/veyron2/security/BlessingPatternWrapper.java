@@ -21,7 +21,8 @@ public class BlessingPatternWrapper {
 
 	private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings);
 	private native boolean nativeIsValid(long nativePtr);
-	private native BlessingPatternWrapper nativeMakeGlob(long nativePtr) throws VeyronException;
+	private native BlessingPatternWrapper nativeMakeNonExtendable(long nativePtr)
+			throws VeyronException;
 	private native void nativeFinalize(long nativePtr);
 
 	private long nativePtr;
@@ -54,23 +55,24 @@ public class BlessingPatternWrapper {
 	}
 
 	/**
-	 * Returns a pattern that matches all extensions of the blessings that are matched by this
-	 * pattern.
+	 * Returns a new pattern that is not matched by any extension of the blessing represented
+	 * by this pattern.
 	 *
 	 * For example:
 	 * <code>
-	 *     final BlessingPatternWrapper delegates =
-	 *             BlessingPatternWrapper.create(new BlessingPattern("alice")).makeGlob();
-	 *     delegates.MatchedBy("alice");            // Returns true
-	 *     delegates.MatchedBy("alice/friend/bob"); // Returns true
+	 *     final BlessingPatternWrapper onlyAlice = BlessingPatternWrapper.create(
+	 *         new BlessingPattern("google/alice")).makeNonExtendable();
+	 *     onlyAlice.MatchedBy("google");                  // Returns true
+	 *     onlyAlice.MatchedBy("google/alice");            // Returns true
+	 *     onlyAlice.MatchedBy("google/alice/bob");        // Returns false
 	 * </code>
 	 *
 	 * @return a pattern that matches all extensions of the blessings that are matched by this
 	 *         pattern.
 	 */
-	public BlessingPatternWrapper makeGlob() {
+	public BlessingPatternWrapper makeNonExtendable() {
 		try {
-			return nativeMakeGlob(this.nativePtr);
+			return nativeMakeNonExtendable(this.nativePtr);
 		} catch (VeyronException e) {
 			android.util.Log.e(TAG, "Couldn't make glob: " + e.getMessage());
 			return null;

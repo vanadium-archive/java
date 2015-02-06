@@ -6,7 +6,11 @@ import io.v.core.veyron2.ipc.Client;
 import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.naming.Namespace;
+import io.v.core.veyron2.security.CaveatRegistry;
+import io.v.core.veyron2.security.MethodCaveatValidator;
 import io.v.core.veyron2.security.Principal;
+import io.v.core.veyron2.security.UnixTimeExpiryCaveatValidator;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate
@@ -62,6 +66,17 @@ public class V {
 	    			throw new RuntimeException(
 	    				"Couldn't initialize Google Veyron Runtime: " + e.getMessage());
 				}
+			}
+			// Register caveat validators.
+			try {
+				CaveatRegistry.register(
+						io.v.core.veyron2.security.Constants.UNIX_TIME_EXPIRY_CAVEAT_X,
+						new UnixTimeExpiryCaveatValidator());
+				CaveatRegistry.register(io.v.core.veyron2.security.Constants.METHOD_CAVEAT_X,
+						new MethodCaveatValidator());
+			} catch (VException e) {
+				throw new RuntimeException(
+						"Couldn't register caveat validators: " + e.getMessage());
 			}
 			context = runtime.getContext();
 			return context;

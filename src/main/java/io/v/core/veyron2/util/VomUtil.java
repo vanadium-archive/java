@@ -1,6 +1,7 @@
 package io.v.core.veyron2.util;
 
 import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom.BinaryDecoder;
 import io.v.core.veyron2.vom.BinaryEncoder;
@@ -24,6 +25,25 @@ public class VomUtil {
 	 * @throws VeyronException if there was an error encoding the value
 	 */
 	public static byte[] encode(Object value, Type type) throws VeyronException {
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final BinaryEncoder encoder = new BinaryEncoder(out);
+		try {
+			encoder.encodeValue(type, value);
+		} catch (IOException e) {
+			throw new VeyronException(e.getMessage());
+		}
+		return out.toByteArray();
+	}
+
+	/**
+	 * VOM-encodes the provided value using a new VOM-encoder.
+	 *
+	 * @param  value           value to be encoded
+	 * @param  type            type of the provided value
+	 * @return                 VOM-encoded value as a byte array
+	 * @throws VeyronException if there was an error encoding the value
+	 */
+	public static byte[] encode(Object value, VdlType type) throws VeyronException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final BinaryEncoder encoder = new BinaryEncoder(out);
 		try {

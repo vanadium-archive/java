@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.v.core.veyron2.services.security.access.TaggedACLMap;
+import io.v.core.veyron2.util.VomUtil;
 
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -147,8 +148,9 @@ public class Security {
 	 * @return                 caveat that requires validation by the provided validator
 	 * @throws VeyronException if the caveat couldn't be created
 	 */
-	public static Caveat newCaveat(CaveatValidator validator) throws VeyronException {
-		return CaveatCoder.encode(validator);
+	public static Caveat newCaveat(CaveatDescriptor desc, Object param) throws VeyronException {
+		final byte[] paramVOM = VomUtil.encode(param, desc.getParamType().getTypeObject());
+		return new Caveat(new byte[0], desc.getId(), paramVOM);
 	}
 
 	/**
@@ -159,8 +161,7 @@ public class Security {
 	 * @throws VeyronException if the caveat couldn't be created
 	 */
 	public static Caveat newExpiryCaveat(DateTime time) throws VeyronException {
-		return newCaveat(new UnixTimeExpiryCaveatValidator(
-			new UnixTimeExpiryCaveat(time.getMillis() / 1000L)));
+		return newCaveat(Constants.UNIX_TIME_EXPIRY_CAVEAT_X, time.getMillis() / 1000L);
 	}
 
 	/**
@@ -179,7 +180,7 @@ public class Security {
 				.add(method)
 				.add(additionalMethods)
 				.build();
-		return newCaveat(new MethodCaveatValidator(new MethodCaveat(methods)));
+		return newCaveat(Constants.METHOD_CAVEAT_X, methods);
 	}
 
 	/**

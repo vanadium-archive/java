@@ -51,11 +51,17 @@ public class PrincipalTest extends AndroidTestCase {
 		final String[] keysGot = got.keySet().toArray(new String[0]);
 		Arrays.sort(keysWant);
 		Arrays.sort(keysGot);
-		assertTrue(Arrays.equals(keysWant, keysGot));
+		if (!Arrays.equals(keysWant, keysGot)) {
+			fail(String.format("Blessings mismatch, want %s, got %s", Arrays.toString(keysWant),
+					Arrays.toString(keysGot)));
+		}
 		for (String key : keysWant) {
 			final Caveat[] caveatsWant = want.get(key);
 			final Caveat[] caveatsGot = got.get(key);
-			assertTrue(Arrays.equals(caveatsWant, caveatsGot));
+			if (!Arrays.equals(caveatsWant, caveatsGot)) {
+				fail(String.format("Blessing %s caveat mismatch: want %s, got %s", key,
+						Arrays.toString(caveatsWant), Arrays.toString(caveatsGot)));
+			}
 		}
 	}
 
@@ -86,16 +92,16 @@ public class PrincipalTest extends AndroidTestCase {
 			final Map<Blessings[], BlessingPattern> testdata =
 					ImmutableMap.<Blessings[], BlessingPattern>builder()
 					.put(new Blessings[]{ aliceWorkFriend, aliceWorkBoss },
-							new BlessingPattern("alice/work/..."))
+							new BlessingPattern("alice/work"))
 					.put(new Blessings[] { aliceWorkFriend },
 							new BlessingPattern("alice/work/friend"))
 					.put(new Blessings[] { aliceGymFriend },
 							new BlessingPattern("alice/gym/friend"))
 					.put(new Blessings[] { aliceWorkFriend, aliceGymFriend, aliceWorkBoss },
-							new BlessingPattern("alice/..."))
+							new BlessingPattern("alice"))
 					.put(new Blessings[] { aliceWorkFriend, aliceGymFriend, aliceWorkBoss },
 							new BlessingPattern("..."))
-					.put(new Blessings[] {}, new BlessingPattern("alice/school/..."))
+					.put(new Blessings[] {}, new BlessingPattern("alice/school"))
 					.build();
 			for (Map.Entry<Blessings[], BlessingPattern> entry : testdata.entrySet()) {
 				final Blessings[] want = entry.getKey();
@@ -109,7 +115,10 @@ public class PrincipalTest extends AndroidTestCase {
 				};
 				Arrays.sort(want, comp);
 				Arrays.sort(got, comp);
-				assertTrue(Arrays.equals(want, got));
+				if (!Arrays.equals(want, got)) {
+					fail(String.format("Pattern: %s; got different blessings, want: %s, got: %s",
+							entry.getValue(), Arrays.toString(want), Arrays.toString(got)));
+				}
 			}
 		} catch (VeyronException e) {
 			fail("Unexpected exception: " + e.getMessage());

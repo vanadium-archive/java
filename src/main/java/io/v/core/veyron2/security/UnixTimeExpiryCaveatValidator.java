@@ -2,34 +2,22 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.verror2.VException;
 
 public class UnixTimeExpiryCaveatValidator implements CaveatValidator {
-	private final UnixTimeExpiryCaveat wire;
-
-	public UnixTimeExpiryCaveatValidator(UnixTimeExpiryCaveat wire) {
-		this.wire = wire;
-	}
-
 	@Override
-	public void validate(VContext context) throws VeyronException {
+	public void validate(VContext context, Object param) throws VException {
+		if (param == null) param = Long.valueOf(0);
+		if (!(param instanceof Long)) {
+			throw new VException(String.format(
+					"Caveat param %s of wrong type: want %s", param, Long.class));
+		}
+		final long expirySeconds = (Long) param;
 		final DateTime now = context.timestamp();
-		final DateTime expiry = new DateTime(this.wire.getValue());
+		final DateTime expiry = new DateTime(expirySeconds * 1000L);
 		if (now.isAfter(expiry)) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 				"UnixTimeExpiryCaveat(%s) failed validation at %s", expiry, now));
 		}
-	}
-
-	@Override
-	public VdlValue getWire() {
-		return this.wire;
-	}
-
-	@Override
-	public String toString() {
-		return String.format(
-			"%d = %s", this.wire.getValue(), new DateTime(this.wire.getValue()));
 	}
 }

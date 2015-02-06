@@ -108,6 +108,5 @@ public interface VRuntime {
 	 *
 	 * @return the base context associated with the runtime.
 	 */
-	@Deprecated
 	public VContext getContext();
 }
