@@ -60,10 +60,6 @@ public class BinaryEncoderTest extends TestCase {
 
     public void testEncode() throws Exception {
         for (io.v.core.veyron2.vom.testdata.TestCase test : Constants.TESTS) {
-            // TODO(rogulenko): remove this after disallowing unnamed arrays
-            if (Pattern.compile("\\[\\d+\\]").matcher(test.getName()).find()) {
-                continue;
-            }
             VdlAny value = test.getValue();
             assertEquals(test.getHex(), TestUtil.encode(value.getElemType(), value.getElem()));
         }
