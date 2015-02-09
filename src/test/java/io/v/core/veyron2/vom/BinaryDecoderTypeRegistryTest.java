@@ -15,7 +15,7 @@ public class BinaryDecoderTypeRegistryTest extends TestCase {
         VdlType vdlType = Types.named("v.io/core/veyron2/vom/testdata.NBool", Types.BOOL);
         String encoded = TestUtil.encode(new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
-        assertNull(Types.getReflectTypeForVdl(vdlType));
+        assertNull(Types.getReflectTypeForVdl(vdlType, false));
         Object value = TestUtil.decode(TestUtil.hexStringToBytes(encoded));
         assertEquals(NBool.class, value.getClass());
         assertEquals(new NBool(true), value);

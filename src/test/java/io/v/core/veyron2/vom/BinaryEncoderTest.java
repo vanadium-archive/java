@@ -21,11 +21,10 @@ import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vom.testdata.NStruct;
 import io.v.core.veyron2.vom.testdata.Constants;
+import io.v.core.veyron2.vom.testdata.NStruct;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class BinaryEncoderTest extends TestCase {
     private static final Map<VdlType, Object> zeroValues = ImmutableMap.<VdlType, Object>builder()

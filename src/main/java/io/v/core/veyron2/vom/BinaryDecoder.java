@@ -62,6 +62,13 @@ public class BinaryDecoder {
         }
         VdlType actualType = decodeType();
         assertTypesCompatible(actualType, targetType);
+        if (targetType == Object.class) {
+            try {
+                targetType = Types.getReflectTypeForVdl(actualType, false);
+            } catch (IllegalArgumentException e) {
+                throw new ConversionException(e.getMessage());
+            }
+        }
         return readValueMessage(actualType, targetType, mode);
     }
 
@@ -154,19 +161,19 @@ public class BinaryDecoder {
 
     private Object readValue(VdlType actualType, Type targetType, DecodingMode mode)
             throws IOException, ConversionException {
-        ConversionTarget target;
-        if (mode == DecodingMode.VDL_VALUE) {
-            target = new ConversionTarget(actualType, VdlValue.class, mode);
-        } else if (targetType == Object.class || targetType == VdlValue.class) {
-            Type bootstrapClass = Types.getReflectTypeForVdl(actualType);
-            if (bootstrapClass != null) {
-                target = new ConversionTarget(bootstrapClass);
+        if (targetType == Object.class || targetType == VdlValue.class) {
+            if (mode == DecodingMode.VDL_VALUE) {
+                targetType = Types.getReflectTypeForVdl(actualType, true);
             } else {
-                target = new ConversionTarget(actualType, (Class<?>)targetType, mode);
+                // This can happen only inside VDL Any, as top-level type is constructed
+                // Outside of readValue().
+                targetType = Types.getReflectTypeForVdl(actualType, false);
+                if (targetType == null) {
+                    targetType = Types.getReflectTypeForVdl(actualType, true);
+                }
             }
-        } else {
-            target = new ConversionTarget(targetType);
         }
+        ConversionTarget target = new ConversionTarget(targetType, actualType, mode);
 
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {

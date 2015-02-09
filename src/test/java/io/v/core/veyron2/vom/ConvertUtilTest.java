@@ -14,10 +14,10 @@ import io.v.core.veyron2.vdl.VdlInt16;
 import io.v.core.veyron2.vdl.VdlInt32;
 import io.v.core.veyron2.vdl.VdlInt64;
 import io.v.core.veyron2.vdl.VdlString;
+import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlUint16;
 import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
-import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom.BinaryDecoder.DecodingMode;
 import io.v.core.veyron2.vom.testdata.NArray2Uint64;
 import io.v.core.veyron2.vom.testdata.NByte;
@@ -283,8 +283,9 @@ public class ConvertUtilTest extends TestCase {
             for (int i = 0; i < numericTypes.length; i++) {
                 for (Class<?> numericType : numericTypes[i]) {
                     Object result = convertValue(test.value, new ConversionTarget(numericType));
+                    VdlType vdlType = Types.getVdlTypeFromReflect(numericType);
                     Object vdlTypeResult = convertValue(test.value, new ConversionTarget(
-                            Types.getVdlTypeFromReflect(numericType), VdlValue.class,
+                            Types.getReflectTypeForVdl(vdlType, true), vdlType,
                             DecodingMode.VDL_VALUE));
                     if (test.typeMask.charAt(i) == '0') {
                         assertNull(result);

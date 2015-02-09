@@ -8,6 +8,7 @@ import junit.framework.TestCase;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -254,5 +255,24 @@ public class TypeTest extends TestCase {
                 }
             }
         }
+    }
+
+    private void verifyReflectType(VdlType vdlType, boolean forceVdl, Class<?> ... classes) {
+        Type reflectType = Types.getReflectTypeForVdl(vdlType, forceVdl);
+        for (int i = 0; i < classes.length; i++) {
+            if (i < classes.length - 1) {
+                assertEquals(classes[i], ((ParameterizedType) reflectType).getRawType());
+                reflectType = ((ParameterizedType) reflectType).getActualTypeArguments()[0];
+            } else {
+                assertEquals(classes[i], reflectType);
+            }
+        }
+    }
+
+    public void testGetReflectTypeForVdl() {
+        verifyReflectType(Types.listOf(Types.STRING), false, VdlList.class, String.class);
+        verifyReflectType(Types.setOf(Types.INT32), false, VdlSet.class, Integer.class);
+        verifyReflectType(Types.arrayOf(2, Types.INT16), true, VdlArray.class, VdlInt16.class);
+        assertNull(Types.getReflectTypeForVdl(Types.arrayOf(2, Types.INT64), false));
     }
 }

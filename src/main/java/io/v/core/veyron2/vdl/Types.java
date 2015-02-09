@@ -286,6 +286,8 @@ public final class Types {
      * Resolves maps, sets, lists, arrays, primitives and classes generated from *.vdl files.
      * All results are statically cached. All named VDL types are also registered so that the
      * corresponding {@code Type} object can be retrieved by calling {@code getReflectTypeForVdl}.
+     *
+     * @throws IllegalArgumentException if the VDL type can't be constructed
      */
     public static VdlType getVdlTypeFromReflect(Type type) {
         if (typeCache.containsKey(type)) {
@@ -295,14 +297,132 @@ public final class Types {
     }
 
     /**
-     * Returns a {@code java.lang.reflect.Type} object corresponding to a named VDL type that was
-     * built by calling {@code getVdlTypeFromReflect}.
+     * Returns a {@code Type} object corresponding to VDL type.
+     * If {@code forceVdlWrappers} is false then we look up named types that were built by calling
+     * {@code getVdlTypeFromReflect}, and build the unnamed types that have java native equivalent
+     * (i.e. all except enum, struct, union).
+     * If {@code forceVdlWrappers} is true then we build type based on VDL wrappers only
+     * (i.e. VdlArray, VdlStruct, ...).
      *
      * @param vdlType the VDL type
-     * @return the {@code Type} object or null if this is an unnamed or unknown VDL type
+     * @param forceVdlWrappers the flag indicating whether to use VDL wrappers only
+     * @return the {@code Type} object
+     * @throws IllegalArgumentException if the type can't be constructed
      */
-    public static Type getReflectTypeForVdl(VdlType vdlType) {
-        return typeRegistry.get(vdlType);
+    public static Type getReflectTypeForVdl(VdlType vdlType, boolean forceVdlWrappers) {
+        if (!forceVdlWrappers && !Strings.isNullOrEmpty(vdlType.getName())) {
+            Type type = typeRegistry.get(vdlType);
+            if (type == null) {
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            }
+            return type;
+        }
+
+        Type key, elem;
+        switch (vdlType.getKind()) {
+            case ANY:
+                return VdlAny.class;
+            case ARRAY:
+                elem = getReflectTypeForVdl(vdlType.getElem(), forceVdlWrappers);
+                if (elem != null) {
+                    return new ParameterizedTypeImpl(VdlArray.class, elem);
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case BOOL:
+                if (forceVdlWrappers) {
+                    return VdlBool.class;
+                }
+                return Boolean.class;
+            case BYTE:
+                if (forceVdlWrappers) {
+                    return VdlByte.class;
+                }
+                return Byte.class;
+            case COMPLEX128:
+                return VdlComplex128.class;
+            case COMPLEX64:
+                return VdlComplex64.class;
+            case ENUM:
+                if (forceVdlWrappers) {
+                    return VdlEnum.class;
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case FLOAT32:
+                if (forceVdlWrappers) {
+                    return VdlFloat32.class;
+                }
+                return Float.class;
+            case FLOAT64:
+                if (forceVdlWrappers) {
+                    return VdlFloat64.class;
+                }
+                return Double.class;
+            case INT16:
+                if (forceVdlWrappers) {
+                    return VdlInt16.class;
+                }
+                return Short.class;
+            case INT32:
+                if (forceVdlWrappers) {
+                    return VdlInt32.class;
+                }
+                return Integer.class;
+            case INT64:
+                if (forceVdlWrappers) {
+                    return VdlInt64.class;
+                }
+                return Long.class;
+            case LIST:
+                elem = getReflectTypeForVdl(vdlType.getElem(), forceVdlWrappers);
+                if (elem != null) {
+                    return new ParameterizedTypeImpl(VdlList.class, elem);
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case MAP:
+                key = getReflectTypeForVdl(vdlType.getKey(), forceVdlWrappers);
+                elem = getReflectTypeForVdl(vdlType.getElem(), forceVdlWrappers);
+                if (key != null && elem != null) {
+                    return new ParameterizedTypeImpl(VdlMap.class, key, elem);
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case OPTIONAL:
+                elem = getReflectTypeForVdl(vdlType.getElem(), forceVdlWrappers);
+                if (elem != null) {
+                    return new ParameterizedTypeImpl(VdlOptional.class, elem);
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case SET:
+                key = getReflectTypeForVdl(vdlType.getKey(), forceVdlWrappers);
+                if (key != null) {
+                    return new ParameterizedTypeImpl(VdlSet.class, key);
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case STRING:
+                if (forceVdlWrappers) {
+                    return VdlString.class;
+                }
+                return String.class;
+            case STRUCT:
+                if (forceVdlWrappers) {
+                    return VdlStruct.class;
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            case TYPEOBJECT:
+                return VdlTypeObject.class;
+            case UINT16:
+                return VdlUint16.class;
+            case UINT32:
+                return VdlUint32.class;
+            case UINT64:
+                return VdlUint64.class;
+            case UNION:
+                if (forceVdlWrappers) {
+                    return VdlUnion.class;
+                }
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            default:
+                throw new IllegalArgumentException("Unsupported VDL type: " + vdlType);
+        }
     }
 
     /**
@@ -517,6 +637,34 @@ public final class Types {
                 this.name = name;
                 this.type = type;
             }
+        }
+    }
+
+    /**
+     * A helper class used to create {@code Type} instances for VDL types.
+     */
+    private static class ParameterizedTypeImpl implements ParameterizedType {
+        private final Type rawType;
+        private final Type[] arguments;
+
+        public ParameterizedTypeImpl(Type rawType, Type ... arguments) {
+            this.rawType = rawType;
+            this.arguments = arguments;
+        }
+
+        @Override
+        public Type[] getActualTypeArguments() {
+            return arguments;
+        }
+
+        @Override
+        public Type getRawType() {
+            return rawType;
+        }
+
+        @Override
+        public Type getOwnerType() {
+            return null;
         }
     }
 }

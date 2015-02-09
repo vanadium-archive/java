@@ -3,8 +3,8 @@ package io.v.core.veyron2.vdl;
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.vom.testdata.TestCase;
 import io.v.core.veyron2.vom.testdata.Constants;
+import io.v.core.veyron2.vom.testdata.TestCase;
 
 import java.lang.reflect.Type;
 
@@ -17,7 +17,7 @@ public class ParcelTest extends AndroidTestCase {
  			final Object value = test.getValue().getElem();
  			if (!(value instanceof VdlValue)) continue;
 
- 			Type type = Types.getReflectTypeForVdl(test.getValue().getElemType());
+			Type type = Types.getReflectTypeForVdl(test.getValue().getElemType(), false);
 			if (type == null) {
 				type = value.getClass();
 			}
