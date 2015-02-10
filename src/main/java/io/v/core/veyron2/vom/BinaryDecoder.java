@@ -38,10 +38,6 @@ import java.util.Set;
  * BinaryDecoder reads a VDL value from {@code InputStream} encoded in binary VOM format.
  */
 public class BinaryDecoder {
-    enum DecodingMode {
-        JAVA_OBJECT, VDL_VALUE
-    }
-
     private final InputStream in;
     private final Map<TypeID, VdlType> decodedTypes;
     private final Map<TypeID, VdlValue> wireTypes;
@@ -54,8 +50,15 @@ public class BinaryDecoder {
         this.binaryMagicByteRead = false;
     }
 
-    private Object decodeValue(Type targetType, DecodingMode mode) throws IOException,
-            ConversionException {
+    /**
+     * Decodes a VDL value. Returns an instance of provided {@code Type}.
+     *
+     * @param targetType the type of returned object
+     * @return the decoded value
+     * @throws IOException
+     * @throws ConversionException
+     */
+    public Object decodeValue(Type targetType) throws IOException, ConversionException {
         if (!binaryMagicByteRead) {
             if ((byte) in.read() != BinaryUtil.BINARY_MAGIC_BYTE) {
                 throw new CorruptVomStreamException(
@@ -73,23 +76,7 @@ public class BinaryDecoder {
                 throw new ConversionException(e.getMessage());
             }
         }
-        return readValueMessage(actualType, targetType, mode);
-    }
-
-    /**
-     * Decodes a VDL value. Returns an instance of provided {@code java.lang.reflect.Type}.
-     *
-     * @param targetType the type of returned object
-     * @return the decoded value
-     * @throws IOException
-     * @throws ConversionException
-     */
-    public Object decodeValue(Type targetType) throws IOException, ConversionException {
-        if (targetType == VdlValue.class) {
-            return decodeValue(targetType, DecodingMode.VDL_VALUE);
-        } else {
-            return decodeValue(targetType, DecodingMode.JAVA_OBJECT);
-        }
+        return readValueMessage(actualType, targetType);
     }
 
     /**
@@ -105,7 +92,7 @@ public class BinaryDecoder {
      * @throws ConversionException
      */
     public Object decodeValue() throws IOException, ConversionException {
-        return decodeValue(Object.class, DecodingMode.JAVA_OBJECT);
+        return decodeValue(Object.class);
     }
 
     private void assertTypesCompatible(VdlType actualType, Type targetType)
@@ -116,13 +103,13 @@ public class BinaryDecoder {
         }
     }
 
-    private Object readValueMessage(VdlType actualType, Type targetType, DecodingMode mode)
-            throws IOException, ConversionException {
+    private Object readValueMessage(VdlType actualType, Type targetType) throws IOException,
+            ConversionException {
         if (BinaryUtil.hasBinaryMsgLen(actualType)) {
             // Do nothing with this information for now.
             BinaryUtil.decodeUint(in);
         }
-        return readValue(actualType, targetType, mode);
+        return readValue(actualType, targetType);
     }
 
     private VdlType decodeType() throws IOException, ConversionException {
@@ -133,8 +120,7 @@ public class BinaryDecoder {
             } else if (typeId > 0) {
                 return getType(new TypeID(typeId));
             } else {
-                VdlAny wireType = (VdlAny) readValueMessage(
-                        Types.ANY, VdlAny.class, DecodingMode.JAVA_OBJECT);
+                VdlAny wireType = (VdlAny) readValueMessage(Types.ANY, VdlAny.class);
                 wireTypes.put(new TypeID(-typeId), (VdlValue) wireType.getElem());
             }
         }
@@ -163,29 +149,26 @@ public class BinaryDecoder {
         }
     }
 
-    private Object readValue(VdlType actualType, Type targetType, DecodingMode mode)
+    private Object readValue(VdlType actualType, Type targetType)
             throws IOException, ConversionException {
-        if (targetType == Object.class || targetType == VdlValue.class) {
-            if (mode == DecodingMode.VDL_VALUE) {
-                targetType = Types.getReflectTypeForVdl(actualType, true);
-            } else {
-                // This can happen only inside VDL Any, as top-level type is constructed
-                // Outside of readValue().
+        if (targetType == VdlValue.class) {
+            targetType = Types.getReflectTypeForVdl(actualType, true);
+        } else if (targetType == Object.class) {
+            // This can happen only inside VDL Any, as top-level type is constructed
+            // Outside of readValue().
+            try {
                 targetType = Types.getReflectTypeForVdl(actualType, false);
-                if (targetType == null) {
-                    targetType = Types.getReflectTypeForVdl(actualType, true);
-                }
+            } catch (IllegalArgumentException e) {
+                targetType = Types.getReflectTypeForVdl(actualType, true);
             }
         }
-        ConversionTarget target = new ConversionTarget(targetType, actualType, mode);
+        ConversionTarget target = new ConversionTarget(targetType, actualType);
 
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {
-                return new VdlAny(actualType,
-                        (Serializable) readValue(actualType, Object.class, mode));
+                return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
             } else if (target.getKind() == Kind.OPTIONAL) {
-                return readValue(actualType,
-                        ReflectUtil.getElementType(target.getTargetType(), 0), mode);
+                return readValue(actualType, ReflectUtil.getElementType(target.getTargetType(), 0));
             }
         }
         if (target.getTargetType() == VException.class) {
@@ -294,8 +277,7 @@ public class BinaryDecoder {
         }
         VdlType actualType = getType(typeId);
         assertTypesCompatible(actualType, targetType);
-        return new VdlAny(actualType,
-                (Serializable) readValue(actualType, targetType, target.getMode()));
+        return new VdlAny(actualType, (Serializable) readValue(actualType, targetType));
     }
 
     private Object readVdlArrayOrVdlList(VdlType actualType, ConversionTarget target)
@@ -325,14 +307,14 @@ public class BinaryDecoder {
             Class<?> elementClass = ReflectUtil.getRawClass(elementType);
             Object array = Array.newInstance(elementClass, targetLen);
             for (int i = 0; i < len; i++) {
-                ReflectUtil.setArrayValue(array, i, readValue(actualType.getElem(), elementType,
-                        target.getMode()), elementClass);
+                ReflectUtil.setArrayValue(array, i, readValue(actualType.getElem(), elementType),
+                        elementClass);
             }
             return ReflectUtil.createGeneric(target, array);
         } else {
             List<Object> list = new ArrayList<Object>();
             for (int i = 0; i < len; i++) {
-                list.add(readValue(actualType.getElem(), elementType, target.getMode()));
+                list.add(readValue(actualType.getElem(), elementType));
             }
             return ReflectUtil.createGeneric(target, list);
         }
@@ -437,14 +419,14 @@ public class BinaryDecoder {
         Type targetKeyType = getTargetKeyType(target);
         int len = (int) BinaryUtil.decodeUint(in);
         for (int i = 0; i < len; i++) {
-            Object key = readValue(actualType.getKey(), targetKeyType, target.getMode());
+            Object key = readValue(actualType.getKey(), targetKeyType);
             Type targetElemType = getMapElemOrStructFieldType(target, key);
             Object elem;
             if (actualType.getKind() == Kind.SET) {
                 elem = ReflectUtil.createPrimitive(new ConversionTarget(targetElemType),
                         true, Boolean.TYPE);
             } else {
-                elem = readValue(actualType.getElem(), targetElemType, target.getMode());
+                elem = readValue(actualType.getElem(), targetElemType);
             }
             setMapElemOrStructField(target, data, key, elem, targetElemType);
         }
@@ -464,7 +446,7 @@ public class BinaryDecoder {
             Type targetElemType = getMapElemOrStructFieldType(target, field.getName());
             Object key = ConvertUtil.convertFromBytes(BinaryUtil.getBytes(field.getName()),
                     new ConversionTarget(targetKeyType));
-            Object elem = readValue(field.getType(), targetElemType, target.getMode());
+            Object elem = readValue(field.getType(), targetElemType);
             setMapElemOrStructField(target, data, key, elem, targetElemType);
         }
         return data;
@@ -483,7 +465,7 @@ public class BinaryDecoder {
         // Solve vdl.Value case.
         if (target.getTargetClass() == VdlUnion.class) {
             return new VdlUnion(actualType, index, actualElemType,
-                    (Serializable) readValue(actualElemType, Object.class, target.getMode()));
+                    (Serializable) readValue(actualElemType, Object.class));
         }
         Class<?> targetClass = target.getTargetClass();
         // This can happen if targetClass is NamedUnion.A.
@@ -504,7 +486,7 @@ public class BinaryDecoder {
         try {
             Type elemType = fieldClass.getDeclaredField("elem").getGenericType();
             return fieldClass.getConstructor(ReflectUtil.getRawClass(elemType)).newInstance(
-                    readValue(actualElemType, elemType, target.getMode()));
+                    readValue(actualElemType, elemType));
         } catch (Exception e) {
             throw new ConversionException(actualType, target.getTargetType(), e.getMessage());
         }
@@ -519,8 +501,7 @@ public class BinaryDecoder {
             if (target.getKind() == Kind.OPTIONAL) {
                 type = ReflectUtil.getElementType(target.getTargetType(), 0);
             }
-            return new VdlOptional<VdlValue>(
-                    (VdlValue) readValue(actualType.getElem(), type, target.getMode()));
+            return new VdlOptional<VdlValue>((VdlValue) readValue(actualType.getElem(), type));
         }
     }
 

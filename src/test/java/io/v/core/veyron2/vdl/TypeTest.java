@@ -272,7 +272,11 @@ public class TypeTest extends TestCase {
     public void testGetReflectTypeForVdl() {
         verifyReflectType(Types.listOf(Types.STRING), false, VdlList.class, String.class);
         verifyReflectType(Types.setOf(Types.INT32), false, VdlSet.class, Integer.class);
-        verifyReflectType(Types.arrayOf(2, Types.INT16), true, VdlArray.class, VdlInt16.class);
-        assertNull(Types.getReflectTypeForVdl(Types.arrayOf(2, Types.INT64), false));
+        verifyReflectType(Types.arrayOf(2, Types.INT16), false, VdlArray.class, Short.class);
+        try {
+            Types.getReflectTypeForVdl(Types.structOf(new VdlField("a", Types.BOOL)), false);
+            fail("Reflect type should not be constructed for VDL type struct{a bool}");
+        } catch (IllegalArgumentException expected) {
+        }
     }
 }
