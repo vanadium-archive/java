@@ -48,4 +48,11 @@ public class TestUtil {
     static String encode(VdlValue value) throws Exception {
         return encode(value.vdlType(), value);
     }
+
+    static String encode(Type type, Object value) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BinaryEncoder encoder = new BinaryEncoder(out);
+        encoder.encodeValue(type, value);
+        return TestUtil.bytesToHexString(out.toByteArray());
+    }
 }

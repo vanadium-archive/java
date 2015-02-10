@@ -3,8 +3,8 @@ package io.v.core.veyron2.verror2;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.i18n.Language;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -84,6 +84,16 @@ public class VException extends Exception {
 		RETRY_REFETCH    (2),
 		RETRY_BACKOFF    (3);
 
+		public static ActionCode fromValue(int value) {
+			switch (value) {
+				case 0: return NO_RETRY;
+				case 1: return RETRY_CONNECTION;
+				case 2: return RETRY_REFETCH;
+				case 3: return RETRY_BACKOFF;
+				default: return NO_RETRY;
+			}
+		}
+
 		private final int value;
 
 		private ActionCode(int value) {
@@ -136,7 +146,7 @@ public class VException extends Exception {
 
 		@Override
 		public String toString() {
-			return this.id + "-" + this.action;
+			return "(" + this.id + "," + this.action + ")";
 		}
 	}
 
@@ -174,7 +184,7 @@ public class VException extends Exception {
 	 *                       language
 	 */
 	public static VException explicitMake(IDAction idAction, String language, String componentName,
-		String opName, Object... params) {
+		String opName, Serializable... params) {
 		final Type[] paramTypes = new Type[params.length];
 		for (int i = 0; i < params.length; ++i) {
 			paramTypes[i] = params[i].getClass();
@@ -198,16 +208,16 @@ public class VException extends Exception {
 	 *                       language
 	 */
 	public static VException explicitMake(IDAction idAction, String language, String componentName,
-		String opName, Type[] paramTypes, Object[] params) {
+		String opName, Type[] paramTypes, Serializable[] params) {
 		if (paramTypes == null) {
 			paramTypes = new Type[0];
 		}
 		if (params == null) {
-			params = new Object[0];
+			params = new Serializable[0];
 		}
 
 		// Append componentName and opName to params.
-		final Object[] newParams = new Object[paramTypes.length + 2];
+		final Serializable[] newParams = new Serializable[paramTypes.length + 2];
 		final Type[] newParamTypes = new Type[paramTypes.length + 2];
 		newParams[0] = componentName;
 		newParamTypes[0] = String.class;
@@ -223,7 +233,8 @@ public class VException extends Exception {
 					"Passed different number of types (%s) than parameters (%s) to VException",
 					paramTypes, params));
 		} else {
-			msg = Language.getDefaultCatalog().format(language, idAction.getID(), newParams);
+			msg = Language.getDefaultCatalog().format(
+					language, idAction.getID(), (Object[]) newParams);
 		}
 
 		return new VException(idAction, msg, newParams, newParamTypes);
@@ -240,7 +251,7 @@ public class VException extends Exception {
 	 * @return          an error with the given identifier and an error string in the inferred
 	 *                  language
 	 */
-	public static VException make(IDAction idAction, VContext ctx, Object... params) {
+	public static VException make(IDAction idAction, VContext ctx, Serializable... params) {
 		final Type[] paramTypes = new Type[params.length];
 		for (int i = 0; i < params.length; ++i) {
 			paramTypes[i] = params[i].getClass();
@@ -262,7 +273,7 @@ public class VException extends Exception {
 	 *                    language
 	 */
 	public static VException make(
-		IDAction idAction, VContext ctx, Type[] paramTypes, Object[] params) {
+		IDAction idAction, VContext ctx, Type[] paramTypes, Serializable[] params) {
 		final String language = languageFromContext(ctx);
 		final String componentName = componentNameFromContext(ctx);
 		// TODO(spetrovic): Implement the opName code.
@@ -330,17 +341,17 @@ public class VException extends Exception {
 	}
 
 	private final IDAction id;  // non-null
-	private final Object[] params;  // non-null
+	private final Serializable[] params;  // non-null
 	private final Type[] paramTypes;  // non-null
 
 	public VException(String msg) {
 		super(msg);
 		this.id = Constants.UNKNOWN;
-		this.params = new Object[] {"", ""};
+		this.params = new Serializable[] {"", ""};
 		this.paramTypes = new Type[] { String.class, String.class };
 	}
 
-	private VException(IDAction id, String msg, Object[] params, Type[] paramTypes) {
+	public VException(IDAction id, String msg, Serializable[] params, Type[] paramTypes) {
 		super(msg);
 		this.id = id;
 		this.params = params;
@@ -376,7 +387,7 @@ public class VException extends Exception {
 	 *
 	 * @return the array of parameters associated with this exception
 	 */
-	public Object[] getParams() { return this.params; }
+	public Serializable[] getParams() { return this.params; }
 
 	/**
 	 * Returns the types of all the parameters associated with this exception, in the same order

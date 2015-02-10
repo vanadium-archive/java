@@ -8,14 +8,18 @@ import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlField;
+import io.v.core.veyron2.vdl.VdlList;
 import io.v.core.veyron2.vdl.VdlOptional;
+import io.v.core.veyron2.vdl.VdlString;
 import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.vdl.VdlTypeObject;
+import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.verror2.VException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -184,6 +188,19 @@ public class BinaryDecoder {
                         ReflectUtil.getElementType(target.getTargetType(), 0), mode);
             }
         }
+        if (target.getTargetType() == VException.class) {
+            if (actualType != Types.ERROR) {
+                throw new ConversionException(actualType, target.getTargetType());
+            }
+            // Decode the data into a Java VdlValue value representing Types.ERROR type.
+            // Note that we the error params (stored inside VdlAny) will be decoded into
+            // Java native types, which is what we want.
+            final Type decodingType =
+                    Types.getReflectTypeForVdl(Types.ERROR, true /*forceVdlWrappers*/);
+            final VdlValue value =
+                    (VdlValue) readValue(actualType, decodingType, DecodingMode.JAVA_OBJECT);
+            return vExceptionFromValue(value);
+        }
         switch (actualType.getKind()) {
             case ANY:
                 return readVdlAny(target);
@@ -236,6 +253,32 @@ public class BinaryDecoder {
         } else {
             throw new ConversionException("Can't create a null value of " + target.getTargetType());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private VException vExceptionFromValue(VdlValue value) {
+        final VdlStruct errorVal = ((VdlOptional<VdlStruct>) value).getElem();
+        if (errorVal == null) {
+            return null;
+        }
+        final VdlStruct idActionVal = (VdlStruct) errorVal.getField("IDAction");
+        final String id = ((VdlString) idActionVal.getField("ID")).getValue();
+        final int action = ((VdlUint32) idActionVal.getField("Action")).getValue();
+        final String msg = ((VdlString) errorVal.getField("Msg")).getValue();
+        final VdlList<VdlAny> paramVals = (VdlList<VdlAny>) errorVal.getField("ParamList");
+        final Serializable[] params = new Serializable[paramVals.size()];
+        final Type[] paramTypes = new Type[paramVals.size()];
+        for (int i = 0; i < paramVals.size(); ++i) {
+            params[i] = paramVals.get(i).getElem();
+            try {
+                paramTypes[i] = Types.getReflectTypeForVdl(paramVals.get(i).getElemType(), false);
+            } catch (IllegalArgumentException e) {
+                paramTypes[i] = VdlValue.class;
+            }
+        }
+        final VException.IDAction idAction =
+                new VException.IDAction(id, VException.ActionCode.fromValue(action));
+        return new VException(idAction, msg, params, paramTypes);
     }
 
     private Object readVdlAny(ConversionTarget target) throws IOException, ConversionException {

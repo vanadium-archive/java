@@ -33,8 +33,13 @@ public abstract class VdlValue implements Serializable {
 
     /**
      * Returns the zero representation for each kind of VDL type.
+     *
+     * @throws IllegalArgumentException if the zero value couldn't be constructed
      */
     public static VdlValue zeroValue(VdlType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("Trying to construct a zero value using null type");
+        }
         switch (type.getKind()) {
             case ANY:
                 return new VdlAny();
@@ -94,6 +99,27 @@ public abstract class VdlValue implements Serializable {
                 return new VdlUint64();
             default:
                 throw new IllegalArgumentException("Unhandled kind " + type.getKind());
+        }
+    }
+
+    /**
+     * Same as {@code zeroValue} except if type is {@code OPTIONAL} it returns a value representing
+     * the zero value of the element type.
+     *
+     * @throws IllegalArgumentException if the non-null zero value couldn't be constructed
+     */
+    public static VdlValue nonNullZeroValue(VdlType type) {
+        if (type == null) {
+            throw new IllegalArgumentException(
+                "Trying to construct a non-null zero value using null type");
+        }
+        switch (type.getKind()) {
+            case ANY:
+                throw new IllegalArgumentException("Type ANY doesn't have a non-null zero value");
+            case OPTIONAL:
+                return new VdlOptional<VdlValue>(zeroValue(type.getElem()));
+            default:
+                return zeroValue(type);
         }
     }
 }

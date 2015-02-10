@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
+import io.v.core.veyron2.verror2.VException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -98,6 +99,8 @@ public final class Types {
      */
     public static final VdlType TYPEOBJECT = createPrimitiveType(Kind.TYPEOBJECT);
 
+    public static final VdlType ERROR = createErrorType();
+
     private static final Map<Type, VdlType> typeCache = new ConcurrentHashMap<Type, VdlType>();
     private static final Map<VdlType, Type> typeRegistry = new ConcurrentHashMap<VdlType, Type>();
 
@@ -133,6 +136,9 @@ public final class Types {
         typeCache.put(Double.TYPE, FLOAT64);
         typeCache.put(Double.class, FLOAT64);
         typeCache.put(String.class, STRING);
+
+        typeCache.put(VException.class, ERROR);
+        typeRegistry.put(ERROR, VException.class);
     }
 
     private static VdlType createPrimitiveType(Kind kind) {
@@ -140,6 +146,16 @@ public final class Types {
         PendingType pending = builder.newPending(kind);
         builder.build();
         return pending.built();
+    }
+
+    private static VdlType createErrorType() {
+        return optionalOf(named("error", structOf(
+                new VdlField("IDAction", structOf(
+                        new VdlField("ID", STRING),
+                        new VdlField("Action", UINT32))),
+                new VdlField("Msg", STRING),
+                new VdlField("ParamList", listOf(ANY))
+        )));
     }
 
     /**
@@ -554,8 +570,10 @@ public final class Types {
                 populateUnion(pending, klass);
             } else if (superClass == VdlArray.class) {
                 populateArray(pending, klass);
-            } else {
+            } else if (superClass != null) {
                 pending.assignBase(lookupOrBuildPending(klass.getGenericSuperclass()));
+            } else {
+                throw new IllegalArgumentException("Unable to create VDL Type for type: " + klass);
             }
             GeneratedFromVdl annotation = klass.getAnnotation(GeneratedFromVdl.class);
             if (annotation != null) {
