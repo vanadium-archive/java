@@ -254,7 +254,7 @@ public class VException extends Exception {
 	public static VException make(IDAction idAction, VContext ctx, Serializable... params) {
 		final Type[] paramTypes = new Type[params.length];
 		for (int i = 0; i < params.length; ++i) {
-			paramTypes[i] = params[i].getClass();
+			paramTypes[i] = params[i] == null ? String.class : params[i].getClass();
 		}
 		return make(idAction, ctx, paramTypes, params);
 	}
@@ -346,7 +346,7 @@ public class VException extends Exception {
 
 	public VException(String msg) {
 		super(msg);
-		this.id = Constants.UNKNOWN;
+		this.id = Errors.UNKNOWN;
 		this.params = new Serializable[] {"", ""};
 		this.paramTypes = new Type[] { String.class, String.class };
 	}
@@ -366,7 +366,6 @@ public class VException extends Exception {
 	public String getID() {
 		return this.id.getID();
 	}
-
 
 	/**
 	 * Returns the action associated with this exception.

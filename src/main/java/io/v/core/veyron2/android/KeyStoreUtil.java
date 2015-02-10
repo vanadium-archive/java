@@ -2,7 +2,7 @@ package io.v.core.veyron2.android;
 
 import android.security.KeyPairGeneratorSpec;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -35,10 +35,10 @@ public class KeyStoreUtil {
 	 * @param  alias           alias under which the private key will be stored inside the KeyStore.
 	 * @return                 an entry storing the private key and the certificate chain for the
 	 *                         corresponding public key.
-	 * @throws VeyronException if the key could not be generated.
+	 * @throws VException      if the key could not be generated.
 	 */
 	public static KeyStore.PrivateKeyEntry genKeyStorePrivateKey(
-		android.content.Context ctx, String alias) throws VeyronException {
+		android.content.Context ctx, String alias) throws VException {
 		try {
 			// NOTE(spetrovic): KeyPairGenerator needs to be initialized with "RSA" algorithm and
 			// not "EC" algorithm, even though we generate "EC" keys below.  Otherwise, Android
@@ -61,12 +61,12 @@ public class KeyStoreUtil {
 			keyGen.generateKeyPair();
 			return getKeyStorePrivateKey(alias);
 		} catch (NoSuchProviderException e) {
-			throw new VeyronException("Couldn't find Android KeyStore");
+			throw new VException("Couldn't find Android KeyStore");
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException(
+			throw new VException(
 					"Keystore doesn't support " + PK_ALGORITHM + " algorithm: " + e.getMessage());
 		} catch (InvalidAlgorithmParameterException e) {
-			throw new VeyronException("Invalid keystore algorithm parameters: " + e.getMessage());
+			throw new VException("Invalid keystore algorithm parameters: " + e.getMessage());
 		}
 	}
 
@@ -77,10 +77,10 @@ public class KeyStoreUtil {
 	 * @param  alias           alias of the key in the KeyStore.
 	 * @return                 an entry storing the private key and the certificate chain for the
 	 *                         corresponding public key.
-	 * @throws VeyronException if the key could not be retrieved.
+	 * @throws VException      if the key could not be retrieved.
 	 */
 	public static KeyStore.PrivateKeyEntry getKeyStorePrivateKey(String alias)
-			throws VeyronException {
+			throws VException {
 		try {
 			final KeyStore keyStore = KeyStore.getInstance(KEYSTORE);
 			keyStore.load(null);
@@ -89,20 +89,20 @@ public class KeyStoreUtil {
 				return null;
 			}
 			if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
-				throw new VeyronException(
+				throw new VException(
 						"Entry " + alias + " exists but not a private key entry.");
 			}
 			return (KeyStore.PrivateKeyEntry)entry;
 		} catch (KeyStoreException e) {
-			throw new VeyronException("KeyStore not initialized: " + e.getMessage());
+			throw new VException("KeyStore not initialized: " + e.getMessage());
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("KeyStore doesn't support the algorithm: " + e.getMessage());
+			throw new VException("KeyStore doesn't support the algorithm: " + e.getMessage());
 		} catch (IOException e) {
-			throw new VeyronException("Error loading keystore: " + e.getMessage());
+			throw new VException("Error loading keystore: " + e.getMessage());
 		} catch (CertificateException e) {
-			throw new VeyronException("Error loading keystore certificates: " + e.getMessage());
+			throw new VException("Error loading keystore certificates: " + e.getMessage());
 		} catch (UnrecoverableEntryException e) {
-			throw new VeyronException("Couldn't get keystore entry: " + e.getMessage());
+			throw new VException("Couldn't get keystore entry: " + e.getMessage());
 		}
 	}
 }

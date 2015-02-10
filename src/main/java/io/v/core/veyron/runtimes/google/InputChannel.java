@@ -1,6 +1,6 @@
 package io.v.core.veyron.runtimes.google;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.util.VomUtil;
 
 import java.io.EOFException;
@@ -11,7 +11,7 @@ public class InputChannel<T> implements io.v.core.veyron2.InputChannel<T> {
 	private final Type type;
 
 	private native boolean nativeAvailable(long nativePtr);
-	private native byte[] nativeReadValue(long nativePtr) throws EOFException, VeyronException;
+	private native byte[] nativeReadValue(long nativePtr) throws EOFException, VException;
 	private native void nativeFinalize(long nativePtr);
 
 	/**
@@ -32,7 +32,7 @@ public class InputChannel<T> implements io.v.core.veyron2.InputChannel<T> {
 	}
 
 	@Override
-	public T readValue() throws EOFException, VeyronException {
+	public T readValue() throws EOFException, VException {
 		final byte[] value = nativeReadValue(this.nativePtr);
 		return (T) VomUtil.decode(value, this.type);
 	}

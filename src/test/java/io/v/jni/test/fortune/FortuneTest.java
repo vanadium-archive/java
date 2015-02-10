@@ -5,7 +5,7 @@ import android.test.AndroidTestCase;
 import org.joda.time.Duration;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Server;
@@ -20,35 +20,35 @@ public class FortuneTest extends AndroidTestCase {
 		private String lastAddedFortune;
 
 		@Override
-		public String get(ServerContext context) throws VeyronException {
+		public String get(ServerContext context) throws VException {
 			if (lastAddedFortune == null) {
-				throw new VeyronException("No fortunes added");
+				throw new VException("No fortunes added");
 			}
 			return lastAddedFortune;
 		}
 
 		@Override
-		public void add(ServerContext context, String fortune) throws VeyronException {
+		public void add(ServerContext context, String fortune) throws VException {
 			lastAddedFortune = fortune;
 		}
 
 		@Override
 	    public int streamingGet(ServerContext context, Stream<String, Boolean> stream)
-	            throws VeyronException {
+	            throws VException {
 		    int numSent = 0;
 		    while (true) {
 	            try {
 	                stream.recv();
-	            } catch (VeyronException e) {
-	                throw new VeyronException(
+	            } catch (VException e) {
+	                throw new VException(
 	                      "Server couldn't receive a boolean item: " + e.getMessage());
 	            } catch (EOFException e) {
 	                break;
 	            }
 	            try {
 	                stream.send(get(context));
-	            } catch (VeyronException e) {
-	                throw new VeyronException(
+	            } catch (VException e) {
+	                throw new VException(
 	                        "Server couldn't send a string item: " + e.getMessage());
 	            }
 	            ++numSent;
@@ -57,7 +57,7 @@ public class FortuneTest extends AndroidTestCase {
 	    }
 	}
 
-	public void testFortune() throws VeyronException {
+	public void testFortune() throws VException {
 		final VContext ctx = V.init(getContext(), new Options());
 		final Server s = V.newServer(ctx);
 		final String[] endpoints = s.listen(null);
@@ -70,7 +70,7 @@ public class FortuneTest extends AndroidTestCase {
 		try {
 			client.get(ctxT);
 			fail("Expected exception during call to get() before call to add()");
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			// OK
 		}
 		final String firstMessage = "First fortune";
@@ -79,7 +79,7 @@ public class FortuneTest extends AndroidTestCase {
 		s.stop();
 	}
 
-	public void testStreaming() throws VeyronException {
+	public void testStreaming() throws VException {
 		final VContext ctx = V.init(getContext(), new Options());
 		final Server s = V.newServer(ctx);
 		final String[] endpoints = s.listen(null);

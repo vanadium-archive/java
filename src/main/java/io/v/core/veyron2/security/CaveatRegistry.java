@@ -1,9 +1,8 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.uniqueid.Id;
 import io.v.core.veyron2.util.VomUtil;
-import io.v.core.veyron2.verror2.VException;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class CaveatRegistry {
 	 *
 	 * @param  desc       caveat descriptor
 	 * @param  validator  caveat validator
-	 * @throws VException if the given caveat validator and descriptor couldn't be registered
+	 * @throws VException      if the given caveat validator and descriptor couldn't be registered
 	 */
 	public static void register(CaveatDescriptor desc, CaveatValidator validator)
 			throws VException {
@@ -56,18 +55,18 @@ public class CaveatRegistry {
 	 *
 	 * @param  ctx        context matched against the caveat
 	 * @param  caveat     security caveat
-	 * @throws VException if the caveat couldn't be validated
+	 * @throws VException      if the caveat couldn't be validated
 	 */
 	public static void validate(VContext ctx, Caveat caveat) throws VException {
 		final RegistryEntry entry = lookup(caveat.getId());
 		if (entry == null) {
-			throw Constants.makeErrCaveatNotRegistered(null, caveat.getId());
+			throw Errors.makeErrCaveatNotRegistered(null, caveat.getId());
 		}
 		Object param = null;
 		try {
 			// TODO(spetrovic): Once rogulenko@ is done, decode with entry.getParamType().
 			param = VomUtil.decode(caveat.getParamVom());
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new VException(e.getMessage());
 		}
 		// TODO(spetrovic): Once rogulenko@ is done, pass the type as well.

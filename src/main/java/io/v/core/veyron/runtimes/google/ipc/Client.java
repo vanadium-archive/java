@@ -1,7 +1,7 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.context.VContext;
 
@@ -12,7 +12,7 @@ public class Client implements io.v.core.veyron2.ipc.Client {
 
 	private native io.v.core.veyron2.ipc.Client.Call nativeStartCall(long nativePtr,
 		VContext context, String name, String method, byte[][] vomArgs, Options opts)
-		throws VeyronException;
+		throws VException;
 	private native void nativeClose(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
 
@@ -22,20 +22,20 @@ public class Client implements io.v.core.veyron2.ipc.Client {
 	// Implement io.v.core.veyron2.ipc.Client.
 	@Override
 	public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
-	        String method, Object[] args, Type[] argTypes) throws VeyronException {
+	        String method, Object[] args, Type[] argTypes) throws VException {
 		return startCall(context, name, method, args, argTypes, null);
 	}
 	@Override
 	public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
-	        String method, Object[] args, Type[] argTypes, Options opts) throws VeyronException {
+	        String method, Object[] args, Type[] argTypes, Options opts) throws VException {
 		if (opts == null) {
 			opts = new Options();
 		}
 		if (method == "") {
-			throw new VeyronException("Empty method name invoked on object %s", name);
+			throw new VException(String.format("Empty method name invoked on object %s", name));
 		}
 		if (args.length != argTypes.length) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 			        "Argument count (%d) doesn't match type count (%d) for method %s of object %s",
 			        args.length, argTypes.length, name, method));
 		}

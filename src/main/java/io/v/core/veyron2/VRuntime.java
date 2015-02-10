@@ -6,6 +6,7 @@ import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.naming.Namespace;
 import io.v.core.veyron2.security.Principal;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * VRuntime is a base interface for all runtime implementations.
@@ -24,9 +25,9 @@ public interface VRuntime {
 	 * @param  ctx             current context
 	 * @param  opts            client options
 	 * @return                 child context to which the new client is attached
-	 * @throws VeyronException if a new client cannot be created
+	 * @throws VException      if a new client cannot be created
 	 */
-	public VContext setNewClient(VContext ctx, Options opts) throws VeyronException;
+	public VContext setNewClient(VContext ctx, Options opts) throws VException;
 
 	/**
 	 * Returns the client attached to the given context.
@@ -45,9 +46,9 @@ public interface VRuntime {
 	 * @param  ctx             current context
 	 * @param  opts            server options
 	 * @return                 the new server instance
-	 * @throws VeyronException if a new server cannot be created
+	 * @throws VException      if a new server cannot be created
 	 */
-	public Server newServer(VContext ctx, Options opts) throws VeyronException;
+	public Server newServer(VContext ctx, Options opts) throws VException;
 
 	/**
 	 * Attaches the given principal to a new context (that is derived from the given context).
@@ -55,9 +56,9 @@ public interface VRuntime {
 	 * @param  ctx             current context
 	 * @param  principal       principal to be attached
 	 * @return                 child context to which the principal is attached
-	 * @throws VeyronException if the principal couldn't be attached
+	 * @throws VException      if the principal couldn't be attached
 	 */
-	public VContext setPrincipal(VContext ctx, Principal principal) throws VeyronException;
+	public VContext setPrincipal(VContext ctx, Principal principal) throws VException;
 
 	/**
 	 * Returns the principal attached to the given context.
@@ -73,9 +74,9 @@ public interface VRuntime {
 	 * @param  ctx             current context
 	 * @param  roots           roots of the new namespace
 	 * @return                 child context to which the principal is attached
-	 * @throws VeyronException if the namespace couldn't be created
+	 * @throws VException      if the namespace couldn't be created
 	 */
-	public VContext setNewNamespace(VContext ctx, String... roots) throws VeyronException;
+	public VContext setNewNamespace(VContext ctx, String... roots) throws VException;
 
 	/**
 	 * Returns the namespace attached to the given context.

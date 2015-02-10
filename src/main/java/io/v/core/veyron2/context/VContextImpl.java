@@ -3,14 +3,14 @@ package io.v.core.veyron2.context;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.util.concurrent.CountDownLatch;
 
 public class VContextImpl extends CancelableVContext {
 	private static final String TAG = "Veyron runtime";
 
-	private static native CancelableVContext nativeCreate() throws VeyronException;
+	private static native CancelableVContext nativeCreate() throws VException;
 
 	/**
 	 * Creates a new context with no data attached.
@@ -23,7 +23,7 @@ public class VContextImpl extends CancelableVContext {
 	public static CancelableVContext create() {
 		try {
 			return nativeCreate();
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't create new context: " + e.getMessage());
 		}
 	}
@@ -33,17 +33,17 @@ public class VContextImpl extends CancelableVContext {
 	// Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.
 	private volatile CountDownLatch doneLatch = null;
 
-	private native DateTime nativeDeadline(long nativePtr) throws VeyronException;
-	private native CountDownLatch nativeDone(long nativePtr) throws VeyronException;
-	private native Object nativeValue(long nativePtr, Object key) throws VeyronException;
-	private native CancelableVContext nativeWithCancel(long nativePtr) throws VeyronException;
+	private native DateTime nativeDeadline(long nativePtr) throws VException;
+	private native CountDownLatch nativeDone(long nativePtr) throws VException;
+	private native Object nativeValue(long nativePtr, Object key) throws VException;
+	private native CancelableVContext nativeWithCancel(long nativePtr) throws VException;
 	private native CancelableVContext nativeWithDeadline(long nativePtr, DateTime deadline)
-		throws VeyronException;
+		throws VException;
 	private native CancelableVContext nativeWithTimeout(long nativePtr, Duration timeout)
-		throws VeyronException;
+		throws VException;
 	private native VContext nativeWithValue(long nativePtr, Object key, Object value)
-		throws VeyronException;
-	private native void nativeCancel(long nativeCancelPtr) throws VeyronException;
+		throws VException;
+	private native void nativeCancel(long nativeCancelPtr) throws VException;
 	private native void nativeFinalize(long nativePtr, long nativeCancelPtr);
 
 	private VContextImpl(long nativePtr, long nativeCancelPtr) {
@@ -54,7 +54,7 @@ public class VContextImpl extends CancelableVContext {
 	public DateTime deadline() {
 		try {
 				return nativeDeadline(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 				android.util.Log.e(TAG, "Couldn't get deadline: " + e.getMessage());
 			return null;
 		}
@@ -69,7 +69,7 @@ public class VContextImpl extends CancelableVContext {
 			try {
 				this.doneLatch = nativeDone(this.nativePtr);
 				return this.doneLatch;
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				android.util.Log.e(TAG, "Couldn't invoke done: " + e.getMessage());
 				return null;
 			}
@@ -79,7 +79,7 @@ public class VContextImpl extends CancelableVContext {
 	public Object value(Object key) {
 		try {
 			return nativeValue(this.nativePtr, key);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get value: " + e.getMessage());
 			return null;
 		}
@@ -88,7 +88,7 @@ public class VContextImpl extends CancelableVContext {
 	public CancelableVContext withCancel() {
 		try {
 			return nativeWithCancel(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't create cancelable context: " + e.getMessage());
 		}
 	}
@@ -96,7 +96,7 @@ public class VContextImpl extends CancelableVContext {
 	public CancelableVContext withDeadline(DateTime deadline) {
 		try {
 			return nativeWithDeadline(this.nativePtr, deadline);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't create context with deadline: " + e.getMessage());
 		}
 	}
@@ -104,7 +104,7 @@ public class VContextImpl extends CancelableVContext {
 	public CancelableVContext withTimeout(Duration timeout) {
 		try {
 			return nativeWithTimeout(this.nativePtr, timeout);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't create context with timeout: " + e.getMessage());
 		}
 	}
@@ -112,7 +112,7 @@ public class VContextImpl extends CancelableVContext {
 	public io.v.core.veyron2.context.VContext withValue(Object key, Object value) {
 		try {
 			return nativeWithValue(this.nativePtr, key, value);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't create context with data: " + e.getMessage());
 		}
 	}
@@ -120,7 +120,7 @@ public class VContextImpl extends CancelableVContext {
 	public void cancel() {
 		try {
 			nativeCancel(this.nativeCancelPtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't cancel context: " + e.getMessage());
 		}
 	}

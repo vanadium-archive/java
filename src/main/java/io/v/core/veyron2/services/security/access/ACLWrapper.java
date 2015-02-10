@@ -1,22 +1,22 @@
 package io.v.core.veyron2.services.security.access;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.security.Authorizer;
 import io.v.core.veyron2.security.VContext;
 
 public class ACLWrapper implements Authorizer {
 	private static final String TAG = "Veyron runtime";
 
-	private static native ACLWrapper nativeWrap(ACL acl) throws VeyronException;
+	private static native ACLWrapper nativeWrap(ACL acl) throws VException;
 
 	/**
 	 * Wraps the provided ACL.
 	 *
 	 * @param  acl             ACL being wrapped.
 	 * @return                 wrapped ACL.
-	 * @throws VeyronException if the ACL couldn't be wrapped.
+	 * @throws VException      if the ACL couldn't be wrapped.
 	 */
-	public static ACLWrapper wrap(ACL acl) throws VeyronException {
+	public static ACLWrapper wrap(ACL acl) throws VException {
 		return nativeWrap(acl);
 	}
 
@@ -48,10 +48,10 @@ public class ACLWrapper implements Authorizer {
 	 * are included in the ACL.
 	 *
 	 * @param ctx              security context of the request.
-	 * @throws VeyronException if the request is not authorized.
+	 * @throws VException      if the request is not authorized.
 	 */
 	@Override
-	public void authorize(VContext ctx) throws VeyronException {
+	public void authorize(VContext ctx) throws VException {
 	    nativeAuthorize(this.nativePtr, ctx);
 	}
 

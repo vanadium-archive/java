@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
@@ -27,9 +27,9 @@ public interface BlessingStore {
 	 * @param  blessings       blessings to be revealed to the specified peers.
 	 * @param  forPeers        a peer to whom the blessings should be revealed.
 	 * @return                 blessings previously associated with the specified pattern.
-	 * @throws VeyronException if there was an error making the association.
+	 * @throws VException      if there was an error making the association.
 	 */
-	public Blessings set(Blessings blessings, BlessingPattern forPeers) throws VeyronException;
+	public Blessings set(Blessings blessings, BlessingPattern forPeers) throws VException;
 
 	/**
 	 * Returns the set of blessings that have been previously added to the store with an intent of
@@ -55,9 +55,9 @@ public interface BlessingStore {
 	 *
 	 * @param  blessings       blessings made available on a subsequent call to
 	 *                         {@code defaultBlessings()}.
-	 * @throws VeyronException if there was an error setting the default blessings.
+	 * @throws VException      if there was an error setting the default blessings.
 	 */
-	public void setDefaultBlessings(Blessings blessings) throws VeyronException;
+	public void setDefaultBlessings(Blessings blessings) throws VException;
 
 	/**
 	 * Returns the blessings to be shared with peers for which no other information is

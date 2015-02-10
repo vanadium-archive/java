@@ -1,28 +1,28 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 public class BlessingPatternWrapper {
 	private static final String TAG = "Veyron runtime";
 
 	private static native BlessingPatternWrapper nativeWrap(BlessingPattern pattern)
-		throws VeyronException;
+		throws VException;
 
 	/**
 	 * Wraps the provided blessing pattern.
 	 *
 	 * @param  pattern         the blessing pattern being wrapped.
 	 * @return                 wrapped blessing pattern.
-	 * @throws VeyronException if the blessing pattern couldn't be wrapped.
+	 * @throws VException      if the blessing pattern couldn't be wrapped.
 	 */
-	public static BlessingPatternWrapper wrap(BlessingPattern pattern) throws VeyronException {
+	public static BlessingPatternWrapper wrap(BlessingPattern pattern) throws VException {
 		return nativeWrap(pattern);
 	}
 
 	private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings);
 	private native boolean nativeIsValid(long nativePtr);
 	private native BlessingPatternWrapper nativeMakeNonExtendable(long nativePtr)
-			throws VeyronException;
+			throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	private long nativePtr;
@@ -73,7 +73,7 @@ public class BlessingPatternWrapper {
 	public BlessingPatternWrapper makeNonExtendable() {
 		try {
 			return nativeMakeNonExtendable(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't make glob: " + e.getMessage());
 			return null;
 		}

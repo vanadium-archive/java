@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -8,9 +8,9 @@ class BlessingRootsImpl implements BlessingRoots {
 	private final long nativePtr;
 
 	private native void nativeAdd(long nativePtr, ECPublicKey root, BlessingPattern pattern)
-		throws VeyronException;
+		throws VException;
 	private native void nativeRecognized(long nativePtr, ECPublicKey root, String blessing)
-		throws VeyronException;
+		throws VException;
 	private native String nativeDebugString(long nativePtr);
 	private native String nativeToString(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -20,11 +20,11 @@ class BlessingRootsImpl implements BlessingRoots {
 	}
 
 	@Override
-	public void add(ECPublicKey root, BlessingPattern pattern) throws VeyronException {
+	public void add(ECPublicKey root, BlessingPattern pattern) throws VException {
 		nativeAdd(this.nativePtr, root, pattern);
 	}
 	@Override
-	public void recognized(ECPublicKey root, String blessing) throws VeyronException {
+	public void recognized(ECPublicKey root, String blessing) throws VException {
 		nativeRecognized(this.nativePtr, root, blessing);
 	}
 	@Override

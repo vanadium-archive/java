@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
  *    final VContext cacheCtx = ctx.withTimeout(Duration.standardSeconds(1));
  *    try {
  *    	fetchDataFromMemcache(cacheCtx, key);
- *    } catch (VeyronException e) {
+ *    } catch (VException e) {
  *      if (e.equals(DEADLINE_EXCEEDED)) {
  *        recomputeData(ctx, key);
  *      }

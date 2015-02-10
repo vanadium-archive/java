@@ -1,6 +1,6 @@
 package io.v.core.veyron2.vdl;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import java.io.EOFException;
 
 /**
@@ -13,9 +13,9 @@ public interface Stream<SendT, RecvT> {
    * space available.
    *
    * @param  item            an item to be sent
-   * @throws VeyronException if there was an error sending the item.
+   * @throws VException      if there was an error sending the item.
    */
-  public void send(SendT item) throws VeyronException;
+  public void send(SendT item) throws VException;
 
   /**
    * Returns the next item in the input stream, blocking until an item is available.
@@ -23,7 +23,7 @@ public interface Stream<SendT, RecvT> {
    *
    * @return RecvT           next item in the input stream
    * @throws EOFException    if a graceful end of input has been reached
-   * @throws VeyronException if there was an error receiving an item
+   * @throws VException      if there was an error receiving an item
    */
-  public RecvT recv() throws EOFException, VeyronException;
+  public RecvT recv() throws EOFException, VException;
 }

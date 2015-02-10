@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Certificate;
@@ -60,22 +60,22 @@ public class BlessingsManager {
 	 * @param  resultCode      result code of the reply
 	 * @param  data            reply data
 	 * @return                 the blessings stored in the reply
-	 * @throws VeyronException if the blessings couldn't be extracted from the reply
+	 * @throws VException      if the blessings couldn't be extracted from the reply
 	 */
 	public static WireBlessings processReply(int resultCode, Intent data)
-			throws VeyronException {
+			throws VException {
 		if (data == null) {
-			throw new VeyronException("NULL blessing response");
+			throw new VException("NULL blessing response");
 		}
 		if (resultCode != Activity.RESULT_OK) {
-			throw new VeyronException("Error getting blessing: " + data.getStringExtra(ERROR));
+			throw new VException("Error getting blessing: " + data.getStringExtra(ERROR));
 		}
 		final WireBlessings wire = (WireBlessings) data.getParcelableExtra(REPLY);
 		if (wire == null) {
-			throw new VeyronException("Got null blessings.");
+			throw new VException("Got null blessings.");
 		}
 		if (wire.getCertificateChains() == null || wire.getCertificateChains().size() <= 0) {
-			throw new VeyronException("Got empty blessings.");
+			throw new VException("Got empty blessings.");
 		}
 		return wire;
 	}
@@ -149,7 +149,7 @@ public class BlessingsManager {
 				final WireBlessings blessing = vomDecodeBlessing(blessingStr);
 				final String name = getBlessingName(blessing);
 				mBlessings.put(name, blessing);
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				android.util.Log.e(TAG, "Couldn't decode blessing, skipping: " + blessingStr);
 			}
 		}
@@ -160,7 +160,7 @@ public class BlessingsManager {
 		for (WireBlessings blessing : mBlessings.values()) {
 			try {
 				blessings.add(vomEncodeBlessing(blessing));
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				android.util.Log.e(TAG, "Couldn't encode blessing: " + blessing);
 			}
 		}
@@ -197,11 +197,11 @@ public class BlessingsManager {
 		return ret;
 	}
 
-	private static String vomEncodeBlessing(WireBlessings wire) throws VeyronException {
+	private static String vomEncodeBlessing(WireBlessings wire) throws VException {
 		return VomUtil.encodeToString(wire, WireBlessings.class);
 	}
 
-	private static WireBlessings vomDecodeBlessing(String encoded) throws VeyronException {
+	private static WireBlessings vomDecodeBlessing(String encoded) throws VException {
 		return (WireBlessings) VomUtil.decodeFromString(encoded, WireBlessings.class);
 	}
 }

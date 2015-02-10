@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -16,9 +16,9 @@ public interface BlessingRoots {
 	 *
 	 * @param  root            root that is deemed an authoritiative key for the provided pattern.
 	 * @param  pattern         pattern for which we're assigning the authoratitative key.
-	 * @throws VeyronException if there was an error assigning the root.
+	 * @throws VException      if there was an error assigning the root.
 	 */
-	public void add(ECPublicKey root, BlessingPattern pattern) throws VeyronException;
+	public void add(ECPublicKey root, BlessingPattern pattern) throws VException;
 
 	/**
 	 * Returns {@code null} iff the provided root is recognized as an authority on a pattern
@@ -26,10 +26,10 @@ public interface BlessingRoots {
 	 *
 	 * @param  root            the root key we're checking for authority.
 	 * @param  blessing        the blessing we're checking against the root.
-	 * @throws VeyronException if the provided root is not recognized as an authority for the
+	 * @throws VException      if the provided root is not recognized as an authority for the
 	 *                         provided blessing.
 	 */
-	public void recognized(ECPublicKey root, String blessing) throws VeyronException;
+	public void recognized(ECPublicKey root, String blessing) throws VException;
 
 	/**
 	 * Return a human-readable string description of the roots.  This description is detailed and

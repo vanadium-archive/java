@@ -1,6 +1,6 @@
 package io.v.core.veyron2.util;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vom.BinaryDecoder;
@@ -22,15 +22,15 @@ public class VomUtil {
 	 * @param  value           value to be encoded
 	 * @param  type            type of the provided value
 	 * @return                 VOM-encoded value as a byte array
-	 * @throws VeyronException if there was an error encoding the value
+	 * @throws VException      if there was an error encoding the value
 	 */
-	public static byte[] encode(Object value, Type type) throws VeyronException {
+	public static byte[] encode(Object value, Type type) throws VException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final BinaryEncoder encoder = new BinaryEncoder(out);
 		try {
 			encoder.encodeValue(type, value);
 		} catch (IOException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		}
 		return out.toByteArray();
 	}
@@ -41,15 +41,15 @@ public class VomUtil {
 	 * @param  value           value to be encoded
 	 * @param  type            type of the provided value
 	 * @return                 VOM-encoded value as a byte array
-	 * @throws VeyronException if there was an error encoding the value
+	 * @throws VException      if there was an error encoding the value
 	 */
-	public static byte[] encode(Object value, VdlType type) throws VeyronException {
+	public static byte[] encode(Object value, VdlType type) throws VException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final BinaryEncoder encoder = new BinaryEncoder(out);
 		try {
 			encoder.encodeValue(type, value);
 		} catch (IOException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		}
 		return out.toByteArray();
 	}
@@ -60,9 +60,9 @@ public class VomUtil {
 	 * @param  value           value to be encoded
 	 * @param  type            type of the provided value
 	 * @return                 VOM-encoded value in a hex-string format
-	 * @throws VeyronException if there was an error encoding the value
+	 * @throws VException      if there was an error encoding the value
 	 */
-	public static String encodeToString(Object value, Type type) throws VeyronException {
+	public static String encodeToString(Object value, Type type) throws VException {
 		final byte[] data = encode(value, type);
 		return bytesToHexString(data);
 	}
@@ -72,15 +72,15 @@ public class VomUtil {
 	 *
 	 * @param  value           VDL value to be encoded
 	 * @return                 VOM-encoded value as a byte array
-	 * @throws VeyronException if there was an error encoding the value
+	 * @throws VException      if there was an error encoding the value
 	 */
-	public static byte[] encode(VdlValue value) throws VeyronException {
+	public static byte[] encode(VdlValue value) throws VException {
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		final BinaryEncoder encoder = new BinaryEncoder(out);
 		try {
 			encoder.encodeValue(value);
 		} catch (IOException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		}
 		return out.toByteArray();
 	}
@@ -92,16 +92,16 @@ public class VomUtil {
 	 * @param  data            VOM-encoded data
 	 * @param  type            type of the object that the data should be decoded into
 	 * @return                 VOM-decoded object
-	 * @throws VeyronException if there was an error decoding the data
+	 * @throws VException      if there was an error decoding the data
 	 */
-	public static Object decode(byte[] data, Type type) throws VeyronException {
+	public static Object decode(byte[] data, Type type) throws VException {
 		final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
 		try {
 			return decoder.decodeValue(type);
 		} catch (IOException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		} catch (ConversionException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		}
 	}
 
@@ -111,16 +111,16 @@ public class VomUtil {
 	 *
 	 * @param  data            VOM-encoded data
 	 * @return                 VOM-decoded object
-	 * @throws VeyronException if there was an error decoding the data
+	 * @throws VException      if there was an error decoding the data
 	 */
-	public static Object decode(byte[] data) throws VeyronException {
+	public static Object decode(byte[] data) throws VException {
 		final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
 		try {
 			return decoder.decodeValue();
 		} catch (IOException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		} catch (ConversionException e) {
-			throw new VeyronException(e.getMessage());
+			throw new VException(e.getMessage());
 		}
 	}
 
@@ -130,9 +130,9 @@ public class VomUtil {
 	 * @param  hex             VOM-encoded data, stored as a hex string
 	 * @param  type            type of the object that the data should be decoded into
 	 * @return                 VOM-decoded object
-	 * @throws VeyronException if there was an error decoding the data
+	 * @throws VException      if there was an error decoding the data
 	 */
-	public static Object decodeFromString(String hex, Type type) throws VeyronException {
+	public static Object decodeFromString(String hex, Type type) throws VException {
 		final byte[] data = hexStringToBytes(hex);
 		return decode(data, type);
 	}
@@ -145,9 +145,9 @@ public class VomUtil {
 		return builder.toString();
 	}
 
-	private static byte[] hexStringToBytes(String hex) throws VeyronException {
+	private static byte[] hexStringToBytes(String hex) throws VException {
 		if (hex.length() % 2 != 0) {
-			throw new VeyronException("Hex strings must be multiples of 2 in length");
+			throw new VException("Hex strings must be multiples of 2 in length");
 		}
 		final int outLen = hex.length() / 2;
 		final byte[] dat = new byte[outLen];

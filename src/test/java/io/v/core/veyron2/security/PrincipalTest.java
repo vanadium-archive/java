@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class PrincipalTest extends AndroidTestCase {
 					.put("alice/work/friend", new Caveat[0])
 					.put("alice/gym/friend", new Caveat[0])
 					.build(), p2.blessingsInfo(aliceAllFriends));
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -120,7 +120,7 @@ public class PrincipalTest extends AndroidTestCase {
 							entry.getValue(), Arrays.toString(want), Arrays.toString(got)));
 				}
 			}
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}

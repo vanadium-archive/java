@@ -2,7 +2,7 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
 
@@ -11,15 +11,15 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 
 	private final long nativePtr;
 
-	public native DateTime nativeTimestamp(long nativePtr) throws VeyronException;
+	public native DateTime nativeTimestamp(long nativePtr) throws VException;
 	public native String nativeMethod(long nativePtr);
-	public native Object[] nativeMethodTags(long nativePtr) throws VeyronException;
+	public native Object[] nativeMethodTags(long nativePtr) throws VException;
 	private native String nativeSuffix(long nativePtr);
 	private native String nativeLocalEndpoint(long nativePtr);
 	private native String nativeRemoteEndpoint(long nativePtr);
-	private native Principal nativeLocalPrincipal(long nativePtr) throws VeyronException;
-	private native Blessings nativeLocalBlessings(long nativePtr) throws VeyronException;
-	private native Blessings nativeRemoteBlessings(long nativePtr) throws VeyronException;
+	private native Principal nativeLocalPrincipal(long nativePtr) throws VException;
+	private native Blessings nativeLocalBlessings(long nativePtr) throws VException;
+	private native Blessings nativeRemoteBlessings(long nativePtr) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	VContextImpl(long nativePtr) {
@@ -30,7 +30,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 	public DateTime timestamp() {
 		try {
 			return nativeTimestamp(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get timestamp: " + e.getMessage());
 			return null;
 		}
@@ -44,7 +44,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 		try {
 			final Object[] tags = nativeMethodTags(this.nativePtr);
 			return tags != null ? tags : new Object[0];
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
 			return new Object[0];
 		}
@@ -65,7 +65,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 	public Principal localPrincipal() {
 		try {
 			return nativeLocalPrincipal(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get local Principal: " + e.getMessage());
 			return null;
 		}
@@ -74,7 +74,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 	public Blessings localBlessings() {
 		try {
 			return nativeLocalBlessings(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get local Blessings: " + e.getMessage());
 			return null;
 		}
@@ -83,7 +83,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 	public Blessings remoteBlessings() {
 		try {
 			return nativeRemoteBlessings(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get remote Blessings: " + e.getMessage());
 			return null;
 		}

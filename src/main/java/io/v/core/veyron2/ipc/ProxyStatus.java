@@ -1,6 +1,6 @@
 package io.v.core.veyron2.ipc;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * ProxyStatus represents the status of a proxy connection maintained by a server.
@@ -8,7 +8,7 @@ import io.v.core.veyron2.VeyronException;
 public class ProxyStatus {
 	private final String proxy;
 	private final String endpoint;
-	private final VeyronException error;
+	private final VException error;
 
 	/**
 	 * Creates a new proxy status object.
@@ -17,7 +17,7 @@ public class ProxyStatus {
 	 * @param  endpoint name of the endpoint that the server is using to receive proxied requests on
 	 * @param  error    any error status of the connection to the proxy
 	 */
-	public ProxyStatus(String proxy, String endpoint, VeyronException error) {
+	public ProxyStatus(String proxy, String endpoint, VException error) {
 		this.proxy = proxy;
 		this.endpoint = endpoint;
 		this.error = error;
@@ -48,7 +48,7 @@ public class ProxyStatus {
 	 *
 	 * @return the error status of the connection to the proxy
 	 */
-	public VeyronException getError() {
+	public VException getError() {
 		return this.error;
 	}
 

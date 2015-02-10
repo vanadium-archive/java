@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 
 import java.security.KeyPairGenerator;
@@ -46,7 +46,7 @@ public class BlessingRootsTest extends AndroidTestCase {
 				for (String blessing : entry.getValue()) {
 					try {
 						roots.recognized(key, blessing);
-					} catch (VeyronException e) {
+					} catch (VException e) {
 						fail("Didn't recognize root: " + entry.getKey() +
 								" as an authority for blessing: " + blessing);
 					}
@@ -59,23 +59,23 @@ public class BlessingRootsTest extends AndroidTestCase {
 						roots.recognized(key, blessing);
 						fail("Shouldn't recognize root: " + entry.getKey() +
 								" as an authority for blessing: " + blessing);
-					} catch (VeyronException e) {
+					} catch (VException e) {
 						// OK
 					}
 				}
 			}
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
 
-	public ECPublicKey mintPublicKey() throws VeyronException {
+	public ECPublicKey mintPublicKey() throws VException {
 		try {
 			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
 			keyGen.initialize(256);
 			return (ECPublicKey) keyGen.generateKeyPair().getPublic();
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Couldn't mint private key: " + e.getMessage());
+			throw new VException("Couldn't mint private key: " + e.getMessage());
 		}
 	}
 }

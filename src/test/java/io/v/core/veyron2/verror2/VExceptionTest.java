@@ -67,13 +67,13 @@ public class VExceptionTest extends AndroidTestCase {
 
 		// Set English and French messages for UNKNOWN and NO_EXIST to ones the test can predict.
 		// Delete any German messages that may be present.
-		cat.set(EN, Constants.UNKNOWN.getID(), "{1} {2} unknown error {_}");
-		cat.set(FR, Constants.UNKNOWN.getID(), "{1} {2} erreur inconnu {_}");
-		cat.set(DE, Constants.UNKNOWN.getID(), "");
+		cat.set(EN, Errors.UNKNOWN.getID(), "{1} {2} unknown error {_}");
+		cat.set(FR, Errors.UNKNOWN.getID(), "{1} {2} erreur inconnu {_}");
+		cat.set(DE, Errors.UNKNOWN.getID(), "");
 
-		cat.set(EN, Constants.NO_EXIST.getID(), "{1} {2} not found {_}");
-		cat.set(FR, Constants.NO_EXIST.getID(), "{1} {2} pas trouvé {_}");
-		cat.set(DE, Constants.NO_EXIST.getID(), "");
+		cat.set(EN, Errors.NO_EXIST.getID(), "{1} {2} not found {_}");
+		cat.set(FR, Errors.NO_EXIST.getID(), "{1} {2} pas trouvé {_}");
+		cat.set(DE, Errors.NO_EXIST.getID(), "");
 
 		VContext ctx = VContextImpl.create();
 		ctx = Language.contextWithLanguage(ctx, FR);
@@ -96,12 +96,12 @@ public class VExceptionTest extends AndroidTestCase {
 		bDE1 = VException.explicitMake(idActionB, DE, "server", "bDE1", 1, 2);
 
 		// The NoExist error in various languages.
-		nEN0 = VException.explicitMake(Constants.NO_EXIST, EN, "server", "nEN0", 0);
-		nEN1 = VException.explicitMake(Constants.NO_EXIST, EN, "server", "nEN1", 1, 2);
-		nFR0 = VException.explicitMake(Constants.NO_EXIST, FR, "server", "nFR0", 0);
-		nFR1 = VException.explicitMake(Constants.NO_EXIST, FR, "server", "nFR1", 1, 2);
-		nDE0 = VException.explicitMake(Constants.NO_EXIST, DE, "server", "nDE0", 0);
-		nDE1 = VException.explicitMake(Constants.NO_EXIST, DE, "server", "nDE1", 1, 2);
+		nEN0 = VException.explicitMake(Errors.NO_EXIST, EN, "server", "nEN0", 0);
+		nEN1 = VException.explicitMake(Errors.NO_EXIST, EN, "server", "nEN1", 1, 2);
+		nFR0 = VException.explicitMake(Errors.NO_EXIST, FR, "server", "nFR0", 0);
+		nFR1 = VException.explicitMake(Errors.NO_EXIST, FR, "server", "nFR1", 1, 2);
+		nDE0 = VException.explicitMake(Errors.NO_EXIST, DE, "server", "nDE0", 0);
+		nDE1 = VException.explicitMake(Errors.NO_EXIST, DE, "server", "nDE1", 1, 2);
 	}
 
 	public static void testBasic() {
@@ -119,12 +119,12 @@ public class VExceptionTest extends AndroidTestCase {
 		expectBasic(bDE0, idActionB, "B: server bDE0 0", 11);
 		expectBasic(bDE1, idActionB, "B: server bDE1 1 2", 12);
 
-		expectBasic(nEN0, Constants.NO_EXIST, "server nEN0 not found 0", 13);
-		expectBasic(nEN1, Constants.NO_EXIST, "server nEN1 not found 1 2", 14);
-		expectBasic(nFR0, Constants.NO_EXIST, "server nFR0 pas trouvé 0", 15);
-		expectBasic(nFR1, Constants.NO_EXIST, "server nFR1 pas trouvé 1 2", 16);
-		expectBasic(nDE0, Constants.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE0 0", 17);
-		expectBasic(nDE1, Constants.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE1 1 2", 18);
+		expectBasic(nEN0, Errors.NO_EXIST, "server nEN0 not found 0", 13);
+		expectBasic(nEN1, Errors.NO_EXIST, "server nEN1 not found 1 2", 14);
+		expectBasic(nFR0, Errors.NO_EXIST, "server nFR0 pas trouvé 0", 15);
+		expectBasic(nFR1, Errors.NO_EXIST, "server nFR1 pas trouvé 1 2", 16);
+		expectBasic(nDE0, Errors.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE0 0", 17);
+		expectBasic(nDE1, Errors.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE1 1 2", 18);
 	}
 
 	public static void testEqual() {

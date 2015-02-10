@@ -1,7 +1,7 @@
 package io.v.core.veyron.runtimes.google;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.naming.Namespace;
@@ -18,26 +18,26 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
 			"/ns.dev.v.io:8101/proxy",
 			false);
 
-	private static native VContext nativeInit() throws VeyronException;
+	private static native VContext nativeInit() throws VException;
 	private static native VContext nativeSetNewClient(VContext ctx, Options opts)
-			throws VeyronException;
+			throws VException;
 	private static native io.v.core.veyron2.ipc.Client nativeGetClient(VContext ctx)
-			throws VeyronException;
+			throws VException;
 	private static native io.v.core.veyron2.ipc.Server nativeNewServer(
-			VContext ctx, ListenSpec spec) throws VeyronException;
+			VContext ctx, ListenSpec spec) throws VException;
 	private static native VContext nativeSetPrincipal(VContext ctx, Principal principal)
-			throws VeyronException;
-	private static native Principal nativeGetPrincipal(VContext ctx) throws VeyronException;
+			throws VException;
+	private static native Principal nativeGetPrincipal(VContext ctx) throws VException;
 	private static native VContext nativeSetNewNamespace(VContext ctx, String... roots)
-			throws VeyronException;
-	private static native Namespace nativeGetNamespace(VContext ctx) throws VeyronException;
+			throws VException;
+	private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
 
 	/**
 	 * Returns a new runtime instance.
 	 *
 	 * @return      a new runtime instance
 	 */
-	public static VRuntime create() throws VeyronException {
+	public static VRuntime create() throws VException {
 		return new VRuntime(nativeInit());
 	}
 
@@ -47,48 +47,48 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
 		this.ctx = setListenSpec(ctx, DEFAULT_LISTEN_SPEC);
 	}
 	@Override
-	public VContext setNewClient(VContext ctx, Options opts) throws VeyronException {
+	public VContext setNewClient(VContext ctx, Options opts) throws VException {
 		return nativeSetNewClient(ctx, opts);
 	}
 	@Override
 	public io.v.core.veyron2.ipc.Client getClient(VContext ctx) {
 		try {
 			return nativeGetClient(ctx);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't get client: " + e.getMessage());
 		}
 	}
 	@Override
 	public io.v.core.veyron2.ipc.Server newServer(VContext ctx, Options opts)
-		throws VeyronException {
+		throws VException {
 		// Get a Java ListenSpec is attached to this context.
 		final ListenSpec spec = (ListenSpec) ctx.value(this);
 		if (spec == null) {
-			throw new VeyronException("Couldn't get attached listen spec");
+			throw new VException("Couldn't get attached listen spec");
 		}
 		return nativeNewServer(ctx, spec);
 	}
 	@Override
-	public VContext setPrincipal(VContext ctx, Principal principal) throws VeyronException {
+	public VContext setPrincipal(VContext ctx, Principal principal) throws VException {
 		return nativeSetPrincipal(ctx, principal);
 	}
 	@Override
 	public Principal getPrincipal(VContext ctx) {
 		try {
 			return nativeGetPrincipal(ctx);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't get principal: " + e.getMessage());
 		}
 	}
 	@Override
-	public VContext setNewNamespace(VContext ctx, String... roots) throws VeyronException {
+	public VContext setNewNamespace(VContext ctx, String... roots) throws VException {
 		return nativeSetNewNamespace(ctx, roots);
 	}
 	@Override
 	public Namespace getNamespace(VContext ctx) {
 		try {
 			return nativeGetNamespace(ctx);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't get namespace: " + e.getMessage());
 		}
 	}

@@ -1,8 +1,6 @@
 package io.v.core.veyron2.security;
 
-import com.google.common.reflect.TypeToken;
-
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.util.VomUtil;
 
 import java.security.interfaces.ECPublicKey;
@@ -18,7 +16,7 @@ class Util {
 	 * @param  wire WireBlessings to be encoded.
 	 * @return      VOM-encoded WireBlessings.
 	 */
-	static byte[] encodeWireBlessings(WireBlessings wire) throws VeyronException {
+	static byte[] encodeWireBlessings(WireBlessings wire) throws VException {
 		return VomUtil.encode(wire, WireBlessings.class);
 	}
 
@@ -27,9 +25,9 @@ class Util {
 	 *
 	 * @param  encoded         VOM-encoded WireBlessings.
 	 * @return                 decoded WireBlessings.
-	 * @throws VeyronException if the provided WireBlessings couldn't be decoded.
+	 * @throws VException      if the provided WireBlessings couldn't be decoded.
 	 */
-	static WireBlessings decodeWireBlessings(byte[] encoded) throws VeyronException {
+	static WireBlessings decodeWireBlessings(byte[] encoded) throws VException {
 		return (WireBlessings) VomUtil.decode(encoded, WireBlessings.class);
 	}
 
@@ -65,7 +63,7 @@ class Util {
 	 * @param  signature Signature to be encoded.
 	 * @return           the encoded Signature.
 	 */
-	static byte[] encodeSignature(Signature signature) throws VeyronException {
+	static byte[] encodeSignature(Signature signature) throws VException {
 		return VomUtil.encode(signature, Signature.class);
 	}
 
@@ -74,9 +72,9 @@ class Util {
 	 *
 	 * @param  encoded         VOM-encoded Signature.
 	 * @return                 decoded Signature.
-	 * @throws VeyronException if the provided Signature couldn't be decoded.
+	 * @throws VException      if the provided Signature couldn't be decoded.
 	 */
-	static Signature decodeSignature(byte[] encoded) throws VeyronException {
+	static Signature decodeSignature(byte[] encoded) throws VException {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
@@ -101,9 +99,9 @@ class Util {
 	 *
 	 * @param  encoded         DER-encoded ECPublicKey.
 	 * @return                 decoded ECPublicKey.
-	 * @throws VeyronException if the provided ECPublicKey couldn't be decoded.
+	 * @throws VException      if the provided ECPublicKey couldn't be decoded.
 	 */
-	static ECPublicKey decodePublicKey(byte[] encoded) throws VeyronException {
+	static ECPublicKey decodePublicKey(byte[] encoded) throws VException {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}
@@ -116,7 +114,7 @@ class Util {
 	 * @param  caveat Caveat to be encoded.
 	 * @return        the encoded Caveat.
 	 */
-	static byte[] encodeCaveat(Caveat caveat) throws VeyronException {
+	static byte[] encodeCaveat(Caveat caveat) throws VException {
 		return VomUtil.encode(caveat, Caveat.class);
 	}
 
@@ -125,9 +123,9 @@ class Util {
 	 *
 	 * @param  encoded         VOM-encoded Caveat.
 	 * @return                 decoded Caveat.
-	 * @throws VeyronException if the provided Caveat couldn't be decoded.
+	 * @throws VException      if the provided Caveat couldn't be decoded.
 	 */
-	static Caveat decodeCaveat(byte[] encoded) throws VeyronException {
+	static Caveat decodeCaveat(byte[] encoded) throws VException {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}

@@ -1,7 +1,7 @@
 package io.v.core.veyron2.android;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.security.Blessings;
@@ -65,7 +65,7 @@ public class V extends io.v.core.veyron2.V {
 			try {
 				context = V.setPrincipal(context, createPrincipal(ctx, opts));
 				context = V.setListenSpec(context, DEFAULT_LISTEN_SPEC);
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				throw new RuntimeException(
 		    			"Couldn't setup Vanadium Runtime options: " + e.getMessage());
 			}
@@ -84,7 +84,7 @@ public class V extends io.v.core.veyron2.V {
 	}
 
 	private static Principal createPrincipal(android.content.Context ctx, Options opts)
-			throws VeyronException {
+			throws VException {
 		// Check if the private key has already been generated for this package.
 		// (NOTE: Android package names are unique.)
 		KeyStore.PrivateKeyEntry keyEntry =

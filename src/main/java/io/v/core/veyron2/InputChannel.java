@@ -1,6 +1,6 @@
 package io.v.core.veyron2;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.io.EOFException;
 
@@ -20,7 +20,7 @@ public interface InputChannel<T> {
 	 *
 	 * @return                 the next value from the channel.
 	 * @throws EOFException    if the graceful EOF is reached.
-	 * @throws VeyronException if a read error is encountered.
+	 * @throws VException      if a read error is encountered.
 	 */
-	public T readValue() throws EOFException, VeyronException;
+	public T readValue() throws EOFException, VException;
 }

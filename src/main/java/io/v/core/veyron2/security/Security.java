@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.v.core.veyron2.services.security.access.TaggedACLMap;
 import io.v.core.veyron2.util.VomUtil;
@@ -29,7 +29,7 @@ public class Security {
 	 * Mints a new private key and creates a signer based on this key.  The key is stored
 	 * in the clear in memory of the running process.
 	 */
-	public static Signer newInMemorySigner() throws VeyronException {
+	public static Signer newInMemorySigner() throws VException {
 		try {
 			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
 			keyGen.initialize(256);
@@ -38,7 +38,7 @@ public class Security {
 		 	final ECPublicKey pubKey = (ECPublicKey) keyPair.getPublic();
 		 	return new ECDSASigner(privKey, pubKey);
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Couldn't mint private key: " + e.getMessage());
+			throw new VException("Couldn't mint private key: " + e.getMessage());
 		}
 	}
 
@@ -47,9 +47,9 @@ public class Security {
 	 * BlessingRoots and BlessingStore in memory.
 	 *
 	 * @return                 in-memory principal using the newly minted private key
-	 * @throws VeyronException if the principal couldn't be created
+	 * @throws VException      if the principal couldn't be created
 	 */
-	public static Principal newPrincipal() throws VeyronException {
+	public static Principal newPrincipal() throws VException {
 		return PrincipalImpl.create();
 	}
 
@@ -59,9 +59,9 @@ public class Security {
 	 *
 	 * @param  signer          signer to be used by the new principal.
 	 * @return                 in-memory principal using the provided signer.
-	 * @throws VeyronException if the principal couldn't be created.
+	 * @throws VException      if the principal couldn't be created.
 	 */
-	public static Principal newPrincipal(Signer signer) throws VeyronException {
+	public static Principal newPrincipal(Signer signer) throws VException {
 		return PrincipalImpl.create(signer);
 	}
 
@@ -74,7 +74,7 @@ public class Security {
 	 * @return        newly created principal.
 	 */
 	public static Principal newPrincipal(Signer signer, BlessingStore store, BlessingRoots roots)
-		throws VeyronException {
+		throws VException {
 		return PrincipalImpl.create(signer, store, roots);
 	}
 
@@ -89,10 +89,10 @@ public class Security {
 	 *                         is done.
 	 * @param  dir             directory where the state for a principal is to be persisted.
 	 * @return                 principal whose state is persisted in the provided directory.
-	 * @throws VeyronException if the principal couldn't be created.
+	 * @throws VException      if the principal couldn't be created.
 	 */
 	public static Principal newPersistentPrincipal(String passphrase, String dir)
-			throws VeyronException {
+			throws VException {
 		return PrincipalImpl.createPersistent(passphrase, dir);
 	}
 
@@ -110,10 +110,10 @@ public class Security {
 	 * @param  signer          signer to be used by the new principal.
 	 * @param  dir             directory where the partial state for a principal is to be persisted.
 	 * @return                 principal whose partial state is persisted in the provided directory.
-	 * @throws VeyronException if the principal couldn't be created.
+	 * @throws VException      if the principal couldn't be created.
 	 */
 	public static Principal newPersistentPrincipal(Signer signer, String dir)
-		throws VeyronException {
+		throws VException {
 		return PrincipalImpl.createPersistent(signer, dir);
 	}
 
@@ -122,9 +122,9 @@ public class Security {
 	 *
 	 * @param  wire            wire-encoded blessings.
 	 * @return                 new blessings based on the wire-encoded blessings.
-	 * @throws VeyronException if the blessings couldn't be created.
+	 * @throws VException      if the blessings couldn't be created.
 	 */
-	public static Blessings newBlessings(WireBlessings wire) throws VeyronException {
+	public static Blessings newBlessings(WireBlessings wire) throws VException {
 		return BlessingsImpl.create(wire);
 	}
 
@@ -135,20 +135,23 @@ public class Security {
 	 *
 	 * @param  blessings       blessings that will be merged.
 	 * @return                 the union of the provided blessings.
-	 * @throws VeyronException if there was an error creating an union.
+	 * @throws VException      if there was an error creating an union.
 	 */
-	public static Blessings unionOfBlessings(Blessings... blessings) throws VeyronException {
+	public static Blessings unionOfBlessings(Blessings... blessings) throws VException {
 		return BlessingsImpl.createUnion(blessings);
 	}
 
 	/**
-	 * Returns a caveat that requires validation by the provided validator.
+	 * Returns a caveat that requires validation by the validator corresponding to the
+	 * given descriptor and uses the provided parameter.
 	 *
-	 * @param  validator       caveat validator
-	 * @return                 caveat that requires validation by the provided validator
-	 * @throws VeyronException if the caveat couldn't be created
+	 * @param  desc            caveat descriptor
+	 * @param  param           caveat parameter used by the associated validator
+	 * @return                 caveat that requires validation by the validator corresponding to the
+	 *                         given descriptor and uses the provided parameter
+	 * @throws VException      if the caveat couldn't be created
 	 */
-	public static Caveat newCaveat(CaveatDescriptor desc, Object param) throws VeyronException {
+	public static Caveat newCaveat(CaveatDescriptor desc, Object param) throws VException {
 		final byte[] paramVOM = VomUtil.encode(param, desc.getParamType().getTypeObject());
 		return new Caveat(new byte[0], desc.getId(), paramVOM);
 	}
@@ -158,9 +161,9 @@ public class Security {
 	 *
 	 * @param  time            time before which the caveat validates
 	 * @return                 caveat that validates if the current time is before the provided time
-	 * @throws VeyronException if the caveat couldn't be created
+	 * @throws VException      if the caveat couldn't be created
 	 */
-	public static Caveat newExpiryCaveat(DateTime time) throws VeyronException {
+	public static Caveat newExpiryCaveat(DateTime time) throws VException {
 		return newCaveat(Constants.UNIX_TIME_EXPIRY_CAVEAT_X, time.getMillis() / 1000L);
 	}
 
@@ -172,10 +175,10 @@ public class Security {
 	 * @param  additionalMethods additional method names for which this caveat should validate
 	 * @return                   caveat that validates iff the method being invoked by the peer is
 	 *                           one of the provided methods
-	 * @throws VeyronException   if the caveat couldn't be created
+	 * @throws VException        if the caveat couldn't be created
 	 */
 	public static Caveat newMethodCaveat(String method, String... additionalMethods)
-			throws VeyronException {
+			throws VException {
 		final List<String> methods = ImmutableList.<String>builder()
 				.add(method)
 				.add(additionalMethods)
@@ -247,7 +250,7 @@ public class Security {
 	 * <code>
 	 *   public class MyDispatcher implements io.v.core.veyron2.ipc.Dispatcher {
 	 *     @Override
-	 *     public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
+	 *     public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
 	 *       final TaggedACLMap acls = new TaggedACLMap(ImmutableMap.of(
 	 *         "R", new ACL(ImmutableList.of(new BlessingPattern("alice/friends/..."),
 	 *                                       new BlessingPattern("alice/family/...")),
@@ -270,10 +273,10 @@ public class Security {
 	 * @param  acls            ACLs containing authorization rules.
 	 * @param  type            type of the method tags this authorizer checks.
 	 * @return                 an above-described authorizer.
-	 * @throws VeyronException if the authorizer couldn't be created.
+	 * @throws VException      if the authorizer couldn't be created.
 	 */
 	public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Class<?> type)
-		throws VeyronException {
+		throws VException {
 		return new TaggedACLAuthorizer(acls, type);
 	}
 
@@ -285,7 +288,7 @@ public class Security {
 	public static Authorizer newAcceptAllAuthorizer() {
 		return new Authorizer() {
 			@Override
-			public void authorize(VContext context) throws VeyronException {
+			public void authorize(VContext context) throws VException {
 				// do nothing
 			}
 		};
@@ -297,10 +300,10 @@ public class Security {
 	 * @param  sig             signature in the veyron format.
 	 * @param  key             public key.
 	 * @param  message         message whose signature is verified.
-	 * @throws VeyronException iff the signature doesn't verify.
+	 * @throws VException      iff the signature doesn't verify.
 	 */
 	public static void verifySignature(Signature sig, ECPublicKey key, byte[] message)
-		throws VeyronException {
+		throws VException {
 		final String hashAlgorithm = sig.getHash().getValue();
 		final String verifyAlgorithm = hashAlgorithm + "withECDSA";
 		try {
@@ -310,15 +313,15 @@ public class Security {
 			verifier.initVerify(key);
 			verifier.update(message);
 			if (!verifier.verify(jSig)) {
-				throw new VeyronException("Signature doesn't verify.");
+				throw new VException("Signature doesn't verify.");
 			}
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Verifying algorithm " + verifyAlgorithm +
+			throw new VException("Verifying algorithm " + verifyAlgorithm +
 					" not supported by the runtime: " + e.getMessage());
 		} catch (InvalidKeyException e) {
-			throw new VeyronException("Invalid private key: " + e.getMessage());
+			throw new VException("Invalid private key: " + e.getMessage());
 		} catch (SignatureException e) {
-			throw new VeyronException(
+			throw new VException(
 				"Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
 		}
 	}

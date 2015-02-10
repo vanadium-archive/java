@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
@@ -11,15 +11,15 @@ class BlessingStoreImpl implements BlessingStore {
 	private final long nativePtr;
 
 	private native Blessings nativeSet(
-		long nativePtr, Blessings blessings, BlessingPattern forPeers) throws VeyronException;
+		long nativePtr, Blessings blessings, BlessingPattern forPeers) throws VException;
 	private native Blessings nativeForPeer(long nativePtr, String[] peerBlessings)
-			throws VeyronException;
+			throws VException;
 	private native void nativeSetDefaultBlessings(long nativePtr, Blessings blessings)
-			throws VeyronException;
-	private native Blessings nativeDefaultBlessings(long nativePtr) throws VeyronException;
-	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
+			throws VException;
+	private native Blessings nativeDefaultBlessings(long nativePtr) throws VException;
+	private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
 	private native Map<BlessingPattern, Blessings> nativePeerBlessings(long nativePtr)
-			throws VeyronException;
+			throws VException;
 	private native String nativeDebugString(long nativePtr);
 	private native String nativeToString(long nativePtr);
 	private native void nativeFinalize(long nativePtr);
@@ -29,27 +29,27 @@ class BlessingStoreImpl implements BlessingStore {
 	}
 
 	@Override
-	public Blessings set(Blessings blessings, BlessingPattern forPeers) throws VeyronException {
+	public Blessings set(Blessings blessings, BlessingPattern forPeers) throws VException {
 		return nativeSet(this.nativePtr, blessings, forPeers);
 	}
 	@Override
 	public Blessings forPeer(String... peerBlessings) {
 		try {
 			return nativeForPeer(this.nativePtr, peerBlessings);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get blessings for peers: " + e.getMessage());
 			return null;
 		}
 	}
 	@Override
-	public void setDefaultBlessings(Blessings blessings) throws VeyronException {
+	public void setDefaultBlessings(Blessings blessings) throws VException {
 		nativeSetDefaultBlessings(this.nativePtr, blessings);
 	}
 	@Override
 	public Blessings defaultBlessings() {
 		try {
 			return nativeDefaultBlessings(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get default blessings: " + e.getMessage());
 			return null;
 		}
@@ -58,7 +58,7 @@ class BlessingStoreImpl implements BlessingStore {
 	public ECPublicKey publicKey() {
 		try {
 			return nativePublicKey(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
 			return null;
 		}
@@ -67,7 +67,7 @@ class BlessingStoreImpl implements BlessingStore {
 	public Map<BlessingPattern, Blessings> peerBlessings() {
 		try {
 			return nativePeerBlessings(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get peer blessings: " + e.getMessage());
 			return null;
 		}

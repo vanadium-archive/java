@@ -1,7 +1,7 @@
 package io.v.core.veyron2.ipc;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.context.VContext;
 
 import java.lang.reflect.Type;
@@ -22,10 +22,10 @@ public interface Client {
 	 * @param  args            array of arguments to the server's method.
 	 * @param  argTypes        array of types of the provided arguments.
 	 * @return                 call object that manages streaming args and results.
-	 * @throws VeyronException if the call cannot be started.
+	 * @throws VException      if the call cannot be started.
 	 */
 	public Call startCall(VContext context, String name, String method,
-		Object[] args, Type[] argTypes) throws VeyronException;
+		Object[] args, Type[] argTypes) throws VException;
 
 	/**
 	 * Starts an asynchronous call of the method on the server instance identified by name, with the
@@ -42,10 +42,10 @@ public interface Client {
 	 * @param  argTypes        array of types of the provided arguments.
 	 * @param  opts            call options.
 	 * @return                 call object that manages streaming args and results.
-	 * @throws VeyronException if the call cannot be started.
+	 * @throws VException      if the call cannot be started.
 	 */
 	public Call startCall(VContext context, String name, String method,
-		Object[] args, Type[] argTypes, Options opts) throws VeyronException;
+		Object[] args, Type[] argTypes, Options opts) throws VException;
 
 	/**
 	 * Discards all the state associated with this client.  In-flight calls may be terminated with
@@ -64,9 +64,9 @@ public interface Client {
 		 * client will fail.  This is an optional call - it's used by streaming clients that need
 		 * the server to throw {@code EOFException}.
 		 *
-		 * @throws VeyronException if there was an error closing.
+		 * @throws VException      if there was an error closing.
 		 */
-		public void closeSend() throws VeyronException;
+		public void closeSend() throws VException;
 
 		/**
 		 * Blocks until the server has finished the call and returns the positional output arguments
@@ -74,8 +74,8 @@ public interface Client {
 		 *
 		 * @param  types           types for all the output arguments.
 		 * @return                 an array of output arguments.
-		 * @throws VeyronException if there was an error executing the call.
+		 * @throws VException      if there was an error executing the call.
 		 */
-		public Object[] finish(Type[] types) throws VeyronException;
+		public Object[] finish(Type[] types) throws VException;
 	}
 }

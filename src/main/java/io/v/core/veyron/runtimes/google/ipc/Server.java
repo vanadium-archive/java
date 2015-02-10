@@ -2,7 +2,7 @@ package io.v.core.veyron.runtimes.google.ipc;
 
 import io.v.core.veyron2.OptionDefs;
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.ipc.Dispatcher;
 import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.ServerStatus;
@@ -12,13 +12,13 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	private final long nativePtr;
 	private final ListenSpec listenSpec;  // non-null.
 
-	private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VeyronException;
+	private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
 	private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
-		throws VeyronException;
-	private native void nativeAddName(long nativePtr, String name) throws VeyronException;
+		throws VException;
+	private native void nativeAddName(long nativePtr, String name) throws VException;
 	private native void nativeRemoveName(long nativePtr, String name);
-	private native ServerStatus nativeGetStatus(long nativePtr) throws VeyronException;
-	private native void nativeStop(long nativePtr) throws VeyronException;
+	private native ServerStatus nativeGetStatus(long nativePtr) throws VException;
+	private native void nativeStop(long nativePtr) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	private Server(long nativePtr, ListenSpec spec) {
@@ -27,14 +27,14 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	}
 	// Implement io.v.core.veyron2.ipc.Server.
 	@Override
-	public String[] listen(ListenSpec spec) throws VeyronException {
+	public String[] listen(ListenSpec spec) throws VException {
 		if (spec == null) {
 			spec = this.listenSpec;
 		}
 		return nativeListen(this.nativePtr, spec);
 	}
 	@Override
-	public void serve(String name, Object object) throws VeyronException {
+	public void serve(String name, Object object) throws VException {
 		if (object instanceof Dispatcher) {
 			nativeServe(this.nativePtr, name, (Dispatcher)object);
 		} else {
@@ -42,7 +42,7 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 		}
 	}
 	@Override
-	public void addName(String name) throws VeyronException {
+	public void addName(String name) throws VException {
 		nativeAddName(this.nativePtr, name);
 	}
 	@Override
@@ -53,12 +53,12 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	public ServerStatus getStatus() {
 		try {
 			return nativeGetStatus(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			throw new RuntimeException("Couldn't get status: " + e.getMessage());
 		}
 	}
 	@Override
-	public void stop() throws VeyronException {
+	public void stop() throws VException {
 		nativeStop(this.nativePtr);
 	}
 	// Implement java.lang.Object.
@@ -85,7 +85,7 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 			this.obj = obj;
 		}
 		@Override
-		public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
+		public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
 			return new ServiceObjectWithAuthorizer(this.obj, null);
 		}
 	}

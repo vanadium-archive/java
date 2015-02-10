@@ -3,7 +3,7 @@ package io.v.core.veyron2.services.security.access;
 import com.google.common.reflect.TypeToken;
 
 import io.v.core.veyron2.util.VomUtil;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * Util provides utilities for encoding/decoding various Veyron formats.  The encoding format
@@ -16,7 +16,7 @@ class Util {
 	 * @param  acl  ACL to be encoded.
 	 * @return      VOM-encoded ACL.
 	 */
-	static byte[] encodeACL(ACL acl) throws VeyronException {
+	static byte[] encodeACL(ACL acl) throws VException {
 		return VomUtil.encode(acl, new TypeToken<ACL>(){}.getType());
 	}
 
@@ -25,9 +25,9 @@ class Util {
 	 *
 	 * @param  encoded         VOM-encoded ACL.
 	 * @return                 decoded ACL.
-	 * @throws VeyronException if the provided ACL couldn't be decoded.
+	 * @throws VException      if the provided ACL couldn't be decoded.
 	 */
-	static ACL decodeACL(byte[] encoded) throws VeyronException {
+	static ACL decodeACL(byte[] encoded) throws VException {
 		if (encoded == null || encoded.length == 0) {
 			return null;
 		}

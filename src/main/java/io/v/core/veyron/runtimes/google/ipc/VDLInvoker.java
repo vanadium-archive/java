@@ -1,6 +1,6 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.ipc.ServerCall;
 import io.v.core.veyron2.vdl.VeyronServer;
@@ -54,12 +54,12 @@ public final class VDLInvoker {
 	 * Creates a new invoker for the given object.
 	 *
 	 * @param  obj             server object we're invoking methods on
-	 * @throws VeyronException if the provided object is invalid (either null or doesn't implement
+	 * @throws VException      if the provided object is invalid (either null or doesn't implement
 	 *                         exactly one VDL interface)
 	 */
-	public VDLInvoker(Object obj) throws VeyronException {
+	public VDLInvoker(Object obj) throws VException {
 		if (obj == null) {
-			throw new VeyronException("Can't create VDLInvoker with a null object.");
+			throw new VException("Can't create VDLInvoker with a null object.");
 		}
 		this.serverClass = obj.getClass();
 
@@ -85,7 +85,7 @@ public final class VDLInvoker {
 			final Map<String, Method> methods = cInfo.getMethods();
 			final Method tagGetter = methods.get("getMethodTags");
 			if (tagGetter == null) {
-				throw new VeyronException(String.format(
+				throw new VException(String.format(
 					"Server class %s doesn't have the 'getMethodTags' method.",
 					c.getCanonicalName()));
 			}
@@ -93,7 +93,7 @@ public final class VDLInvoker {
 			//in the VDL.
 			//final Method signature = methods.get("signature");
 			//if (signature == null) {
-			//	throw new VeyronException(String.format(
+			//	throw new VException(String.format(
 			//		"Server class %s doesn't have the 'signature' method.",
 			//		c.getCanonicalName()));
 			//}
@@ -106,7 +106,7 @@ public final class VDLInvoker {
 					// getMethodTags() not defined.
 				} catch (InvocationTargetException e) {
 					// getMethodTags() threw an exception.
-					throw new VeyronException(String.format("Error getting tag for method %q: %s",
+					throw new VException(String.format("Error getting tag for method %q: %s",
 						m.getKey(), e.getTargetException().getMessage()));
 				}
 				invokableMethods.put(m.getKey(), new ServerMethod(wrapper, m.getValue(), tags));
@@ -120,12 +120,12 @@ public final class VDLInvoker {
 	 *
 	 * @param  method                   method we are retrieving tags for.
 	 * @return                          tags associated with the provided method.
-	 * @throws VeyronException if the method doesn't exist.
+	 * @throws VException      if the method doesn't exist.
 	 */
-	public Object[] getMethodTags(String method) throws VeyronException {
+	public Object[] getMethodTags(String method) throws VException {
 		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 					"Couldn't find method %s in class %s",
 					method, this.serverClass.getCanonicalName()));
 		}
@@ -138,9 +138,9 @@ public final class VDLInvoker {
 	 *
 	 * @param srv                       the server object
 	 * @return                          a list of server wrappers
-	 * @throws VeyronException if the input server is invalid.
+	 * @throws VException      if the input server is invalid.
 	 */
-	private List<Object> wrapServer(Object srv) throws VeyronException {
+	private List<Object> wrapServer(Object srv) throws VException {
 		List<Object> stubs = new ArrayList<Object>();
 		for (Class<?> iface : srv.getClass().getInterfaces()) {
 			final VeyronServer vs = iface.getAnnotation(VeyronServer.class);
@@ -165,7 +165,7 @@ public final class VDLInvoker {
 			}
 		}
 		if (stubs.size() == 0) {
-			throw new VeyronException(
+			throw new VException(
 					"Object does not implement a valid generated server interface.");
 		}
 		return stubs;
@@ -192,12 +192,12 @@ public final class VDLInvoker {
 	 * @param  call                     in-flight call information
 	 * @param  vomArgs                  VOM-encoded arguments to the method
 	 * @return InvokeReply              VOM-encoded invocation reply and application errors
-	 * @throws VeyronException          if the method couldn't be invoked
+	 * @throws VException               if the method couldn't be invoked
 	 */
-	public InvokeReply invoke(String method, ServerCall call, byte[][] vomArgs) throws VeyronException {
+	public InvokeReply invoke(String method, ServerCall call, byte[][] vomArgs) throws VException {
 		final ServerMethod m = this.invokableMethods.get(method);
 		if (m == null) {
-			throw new VeyronException(String.format("Couldn't find method %s in class %s",
+			throw new VException(String.format("Couldn't find method %s in class %s",
 					method, this.serverClass.getCanonicalName()));
 		}
 
@@ -206,33 +206,33 @@ public final class VDLInvoker {
 
 		// Invoke the method and process results.
 		Object result = null;
-		VeyronException appError = null;
+		VException appError = null;
 		try {
 			result = m.invoke(args);
 		} catch (InvocationTargetException e) { // The underlying method threw an exception.
-			if ((e.getCause() instanceof VeyronException)) {
-				appError = (VeyronException) e.getTargetException();
+			if ((e.getCause() instanceof VException)) {
+				appError = (VException) e.getTargetException();
 			} else {
 				// Dump the stack trace locally.
 				e.getTargetException().printStackTrace();
-				throw new VeyronException(String.format(
-					"Remote invocations of java methods may only throw VeyronException, but call " +
+				throw new VException(String.format(
+					"Remote invocations of java methods may only throw VException, but call " +
 					"to %s threw %s", method, e.getTargetException().getClass()));
 			}
 		} catch (IllegalAccessException e) {
-		    throw new VeyronException(String.format("Couldn't invoke method %s: %s",
+		    throw new VException(String.format("Couldn't invoke method %s: %s",
 		            m.method.getName(), e.getMessage()));
 		}
 		return prepareReply(m, result, appError);
 	}
 
 	private static Object[] prepareArgs(ServerMethod m, ServerCall call, byte[][] vomArgs)
-			throws VeyronException {
+			throws VException {
 		// The first argument is always context, so we add it.
 		final int argsLength = vomArgs.length + 1;
 		final Type[] types = m.method.getGenericParameterTypes();
 		if (argsLength != types.length) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 				"Mismatch in number of arguments for method %s: want %d, have %d",
 				m.method.getName(), types.length, argsLength));
 		}
@@ -245,8 +245,8 @@ public final class VDLInvoker {
 		return ret;
 	}
 
-	private static InvokeReply prepareReply(ServerMethod m, Object result, VeyronException appError)
-			throws VeyronException {
+	private static InvokeReply prepareReply(ServerMethod m, Object result, VException appError)
+			throws VException {
 		final InvokeReply reply = new InvokeReply();
 		if (appError != null) {
 			reply.hasApplicationError = true;
@@ -265,7 +265,7 @@ public final class VDLInvoker {
 			        final Object value = result != null ? fields[i].get(result) : null;
 			        reply.results[i] = VomUtil.encode(value, fields[i].getGenericType());
 			    } catch (IllegalAccessException e) {
-			        throw new VeyronException("Couldn't get field: " + e.getMessage());
+			        throw new VException("Couldn't get field: " + e.getMessage());
 			    }
 			}
 		} else {
@@ -278,7 +278,7 @@ public final class VDLInvoker {
 	private static class ClassInfo {
 		final Map<String, Method> methods = new HashMap<String, Method>();
 
-		ClassInfo(Class<?> c) throws VeyronException {
+		ClassInfo(Class<?> c) throws VException {
 			final Method[] methodList = c.getDeclaredMethods();
 			for (int i = 0; i < methodList.length; i++) {
 				final Method method = methodList[i];
@@ -288,7 +288,7 @@ public final class VDLInvoker {
 				} catch (IllegalArgumentException e) {
 				} // method not an VDL method.
 				if (oldval != null) {
-					throw new VeyronException("Overloading of method " + method.getName()
+					throw new VException("Overloading of method " + method.getName()
 							+ " not allowed on server wrapper");
 				}
 			}

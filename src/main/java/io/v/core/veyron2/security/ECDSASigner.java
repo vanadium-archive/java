@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -22,7 +22,7 @@ public class ECDSASigner implements io.v.core.veyron2.security.Signer {
 	}
 
 	@Override
-	public Signature sign(byte[] purpose, byte[] message) throws VeyronException {
+	public Signature sign(byte[] purpose, byte[] message) throws VException {
 		message = CryptoUtil.messageDigest(HASH_ALGORITHM, message, purpose);
 		// Sign.  Note that the signer will first apply another hash on the message, resulting in:
 		// ECDSA.Sign(Hash(Hash(message) + Hash(purpose))).
@@ -33,12 +33,12 @@ public class ECDSASigner implements io.v.core.veyron2.security.Signer {
 			final byte[] asn1Sig = sig.sign();
 			return CryptoUtil.veyronSignature(HASH_ALGORITHM, purpose, asn1Sig);
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Signing algorithm " + SIGN_ALGORITHM +
+			throw new VException("Signing algorithm " + SIGN_ALGORITHM +
 				" not supported by the runtime: " + e.getMessage());
 		} catch (InvalidKeyException e) {
-			throw new VeyronException("Invalid private key: " + e.getMessage());
+			throw new VException("Invalid private key: " + e.getMessage());
 		} catch (SignatureException e) {
-			throw new VeyronException(
+			throw new VException(
 				"Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
 		}
 	}

@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
@@ -14,46 +14,46 @@ public class PrincipalImpl implements Principal {
 	private final BlessingStore store;
 	private final BlessingRoots roots;
 
-	private static native PrincipalImpl nativeCreate() throws VeyronException;
-	private static native PrincipalImpl nativeCreateForSigner(Signer signer) throws VeyronException;
+	private static native PrincipalImpl nativeCreate() throws VException;
+	private static native PrincipalImpl nativeCreateForSigner(Signer signer) throws VException;
 	private static native PrincipalImpl nativeCreateForAll(Signer signer, BlessingStore store,
-		BlessingRoots roots) throws VeyronException;
+		BlessingRoots roots) throws VException;
 	private static native PrincipalImpl nativeCreatePersistent(String passphrase, String dir)
-			throws VeyronException;
+			throws VException;
 	private static native PrincipalImpl nativeCreatePersistentForSigner(Signer signer, String dir)
-			throws VeyronException;
+			throws VException;
 
-	static PrincipalImpl create() throws VeyronException {
+	static PrincipalImpl create() throws VException {
 		return nativeCreate();
 	}
-	static PrincipalImpl create(Signer signer) throws VeyronException {
+	static PrincipalImpl create(Signer signer) throws VException {
 		return nativeCreateForSigner(signer);
 	}
 	static PrincipalImpl create(Signer signer, BlessingStore store, BlessingRoots roots)
-		throws VeyronException {
+		throws VException {
 		return nativeCreateForAll(signer, store, roots);
 	}
-	static PrincipalImpl createPersistent(String passphrase, String dir) throws VeyronException {
+	static PrincipalImpl createPersistent(String passphrase, String dir) throws VException {
 		return nativeCreatePersistent(passphrase, dir);
 	}
-	static PrincipalImpl createPersistent(Signer signer, String dir) throws VeyronException {
+	static PrincipalImpl createPersistent(Signer signer, String dir) throws VException {
 		return nativeCreatePersistentForSigner(signer, dir);
 	}
 
 	private native Blessings nativeBless(long nativePtr, ECPublicKey key, Blessings with,
-		String extension, Caveat caveat, Caveat[] additionalCaveats) throws VeyronException;
+		String extension, Caveat caveat, Caveat[] additionalCaveats) throws VException;
 	private native Blessings nativeBlessSelf(long nativePtr, String name, Caveat[] caveats)
-			throws VeyronException;
-	private native Signature nativeSign(long nativePtr, byte[] message) throws VeyronException;
-	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
+			throws VException;
+	private native Signature nativeSign(long nativePtr, byte[] message) throws VException;
+	private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
 	private native Blessings[] nativeBlessingsByName(long nativePtr, BlessingPattern name)
-			throws VeyronException;
+			throws VException;
 	private native Map<String, Caveat[]> nativeBlessingsInfo(long nativePtr, Blessings blessings)
-			throws VeyronException;
-	private native BlessingStore nativeBlessingStore(long nativePtr) throws VeyronException;
-	private native BlessingRoots nativeRoots(long nativePtr) throws VeyronException;
+			throws VException;
+	private native BlessingStore nativeBlessingStore(long nativePtr) throws VException;
+	private native BlessingRoots nativeRoots(long nativePtr) throws VException;
 	private native void nativeAddToRoots(long nativePtr, Blessings blessings)
-			throws VeyronException;
+			throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	private PrincipalImpl(long nativePtr, Signer signer, BlessingStore store, BlessingRoots roots) {
@@ -65,15 +65,15 @@ public class PrincipalImpl implements Principal {
 
 	@Override
 	public Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
-		Caveat... additionalCaveats) throws VeyronException {
+		Caveat... additionalCaveats) throws VException {
 		return nativeBless(this.nativePtr, key, with, extension, caveat, additionalCaveats);
 	}
 	@Override
-	public Blessings blessSelf(String name, Caveat... caveats) throws VeyronException {
+	public Blessings blessSelf(String name, Caveat... caveats) throws VException {
 		return nativeBlessSelf(this.nativePtr, name, caveats);
 	}
 	@Override
-	public Signature sign(byte[] message) throws VeyronException {
+	public Signature sign(byte[] message) throws VException {
 		if (this.signer != null) {
 			final byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
 			return this.signer.sign(purpose, message);
@@ -87,7 +87,7 @@ public class PrincipalImpl implements Principal {
 		}
 		try {
 			return nativePublicKey(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
 			return null;
 		}
@@ -96,7 +96,7 @@ public class PrincipalImpl implements Principal {
 	public Blessings[] blessingsByName(BlessingPattern name) {
 		try {
 			return nativeBlessingsByName(this.nativePtr, name);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get blessings for name: " + e.getMessage());
 			return new Blessings[0];
 		}
@@ -105,7 +105,7 @@ public class PrincipalImpl implements Principal {
 	public Map<String, Caveat[]> blessingsInfo(Blessings blessings) {
 		try {
 			return nativeBlessingsInfo(this.nativePtr, blessings);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG,
 				"Couldn't get human-readable strings for blessings: " + e.getMessage());
 			return new HashMap<String, Caveat[]>();
@@ -118,7 +118,7 @@ public class PrincipalImpl implements Principal {
 		}
 		try {
 			return nativeBlessingStore(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get Blessing Store: " + e.getMessage());
 			return null;
 		}
@@ -130,13 +130,13 @@ public class PrincipalImpl implements Principal {
 		}
 		try {
 			return nativeRoots(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get Blessing Store: " + e.getMessage());
 			return null;
 		}
 	}
 	@Override
-	public void addToRoots(Blessings blessings) throws VeyronException {
+	public void addToRoots(Blessings blessings) throws VException {
 		nativeAddToRoots(this.nativePtr, blessings);
 	}
 	@Override

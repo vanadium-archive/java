@@ -62,7 +62,7 @@ public class V {
 				// Use the default runtime implementation.
 				try {
 					runtime = io.v.core.veyron.runtimes.google.VRuntime.create();
-				} catch (VeyronException e) {
+				} catch (VException e) {
 	    			throw new RuntimeException(
 	    				"Couldn't initialize Google Veyron Runtime: " + e.getMessage());
 				}
@@ -98,9 +98,9 @@ public class V {
 	 *
 	 * @param  ctx             current context
 	 * @return                 child context to which the new client is attached
-	 * @throws VeyronException if a new client cannot be created
+	 * @throws VException      if a new client cannot be created
 	 */
-	public static VContext setNewClient(VContext ctx) throws VeyronException {
+	public static VContext setNewClient(VContext ctx) throws VException {
 		return setNewClient(ctx, null);
 	}
 
@@ -113,9 +113,9 @@ public class V {
 	 * @param  ctx             current context
 	 * @param  opts            client options
 	 * @return                 child context to which the new client is attached
-	 * @throws VeyronException if a new client cannot be created
+	 * @throws VException      if a new client cannot be created
 	 */
-	public static VContext setNewClient(VContext ctx, Options opts) throws VeyronException {
+	public static VContext setNewClient(VContext ctx, Options opts) throws VException {
 		if (opts == null) opts = new Options();
 		return getRuntime().setNewClient(ctx, opts);
 	}
@@ -135,9 +135,9 @@ public class V {
 	 *
 	 * @param  ctx             current context
 	 * @return                 the new server instance
-	 * @throws VeyronException if a new server cannot be created
+	 * @throws VException      if a new server cannot be created
 	 */
-	public static Server newServer(VContext ctx) throws VeyronException {
+	public static Server newServer(VContext ctx) throws VException {
 		return newServer(ctx, null);
 	}
 
@@ -150,9 +150,9 @@ public class V {
 	 * @param  ctx             current context
 	 * @param  opts            server options
 	 * @return                 the new server instance
-	 * @throws VeyronException if a new server cannot be created
+	 * @throws VException      if a new server cannot be created
 	 */
-	public static Server newServer(VContext ctx, Options opts) throws VeyronException {
+	public static Server newServer(VContext ctx, Options opts) throws VException {
 		if (opts == null) opts = new Options();
 		return getRuntime().newServer(ctx, opts);
 	}
@@ -164,9 +164,9 @@ public class V {
 	 * @param  ctx             current context
 	 * @param  principal       principal to be attached
 	 * @return                 child context to which the principal is attached
-	 * @throws VeyronException if the principal couldn't be attached
+	 * @throws VException      if the principal couldn't be attached
 	 */
-	public static VContext setPrincipal(VContext ctx, Principal principal) throws VeyronException {
+	public static VContext setPrincipal(VContext ctx, Principal principal) throws VException {
 		return getRuntime().setPrincipal(ctx, principal);
 	}
 
@@ -186,9 +186,9 @@ public class V {
 	 * @param  ctx             current context
 	 * @param  roots           roots of the namespace
 	 * @return                 child context to which the principal is attached
-	 * @throws VeyronException if the namespace couldn't be created
+	 * @throws VException      if the namespace couldn't be created
 	 */
-	public static VContext setNewNamespace(VContext ctx, String... roots) throws VeyronException {
+	public static VContext setNewNamespace(VContext ctx, String... roots) throws VException {
 		return getRuntime().setNewNamespace(ctx, roots);
 	}
 

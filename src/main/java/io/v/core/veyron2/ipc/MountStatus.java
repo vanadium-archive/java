@@ -3,7 +3,7 @@ package io.v.core.veyron2.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * MountStatus represents the status of the last mount or unmount operation for a server.
@@ -12,10 +12,10 @@ public class MountStatus {
 	private final String name;
 	private final String server;
 	private final DateTime lastMount;
-	private final VeyronException lastMountError;
+	private final VException lastMountError;
 	private final Duration ttl;
 	private final DateTime lastUnmount;
-	private final VeyronException lastUnmountError;
+	private final VException lastUnmountError;
 
 	/**
 	 * Creates a new mount status object.
@@ -29,8 +29,8 @@ public class MountStatus {
 	 * @param  lastUnmountError any error reported by the last attempted unmount
 	 */
 	public MountStatus(String name, String server, DateTime lastMount,
-		VeyronException lastMountError, Duration ttl, DateTime lastUnmount,
-		VeyronException lastUnmountError) {
+		VException lastMountError, Duration ttl, DateTime lastUnmount,
+		VException lastUnmountError) {
 		this.name = name;
 		this.server = server;
 		this.lastMount = lastMount;
@@ -72,7 +72,7 @@ public class MountStatus {
 	 *
 	 * @return an error reported by the last attempted mount
 	 */
-	public VeyronException getLastMountError() {
+	public VException getLastMountError() {
 		return this.lastMountError;
 	}
 
@@ -99,7 +99,7 @@ public class MountStatus {
 	 *
 	 * @return an error reported by the last attempted unmount
 	 */
-	public VeyronException getLastUnmountError() {
+	public VException getLastUnmountError() {
 		return this.lastUnmountError;
 	}
 

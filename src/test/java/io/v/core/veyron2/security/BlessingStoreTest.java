@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 
 import java.util.Map;
@@ -43,13 +43,13 @@ public class BlessingStoreTest extends AndroidTestCase {
 				try {
 					store.set(entry.getValue(), entry.getKey());
 					fail("Expected error for pattern: " + entry.getValue());
-				} catch (VeyronException e) {
+				} catch (VException e) {
 					// OK
 				}
 			}
 			final Map<BlessingPattern, Blessings> actual = store.peerBlessings();
 			assertEquals(want, actual);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -66,7 +66,7 @@ public class BlessingStoreTest extends AndroidTestCase {
 			assertEquals(blessingA, store.defaultBlessings());
 			store.setDefaultBlessings(blessingB);
 			assertEquals(blessingB, store.defaultBlessings());
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -102,13 +102,13 @@ public class BlessingStoreTest extends AndroidTestCase {
 			for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
 				assertEquals(entry.getValue(), store.forPeer(entry.getKey()));
 			}
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
 
 	private static Blessings newBlessing(Principal blessee, String root, String extension)
-			throws VeyronException {
+			throws VException {
 		final Principal blesser = Security.newPrincipal();
 		return blesser.bless(blessee.publicKey(), blesser.blessSelf(root), extension,
 				Security.newUnconstrainedUseCaveat());

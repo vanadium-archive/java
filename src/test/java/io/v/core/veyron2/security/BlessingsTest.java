@@ -2,7 +2,7 @@ package io.v.core.veyron2.security;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class BlessingsTest extends AndroidTestCase {
 			final VContext ctx = Security.newContext(new VContextParams().withLocalPrincipal(p2));
 			final String[] blessings = aliceWorkFriend.forContext(ctx);
 			assertTrue(Arrays.equals(new String[]{ "alice/work/friend" }, blessings));
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -42,7 +42,7 @@ public class BlessingsTest extends AndroidTestCase {
 					alice, "work/friend", Security.newUnconstrainedUseCaveat());
 			assertTrue(Arrays.equals(
 					p2.publicKey().getEncoded(), aliceWorkFriend.publicKey().getEncoded()));
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}

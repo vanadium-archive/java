@@ -4,9 +4,8 @@ import android.test.AndroidTestCase;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.VeyronException;
-import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.android.V;
 import io.v.jni.test.security.TestCaveatValidator;
 
 import java.util.Arrays;
@@ -36,7 +35,7 @@ public class CaveatTest extends AndroidTestCase {
 						new VContextParams().withLocalPrincipal(p1).withMethod("fail"));
 				assertEquals(null, alice.forContext(ctx));
 			}
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -65,7 +64,7 @@ public class CaveatTest extends AndroidTestCase {
 						.withTimestamp(DateTime.now().plusHours(2)));
 				assertEquals(null, alice.forContext(ctx));
 			}
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}
@@ -96,8 +95,6 @@ public class CaveatTest extends AndroidTestCase {
 						.withSuffix("fail"));
 				assertEquals(null, alice.forContext(ctx));
 			}
-		} catch (VeyronException e) {
-			fail("Unexpected exception: " + e.getMessage());
 		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}

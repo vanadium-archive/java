@@ -1,20 +1,20 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 
 class BlessingsImpl extends Blessings {
 	private static final String TAG = "Veyron runtime";
 
-	private static native Blessings nativeCreate(WireBlessings wire) throws VeyronException;
-	private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VeyronException;
+	private static native Blessings nativeCreate(WireBlessings wire) throws VException;
+	private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
-	static Blessings create(WireBlessings wire) throws VeyronException {
+	static Blessings create(WireBlessings wire) throws VException {
 		return nativeCreate(wire);
 	}
 
-	static Blessings createUnion(Blessings... blessings) throws VeyronException {
+	static Blessings createUnion(Blessings... blessings) throws VException {
 		return nativeCreateUnion(blessings);
 	}
 
@@ -22,8 +22,8 @@ class BlessingsImpl extends Blessings {
 	private final WireBlessings wire;  // non-null
 
 	private native String[] nativeForContext(long nativePtr, VContext context)
-		throws VeyronException;
-	private native ECPublicKey nativePublicKey(long nativePtr) throws VeyronException;
+		throws VException;
+	private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	private BlessingsImpl(long nativePtr, WireBlessings wire) {
@@ -35,7 +35,7 @@ class BlessingsImpl extends Blessings {
 	public String[] forContext(VContext context) {
 		try {
 			return nativeForContext(this.nativePtr, context);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get blessings for context: " + e.getMessage());
 			return null;
 		}
@@ -44,7 +44,7 @@ class BlessingsImpl extends Blessings {
 	public ECPublicKey publicKey() {
 		try {
 			return nativePublicKey(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Coudln't get public key: " + e.getMessage());
 			return null;
 		}

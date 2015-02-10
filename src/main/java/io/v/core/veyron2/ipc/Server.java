@@ -1,6 +1,6 @@
 package io.v.core.veyron2.ipc;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * Server defines the interface for managing a collection of services.
@@ -21,9 +21,9 @@ public interface Server {
 	 *
 	 * @param  spec            information on how to create the network endpoint(s)
 	 * @return                 array of endpoint strings
-	 * @throws VeyronException if the server couldn't listen  provided protocol can't be listened on
+	 * @throws VException      if the server couldn't listen  provided protocol can't be listened on
 	 */
-	public String[] listen(ListenSpec spec) throws VeyronException;
+	public String[] listen(ListenSpec spec) throws VException;
 
 	/**
 	 * Associates object with name by publishing the address of this server with the mount table
@@ -47,9 +47,9 @@ public interface Server {
 	 *
 	 * @param  name            name under which the supplied object should be published
 	 * @param  object   object to be published under the given name
-	 * @throws VeyronException if the object couldn't be published under the given name
+	 * @throws VException      if the object couldn't be published under the given name
 	 */
-	public void serve(String name, Object object) throws VeyronException;
+	public void serve(String name, Object object) throws VException;
 
 	/**
 	 * Adds the specified name to the mount table for the object or {@code Dispatcher} served by
@@ -58,9 +58,9 @@ public interface Server {
 	 * This method may be called multiple times but only after {@code serve} has been called.
 	 *
 	 * @param  name            name to be added to the mount table
-	 * @throws VeyronException if the name couldn't be added to the mount table
+	 * @throws VException      if the name couldn't be added to the mount table
 	 */
-	public void addName(String name) throws VeyronException;
+	public void addName(String name) throws VException;
 
 	/**
 	 * Removes the specified name from the mount table.
@@ -83,7 +83,7 @@ public interface Server {
 	 * calls are allowed to complete.  All published mountpoints are unmounted.  This call waits for
 	 * this process to complete, and returns once the server has been shut down.
 	 *
-	 * @throws VeyronException if there was an error stopping the server
+	 * @throws VException      if there was an error stopping the server
 	 */
-	public void stop() throws VeyronException;
+	public void stop() throws VException;
 }

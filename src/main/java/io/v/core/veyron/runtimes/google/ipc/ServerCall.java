@@ -3,7 +3,7 @@ package io.v.core.veyron.runtimes.google.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.context.CancelableVContext;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;
@@ -21,7 +21,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 	private final VContext context;
 	private final io.v.core.veyron2.security.VContext securityContext;
 
-	public native Blessings nativeBlessings(long nativePtr) throws VeyronException;
+	public native Blessings nativeBlessings(long nativePtr) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	private ServerCall(long nativePtr, Stream stream, VContext context,
@@ -36,18 +36,18 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
 	public Blessings blessings() {
 		try {
 			return nativeBlessings(this.nativePtr);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't get blessings: " + e.getMessage());
 			return null;
 		}
 	}
 	// Implements io.v.core.veyron2.ipc.Stream.
 	@Override
-	public void send(Object item, Type type) throws VeyronException {
+	public void send(Object item, Type type) throws VException {
 		this.stream.send(item, type);
 	}
 	@Override
-	public Object recv(Type type) throws EOFException, VeyronException {
+	public Object recv(Type type) throws EOFException, VException {
 		return this.stream.recv(type);
 	}
 	// Implements io.v.core.veyron2.context.VContext.

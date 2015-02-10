@@ -3,7 +3,7 @@ package io.v.core.veyron.runtimes.google.naming;
 import com.google.common.reflect.TypeToken;
 
 import io.v.core.veyron.runtimes.google.InputChannel;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.naming.VDLMountEntry;
 
@@ -12,7 +12,7 @@ public class Namespace implements io.v.core.veyron2.naming.Namespace {
 
 	// Returns the pointer to a *buffered* Go channel of type chan interface{}.
 	private native long nativeGlob(
-		long nativePtr, VContext context, String pattern) throws VeyronException;
+		long nativePtr, VContext context, String pattern) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
 	public Namespace(long nativePtr) {
@@ -20,7 +20,7 @@ public class Namespace implements io.v.core.veyron2.naming.Namespace {
 	}
 	@Override
 	public io.v.core.veyron2.InputChannel<VDLMountEntry> glob(VContext context, String pattern)
-		throws VeyronException {
+		throws VException {
 		final long chanPtr = nativeGlob(this.nativePtr, context, pattern);
 		return new InputChannel<VDLMountEntry>(chanPtr, new TypeToken<VDLMountEntry>(){}.getType());
 	}

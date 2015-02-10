@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
@@ -31,10 +31,10 @@ public interface Principal {
 	 * @param  caveat            caveat on the blessing.
 	 * @param  additionalCaveats addional caveats on the blessing.
 	 * @return                   the resulting blessings.
-	 * @throws VeyronException   if the blessee couldn't be blessed.
+	 * @throws VException        if the blessee couldn't be blessed.
 	 */
 	public Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
-		Caveat... additionalCaveats) throws VeyronException;
+		Caveat... additionalCaveats) throws VException;
 
 	/**
 	 * Creates a blessing with the provided name for this principal.
@@ -42,18 +42,18 @@ public interface Principal {
 	 * @param  name            the name to bless self with.
 	 * @param  caveats         caveats on the blessings.
 	 * @return                 the resulting blessings.
-	 * @throws VeyronException if there was an error blessing self.
+	 * @throws VException      if there was an error blessing self.
 	 */
-	public Blessings blessSelf(String name, Caveat... caveats) throws VeyronException;
+	public Blessings blessSelf(String name, Caveat... caveats) throws VException;
 
 	/**
 	 * Uses the private key of the principal to sign message.
 	 *
 	 * @param  message         the message to be signed.
 	 * @return                 signature of the message.
-	 * @throws VeyronException if the message couldn't be signed.
+	 * @throws VException      if the message couldn't be signed.
 	 */
-	public Signature sign(byte[] message) throws VeyronException;
+	public Signature sign(byte[] message) throws VException;
 
 	/**
 	 * Returns the public key counterpart of the private key held by the principal.
@@ -115,7 +115,7 @@ public interface Principal {
 	 *
 	 * @param  blessings       blessings to be used as authorities on blessing chains beginning at
 	 *                         those roots.
-	 * @throws VeyronException if there was an error assigning the said authorities.
+	 * @throws VException      if there was an error assigning the said authorities.
 	 */
-	public void addToRoots(Blessings blessings) throws VeyronException;
+	public void addToRoots(Blessings blessings) throws VException;
 }

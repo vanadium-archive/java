@@ -1,6 +1,6 @@
 package io.v.core.veyron2.ipc;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 /**
  * Dispatcher defines the interface that a server must implement to handle method invocations on
@@ -23,7 +23,7 @@ public interface Dispatcher {
 	 * @return                 a container storing (1) the service object identified by the given
 	 *                         suffix and (2) the associated authorizer; {@code null} is returned
 	 *                         if this dispatcher doesn't handle the object.
-	 * @throws VeyronException if the lookup error has occured.
+	 * @throws VException      if the lookup error has occured.
 	 */
-	public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException;
+	public ServiceObjectWithAuthorizer lookup(String suffix) throws VException;
 }

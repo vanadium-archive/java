@@ -3,7 +3,7 @@ package io.v.core.veyron2.ipc;
 import android.test.AndroidTestCase;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 
@@ -17,8 +17,8 @@ public class ServerTest extends AndroidTestCase {
 	public ServerTest() {
 		dummyDispatcher = new Dispatcher() {
 			@Override
-			public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
-				throw new VeyronException("Lookup unimplemented.");
+			public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
+				throw new VException("Lookup unimplemented.");
 			}
 		};
 	}
@@ -38,7 +38,7 @@ public class ServerTest extends AndroidTestCase {
 			assertTrue(Arrays.equals(new String[]{ "name1", "name3" }, getNames(s)));
 			s.removeName("name2");
 			assertTrue(Arrays.equals(new String[]{ "name1", "name3" }, getNames(s)));
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			fail("Unexpected exception: " + e.getMessage());
 		}
 	}

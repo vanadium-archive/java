@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,18 +56,18 @@ public class CryptoUtil {
 	 *
 	 * @param  encodedKey      DER-encoded ECDSA public key.
 	 * @return                 ECDSA public key.
-	 * @throws VeyronException if the public key could not be decoded.
+	 * @throws VException      if the public key could not be decoded.
 	 */
-	public static ECPublicKey decodeECPublicKey(byte[] encodedKey) throws VeyronException {
+	public static ECPublicKey decodeECPublicKey(byte[] encodedKey) throws VException {
 		try {
 			final X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedKey);
 			final KeyFactory factory = KeyFactory.getInstance(PK_ALGORITHM);
 			return (ECPublicKey)factory.generatePublic(spec);
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException(
+			throw new VException(
 				"Java runtime doesn't support " + PK_ALGORITHM + " algorithm: " + e.getMessage());
 		} catch (InvalidKeySpecException e) {
-			throw new VeyronException("Encoded key is incompatible with " + PK_ALGORITHM +
+			throw new VException("Encoded key is incompatible with " + PK_ALGORITHM +
 				" algorithm: " + e.getMessage());
 		}
 	}
@@ -78,18 +78,18 @@ public class CryptoUtil {
 	 * @param curve            EC curve
 	 * @param point            EC point
 	 * @return                 ANSI X9.62-encoded EC point.
-	 * @throws VeyronException if the curve and the point are incompatible.
+	 * @throws VException      if the curve and the point are incompatible.
 	 */
-	public static byte[] encodeECPoint(EllipticCurve curve, ECPoint point) throws VeyronException {
+	public static byte[] encodeECPoint(EllipticCurve curve, ECPoint point) throws VException {
 		final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
 		final byte[] x = point.getAffineX().toByteArray();
 		final byte[] y = point.getAffineY().toByteArray();
 		if (x.length != byteLen) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 					"Illegal length for X axis of EC point, want %d have %d", byteLen, x.length));
 		}
 		if (y.length != byteLen) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 					"Illegal length for Y axis of EC point, want %d have %d", byteLen, y.length));
 		}
 		final byte[] xy = new byte[1 + 2 * byteLen];
@@ -104,16 +104,16 @@ public class CryptoUtil {
 	 *
 	 * @param  xy              ANSI X9.62-encoded EC point.
 	 * @return                 EC point.
-	 * @throws VeyronException if the EC point couldn't be decoded.
+	 * @throws VException      if the EC point couldn't be decoded.
 	 */
-	public static ECPoint decodeECPoint(EllipticCurve curve, byte[] xy) throws VeyronException {
+	public static ECPoint decodeECPoint(EllipticCurve curve, byte[] xy) throws VException {
 		final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
 		if (xy.length != (1 + 2 * byteLen)) {
-			throw new VeyronException(String.format(
+			throw new VException(String.format(
 					"Data length mismatch: want %d have %d", (1 + 2 * byteLen), xy.length));
 		}
 		if (xy[0] != 4) { // compressed form
-			throw new VeyronException("Compressed curve formats not supported");
+			throw new VException("Compressed curve formats not supported");
 		}
 		final BigInteger x = new BigInteger(Arrays.copyOfRange(xy, 1, 1 + byteLen));
 		final BigInteger y = new BigInteger(Arrays.copyOfRange(xy, 1 + byteLen, xy.length));
@@ -126,19 +126,19 @@ public class CryptoUtil {
 	 * @param  hashAlgorithm   name of the hash algorithm to use.
 	 * @param  message         message to apply the hash function on.
 	 * @return                 hashed message.
-	 * @throws VeyronException if the message couldn't be hashed.
+	 * @throws VException      if the message couldn't be hashed.
 	 */
-	public static byte[] hash(String hashAlgorithm, byte[] message) throws VeyronException {
+	public static byte[] hash(String hashAlgorithm, byte[] message) throws VException {
 		try {
 			final MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
 			md.update(message);
 			final byte[] ret = md.digest();
 			if (ret == null || ret.length == 0) {
-				throw new VeyronException("Got empty message after a hash using " + hashAlgorithm);
+				throw new VException("Got empty message after a hash using " + hashAlgorithm);
 			}
 			return ret;
 		} catch (NoSuchAlgorithmException e) {
-			throw new VeyronException("Hashing algorithm " + hashAlgorithm + " not " +
+			throw new VException("Hashing algorithm " + hashAlgorithm + " not " +
 				"supported by the runtime: " + e.getMessage());
 		}
 	}
@@ -151,15 +151,15 @@ public class CryptoUtil {
 	 * @param  message         message that is part of the digest.
 	 * @param  purpose         purpose that is part of the digest.
 	 * @return                 digest for the specified message and digest.
-	 * @throws VeyronException if there was an error creating a digest.
+	 * @throws VException      if there was an error creating a digest.
 	 */
 	static byte[] messageDigest(String hashAlgorithm,
-		byte[] message, byte[] purpose) throws VeyronException {
+		byte[] message, byte[] purpose) throws VException {
 		if (message == null) {
-			throw new VeyronException("Empty message.");
+			throw new VException("Empty message.");
 		}
 		if (purpose == null) {
-			throw new VeyronException("Empty purpose.");
+			throw new VException("Empty purpose.");
 		}
 		message = hash(hashAlgorithm, message);
 		purpose = hash(hashAlgorithm, purpose);
@@ -181,9 +181,9 @@ public class CryptoUtil {
 	 *
 	 * @param  sig             signature in Veyron format.
 	 * @return                 signature in ASN.1 format.
-	 * @throws VeyronException if the signature couldn't be converted.
+	 * @throws VException      if the signature couldn't be converted.
 	 */
-	public static byte[] javaSignature(Signature sig) throws VeyronException {
+	public static byte[] javaSignature(Signature sig) throws VException {
 		// The ASN.1 format of the signature should be:
 		//    Signature ::= SEQUENCE {
 		//       r   INTEGER,
@@ -197,10 +197,10 @@ public class CryptoUtil {
 		final byte[] r = sig.getR();
 		final byte[] s = sig.getS();
 		if (r == null || r.length == 0) {
-			throw new VeyronException("Empty R component of signature.");
+			throw new VException("Empty R component of signature.");
 		}
 		if (s == null || s.length == 0) {
-			throw new VeyronException("Empty S component of signature.");
+			throw new VException("Empty S component of signature.");
 		}
 		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 		out.write(0x30);
@@ -221,10 +221,10 @@ public class CryptoUtil {
 	 * @param  purpose         purpose of the generated signature.
 	 * @param  sig             signature in ASN.1 format.
 	 * @return                 signature in Veyron format.
-	 * @throws VeyronException if the signature couldn't be converted.
+	 * @throws VException      if the signature couldn't be converted.
 	 */
 	public static Signature veyronSignature(String hashAlgorithm, byte[] purpose, byte[] sig)
-		throws VeyronException {
+		throws VException {
 		byte[] r, s;
 		// The ASN.1 format of the signature should be:
 		//    Signature ::= SEQUENCE {
@@ -239,30 +239,30 @@ public class CryptoUtil {
 		final ByteArrayInputStream in = new ByteArrayInputStream(sig);
 		int b;
 		if ((b = in.read()) != 0x30) {
-			throw new VeyronException(String.format("Invalid signature type, want SEQUENCE (0x30), got 0x%02X", b));
+			throw new VException(String.format("Invalid signature type, want SEQUENCE (0x30), got 0x%02X", b));
 		}
 		if ((b = in.read()) != in.available()) {
-			throw new VeyronException(String.format("Invalid signature length, want %d, got %d", in.available(), b));
+			throw new VException(String.format("Invalid signature length, want %d, got %d", in.available(), b));
 		}
 		if ((b = in.read()) != 0x02) {
-			throw new VeyronException(String.format("Invalid type for R, want INTEGER (0x02), got 0x%02X", b));
+			throw new VException(String.format("Invalid type for R, want INTEGER (0x02), got 0x%02X", b));
 		}
 		if ((b = in.read()) > in.available()) {
-			throw new VeyronException(String.format("Invalid length for R, want less than %d, got %d", in.available(), b));
+			throw new VException(String.format("Invalid length for R, want less than %d, got %d", in.available(), b));
 		}
 		r = new byte[b];
 		if (in.read(r, 0, b) != b) {
-			throw new VeyronException(String.format("Error reading %d bytes of R from signature", b));
+			throw new VException(String.format("Error reading %d bytes of R from signature", b));
 		}
 		if ((b = in.read()) != 0x02) {
-			throw new VeyronException(String.format("Invalid type for S, want INTEGER (0x02), got 0x%02X", b));
+			throw new VException(String.format("Invalid type for S, want INTEGER (0x02), got 0x%02X", b));
 		}
 		if ((b = in.read()) > in.available()) {
-			throw new VeyronException(String.format("Invalid length for S, want less than %d, got %d", in.available(), b));
+			throw new VException(String.format("Invalid length for S, want less than %d, got %d", in.available(), b));
 		}
 		s = new byte[b];
 		if (in.read(s, 0, b) != b) {
-			throw new VeyronException(String.format("Error reading %d bytes of S from signature", b));
+			throw new VException(String.format("Error reading %d bytes of S from signature", b));
 		}
 		return new Signature(purpose, new Hash(hashAlgorithm), r, s);
 	}
