@@ -1,6 +1,6 @@
 package io.v.core.veyron2.services.security.access;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.security.Authorizer;
 import io.v.core.veyron2.security.VContext;
 

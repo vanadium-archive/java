@@ -1,7 +1,8 @@
-package io.v.core.veyron2.verror2;
+package io.v.core.veyron2.verror;
 
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.i18n.Language;
+import io.v.core.veyron2.verror.Errors;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;

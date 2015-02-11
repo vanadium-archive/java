@@ -3,7 +3,7 @@ package io.v.core.veyron.runtimes.google.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.context.CancelableVContext;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;

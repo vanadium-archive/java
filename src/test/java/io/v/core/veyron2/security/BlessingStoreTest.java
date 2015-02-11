@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.android.V;
 
 import java.util.Map;

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.v.core.veyron2.services.security.access.TaggedACLMap;
 import io.v.core.veyron2.util.VomUtil;
@@ -153,7 +153,7 @@ public class Security {
 	 */
 	public static Caveat newCaveat(CaveatDescriptor desc, Object param) throws VException {
 		final byte[] paramVOM = VomUtil.encode(param, desc.getParamType().getTypeObject());
-		return new Caveat(new byte[0], desc.getId(), paramVOM);
+		return new Caveat(desc.getId(), paramVOM);
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class Security {
 	 * @return a caveat that never fails to validate.
 	 */
 	public static Caveat newUnconstrainedUseCaveat() {
-		return new Caveat(null, null, null);
+		return new Caveat(null, null);
 	}
 
 	/**

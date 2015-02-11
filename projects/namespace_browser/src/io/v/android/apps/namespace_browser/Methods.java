@@ -4,12 +4,11 @@ import com.google.common.reflect.TypeToken;
 
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.Client;
 import io.v.core.veyron2.ipc.Client.Call;
-import io.v.core.veyron2.ipc.ServiceSignature;
+import io.v.core.veyron2.verror2.VException;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -24,9 +23,9 @@ public class Methods {
    *
    * @param name             a name of the object
    * @return                 list of method names of the provided object.
-   * @throws VeyronException if there was an error getting the list of names.
+   * @throws VException      if there was an error getting the list of names.
    */
-	public static List<String> get(String name, VContext ctx) throws VeyronException {
+	public static List<String> get(String name, VContext ctx) throws VException {
 		final Client client = V.getClient(ctx);
 		final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
 		final Call call = client.startCall(ctxT, name, "signature", new Object[0], new Type[0]);

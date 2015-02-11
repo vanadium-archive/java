@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;
@@ -35,6 +34,7 @@ import io.v.core.veyron2.security.Principal;
 import io.v.core.veyron2.security.Security;
 import io.v.core.veyron2.security.WireBlessings;
 import io.v.core.veyron2.util.VomUtil;
+import io.v.core.veyron2.verror2.VException;
 
 import java.io.IOException;
 import java.security.interfaces.ECPublicKey;
@@ -234,7 +234,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
 		}
 		try {
 			return Security.newExpiryCaveat(expiry);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			android.util.Log.e(TAG, "Couldn't create expiry caveat: " + e.getMessage());
 			return null;
 		}
@@ -312,7 +312,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
 				return;
 			}
 			replyWithSuccess(retWire);
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			replyWithError("Couldn't bless: " + e.getMessage());
 		}
 	}

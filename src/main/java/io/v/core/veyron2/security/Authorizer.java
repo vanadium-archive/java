@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 /**
  * Authorizer is the interface for performing authorization checks.

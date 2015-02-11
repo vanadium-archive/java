@@ -10,7 +10,7 @@ import io.v.core.veyron2.security.CaveatRegistry;
 import io.v.core.veyron2.security.MethodCaveatValidator;
 import io.v.core.veyron2.security.Principal;
 import io.v.core.veyron2.security.UnixTimeExpiryCaveatValidator;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate

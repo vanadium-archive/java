@@ -14,7 +14,7 @@ import io.v.core.veyron2.ipc.ServerContext;
 import io.v.core.veyron2.vdl.ClientStream;
 import io.v.core.veyron2.vdl.Stream;
 import io.v.core.veyron2.vdl.VdlUint32;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 import java.io.EOFException;
 import java.io.Serializable;

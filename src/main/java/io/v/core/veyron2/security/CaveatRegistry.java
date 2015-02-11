@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.uniqueid.Id;
 import io.v.core.veyron2.util.VomUtil;
 
@@ -60,7 +60,7 @@ public class CaveatRegistry {
 	public static void validate(VContext ctx, Caveat caveat) throws VException {
 		final RegistryEntry entry = lookup(caveat.getId());
 		if (entry == null) {
-			throw Errors.makeErrCaveatNotRegistered(null, caveat.getId());
+			throw Errors.makeCaveatNotRegistered(null, caveat.getId());
 		}
 		Object param = null;
 		try {

@@ -5,7 +5,7 @@ import com.google.common.base.Strings;
 
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;

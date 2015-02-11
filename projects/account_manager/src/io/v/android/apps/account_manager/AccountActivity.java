@@ -21,7 +21,7 @@ import org.joda.time.Duration;
 import io.v.core.veyron.services.identity.OAuthBlesserClient;
 import io.v.core.veyron.services.identity.OAuthBlesserClient.BlessUsingAccessTokenOut;
 import io.v.core.veyron.services.identity.OAuthBlesserClientFactory;
-import io.v.core.veyron2.VeyronException;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Certificate;
@@ -169,7 +169,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 					return null;
 				}
 				return blessing;
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				errorMsg = e.getMessage();
 				return null;
 			}
@@ -185,7 +185,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
 			try {
 				final String encoded = VomUtil.encodeToString(blessing, WireBlessings.class);
 				replyWithSuccess(blessing, encoded);
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				replyWithError("Couldn't encode identity obtained from Vanadium " +
 						"identity servers: " + e.getMessage());
 			}

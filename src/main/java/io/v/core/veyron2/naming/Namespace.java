@@ -1,7 +1,7 @@
 package io.v.core.veyron2.naming;
 
 import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 import io.v.core.veyron2.InputChannel;
 

@@ -1,6 +1,6 @@
 package io.v.core.veyron.runtimes.google;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.util.VomUtil;
 
 import java.io.EOFException;

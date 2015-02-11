@@ -1,4 +1,4 @@
-package io.v.core.veyron2.verror2;
+package io.v.core.veyron2.verror;
 
 import android.test.AndroidTestCase;
 
@@ -7,6 +7,7 @@ import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.context.VContextImpl;
 import io.v.core.veyron2.i18n.Catalog;
 import io.v.core.veyron2.i18n.Language;
+import io.v.core.veyron2.verror.Errors;
 
 /**
  * VExceptionTest tests the {@code VException} implementation.

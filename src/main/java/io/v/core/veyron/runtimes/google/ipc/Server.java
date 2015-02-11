@@ -2,7 +2,7 @@ package io.v.core.veyron.runtimes.google.ipc;
 
 import io.v.core.veyron2.OptionDefs;
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.ipc.Dispatcher;
 import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.ServerStatus;

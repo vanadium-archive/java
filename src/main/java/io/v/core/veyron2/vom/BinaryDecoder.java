@@ -19,7 +19,7 @@ import io.v.core.veyron2.vdl.VdlTypeObject;
 import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 import java.io.IOException;
 import java.io.InputStream;

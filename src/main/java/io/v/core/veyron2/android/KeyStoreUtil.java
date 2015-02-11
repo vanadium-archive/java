@@ -2,7 +2,7 @@ package io.v.core.veyron2.android;
 
 import android.security.KeyPairGeneratorSpec;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 import java.io.IOException;
 import java.math.BigInteger;

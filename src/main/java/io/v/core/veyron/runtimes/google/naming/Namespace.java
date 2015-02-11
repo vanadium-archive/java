@@ -3,7 +3,7 @@ package io.v.core.veyron.runtimes.google.naming;
 import com.google.common.reflect.TypeToken;
 
 import io.v.core.veyron.runtimes.google.InputChannel;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.naming.VDLMountEntry;
 

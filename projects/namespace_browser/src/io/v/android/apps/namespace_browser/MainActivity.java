@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.v.android.libs.security.BlessingsManager;
-import io.v.core.veyron2.VeyronException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.naming.VDLMountEntry;
@@ -31,6 +30,7 @@ import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
 import io.v.core.veyron2.security.Security;
 import io.v.core.veyron2.security.WireBlessings;
+import io.v.core.veyron2.verror2.VException;
 
 import java.util.List;
 import java.util.Set;
@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
 					mBlessingsManager.add(blessings);
 					Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
 					updateBlessingsView();
-				} catch (VeyronException e) {
+				} catch (VException e) {
 					final String msg = "Couldn't derive blessing: " + e.getMessage();
 					Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 				}
@@ -229,7 +229,7 @@ public class MainActivity extends Activity {
 			final Principal p = V.getPrincipal(mBaseContext);
 			p.blessingStore().setDefaultBlessings(blessings);
 			mSelectedBlessing = blessingName;
-		} catch (VeyronException e) {
+		} catch (VException e) {
 			final String msg = String.format(
 			        "Couldn't set blessing %s: %s", blessingName, e.getMessage());
 			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -280,7 +280,7 @@ public class MainActivity extends Activity {
 			final VDLMountEntry entry = (VDLMountEntry)dirView.getTag();
 			try {
 				return Namespace.glob(entry.getName(), mBaseContext);
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				errorMsg = "Error fetching names: " + e.getMessage();
 				return null;
 			}
@@ -333,7 +333,7 @@ public class MainActivity extends Activity {
 			final VDLMountEntry entry = (VDLMountEntry)objView.getTag();
 			try {
 				return Methods.get(entry.getName(), mBaseContext);
-			} catch (VeyronException e) {
+			} catch (VException e) {
 				errorMsg = "Error fetching methods: " + e.getMessage();
 				return null;
 			}

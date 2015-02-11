@@ -11,7 +11,7 @@ import io.v.core.veyron2.ipc.ServerContext;
 import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.vdl.Stream;
 import io.v.core.veyron2.vdl.VdlUint32;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.jni.test.fortune.ComplexErrorParam;
 import io.v.jni.test.fortune.Errors;
 import io.v.jni.test.fortune.FortuneServer;

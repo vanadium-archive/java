@@ -2,7 +2,7 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 public class UnixTimeExpiryCaveatValidator implements CaveatValidator {
 	@Override

@@ -4,7 +4,7 @@ import android.test.AndroidTestCase;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.android.V;
 import io.v.jni.test.security.TestCaveatValidator;
 

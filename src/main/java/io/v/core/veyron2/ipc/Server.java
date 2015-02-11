@@ -1,6 +1,6 @@
 package io.v.core.veyron2.ipc;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 /**
  * Server defines the interface for managing a collection of services.

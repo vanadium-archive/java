@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Certificate;

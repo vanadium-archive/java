@@ -1,6 +1,6 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 public class BlessingPatternWrapper {
 	private static final String TAG = "Veyron runtime";

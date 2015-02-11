@@ -3,7 +3,7 @@ package io.v.core.veyron2.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 /**
  * MountStatus represents the status of the last mount or unmount operation for a server.

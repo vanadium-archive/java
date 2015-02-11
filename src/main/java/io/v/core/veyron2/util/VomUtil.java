@@ -4,7 +4,7 @@ import io.v.core.veyron2.vdl.VdlOptional;
 import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.vom.BinaryDecoder;
 import io.v.core.veyron2.vom.BinaryEncoder;
 import io.v.core.veyron2.vom.ConversionException;

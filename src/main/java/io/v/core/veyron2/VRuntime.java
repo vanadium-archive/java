@@ -6,7 +6,7 @@ import io.v.core.veyron2.ipc.ListenSpec;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.naming.Namespace;
 import io.v.core.veyron2.security.Principal;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 
 /**
  * VRuntime is a base interface for all runtime implementations.

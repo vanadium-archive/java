@@ -10,7 +10,7 @@ import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.vom.testdata.Constants;
 
 import java.io.Serializable;
