@@ -5,6 +5,7 @@ import io.v.core.veyron2.i18n.Language;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -146,7 +147,7 @@ public class VException extends Exception {
 
 		@Override
 		public String toString() {
-			return "(" + this.id + "," + this.action + ")";
+			return String.format("{ID: %s, Action: %s}", this.id, this.action);
 		}
 	}
 
@@ -401,12 +402,25 @@ public class VException extends Exception {
 	/**
 	 * Returns true iff the error identifier associated with this exception is equal to the provided
 	 * identifier.
+	 *
 	 * @param  id the error identifier we're comparing with this error
 	 * @return    true iff the error identifier associated with this exception is equal to the
 	 *            provided identifier.
 	 */
 	public boolean is(String id) {
 		return getID().equals(id);
+	}
+
+	/**
+	 * Returns true iff the error identifier associated with this exception is equal to the provided
+	 * identifier.
+	 *
+	 * @param  idAction the error identifier we're comparing with this error
+	 * @return          true iff the error identifier associated with this exception is equal to the
+	 *                  provided identifier.
+	 */
+	public boolean is(IDAction idAction) {
+		return is(idAction.getID());
 	}
 
 	@Override
@@ -421,6 +435,12 @@ public class VException extends Exception {
 	@Override
 	public int hashCode() {
 		return this.id.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return String.format("{IDAction: %s, Msg: \"%s\", Params: %s, ParamTypes: %s}", this.id,
+				getMessage(), Arrays.toString(this.params), Arrays.toString(this.paramTypes));
 	}
 
 	private static class ComponentNameKey {

@@ -1,8 +1,10 @@
 package io.v.core.veyron2.util;
 
-import io.v.core.veyron2.verror2.VException;
+import io.v.core.veyron2.vdl.VdlOptional;
+import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.verror2.VException;
 import io.v.core.veyron2.vom.BinaryDecoder;
 import io.v.core.veyron2.vom.BinaryEncoder;
 import io.v.core.veyron2.vom.ConversionException;
@@ -135,6 +137,22 @@ public class VomUtil {
 	public static Object decodeFromString(String hex, Type type) throws VException {
 		final byte[] data = hexStringToBytes(hex);
 		return decode(data, type);
+	}
+
+	/**
+	 * Helper class for decoding errors encoded via Go vom encoder.  Go vom encoder encodes
+	 * the errors into a non-optional error type, which we're not handling correctly right now.
+	 *
+	 * TODO(spetrovic): remove this method once the error type becomes non-optional everywhere.
+	 */
+	private static Object decodeError(byte[] data) throws VException {
+		VdlValue val = (VdlValue) decode(data, VdlValue.class);
+		if (val instanceof VdlStruct) {
+			val = new VdlOptional<VdlStruct>((VdlStruct) val);
+		}
+		final byte[] newData = encode(val);
+		final Object ret = decode(newData, VException.class);
+		return ret;
 	}
 
 	private static String bytesToHexString(byte[] data) {

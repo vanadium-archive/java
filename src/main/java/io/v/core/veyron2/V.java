@@ -79,6 +79,10 @@ public class V {
 						"Couldn't register caveat validators: " + e.getMessage());
 			}
 			context = runtime.getContext();
+
+			// Set the VException component name to this binary name.
+			context = VException.contextWithComponentName(
+					context, System.getProperty("program.name", ""));
 			return context;
 		}
 	}

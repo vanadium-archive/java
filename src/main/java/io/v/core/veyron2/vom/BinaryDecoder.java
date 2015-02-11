@@ -180,8 +180,7 @@ public class BinaryDecoder {
             // Java native types, which is what we want.
             final Type decodingType =
                     Types.getReflectTypeForVdl(Types.ERROR, true /*forceVdlWrappers*/);
-            final VdlValue value =
-                    (VdlValue) readValue(actualType, decodingType, DecodingMode.JAVA_OBJECT);
+            final VdlValue value = (VdlValue) readValue(actualType, decodingType);
             return vExceptionFromValue(value);
         }
         switch (actualType.getKind()) {

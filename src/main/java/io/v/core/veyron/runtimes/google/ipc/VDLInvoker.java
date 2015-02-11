@@ -174,13 +174,11 @@ public final class VDLInvoker {
 	/**
 	 * InvokeReply stores the replies for the {@link #invoke} method. The
 	 * replies are VOM-encoded. In addition to replies, this class also stores
-	 * application error, if any.
+	 * VOM-encoded application error, if any.
 	 */
 	public static class InvokeReply {
 		public byte[][] results = null; // can be null, e.g., if an error occurred.
-		public boolean hasApplicationError = false;
-		public String errorID = null;
-		public String errorMsg = null;
+		public byte[] vomAppError = null;
 	}
 
 	/**
@@ -249,9 +247,7 @@ public final class VDLInvoker {
 			throws VException {
 		final InvokeReply reply = new InvokeReply();
 		if (appError != null) {
-			reply.hasApplicationError = true;
-			reply.errorID = appError.getID();
-			reply.errorMsg = appError.getMessage();
+			reply.vomAppError = VomUtil.encode(appError, VException.class);
 		}
 		if (m.method.getReturnType() == void.class) {
 			reply.results = new byte[0][];

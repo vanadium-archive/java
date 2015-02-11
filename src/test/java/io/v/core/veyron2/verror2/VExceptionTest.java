@@ -151,9 +151,17 @@ public class VExceptionTest extends AndroidTestCase {
 			fail(String.format("%d: (%s).is(%s) == false, want true", tag, error,
 					idAction.getID()));
 		}
+		if (!error.is(idAction)) {
+			fail(String.format("%d: (%s).is(%s) == false, want true", tag, error,
+					idAction));
+		}
 		if (error.is(idActionC.getID())) {
 			fail(String.format("%d: (%s).is(%s) == true, want false", tag, error,
 					idActionC.getID()));
+		}
+		if (error.is(idActionC)) {
+			fail(String.format("%d: (%s).is(%s) == true, want false", tag, error,
+					idActionC));
 		}
 	}
 

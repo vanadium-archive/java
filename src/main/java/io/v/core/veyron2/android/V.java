@@ -69,6 +69,8 @@ public class V extends io.v.core.veyron2.V {
 				throw new RuntimeException(
 		    			"Couldn't setup Vanadium Runtime options: " + e.getMessage());
 			}
+			// Set the VException component name to the Android context package name.
+			context = VException.contextWithComponentName(context, ctx.getPackageName());
 			return context;
 		}
 	}
