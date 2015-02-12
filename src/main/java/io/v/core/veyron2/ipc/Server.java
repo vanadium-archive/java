@@ -1,5 +1,6 @@
 package io.v.core.veyron2.ipc;
 
+import io.v.core.veyron2.InputChannel;
 import io.v.core.veyron2.verror.VException;
 
 /**
@@ -77,6 +78,22 @@ public interface Server {
 	 * @return the current status of the server
 	 */
 	public ServerStatus getStatus();
+
+	/**
+	 * Returns a channel over which {@code NetworkChange} objects will be sent. The server will
+	 * not block sending data over this channel and hence change events may be lost if the
+	 * implementation doesn't ensure there is sufficient buffering in the channel.
+	 *
+	 * @return a channel over which {@code NetworkChange} objects will be sent
+	 */
+	public InputChannel<NetworkChange> watchNetwork();
+
+	/**
+	 * Unregisters a channel previously registered using {@code watchNetwork}.
+	 *
+	 * @param channel a channel previously registered using {@code watchNetwork}
+	 */
+	public void unwatchNetwork(InputChannel<NetworkChange> channel);
 
 	/**
 	 * Gracefully stops all services on this server.  New calls are rejected, but any in-flight

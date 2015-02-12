@@ -1,12 +1,12 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.OptionDefs;
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron.runtimes.google.InputChannel;
 import io.v.core.veyron2.ipc.Dispatcher;
 import io.v.core.veyron2.ipc.ListenSpec;
+import io.v.core.veyron2.ipc.NetworkChange;
 import io.v.core.veyron2.ipc.ServerStatus;
 import io.v.core.veyron2.ipc.ServiceObjectWithAuthorizer;
+import io.v.core.veyron2.verror.VException;
 
 public class Server implements io.v.core.veyron2.ipc.Server {
 	private final long nativePtr;
@@ -18,6 +18,9 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	private native void nativeAddName(long nativePtr, String name) throws VException;
 	private native void nativeRemoveName(long nativePtr, String name);
 	private native ServerStatus nativeGetStatus(long nativePtr) throws VException;
+	private native InputChannel<NetworkChange> nativeWatchNetwork(long nativePtr) throws VException;
+	private native void nativeUnwatchNetwork(long nativePtr, InputChannel<NetworkChange> channel)
+			throws VException;
 	private native void nativeStop(long nativePtr) throws VException;
 	private native void nativeFinalize(long nativePtr);
 
@@ -55,6 +58,25 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 			return nativeGetStatus(this.nativePtr);
 		} catch (VException e) {
 			throw new RuntimeException("Couldn't get status: " + e.getMessage());
+		}
+	}
+	@Override
+	public io.v.core.veyron2.InputChannel<NetworkChange> watchNetwork() {
+		try {
+			return nativeWatchNetwork(this.nativePtr);
+		} catch (VException e) {
+			throw new RuntimeException("Couldn't watch network: " + e.getMessage());
+		}
+	}
+	@Override
+	public void unwatchNetwork(io.v.core.veyron2.InputChannel<NetworkChange> channel) {
+		if (!(channel instanceof InputChannel)) {  // also handles channel == null
+			return;
+		}
+		try {
+			nativeUnwatchNetwork(this.nativePtr, (InputChannel<NetworkChange>) channel);
+		} catch (VException e) {
+			throw new RuntimeException("Couldn't unwatch network: " + e.getMessage());
 		}
 	}
 	@Override

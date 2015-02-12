@@ -1,29 +1,26 @@
 package io.v.core.veyron.runtimes.google;
 
 import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.util.VomUtil;
-
 import java.io.EOFException;
-import java.lang.reflect.Type;
 
 public class InputChannel<T> implements io.v.core.veyron2.InputChannel<T> {
 	private final long nativePtr;
-	private final Type type;
+	private final long sourceNativePtr;
 
 	private native boolean nativeAvailable(long nativePtr);
-	private native byte[] nativeReadValue(long nativePtr) throws EOFException, VException;
-	private native void nativeFinalize(long nativePtr);
+	private native Object nativeReadValue(long nativePtr) throws EOFException, VException;
+	private native void nativeFinalize(long nativePtr, long sourceNativePtr);
 
 	/**
-	 * Creates a new instance of InputChannel using the underlying Go channel as input.
-	 * The Go channel must be of type {@code chan interface{}} *AND* it must be buffered.
+	 * Creates a new instance of {@code InputChannel}.
 	 *
-	 * @param  nativePtr a pointer to the Go channel of type chan interface{}
-	 * @param  type      type of Java values.
+	 * @param  nativePtr       native pointer to the Go channel of Java objects
+	 * @param  sourceNativePtr native pointer to the Go channel that feeds the above Go channel
+	 *                         of Java object
 	 */
-	public InputChannel(long nativePtr, Type type) {
+	public InputChannel(long nativePtr, long sourceNativePtr) {
 		this.nativePtr = nativePtr;
-		this.type = type;
+		this.sourceNativePtr = sourceNativePtr;
 	}
 
 	@Override
@@ -32,12 +29,25 @@ public class InputChannel<T> implements io.v.core.veyron2.InputChannel<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public T readValue() throws EOFException, VException {
-		final byte[] value = nativeReadValue(this.nativePtr);
-		return (T) VomUtil.decode(value, this.type);
+		return (T) nativeReadValue(this.nativePtr);
 	}
 	@Override
 	protected void finalize() {
-		nativeFinalize(this.nativePtr);
+		nativeFinalize(this.nativePtr, this.sourceNativePtr);
 	}
+	/**
+	 * Returns the native pointer to the Go channel of Java objects.
+	 * 
+	 * @return the native pointer to the Go channel of Java objects
+	 */
+	public long getNativePtr() { return this.nativePtr; }
+
+	/**
+	 * Returns the native pointer to the Go channel that feeds the above Go channel of Java object.
+	 *
+	 * @return the native pointer to the Go channel that feeds the above Go channel of Java object
+	 */
+	public long getSourceNativePtr() { return this.sourceNativePtr; }
 }

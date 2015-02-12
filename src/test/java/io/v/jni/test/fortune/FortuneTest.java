@@ -6,9 +6,11 @@ import android.test.AndroidTestCase;
 
 import org.joda.time.Duration;
 
+import io.v.core.veyron2.InputChannel;
 import io.v.core.veyron2.Options;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.context.VContext;
+import io.v.core.veyron2.ipc.NetworkChange;
 import io.v.core.veyron2.ipc.Server;
 import io.v.core.veyron2.ipc.ServerContext;
 import io.v.core.veyron2.vdl.ClientStream;
@@ -153,5 +155,18 @@ public class FortuneTest extends AndroidTestCase {
             assertEquals(Integer.class, paramTypes[4]);
         }
         s.stop();
+    }
+
+    public void testWatchNetwork() throws VException {
+        final VContext ctx = V.init(getContext(), new Options());
+        final Server s = V.newServer(ctx);
+        s.listen(null);
+        final FortuneServer server = new FortuneServerImpl();
+        s.serve("fortune", server);
+
+        // TODO(spetrovic): Figure out how to force network change in android and test that the
+        // changes get announced on this channel.
+        final InputChannel<NetworkChange> channel = s.watchNetwork();
+        s.unwatchNetwork(channel);
     }
 }
