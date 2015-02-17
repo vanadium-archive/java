@@ -3,16 +3,14 @@ package io.v.core.veyron2.vdl;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * VdlUnion is a representation of a VDL union.
  */
 public class VdlUnion extends VdlValue implements Parcelable {
-    private Serializable elem;
+    private Object elem;
     private int index;
 
-    protected VdlUnion(VdlType type, int index, Serializable elem) {
+    protected VdlUnion(VdlType type, int index, Object elem) {
         super(type);
         assertKind(Kind.UNION);
         if (index < 0 || index > type.getFields().size()) {
@@ -23,7 +21,7 @@ public class VdlUnion extends VdlValue implements Parcelable {
         this.elem = elem;
     }
 
-    public VdlUnion(VdlType type, int index, VdlType elemType, Serializable elem) {
+    public VdlUnion(VdlType type, int index, VdlType elemType, Object elem) {
         this(type, index, elem);
         if (!vdlType().getFields().get(index).getType().equals(elemType)) {
             throw new IllegalArgumentException("Illegal type " + elemType + " of elem: it should"
@@ -31,7 +29,7 @@ public class VdlUnion extends VdlValue implements Parcelable {
         }
     }
 
-    public Serializable getElem() {
+    public Object getElem() {
         return elem;
     }
 
