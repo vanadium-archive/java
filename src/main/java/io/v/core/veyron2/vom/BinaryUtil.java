@@ -26,11 +26,12 @@ final class BinaryUtil {
      * Unsigned integers are the basis for all other primitive values. This is a two-state encoding.
      * If the number is less than 128 (0 through 0x7f), its value is written directly. Otherwise the
      * value is written in big-endian byte order preceded by the negated byte length.
+     * Returns true iff the value is non-zero.
      */
-    public static void encodeUint(OutputStream out, final long value) throws IOException {
+    public static boolean encodeUint(OutputStream out, final long value) throws IOException {
         if ((value & 0x7f) == value) {
             out.write((byte) value);
-            return;
+            return value != 0;
         }
         int len = 0;
         while (((value >>> (len * 8)) | 0xff) != 0xff) {
@@ -42,14 +43,15 @@ final class BinaryUtil {
             len--;
             out.write((byte) (value >>> (len * 8)));
         }
+        return true;
     }
 
-    public static void encodeUint(OutputStream out, final int value) throws IOException {
-        encodeUint(out, value & 0xffffffffL);
+    public static boolean encodeUint(OutputStream out, final int value) throws IOException {
+        return encodeUint(out, value & 0xffffffffL);
     }
 
-    public static void encodeUint(OutputStream out, final short value) throws IOException {
-        encodeUint(out, value & 0xffffL);
+    public static boolean encodeUint(OutputStream out, final short value) throws IOException {
+        return encodeUint(out, value & 0xffffL);
     }
 
     public static long decodeUint(InputStream in) throws IOException {
@@ -80,12 +82,13 @@ final class BinaryUtil {
     /**
      * Signed integers are encoded as unsigned integers, where the low bit says whether to
      * complement the other bits to recover the int.
+     * Returns true iff the value is non-zero.
      */
-    public static void encodeInt(OutputStream out, final long value) throws IOException {
+    public static boolean encodeInt(OutputStream out, final long value) throws IOException {
         if (value < 0) {
-            encodeUint(out, ((~value) << 1) | 1);
+            return encodeUint(out, ((~value) << 1) | 1);
         } else {
-            encodeUint(out, value << 1);
+            return encodeUint(out, value << 1);
         }
     }
 
@@ -100,9 +103,10 @@ final class BinaryUtil {
 
     /**
      * Floating point numbers are encoded as byte-reversed ieee754.
+     * Returns true iff the value is non-zero;
      */
-    public static void encodeDouble(OutputStream out, final double value) throws IOException {
-        encodeUint(out, Long.reverseBytes(Double.doubleToLongBits(value)));
+    public static boolean encodeDouble(OutputStream out, final double value) throws IOException {
+        return encodeUint(out, Long.reverseBytes(Double.doubleToLongBits(value)));
     }
 
     public static double decodeDouble(InputStream in) throws IOException {
@@ -111,9 +115,11 @@ final class BinaryUtil {
 
     /**
      * Booleans are encoded as a byte where 0 = false and anything else is true.
+     * Returns the encoded value.
      */
-    public static void encodeBoolean(OutputStream out, final boolean value) throws IOException {
+    public static boolean encodeBoolean(OutputStream out, final boolean value) throws IOException {
         out.write(value ? 1 : 0);
+        return value;
     }
 
     public static boolean decodeBoolean(InputStream in) throws IOException {
