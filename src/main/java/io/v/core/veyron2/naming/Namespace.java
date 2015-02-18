@@ -10,13 +10,13 @@ import io.v.core.veyron2.InputChannel;
  * interface to a client side library for the MountTable service.
  */
 public interface Namespace {
-	/**
-	 * Returns all names matching the provided pattern.
-	 *
-	 * @param  context         a client context.
-	 * @param  pattern         a pattern that should be matched.
-	 * @return                 an input channel of MountEntry objects matching the provided pattern.
-	 * @throws VException      if an error is encountered.
-	 */
-	public InputChannel<VDLMountEntry> glob(VContext context, String pattern) throws VException;
+    /**
+     * Returns all names matching the provided pattern.
+     *
+     * @param  context         a client context.
+     * @param  pattern         a pattern that should be matched.
+     * @return                 an input channel of MountEntry objects matching the provided pattern.
+     * @throws VException      if an error is encountered.
+     */
+    public InputChannel<VDLMountEntry> glob(VContext context, String pattern) throws VException;
 }

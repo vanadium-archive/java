@@ -73,381 +73,381 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * {@code ": "} or followed by {@code ":"} or both, respectively.
  */
 public class VException extends Exception {
-	private static VContext defaultContext = null;
-	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static VContext defaultContext = null;
+    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-	/**
-	 * ActionCode represents the action expected to be performed by a typical client receiving
-	 * an error that perhaps it does not understand.
-	 */
-	public static enum ActionCode {
-		NO_RETRY         (0),
-		RETRY_CONNECTION (1),
-		RETRY_REFETCH    (2),
-		RETRY_BACKOFF    (3);
+    /**
+     * ActionCode represents the action expected to be performed by a typical client receiving
+     * an error that perhaps it does not understand.
+     */
+    public static enum ActionCode {
+        NO_RETRY         (0),
+        RETRY_CONNECTION (1),
+        RETRY_REFETCH    (2),
+        RETRY_BACKOFF    (3);
 
-		public static ActionCode fromValue(int value) {
-			switch (value) {
-				case 0: return NO_RETRY;
-				case 1: return RETRY_CONNECTION;
-				case 2: return RETRY_REFETCH;
-				case 3: return RETRY_BACKOFF;
-				default: return NO_RETRY;
-			}
-		}
+        public static ActionCode fromValue(int value) {
+            switch (value) {
+                case 0: return NO_RETRY;
+                case 1: return RETRY_CONNECTION;
+                case 2: return RETRY_REFETCH;
+                case 3: return RETRY_BACKOFF;
+                default: return NO_RETRY;
+            }
+        }
 
-		private final int value;
+        private final int value;
 
-		private ActionCode(int value) {
-			this.value = value;
-		}
-		public int getValue() { return this.value; }
-	}
+        private ActionCode(int value) {
+            this.value = value;
+        }
+        public int getValue() { return this.value; }
+    }
 
-	/**
-	 * IDAction combines a unique identifier for errors with an {@code ActionCode}.  The identifier
-	 * allows stable error checking across different error messages and different address spaces.
-	 *
-	 * By convention the format for the identifier is "PKGPATH.NAME" - e.g. {@code errIDFoo} defined
-	 * in the {@code io.v.core.veyron2.verror} package has id
-	 * {@code io.v.core.veyron2.verror.errIDFoo}.  It is unwise ever to create two {@code IDAction}s
-	 * that associate different {@code ActionCode}s with the same id.
-	*/
-	public static class IDAction {
-		private final String id;
-		private final ActionCode action;
+    /**
+     * IDAction combines a unique identifier for errors with an {@code ActionCode}.  The identifier
+     * allows stable error checking across different error messages and different address spaces.
+     *
+     * By convention the format for the identifier is "PKGPATH.NAME" - e.g. {@code errIDFoo} defined
+     * in the {@code io.v.core.veyron2.verror} package has id
+     * {@code io.v.core.veyron2.verror.errIDFoo}.  It is unwise ever to create two {@code IDAction}s
+     * that associate different {@code ActionCode}s with the same id.
+    */
+    public static class IDAction {
+        private final String id;
+        private final ActionCode action;
 
-		public IDAction(String id, ActionCode action) {
-			this.id = id == null ? "" : id;
-			this.action = action;
-		}
+        public IDAction(String id, ActionCode action) {
+            this.id = id == null ? "" : id;
+            this.action = action;
+        }
 
-		public String getID() { return this.id; }
+        public String getID() { return this.id; }
 
-		public ActionCode getAction() { return this.action; }
+        public ActionCode getAction() { return this.action; }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (this.getClass() != obj.getClass()) return false;
-			final IDAction other = (IDAction) obj;
-			if (!this.id.equals(other.id)) return false;
-			if (this.action != other.action) return false;
-			return true;
-		}
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (this.getClass() != obj.getClass()) return false;
+            final IDAction other = (IDAction) obj;
+            if (!this.id.equals(other.id)) return false;
+            if (this.action != other.action) return false;
+            return true;
+        }
 
-		@Override
-		public int hashCode() {
-			int result = 1;
-			final int prime = 31;
-			result = prime * result + id.hashCode();
-			result = prime * result + action.hashCode();
-			return result;
-		}
+        @Override
+        public int hashCode() {
+            int result = 1;
+            final int prime = 31;
+            result = prime * result + id.hashCode();
+            result = prime * result + action.hashCode();
+            return result;
+        }
 
-		@Override
-		public String toString() {
-			return String.format("{ID: %s, Action: %s}", this.id, this.action);
-		}
-	}
+        @Override
+        public String toString() {
+            return String.format("{ID: %s, Action: %s}", this.id, this.action);
+        }
+    }
 
-	/**
-	 * Register returns an {@code IDAction} with the given identifier and action fields and
-	 * inserts a message into the default i18n catalogue in US English.  Other languages can be
-	 * added by directly modifying the catalogue.
-	 *
-	 * @param  id          error identifier
-	 * @param  action      error action
-	 * @param  englishText english message associated with the error
-	 * @return             {@code IDAction} with the given identifier and action fields
-	 */
-	public static IDAction register(String id, ActionCode action, String englishText) {
-		Language.getDefaultCatalog().setWithBase("en-US", id, englishText);
-		return new IDAction(id, action);
-	}
+    /**
+     * Register returns an {@code IDAction} with the given identifier and action fields and
+     * inserts a message into the default i18n catalogue in US English.  Other languages can be
+     * added by directly modifying the catalogue.
+     *
+     * @param  id          error identifier
+     * @param  action      error action
+     * @param  englishText english message associated with the error
+     * @return             {@code IDAction} with the given identifier and action fields
+     */
+    public static IDAction register(String id, ActionCode action, String englishText) {
+        Language.getDefaultCatalog().setWithBase("en-US", id, englishText);
+        return new IDAction(id, action);
+    }
 
-	/*
-	 * Returns an error with the given identifier and an error string in the chosen language.
-	 * The component and operation name are included the first and second parameters of the error.
-	 * Other parameters are taken from {@code params}. The parameters are formatted into the message
-	 * according to the format described in the {@code VException} documentation.
-	 *
-	 * The provided parameters need to be VOM-encodeable.  This means that they have to be of one
-	 * of the supported VOM types, which includes all Java primitive types, all VDL types, and
-	 * Lists/Maps/Sets of those.
-	 *
-	 * @param  idAction      error identifier
-	 * @param  language      error language, in IETF format
-	 * @param  componentName error component name
-	 * @param  opName        error operation name
-	 * @param  params        error message parameters
-	 * @return               an error with the given identifier and an error string in the given
-	 *                       language
-	 */
-	public static VException explicitMake(IDAction idAction, String language, String componentName,
-		String opName, Serializable... params) {
-		final Type[] paramTypes = new Type[params.length];
-		for (int i = 0; i < params.length; ++i) {
-			paramTypes[i] = params[i].getClass();
-		}
-		return explicitMake(idAction, language, componentName, opName, paramTypes, params);
-	}
+    /*
+     * Returns an error with the given identifier and an error string in the chosen language.
+     * The component and operation name are included the first and second parameters of the error.
+     * Other parameters are taken from {@code params}. The parameters are formatted into the message
+     * according to the format described in the {@code VException} documentation.
+     *
+     * The provided parameters need to be VOM-encodeable.  This means that they have to be of one
+     * of the supported VOM types, which includes all Java primitive types, all VDL types, and
+     * Lists/Maps/Sets of those.
+     *
+     * @param  idAction      error identifier
+     * @param  language      error language, in IETF format
+     * @param  componentName error component name
+     * @param  opName        error operation name
+     * @param  params        error message parameters
+     * @return               an error with the given identifier and an error string in the given
+     *                       language
+     */
+    public static VException explicitMake(IDAction idAction, String language, String componentName,
+        String opName, Serializable... params) {
+        final Type[] paramTypes = new Type[params.length];
+        for (int i = 0; i < params.length; ++i) {
+            paramTypes[i] = params[i].getClass();
+        }
+        return explicitMake(idAction, language, componentName, opName, paramTypes, params);
+    }
 
-	/**
-	 * Just like {@code explicitMake} but explicitly provides the types for all parameters.  This is
-	 * necessary as parameters may need to be VOM-encoded (to be shipped across the wire), and Java
-	 * doesn't always have the ability to deduce the right type from the value (e.g., generic
-	 * parameters like List<String> or Map<String, Integer>).
-	 *
-	 * @param  idAction      error identifier
-	 * @param  language      error language, in IETF format
-	 * @param  componentName error component name
-	 * @param  opName        error operation name
-	 * @param  paramTypes    error message parameter types
-	 * @param  params        error message parameters
-	 * @return               an error with the given identifier and an error string in the given
-	 *                       language
-	 */
-	public static VException explicitMake(IDAction idAction, String language, String componentName,
-		String opName, Type[] paramTypes, Serializable[] params) {
-		if (paramTypes == null) {
-			paramTypes = new Type[0];
-		}
-		if (params == null) {
-			params = new Serializable[0];
-		}
+    /**
+     * Just like {@code explicitMake} but explicitly provides the types for all parameters.  This is
+     * necessary as parameters may need to be VOM-encoded (to be shipped across the wire), and Java
+     * doesn't always have the ability to deduce the right type from the value (e.g., generic
+     * parameters like List<String> or Map<String, Integer>).
+     *
+     * @param  idAction      error identifier
+     * @param  language      error language, in IETF format
+     * @param  componentName error component name
+     * @param  opName        error operation name
+     * @param  paramTypes    error message parameter types
+     * @param  params        error message parameters
+     * @return               an error with the given identifier and an error string in the given
+     *                       language
+     */
+    public static VException explicitMake(IDAction idAction, String language, String componentName,
+        String opName, Type[] paramTypes, Serializable[] params) {
+        if (paramTypes == null) {
+            paramTypes = new Type[0];
+        }
+        if (params == null) {
+            params = new Serializable[0];
+        }
 
-		// Append componentName and opName to params.
-		final Serializable[] newParams = new Serializable[paramTypes.length + 2];
-		final Type[] newParamTypes = new Type[paramTypes.length + 2];
-		newParams[0] = componentName;
-		newParamTypes[0] = String.class;
-		newParams[1] = opName;
-		newParamTypes[1] = String.class;
-		System.arraycopy(params, 0, newParams, 2, params.length);
-		System.arraycopy(paramTypes, 0, newParamTypes, 2, paramTypes.length);
+        // Append componentName and opName to params.
+        final Serializable[] newParams = new Serializable[paramTypes.length + 2];
+        final Type[] newParamTypes = new Type[paramTypes.length + 2];
+        newParams[0] = componentName;
+        newParamTypes[0] = String.class;
+        newParams[1] = opName;
+        newParamTypes[1] = String.class;
+        System.arraycopy(params, 0, newParams, 2, params.length);
+        System.arraycopy(paramTypes, 0, newParamTypes, 2, paramTypes.length);
 
-		// Construct the error message.
-		String msg = "";
-		if (paramTypes.length != params.length) {
-			android.util.Log.e("Veyron runtime", String.format(
-					"Passed different number of types (%s) than parameters (%s) to VException",
-					paramTypes, params));
-		} else {
-			msg = Language.getDefaultCatalog().format(
-					language, idAction.getID(), (Object[]) newParams);
-		}
+        // Construct the error message.
+        String msg = "";
+        if (paramTypes.length != params.length) {
+            android.util.Log.e("Veyron runtime", String.format(
+                    "Passed different number of types (%s) than parameters (%s) to VException",
+                    paramTypes, params));
+        } else {
+            msg = Language.getDefaultCatalog().format(
+                    language, idAction.getID(), (Object[]) newParams);
+        }
 
-		return new VException(idAction, msg, newParams, newParamTypes);
-	}
+        return new VException(idAction, msg, newParams, newParamTypes);
+    }
 
-	/**
-	 * Just like {@code explicitMake} but obtains the language, component name, and operation
-	 * name from the given context.  If the provided context is {@code null}, default values
-	 * are used.
-	 *
-	 * @param  idAction error identifier
-	 * @param  ctx      context
-	 * @param  params   error message parameters
-	 * @return          an error with the given identifier and an error string in the inferred
-	 *                  language
-	 */
-	public static VException make(IDAction idAction, VContext ctx, Serializable... params) {
-		final Type[] paramTypes = new Type[params.length];
-		for (int i = 0; i < params.length; ++i) {
-			paramTypes[i] = params[i] == null ? String.class : params[i].getClass();
-		}
-		return make(idAction, ctx, paramTypes, params);
-	}
+    /**
+     * Just like {@code explicitMake} but obtains the language, component name, and operation
+     * name from the given context.  If the provided context is {@code null}, default values
+     * are used.
+     *
+     * @param  idAction error identifier
+     * @param  ctx      context
+     * @param  params   error message parameters
+     * @return          an error with the given identifier and an error string in the inferred
+     *                  language
+     */
+    public static VException make(IDAction idAction, VContext ctx, Serializable... params) {
+        final Type[] paramTypes = new Type[params.length];
+        for (int i = 0; i < params.length; ++i) {
+            paramTypes[i] = params[i] == null ? String.class : params[i].getClass();
+        }
+        return make(idAction, ctx, paramTypes, params);
+    }
 
-	/**
-	 * Just like {@code make} but explicitly provides the types for all parameters.  This is
-	 * necessary as parameters may need to be VOM-encoded (to be shipped across the wire), and Java
-	 * doesn't always have the ability to deduce the right type from the value (e.g., generic
-	 * parameters like {@code List<String>} or {@code Map<String, Integer>}).
-	 *
-	 * @param  idAction   error identifier
-	 * @param  ctx        context
-	 * @param  paramTypes error message parameter types
-	 * @param  params     error message parameters
-	 * @return            an error with the given identifier and an error string in the inferred
-	 *                    language
-	 */
-	public static VException make(
-		IDAction idAction, VContext ctx, Type[] paramTypes, Serializable[] params) {
-		final String language = languageFromContext(ctx);
-		final String componentName = componentNameFromContext(ctx);
-		// TODO(spetrovic): Implement the opName code.
-		final String opName = "";
-		return explicitMake(idAction, language, componentName, opName, paramTypes, params);
-	}
+    /**
+     * Just like {@code make} but explicitly provides the types for all parameters.  This is
+     * necessary as parameters may need to be VOM-encoded (to be shipped across the wire), and Java
+     * doesn't always have the ability to deduce the right type from the value (e.g., generic
+     * parameters like {@code List<String>} or {@code Map<String, Integer>}).
+     *
+     * @param  idAction   error identifier
+     * @param  ctx        context
+     * @param  paramTypes error message parameter types
+     * @param  params     error message parameters
+     * @return            an error with the given identifier and an error string in the inferred
+     *                    language
+     */
+    public static VException make(
+        IDAction idAction, VContext ctx, Type[] paramTypes, Serializable[] params) {
+        final String language = languageFromContext(ctx);
+        final String componentName = componentNameFromContext(ctx);
+        // TODO(spetrovic): Implement the opName code.
+        final String opName = "";
+        return explicitMake(idAction, language, componentName, opName, paramTypes, params);
+    }
 
-	/**
-	 * Sets the default context that is used whenever a user passes in a {@code null} context
-	 * to {@code make} methods above.
-	 *
-	 * @param ctx default context
-	 */
-	public static void setDefaultContext(VContext ctx) {
-		lock.writeLock().lock();
-		defaultContext = ctx;
-		lock.writeLock().unlock();
-	}
+    /**
+     * Sets the default context that is used whenever a user passes in a {@code null} context
+     * to {@code make} methods above.
+     *
+     * @param ctx default context
+     */
+    public static void setDefaultContext(VContext ctx) {
+        lock.writeLock().lock();
+        defaultContext = ctx;
+        lock.writeLock().unlock();
+    }
 
-	/**
-	 * Returns a child of the given context that has the provided component name attached to it.
-	 *
-	 * @param  base          base context
-	 * @param  componentName a component name that is to be attached
-	 * @return               a child of the given context that has the provided component name
-	 *                       attached to it
-	 */
-	public static VContext contextWithComponentName(VContext base, String componentName) {
-		return base.withValue(new ComponentNameKey(), componentName);
-	}
+    /**
+     * Returns a child of the given context that has the provided component name attached to it.
+     *
+     * @param  base          base context
+     * @param  componentName a component name that is to be attached
+     * @return               a child of the given context that has the provided component name
+     *                       attached to it
+     */
+    public static VContext contextWithComponentName(VContext base, String componentName) {
+        return base.withValue(new ComponentNameKey(), componentName);
+    }
 
-	private static String componentNameFromContext(VContext ctx) {
-		if (ctx == null) {
-			lock.readLock().lock();
-			ctx = defaultContext;
-			lock.readLock().unlock();
-		}
-		String componentName = "";
-		if (ctx != null) {
-			final Object value = ctx.value(new ComponentNameKey());
-			if (value != null && value instanceof String) {
-				componentName = (String) value;
-			}
-		}
-		if (componentName.isEmpty()) {
-			componentName = System.getProperty("program.name", "");
-		}
-		return componentName;
-	}
+    private static String componentNameFromContext(VContext ctx) {
+        if (ctx == null) {
+            lock.readLock().lock();
+            ctx = defaultContext;
+            lock.readLock().unlock();
+        }
+        String componentName = "";
+        if (ctx != null) {
+            final Object value = ctx.value(new ComponentNameKey());
+            if (value != null && value instanceof String) {
+                componentName = (String) value;
+            }
+        }
+        if (componentName.isEmpty()) {
+            componentName = System.getProperty("program.name", "");
+        }
+        return componentName;
+    }
 
-	private static String languageFromContext(VContext ctx) {
-		if (ctx == null) {
-			lock.readLock().lock();
-			ctx = defaultContext;
-			lock.readLock().unlock();
-		}
-		String language = "";
-		if (ctx != null) {
-			language = Language.languageFromContext(ctx);
-		}
-		if (language.isEmpty()) {
-			language = "en-US";
-		}
-		return language;
-	}
+    private static String languageFromContext(VContext ctx) {
+        if (ctx == null) {
+            lock.readLock().lock();
+            ctx = defaultContext;
+            lock.readLock().unlock();
+        }
+        String language = "";
+        if (ctx != null) {
+            language = Language.languageFromContext(ctx);
+        }
+        if (language.isEmpty()) {
+            language = "en-US";
+        }
+        return language;
+    }
 
-	private final IDAction id;  // non-null
-	private final Serializable[] params;  // non-null
-	private final Type[] paramTypes;  // non-null
+    private final IDAction id;  // non-null
+    private final Serializable[] params;  // non-null
+    private final Type[] paramTypes;  // non-null
 
-	public VException(String msg) {
-		super(msg);
-		this.id = Errors.UNKNOWN;
-		this.params = new Serializable[] {"", ""};
-		this.paramTypes = new Type[] { String.class, String.class };
-	}
+    public VException(String msg) {
+        super(msg);
+        this.id = Errors.UNKNOWN;
+        this.params = new Serializable[] {"", ""};
+        this.paramTypes = new Type[] { String.class, String.class };
+    }
 
-	public VException(IDAction id, String msg, Serializable[] params, Type[] paramTypes) {
-		super(msg);
-		this.id = id;
-		this.params = params;
-		this.paramTypes = paramTypes;
-	}
+    public VException(IDAction id, String msg, Serializable[] params, Type[] paramTypes) {
+        super(msg);
+        this.id = id;
+        this.params = params;
+        this.paramTypes = paramTypes;
+    }
 
-	/**
-	 * Returns the error identifier associated with this exception.
-	 *
-	 * @return the error identifier associated with this exception
-	 */
-	public String getID() {
-		return this.id.getID();
-	}
+    /**
+     * Returns the error identifier associated with this exception.
+     *
+     * @return the error identifier associated with this exception
+     */
+    public String getID() {
+        return this.id.getID();
+    }
 
-	/**
-	 * Returns the action associated with this exception.
-	 *
-	 * @return the action associated with this exception
-	 */
-	public ActionCode getAction() {
-		return this.id.getAction();
-	}
+    /**
+     * Returns the action associated with this exception.
+     *
+     * @return the action associated with this exception
+     */
+    public ActionCode getAction() {
+        return this.id.getAction();
+    }
 
-	/**
-	 * Returns the parameters associated with this exception.  The expectation is that the
-	 * first parameter will be a string that identifies the component (typically the server or
-	 * binary) where the error was generated, the second will be a string that identifies the
-	 * operation that encountered the error.  The remaining parameters typically identify the
-	 * object(s) on which the operation was acting.  A component passing on an error from another
-	 * may prefix the first parameter with its name, a colon and a space.
-	 *
-	 * @return the array of parameters associated with this exception
-	 */
-	public Serializable[] getParams() { return this.params; }
+    /**
+     * Returns the parameters associated with this exception.  The expectation is that the
+     * first parameter will be a string that identifies the component (typically the server or
+     * binary) where the error was generated, the second will be a string that identifies the
+     * operation that encountered the error.  The remaining parameters typically identify the
+     * object(s) on which the operation was acting.  A component passing on an error from another
+     * may prefix the first parameter with its name, a colon and a space.
+     *
+     * @return the array of parameters associated with this exception
+     */
+    public Serializable[] getParams() { return this.params; }
 
-	/**
-	 * Returns the types of all the parameters associated with this exception, in the same order
-	 * as {@code getParams()}.  This type information is necessary as we may wish to encode the
-	 * returned parameters and Java doesn't always have the ability to deduce the right type from
-	 * the value (e.g., generic parameters like List<String> or Map<String, Integer>).
-	 *
-	 * @return the array of types of all the parameters associated with this exception.
-	 */
-	public Type[] getParamTypes() { return this.paramTypes; }
+    /**
+     * Returns the types of all the parameters associated with this exception, in the same order
+     * as {@code getParams()}.  This type information is necessary as we may wish to encode the
+     * returned parameters and Java doesn't always have the ability to deduce the right type from
+     * the value (e.g., generic parameters like List<String> or Map<String, Integer>).
+     *
+     * @return the array of types of all the parameters associated with this exception.
+     */
+    public Type[] getParamTypes() { return this.paramTypes; }
 
-	/**
-	 * Returns true iff the error identifier associated with this exception is equal to the provided
-	 * identifier.
-	 *
-	 * @param  id the error identifier we're comparing with this error
-	 * @return    true iff the error identifier associated with this exception is equal to the
-	 *            provided identifier.
-	 */
-	public boolean is(String id) {
-		return getID().equals(id);
-	}
+    /**
+     * Returns true iff the error identifier associated with this exception is equal to the provided
+     * identifier.
+     *
+     * @param  id the error identifier we're comparing with this error
+     * @return    true iff the error identifier associated with this exception is equal to the
+     *            provided identifier.
+     */
+    public boolean is(String id) {
+        return getID().equals(id);
+    }
 
-	/**
-	 * Returns true iff the error identifier associated with this exception is equal to the provided
-	 * identifier.
-	 *
-	 * @param  idAction the error identifier we're comparing with this error
-	 * @return          true iff the error identifier associated with this exception is equal to the
-	 *                  provided identifier.
-	 */
-	public boolean is(IDAction idAction) {
-		return is(idAction.getID());
-	}
+    /**
+     * Returns true iff the error identifier associated with this exception is equal to the provided
+     * identifier.
+     *
+     * @param  idAction the error identifier we're comparing with this error
+     * @return          true iff the error identifier associated with this exception is equal to the
+     *                  provided identifier.
+     */
+    public boolean is(IDAction idAction) {
+        return is(idAction.getID());
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
-		final VException other = (VException) obj;
-		return this.getID().equals(other.getID());
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        final VException other = (VException) obj;
+        return this.getID().equals(other.getID());
+    }
 
-	@Override
-	public int hashCode() {
-		return this.id.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
 
-	@Override
-	public String toString() {
-		return String.format("{IDAction: %s, Msg: \"%s\", Params: %s, ParamTypes: %s}", this.id,
-				getMessage(), Arrays.toString(this.params), Arrays.toString(this.paramTypes));
-	}
+    @Override
+    public String toString() {
+        return String.format("{IDAction: %s, Msg: \"%s\", Params: %s, ParamTypes: %s}", this.id,
+                getMessage(), Arrays.toString(this.params), Arrays.toString(this.paramTypes));
+    }
 
-	private static class ComponentNameKey {
-		@Override
-		public int hashCode() {
-			return 0;
-		}
-	}
+    private static class ComponentNameKey {
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+    }
 }
