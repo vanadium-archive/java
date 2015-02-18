@@ -6,6 +6,12 @@ package io.v.core.veyron2.ipc;
  */
 public class ListenSpec {
 	/**
+	 * A default listen spec that (1) connects to the first available address, (2) doesn't proxy
+	 * connections, and (3) supports roaming.
+	 */
+	public static final ListenSpec DEFAULT = new ListenSpec(
+			new ListenSpec.Address("tcp", ":0"), "", true);
+	/**
 	 * Address is a pair of (network protocol, address) that the server should listen on.
 	 * For TCP, the address must be in {@code ip:port} format. The {@code ip} may be omitted, but
 	 * the {@code port} can not (choose a port of {@code 0} to have the system allocate one).
@@ -42,6 +48,18 @@ public class ListenSpec {
 		this.addrs = addrs;
 		this.proxy = proxy;
 		this.roaming = roaming;
+	}
+
+	public ListenSpec(Address addr, String proxy, boolean roaming) {
+		this(new Address[]{ addr }, proxy, roaming);
+	}
+
+	public ListenSpec(String proxy, boolean roaming) {
+		this(DEFAULT.getAddresses(), proxy, roaming);
+	}
+
+	public ListenSpec() {
+		this(DEFAULT.getAddresses(), DEFAULT.getProxy(), DEFAULT.isRoaming());
 	}
 
 	/**

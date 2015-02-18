@@ -10,7 +10,7 @@ import io.v.core.veyron2.verror.VException;
 
 public class Server implements io.v.core.veyron2.ipc.Server {
 	private final long nativePtr;
-	private final ListenSpec listenSpec;  // non-null.
+	private final ListenSpec listenSpec;
 
 	private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
 	private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
@@ -33,6 +33,9 @@ public class Server implements io.v.core.veyron2.ipc.Server {
 	public String[] listen(ListenSpec spec) throws VException {
 		if (spec == null) {
 			spec = this.listenSpec;
+		}
+		if (spec == null) {
+			spec = ListenSpec.DEFAULT;
 		}
 		return nativeListen(this.nativePtr, spec);
 	}

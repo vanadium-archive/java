@@ -34,9 +34,7 @@ public class V extends io.v.core.veyron2.V {
 		RedirectStderr.Start();
 	}
 	private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
-			new ListenSpec.Address[] { new ListenSpec.Address("tcp", ":0")},
-			"/ns.dev.v.io:8101/proxy",
-			true);
+			new ListenSpec.Address("tcp", ":0"), "proxy", true);
 	private static volatile VContext context = null;
 
 	/**

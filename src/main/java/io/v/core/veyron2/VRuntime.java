@@ -41,7 +41,7 @@ public interface VRuntime {
 	 * Creates a new server instance with the provided options.  A particular runtime
 	 * implementation chooses which options to support, but at the minimum it must handle
 	 * the following options:
-	 *     {@code OptionDefs.DEFAULT_LISTEN_SPEC}
+	 *     CURRENTLY NO OPTIONS ARE MANDATED
 	 *
 	 * @param  ctx             current context
 	 * @param  opts            server options

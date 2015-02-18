@@ -4,6 +4,8 @@ import org.joda.time.DateTime;
 
 import io.v.core.veyron2.verror.VException;
 
+import java.util.Arrays;
+
 /**
  * NetworkChange represents the changes made in response to a network setting change
  * being received.
@@ -58,4 +60,11 @@ public class NetworkChange {
      * @return any error encountered
      */
     public VException getError() { return this.error; }
+
+    @Override
+    public String toString() {
+        return String.format("{Time: %s, State: %s, Setting: %s, Changed: %s, Error: %s}",
+                this.time, this.state, this.setting, Arrays.toString(this.changedEndpoints),
+                this.error);
+    }
 }

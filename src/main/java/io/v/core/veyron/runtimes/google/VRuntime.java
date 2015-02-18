@@ -13,10 +13,6 @@ import io.v.core.veyron2.security.Principal;
  */
 public class VRuntime implements io.v.core.veyron2.VRuntime {
 	private static final String TAG = "Veyron runtime";
-	private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
-			new ListenSpec.Address[] { new ListenSpec.Address("tcp", ":0") },
-			"/ns.dev.v.io:8101/proxy",
-			false);
 
 	private static native VContext nativeInit() throws VException;
 	private static native VContext nativeSetNewClient(VContext ctx, Options opts)
@@ -44,7 +40,7 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
 	private final VContext ctx;  // non-null
 
 	private VRuntime(VContext ctx) {
-		this.ctx = setListenSpec(ctx, DEFAULT_LISTEN_SPEC);
+		this.ctx = ctx;
 	}
 	@Override
 	public VContext setNewClient(VContext ctx, Options opts) throws VException {
@@ -59,13 +55,9 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
 		}
 	}
 	@Override
-	public io.v.core.veyron2.ipc.Server newServer(VContext ctx, Options opts)
-		throws VException {
-		// Get a Java ListenSpec is attached to this context.
+	public io.v.core.veyron2.ipc.Server newServer(VContext ctx, Options opts) throws VException {
+		// Get a Java ListenSpec that is attached to this context (if any).
 		final ListenSpec spec = (ListenSpec) ctx.value(this);
-		if (spec == null) {
-			throw new VException("Couldn't get attached listen spec");
-		}
 		return nativeNewServer(ctx, spec);
 	}
 	@Override
