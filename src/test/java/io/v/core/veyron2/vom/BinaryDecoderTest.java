@@ -108,26 +108,26 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeVExceptionBadParams() throws Exception {
-    	final Serializable[] params = {
-    			ImmutableList.<String>of("3"),
-    			ImmutableMap.<String, String>of("4", "")
-    	};
-    	final Type[] paramTypes = {
-    			List.class,
-    			Map.class
-    	};
-    	final VException v = new VException(new VException.IDAction(
-    			"io.v.core.veyron2.vom.Testing", VException.ActionCode.NO_RETRY),
-    			"1 2 [3] 4=", params, paramTypes);
-    	final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
-    	final Object decoded = TestUtil.decode(encoded);
-    	if (!(decoded instanceof VException)) {
-    		fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
-    	}
-    	final VException decodedV = (VException) decoded;
-    	assertEquals(v, decoded);
-    	assertEquals(v.getMessage(), decodedV.getMessage());
-    	assertEquals(Arrays.toString(new String[]{}), Arrays.toString(decodedV.getParams()));
+        final Serializable[] params = {
+                ImmutableList.<String>of("3"),
+                ImmutableMap.<String, String>of("4", "")
+        };
+        final Type[] paramTypes = {
+                List.class,
+                Map.class
+        };
+        final VException v = new VException(new VException.IDAction(
+                "io.v.core.veyron2.vom.Testing", VException.ActionCode.NO_RETRY),
+                "1 2 [3] 4=", params, paramTypes);
+        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        final Object decoded = TestUtil.decode(encoded);
+        if (!(decoded instanceof VException)) {
+            fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
+        }
+        final VException decodedV = (VException) decoded;
+        assertEquals(v, decoded);
+        assertEquals(v.getMessage(), decodedV.getMessage());
+        assertEquals(Arrays.toString(new String[]{}), Arrays.toString(decodedV.getParams()));
     }
 
     public void testDecodeEncodeVException() throws Exception {
