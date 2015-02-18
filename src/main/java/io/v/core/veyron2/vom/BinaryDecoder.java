@@ -149,8 +149,10 @@ public class BinaryDecoder {
 
     private Object readValue(VdlType actualType, Type targetType)
             throws IOException, ConversionException {
+        ConversionTarget target;
         if (targetType == VdlValue.class) {
             targetType = Types.getReflectTypeForVdl(actualType, true);
+            target = new ConversionTarget(targetType, actualType);
         } else if (targetType == Object.class) {
             // This can happen only inside VDL Any, as top-level type is constructed
             // Outside of readValue().
@@ -159,8 +161,10 @@ public class BinaryDecoder {
             } catch (IllegalArgumentException e) {
                 targetType = Types.getReflectTypeForVdl(actualType, true);
             }
+            target = new ConversionTarget(targetType, actualType);
+        } else {
+            target = new ConversionTarget(targetType);
         }
-        ConversionTarget target = new ConversionTarget(targetType, actualType);
 
         // Solve any/optional case.
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
@@ -473,8 +477,10 @@ public class BinaryDecoder {
             Type type = target.getTargetType();
             if (target.getKind() == Kind.OPTIONAL) {
                 type = ReflectUtil.getElementType(target.getTargetType(), 0);
+                return new VdlOptional<VdlValue>((VdlValue) readValue(actualType.getElem(), type));
+            } else {
+                return readValue(actualType.getElem(), type);
             }
-            return new VdlOptional<VdlValue>((VdlValue) readValue(actualType.getElem(), type));
         }
     }
 

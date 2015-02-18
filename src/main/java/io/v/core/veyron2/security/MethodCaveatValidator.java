@@ -23,7 +23,6 @@ public class MethodCaveatValidator implements CaveatValidator {
             if (!(method instanceof String)) {
                 throw new VException(String.format(
                         "Caveat param %s element %s of wrong type: want String", param, method));
-                        
             }
             if (context.method().equals(method)) {
                 return;
@@ -33,4 +32,3 @@ public class MethodCaveatValidator implements CaveatValidator {
             "MethodCaveat(%s) failed validation for method %s", param, context.method()));
     }
 }
-

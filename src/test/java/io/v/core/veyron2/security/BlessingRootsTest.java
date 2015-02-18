@@ -28,16 +28,16 @@ public class BlessingRootsTest extends AndroidTestCase {
 
             final Map<ECPublicKey, String[]> recognized =
                     ImmutableMap.<ECPublicKey, String[]>builder()
-                    .put(keys[0],
-                            new String[]{ "veyron", "veyron/foo", "veyron/foo/bar", "google" })
-                    .put(keys[1], new String[]{ "google", "google/foo", "google/foo/bar" })
+                    .put(keys[0], new String[]{
+                            "veyron", "veyron/foo", "veyron/foo/bar", "google" })
+                    .put(keys[1], new String[]{ "google/foo", "google/foo/bar" })
                     .put(keys[2], new String[]{ })
                     .build();
             final Map<ECPublicKey, String[]> notRecognized =
                     ImmutableMap.<ECPublicKey, String[]>builder()
                     .put(keys[0], new String[]{ "google/foo", "foo", "foo/bar" })
-                    .put(keys[1],
-                            new String[]{ "google/bar", "veyron", "veyron/foo", "foo", "foo/bar" })
+                    .put(keys[1], new String[]{ 
+                            "google", "google/bar", "veyron", "veyron/foo", "foo", "foo/bar" })
                     .put(keys[2], new String[] { "veyron", "veyron/foo", "veyron/bar", "google",
                             "google/foo", "google/bar", "foo", "foo/bar" })
                     .build();

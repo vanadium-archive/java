@@ -139,22 +139,6 @@ public class VomUtil {
         return decode(data, type);
     }
 
-    /**
-     * Helper class for decoding errors encoded via Go vom encoder.  Go vom encoder encodes
-     * the errors into a non-optional error type, which we're not handling correctly right now.
-     *
-     * TODO(spetrovic): remove this method once the error type becomes non-optional everywhere.
-     */
-    private static Object decodeError(byte[] data) throws VException {
-        VdlValue val = (VdlValue) decode(data, VdlValue.class);
-        if (val instanceof VdlStruct) {
-            val = new VdlOptional<VdlStruct>((VdlStruct) val);
-        }
-        final byte[] newData = encode(val);
-        final Object ret = decode(newData, VException.class);
-        return ret;
-    }
-
     private static String bytesToHexString(byte[] data) {
         final StringBuilder builder = new StringBuilder();
         for (byte b : data) {
