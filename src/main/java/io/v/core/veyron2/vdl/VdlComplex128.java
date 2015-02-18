@@ -25,6 +25,10 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
         this(real, 0);
     }
 
+    public VdlComplex128() {
+        this(0, 0);
+    }
+
     public double getReal() {
         return real;
     }
