@@ -17,38 +17,26 @@ public final class BootstrapType {
 
     static {
         typeToId = ImmutableMap.<VdlType, TypeID>builder()
-                // Primitive types
-                .put(Types.ANY, Constants.WIRE_ANY_ID)
-                .put(Types.TYPEOBJECT, Constants.WIRE_TYPE_ID)
-                .put(Types.BOOL, Constants.WIRE_BOOL_ID)
-                .put(Types.STRING, Constants.WIRE_STRING_ID)
-                .put(Types.BYTE, Constants.WIRE_BYTE_ID)
-                .put(Types.UINT16, Constants.WIRE_UINT_16_ID)
-                .put(Types.UINT32, Constants.WIRE_UINT_32_ID)
-                .put(Types.UINT64, Constants.WIRE_UINT_64_ID)
-                .put(Types.INT16, Constants.WIRE_INT_16_ID)
-                .put(Types.INT32, Constants.WIRE_INT_32_ID)
-                .put(Types.INT64, Constants.WIRE_INT_64_ID)
-                .put(Types.FLOAT32, Constants.WIRE_FLOAT_32_ID)
-                .put(Types.FLOAT64, Constants.WIRE_FLOAT_64_ID)
-                .put(Types.COMPLEX64, Constants.WIRE_COMPLEX_64_ID)
-                .put(Types.COMPLEX128, Constants.WIRE_COMPLEX_128_ID)
+                // Primitive types.
+                .put(Types.BOOL, Constants.WIRE_ID_BOOL)
+                .put(Types.BYTE, Constants.WIRE_ID_BYTE)
+                .put(Types.STRING, Constants.WIRE_ID_STRING)
+                .put(Types.UINT16, Constants.WIRE_ID_UINT_16)
+                .put(Types.UINT32, Constants.WIRE_ID_UINT_32)
+                .put(Types.UINT64, Constants.WIRE_ID_UINT_64)
+                .put(Types.INT16, Constants.WIRE_ID_INT_16)
+                .put(Types.INT32, Constants.WIRE_ID_INT_32)
+                .put(Types.INT64, Constants.WIRE_ID_INT_64)
+                .put(Types.FLOAT32, Constants.WIRE_ID_FLOAT_32)
+                .put(Types.FLOAT64, Constants.WIRE_ID_FLOAT_64)
+                .put(Types.COMPLEX64, Constants.WIRE_ID_COMPLEX_64)
+                .put(Types.COMPLEX128, Constants.WIRE_ID_COMPLEX_128)
+                .put(Types.TYPEOBJECT, Constants.WIRE_ID_TYPE_OBJECT)
+                .put(Types.ANY, Constants.WIRE_ID_ANY)
 
-                // Generic types
-                .put(WireNamed.VDL_TYPE, Constants.WIRE_NAMED_ID)
-                .put(WireEnum.VDL_TYPE, Constants.WIRE_ENUM_ID)
-                .put(WireArray.VDL_TYPE, Constants.WIRE_ARRAY_ID)
-                .put(WireList.VDL_TYPE, Constants.WIRE_LIST_ID)
-                .put(WireSet.VDL_TYPE, Constants.WIRE_SET_ID)
-                .put(WireMap.VDL_TYPE, Constants.WIRE_MAP_ID)
-                .put(WireStruct.VDL_TYPE, Constants.WIRE_STRUCT_ID)
-                .put(WireField.VDL_TYPE, Constants.WIRE_FIELD_ID)
-                .put(Types.listOf(WireField.VDL_TYPE), Constants.WIRE_FIELD_LIST_ID)
-                .put(WireUnion.VDL_TYPE, Constants.WIRE_UNION_ID)
-                .put(WireOptional.VDL_TYPE, Constants.WIRE_OPTIONAL_ID)
-                .put(Types.listOf(Types.BYTE), Constants.WIRE_BYTE_LIST_ID)
-                .put(Types.listOf(Types.STRING), Constants.WIRE_STRING_LIST_ID)
-                .put(Types.listOf(TypeID.VDL_TYPE), Constants.WIRE_TYPE_LIST_ID)
+                // Other commonly used composites.
+                .put(Types.listOf(Types.BYTE), Constants.WIRE_ID_BYTE_LIST)
+                .put(Types.listOf(Types.STRING), Constants.WIRE_ID_STRING_LIST)
                 .build();
 
         ImmutableMap.Builder<TypeID, VdlType> idToTypeBuilder =

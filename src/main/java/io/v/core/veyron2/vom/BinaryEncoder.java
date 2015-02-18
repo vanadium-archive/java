@@ -1,6 +1,7 @@
 package io.v.core.veyron2.vom;
 
 import io.v.core.veyron2.vdl.AbstractVdlStruct;
+import io.v.core.veyron2.vdl.IDAction;
 import io.v.core.veyron2.vdl.Kind;
 import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
@@ -27,6 +28,7 @@ import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.vdl.WireError;
 import io.v.core.veyron2.verror.VException;
 
 import java.io.ByteArrayOutputStream;
@@ -45,19 +47,19 @@ import java.util.Set;
  * BinaryEncoder writes VDL values to {@code OutputStream} in binary VOM format.
  */
 public class BinaryEncoder {
-    private final ByteArrayOutputStream valueBuffer;
-    private final ByteArrayOutputStream typeBuffer;
+    private final EncodingStream valueBuffer;
+    private final EncodingStream typeBuffer;
     private final OutputStream out;
     private final Map<VdlType, TypeID> visitedTypes;
     private TypeID nextTypeId;
     private boolean binaryMagicByteWritten;
 
     public BinaryEncoder(OutputStream out) {
-        this.valueBuffer = new ByteArrayOutputStream();
-        this.typeBuffer = new ByteArrayOutputStream();
+        this.valueBuffer = new EncodingStream();
+        this.typeBuffer = new EncodingStream();
         this.out = out;
         this.visitedTypes = new HashMap<VdlType, TypeID>();
-        this.nextTypeId = Constants.WIRE_TYPE_FIRST_USER_ID;
+        this.nextTypeId = Constants.WIRE_ID_FIRST_USER_TYPE;
         this.binaryMagicByteWritten = false;
     }
 
@@ -125,14 +127,14 @@ public class BinaryEncoder {
         nextTypeId = new TypeID(nextTypeId.getValue() + 1);
         visitedTypes.put(type, typeId);
 
-        VdlValue wireType = new VdlAny(convertToWireType(type));
+        WireType wireType = convertToWireType(type);
         typeBuffer.reset();
         writeValue(typeBuffer, wireType, wireType.vdlType());
         writeMessage(typeBuffer, -typeId.getValue(), true);
         return typeId;
     }
 
-    private VdlValue convertToWireType(VdlType type) throws IOException {
+    private WireType convertToWireType(VdlType type) throws IOException {
         switch (type.getKind()) {
             case BOOL:
             case BYTE:
@@ -147,17 +149,18 @@ public class BinaryEncoder {
             case COMPLEX64:
             case COMPLEX128:
             case STRING:
-                return new WireNamed(type.getName(),
-                        getType(Types.primitiveTypeFromKind(type.getKind())));
+                return new WireType.NamedT(new WireNamed(
+                        type.getName(), getType(Types.primitiveTypeFromKind(type.getKind()))));
             case ARRAY:
-                return new WireArray(type.getName(), getType(type.getElem()),
-                        new TypeID(type.getLength()));
+                return new WireType.ArrayT(new WireArray(
+                        type.getName(), getType(type.getElem()), new VdlUint64(type.getLength())));
             case ENUM:
-                return new WireEnum(type.getName(), type.getLabels());
+                return new WireType.EnumT(new WireEnum(type.getName(), type.getLabels()));
             case LIST:
-                return new WireList(type.getName(), getType(type.getElem()));
+                return new WireType.ListT(new WireList(type.getName(), getType(type.getElem())));
             case MAP:
-                return new WireMap(type.getName(), getType(type.getKey()), getType(type.getElem()));
+                return new WireType.MapT(new WireMap(
+                        type.getName(), getType(type.getKey()), getType(type.getElem())));
             case STRUCT:
             case UNION:
                 List<WireField> wireFields = new ArrayList<WireField>();
@@ -165,90 +168,73 @@ public class BinaryEncoder {
                     wireFields.add(new WireField(field.getName(), getType(field.getType())));
                 }
                 if (type.getKind() == Kind.UNION) {
-                    return new WireUnion(type.getName(), wireFields);
+                    return new WireType.UnionT(new WireUnion(type.getName(), wireFields));
                 } else {
-                    return new WireStruct(type.getName(), wireFields);
+                    return new WireType.StructT(new WireStruct(type.getName(), wireFields));
                 }
             case SET:
-                return new WireSet(type.getName(), getType(type.getKey()));
+                return new WireType.SetT(new WireSet(type.getName(), getType(type.getKey())));
             case OPTIONAL:
-                return new WireOptional(type.getName(), getType(type.getElem()));
+                return new WireType.OptionalT(new WireOptional(
+                        type.getName(), getType(type.getElem())));
             default:
                 throw new RuntimeException("Unknown wiretype for kind: " + type.getKind());
         }
     }
 
-    private void writeValue(OutputStream out, Object value, VdlType type) throws IOException {
+    /**
+     * Writes a value to output stream and returns true iff the value is non-zero.
+     * The returned value can be used skip encoding of zero fields in structs.
+     */
+    private boolean writeValue(EncodingStream out, Object value, VdlType type) throws IOException {
         if (value == null) {
             value = VdlValue.zeroValue(type);
         }
         if (value instanceof VException) {
-            if (type != Types.ERROR) {
-                throw new IOException(String.format("Wrong VdlType for VException, want %s, got %s",
-                        Types.ERROR, type));
-            }
             final VdlValue vdlValue = valueFromVException((VException) value);
-            writeValue(out, vdlValue, type);
-            return;
+            return writeValue(out, vdlValue, type);
         }
         switch (type.getKind()) {
             case ANY:
-                writeVdlAny(out, value);
-                break;
+                return writeVdlAny(out, value);
             case ARRAY:
-                writeVdlArray(out, value);
-                break;
+                return writeVdlArray(out, value);
             case BOOL:
-                writeVdlBool(out, value);
-                break;
+                return writeVdlBool(out, value);
             case BYTE:
-                writeVdlByte(out, value);
-                break;
+                return writeVdlByte(out, value);
             case COMPLEX64:
             case COMPLEX128:
-                writeVdlComplex(out, value);
-                break;
+                return writeVdlComplex(out, value);
             case ENUM:
-                writeVdlEnum(out, value);
-                break;
+                return writeVdlEnum(out, value);
             case FLOAT32:
             case FLOAT64:
-                writeVdlFloat(out, value);
-                break;
+                return writeVdlFloat(out, value);
             case INT16:
             case INT32:
             case INT64:
-                writeVdlInt(out, value);
-                break;
+                return writeVdlInt(out, value);
             case LIST:
-                writeVdlList(out, value, type);
-                break;
+                return writeVdlList(out, value, type);
             case MAP:
-                writeVdlMap(out, value, type);
-                break;
+                return writeVdlMap(out, value, type);
             case UNION:
-                writeVdlUnion(out, value);
-                break;
+                return writeVdlUnion(out, value);
             case OPTIONAL:
-                writeVdlOptional(out, value);
-                break;
+                return writeVdlOptional(out, value);
             case SET:
-                writeVdlSet(out, value, type);
-                break;
+                return writeVdlSet(out, value, type);
             case STRING:
-                writeVdlString(out, value);
-                break;
+                return writeVdlString(out, value);
             case STRUCT:
-                writeVdlStruct(out, value);
-                break;
+                return writeVdlStruct(out, value);
             case UINT16:
             case UINT32:
             case UINT64:
-                writeVdlUint(out, value);
-                break;
+                return writeVdlUint(out, value);
             case TYPEOBJECT:
-                writeVdlTypeObject(out, value);
-                break;
+                return writeVdlTypeObject(out, value);
             default:
                 throw new RuntimeException("Unknown kind: " + type.getKind());
         }
@@ -258,10 +244,7 @@ public class BinaryEncoder {
     private VdlValue valueFromVException(VException e) {
         final VdlOptional<VdlStruct> error =
                 (VdlOptional<VdlStruct>) VdlValue.nonNullZeroValue(Types.ERROR);
-        final VdlStruct idActionVal = (VdlStruct) error.getElem().getField("IDAction");
-        idActionVal.assignField("ID", new VdlString(e.getID()));
-        idActionVal.assignField("Action", new VdlUint32(e.getAction().getValue()));
-        error.getElem().assignField("Msg", new VdlString(e.getMessage()));
+        final IDAction idAction = new IDAction(e.getID(), new VdlUint32(e.getAction().getValue()));
         final Serializable[] params = e.getParams();
         final Type[] paramTypes = e.getParamTypes();
         final VdlList<VdlAny> paramListVal =
@@ -278,111 +261,152 @@ public class BinaryEncoder {
                 }
             }
         }
-        return error;
+        return new VdlOptional<WireError>(new WireError(idAction, e.getMessage(), paramListVal));
     }
 
-    private void writeVdlAny(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL any to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlAny(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.ANY, value, VdlAny.class);
         VdlAny anyValue = (VdlAny) value;
         Object elem = anyValue.getElem();
         if (elem != null) {
             BinaryUtil.encodeUint(out, getType(anyValue.getElemType()).getValue());
             writeValue(out, elem, anyValue.getElemType());
+            return true;
         } else {
-            BinaryUtil.encodeUint(out, 0);
+            BinaryUtil.encodeUint(out, Constants.WIRE_CTRL_NIL);
+            return false;
         }
     }
 
-    private void writeVdlArray(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL array to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlArray(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.ARRAY, value, VdlArray.class);
         VdlArray<?> arrayValue = (VdlArray<?>) value;
+        BinaryUtil.encodeUint(out, 0);
         for (Object elem : arrayValue) {
             writeValue(out, elem, arrayValue.vdlType().getElem());
         }
+        return arrayValue.size() != 0;
     }
 
-    private void writeVdlBool(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL bool to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlBool(OutputStream out, Object value) throws IOException {
         if (value instanceof VdlBool) {
-            BinaryUtil.encodeBoolean(out, ((VdlBool) value).getValue());
+            return BinaryUtil.encodeBoolean(out, ((VdlBool) value).getValue());
         } else if (value instanceof Boolean) {
-            BinaryUtil.encodeBoolean(out, (Boolean) value);
+            return BinaryUtil.encodeBoolean(out, (Boolean) value);
         } else {
             throw new IOException("Unsupported VDL bool value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlByte(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL byte to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlByte(EncodingStream out, Object value) throws IOException {
+        byte byteValue;
         if (value instanceof VdlByte) {
-            out.write(((VdlByte) value).getValue());
+            byteValue = ((VdlByte) value).getValue();
+            out.write(byteValue);
         } else if (value instanceof Byte) {
-            out.write((Byte) value);
+            byteValue = (Byte) value;
+            out.write(byteValue);
         } else {
             throw new IOException("Unsupported VDL byte value (type " + value.getClass()
                     + ", value " + value + ")");
         }
+        return byteValue != 0;
     }
 
-    private void writeVdlComplex(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL complex to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlComplex(EncodingStream out, Object value) throws IOException {
         if (value instanceof VdlComplex64) {
-            BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getReal());
-            BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getImag());
+            boolean isNonZero = BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getReal());
+            isNonZero |= BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getImag());
+            return isNonZero;
         } else if (value instanceof VdlComplex128) {
-            BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getReal());
-            BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getImag());
+            boolean isNonZero = BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getReal());
+            isNonZero |= BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getImag());
+            return isNonZero;
         } else {
             throw new IOException("Unsupported VDL complex value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlEnum(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL enum to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlEnum(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.ENUM, value, VdlEnum.class);
         VdlEnum enumValue = (VdlEnum) value;
-        BinaryUtil.encodeUint(out, enumValue.vdlType().getLabels().indexOf(enumValue.name()));
+        int index = enumValue.vdlType().getLabels().indexOf(enumValue.name());
+        BinaryUtil.encodeUint(out, index);
+        return index != 0;
     }
 
-    private void writeVdlFloat(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL float to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlFloat(EncodingStream out, Object value) throws IOException {
         if (value instanceof VdlFloat32) {
-            BinaryUtil.encodeDouble(out, ((VdlFloat32) value).getValue());
+            return BinaryUtil.encodeDouble(out, ((VdlFloat32) value).getValue());
         } else if (value instanceof VdlFloat64) {
-            BinaryUtil.encodeDouble(out, ((VdlFloat64) value).getValue());
+            return BinaryUtil.encodeDouble(out, ((VdlFloat64) value).getValue());
         } else if (value instanceof Float) {
-            BinaryUtil.encodeDouble(out, (Float) value);
+            return BinaryUtil.encodeDouble(out, (Float) value);
         } else if (value instanceof Double){
-            BinaryUtil.encodeDouble(out, (Double) value);
+            return BinaryUtil.encodeDouble(out, (Double) value);
         } else {
             throw new IOException("Unsupported VDL float value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlInt(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL int to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlInt(EncodingStream out, Object value) throws IOException {
         if (value instanceof VdlInt16) {
-            BinaryUtil.encodeInt(out, ((VdlInt16) value).getValue());
+            return BinaryUtil.encodeInt(out, ((VdlInt16) value).getValue());
         } else if (value instanceof VdlInt32) {
-            BinaryUtil.encodeInt(out, ((VdlInt32) value).getValue());
+            return BinaryUtil.encodeInt(out, ((VdlInt32) value).getValue());
         } else if (value instanceof VdlInt64) {
-            BinaryUtil.encodeInt(out, ((VdlInt64) value).getValue());
+            return BinaryUtil.encodeInt(out, ((VdlInt64) value).getValue());
         } else if (value instanceof Short){
-            BinaryUtil.encodeInt(out, (Short) value);
+            return BinaryUtil.encodeInt(out, (Short) value);
         } else if (value instanceof Integer) {
-            BinaryUtil.encodeInt(out, (Integer) value);
+            return BinaryUtil.encodeInt(out, (Integer) value);
         } else if (value instanceof Long) {
-            BinaryUtil.encodeInt(out, (Long) value);
+            return BinaryUtil.encodeInt(out, (Long) value);
         } else {
             throw new IOException("Unsupported VDL int value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlList(OutputStream out, Object value, VdlType type) throws IOException {
+    /**
+     * Writes a VDL list to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlList(EncodingStream out, Object value, VdlType type)
+            throws IOException {
         if (value instanceof List) {
             List<?> listValue = (List<?>) value;
             BinaryUtil.encodeUint(out, listValue.size());
             for (Object elem : listValue) {
                 writeValue(out, elem, type.getElem());
             }
+            return listValue.size() != 0;
         } else if (value.getClass().isArray()) {
             Object arrayValue = value;
             int len = Array.getLength(arrayValue);
@@ -390,13 +414,17 @@ public class BinaryEncoder {
             for (int i = 0; i < len; i++) {
                 writeValue(out, Array.get(arrayValue, i), type.getElem());
             }
+            return len != 0;
         } else {
             throw new IOException("Unsupported VDL list value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlMap(OutputStream out, Object value, VdlType type) throws IOException {
+    /**
+     * Writes a VDL map to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlMap(EncodingStream out, Object value, VdlType type) throws IOException {
         expectClass(Kind.MAP, value, Map.class);
         Map<?, ?> mapValue = (Map<?, ?>) value;
         BinaryUtil.encodeUint(out, mapValue.size());
@@ -404,38 +432,56 @@ public class BinaryEncoder {
             writeValue(out, entry.getKey(), type.getKey());
             writeValue(out, entry.getValue(), type.getElem());
         }
+        return mapValue.size() != 0;
     }
 
-    private void writeVdlUnion(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL union to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlUnion(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.UNION, value, VdlUnion.class);
         VdlUnion unionValue = (VdlUnion) value;
         Object elem = unionValue.getElem();
         int index = unionValue.getIndex();
-        BinaryUtil.encodeUint(out, index + 1);
-        writeValue(out, elem, unionValue.vdlType().getFields().get(index).getType());
+        VdlType elemType = unionValue.vdlType().getFields().get(index).getType();
+        BinaryUtil.encodeUint(out, index);
+        boolean isNonZero = index != 0;
+        isNonZero |= writeValue(out, elem, elemType);
+        return isNonZero;
     }
 
-    private void writeVdlOptional(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL optional to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlOptional(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.OPTIONAL, value, VdlOptional.class);
         VdlOptional<?> optionalValue = (VdlOptional<?>) value;
         if (optionalValue.isNull()) {
-            BinaryUtil.encodeUint(out, 0);
+            writeVdlByte(out, Constants.WIRE_CTRL_NIL);
+            return false;
         } else {
-            BinaryUtil.encodeUint(out, 1);
             writeValue(out, optionalValue.getElem(), optionalValue.vdlType().getElem());
+            return true;
         }
     }
 
-    private void writeVdlSet(OutputStream out, Object value, VdlType type) throws IOException {
+    /**
+     * Writes a VDL set to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlSet(EncodingStream out, Object value, VdlType type) throws IOException {
         expectClass(Kind.SET, value, Set.class);
         Set<?> setValue = (Set<?>) value;
         BinaryUtil.encodeUint(out, setValue.size());
         for (Object key : setValue) {
             writeValue(out, key, type.getKey());
         }
+        return setValue.size() != 0;
     }
 
-    private void writeVdlString(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL string to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlString(EncodingStream out, Object value) throws IOException {
         String stringValue;
         if (value instanceof VdlString) {
             stringValue = ((VdlString) value).getValue();
@@ -446,11 +492,16 @@ public class BinaryEncoder {
                     + ", value " + value + ")");
         }
         BinaryUtil.encodeBytes(out, BinaryUtil.getBytes(stringValue));
+        return stringValue.length() != 0;
     }
 
-    private void writeVdlStruct(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL struct to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlStruct(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.STRUCT, value, AbstractVdlStruct.class);
         List<VdlField> fields = ((AbstractVdlStruct) value).vdlType().getFields();
+        boolean hasNonZeroField = false;
         for (int i = 0; i < fields.size(); i++) {
             VdlField field = fields.get(i);
             Object fieldValue = null;
@@ -464,29 +515,43 @@ public class BinaryEncoder {
                             + ", value " + value + ")");
                 }
             }
-            BinaryUtil.encodeUint(out, i + 1);
-            writeValue(out, fieldValue, field.getType());
+            int prevCount = out.getCount();
+            BinaryUtil.encodeUint(out, i);
+            if (writeValue(out, fieldValue, field.getType())) {
+                hasNonZeroField = true;
+            } else {
+                // Roll back writing of a zero value.
+                out.setCount(prevCount);
+            }
         }
-        BinaryUtil.encodeUint(out, 0);
+        writeVdlByte(out, Constants.WIRE_CTRL_EOF);
+        return hasNonZeroField;
     }
 
-    private void writeVdlUint(OutputStream out, Object value) throws IOException {
+    /**
+     * Writes a VDL uint to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlUint(EncodingStream out, Object value) throws IOException {
         if (value instanceof VdlUint16) {
-            BinaryUtil.encodeUint(out, ((VdlUint16) value).getValue());
+            return BinaryUtil.encodeUint(out, ((VdlUint16) value).getValue());
         } else if (value instanceof VdlUint32) {
-            BinaryUtil.encodeUint(out, ((VdlUint32) value).getValue());
+            return BinaryUtil.encodeUint(out, ((VdlUint32) value).getValue());
         } else if (value instanceof VdlUint64) {
-            BinaryUtil.encodeUint(out, ((VdlUint64) value).getValue());
+            return BinaryUtil.encodeUint(out, ((VdlUint64) value).getValue());
         } else {
             throw new IOException("Unsupported VDL uint value (type " + value.getClass()
                     + ", value " + value + ")");
         }
     }
 
-    private void writeVdlTypeObject(OutputStream out, Object object) throws IOException {
+    /**
+     * Writes a VDL typeObject to output stream and returns true iff the value is non-zero.
+     */
+    private boolean writeVdlTypeObject(EncodingStream out, Object object) throws IOException {
         expectClass(Kind.TYPEOBJECT, object, VdlTypeObject.class);
         VdlTypeObject value = (VdlTypeObject) object;
         BinaryUtil.encodeUint(out, getType(value.getTypeObject()).getValue());
+        return value.getTypeObject() != Types.ANY;
     }
 
     private void expectClass(Kind kind, Object value, Class<?> klass) throws IOException {

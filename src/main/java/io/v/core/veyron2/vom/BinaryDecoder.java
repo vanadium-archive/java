@@ -1,6 +1,7 @@
 package io.v.core.veyron2.vom;
 
 import com.google.common.base.Strings;
+import com.google.common.reflect.TypeToken;
 
 import io.v.core.veyron2.vdl.GeneratedFromVdl;
 import io.v.core.veyron2.vdl.Kind;
@@ -8,19 +9,18 @@ import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlField;
-import io.v.core.veyron2.vdl.VdlList;
 import io.v.core.veyron2.vdl.VdlOptional;
-import io.v.core.veyron2.vdl.VdlString;
 import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.vdl.VdlTypeObject;
-import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.vdl.WireError;
 import io.v.core.veyron2.verror.VException;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -38,15 +38,15 @@ import java.util.Set;
  * BinaryDecoder reads a VDL value from {@code InputStream} encoded in binary VOM format.
  */
 public class BinaryDecoder {
-    private final InputStream in;
+    private final BufferedInputStream in;
     private final Map<TypeID, VdlType> decodedTypes;
-    private final Map<TypeID, VdlValue> wireTypes;
+    private final Map<TypeID, WireType> wireTypes;
     private boolean binaryMagicByteRead;
 
     public BinaryDecoder(InputStream in) {
-        this.in = in;
+        this.in = new BufferedInputStream(in);
         this.decodedTypes = new HashMap<TypeID, VdlType>();
-        this.wireTypes = new HashMap<TypeID, VdlValue>();
+        this.wireTypes = new HashMap<TypeID, WireType>();
         this.binaryMagicByteRead = false;
     }
 
@@ -120,8 +120,8 @@ public class BinaryDecoder {
             } else if (typeId > 0) {
                 return getType(new TypeID(typeId));
             } else {
-                VdlAny wireType = (VdlAny) readValueMessage(Types.ANY, VdlAny.class);
-                wireTypes.put(new TypeID(-typeId), (VdlValue) wireType.getElem());
+                WireType wireType = (WireType) readValueMessage(WireType.VDL_TYPE, WireType.class);
+                wireTypes.put(new TypeID(-typeId), wireType);
             }
         }
     }
@@ -172,14 +172,10 @@ public class BinaryDecoder {
             }
         }
         if (target.getTargetType() == VException.class) {
-            if (actualType != Types.ERROR) {
-                throw new ConversionException(actualType, target.getTargetType());
-            }
             // Decode the data into a Java VdlValue value representing Types.ERROR type.
             // Note that we the error params (stored inside VdlAny) will be decoded into
             // Java native types, which is what we want.
-            final Type decodingType =
-                    Types.getReflectTypeForVdl(Types.ERROR, true /*forceVdlWrappers*/);
+            final Type decodingType = new TypeToken<VdlOptional<WireError>>(){}.getType();
             final VdlValue value = (VdlValue) readValue(actualType, decodingType);
             return vExceptionFromValue(value);
         }
@@ -239,15 +235,14 @@ public class BinaryDecoder {
 
     @SuppressWarnings("unchecked")
     private VException vExceptionFromValue(VdlValue value) {
-        final VdlStruct errorVal = ((VdlOptional<VdlStruct>) value).getElem();
+        final WireError errorVal = ((VdlOptional<WireError>) value).getElem();
         if (errorVal == null) {
             return null;
         }
-        final VdlStruct idActionVal = (VdlStruct) errorVal.getField("IDAction");
-        final String id = ((VdlString) idActionVal.getField("ID")).getValue();
-        final int action = ((VdlUint32) idActionVal.getField("Action")).getValue();
-        final String msg = ((VdlString) errorVal.getField("Msg")).getValue();
-        final VdlList<VdlAny> paramVals = (VdlList<VdlAny>) errorVal.getField("ParamList");
+        final String id = errorVal.getIDAction().getID();
+        final int action = errorVal.getIDAction().getAction().getValue();
+        final String msg = errorVal.getMsg();
+        final List<VdlAny> paramVals = errorVal.getParamList();
         final Serializable[] params = new Serializable[paramVals.size()];
         final Type[] paramTypes = new Type[paramVals.size()];
         for (int i = 0; i < paramVals.size(); ++i) {
@@ -264,8 +259,8 @@ public class BinaryDecoder {
     }
 
     private Object readVdlAny(ConversionTarget target) throws IOException, ConversionException {
-        TypeID typeId = new TypeID(BinaryUtil.decodeUint(in));
-        if (typeId.getValue() == 0) {
+        if (peekFlag() == Constants.WIRE_CTRL_NIL) {
+            in.skip(1);
             return createNullValue(target);
         }
         Type targetType;
@@ -274,7 +269,7 @@ public class BinaryDecoder {
         } else {
             targetType = Object.class;
         }
-        VdlType actualType = getType(typeId);
+        VdlType actualType = getType(new TypeID(BinaryUtil.decodeUint(in)));
         assertTypesCompatible(actualType, targetType);
         return new VdlAny(actualType, (Serializable) readValue(actualType, targetType));
     }
@@ -285,6 +280,11 @@ public class BinaryDecoder {
         if (actualType.getKind() == Kind.LIST) {
             len = (int) BinaryUtil.decodeUint(in);
         } else {
+            long uint = BinaryUtil.decodeUint(in);
+            if (uint != 0) {
+                throw new CorruptVomStreamException(
+                        "Array length should be encoded as 0, but it is " + uint);
+            }
             len = actualType.getLength();
         }
 
@@ -437,11 +437,12 @@ public class BinaryDecoder {
         Object data = createMapOrSetOrStruct(target);
         Type targetKeyType = getTargetKeyType(target);
         while (true) {
-            int index = (int) BinaryUtil.decodeUint(in);
-            if (index == 0) {
+            if (peekFlag() == Constants.WIRE_CTRL_EOF) {
+                in.skip(1);
                 break;
             }
-            VdlField field = actualType.getFields().get(index - 1);
+            int index = (int) BinaryUtil.decodeUint(in);
+            VdlField field = actualType.getFields().get(index);
             Type targetElemType = getMapElemOrStructFieldType(target, field.getName());
             Object key = ConvertUtil.convertFromBytes(BinaryUtil.getBytes(field.getName()),
                     new ConversionTarget(targetKeyType));
@@ -454,17 +455,16 @@ public class BinaryDecoder {
     private Object readVdlUnion(VdlType actualType, ConversionTarget target) throws IOException,
             ConversionException {
         int index = (int) BinaryUtil.decodeUint(in);
-        if (index <= 0 || index > actualType.getFields().size()) {
-            throw new CorruptVomStreamException("One of index " + index + " is out of range " + 1 +
+        if (index < 0 || index >= actualType.getFields().size()) {
+            throw new CorruptVomStreamException("Union index " + index + " is out of range " + 1 +
                     "..." + actualType.getFields().size());
         }
-        index--;
         VdlField actualField = actualType.getFields().get(index);
         VdlType actualElemType = actualField.getType();
         // Solve vdl.Value case.
         if (target.getTargetClass() == VdlUnion.class) {
             return new VdlUnion(actualType, index, actualElemType,
-                    (Serializable) readValue(actualElemType, Object.class));
+                    readValue(actualElemType, Object.class));
         }
         Class<?> targetClass = target.getTargetClass();
         // This can happen if targetClass is NamedUnion.A.
@@ -493,7 +493,8 @@ public class BinaryDecoder {
 
     private Object readVdlOptional(VdlType actualType, ConversionTarget target) throws IOException,
             ConversionException {
-        if (BinaryUtil.decodeUint(in) == 0) {
+        if (peekFlag() == Constants.WIRE_CTRL_NIL) {
+            in.skip(1);
             return createNullValue(target);
         } else {
             Type type = target.getTargetType();
@@ -516,6 +517,13 @@ public class BinaryDecoder {
 
     private Object readVdlTypeObject() throws IOException {
         return new VdlTypeObject(getType(new TypeID(BinaryUtil.decodeUint(in))));
+    }
+
+    private byte peekFlag() throws IOException {
+        in.mark(1);
+        byte flag = (byte) in.read();
+        in.reset();
+        return flag;
     }
 
     /**
@@ -560,62 +568,64 @@ public class BinaryDecoder {
         }
 
         private PendingType buildPendingType(TypeID typeId) throws CorruptVomStreamException {
-            VdlValue wireType = BinaryDecoder.this.wireTypes.get(typeId);
+            WireType wireType = BinaryDecoder.this.wireTypes.get(typeId);
             if (wireType == null) {
                 throw new CorruptVomStreamException("Unknown wire type " + typeId);
             }
             PendingType pending = builder.newPending();
             pendingTypes.put(typeId, pending);
 
-            if (wireType instanceof WireNamed) {
-                WireNamed wireNamed = (WireNamed) wireType;
-                return pending.setName(wireNamed.getName())
-                        .assignBase(lookupOrBuildPending(wireNamed.getBase()));
-            } else if (wireType instanceof WireArray) {
-                WireArray wireArray = (WireArray) wireType;
-                return pending.setName(wireArray.getName()).setKind(Kind.ARRAY)
-                        .setLength((int) wireArray.getLen().getValue())
-                        .setElem(lookupOrBuildPending(wireArray.getElem()));
-            } else if (wireType instanceof WireEnum) {
-                WireEnum wireEnum = (WireEnum) wireType;
-                pending.setName(wireEnum.getName()).setKind(Kind.ENUM);
-                for (String label : wireEnum.getLabels()) {
-                    pending.addLabel(label);
-                }
-                return pending;
-            } else if (wireType instanceof WireList) {
-                WireList wireList = (WireList) wireType;
-                return pending.setName(wireList.getName()).setKind(Kind.LIST)
-                        .setElem(lookupOrBuildPending(wireList.getElem()));
-            } else if (wireType instanceof WireMap) {
-                WireMap wireMap = (WireMap) wireType;
-                return pending.setName(wireMap.getName()).setKind(Kind.MAP)
-                        .setKey(lookupOrBuildPending(wireMap.getKey()))
-                        .setElem(lookupOrBuildPending(wireMap.getElem()));
-            } else if (wireType instanceof WireUnion) {
-                WireUnion wireUnion = (WireUnion) wireType;
-                pending.setName(wireUnion.getName()).setKind(Kind.UNION);
-                for (WireField field : wireUnion.getFields()) {
-                    pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
-                }
-                return pending;
-            } else if (wireType instanceof WireSet) {
-                WireSet wireSet = (WireSet) wireType;
-                return pending.setName(wireSet.getName()).setKind(Kind.SET)
-                        .setKey(lookupOrBuildPending(wireSet.getKey()));
-            } else if (wireType instanceof WireStruct) {
-                WireStruct wireStruct = (WireStruct) wireType;
-                pending.setName(wireStruct.getName()).setKind(Kind.STRUCT);
-                for (WireField field : wireStruct.getFields()) {
-                    pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
-                }
-                return pending;
-            } else if (wireType instanceof WireOptional) {
-                WireOptional wireOptional = (WireOptional) wireType;
-                return pending.setName(wireOptional.getName()).setKind(Kind.OPTIONAL)
-                        .setElem(lookupOrBuildPending(wireOptional.getElem()));
-            } else {
-                throw new CorruptVomStreamException("Unknown wire type: " + wireType.vdlType());
+            switch (wireType.getIndex()) {
+                // The mapping is defined in wireType.vdl and is not going to change.
+                case 0: // "NameT"
+                    WireNamed wireNamed = (WireNamed) wireType.getElem();
+                    return pending.setName(wireNamed.getName())
+                            .assignBase(lookupOrBuildPending(wireNamed.getBase()));
+                case 1: // "EnumT"
+                    WireEnum wireEnum = (WireEnum) wireType.getElem();
+                    pending.setName(wireEnum.getName()).setKind(Kind.ENUM);
+                    for (String label : wireEnum.getLabels()) {
+                        pending.addLabel(label);
+                    }
+                    return pending;
+                case 2: // "ArrayT"
+                    WireArray wireArray = (WireArray) wireType.getElem();
+                    return pending.setName(wireArray.getName()).setKind(Kind.ARRAY)
+                            .setLength((int) wireArray.getLen().getValue())
+                            .setElem(lookupOrBuildPending(wireArray.getElem()));
+                case 3: // "ListT"
+                    WireList wireList = (WireList) wireType.getElem();
+                    return pending.setName(wireList.getName()).setKind(Kind.LIST)
+                            .setElem(lookupOrBuildPending(wireList.getElem()));
+                case 4: // "SetT"
+                    WireSet wireSet = (WireSet) wireType.getElem();
+                    return pending.setName(wireSet.getName()).setKind(Kind.SET)
+                            .setKey(lookupOrBuildPending(wireSet.getKey()));
+                case 5: // "MapT"
+                    WireMap wireMap = (WireMap) wireType.getElem();
+                    return pending.setName(wireMap.getName()).setKind(Kind.MAP)
+                            .setKey(lookupOrBuildPending(wireMap.getKey()))
+                            .setElem(lookupOrBuildPending(wireMap.getElem()));
+                case 6: // "StructT"
+                    WireStruct wireStruct = (WireStruct) wireType.getElem();
+                    pending.setName(wireStruct.getName()).setKind(Kind.STRUCT);
+                    for (WireField field : wireStruct.getFields()) {
+                        pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
+                    }
+                    return pending;
+                case 7: // "UnionT"
+                    WireUnion wireUnion = (WireUnion) wireType.getElem();
+                    pending.setName(wireUnion.getName()).setKind(Kind.UNION);
+                    for (WireField field : wireUnion.getFields()) {
+                        pending.addField(field.getName(), lookupOrBuildPending(field.getType()));
+                    }
+                    return pending;
+                case 8: // "OptionalT"
+                    WireOptional wireOptional = (WireOptional) wireType.getElem();
+                    return pending.setName(wireOptional.getName()).setKind(Kind.OPTIONAL)
+                            .setElem(lookupOrBuildPending(wireOptional.getElem()));
+                default:
+                    throw new CorruptVomStreamException("Unknown wire type: " + wireType.vdlType());
             }
         }
     }
