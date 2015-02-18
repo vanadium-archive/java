@@ -1,8 +1,8 @@
 package io.v.core.veyron2.vom;
 
 import io.v.core.veyron2.vdl.AbstractVdlStruct;
-import io.v.core.veyron2.vdl.IDAction;
 import io.v.core.veyron2.vdl.Kind;
+import io.v.core.veyron2.vdl.NativeTypes;
 import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
 import io.v.core.veyron2.vdl.VdlArray;
@@ -17,7 +17,6 @@ import io.v.core.veyron2.vdl.VdlFloat64;
 import io.v.core.veyron2.vdl.VdlInt16;
 import io.v.core.veyron2.vdl.VdlInt32;
 import io.v.core.veyron2.vdl.VdlInt64;
-import io.v.core.veyron2.vdl.VdlList;
 import io.v.core.veyron2.vdl.VdlOptional;
 import io.v.core.veyron2.vdl.VdlString;
 import io.v.core.veyron2.vdl.VdlStruct;
@@ -28,13 +27,10 @@ import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.vdl.VdlUint64;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vdl.WireError;
-import io.v.core.veyron2.verror.VException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -190,8 +186,11 @@ public class BinaryEncoder {
         if (value == null) {
             value = VdlValue.zeroValue(type);
         }
-        if (value instanceof VException) {
-            final VdlValue vdlValue = valueFromVException((VException) value);
+
+        // Convert native value.
+        NativeTypes.Converter converter = Types.getNativeTypeConverter(value.getClass());
+        if (converter != null) {
+            final VdlValue vdlValue = converter.vdlValueFromNative(value);
             return writeValue(out, vdlValue, type);
         }
         switch (type.getKind()) {
@@ -238,30 +237,6 @@ public class BinaryEncoder {
             default:
                 throw new RuntimeException("Unknown kind: " + type.getKind());
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private VdlValue valueFromVException(VException e) {
-        final VdlOptional<VdlStruct> error =
-                (VdlOptional<VdlStruct>) VdlValue.nonNullZeroValue(Types.ERROR);
-        final IDAction idAction = new IDAction(e.getID(), new VdlUint32(e.getAction().getValue()));
-        final Serializable[] params = e.getParams();
-        final Type[] paramTypes = e.getParamTypes();
-        final VdlList<VdlAny> paramListVal =
-                (VdlList<VdlAny>) error.getElem().getField("ParamList");
-        for (int i = 0; i < params.length; ++i) {
-            if (params[i] instanceof VdlValue) {
-                paramListVal.add(new VdlAny((VdlValue) params[i]));
-            } else {
-                try {
-                    final VdlType vdlType = Types.getVdlTypeFromReflect(paramTypes[i]);
-                    paramListVal.add(new VdlAny(vdlType, params[i]));
-                } catch (IllegalArgumentException ex) {
-                    // Do nothing - the param will be dropped.
-                }
-            }
-        }
-        return new VdlOptional<WireError>(new WireError(idAction, e.getMessage(), paramListVal));
     }
 
     /**

@@ -1,10 +1,10 @@
 package io.v.core.veyron2.vom;
 
 import com.google.common.base.Strings;
-import com.google.common.reflect.TypeToken;
 
 import io.v.core.veyron2.vdl.GeneratedFromVdl;
 import io.v.core.veyron2.vdl.Kind;
+import io.v.core.veyron2.vdl.NativeTypes;
 import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlAny;
 import io.v.core.veyron2.vdl.VdlArray;
@@ -17,8 +17,6 @@ import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.vdl.VdlTypeObject;
 import io.v.core.veyron2.vdl.VdlUnion;
 import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vdl.WireError;
-import io.v.core.veyron2.verror.VException;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -164,6 +162,7 @@ public class BinaryDecoder {
         }
         ConversionTarget target = new ConversionTarget(targetType, actualType);
 
+        // Solve any/optional case.
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {
                 return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
@@ -171,13 +170,12 @@ public class BinaryDecoder {
                 return readValue(actualType, ReflectUtil.getElementType(target.getTargetType(), 0));
             }
         }
-        if (target.getTargetType() == VException.class) {
-            // Decode the data into a Java VdlValue value representing Types.ERROR type.
-            // Note that we the error params (stored inside VdlAny) will be decoded into
-            // Java native types, which is what we want.
-            final Type decodingType = new TypeToken<VdlOptional<WireError>>(){}.getType();
-            final VdlValue value = (VdlValue) readValue(actualType, decodingType);
-            return vExceptionFromValue(value);
+
+        // Convert native value.
+        NativeTypes.Converter converter = Types.getNativeTypeConverter(target.getTargetType());
+        if (converter != null) {
+            final VdlValue value = (VdlValue) readValue(actualType, converter.getWireType());
+            return converter.nativeFromVdlValue(value);
         }
         switch (actualType.getKind()) {
             case ANY:
@@ -231,31 +229,6 @@ public class BinaryDecoder {
         } else {
             throw new ConversionException("Can't create a null value of " + target.getTargetType());
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private VException vExceptionFromValue(VdlValue value) {
-        final WireError errorVal = ((VdlOptional<WireError>) value).getElem();
-        if (errorVal == null) {
-            return null;
-        }
-        final String id = errorVal.getIDAction().getID();
-        final int action = errorVal.getIDAction().getAction().getValue();
-        final String msg = errorVal.getMsg();
-        final List<VdlAny> paramVals = errorVal.getParamList();
-        final Serializable[] params = new Serializable[paramVals.size()];
-        final Type[] paramTypes = new Type[paramVals.size()];
-        for (int i = 0; i < paramVals.size(); ++i) {
-            params[i] = paramVals.get(i).getElem();
-            try {
-                paramTypes[i] = Types.getReflectTypeForVdl(paramVals.get(i).getElemType(), false);
-            } catch (IllegalArgumentException e) {
-                paramTypes[i] = VdlValue.class;
-            }
-        }
-        final VException.IDAction idAction =
-                new VException.IDAction(id, VException.ActionCode.fromValue(action));
-        return new VException(idAction, msg, params, paramTypes);
     }
 
     private Object readVdlAny(ConversionTarget target) throws IOException, ConversionException {

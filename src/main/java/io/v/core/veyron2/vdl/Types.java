@@ -3,6 +3,8 @@ package io.v.core.veyron2.vdl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import io.v.core.veyron2.vdl.NativeTypes.Converter;
+import io.v.core.veyron2.vdl.NativeTypes.VExceptionCoverter;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.verror.VException;
@@ -99,10 +101,10 @@ public final class Types {
      */
     public static final VdlType TYPEOBJECT = createPrimitiveType(Kind.TYPEOBJECT);
 
-    public static final VdlType ERROR = createErrorType();
-
     private static final Map<Type, VdlType> typeCache = new ConcurrentHashMap<Type, VdlType>();
     private static final Map<VdlType, Type> typeRegistry = new ConcurrentHashMap<VdlType, Type>();
+    private static final Map<Type, Converter> nativeTypeRegistry =
+            new ConcurrentHashMap<Type, Converter>();
 
     static {
         typeCache.put(VdlAny.class, ANY);
@@ -137,8 +139,14 @@ public final class Types {
         typeCache.put(Double.class, FLOAT64);
         typeCache.put(String.class, STRING);
 
-        typeCache.put(VException.class, ERROR);
-        typeRegistry.put(ERROR, VException.class);
+        registerNativeType(VException.class, VExceptionCoverter.INSTANCE);
+    }
+
+    private static void registerNativeType(Type nativeType, Converter converter) {
+        VdlType vdlType = getVdlTypeFromReflect(converter.getWireType());
+        typeCache.put(nativeType, vdlType);
+        typeRegistry.put(vdlType, nativeType);
+        nativeTypeRegistry.put(nativeType, converter);
     }
 
     private static VdlType createPrimitiveType(Kind kind) {
@@ -146,16 +154,6 @@ public final class Types {
         PendingType pending = builder.newPending(kind);
         builder.build();
         return pending.built();
-    }
-
-    private static VdlType createErrorType() {
-        return optionalOf(named("error", structOf(
-                new VdlField("IDAction", structOf(
-                        new VdlField("ID", STRING),
-                        new VdlField("Action", UINT32))),
-                new VdlField("Msg", STRING),
-                new VdlField("ParamList", listOf(ANY))
-        )));
     }
 
     /**
@@ -295,6 +293,14 @@ public final class Types {
         PendingType pending = builder.newPending().assignBase(base).setName(name);
         builder.build();
         return pending.built();
+    }
+
+    /**
+     * Returns a {@code NativeTypes.Converter} object for a provided java native type or null
+     * if there is no converter from provided java type to its VDL wire representation.
+     */
+    public static NativeTypes.Converter getNativeTypeConverter(Type type) {
+        return nativeTypeRegistry.get(type);
     }
 
     /**
