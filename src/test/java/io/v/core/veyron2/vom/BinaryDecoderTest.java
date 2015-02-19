@@ -6,6 +6,10 @@ import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+
 import io.v.core.veyron2.vdl.Types;
 import io.v.core.veyron2.vdl.VdlArray;
 import io.v.core.veyron2.vdl.VdlType;
@@ -74,7 +78,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeVdlArray() throws Exception {
-        VdlArray<?> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
+        VdlArray<Byte> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
         byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(v));
         Object decoded = TestUtil.decode(encoded);
         assertNotNull(decoded);
@@ -155,5 +159,16 @@ public class BinaryDecoderTest extends TestCase {
         final byte[] reEncoded = TestUtil.hexStringToBytes(
                 TestUtil.encode(VException.class, decodedV));
         assertEquals(Arrays.toString(encoded), Arrays.toString(reEncoded));
+    }
+
+    private void assertDecodeEncode(Object value) throws Exception {
+        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value.getClass(), value));
+        final Object decoded = TestUtil.decode(encoded);
+        assertEquals(value, decoded);
+    }
+
+    public void testDecodeEncodeTime() throws Exception {
+        assertDecodeEncode(new DateTime(2015, 2, 18, 20, 34, 35, 997, DateTimeZone.UTC));
+        assertDecodeEncode(new Duration(239017));
     }
 }

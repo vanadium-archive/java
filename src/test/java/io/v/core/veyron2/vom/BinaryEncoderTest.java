@@ -63,7 +63,6 @@ public class BinaryEncoderTest extends TestCase {
             assertEquals(test.getHex(), TestUtil.encode(value.getElemType(), value.getElem()));
         }
 
-        // TODO(rogulenko): ensure compatibility with go after vdl.Any issue is solved
         VdlType testsType = Types.getVdlTypeFromReflect(
                 Constants.class.getDeclaredField("TESTS").getGenericType());
         assertNotNull(TestUtil.encode(testsType, Constants.TESTS));

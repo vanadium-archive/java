@@ -3,6 +3,8 @@ package io.v.core.veyron2.vdl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import io.v.core.veyron2.vdl.NativeTime.DateTimeConverter;
+import io.v.core.veyron2.vdl.NativeTime.DurationConverter;
 import io.v.core.veyron2.vdl.NativeTypes.Converter;
 import io.v.core.veyron2.vdl.NativeTypes.VExceptionCoverter;
 import io.v.core.veyron2.vdl.VdlType.Builder;
@@ -140,6 +142,8 @@ public final class Types {
         typeCache.put(String.class, STRING);
 
         registerNativeType(VException.class, VExceptionCoverter.INSTANCE);
+        registerNativeType(org.joda.time.DateTime.class, DateTimeConverter.INSTANCE);
+        registerNativeType(org.joda.time.Duration.class, DurationConverter.INSTANCE);
     }
 
     private static void registerNativeType(Type nativeType, Converter converter) {
