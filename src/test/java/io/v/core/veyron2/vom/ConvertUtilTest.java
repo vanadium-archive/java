@@ -283,8 +283,7 @@ public class ConvertUtilTest extends TestCase {
                 for (Class<?> numericType : numericTypes[i]) {
                     Object result = convertValue(test.value, new ConversionTarget(numericType));
                     VdlType vdlType = Types.getVdlTypeFromReflect(numericType);
-                    Object vdlTypeResult = convertValue(test.value, new ConversionTarget(
-                            Types.getReflectTypeForVdl(vdlType, true), vdlType));
+                    Object vdlTypeResult = convertValue(test.value, new ConversionTarget(vdlType));
                     if (test.typeMask.charAt(i) == '0') {
                         assertNull(result);
                         assertNull(vdlTypeResult);

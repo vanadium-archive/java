@@ -40,20 +40,10 @@ public class TypeTest extends TestCase {
     private static final class MyFloat64 extends VdlFloat64 {}
     @GeneratedFromVdl(name = "MyString")
     private static final class MyString extends VdlString {}
-
     @GeneratedFromVdl(name = "MyComplex64")
-    private static final class MyComplex64 extends VdlComplex64 {
-        public MyComplex64() {
-            super(0);
-        }
-    }
-
+    private static final class MyComplex64 extends VdlComplex64 {}
     @GeneratedFromVdl(name = "MyComplex128")
-    private static final class MyComplex128 extends VdlComplex128 {
-        public MyComplex128() {
-            super(0);
-        }
-    }
+    private static final class MyComplex128 extends VdlComplex128 {}
 
     @SuppressWarnings("unused")
     @GeneratedFromVdl(name = "MyUnion")
@@ -257,8 +247,8 @@ public class TypeTest extends TestCase {
         }
     }
 
-    private void verifyReflectType(VdlType vdlType, boolean forceVdl, Class<?> ... classes) {
-        Type reflectType = Types.getReflectTypeForVdl(vdlType, forceVdl);
+    private void verifyReflectType(VdlType vdlType, Class<?> ... classes) {
+        Type reflectType = Types.getReflectTypeForVdl(vdlType);
         for (int i = 0; i < classes.length; i++) {
             if (i < classes.length - 1) {
                 assertEquals(classes[i], ((ParameterizedType) reflectType).getRawType());
@@ -270,11 +260,15 @@ public class TypeTest extends TestCase {
     }
 
     public void testGetReflectTypeForVdl() {
-        verifyReflectType(Types.listOf(Types.STRING), false, VdlList.class, String.class);
-        verifyReflectType(Types.setOf(Types.INT32), false, VdlSet.class, Integer.class);
-        verifyReflectType(Types.arrayOf(2, Types.INT16), false, VdlArray.class, Short.class);
+        verifyReflectType(Types.listOf(Types.STRING), VdlList.class, String.class);
+        verifyReflectType(Types.setOf(Types.INT32), VdlSet.class, Integer.class);
         try {
-            Types.getReflectTypeForVdl(Types.structOf(new VdlField("a", Types.BOOL)), false);
+            Types.getReflectTypeForVdl(Types.arrayOf(2, Types.INT16));
+            fail("Reflect type should not be constructed for VDL type [2]int16");
+        } catch (IllegalArgumentException expected) {
+        }
+        try {
+            Types.getReflectTypeForVdl(Types.structOf(new VdlField("a", Types.BOOL)));
             fail("Reflect type should not be constructed for VDL type struct{a bool}");
         } catch (IllegalArgumentException expected) {
         }
