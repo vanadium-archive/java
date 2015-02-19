@@ -12,8 +12,21 @@ import java.util.List;
  * (like org.joda.time) to VDL wire representation.
  */
 public class NativeTypes {
+    /**
+     * @throws IllegalArgumentException if value is not an instance of expected class
+     */
+    static void assertInstanceOf(Object value, Class<?> expectedClass) {
+        if (!expectedClass.isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Unexpected value class: expected "
+                    + expectedClass + ", got " + value.getClass());
+        }
+    }
+
+    /**
+     * Converts {@code VException}.
+     */
     static final class VExceptionCoverter extends Converter {
-        static VExceptionCoverter INSTANCE = new VExceptionCoverter();
+        static final VExceptionCoverter INSTANCE = new VExceptionCoverter();
 
         private VExceptionCoverter() {
             super(WireError.class);
@@ -21,10 +34,7 @@ public class NativeTypes {
 
         @Override
         public WireError vdlValueFromNative(Object nativeValue) {
-            if (!(nativeValue instanceof VException)) {
-                throw new IllegalArgumentException("Unexpected type of native value: expected "
-                        + VException.class + ", got " + nativeValue.getClass());
-            }
+            assertInstanceOf(nativeValue, VException.class);
             final VException e = (VException) nativeValue;
             final List<VdlAny> paramVals = new ArrayList<VdlAny>();
             final Serializable[] params = e.getParams();
@@ -47,10 +57,7 @@ public class NativeTypes {
 
         @Override
         public VException nativeFromVdlValue(VdlValue value) {
-            if (!(value instanceof WireError)) {
-                throw new IllegalArgumentException("Unexpected type of VDL value: expected "
-                        + WireError.class + ", got " + value.getClass());
-            }
+            assertInstanceOf(value, WireError.class);
             final WireError error = (WireError) value;
             final IDAction idActionVal = error.getIDAction();
             final VException.IDAction idAction = new VException.IDAction(idActionVal.getID(),
