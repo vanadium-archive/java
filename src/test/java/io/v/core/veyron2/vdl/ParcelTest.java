@@ -17,7 +17,7 @@ public class ParcelTest extends AndroidTestCase {
              final Object value = test.getValue().getElem();
              if (!(value instanceof VdlValue)) continue;
 
-            Type type = Types.getReflectTypeForVdl(test.getValue().getElemType(), false);
+            Type type = Types.getReflectTypeForVdl(test.getValue().getElemType());
             if (type == null) {
                 type = value.getClass();
             }

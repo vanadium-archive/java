@@ -63,7 +63,7 @@ public class NativeTypes {
                 VdlAny paramVal = paramVals.get(i);
                 params[i] = paramVal.getElem();
                 try {
-                    paramTypes[i] = Types.getReflectTypeForVdl(paramVal.getElemType(), false);
+                    paramTypes[i] = Types.getReflectTypeForVdl(paramVal.getElemType());
                 } catch (IllegalArgumentException e) {
                     paramTypes[i] = VdlValue.class;
                 }

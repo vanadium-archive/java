@@ -76,7 +76,7 @@ public class BinaryDecoderTest extends TestCase {
     public void testDecodeVdlArray() throws Exception {
         VdlArray<?> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
         byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(v));
-        Object decoded = TestUtil.decode(encoded);
+        Object decoded = TestUtil.decode(encoded, VdlValue.class);
         assertNotNull(decoded);
     }
 

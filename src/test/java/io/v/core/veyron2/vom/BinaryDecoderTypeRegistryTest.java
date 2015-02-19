@@ -16,7 +16,7 @@ public class BinaryDecoderTypeRegistryTest extends TestCase {
         String encoded = TestUtil.encode(new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
         try {
-            Types.getReflectTypeForVdl(vdlType, false);
+            Types.getReflectTypeForVdl(vdlType);
             fail("Class NBool is not loaded yet");
         } catch (IllegalArgumentException expected) {
         }

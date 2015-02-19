@@ -69,7 +69,7 @@ public class BinaryDecoder {
         assertTypesCompatible(actualType, targetType);
         if (targetType == Object.class) {
             try {
-                targetType = Types.getReflectTypeForVdl(actualType, false);
+                targetType = Types.getReflectTypeForVdl(actualType);
             } catch (IllegalArgumentException e) {
                 throw new ConversionException(e.getMessage());
             }
@@ -151,17 +151,16 @@ public class BinaryDecoder {
             throws IOException, ConversionException {
         ConversionTarget target;
         if (targetType == VdlValue.class) {
-            targetType = Types.getReflectTypeForVdl(actualType, true);
-            target = new ConversionTarget(targetType, actualType);
+            target = new ConversionTarget(actualType);
         } else if (targetType == Object.class) {
             // This can happen only inside VDL Any, as top-level type is constructed
             // Outside of readValue().
             try {
-                targetType = Types.getReflectTypeForVdl(actualType, false);
+                targetType = Types.getReflectTypeForVdl(actualType);
+                target = new ConversionTarget(targetType, actualType);
             } catch (IllegalArgumentException e) {
-                targetType = Types.getReflectTypeForVdl(actualType, true);
+                target = new ConversionTarget(actualType);
             }
-            target = new ConversionTarget(targetType, actualType);
         } else {
             target = new ConversionTarget(targetType);
         }
