@@ -2,7 +2,8 @@ package io.v.core.veyron2.verror;
 
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.i18n.Language;
-import io.v.core.veyron2.verror.Errors;
+import io.v.core.veyron2.vdl.Types;
+import io.v.core.veyron2.vdl.VdlType;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -219,26 +220,16 @@ public class VException extends Exception {
         }
 
         // Append componentName and opName to params.
-        final Serializable[] newParams = new Serializable[paramTypes.length + 2];
+        final Serializable[] newParams = new Serializable[params.length + 2];
         final Type[] newParamTypes = new Type[paramTypes.length + 2];
         newParams[0] = componentName;
         newParamTypes[0] = String.class;
         newParams[1] = opName;
         newParamTypes[1] = String.class;
         System.arraycopy(params, 0, newParams, 2, params.length);
-        System.arraycopy(paramTypes, 0, newParamTypes, 2, paramTypes.length);
-
-        // Construct the error message.
-        String msg = "";
-        if (paramTypes.length != params.length) {
-            android.util.Log.e("Veyron runtime", String.format(
-                    "Passed different number of types (%s) than parameters (%s) to VException",
-                    paramTypes, params));
-        } else {
-            msg = Language.getDefaultCatalog().format(
+        System.arraycopy(paramTypes, 0, newParamTypes, 2, params.length);
+        final String msg = Language.getDefaultCatalog().format(
                     language, idAction.getID(), (Object[]) newParams);
-        }
-
         return new VException(idAction, msg, newParams, newParamTypes);
     }
 
@@ -342,20 +333,51 @@ public class VException extends Exception {
         return language;
     }
 
+    private static VdlType[] convertParamTypes(Type[] types) {
+        if (types == null) {
+            return null;
+        }
+        final VdlType[] vdlTypes = new VdlType[types.length];
+        for (int i = 0; i < types.length; ++i) {
+            try {
+                vdlTypes[i] = Types.getVdlTypeFromReflect(types[i]);
+            } catch (IllegalArgumentException e) {
+                System.err.println(String.format(
+                        "Couldn't determine VDL type for param reflect type %s.  This param will " +
+                        "be dropped if ever VOM-encoded", types[i]));
+                vdlTypes[i] = null;
+            }
+        }
+        return vdlTypes;
+    }
+
     private final IDAction id;  // non-null
     private final Serializable[] params;  // non-null
-    private final Type[] paramTypes;  // non-null
+    private final VdlType[] paramTypes;  // non-null, same length as params
 
     public VException(String msg) {
-        super(msg);
-        this.id = Errors.UNKNOWN;
-        this.params = new Serializable[] {"", ""};
-        this.paramTypes = new Type[] { String.class, String.class };
+        this(Errors.UNKNOWN,
+                msg, new Serializable[] {"", ""}, new Type[]{ String.class, String.class });
     }
 
     public VException(IDAction id, String msg, Serializable[] params, Type[] paramTypes) {
+        this(id, msg, params, convertParamTypes(paramTypes));
+    }
+
+    public VException(IDAction id, String msg, Serializable[] params, VdlType[] paramTypes) {
         super(msg);
-        this.id = id;
+        this.id = id;      
+        params = params != null ? params : new Serializable[0];
+        paramTypes = paramTypes != null ? paramTypes : new VdlType[0];
+        if (params.length != paramTypes.length) {
+            System.err.println(String.format(
+                    "Passed different number of types (%s) than parameters (%s) to VException. " +
+                    "Some params may be dropped.", paramTypes, params));
+            final int length =
+                    params.length < paramTypes.length ? params.length : paramTypes.length;
+            params = Arrays.copyOf(params, length);
+            paramTypes = Arrays.copyOf(paramTypes, length);
+        }
         this.params = params;
         this.paramTypes = paramTypes;
     }
@@ -377,28 +399,6 @@ public class VException extends Exception {
     public ActionCode getAction() {
         return this.id.getAction();
     }
-
-    /**
-     * Returns the parameters associated with this exception.  The expectation is that the
-     * first parameter will be a string that identifies the component (typically the server or
-     * binary) where the error was generated, the second will be a string that identifies the
-     * operation that encountered the error.  The remaining parameters typically identify the
-     * object(s) on which the operation was acting.  A component passing on an error from another
-     * may prefix the first parameter with its name, a colon and a space.
-     *
-     * @return the array of parameters associated with this exception
-     */
-    public Serializable[] getParams() { return this.params; }
-
-    /**
-     * Returns the types of all the parameters associated with this exception, in the same order
-     * as {@code getParams()}.  This type information is necessary as we may wish to encode the
-     * returned parameters and Java doesn't always have the ability to deduce the right type from
-     * the value (e.g., generic parameters like List<String> or Map<String, Integer>).
-     *
-     * @return the array of types of all the parameters associated with this exception.
-     */
-    public Type[] getParamTypes() { return this.paramTypes; }
 
     /**
      * Returns true iff the error identifier associated with this exception is equal to the provided
@@ -444,10 +444,53 @@ public class VException extends Exception {
                 getMessage(), Arrays.toString(this.params), Arrays.toString(this.paramTypes));
     }
 
+    /**
+     * Returns true if this {@code VException} is deeply equal to the provided {@code Object}.
+     * Unlike {@code equals()}, this method, in addition to comparing identifiers, also compares
+     * action codes and parameters.
+     *
+     * @param  obj the other object we are testing for equality
+     * @return     true if this {@code VException} is deeply equal to the other object
+     */
+    public boolean deepEquals(Object obj) {
+        if (!equals(obj)) return false;
+        final VException other = (VException) obj;
+        // equals() has already compared the IDs.
+        if (!getAction().equals(other.getAction())) return false;
+        if (!Arrays.deepEquals(getParams(), other.getParams())) return false;
+        return Arrays.equals(getParamTypes(), other.getParamTypes());
+    }
+
     private static class ComponentNameKey {
         @Override
         public int hashCode() {
             return 0;
         }
     }
+
+    /**
+     * Returns the parameters associated with this exception.  The expectation is that the
+     * first parameter will be a string that identifies the component (typically the server or
+     * binary) where the error was generated, the second will be a string that identifies the
+     * operation that encountered the error.  The remaining parameters typically identify the
+     * object(s) on which the operation was acting.  A component passing on an error from another
+     * may prefix the first parameter with its name, a colon and a space.
+     *
+     * @return the array of parameters associated with this exception
+     */
+    Serializable[] getParams() { return this.params; }
+
+    /**
+     * Returns the VDL types of all the parameters associated with this exception, in the same
+     * order as {@code getParams()}.  This type information is necessary for VOM encoding as
+     * Java doesn't always give us the ability to deduce the right type from the value (e.g.,
+     * generic parameters like List<String> or Map<String, Integer>).
+     *
+     * NOTE: some types may be {@code null}, which means that the {@code VdlType} could not be
+     * deduced from the Java reflect type.  In this case, the param will be dropped during the VOM
+     * encoding.
+     *
+     * @return the array of VDL types of all the parameters associated with this exception.
+     */
+    VdlType[] getParamTypes() { return this.paramTypes; }
 }

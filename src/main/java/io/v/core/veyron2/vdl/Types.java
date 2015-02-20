@@ -6,10 +6,10 @@ import com.google.common.base.Strings;
 import io.v.core.veyron2.vdl.NativeTime.DateTimeConverter;
 import io.v.core.veyron2.vdl.NativeTime.DurationConverter;
 import io.v.core.veyron2.vdl.NativeTypes.Converter;
-import io.v.core.veyron2.vdl.NativeTypes.VExceptionCoverter;
 import io.v.core.veyron2.vdl.VdlType.Builder;
 import io.v.core.veyron2.vdl.VdlType.PendingType;
 import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.verror.VExceptionVdlConverter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -141,7 +141,7 @@ public final class Types {
         typeCache.put(Double.class, FLOAT64);
         typeCache.put(String.class, STRING);
 
-        registerNativeType(VException.class, VExceptionCoverter.INSTANCE);
+        registerNativeType(VException.class, VExceptionVdlConverter.INSTANCE);
         registerNativeType(org.joda.time.DateTime.class, DateTimeConverter.INSTANCE);
         registerNativeType(org.joda.time.Duration.class, DurationConverter.INSTANCE);
     }

@@ -19,14 +19,15 @@ import io.v.core.veyron2.vdl.VdlUint32;
 import io.v.core.veyron2.verror.VException;
 
 import java.io.EOFException;
-import java.io.Serializable;
-import java.lang.reflect.Type;
 
 public class FortuneTest extends AndroidTestCase {
     private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
             "StrVal",
             11,
             ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
+
+    private static final VException COMPLEX_ERROR = VException.explicitMake(
+            Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
 
     public static class FortuneServerImpl implements FortuneServer {
         private String lastAddedFortune;
@@ -70,7 +71,7 @@ public class FortuneTest extends AndroidTestCase {
 
         @Override
         public void getComplexError(ServerContext context) throws VException {
-            throw VException.make(Errors.ERR_COMPLEX, context, COMPLEX_PARAM, "secondParam", 3);
+            throw COMPLEX_ERROR;
         }
     }
 
@@ -138,21 +139,9 @@ public class FortuneTest extends AndroidTestCase {
             client.getComplexError(ctxT);
             fail("Expected exception during call to getComplexError()");
         } catch (VException e) {
-            if (!e.is(Errors.ERR_COMPLEX)) {
-                fail(String.format("Expected error %s, got %s", Errors.ERR_COMPLEX, e));
+            if (!COMPLEX_ERROR.deepEquals(e)) {
+                fail(String.format("Expected error %s, got %s", COMPLEX_ERROR, e));
             }
-            final Serializable[] params = e.getParams();
-            final Type[] paramTypes = e.getParamTypes();
-            assertEquals(5, params.length);
-            assertEquals(5, paramTypes.length);
-            assertEquals(String.class, paramTypes[0]);  // componentName
-            assertEquals(String.class, paramTypes[1]);  // opName
-            assertEquals(COMPLEX_PARAM, params[2]);
-            assertEquals(ComplexErrorParam.class, paramTypes[2]);
-            assertEquals("secondParam", params[3]);
-            assertEquals(String.class, paramTypes[3]);
-            assertEquals(3, params[4]);
-            assertEquals(Integer.class, paramTypes[4]);
         }
         s.stop();
     }

@@ -17,8 +17,6 @@ import io.v.jni.test.fortune.Errors;
 import io.v.jni.test.fortune.FortuneServer;
 
 import java.io.EOFException;
-import java.io.Serializable;
-import java.lang.reflect.Type;
 
 public class VDLInvokerTest extends AndroidTestCase {
   static {
@@ -28,6 +26,9 @@ public class VDLInvokerTest extends AndroidTestCase {
       "StrVal",
       11,
       ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
+
+  private static final VException COMPLEX_ERROR = VException.explicitMake(
+          Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
 
   private static class TestFortuneImpl implements FortuneServer {
         String fortune = "";
@@ -64,7 +65,7 @@ public class VDLInvokerTest extends AndroidTestCase {
         }
         @Override
         public void getComplexError(ServerContext context) throws VException {
-          throw VException.make(Errors.ERR_COMPLEX, context, COMPLEX_PARAM, "secondParam", 3);
+          throw COMPLEX_ERROR;
         }
     }
 
@@ -88,29 +89,17 @@ public class VDLInvokerTest extends AndroidTestCase {
             assertEquals(null, reply.vomAppError);
         }
         {
-          // Test error.
-          final byte[][] args = new byte[][] {};
+            // Test error.
+            final byte[][] args = new byte[][] {};
             final VDLInvoker.InvokeReply reply = invoker.invoke("getComplexError", call, args);
             assertEquals(0, reply.results.length);
             if (reply.vomAppError == null) {
               fail("Expected error, got null");
             }
             final VException e = (VException) VomUtil.decode(reply.vomAppError, VException.class);
-            if (!e.is(Errors.ERR_COMPLEX)) {
-              fail(String.format("Expected error %s, got %s", Errors.ERR_COMPLEX, e));
+            if (!COMPLEX_ERROR.deepEquals(e)) {
+                fail(String.format("Expected error %s, got %s", COMPLEX_ERROR, e));
             }
-            final Serializable[] params = e.getParams();
-            final Type[] paramTypes = e.getParamTypes();
-            assertEquals(5, params.length);
-            assertEquals(5, paramTypes.length);
-            assertEquals(String.class, paramTypes[0]);  // componentName
-            assertEquals(String.class, paramTypes[1]);  // opName
-            assertEquals(COMPLEX_PARAM, params[2]);
-            assertEquals(ComplexErrorParam.class, paramTypes[2]);
-            assertEquals("secondParam", params[3]);
-            assertEquals(String.class, paramTypes[3]);
-            assertEquals(3, params[4]);
-            assertEquals(Integer.class, paramTypes[4]);
         }
     }
 }

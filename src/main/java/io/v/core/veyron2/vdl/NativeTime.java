@@ -1,7 +1,5 @@
 package io.v.core.veyron2.vdl;
 
-import static io.v.core.veyron2.vdl.NativeTypes.assertInstanceOf;
-
 import org.joda.time.DateTimeZone;
 
 import io.v.core.veyron2.vdl.NativeTypes.Converter;

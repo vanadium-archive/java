@@ -102,13 +102,9 @@ public class BinaryDecoderTest extends TestCase {
                 "1 2 [3] 4=", params, paramTypes);
         final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
         final Object decoded = TestUtil.decode(encoded);
-        if (!(decoded instanceof VException)) {
-            fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
+        if (!v.deepEquals(decoded)) {
+            fail(String.format("Expected error %s, got %s", v, decoded));
         }
-        final VException decodedV = (VException) decoded;
-        assertEquals(v, decoded);
-        assertEquals(v.getMessage(), decodedV.getMessage());
-        assertEquals(Arrays.toString(v.getParams()), Arrays.toString(decodedV.getParams()));
     }
 
     public void testDecodeVExceptionBadParams() throws Exception {
@@ -125,13 +121,12 @@ public class BinaryDecoderTest extends TestCase {
                 "1 2 [3] 4=", params, paramTypes);
         final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
         final Object decoded = TestUtil.decode(encoded);
-        if (!(decoded instanceof VException)) {
-            fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
+        final VException expected = new VException(new VException.IDAction(
+                "io.v.core.veyron2.vom.Testing", VException.ActionCode.NO_RETRY),
+                "1 2 [3] 4=", null, new Type[0]);
+        if (!expected.deepEquals(decoded)) {
+            fail(String.format("Expected error %s, got %s", v, decoded));
         }
-        final VException decodedV = (VException) decoded;
-        assertEquals(v, decoded);
-        assertEquals(v.getMessage(), decodedV.getMessage());
-        assertEquals(Arrays.toString(new String[]{}), Arrays.toString(decodedV.getParams()));
     }
 
     public void testDecodeEncodeVException() throws Exception {
