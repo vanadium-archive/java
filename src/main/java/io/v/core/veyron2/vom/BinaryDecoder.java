@@ -170,7 +170,8 @@ public class BinaryDecoder {
             if (target.getKind() == Kind.ANY) {
                 return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
             } else if (target.getKind() == Kind.OPTIONAL) {
-                return readValue(actualType, ReflectUtil.getElementType(target.getTargetType(), 0));
+                Type elemType = ReflectUtil.getElementType(target.getTargetType(), 0);
+                return new VdlOptional<VdlValue>((VdlValue) readValue(actualType, elemType));
             }
         }
 
@@ -239,15 +240,14 @@ public class BinaryDecoder {
             in.skip(1);
             return createNullValue(target);
         }
-        Type targetType;
-        if (target.getKind() != Kind.ANY) {
-            targetType = target.getTargetType();
-        } else {
-            targetType = Object.class;
-        }
         VdlType actualType = getType(new TypeID(BinaryUtil.decodeUint(in)));
-        assertTypesCompatible(actualType, targetType);
-        return new VdlAny(actualType, (Serializable) readValue(actualType, targetType));
+        if (target.getKind() == Kind.ANY) {
+            return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
+        } else {
+            Type targetType = target.getTargetType();
+            assertTypesCompatible(actualType, targetType);
+            return readValue(actualType, targetType);
+        }
     }
 
     private Object readVdlArrayOrVdlList(VdlType actualType, ConversionTarget target)
