@@ -2,6 +2,8 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
+import io.v.core.veyron2.vdl.VdlValue;
+
 class VContextParamImpl implements io.v.core.veyron2.security.VContext {
     private final VContextParams params;
 
@@ -18,7 +20,7 @@ class VContextParamImpl implements io.v.core.veyron2.security.VContext {
         return this.params.getMethod();
     }
     @Override
-    public Object[] methodTags() {
+    public VdlValue[] methodTags() {
         return this.params.getMethodTags();
     }
     @Override

@@ -1,9 +1,9 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
 import io.v.core.veyron2.Options;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.context.VContext;
+import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 
 import java.lang.reflect.Type;
 

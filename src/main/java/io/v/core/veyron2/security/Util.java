@@ -1,7 +1,7 @@
 package io.v.core.veyron2.security;
 
 import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.util.VomUtil;
+import io.v.core.veyron2.vom.VomUtil;
 
 import java.security.interfaces.ECPublicKey;
 

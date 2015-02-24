@@ -2,8 +2,8 @@ package io.v.core.veyron2.services.security.access;
 
 import com.google.common.reflect.TypeToken;
 
-import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 
 /**
  * Util provides utilities for encoding/decoding various Veyron formats.  The encoding format

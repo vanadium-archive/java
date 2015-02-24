@@ -1,6 +1,7 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import android.test.AndroidTestCase;
@@ -8,15 +9,19 @@ import android.test.AndroidTestCase;
 import io.v.core.veyron2.android.V;
 import io.v.core.veyron2.ipc.ServerCall;
 import io.v.core.veyron2.ipc.ServerContext;
-import io.v.core.veyron2.util.VomUtil;
+import io.v.core.veyron2.services.security.access.Constants;
 import io.v.core.veyron2.vdl.Stream;
 import io.v.core.veyron2.vdl.VdlUint32;
+import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 import io.v.jni.test.fortune.ComplexErrorParam;
 import io.v.jni.test.fortune.Errors;
 import io.v.jni.test.fortune.FortuneServer;
 
 import java.io.EOFException;
+import java.util.Arrays;
+import java.util.Map;
 
 public class VDLInvokerTest extends AndroidTestCase {
   static {
@@ -67,6 +72,9 @@ public class VDLInvokerTest extends AndroidTestCase {
         public void getComplexError(ServerContext context) throws VException {
           throw COMPLEX_ERROR;
         }
+
+        @Override
+        public void noTags(ServerContext context) throws VException {}
     }
 
     public void testInvoke() throws VException {
@@ -99,6 +107,26 @@ public class VDLInvokerTest extends AndroidTestCase {
             final VException e = (VException) VomUtil.decode(reply.vomAppError, VException.class);
             if (!COMPLEX_ERROR.deepEquals(e)) {
                 fail(String.format("Expected error %s, got %s", COMPLEX_ERROR, e));
+            }
+        }
+    }
+
+    public void testGetTags() throws VException {
+        final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
+        final Map<String, VdlValue[]> testCases = ImmutableMap.<String, VdlValue[]>builder()
+                .put("add", new VdlValue[]{ Constants.WRITE })
+                .put("get", new VdlValue[]{ Constants.READ })
+                .put("streamingGet", new VdlValue[] { Constants.READ })
+                .put("getComplexError", new VdlValue[] { Constants.READ })
+                .put("noTags", new VdlValue[0])
+                .build();
+        for (final Map.Entry<String, VdlValue[]> testCase : testCases.entrySet()) {
+            final String method = testCase.getKey();
+            final VdlValue[] expected = testCase.getValue();
+            final VdlValue[] actual = invoker.getMethodTags(method);
+            if (!Arrays.equals(expected, actual)) {
+                fail(String.format("Wrong tags for method %s, want %s, got %s", method,
+                        Arrays.toString(expected), Arrays.toString(actual)));
             }
         }
     }

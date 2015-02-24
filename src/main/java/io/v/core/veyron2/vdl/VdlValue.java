@@ -1,6 +1,14 @@
 package io.v.core.veyron2.vdl;
 
+import io.v.core.veyron2.vom.BinaryDecoder;
+import io.v.core.veyron2.vom.BinaryEncoder;
+import io.v.core.veyron2.vom.ConversionException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +37,50 @@ public abstract class VdlValue implements Serializable {
      */
     public VdlType vdlType() {
         return type;
+    }
+
+    /**
+     * Returns the {@code VdlValue} corresponding to the provided Java value of a given
+     * {@code VdlType}.
+     *
+     * @param  value                    Java object to be converted to {@code VdlValue}
+     * @param  type                     type of the value
+     * @return                          {@code VdlValue} corresponding to the above value
+     * @throws IllegalArgumentException if the provided value cannot be converted
+     */
+    public static VdlValue valueOf(Object value, VdlType type) {
+        try {
+            // VOM-Encode.
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final BinaryEncoder encoder = new BinaryEncoder(out);
+            encoder.encodeValue(type, value);
+
+            // VOM-Decode to VdlValue.
+            final BinaryDecoder decoder =
+                    new BinaryDecoder(new ByteArrayInputStream(out.toByteArray()));
+            return (VdlValue) decoder.decodeValue(VdlValue.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(String.format(
+                "IO error while converting value %s of type %s into VdlValue: %s",
+                value, type, e.getMessage()));
+        } catch (ConversionException e) {
+            throw new IllegalArgumentException(String.format(
+                "Couldn't convert value %s of type %s into VdlValue: %s",
+                value, type, e.getMessage()));
+        }
+    }
+
+    /**
+     * Returns the {@code VdlValue} corresponding to the provided Java value of a given
+     * reflection type.
+     *
+     * @param  value                    Java object to be converted to {@code VdlValue}
+     * @param  type                     type of the value
+     * @return                          {@code VdlValue} corresponding to the above value
+     * @throws IllegalArgumentException if the provided value cannot be converted
+     */
+    public static VdlValue valueOf(Object value, Type type) {
+        return valueOf(value, Types.getVdlTypeFromReflect(type));
     }
 
     /**

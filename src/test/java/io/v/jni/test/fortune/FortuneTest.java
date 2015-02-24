@@ -7,8 +7,7 @@ import android.test.AndroidTestCase;
 import org.joda.time.Duration;
 
 import io.v.core.veyron2.InputChannel;
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.android.V;
+import io.v.core.veyron2.V;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.ipc.NetworkChange;
 import io.v.core.veyron2.ipc.Server;
@@ -21,6 +20,9 @@ import io.v.core.veyron2.verror.VException;
 import java.io.EOFException;
 
 public class FortuneTest extends AndroidTestCase {
+    static {
+        V.init();
+    }
     private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
             "StrVal",
             11,
@@ -73,10 +75,13 @@ public class FortuneTest extends AndroidTestCase {
         public void getComplexError(ServerContext context) throws VException {
             throw COMPLEX_ERROR;
         }
+
+        @Override
+        public void noTags(ServerContext context) throws VException {}
     }
 
     public void testFortune() throws VException {
-        final VContext ctx = V.init(getContext(), new Options());
+        final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(null);
         final FortuneServer server = new FortuneServerImpl();
@@ -100,7 +105,7 @@ public class FortuneTest extends AndroidTestCase {
     }
 
     public void testStreaming() throws VException {
-        final VContext ctx = V.init(getContext(), new Options());
+        final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(null);
         final FortuneServer server = new FortuneServerImpl();
@@ -126,7 +131,7 @@ public class FortuneTest extends AndroidTestCase {
     }
 
     public void testComplexError() throws VException {
-        final VContext ctx = V.init(getContext(), new Options());
+        final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(null);
         final FortuneServer server = new FortuneServerImpl();
@@ -147,7 +152,7 @@ public class FortuneTest extends AndroidTestCase {
     }
 
     public void testWatchNetwork() throws VException {
-        final VContext ctx = V.init(getContext(), new Options());
+        final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         s.listen(null);
         final FortuneServer server = new FortuneServerImpl();

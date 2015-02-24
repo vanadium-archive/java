@@ -2,6 +2,8 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
+import io.v.core.veyron2.vdl.VdlValue;
+
 /**
  * Context defines the state available for authorizing a principal.
  */
@@ -26,7 +28,7 @@ public interface VContext {
      *
      * @return tags attached to the method.
      */
-    public Object[] methodTags();
+    public VdlValue[] methodTags();
 
     /**
      * Returns the veyron name suffix for the request.

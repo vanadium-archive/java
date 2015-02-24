@@ -2,6 +2,8 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
+import io.v.core.veyron2.vdl.VdlValue;
+
 /**
  * VContextParams stores security-context creation parameters.  Here is an example of a simple
  * context creation:
@@ -23,7 +25,7 @@ public class VContextParams {
 
     private DateTime timestamp;
     private String method;
-    private Object[] methodTags;
+    private VdlValue[] methodTags;
     private String suffix;
     private String localEndpoint;
     private String remoteEndpoint;
@@ -67,7 +69,7 @@ public class VContextParams {
      * @param  tags method tags
      * @return      a child of the current params with the given method tags attached.
      */
-    public VContextParams withMethodTags(Object[] tags) {
+    public VContextParams withMethodTags(VdlValue... tags) {
         final VContextParams ret = new VContextParams(this);
         ret.methodTags = tags;
         return ret;
@@ -163,7 +165,7 @@ public class VContextParams {
      *
      * @return method tags attached to the params
      */
-    public Object[] getMethodTags() {
+    public VdlValue[] getMethodTags() {
         if (this.methodTags != null) return this.methodTags;
         if (this.parent != null) return this.parent.getMethodTags();
         return null;

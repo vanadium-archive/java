@@ -1,7 +1,5 @@
-package io.v.core.veyron2.util;
+package io.v.core.veyron2.vom;
 
-import io.v.core.veyron2.vdl.VdlOptional;
-import io.v.core.veyron2.vdl.VdlStruct;
 import io.v.core.veyron2.vdl.VdlType;
 import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.verror.VException;
@@ -15,7 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * VomUtil contains utilities used by the ipc package.
+ * VomUtil contains convenience methods for VOM-encoding/decoding.
  */
 public class VomUtil {
     /**

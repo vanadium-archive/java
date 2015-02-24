@@ -50,25 +50,28 @@ public class V extends io.v.core.veyron2.V {
      * recognized:
      *   CURRENTLY NO OPTIONS ARE SUPPORTED
      *
-     * @param  ctx  Android application context
-     * @param  opts options for the default runtime
-     * @return      base context
+     * @param  androidCtx  Android application context
+     * @param  opts        options for the default runtime
+     * @return             base context
      */
-    public static VContext init(android.content.Context ctx, Options opts) {
+    public static VContext init(android.content.Context androidCtx, Options opts) {
         if (context != null) return context;
         synchronized (V.class) {
             if (context != null) return context;
+            if (androidCtx == null) {
+                throw new RuntimeException("Android context must be non-null.");
+            }
             context = io.v.core.veyron2.V.init(opts);
             // Attach principal and listen spec to the context.
             try {
-                context = V.setPrincipal(context, createPrincipal(ctx, opts));
+                context = V.setPrincipal(context, createPrincipal(androidCtx));
                 context = V.setListenSpec(context, DEFAULT_LISTEN_SPEC);
             } catch (VException e) {
                 throw new RuntimeException(
                         "Couldn't setup Vanadium Runtime options: " + e.getMessage());
             }
             // Set the VException component name to the Android context package name.
-            context = VException.contextWithComponentName(context, ctx.getPackageName());
+            context = VException.contextWithComponentName(context, androidCtx.getPackageName());
             return context;
         }
     }
@@ -83,8 +86,7 @@ public class V extends io.v.core.veyron2.V {
         return V.init(ctx, null);
     }
 
-    private static Principal createPrincipal(android.content.Context ctx, Options opts)
-            throws VException {
+    private static Principal createPrincipal(android.content.Context ctx) throws VException {
         // Check if the private key has already been generated for this package.
         // (NOTE: Android package names are unique.)
         KeyStore.PrivateKeyEntry keyEntry =

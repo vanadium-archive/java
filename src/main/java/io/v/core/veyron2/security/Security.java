@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 
 import org.joda.time.DateTime;
 
-import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.services.security.access.TaggedACLAuthorizer;
 import io.v.core.veyron2.services.security.access.TaggedACLMap;
-import io.v.core.veyron2.util.VomUtil;
+import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 
+import java.lang.reflect.Type;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -66,11 +67,14 @@ public class Security {
     }
 
     /**
-     * Creates a principal using the provided signer, BlessingStore, and BlessingRoots.
+     * Creates a principal using the provided signer, blessing store, and blessing roots.  If the
+     * provided store is {@code null}, the principal will use a store whose every opration will
+     * fail.  If the provided roots are {@code null}, the principal will not trust any public keys
+     * and all subsequent {@code addToRoots} operations will fail.
      *
      * @param  signer signer to be used by the principal.
-     * @param  store  BlessingStore to be used by the principal.
-     * @param  roots  BlessingRoots to be used by the principal.
+     * @param  store  blessing store to be used by the principal.
+     * @param  roots  blessing roots to be used by the principal.
      * @return        newly created principal.
      */
     public static Principal newPrincipal(Signer signer, BlessingStore store, BlessingRoots roots)
@@ -275,9 +279,9 @@ public class Security {
      * @return                 an above-described authorizer.
      * @throws VException      if the authorizer couldn't be created.
      */
-    public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Class<?> type)
+    public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Type type)
         throws VException {
-        return new TaggedACLAuthorizer(acls, type);
+        return TaggedACLAuthorizer.create(acls, type);
     }
 
     /**

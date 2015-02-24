@@ -1,9 +1,10 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.util.VomUtil;
 import io.v.core.veyron2.ipc.ServerCall;
+import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.vdl.VeyronServer;
+import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -30,15 +31,15 @@ public final class VDLInvoker {
     private final static class ServerMethod {
         private final Object wrappedServer;
         private final Method method;
-        private final Object[] tags;
+        private final VdlValue[] tags;
 
-        public ServerMethod(Object wrappedServer, Method method, Object[] tags) {
+        public ServerMethod(Object wrappedServer, Method method, VdlValue[] tags) {
             this.wrappedServer = wrappedServer;
             this.method = method;
-            this.tags = tags;
+            this.tags = tags != null ? tags : new VdlValue[0];
         }
 
-        public Object[] getTags() { return this.tags; }
+        public VdlValue[] getTags() { return this.tags; }
 
         public Object invoke(Object... args) throws IllegalAccessException,
                 IllegalArgumentException, InvocationTargetException {
@@ -99,9 +100,9 @@ public final class VDLInvoker {
             //}
             for (Entry<String, Method> m : methods.entrySet()) {
                 // Get the method tags.
-                Object[] tags = null;
+                VdlValue[] tags = null;
                 try {
-                    tags = (Object[])tagGetter.invoke(wrapper, null, m.getValue().getName());
+                    tags = (VdlValue[])tagGetter.invoke(wrapper, null, m.getValue().getName());
                 } catch (IllegalAccessException e) {
                     // getMethodTags() not defined.
                 } catch (InvocationTargetException e) {
@@ -115,18 +116,18 @@ public final class VDLInvoker {
     }
 
     /**
-     * Returns all the tags associated with the provided method or {@code null} if no tags have
-     * been associated with it.
+     * Returns all the tags associated with the provided method or an empty array if
+     * no tags have been associated with it.
      *
-     * @param  method                   method we are retrieving tags for.
-     * @return                          tags associated with the provided method.
-     * @throws VException      if the method doesn't exist.
+     * @param  method     method we are retrieving tags for.
+     * @return            tags associated with the provided method.
+     * @throws VException if the method doesn't exist.
      */
-    public Object[] getMethodTags(String method) throws VException {
+    public VdlValue[] getMethodTags(String method) throws VException {
         final ServerMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new VException(String.format(
-                    "Couldn't find method %s in class %s",
+                    "Couldn't find method \"%s\" in class %s",
                     method, this.serverClass.getCanonicalName()));
         }
         return m.getTags();
@@ -136,9 +137,9 @@ public final class VDLInvoker {
      * Iterate through the veyron servers an object implements and generates
      * server wrappers for each.
      *
-     * @param srv                       the server object
-     * @return                          a list of server wrappers
-     * @throws VException      if the input server is invalid.
+     * @param srv         the server object
+     * @return            a list of server wrappers
+     * @throws VException if the input server is invalid.
      */
     private List<Object> wrapServer(Object srv) throws VException {
         List<Object> stubs = new ArrayList<Object>();

@@ -3,11 +3,12 @@ package io.v.core.veyron.runtimes.google.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.context.CancelableVContext;
 import io.v.core.veyron2.context.VContext;
 import io.v.core.veyron2.security.Blessings;
 import io.v.core.veyron2.security.Principal;
+import io.v.core.veyron2.vdl.VdlValue;
+import io.v.core.veyron2.verror.VException;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
@@ -89,7 +90,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
         return this.securityContext.method();
     }
     @Override
-    public Object[] methodTags() {
+    public VdlValue[] methodTags() {
         return this.securityContext.methodTags();
     }
     @Override

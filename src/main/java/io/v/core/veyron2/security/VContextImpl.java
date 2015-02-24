@@ -2,9 +2,8 @@ package io.v.core.veyron2.security;
 
 import org.joda.time.DateTime;
 
+import io.v.core.veyron2.vdl.VdlValue;
 import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.security.Blessings;
-import io.v.core.veyron2.security.Principal;
 
 class VContextImpl implements io.v.core.veyron2.security.VContext {
     private static final String TAG = "Veyron runtime";
@@ -13,7 +12,7 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
 
     public native DateTime nativeTimestamp(long nativePtr) throws VException;
     public native String nativeMethod(long nativePtr);
-    public native Object[] nativeMethodTags(long nativePtr) throws VException;
+    public native VdlValue[] nativeMethodTags(long nativePtr) throws VException;
     private native String nativeSuffix(long nativePtr);
     private native String nativeLocalEndpoint(long nativePtr);
     private native String nativeRemoteEndpoint(long nativePtr);
@@ -40,13 +39,13 @@ class VContextImpl implements io.v.core.veyron2.security.VContext {
         return nativeMethod(this.nativePtr);
     }
     @Override
-    public Object[] methodTags() {
+    public VdlValue[] methodTags() {
         try {
-            final Object[] tags = nativeMethodTags(this.nativePtr);
-            return tags != null ? tags : new Object[0];
+            final VdlValue[] tags = nativeMethodTags(this.nativePtr);
+            return tags != null ? tags : new VdlValue[0];
         } catch (VException e) {
             android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
-            return new Object[0];
+            return new VdlValue[0];
         }
     }
     @Override

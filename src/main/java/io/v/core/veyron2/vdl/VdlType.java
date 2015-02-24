@@ -87,6 +87,7 @@ public final class VdlType implements Serializable {
             }
     }
 
+    @SuppressWarnings("unused")
     private Object readResolve() throws ObjectStreamException {
         return getUniqueType(this);
     }

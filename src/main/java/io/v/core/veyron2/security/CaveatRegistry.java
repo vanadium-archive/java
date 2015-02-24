@@ -1,8 +1,8 @@
 package io.v.core.veyron2.security;
 
-import io.v.core.veyron2.verror.VException;
 import io.v.core.veyron2.uniqueid.Id;
-import io.v.core.veyron2.util.VomUtil;
+import io.v.core.veyron2.verror.VException;
+import io.v.core.veyron2.vom.VomUtil;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
