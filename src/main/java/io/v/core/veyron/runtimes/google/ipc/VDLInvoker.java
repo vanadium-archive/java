@@ -1,10 +1,10 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.ipc.ServerCall;
-import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.vdl.VeyronServer;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.ipc.ServerCall;
+import io.v.v23.vdl.VdlValue;
+import io.v.v23.vdl.VeyronServer;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

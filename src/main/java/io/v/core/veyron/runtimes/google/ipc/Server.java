@@ -1,14 +1,14 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
 import io.v.core.veyron.runtimes.google.InputChannel;
-import io.v.core.veyron2.ipc.Dispatcher;
-import io.v.core.veyron2.ipc.ListenSpec;
-import io.v.core.veyron2.ipc.NetworkChange;
-import io.v.core.veyron2.ipc.ServerStatus;
-import io.v.core.veyron2.ipc.ServiceObjectWithAuthorizer;
-import io.v.core.veyron2.verror.VException;
+import io.v.v23.ipc.Dispatcher;
+import io.v.v23.ipc.ListenSpec;
+import io.v.v23.ipc.NetworkChange;
+import io.v.v23.ipc.ServerStatus;
+import io.v.v23.ipc.ServiceObjectWithAuthorizer;
+import io.v.v23.verror.VException;
 
-public class Server implements io.v.core.veyron2.ipc.Server {
+public class Server implements io.v.v23.ipc.Server {
     private final long nativePtr;
     private final ListenSpec listenSpec;
 
@@ -28,7 +28,7 @@ public class Server implements io.v.core.veyron2.ipc.Server {
         this.nativePtr = nativePtr;
         this.listenSpec = spec;
     }
-    // Implement io.v.core.veyron2.ipc.Server.
+    // Implement io.v.v23.ipc.Server.
     @Override
     public String[] listen(ListenSpec spec) throws VException {
         if (spec == null) {
@@ -64,7 +64,7 @@ public class Server implements io.v.core.veyron2.ipc.Server {
         }
     }
     @Override
-    public io.v.core.veyron2.InputChannel<NetworkChange> watchNetwork() {
+    public io.v.v23.InputChannel<NetworkChange> watchNetwork() {
         try {
             return nativeWatchNetwork(this.nativePtr);
         } catch (VException e) {
@@ -72,7 +72,7 @@ public class Server implements io.v.core.veyron2.ipc.Server {
         }
     }
     @Override
-    public void unwatchNetwork(io.v.core.veyron2.InputChannel<NetworkChange> channel) {
+    public void unwatchNetwork(io.v.v23.InputChannel<NetworkChange> channel) {
         if (!(channel instanceof InputChannel)) {  // also handles channel == null
             return;
         }

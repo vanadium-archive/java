@@ -8,12 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import io.v.core.veyron2.android.V;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.security.Certificate;
-import io.v.core.veyron2.security.WireBlessings;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.android.V;
+import io.v.v23.context.VContext;
+import io.v.v23.security.Certificate;
+import io.v.v23.security.WireBlessings;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;

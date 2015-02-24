@@ -1,25 +1,25 @@
 package io.v.core.veyron.runtimes.google;
 
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.ipc.ListenSpec;
-import io.v.core.veyron2.naming.Namespace;
-import io.v.core.veyron2.security.Principal;
+import io.v.v23.Options;
+import io.v.v23.verror.VException;
+import io.v.v23.context.VContext;
+import io.v.v23.ipc.ListenSpec;
+import io.v.v23.naming.Namespace;
+import io.v.v23.security.Principal;
 
 /**
- * VRuntime is an implementation of {@code io.v.core.veyron2.VRuntime} that calls to native Go
+ * VRuntime is an implementation of {@code io.v.v23.VRuntime} that calls to native Go
  * code for most of its functionalities.
  */
-public class VRuntime implements io.v.core.veyron2.VRuntime {
+public class VRuntime implements io.v.v23.VRuntime {
     private static final String TAG = "Veyron runtime";
 
     private static native VContext nativeInit() throws VException;
     private static native VContext nativeSetNewClient(VContext ctx, Options opts)
             throws VException;
-    private static native io.v.core.veyron2.ipc.Client nativeGetClient(VContext ctx)
+    private static native io.v.v23.ipc.Client nativeGetClient(VContext ctx)
             throws VException;
-    private static native io.v.core.veyron2.ipc.Server nativeNewServer(
+    private static native io.v.v23.ipc.Server nativeNewServer(
             VContext ctx, ListenSpec spec) throws VException;
     private static native VContext nativeSetPrincipal(VContext ctx, Principal principal)
             throws VException;
@@ -47,7 +47,7 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
         return nativeSetNewClient(ctx, opts);
     }
     @Override
-    public io.v.core.veyron2.ipc.Client getClient(VContext ctx) {
+    public io.v.v23.ipc.Client getClient(VContext ctx) {
         try {
             return nativeGetClient(ctx);
         } catch (VException e) {
@@ -55,7 +55,7 @@ public class VRuntime implements io.v.core.veyron2.VRuntime {
         }
     }
     @Override
-    public io.v.core.veyron2.ipc.Server newServer(VContext ctx, Options opts) throws VException {
+    public io.v.v23.ipc.Server newServer(VContext ctx, Options opts) throws VException {
         // Get a Java ListenSpec that is attached to this context (if any).
         final ListenSpec spec = (ListenSpec) ctx.value(this);
         return nativeNewServer(ctx, spec);

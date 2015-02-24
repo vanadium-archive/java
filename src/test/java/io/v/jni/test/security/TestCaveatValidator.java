@@ -1,8 +1,8 @@
 package io.v.jni.test.security;
 
-import io.v.core.veyron2.security.CaveatValidator;
-import io.v.core.veyron2.security.VContext;
-import io.v.core.veyron2.verror.VException;
+import io.v.v23.security.CaveatValidator;
+import io.v.v23.security.VContext;
+import io.v.v23.verror.VException;
 
 /**
  * Validator for {@code TestCaveat} that validates the context if its veyron suffix

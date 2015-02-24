@@ -1,12 +1,12 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Stream implements io.v.core.veyron2.ipc.Stream {
+public class Stream implements io.v.v23.ipc.Stream {
     private final long nativePtr;
 
     private native void nativeSend(long nativePtr, byte[] vomItem) throws VException;

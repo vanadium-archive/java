@@ -1,14 +1,14 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Call implements io.v.core.veyron2.ipc.Client.Call {
+public class Call implements io.v.v23.ipc.Client.Call {
     private final long nativePtr;
-    private final io.v.core.veyron2.ipc.Stream stream;
+    private final io.v.v23.ipc.Stream stream;
 
     private native void nativeCloseSend() throws VException;
     private native byte[][] nativeFinish(long nativePtr, int numResults) throws VException;
@@ -19,7 +19,7 @@ public class Call implements io.v.core.veyron2.ipc.Client.Call {
         this.stream = stream;
     }
 
-    // Implements io.v.core.veyron2.ipc.Client.Call.
+    // Implements io.v.v23.ipc.Client.Call.
     @Override
     public void closeSend() throws VException {
         nativeCloseSend();
@@ -39,7 +39,7 @@ public class Call implements io.v.core.veyron2.ipc.Client.Call {
         }
         return ret;
     }
-    // Implements io.v.core.veyron2.ipc.Stream.
+    // Implements io.v.v23.ipc.Stream.
     @Override
     public void send(Object item, Type type) throws VException {
         this.stream.send(item, type);

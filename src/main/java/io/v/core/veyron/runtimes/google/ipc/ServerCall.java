@@ -3,36 +3,36 @@ package io.v.core.veyron.runtimes.google.ipc;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.context.CancelableVContext;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.security.Blessings;
-import io.v.core.veyron2.security.Principal;
-import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.verror.VException;
+import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
+import io.v.v23.security.Blessings;
+import io.v.v23.security.Principal;
+import io.v.v23.vdl.VdlValue;
+import io.v.v23.verror.VException;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
 import java.util.concurrent.CountDownLatch;
 
-public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
+public class ServerCall implements io.v.v23.ipc.ServerCall {
     private static final String TAG = "Veyron runtime";
 
     private final long nativePtr;
     private final Stream stream;
     private final VContext context;
-    private final io.v.core.veyron2.security.VContext securityContext;
+    private final io.v.v23.security.VContext securityContext;
 
     public native Blessings nativeBlessings(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private ServerCall(long nativePtr, Stream stream, VContext context,
-        io.v.core.veyron2.security.VContext securityContext) {
+        io.v.v23.security.VContext securityContext) {
         this.nativePtr = nativePtr;
         this.stream = stream;
         this.context = context;
         this.securityContext = securityContext;
     }
-    // Implements io.v.core.veyron2.ipc.ServerContext.
+    // Implements io.v.v23.ipc.ServerContext.
     @Override
     public Blessings blessings() {
         try {
@@ -42,7 +42,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
             return null;
         }
     }
-    // Implements io.v.core.veyron2.ipc.Stream.
+    // Implements io.v.v23.ipc.Stream.
     @Override
     public void send(Object item, Type type) throws VException {
         this.stream.send(item, type);
@@ -51,7 +51,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
     public Object recv(Type type) throws EOFException, VException {
         return this.stream.recv(type);
     }
-    // Implements io.v.core.veyron2.context.VContext.
+    // Implements io.v.v23.context.VContext.
     @Override
     public DateTime deadline() {
         return this.context.deadline();
@@ -80,7 +80,7 @@ public class ServerCall implements io.v.core.veyron2.ipc.ServerCall {
     public VContext withValue(Object key, Object value) {
         return this.context.withValue(key, value);
     }
-    // Implements io.v.core.veyron2.security.VContext.
+    // Implements io.v.v23.security.VContext.
     @Override
     public DateTime timestamp() {
         return this.securityContext.timestamp();

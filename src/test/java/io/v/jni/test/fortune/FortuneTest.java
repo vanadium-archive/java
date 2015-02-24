@@ -6,16 +6,16 @@ import android.test.AndroidTestCase;
 
 import org.joda.time.Duration;
 
-import io.v.core.veyron2.InputChannel;
-import io.v.core.veyron2.V;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.ipc.NetworkChange;
-import io.v.core.veyron2.ipc.Server;
-import io.v.core.veyron2.ipc.ServerContext;
-import io.v.core.veyron2.vdl.ClientStream;
-import io.v.core.veyron2.vdl.Stream;
-import io.v.core.veyron2.vdl.VdlUint32;
-import io.v.core.veyron2.verror.VException;
+import io.v.v23.InputChannel;
+import io.v.v23.V;
+import io.v.v23.context.VContext;
+import io.v.v23.ipc.NetworkChange;
+import io.v.v23.ipc.Server;
+import io.v.v23.ipc.ServerContext;
+import io.v.v23.vdl.ClientStream;
+import io.v.v23.vdl.Stream;
+import io.v.v23.vdl.VdlUint32;
+import io.v.v23.verror.VException;
 
 import java.io.EOFException;
 

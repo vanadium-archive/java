@@ -2,12 +2,12 @@ package io.v.core.veyron.runtimes.google.naming;
 
 import com.google.common.reflect.TypeToken;
 
-import io.v.core.veyron2.InputChannel;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.naming.VDLMountEntry;
+import io.v.v23.InputChannel;
+import io.v.v23.verror.VException;
+import io.v.v23.context.VContext;
+import io.v.v23.naming.VDLMountEntry;
 
-public class Namespace implements io.v.core.veyron2.naming.Namespace {
+public class Namespace implements io.v.v23.naming.Namespace {
     private final long nativePtr;
 
     private native InputChannel<VDLMountEntry> nativeGlob(

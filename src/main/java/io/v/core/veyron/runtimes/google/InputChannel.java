@@ -1,9 +1,9 @@
 package io.v.core.veyron.runtimes.google;
 
-import io.v.core.veyron2.verror.VException;
+import io.v.v23.verror.VException;
 import java.io.EOFException;
 
-public class InputChannel<T> implements io.v.core.veyron2.InputChannel<T> {
+public class InputChannel<T> implements io.v.v23.InputChannel<T> {
     private final long nativePtr;
     private final long sourceNativePtr;
 

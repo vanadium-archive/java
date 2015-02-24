@@ -6,15 +6,15 @@ import com.google.common.reflect.TypeToken;
 
 import android.test.AndroidTestCase;
 
-import io.v.core.veyron2.android.V;
-import io.v.core.veyron2.ipc.ServerCall;
-import io.v.core.veyron2.ipc.ServerContext;
-import io.v.core.veyron2.services.security.access.Constants;
-import io.v.core.veyron2.vdl.Stream;
-import io.v.core.veyron2.vdl.VdlUint32;
-import io.v.core.veyron2.vdl.VdlValue;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.android.V;
+import io.v.v23.ipc.ServerCall;
+import io.v.v23.ipc.ServerContext;
+import io.v.v23.services.security.access.Constants;
+import io.v.v23.vdl.Stream;
+import io.v.v23.vdl.VdlUint32;
+import io.v.v23.vdl.VdlValue;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 import io.v.jni.test.fortune.ComplexErrorParam;
 import io.v.jni.test.fortune.Errors;
 import io.v.jni.test.fortune.FortuneServer;

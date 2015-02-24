@@ -1,16 +1,16 @@
 package io.v.core.veyron.runtimes.google.ipc;
 
-import io.v.core.veyron2.Options;
-import io.v.core.veyron2.context.VContext;
-import io.v.core.veyron2.verror.VException;
-import io.v.core.veyron2.vom.VomUtil;
+import io.v.v23.Options;
+import io.v.v23.context.VContext;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Type;
 
-public class Client implements io.v.core.veyron2.ipc.Client {
+public class Client implements io.v.v23.ipc.Client {
     private final long nativePtr;
 
-    private native io.v.core.veyron2.ipc.Client.Call nativeStartCall(long nativePtr,
+    private native io.v.v23.ipc.Client.Call nativeStartCall(long nativePtr,
         VContext context, String name, String method, byte[][] vomArgs, Options opts)
         throws VException;
     private native void nativeClose(long nativePtr);
@@ -19,14 +19,14 @@ public class Client implements io.v.core.veyron2.ipc.Client {
     private Client(long nativePtr) {
         this.nativePtr = nativePtr;
     }
-    // Implement io.v.core.veyron2.ipc.Client.
+    // Implement io.v.v23.ipc.Client.
     @Override
-    public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
+    public io.v.v23.ipc.Client.Call startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes) throws VException {
         return startCall(context, name, method, args, argTypes, null);
     }
     @Override
-    public io.v.core.veyron2.ipc.Client.Call startCall(VContext context, String name,
+    public io.v.v23.ipc.Client.Call startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes, Options opts) throws VException {
         if (opts == null) {
             opts = new Options();
