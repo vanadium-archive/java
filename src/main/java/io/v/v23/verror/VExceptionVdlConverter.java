@@ -1,12 +1,12 @@
  package io.v.v23.verror;
 
-import io.v.v23.vdl.IDAction;
 import io.v.v23.vdl.NativeTypes.Converter;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlType;
-import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.WireError;
+import io.v.v23.vdl.WireRetryCode;
+import io.v.v23.verror.VException.ActionCode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +22,16 @@ public final class VExceptionVdlConverter extends Converter {
         super(WireError.class);
     }
 
+    private WireRetryCode actionCodeToWire(ActionCode code) {
+        switch (code) {
+            case NO_RETRY: return WireRetryCode.NoRetry;
+            case RETRY_CONNECTION: return WireRetryCode.RetryConnection;
+            case RETRY_REFETCH: return WireRetryCode.RetryRefetch;
+            case RETRY_BACKOFF: return WireRetryCode.RetryBackoff;
+            default: return WireRetryCode.NoRetry;
+        }
+    }
+
     @Override
     public WireError vdlValueFromNative(Object nativeValue) {
         assertInstanceOf(nativeValue, VException.class);
@@ -35,17 +45,15 @@ public final class VExceptionVdlConverter extends Converter {
             }
             paramVals.add(new VdlAny(paramTypes[i], params[i]));
         }
-        return new WireError(new IDAction(e.getID(),  new VdlUint32(e.getAction().getValue())),
-                e.getMessage(), paramVals);
+        return new WireError(e.getID(), actionCodeToWire(e.getAction()), e.getMessage(), paramVals);
     }
 
     @Override
     public VException nativeFromVdlValue(VdlValue value) {
         assertInstanceOf(value, WireError.class);
         final WireError error = (WireError) value;
-        final IDAction idActionVal = error.getIDAction();
-        final VException.IDAction idAction = new VException.IDAction(idActionVal.getID(),
-                VException.ActionCode.fromValue(idActionVal.getAction().getValue()));
+        final VException.IDAction idAction = new VException.IDAction(error.getId(),
+                VException.ActionCode.fromValue(error.getRetryCode().ordinal()));
 
         final List<VdlAny> paramVals = error.getParamList();
         final Serializable[] params = new Serializable[paramVals.size()];

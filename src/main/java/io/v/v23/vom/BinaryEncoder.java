@@ -324,10 +324,9 @@ public class BinaryEncoder {
      */
     private boolean writeVdlEnum(EncodingStream out, Object value) throws IOException {
         expectClass(Kind.ENUM, value, VdlEnum.class);
-        VdlEnum enumValue = (VdlEnum) value;
-        int index = enumValue.vdlType().getLabels().indexOf(enumValue.name());
-        BinaryUtil.encodeUint(out, index);
-        return index != 0;
+        int ordinal = ((VdlEnum) value).ordinal();
+        BinaryUtil.encodeUint(out, ordinal);
+        return ordinal != 0;
     }
 
     /**

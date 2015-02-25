@@ -8,11 +8,13 @@ import android.os.Parcelable;
  */
 public class VdlEnum extends VdlValue implements Parcelable {
     private final String name;
+    private final int ordinal;
 
     public VdlEnum(VdlType type, String name) {
         super(type);
         assertKind(Kind.ENUM);
-        if (type.getLabels().indexOf(name) == -1) {
+        this.ordinal = type.getLabels().indexOf(name);
+        if (this.ordinal == -1) {
             throw new IllegalArgumentException("Undeclared enum label " + name);
         }
         this.name = name;
@@ -20,6 +22,10 @@ public class VdlEnum extends VdlValue implements Parcelable {
 
     public String name() {
         return name;
+    }
+
+    public int ordinal() {
+        return ordinal;
     }
 
     @Override
