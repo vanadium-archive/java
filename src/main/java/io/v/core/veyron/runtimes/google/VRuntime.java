@@ -1,11 +1,11 @@
 package io.v.core.veyron.runtimes.google;
 
 import io.v.v23.Options;
-import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 import io.v.v23.ipc.ListenSpec;
-import io.v.v23.naming.Namespace;
+import io.v.v23.naming.ns.Namespace;
 import io.v.v23.security.Principal;
+import io.v.v23.verror.VException;
 
 /**
  * VRuntime is an implementation of {@code io.v.v23.VRuntime} that calls to native Go

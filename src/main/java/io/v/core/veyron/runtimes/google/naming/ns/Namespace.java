@@ -1,4 +1,4 @@
-package io.v.core.veyron.runtimes.google.naming;
+package io.v.core.veyron.runtimes.google.naming.ns;
 
 import com.google.common.reflect.TypeToken;
 
@@ -7,7 +7,7 @@ import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.VDLMountEntry;
 
-public class Namespace implements io.v.v23.naming.Namespace {
+public class Namespace implements io.v.v23.naming.ns.Namespace {
     private final long nativePtr;
 
     private native InputChannel<VDLMountEntry> nativeGlob(

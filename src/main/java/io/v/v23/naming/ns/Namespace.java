@@ -1,9 +1,9 @@
-package io.v.v23.naming;
-
-import io.v.v23.context.VContext;
-import io.v.v23.verror.VException;
+package io.v.v23.naming.ns;
 
 import io.v.v23.InputChannel;
+import io.v.v23.context.VContext;
+import io.v.v23.naming.VDLMountEntry;
+import io.v.v23.verror.VException;
 
 /**
  * Namespace provides translation from object names to server object addresses.  It represents the

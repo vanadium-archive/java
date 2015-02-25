@@ -4,7 +4,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.ipc.Client;
 import io.v.v23.ipc.ListenSpec;
 import io.v.v23.ipc.Server;
-import io.v.v23.naming.Namespace;
+import io.v.v23.naming.ns.Namespace;
 import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
 
