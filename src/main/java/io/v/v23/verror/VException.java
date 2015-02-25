@@ -314,6 +314,9 @@ public class VException extends Exception {
         if (componentName.isEmpty()) {
             componentName = System.getProperty("program.name", "");
         }
+        if (componentName.isEmpty()) {
+            componentName = System.getProperty("user.name", "");
+        }
         return componentName;
     }
 
@@ -356,8 +359,7 @@ public class VException extends Exception {
     private final VdlType[] paramTypes;  // non-null, same length as params
 
     public VException(String msg) {
-        this(Errors.UNKNOWN,
-                msg, new Serializable[] {"", ""}, new Type[]{ String.class, String.class });
+        this(make(Errors.UNKNOWN, null, msg));
     }
 
     public VException(IDAction id, String msg, Serializable[] params, Type[] paramTypes) {
@@ -366,7 +368,7 @@ public class VException extends Exception {
 
     public VException(IDAction id, String msg, Serializable[] params, VdlType[] paramTypes) {
         super(msg);
-        this.id = id;      
+        this.id = id;
         params = params != null ? params : new Serializable[0];
         paramTypes = paramTypes != null ? paramTypes : new VdlType[0];
         if (params.length != paramTypes.length) {
@@ -380,6 +382,10 @@ public class VException extends Exception {
         }
         this.params = params;
         this.paramTypes = paramTypes;
+    }
+
+    private VException(VException other) {
+        this(other.id, other.getMessage(), other.params, other.paramTypes);
     }
 
     /**

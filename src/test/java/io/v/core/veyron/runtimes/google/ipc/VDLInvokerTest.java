@@ -75,6 +75,9 @@ public class VDLInvokerTest extends AndroidTestCase {
 
         @Override
         public void noTags(ServerContext context) throws VException {}
+
+        @Override
+        public void testContext(ServerContext context) throws VException {}
     }
 
     public void testInvoke() throws VException {

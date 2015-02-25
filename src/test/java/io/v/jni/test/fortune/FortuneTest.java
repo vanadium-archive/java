@@ -12,12 +12,15 @@ import io.v.v23.context.VContext;
 import io.v.v23.ipc.NetworkChange;
 import io.v.v23.ipc.Server;
 import io.v.v23.ipc.ServerContext;
+import io.v.v23.services.security.access.Constants;
 import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
+import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;
+import java.util.Arrays;
 
 public class FortuneTest extends AndroidTestCase {
     static {
@@ -30,7 +33,7 @@ public class FortuneTest extends AndroidTestCase {
 
     private static final VException COMPLEX_ERROR = VException.explicitMake(
             Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
-
+  
     public static class FortuneServerImpl implements FortuneServer {
         private String lastAddedFortune;
 
@@ -74,6 +77,46 @@ public class FortuneTest extends AndroidTestCase {
         @Override
         public void getComplexError(ServerContext context) throws VException {
             throw COMPLEX_ERROR;
+        }
+
+        @Override
+        public void testContext(ServerContext context) throws VException {
+            if (context == null) {
+                throw new VException("Context is null");
+            }
+            if (context.timestamp() == null) {
+                throw new VException("Timestamp is null");
+            }
+            if (!"testContext".equals(context.method())) {
+                throw new VException(String.format("Wrong method, want \"testContext\", got %s",
+                        context.method()));
+            }
+            final VdlValue[] expectedMethodTags = new VdlValue[]{ Constants.READ };
+            if (!Arrays.equals(expectedMethodTags, context.methodTags())) {
+                throw new VException(String.format("Wrong method tags, want %s, got %s",
+                        expectedMethodTags, Arrays.toString(context.methodTags())));
+            }
+            if (context.suffix() == null) {
+                throw new VException("Suffix is null");
+            }
+            if (context.localPrincipal() == null) {
+                throw new VException("Local principal is null");
+            }
+            if (context.localBlessings() == null) {
+                throw new VException("Local blessings are null");
+            }
+            if (context.remoteBlessings() == null) {
+                throw new VException("Remote blessings are null");
+            }
+            if (context.localEndpoint() == null || context.localEndpoint().isEmpty()) {
+                throw new VException("Local endpoint is empty");
+            }
+            if (context.remoteEndpoint() == null || context.remoteEndpoint().isEmpty()) {
+                throw new VException("Remote endpoint is empty");
+            }
+            if (context.context() == null) {
+                throw new VException("Vanadium context is null");
+            }
         }
 
         @Override
@@ -162,5 +205,22 @@ public class FortuneTest extends AndroidTestCase {
         // changes get announced on this channel.
         final InputChannel<NetworkChange> channel = s.watchNetwork();
         s.unwatchNetwork(channel);
+    }
+
+    public void testContext() throws VException {
+        final VContext ctx = V.init();
+        final Server s = V.newServer(ctx);
+        final String[] endpoints = s.listen(null);
+        final FortuneServer server = new FortuneServerImpl();
+        s.serve("fortune", server);
+
+        final String name = "/" + endpoints[0];
+        final FortuneClient client = FortuneClientFactory.bind(name);
+        final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        try {
+            client.testContext(ctxT);
+        } catch (VException e) {
+            fail("Context check failed: " + e.getMessage());
+        }
     }
 }

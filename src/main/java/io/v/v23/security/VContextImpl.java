@@ -19,6 +19,7 @@ class VContextImpl implements io.v.v23.security.VContext {
     private native Principal nativeLocalPrincipal(long nativePtr) throws VException;
     private native Blessings nativeLocalBlessings(long nativePtr) throws VException;
     private native Blessings nativeRemoteBlessings(long nativePtr) throws VException;
+    private native io.v.v23.context.VContext nativeContext(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     VContextImpl(long nativePtr) {
@@ -84,6 +85,15 @@ class VContextImpl implements io.v.v23.security.VContext {
             return nativeRemoteBlessings(this.nativePtr);
         } catch (VException e) {
             android.util.Log.e(TAG, "Couldn't get remote Blessings: " + e.getMessage());
+            return null;
+        }
+    }
+    @Override
+    public io.v.v23.context.VContext context() {
+        try {
+            return nativeContext(this.nativePtr);
+        } catch (VException e) {
+            android.util.Log.e(TAG, "Couldn't get Vanadium context: " + e.getMessage());
             return null;
         }
     }

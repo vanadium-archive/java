@@ -104,6 +104,7 @@ public class CaveatRegistry {
         }
         CaveatDescriptor getDescriptor() { return this.desc; }
         CaveatValidator getValidator() { return this.validator; }
+        @SuppressWarnings("unused")
         Type getParamType() { return this.paramType; }
         String getRegisterer() { return this.registerer; }
     }

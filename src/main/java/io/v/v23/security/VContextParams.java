@@ -32,6 +32,7 @@ public class VContextParams {
     private Principal principal;
     private Blessings localBlessings;
     private Blessings remoteBlessings;
+    private io.v.v23.context.VContext context;
 
     public VContextParams() {
         this.parent = null;
@@ -45,7 +46,7 @@ public class VContextParams {
      * Returns a child of the current params with the given timestamp attached.
      *
      * @param  time timestamp
-     * @return      a child of the current params with the given timestamp attached.
+     * @return      a child of the current params with the given timestamp attached
      */
     public VContextParams withTimestamp(DateTime time) {
         final VContextParams ret = new VContextParams(this);
@@ -56,7 +57,7 @@ public class VContextParams {
      * Returns a child of the current params with the given method name attached.
      *
      * @param  method method name
-     * @return      a child of the current params with the given method name attached.
+     * @return      a child of the current params with the given method name attached
      */
     public VContextParams withMethod(String method) {
         final VContextParams ret = new VContextParams(this);
@@ -67,7 +68,7 @@ public class VContextParams {
      * Returns a child of the current params with the given method tags attached.
      *
      * @param  tags method tags
-     * @return      a child of the current params with the given method tags attached.
+     * @return      a child of the current params with the given method tags attached
      */
     public VContextParams withMethodTags(VdlValue... tags) {
         final VContextParams ret = new VContextParams(this);
@@ -78,7 +79,7 @@ public class VContextParams {
      * Returns a child of the current params with the given veyron name suffix attached.
      *
      * @param  suffix veyron name suffix
-     * @return      a child of the current params with the given veyron name suffix attached.
+     * @return      a child of the current params with the given veyron name suffix attached
      */
     public VContextParams withSuffix(String suffix) {
         final VContextParams ret = new VContextParams(this);
@@ -89,7 +90,7 @@ public class VContextParams {
      * Returns a child of the current params with the given local endpoint attached.
      *
      * @param  endpoint local endpoint
-     * @return      a child of the current params with the given local endpoint attached.
+     * @return      a child of the current params with the given local endpoint attached
      */
     public VContextParams withLocalEndpoint(String endpoint) {
         final VContextParams ret = new VContextParams(this);
@@ -100,7 +101,7 @@ public class VContextParams {
      * Returns a child of the current params with the given remote endpoint attached.
      *
      * @param  endpoint remote endpoint
-     * @return      a child of the current params with the given remote endpoint attached.
+     * @return      a child of the current params with the given remote endpoint attached
      */
     public VContextParams withRemoteEndpoint(String endpoint) {
         final VContextParams ret = new VContextParams(this);
@@ -111,7 +112,7 @@ public class VContextParams {
      * Returns a child of the current params with the given local principal attached.
      *
      * @param  principal local principal
-     * @return      a child of the current params with the given local principal attached.
+     * @return      a child of the current params with the given local principal attached
      */
     public VContextParams withLocalPrincipal(Principal principal) {
         final VContextParams ret = new VContextParams(this);
@@ -122,7 +123,7 @@ public class VContextParams {
      * Returns a child of the current params with the given local blessings attached.
      *
      * @param  blessings local blessings
-     * @return      a child of the current params with the given local blessings attached.
+     * @return      a child of the current params with the given local blessings attached
      */
     public VContextParams withLocalBlessings(Blessings blessings) {
         final VContextParams ret = new VContextParams(this);
@@ -133,11 +134,22 @@ public class VContextParams {
      * Returns a child of the current params with the given remote blessings attached.
      *
      * @param  blessings remote blessings
-     * @return      a child of the current params with the given remote blessings attached.
+     * @return      a child of the current params with the given remote blessings attached
      */
     public VContextParams withRemoteBlessings(Blessings blessings) {
         final VContextParams ret = new VContextParams(this);
         ret.remoteBlessings = blessings;
+        return ret;
+    }
+    /**
+     * Returns a child of the current params with the given Vanadium context attached.
+     *
+     * @param  context Vanadium context
+     * @return         a child of the current params with the given Vanadium context attached
+     */
+    public VContextParams withContext(io.v.v23.context.VContext context) {
+        final VContextParams ret = new VContextParams(this);
+        ret.context = context;
         return ret;
     }
     /**
@@ -236,4 +248,16 @@ public class VContextParams {
         if (this.parent != null) return this.parent.getRemoteBlessings();
         return null;
     }
+    /**
+     * Returns Vanadium context attached to the params, or {@code null} if no Vanadium context is
+     * attached.
+     *
+     * @return Vanadium context attached to the params
+     */
+    public io.v.v23.context.VContext getContext() {
+        if (this.context != null) return this.context;
+        if (this.parent != null) return this.parent.getContext();
+        return null;
+    }
+
 }

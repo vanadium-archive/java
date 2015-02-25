@@ -117,6 +117,10 @@ public class ServerCall implements io.v.v23.ipc.ServerCall {
     public Blessings remoteBlessings() {
         return this.securityContext.remoteBlessings();
     }
+    @Override
+    public io.v.v23.context.VContext context() {
+        return this.securityContext.context();
+    }
     // Implements java.lang.Object.
     @Override
     protected void finalize() {

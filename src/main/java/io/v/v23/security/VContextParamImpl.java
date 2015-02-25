@@ -47,4 +47,8 @@ class VContextParamImpl implements io.v.v23.security.VContext {
     public Blessings remoteBlessings() {
         return this.params.getRemoteBlessings();
     }
+    @Override
+    public io.v.v23.context.VContext context() {
+        return this.params.getContext();
+    }
 }
