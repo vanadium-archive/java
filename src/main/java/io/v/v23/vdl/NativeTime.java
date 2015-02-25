@@ -28,22 +28,22 @@ public class NativeTime {
         static final DurationConverter INSTANCE = new DurationConverter();
 
         private DurationConverter() {
-            super(io.v.v23.vdl.vdlroot.src.time.Duration.class);
+            super(io.v.v23.vdlroot.time.Duration.class);
         }
 
         @Override
         public VdlValue vdlValueFromNative(Object nativeValue) {
             assertInstanceOf(nativeValue, org.joda.time.Duration.class);
             final long millis = ((org.joda.time.Duration) nativeValue).getMillis();
-            return new io.v.v23.vdl.vdlroot.src.time.Duration(millis / MILLIS_PER_SECOND,
+            return new io.v.v23.vdlroot.time.Duration(millis / MILLIS_PER_SECOND,
                     (int) ((millis % MILLIS_PER_SECOND) * NANOS_PER_MILLISECOND));
         }
 
         @Override
         public Object nativeFromVdlValue(VdlValue value) {
-            assertInstanceOf(value, io.v.v23.vdl.vdlroot.src.time.Duration.class);
-            final io.v.v23.vdl.vdlroot.src.time.Duration wireDuration =
-                    (io.v.v23.vdl.vdlroot.src.time.Duration) value;
+            assertInstanceOf(value, io.v.v23.vdlroot.time.Duration.class);
+            final io.v.v23.vdlroot.time.Duration wireDuration =
+                    (io.v.v23.vdlroot.time.Duration) value;
             return new org.joda.time.Duration(wireDuration.getSeconds() * MILLIS_PER_SECOND
                     + wireDuration.getNano() / NANOS_PER_MILLISECOND);
         }
@@ -56,22 +56,22 @@ public class NativeTime {
         static final DateTimeConverter INSTANCE = new DateTimeConverter();
 
         private DateTimeConverter() {
-            super(io.v.v23.vdl.vdlroot.src.time.Time.class);
+            super(io.v.v23.vdlroot.time.Time.class);
         }
 
         @Override
         public VdlValue vdlValueFromNative(Object nativeValue) {
             assertInstanceOf(nativeValue, org.joda.time.DateTime.class);
             final long millis = ((org.joda.time.DateTime) nativeValue).getMillis() + JAVA_EPOCH;
-            return new io.v.v23.vdl.vdlroot.src.time.Time(millis / MILLIS_PER_SECOND,
+            return new io.v.v23.vdlroot.time.Time(millis / MILLIS_PER_SECOND,
                     (int) ((millis % MILLIS_PER_SECOND) * NANOS_PER_MILLISECOND));
         }
 
         @Override
         public Object nativeFromVdlValue(VdlValue value) {
-            assertInstanceOf(value, io.v.v23.vdl.vdlroot.src.time.Time.class);
-            final io.v.v23.vdl.vdlroot.src.time.Time wireTime =
-                    (io.v.v23.vdl.vdlroot.src.time.Time) value;
+            assertInstanceOf(value, io.v.v23.vdlroot.time.Time.class);
+            final io.v.v23.vdlroot.time.Time wireTime =
+                    (io.v.v23.vdlroot.time.Time) value;
             final long millis = wireTime.getSeconds() * MILLIS_PER_SECOND - JAVA_EPOCH
                     + wireTime.getNano() / NANOS_PER_MILLISECOND;
             return new org.joda.time.DateTime(millis, DateTimeZone.UTC);

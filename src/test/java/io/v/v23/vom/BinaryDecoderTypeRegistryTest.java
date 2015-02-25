@@ -12,7 +12,7 @@ import io.v.v23.vom.testdata.NBool;
  */
 public class BinaryDecoderTypeRegistryTest extends TestCase {
     public void testGuessType() throws Exception {
-        VdlType vdlType = Types.named("v.io/core/veyron2/vom/testdata.NBool", Types.BOOL);
+        VdlType vdlType = Types.named("v.io/v23/vom/testdata.NBool", Types.BOOL);
         String encoded = TestUtil.encode(new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
         try {

@@ -11,8 +11,8 @@ import junit.framework.TestCase;
 import org.joda.time.DateTime;
 
 import io.v.v23.vdl.NativeTypes.Converter;
-import io.v.v23.vdl.vdlroot.src.time.Duration;
-import io.v.v23.vdl.vdlroot.src.time.Time;
+import io.v.v23.vdlroot.time.Duration;
+import io.v.v23.vdlroot.time.Time;
 
 import java.util.Map;
 
