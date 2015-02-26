@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Type represents VDL types.
  */
 public final class VdlType implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Kind kind; // used by all kinds
     private String name; // used by all kinds
     private ImmutableList<String> labels; // used by enum
@@ -34,7 +36,7 @@ public final class VdlType implements Serializable {
 
     /**
      * Generated a type string representing type, which also is its human-readable representation.
-     * To brake loops we cache named types only, as you can't define an unnamed cyclic type in VDL.
+     * To break loops we cache named types only, as you can't define an unnamed cyclic type in VDL.
      * We also ensure that there is at most one VDL type instance for each name. These two
      * assumptions make VDL type graph isomorphism check based on type strings straightforward.
      */
@@ -87,7 +89,6 @@ public final class VdlType implements Serializable {
             }
     }
 
-    @SuppressWarnings("unused")
     private Object readResolve() throws ObjectStreamException {
         return getUniqueType(this);
     }

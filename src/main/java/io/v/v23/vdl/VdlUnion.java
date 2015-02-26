@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlUnion is a representation of a VDL union.
  */
-public class VdlUnion extends VdlValue implements Parcelable {
+public class VdlUnion extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private Object elem;
     private int index;
 
@@ -58,26 +57,4 @@ public class VdlUnion extends VdlValue implements Parcelable {
     public String toString() {
         return elem.toString();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    public static final Creator<VdlUnion> CREATOR = new Creator<VdlUnion>() {
-        @Override
-        public VdlUnion createFromParcel(Parcel in) {
-            return (VdlUnion) in.readSerializable();
-        }
-
-        @Override
-        public VdlUnion[] newArray(int size) {
-            return new VdlUnion[size];
-        }
-    };
 }

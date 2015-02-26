@@ -1,15 +1,14 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
 import java.lang.reflect.Type;
 
 /**
  * VdlAny is a representation of a VDL any.
  */
-public final class VdlAny extends VdlValue implements Parcelable {
+public final class VdlAny extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final Serializable elem;
     private final VdlType elemType;
 
@@ -57,26 +56,4 @@ public final class VdlAny extends VdlValue implements Parcelable {
     public String toString() {
         return elem == null ? null : elem.toString();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    public static final Creator<VdlAny> CREATOR = new Creator<VdlAny>() {
-        @Override
-        public VdlAny createFromParcel(Parcel in) {
-            return (VdlAny) in.readSerializable();
-        }
-
-        @Override
-        public VdlAny[] newArray(int size) {
-            return new VdlAny[size];
-        }
-    };
 }

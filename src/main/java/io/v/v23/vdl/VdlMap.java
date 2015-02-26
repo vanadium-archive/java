@@ -1,8 +1,5 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +11,9 @@ import java.util.Set;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class VdlMap<K, V> extends VdlValue implements Map<K, V>, Parcelable {
+public class VdlMap<K, V> extends VdlValue implements Map<K, V> {
+    private static final long serialVersionUID = 1L;
+
     private final Map<K, V> impl;
 
     /**
@@ -105,27 +104,4 @@ public class VdlMap<K, V> extends VdlValue implements Map<K, V>, Parcelable {
     public Collection<V> values() {
         return impl.values();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final Creator<VdlMap> CREATOR = new Creator<VdlMap>() {
-        @Override
-        public VdlMap createFromParcel(Parcel in) {
-            return (VdlMap) in.readSerializable();
-        }
-
-        @Override
-        public VdlMap[] newArray(int size) {
-            return new VdlMap[size];
-        }
-    };
 }

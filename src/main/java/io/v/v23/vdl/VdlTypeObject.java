@@ -1,14 +1,13 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.lang.reflect.Type;
 
 /**
  * VdlTypeObject is a representation of a VDL typeObject.
  */
-public final class VdlTypeObject extends VdlValue implements Parcelable {
+public final class VdlTypeObject extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final VdlType typeObject;
 
     public VdlTypeObject(VdlType typeObject) {
@@ -46,26 +45,4 @@ public final class VdlTypeObject extends VdlValue implements Parcelable {
     public String toString() {
         return typeObject.toString();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    public static final Creator<VdlTypeObject> CREATOR = new Creator<VdlTypeObject>() {
-        @Override
-        public VdlTypeObject createFromParcel(Parcel in) {
-            return (VdlTypeObject) in.readSerializable();
-        }
-
-        @Override
-        public VdlTypeObject[] newArray(int size) {
-            return new VdlTypeObject[size];
-        }
-    };
 }

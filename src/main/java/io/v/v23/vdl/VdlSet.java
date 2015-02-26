@@ -1,8 +1,5 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,7 +10,9 @@ import java.util.Set;
  *
  * @param <T> The type of the set element.
  */
-public class VdlSet<T> extends VdlValue implements Set<T>, Parcelable {
+public class VdlSet<T> extends VdlValue implements Set<T> {
+    private static final long serialVersionUID = 1L;
+
     private final Set<T> impl;
 
     /**
@@ -106,30 +105,7 @@ public class VdlSet<T> extends VdlValue implements Set<T>, Parcelable {
     }
 
     @Override
-    public <T> T[] toArray(T[] array) {
+    public <E> E[] toArray(E[] array) {
         return impl.toArray(array);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final Creator<VdlSet> CREATOR = new Creator<VdlSet>() {
-        @Override
-        public VdlSet createFromParcel(Parcel in) {
-            return (VdlSet) in.readSerializable();
-        }
-
-        @Override
-        public VdlSet[] newArray(int size) {
-            return new VdlSet[size];
-        }
-    };
 }

@@ -5,6 +5,8 @@ package io.v.v23.vdl;
  * It is used to get VDL type from classes through reflection.
  */
 public abstract class AbstractVdlStruct extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     public AbstractVdlStruct(VdlType type) {
         super(type);
         assertKind(Kind.STRUCT);

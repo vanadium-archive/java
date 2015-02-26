@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlInt32 is a representation of a VDL int32.
  */
-public class VdlInt32 extends VdlValue implements Parcelable {
+public class VdlInt32 extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final int value;
 
     public VdlInt32(VdlType type, int value) {
@@ -17,6 +16,14 @@ public class VdlInt32 extends VdlValue implements Parcelable {
 
     public VdlInt32(int value) {
         this(Types.INT32, value);
+    }
+
+    public VdlInt32() {
+        this(0);
+    }
+
+    protected VdlInt32(VdlType type) {
+        this(type, 0);
     }
 
     public int getValue() {
@@ -41,33 +48,4 @@ public class VdlInt32 extends VdlValue implements Parcelable {
         return Integer.toString(value);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(value);
-    }
-
-    public static final Creator<VdlInt32> CREATOR = new Creator<VdlInt32>() {
-        @Override
-        public VdlInt32 createFromParcel(Parcel in) {
-            return new VdlInt32(in.readInt());
-        }
-
-        @Override
-        public VdlInt32[] newArray(int size) {
-            return new VdlInt32[size];
-        }
-    };
-
-    protected VdlInt32(VdlType type) {
-        this(type, 0);
-    }
-
-    public VdlInt32() {
-        this(0);
-    }
 }

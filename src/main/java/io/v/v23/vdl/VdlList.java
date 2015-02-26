@@ -1,8 +1,5 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +11,9 @@ import java.util.ListIterator;
  *
  * @param <T> The type of the list element.
  */
-public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
+public class VdlList<T> extends VdlValue implements List<T> {
+    private static final long serialVersionUID = 1L;
+
     private final List<T> impl;
 
     /**
@@ -157,30 +156,7 @@ public class VdlList<T> extends VdlValue implements List<T>, Parcelable {
     }
 
     @Override
-    public <T> T[] toArray(T[] array) {
+    public <E> E[] toArray(E[] array) {
         return impl.toArray(array);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final Creator<VdlList> CREATOR = new Creator<VdlList>() {
-        @Override
-        public VdlList createFromParcel(Parcel in) {
-            return (VdlList) in.readSerializable();
-        }
-
-        @Override
-        public VdlList[] newArray(int size) {
-            return new VdlList[size];
-        }
-    };
 }

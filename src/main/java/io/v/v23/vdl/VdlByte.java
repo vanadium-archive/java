@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlByte is a representation of a VDL byte.
  */
-public class VdlByte extends VdlValue implements Parcelable {
+public class VdlByte extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final byte value;
 
     public VdlByte(VdlType type, byte value) {
@@ -21,6 +20,14 @@ public class VdlByte extends VdlValue implements Parcelable {
 
     public byte getValue() {
         return this.value;
+    }
+
+    public VdlByte() {
+        this((byte) 0);
+    }
+
+    protected VdlByte(VdlType type) {
+        this(type, (byte) 0);
     }
 
     @Override
@@ -39,35 +46,5 @@ public class VdlByte extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return Byte.toString(value);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeByte(value);
-    }
-
-    public static final Creator<VdlByte> CREATOR = new Creator<VdlByte>() {
-        @Override
-        public VdlByte createFromParcel(Parcel in) {
-            return new VdlByte(in.readByte());
-        }
-
-        @Override
-        public VdlByte[] newArray(int size) {
-            return new VdlByte[size];
-        }
-    };
-
-    protected VdlByte(VdlType type) {
-        this(type, (byte) 0);
-    }
-
-    public VdlByte() {
-        this((byte) 0);
     }
 }

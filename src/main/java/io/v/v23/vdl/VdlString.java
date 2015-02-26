@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlString is a representation of a VDL string.
  */
-public class VdlString extends VdlValue implements Parcelable {
+public class VdlString extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final String value;
 
     public VdlString(VdlType type, String value) {
@@ -17,6 +16,14 @@ public class VdlString extends VdlValue implements Parcelable {
 
     public VdlString(String value) {
         this(Types.STRING, value);
+    }
+
+    public VdlString() {
+        this("");
+    }
+
+    protected VdlString(VdlType type) {
+        this(type, "");
     }
 
     public String getValue() {
@@ -39,35 +46,5 @@ public class VdlString extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return value;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeString(value);
-    }
-
-    public static final Creator<VdlString> CREATOR = new Creator<VdlString>() {
-        @Override
-        public VdlString createFromParcel(Parcel in) {
-            return new VdlString(in.readString());
-        }
-
-        @Override
-        public VdlString[] newArray(int size) {
-            return new VdlString[size];
-        }
-    };
-
-    protected VdlString(VdlType type) {
-        this(type, "");
-    }
-
-    public VdlString() {
-        this("");
     }
 }

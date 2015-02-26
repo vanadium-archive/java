@@ -69,7 +69,7 @@ public class BlessingsManager {
         if (resultCode != Activity.RESULT_OK) {
             throw new VException("Error getting blessing: " + data.getStringExtra(ERROR));
         }
-        final WireBlessings wire = (WireBlessings) data.getParcelableExtra(REPLY);
+        final WireBlessings wire = (WireBlessings) data.getSerializableExtra(REPLY);
         if (wire == null) {
             throw new VException("Got null blessings.");
         }

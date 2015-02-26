@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlInt64 is a representation of a VDL int64.
  */
-public class VdlInt64 extends VdlValue implements Parcelable {
+public class VdlInt64 extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final long value;
 
     public VdlInt64(VdlType type, long value) {
@@ -17,6 +16,14 @@ public class VdlInt64 extends VdlValue implements Parcelable {
 
     public VdlInt64(long value) {
         this(Types.INT64, value);
+    }
+
+    public VdlInt64() {
+        this(0);
+    }
+
+    protected VdlInt64(VdlType type) {
+        this(type, 0);
     }
 
     public long getValue() {
@@ -39,35 +46,5 @@ public class VdlInt64 extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return Long.toString(value);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeLong(value);
-    }
-
-    public static final Creator<VdlInt64> CREATOR = new Creator<VdlInt64>() {
-        @Override
-        public VdlInt64 createFromParcel(Parcel in) {
-            return new VdlInt64(in.readLong());
-        }
-
-        @Override
-        public VdlInt64[] newArray(int size) {
-            return new VdlInt64[size];
-        }
-    };
-
-    protected VdlInt64(VdlType type) {
-        this(type, 0);
-    }
-
-    public VdlInt64() {
-        this(0);
     }
 }

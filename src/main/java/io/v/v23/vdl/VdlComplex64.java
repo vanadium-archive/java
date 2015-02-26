@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlComplex64 is a representation of a VDL complex64.
  */
-public class VdlComplex64 extends VdlValue implements Parcelable {
+public class VdlComplex64 extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final float real;
     private final float imag;
 
@@ -53,32 +52,5 @@ public class VdlComplex64 extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return "{real=" + Float.toString(real) + ", imag=" + Float.toString(imag) + "}";
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeFloat(real);
-        out.writeFloat(imag);
-    }
-
-    public static final Creator<VdlComplex64> CREATOR = new Creator<VdlComplex64>() {
-        @Override
-        public VdlComplex64 createFromParcel(Parcel in) {
-            return new VdlComplex64(in);
-        }
-
-        @Override
-        public VdlComplex64[] newArray(int size) {
-            return new VdlComplex64[size];
-        }
-    };
-
-    private VdlComplex64(Parcel in) {
-        this(in.readFloat(), in.readFloat());
     }
 }

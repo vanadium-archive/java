@@ -1,8 +1,4 @@
-
 package io.v.v23.vdl;
-
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +13,9 @@ import java.util.NoSuchElementException;
  *
  * @param <T> The type of the array element.
  */
-public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
+public class VdlArray<T> extends VdlValue implements List<T> {
+    private static final long serialVersionUID = 1L;
+
     private final T[] backingArray;
     private final int start, end;
 
@@ -320,27 +318,4 @@ public class VdlArray<T> extends VdlValue implements List<T>, Parcelable {
         }
 
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final Creator<VdlArray> CREATOR = new Creator<VdlArray>() {
-        @Override
-        public VdlArray createFromParcel(Parcel in) {
-            return (VdlArray) in.readSerializable();
-        }
-
-        @Override
-        public VdlArray[] newArray(int size) {
-            return new VdlArray[size];
-        }
-    };
 }

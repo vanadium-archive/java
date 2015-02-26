@@ -19,45 +19,75 @@ import java.util.Set;
  */
 public class TypeTest extends TestCase {
     @GeneratedFromVdl(name = "MyBool")
-    private static final class MyBool extends VdlBool {}
+    private static final class MyBool extends VdlBool {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyByte")
-    private static final class MyByte extends VdlByte {}
+    private static final class MyByte extends VdlByte {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyUint16")
-    private static final class MyUint16 extends VdlUint16 {}
+    private static final class MyUint16 extends VdlUint16 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyUint32")
-    private static final class MyUint32 extends VdlUint32 {}
+    private static final class MyUint32 extends VdlUint32 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyUint64")
-    private static final class MyUint64 extends VdlUint64 {}
+    private static final class MyUint64 extends VdlUint64 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyInt16")
-    private static final class MyInt16 extends VdlInt16 {}
+    private static final class MyInt16 extends VdlInt16 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyInt32")
-    private static final class MyInt32 extends VdlInt32 {}
+    private static final class MyInt32 extends VdlInt32 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyInt64")
-    private static final class MyInt64 extends VdlInt64 {}
+    private static final class MyInt64 extends VdlInt64 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyFloat32")
-    private static final class MyFloat32 extends VdlFloat32 {}
+    private static final class MyFloat32 extends VdlFloat32 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyFloat64")
-    private static final class MyFloat64 extends VdlFloat64 {}
+    private static final class MyFloat64 extends VdlFloat64 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyString")
-    private static final class MyString extends VdlString {}
+    private static final class MyString extends VdlString {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyComplex64")
-    private static final class MyComplex64 extends VdlComplex64 {}
+    private static final class MyComplex64 extends VdlComplex64 {
+        private static final long serialVersionUID = 1L;
+    }
     @GeneratedFromVdl(name = "MyComplex128")
-    private static final class MyComplex128 extends VdlComplex128 {}
+    private static final class MyComplex128 extends VdlComplex128 {
+        private static final long serialVersionUID = 1L;
+    }
 
     @SuppressWarnings("unused")
     @GeneratedFromVdl(name = "MyUnion")
     private static class MyUnion extends VdlUnion {
+        private static final long serialVersionUID = 1L;
         @GeneratedFromVdl(name = "A", index = 0)
         public static class A extends MyUnion {
+            private static final long serialVersionUID = 1L;
             private MyInt16 elem;
         }
         @GeneratedFromVdl(name = "B", index = 1)
         public static class B extends MyUnion {
+            private static final long serialVersionUID = 1L;
             private VdlInt32 elem;
         }
         @GeneratedFromVdl(name = "C", index = 2)
         public static class C extends MyUnion {
+            private static final long serialVersionUID = 1L;
             private Long elem;
         }
 
@@ -68,13 +98,11 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MyEnum")
     private static final class MyEnum extends VdlEnum {
-        @SuppressWarnings("unused")
+        private static final long serialVersionUID = 1L;
         @GeneratedFromVdl(name = "LABEL1", index = 0)
         public static final MyEnum LABEL1 = new MyEnum("LABEL1");
-        @SuppressWarnings("unused")
         @GeneratedFromVdl(name = "LABEL2", index = 1)
         public static final MyEnum LABEL2 = new MyEnum("LABEL2");
-        @SuppressWarnings("unused")
         @GeneratedFromVdl(name = "LABEL3", index = 2)
         public static final MyEnum LABEL3 = new MyEnum("LABEL3");
 
@@ -85,6 +113,7 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MyArray12")
     private static final class MyArray12 extends VdlArray<Set<MyUnion>> {
+        private static final long serialVersionUID = 1L;
         @SuppressWarnings("unused")
         public static final int LENGTH = 12;
 
@@ -95,6 +124,7 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MyList")
     private static final class MyList extends VdlList<List<MyArray12>> {
+        private static final long serialVersionUID = 1L;
         public MyList(List<List<MyArray12>> impl) {
             super(Types.getVdlTypeFromReflect(MyList.class), impl);
         }
@@ -102,6 +132,7 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MySet")
     private static final class MySet extends VdlSet<Set<MyList>> {
+        private static final long serialVersionUID = 1L;
         public MySet(Set<Set<MyList>> impl) {
             super(Types.getVdlTypeFromReflect(MySet.class), impl);
         }
@@ -109,6 +140,7 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MyMap")
     private static final class MyMap extends VdlMap<MyEnum, Map<MySet, MySet>> {
+        private static final long serialVersionUID = 1L;
         public MyMap(Map<MyEnum, Map<MySet, MySet>> impl) {
             super(Types.getVdlTypeFromReflect(MyMap.class), impl);
         }
@@ -116,6 +148,7 @@ public class TypeTest extends TestCase {
 
     @GeneratedFromVdl(name = "MyStruct")
     private static final class MyStruct extends AbstractVdlStruct {
+        private static final long serialVersionUID = 1L;
         @GeneratedFromVdl(name = "ByteArray", index = 0)
         private byte[][] byteArray;
         @GeneratedFromVdl(name = "Set", index = 1)

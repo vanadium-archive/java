@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlUint16 is a representation of a VDL uint16.
  */
-public class VdlUint16 extends VdlValue implements Parcelable {
+public class VdlUint16 extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final short value;
 
     public VdlUint16(VdlType type, short value) {
@@ -17,6 +16,14 @@ public class VdlUint16 extends VdlValue implements Parcelable {
 
     public VdlUint16(short value) {
         this(Types.UINT16, value);
+    }
+
+    public VdlUint16() {
+        this((short) 0);
+    }
+
+    protected VdlUint16(VdlType type) {
+        this(type, (short) 0);
     }
 
     public short getValue() {
@@ -39,35 +46,5 @@ public class VdlUint16 extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return Short.toString(value);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(value);
-    }
-
-    public static final Creator<VdlUint16> CREATOR = new Creator<VdlUint16>() {
-        @Override
-        public VdlUint16 createFromParcel(Parcel in) {
-            return new VdlUint16((short) in.readInt());
-        }
-
-        @Override
-        public VdlUint16[] newArray(int size) {
-            return new VdlUint16[size];
-        }
-    };
-
-    protected VdlUint16(VdlType type) {
-        this(type, (short) 0);
-    }
-
-    public VdlUint16() {
-        this((short) 0);
     }
 }

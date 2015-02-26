@@ -1,8 +1,5 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.lang.reflect.Type;
 
 /**
@@ -10,7 +7,9 @@ import java.lang.reflect.Type;
  *
  * @param <T> The type of the element.
  */
-public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcelable {
+public class VdlOptional<T extends VdlValue> extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final T elem;
 
     /**
@@ -79,27 +78,4 @@ public class VdlOptional<T extends VdlValue> extends VdlValue implements Parcela
     public String toString() {
         return elem == null ? null : elem.toString();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static final Creator<VdlOptional> CREATOR = new Creator<VdlOptional>() {
-        @Override
-        public VdlOptional createFromParcel(Parcel in) {
-            return (VdlOptional) in.readSerializable();
-        }
-
-        @Override
-        public VdlOptional[] newArray(int size) {
-            return new VdlOptional[size];
-        }
-    };
 }

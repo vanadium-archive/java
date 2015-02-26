@@ -1,15 +1,14 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * VdlStruct is a map based representation of a VDL struct.
  */
-public class VdlStruct extends AbstractVdlStruct implements Parcelable {
+public class VdlStruct extends AbstractVdlStruct {
+    private static final long serialVersionUID = 1L;
+
     private final Map<String, VdlValue> fields;
     private final Map<String, VdlType> fieldTypes;
 
@@ -67,26 +66,4 @@ public class VdlStruct extends AbstractVdlStruct implements Parcelable {
     public String toString() {
         return fields.toString();
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    public static final Creator<VdlStruct> CREATOR = new Creator<VdlStruct>() {
-        @Override
-        public VdlStruct createFromParcel(Parcel in) {
-            return (VdlStruct) in.readSerializable();
-        }
-
-        @Override
-        public VdlStruct[] newArray(int size) {
-            return new VdlStruct[size];
-        }
-    };
 }

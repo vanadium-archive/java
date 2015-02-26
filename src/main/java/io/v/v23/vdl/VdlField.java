@@ -6,6 +6,8 @@ import java.io.Serializable;
  * VdlField represents a struct or union field in a VDL type.
  */
 public final class VdlField implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final String name;
     private final VdlType type;
 

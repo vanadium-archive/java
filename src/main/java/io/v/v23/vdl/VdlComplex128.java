@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlComplex128 is a representation of a VDL complex128.
  */
-public class VdlComplex128 extends VdlValue implements Parcelable {
+public class VdlComplex128 extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final double real;
     private final double imag;
 
@@ -53,32 +52,5 @@ public class VdlComplex128 extends VdlValue implements Parcelable {
     @Override
     public String toString() {
         return "{real=" + Double.toString(real) + ", imag=" + Double.toString(imag) + "}";
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeDouble(real);
-        out.writeDouble(imag);
-    }
-
-    public static final Creator<VdlComplex128> CREATOR = new Creator<VdlComplex128>() {
-        @Override
-        public VdlComplex128 createFromParcel(Parcel in) {
-            return new VdlComplex128(in);
-        }
-
-        @Override
-        public VdlComplex128[] newArray(int size) {
-            return new VdlComplex128[size];
-        }
-    };
-
-    private VdlComplex128(Parcel in) {
-        this(in.readDouble(), in.readDouble());
     }
 }

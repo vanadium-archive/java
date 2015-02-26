@@ -1,12 +1,11 @@
 package io.v.v23.vdl;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * VdlEnum is a representation of a VDL enum.
  */
-public class VdlEnum extends VdlValue implements Parcelable {
+public class VdlEnum extends VdlValue {
+    private static final long serialVersionUID = 1L;
+
     private final String name;
     private final int ordinal;
 
@@ -45,26 +44,4 @@ public class VdlEnum extends VdlValue implements Parcelable {
     public String toString() {
         return name;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeSerializable(this);
-    }
-
-    public static final Creator<VdlEnum> CREATOR = new Creator<VdlEnum>() {
-        @Override
-        public VdlEnum createFromParcel(Parcel in) {
-            return (VdlEnum) in.readSerializable();
-        }
-
-        @Override
-        public VdlEnum[] newArray(int size) {
-            return new VdlEnum[size];
-        }
-    };
 }
