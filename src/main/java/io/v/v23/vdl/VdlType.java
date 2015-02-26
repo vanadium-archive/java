@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,8 +88,13 @@ public final class VdlType implements Serializable {
             }
     }
 
-    private Object readResolve() throws ObjectStreamException {
-        return getUniqueType(this);
+    private Object readResolve() {
+        VdlType uniqueType = uniqueTypes.get(this.typeString);
+        if (uniqueType != null) {
+            return uniqueType;
+        } else {
+            return addUniqueType(this);
+        }
     }
 
     private static VdlType getUniqueType(VdlType type) {
