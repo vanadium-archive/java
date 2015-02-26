@@ -5,8 +5,6 @@ import io.v.v23.security.Authorizer;
 import io.v.v23.security.VContext;
 
 public class ACLWrapper implements Authorizer {
-    private static final String TAG = "Veyron runtime";
-
     private static native ACLWrapper nativeWrap(ACL acl) throws VException;
 
     /**

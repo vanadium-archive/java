@@ -6,8 +6,6 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Map;
 
 class BlessingStoreImpl implements BlessingStore {
-    private static final String TAG = "Veyron runtime";
-
     private final long nativePtr;
 
     private native Blessings nativeSet(
@@ -37,8 +35,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativeForPeer(this.nativePtr, peerBlessings);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get blessings for peers: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get blessings for peers: " + e.getMessage());
         }
     }
     @Override
@@ -50,8 +47,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativeDefaultBlessings(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get default blessings: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get default blessings: " + e.getMessage());
         }
     }
     @Override
@@ -59,8 +55,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
         }
     }
     @Override
@@ -68,8 +63,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativePeerBlessings(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get peer blessings: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get peer blessings: " + e.getMessage());
         }
     }
     @Override

@@ -8,8 +8,6 @@ import io.v.v23.verror.VException;
 import java.util.concurrent.CountDownLatch;
 
 public class VContextImpl extends CancelableVContext {
-    private static final String TAG = "Veyron runtime";
-
     private static native CancelableVContext nativeCreate() throws VException;
 
     /**
@@ -53,10 +51,9 @@ public class VContextImpl extends CancelableVContext {
     @Override
     public DateTime deadline() {
         try {
-                return nativeDeadline(this.nativePtr);
+            return nativeDeadline(this.nativePtr);
         } catch (VException e) {
-                android.util.Log.e(TAG, "Couldn't get deadline: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get deadline: " + e.getMessage());
         }
     }
     @Override
@@ -70,8 +67,7 @@ public class VContextImpl extends CancelableVContext {
                 this.doneLatch = nativeDone(this.nativePtr);
                 return this.doneLatch;
             } catch (VException e) {
-                android.util.Log.e(TAG, "Couldn't invoke done: " + e.getMessage());
-                return null;
+                throw new RuntimeException("Couldn't invoke done: " + e.getMessage());
             }
         }
     }
@@ -80,8 +76,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeValue(this.nativePtr, key);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get value: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get value: " + e.getMessage());
         }
     }
     @Override
@@ -121,7 +116,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             nativeCancel(this.nativeCancelPtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't cancel context: " + e.getMessage());
+            throw new RuntimeException("Couldn't cancel context: " + e.getMessage());
         }
     }
     @Override

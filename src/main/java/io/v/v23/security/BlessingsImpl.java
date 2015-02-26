@@ -5,8 +5,6 @@ import io.v.v23.verror.VException;
 import java.security.interfaces.ECPublicKey;
 
 class BlessingsImpl extends Blessings {
-    private static final String TAG = "Veyron runtime";
-
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
@@ -21,8 +19,7 @@ class BlessingsImpl extends Blessings {
     private final long nativePtr;
     private final WireBlessings wire;  // non-null
 
-    private native String[] nativeForContext(long nativePtr, VContext context)
-        throws VException;
+    private native String[] nativeForContext(long nativePtr, VContext context) throws VException;
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
@@ -36,8 +33,7 @@ class BlessingsImpl extends Blessings {
         try {
             return nativeForContext(this.nativePtr, context);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get blessings for context: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get blessings for context: " + e.getMessage());
         }
     }
     @Override
@@ -45,8 +41,7 @@ class BlessingsImpl extends Blessings {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Coudln't get public key: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Coudln't get public key: " + e.getMessage());
         }
     }
     @Override

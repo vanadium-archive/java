@@ -15,8 +15,6 @@ import java.lang.reflect.Type;
 import java.util.concurrent.CountDownLatch;
 
 public class ServerCall implements io.v.v23.ipc.ServerCall {
-    private static final String TAG = "Veyron runtime";
-
     private final long nativePtr;
     private final Stream stream;
     private final VContext context;
@@ -38,8 +36,7 @@ public class ServerCall implements io.v.v23.ipc.ServerCall {
         try {
             return nativeBlessings(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get blessings: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get blessings: " + e.getMessage());
         }
     }
     // Implements io.v.v23.ipc.Stream.

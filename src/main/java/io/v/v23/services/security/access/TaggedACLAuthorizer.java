@@ -12,7 +12,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class TaggedACLAuthorizer implements Authorizer {
-    public static final String TAG = "Veyron runtime";
     private final TaggedACLMap acls;  // non-null
     private final VdlType tagType;  // non-null
 

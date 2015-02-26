@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PrincipalImpl implements Principal {
-    private static final String TAG = "Veyron runtime";
-
     private final long nativePtr;
     private final Signer signer;
     private final BlessingStore store;
@@ -88,8 +86,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get public key: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
         }
     }
     @Override
@@ -97,8 +94,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeBlessingsByName(this.nativePtr, name);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get blessings for name: " + e.getMessage());
-            return new Blessings[0];
+            throw new RuntimeException("Couldn't get blessings for name: " + e.getMessage());
         }
     }
     @Override
@@ -106,9 +102,8 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeBlessingsInfo(this.nativePtr, blessings);
         } catch (VException e) {
-            android.util.Log.e(TAG,
-                "Couldn't get human-readable strings for blessings: " + e.getMessage());
-            return new HashMap<String, Caveat[]>();
+            throw new RuntimeException(
+                    "Couldn't get human-readable strings for blessings: " + e.getMessage());
         }
     }
     @Override
@@ -119,8 +114,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeBlessingStore(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get Blessing Store: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get Blessing Store: " + e.getMessage());
         }
     }
     @Override
@@ -131,8 +125,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeRoots(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get Blessing Store: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get Blessing Store: " + e.getMessage());
         }
     }
     @Override

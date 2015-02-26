@@ -6,8 +6,6 @@ import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
 class VContextImpl implements io.v.v23.security.VContext {
-    private static final String TAG = "Veyron runtime";
-
     private final long nativePtr;
 
     public native DateTime nativeTimestamp(long nativePtr) throws VException;
@@ -31,8 +29,7 @@ class VContextImpl implements io.v.v23.security.VContext {
         try {
             return nativeTimestamp(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get timestamp: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get timestamp: " + e.getMessage());
         }
     }
     @Override
@@ -45,8 +42,7 @@ class VContextImpl implements io.v.v23.security.VContext {
             final VdlValue[] tags = nativeMethodTags(this.nativePtr);
             return tags != null ? tags : new VdlValue[0];
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get method tags: " + e.getMessage());
-            return new VdlValue[0];
+            throw new RuntimeException("Couldn't get method tags: " + e.getMessage());
         }
     }
     @Override
@@ -66,8 +62,7 @@ class VContextImpl implements io.v.v23.security.VContext {
         try {
             return nativeLocalPrincipal(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get local Principal: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get local Principal: " + e.getMessage());
         }
     }
     @Override
@@ -75,8 +70,7 @@ class VContextImpl implements io.v.v23.security.VContext {
         try {
             return nativeLocalBlessings(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get local Blessings: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get local Blessings: " + e.getMessage());
         }
     }
     @Override
@@ -84,8 +78,7 @@ class VContextImpl implements io.v.v23.security.VContext {
         try {
             return nativeRemoteBlessings(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get remote Blessings: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get remote Blessings: " + e.getMessage());
         }
     }
     @Override
@@ -93,8 +86,7 @@ class VContextImpl implements io.v.v23.security.VContext {
         try {
             return nativeContext(this.nativePtr);
         } catch (VException e) {
-            android.util.Log.e(TAG, "Couldn't get Vanadium context: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Couldn't get Vanadium context: " + e.getMessage());
         }
     }
     // Implements java.lang.Object.

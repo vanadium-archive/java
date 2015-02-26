@@ -12,8 +12,6 @@ import io.v.v23.verror.VException;
  * code for most of its functionalities.
  */
 public class VRuntime implements io.v.v23.VRuntime {
-    private static final String TAG = "Veyron runtime";
-
     private static native VContext nativeInit() throws VException;
     private static native VContext nativeSetNewClient(VContext ctx, Options opts)
             throws VException;
