@@ -129,7 +129,7 @@ public class Security {
      * @throws VException      if the blessings couldn't be created.
      */
     public static Blessings newBlessings(WireBlessings wire) throws VException {
-        return BlessingsImpl.create(wire);
+        return Blessings.create(wire);
     }
 
     /**
@@ -142,7 +142,7 @@ public class Security {
      * @throws VException      if there was an error creating an union.
      */
     public static Blessings unionOfBlessings(Blessings... blessings) throws VException {
-        return BlessingsImpl.createUnion(blessings);
+        return Blessings.createUnion(blessings);
     }
 
     /**
@@ -168,7 +168,7 @@ public class Security {
      * @throws VException      if the caveat couldn't be created
      */
     public static Caveat newExpiryCaveat(DateTime time) throws VException {
-        return newCaveat(Constants.UNIX_TIME_EXPIRY_CAVEAT_X, time.getMillis() / 1000L);
+        return newCaveat(Constants.EXPIRY_CAVEAT_X, time);
     }
 
     /**
@@ -196,8 +196,8 @@ public class Security {
      *
      * @return a caveat that never fails to validate.
      */
-    public static Caveat newUnconstrainedUseCaveat() {
-        return new Caveat(null, null);
+    public static Caveat newUnconstrainedUseCaveat() throws VException {
+        return newCaveat(Constants.CONST_CAVEAT, true);
     }
 
     /**

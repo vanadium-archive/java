@@ -23,7 +23,10 @@ public class BlessingsTest extends AndroidTestCase {
                     alice, "work/friend", Security.newUnconstrainedUseCaveat());
             final VContext ctx = Security.newContext(new VContextParams().withLocalPrincipal(p2));
             final String[] blessings = aliceWorkFriend.forContext(ctx);
-            assertTrue(Arrays.equals(new String[]{ "alice/work/friend" }, blessings));
+            if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
+                fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
+                        Arrays.toString(blessings)));
+            }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -40,8 +43,11 @@ public class BlessingsTest extends AndroidTestCase {
 
             final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                     alice, "work/friend", Security.newUnconstrainedUseCaveat());
-            assertTrue(Arrays.equals(
-                    p2.publicKey().getEncoded(), aliceWorkFriend.publicKey().getEncoded()));
+            if (!Arrays.equals(
+                    aliceWorkFriend.publicKey().getEncoded(), p2.publicKey().getEncoded())) {
+                fail(String.format("Expected public key: %s, got %s",
+                        aliceWorkFriend.publicKey().getEncoded(), p2.publicKey().getEncoded()));
+            }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
         }

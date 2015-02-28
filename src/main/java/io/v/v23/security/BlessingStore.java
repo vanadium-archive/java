@@ -70,8 +70,6 @@ public interface BlessingStore {
      * {@code setDefaultBlessings()}, or if no such call was made it is equivalent to
      * {@code forPeer()} with no arguments.
      *
-     * Returns {@code null} if there is no usable blessing.
-     *
      * @return blessings to be shared with peers for which no other information is available.
      */
     public Blessings defaultBlessings();

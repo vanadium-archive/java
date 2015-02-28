@@ -61,7 +61,7 @@ public class BlessingStoreTest extends AndroidTestCase {
             final BlessingStore store = principal.blessingStore();
             final Blessings blessingA = newBlessing(principal, "root", "A");
             final Blessings blessingB = newBlessing(principal, "root", "B");
-            assertEquals(null, store.defaultBlessings());
+            assertTrue(store.defaultBlessings().isEmpty());
             store.setDefaultBlessings(blessingA);
             assertEquals(blessingA, store.defaultBlessings());
             store.setDefaultBlessings(blessingB);

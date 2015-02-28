@@ -31,14 +31,14 @@ public class PrincipalTest extends AndroidTestCase {
             final Blessings aliceAllFriends = Security.unionOfBlessings(
                 aliceWorkFriend, aliceGymFriend);
             assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                    .put("alice/work/friend", new Caveat[0])
+                    .put("alice/work/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
                     .build(), p2.blessingsInfo(aliceWorkFriend));
             assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                    .put("alice/gym/friend", new Caveat[0])
+                    .put("alice/gym/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
                     .build(), p2.blessingsInfo(aliceGymFriend));
             assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                    .put("alice/work/friend", new Caveat[0])
-                    .put("alice/gym/friend", new Caveat[0])
+                    .put("alice/work/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
+                    .put("alice/gym/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
                     .build(), p2.blessingsInfo(aliceAllFriends));
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());

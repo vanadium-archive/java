@@ -7,6 +7,8 @@ import io.v.v23.ipc.ListenSpec;
 import io.v.v23.ipc.Server;
 import io.v.v23.naming.ns.Namespace;
 import io.v.v23.security.CaveatRegistry;
+import io.v.v23.security.ConstCaveatValidator;
+import io.v.v23.security.ExpiryCaveatValidator;
 import io.v.v23.security.MethodCaveatValidator;
 import io.v.v23.security.Principal;
 import io.v.v23.security.UnixTimeExpiryCaveatValidator;
@@ -70,8 +72,14 @@ public class V {
             // Register caveat validators.
             try {
                 CaveatRegistry.register(
+                        io.v.v23.security.Constants.CONST_CAVEAT,
+                        new ConstCaveatValidator());
+                CaveatRegistry.register(
                         io.v.v23.security.Constants.UNIX_TIME_EXPIRY_CAVEAT_X,
                         new UnixTimeExpiryCaveatValidator());
+                CaveatRegistry.register(
+                        io.v.v23.security.Constants.EXPIRY_CAVEAT_X,
+                        new ExpiryCaveatValidator());
                 CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT_X,
                         new MethodCaveatValidator());
             } catch (VException e) {

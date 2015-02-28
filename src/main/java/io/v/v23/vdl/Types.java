@@ -3,6 +3,8 @@ package io.v.v23.vdl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import io.v.v23.security.Blessings;
+import io.v.v23.security.BlessingsNativeConverter;
 import io.v.v23.vdl.NativeTime.DateTimeConverter;
 import io.v.v23.vdl.NativeTime.DurationConverter;
 import io.v.v23.vdl.NativeTypes.Converter;
@@ -144,6 +146,7 @@ public final class Types {
         registerNativeType(VException.class, VExceptionVdlConverter.INSTANCE);
         registerNativeType(org.joda.time.DateTime.class, DateTimeConverter.INSTANCE);
         registerNativeType(org.joda.time.Duration.class, DurationConverter.INSTANCE);
+        registerNativeType(Blessings.class, BlessingsNativeConverter.INSTANCE);
     }
 
     private static void registerNativeType(Type nativeType, Converter converter) {
