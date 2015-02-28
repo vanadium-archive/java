@@ -124,8 +124,8 @@ public class VExceptionTest extends AndroidTestCase {
         expectBasic(nEN1, Errors.NO_EXIST, "server nEN1 not found 1 2", 14);
         expectBasic(nFR0, Errors.NO_EXIST, "server nFR0 pas trouvé 0", 15);
         expectBasic(nFR1, Errors.NO_EXIST, "server nFR1 pas trouvé 1 2", 16);
-        expectBasic(nDE0, Errors.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE0 0", 17);
-        expectBasic(nDE1, Errors.NO_EXIST, "v.io/core/veyron2/verror.NoExist: server nDE1 1 2", 18);
+        expectBasic(nDE0, Errors.NO_EXIST, "v.io/x/ref2/verror.NoExist: server nDE0 0", 17);
+        expectBasic(nDE1, Errors.NO_EXIST, "v.io/x/ref2/verror.NoExist: server nDE1 1 2", 18);
     }
 
     public static void testEqual() {
