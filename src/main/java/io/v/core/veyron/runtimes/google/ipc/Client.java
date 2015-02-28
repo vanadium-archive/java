@@ -31,7 +31,7 @@ public class Client implements io.v.v23.ipc.Client {
         if (opts == null) {
             opts = new Options();
         }
-        if (method == "") {
+        if ("".equals(method)) {
             throw new VException(String.format("Empty method name invoked on object %s", name));
         }
         if (args.length != argTypes.length) {
