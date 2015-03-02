@@ -171,7 +171,7 @@ public abstract class VdlValue implements Serializable {
             case ANY:
                 throw new IllegalArgumentException("Type ANY doesn't have a non-null zero value");
             case OPTIONAL:
-                return new VdlOptional<VdlValue>(zeroValue(type.getElem()));
+                return VdlOptional.of(zeroValue(type.getElem()));
             default:
                 return zeroValue(type);
         }

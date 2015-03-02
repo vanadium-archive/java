@@ -20,8 +20,8 @@ import java.util.Map;
 public class ConversionTest extends TestCase {
     private final ImmutableMultimap<VdlValue, Type> tests =
             ImmutableMultimap.<VdlValue, Type>builder()
-            .put(new VdlOptional<VdlValue>(new VdlUint32()), VdlInt32.class)
-            .put(new VdlOptional<VdlValue>(new VdlUint32()),
+            .put(VdlOptional.of(new VdlUint32()), VdlInt32.class)
+            .put(VdlOptional.of(new VdlUint32()),
                     new TypeToken<VdlOptional<VdlInt32>>(){}.getType())
             .put(new VdlUint32(), VdlInt32.class)
             .put(new VdlUint32(), new TypeToken<VdlOptional<VdlInt32>>(){}.getType())
