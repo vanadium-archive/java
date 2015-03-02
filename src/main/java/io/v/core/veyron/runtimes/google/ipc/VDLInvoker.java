@@ -107,7 +107,7 @@ public final class VDLInvoker {
                     // getMethodTags() not defined.
                 } catch (InvocationTargetException e) {
                     // getMethodTags() threw an exception.
-                    throw new VException(String.format("Error getting tag for method %q: %s",
+                    throw new VException(String.format("Error getting tag for method %s: %s",
                         m.getKey(), e.getTargetException().getMessage()));
                 }
                 invokableMethods.put(m.getKey(), new ServerMethod(wrapper, m.getValue(), tags));
