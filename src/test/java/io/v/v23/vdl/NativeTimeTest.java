@@ -40,10 +40,10 @@ public class NativeTimeTest extends TestCase {
         for (Map.Entry<Time, DateTime> test : tests.entrySet()) {
             Time wireTime = test.getKey();
             assertEquals(test.getValue(), conv.nativeFromVdlValue(wireTime));
-            if (wireTime.getSeconds() < 0 && wireTime.getNano() > 0) {
-                wireTime = new Time(wireTime.getSeconds() + 1, wireTime.getNano() - NPS);
-            } else if (wireTime.getSeconds() > 0 && wireTime.getNano() < 0) {
-                wireTime = new Time(wireTime.getSeconds() - 1, wireTime.getNano() + NPS);
+            if (wireTime.getSeconds() < 0 && wireTime.getNanos() > 0) {
+                wireTime = new Time(wireTime.getSeconds() + 1, wireTime.getNanos() - NPS);
+            } else if (wireTime.getSeconds() > 0 && wireTime.getNanos() < 0) {
+                wireTime = new Time(wireTime.getSeconds() - 1, wireTime.getNanos() + NPS);
             }
             assertEquals(wireTime, conv.vdlValueFromNative(test.getValue()));
         }

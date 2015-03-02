@@ -45,7 +45,7 @@ public class NativeTime {
             final io.v.v23.vdlroot.time.Duration wireDuration =
                     (io.v.v23.vdlroot.time.Duration) value;
             return new org.joda.time.Duration(wireDuration.getSeconds() * MILLIS_PER_SECOND
-                    + wireDuration.getNano() / NANOS_PER_MILLISECOND);
+                    + wireDuration.getNanos() / NANOS_PER_MILLISECOND);
         }
     }
 
@@ -73,7 +73,7 @@ public class NativeTime {
             final io.v.v23.vdlroot.time.Time wireTime =
                     (io.v.v23.vdlroot.time.Time) value;
             final long millis = wireTime.getSeconds() * MILLIS_PER_SECOND - JAVA_EPOCH
-                    + wireTime.getNano() / NANOS_PER_MILLISECOND;
+                    + wireTime.getNanos() / NANOS_PER_MILLISECOND;
             return new org.joda.time.DateTime(millis, DateTimeZone.UTC);
         }
     }

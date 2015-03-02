@@ -171,7 +171,7 @@ public class BinaryDecoder {
                 return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
             } else if (target.getKind() == Kind.OPTIONAL) {
                 Type elemType = ReflectUtil.getElementType(target.getTargetType(), 0);
-                return new VdlOptional<VdlValue>((VdlValue) readValue(actualType, elemType));
+                return VdlOptional.of((VdlValue) readValue(actualType, elemType));
             }
         }
 
@@ -476,7 +476,7 @@ public class BinaryDecoder {
             Type type = target.getTargetType();
             if (target.getKind() == Kind.OPTIONAL) {
                 type = ReflectUtil.getElementType(target.getTargetType(), 0);
-                return new VdlOptional<VdlValue>((VdlValue) readValue(actualType.getElem(), type));
+                return VdlOptional.of((VdlValue) readValue(actualType.getElem(), type));
             } else {
                 return readValue(actualType.getElem(), type);
             }

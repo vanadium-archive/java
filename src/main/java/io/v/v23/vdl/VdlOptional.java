@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
  *
  * @param <T> The type of the element.
  */
-public class VdlOptional<T extends VdlValue> extends VdlValue {
+public class VdlOptional<T> extends VdlValue {
     private static final long serialVersionUID = 1L;
 
     private final T elem;
@@ -22,16 +22,6 @@ public class VdlOptional<T extends VdlValue> extends VdlValue {
         super(vdlType);
         assertKind(Kind.OPTIONAL);
         this.elem = element;
-    }
-
-    /**
-     * Creates a VdlOptional that wraps a provided non-null element.
-     *
-     * @param element the wrapped element
-     * @throws NullPointerException is the element is null
-     */
-    public VdlOptional(T element) {
-        this(Types.optionalOf(element.vdlType()), element);
     }
 
     /**
@@ -50,6 +40,16 @@ public class VdlOptional<T extends VdlValue> extends VdlValue {
      */
     public VdlOptional(Type type) {
         this(Types.getVdlTypeFromReflect(type));
+    }
+
+    /**
+     * Creates a VdlOptional that wraps a provided non-null VDL value.
+     *
+     * @param element the wrapped element
+     * @throws NullPointerException is the element is null
+     */
+    public static <T extends VdlValue> VdlOptional<T> of(T element) {
+        return new VdlOptional<T>(Types.optionalOf(element.vdlType()), element);
     }
 
     public boolean isNull() {
