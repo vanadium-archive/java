@@ -63,7 +63,7 @@ public class V {
             } else {
                 // Use the default runtime implementation.
                 try {
-                    runtime = io.v.impl.google.VRuntime.create();
+                    runtime = io.v.impl.google.rt.VRuntime.create();
                 } catch (VException e) {
                     throw new RuntimeException(
                         "Couldn't initialize Google Veyron Runtime: " + e.getMessage());

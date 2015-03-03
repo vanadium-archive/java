@@ -1,4 +1,4 @@
-package io.v.impl.google;
+package io.v.impl.google.channel;
 
 import io.v.v23.verror.VException;
 import java.io.EOFException;
