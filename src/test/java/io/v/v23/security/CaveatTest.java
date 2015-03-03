@@ -21,19 +21,19 @@ public class CaveatTest extends AndroidTestCase {
             final Blessings alice = p1.blessSelf("alice", Security.newMethodCaveat("succeed"));
             p1.addToRoots(alice);
             {
-                final VContext ctx = Security.newContext(
-                        new VContextParams().withLocalPrincipal(p1).withMethod("succeed"));
+                final Call call = Security.newCall(
+                        new CallParams().withLocalPrincipal(p1).withMethod("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = alice.forContext(ctx);
+                final String[] got = alice.forCall(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
                 }
             }
             {
-                final VContext ctx = Security.newContext(
-                        new VContextParams().withLocalPrincipal(p1).withMethod("fail"));
-                assertEquals(null, alice.forContext(ctx));
+                final Call call = Security.newCall(
+                        new CallParams().withLocalPrincipal(p1).withMethod("fail"));
+                assertEquals(null, alice.forCall(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -48,21 +48,21 @@ public class CaveatTest extends AndroidTestCase {
                 "alice", Security.newExpiryCaveat(DateTime.now().plusHours(1)));
             p1.addToRoots(alice);
             {
-                final VContext ctx = Security.newContext(new VContextParams()
+                final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withTimestamp(DateTime.now()));
                 final String[] want = { "alice" };
-                final String[] got = alice.forContext(ctx);
+                final String[] got = alice.forCall(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
                 }
             }
             {
-                final VContext ctx = Security.newContext(new VContextParams()
+                final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withTimestamp(DateTime.now().plusHours(2)));
-                assertEquals(null, alice.forContext(ctx));
+                assertEquals(null, alice.forCall(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -79,21 +79,21 @@ public class CaveatTest extends AndroidTestCase {
                     Security.newCaveat(io.v.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
             p1.addToRoots(alice);
             {
-                final VContext ctx = Security.newContext(new VContextParams()
+                final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withSuffix("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = alice.forContext(ctx);
+                final String[] got = alice.forCall(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
                 }
             }
             {
-                final VContext ctx = Security.newContext(new VContextParams()
+                final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withSuffix("fail"));
-                assertEquals(null, alice.forContext(ctx));
+                assertEquals(null, alice.forCall(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());

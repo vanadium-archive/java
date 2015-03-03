@@ -1,8 +1,8 @@
 package io.v.v23.services.security.access;
 
-import io.v.v23.verror.VException;
 import io.v.v23.security.Authorizer;
-import io.v.v23.security.VContext;
+import io.v.v23.security.Call;
+import io.v.v23.verror.VException;
 
 public class ACLWrapper implements Authorizer {
     private static native ACLWrapper nativeWrap(ACL acl) throws VException;
@@ -19,7 +19,7 @@ public class ACLWrapper implements Authorizer {
     }
 
     private native boolean nativeIncludes(long nativePtr, String[] blessings);
-    private native void nativeAuthorize(long nativePtr, VContext ctx);
+    private native void nativeAuthorize(long nativePtr, Call call);
     private native void nativeFinalize(long nativePtr);
 
     private long nativePtr;
@@ -45,12 +45,12 @@ public class ACLWrapper implements Authorizer {
      * Implements {@code Authorizer} where the request is authorized only if the remote blessings
      * are included in the ACL.
      *
-     * @param ctx              security context of the request.
-     * @throws VException      if the request is not authorized.
+     * @param  call       the call being authorized
+     * @throws VException if the request is not authorized
      */
     @Override
-    public void authorize(VContext ctx) throws VException {
-        nativeAuthorize(this.nativePtr, ctx);
+    public void authorize(Call call) throws VException {
+        nativeAuthorize(this.nativePtr, call);
     }
 
     /*

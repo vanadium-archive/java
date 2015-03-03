@@ -2,12 +2,13 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 
 /**
- * Context defines the state available for authorizing a principal.
+ * Call defines the state available for authorizing a principal.
  */
-public interface VContext {
+public interface Call {
     /**
      * Returns the timestamp at which the authorization state is to be checked.
      *
@@ -77,5 +78,5 @@ public interface VContext {
      *
      * @return the associated Vanadium context
      */
-    public io.v.v23.context.VContext context();
+    public VContext context();
 }

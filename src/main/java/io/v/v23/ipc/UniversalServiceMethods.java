@@ -1,9 +1,5 @@
 package io.v.v23.ipc;
 
-import io.v.v23.Options;
-import io.v.v23.verror.VException;
-import io.v.v23.context.VContext;
-
 /**
  * UniversalServiceMethods defines the set of methods that are implemented on all services.
  */

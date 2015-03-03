@@ -1,6 +1,4 @@
-package io.v.core.veyron.runtimes.google.naming.ns;
-
-import com.google.common.reflect.TypeToken;
+package io.v.impl.google.naming.ns;
 
 import io.v.v23.InputChannel;
 import io.v.v23.verror.VException;

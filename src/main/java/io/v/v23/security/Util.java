@@ -11,27 +11,6 @@ import java.security.interfaces.ECPublicKey;
  */
 class Util {
     /**
-     * VOM-encodes the provided WireBlessings.
-     *
-     * @param  wire WireBlessings to be encoded.
-     * @return      VOM-encoded WireBlessings.
-     */
-    static byte[] encodeWireBlessings(WireBlessings wire) throws VException {
-        return VomUtil.encode(wire, WireBlessings.class);
-    }
-
-    /**
-     * VOM-decodes the provided VOM-encoded WireBlessings.
-     *
-     * @param  encoded         VOM-encoded WireBlessings.
-     * @return                 decoded WireBlessings.
-     * @throws VException      if the provided WireBlessings couldn't be decoded.
-     */
-    static WireBlessings decodeWireBlessings(byte[] encoded) throws VException {
-        return (WireBlessings) VomUtil.decode(encoded, WireBlessings.class);
-    }
-
-    /**
      * Encodes the provided BlessingPattern as a string.
      *
      * @param  pattern BlessingPattern to be encoded.
@@ -106,29 +85,5 @@ class Util {
             return null;
         }
         return CryptoUtil.decodeECPublicKey(encoded);
-    }
-
-    /**
-     * VOM-encodes the provided Caveat.
-     *
-     * @param  caveat Caveat to be encoded.
-     * @return        the encoded Caveat.
-     */
-    static byte[] encodeCaveat(Caveat caveat) throws VException {
-        return VomUtil.encode(caveat, Caveat.class);
-    }
-
-    /**
-     * VOM-decodes the VOM-encoded Caveat.
-     *
-     * @param  encoded         VOM-encoded Caveat.
-     * @return                 decoded Caveat.
-     * @throws VException      if the provided Caveat couldn't be decoded.
-     */
-    static Caveat decodeCaveat(byte[] encoded) throws VException {
-        if (encoded == null || encoded.length == 0) {
-            return null;
-        }
-        return (Caveat) VomUtil.decode(encoded, Caveat.class);
     }
 }

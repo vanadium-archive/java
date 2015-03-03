@@ -1,6 +1,6 @@
-package io.v.core.veyron.runtimes.google.ipc;
+package io.v.impl.google.ipc;
 
-import io.v.v23.ipc.ServerCall;
+import io.v.v23.ipc.StreamServerCall;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.VeyronServer;
 import io.v.v23.verror.VException;
@@ -193,7 +193,8 @@ public final class VDLInvoker {
      * @return InvokeReply              VOM-encoded invocation reply and application errors
      * @throws VException               if the method couldn't be invoked
      */
-    public InvokeReply invoke(String method, ServerCall call, byte[][] vomArgs) throws VException {
+    public InvokeReply invoke(String method, StreamServerCall call, byte[][] vomArgs)
+            throws VException {
         final ServerMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new VException(String.format("Couldn't find method %s in class %s",
@@ -225,9 +226,9 @@ public final class VDLInvoker {
         return prepareReply(m, result, appError);
     }
 
-    private static Object[] prepareArgs(ServerMethod m, ServerCall call, byte[][] vomArgs)
+    private static Object[] prepareArgs(ServerMethod m, StreamServerCall call, byte[][] vomArgs)
             throws VException {
-        // The first argument is always context, so we add it.
+        // The first argument is always the call, so we add it.
         final int argsLength = vomArgs.length + 1;
         final Type[] types = m.method.getGenericParameterTypes();
         if (argsLength != types.length) {

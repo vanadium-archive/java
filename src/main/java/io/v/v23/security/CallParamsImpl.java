@@ -2,12 +2,13 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 
-class VContextParamImpl implements io.v.v23.security.VContext {
-    private final VContextParams params;
+class CallParamsImpl implements Call {
+    private final CallParams params;
 
-    VContextParamImpl(VContextParams params) {
+    CallParamsImpl(CallParams params) {
         this.params = params;
     }
 
@@ -48,7 +49,7 @@ class VContextParamImpl implements io.v.v23.security.VContext {
         return this.params.getRemoteBlessings();
     }
     @Override
-    public io.v.v23.context.VContext context() {
+    public VContext context() {
         return this.params.getContext();
     }
 }

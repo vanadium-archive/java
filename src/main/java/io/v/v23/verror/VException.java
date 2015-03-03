@@ -74,6 +74,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * {@code ": "} or followed by {@code ":"} or both, respectively.
  */
 public class VException extends Exception {
+    private static final long serialVersionUID = 1L;
     private static VContext defaultContext = null;
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 

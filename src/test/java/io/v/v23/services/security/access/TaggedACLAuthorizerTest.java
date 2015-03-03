@@ -10,12 +10,12 @@ import io.v.v23.security.Authorizer;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingRoots;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Call;
+import io.v.v23.security.CallParams;
 import io.v.v23.security.Constants;
 import io.v.v23.security.Principal;
 import io.v.v23.security.Security;
 import io.v.v23.security.Signer;
-import io.v.v23.security.VContext;
-import io.v.v23.security.VContextParams;
 import io.v.v23.services.security.access.test.MyObjectServerWrapper;
 import io.v.v23.services.security.access.test.MyTag;
 import io.v.v23.vdl.VdlValue;
@@ -56,13 +56,13 @@ public class TaggedACLAuthorizerTest extends AndroidTestCase {
 
         void runAuthorize(String method, Blessings client) throws VException {
             final Authorizer authorizer = TaggedACLAuthorizer.create(this.acl, MyTag.class);
-            final VContext ctx = Security.newContext(new VContextParams()
+            final Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(this.pServer)
                     .withLocalBlessings(this.server)
                     .withRemoteBlessings(client)
                     .withMethod(method)
                     .withMethodTags(getMethodTags(method)));
-            authorizer.authorize(ctx);
+            authorizer.authorize(call);
         }
     }
 
@@ -154,14 +154,14 @@ public class TaggedACLAuthorizerTest extends AndroidTestCase {
                 "R", new ACL(ImmutableList.of(new BlessingPattern("nobody/$")), null))),
                 MyTag.class);
         for (final String testCase : new String[]{ "put", "get", "resolve", "noTags", "allTags" }) {
-            final VContext ctx = Security.newContext(new VContextParams()
+            final Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(p)
                     .withLocalBlessings(server)
                     .withRemoteBlessings(client)
                     .withMethod(testCase)
                     .withMethodTags(getMethodTags(testCase)));
             try {
-                authorizer.authorize(ctx);
+                authorizer.authorize(call);
             } catch (VException e) {
                 fail(String.format("Access denied for method %s: %s", testCase, e.getMessage()));
             }

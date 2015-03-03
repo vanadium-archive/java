@@ -11,7 +11,7 @@ import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.ipc.NetworkChange;
 import io.v.v23.ipc.Server;
-import io.v.v23.ipc.ServerContext;
+import io.v.v23.ipc.ServerCall;
 import io.v.v23.services.security.access.Constants;
 import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
@@ -33,25 +33,25 @@ public class FortuneTest extends AndroidTestCase {
 
     private static final VException COMPLEX_ERROR = VException.explicitMake(
             Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
-  
+
     public static class FortuneServerImpl implements FortuneServer {
         private String lastAddedFortune;
 
         @Override
-        public String get(ServerContext context) throws VException {
+        public String get(ServerCall call) throws VException {
             if (lastAddedFortune == null) {
-                throw VException.make(Errors.ERR_NO_FORTUNES, context);
+                throw VException.make(Errors.ERR_NO_FORTUNES, call.context());
             }
             return lastAddedFortune;
         }
 
         @Override
-        public void add(ServerContext context, String fortune) throws VException {
+        public void add(ServerCall call, String fortune) throws VException {
             lastAddedFortune = fortune;
         }
 
         @Override
-        public int streamingGet(ServerContext context, Stream<String, Boolean> stream)
+        public int streamingGet(ServerCall call, Stream<String, Boolean> stream)
                 throws VException {
             int numSent = 0;
             while (true) {
@@ -64,7 +64,7 @@ public class FortuneTest extends AndroidTestCase {
                     break;
                 }
                 try {
-                    stream.send(get(context));
+                    stream.send(get(call));
                 } catch (VException e) {
                     throw new VException(
                             "Server couldn't send a string item: " + e.getMessage());
@@ -75,52 +75,52 @@ public class FortuneTest extends AndroidTestCase {
         }
 
         @Override
-        public void getComplexError(ServerContext context) throws VException {
+        public void getComplexError(ServerCall call) throws VException {
             throw COMPLEX_ERROR;
         }
 
         @Override
-        public void testContext(ServerContext context) throws VException {
-            if (context == null) {
+        public void testContext(ServerCall call) throws VException {
+            if (call == null) {
                 throw new VException("Context is null");
             }
-            if (context.timestamp() == null) {
+            if (call.timestamp() == null) {
                 throw new VException("Timestamp is null");
             }
-            if (!"testContext".equals(context.method())) {
+            if (!"testContext".equals(call.method())) {
                 throw new VException(String.format("Wrong method, want \"testContext\", got %s",
-                        context.method()));
+                        call.method()));
             }
             final VdlValue[] expectedMethodTags = new VdlValue[]{ Constants.READ };
-            if (!Arrays.equals(expectedMethodTags, context.methodTags())) {
+            if (!Arrays.equals(expectedMethodTags, call.methodTags())) {
                 throw new VException(String.format("Wrong method tags, want %s, got %s",
-                        expectedMethodTags, Arrays.toString(context.methodTags())));
+                        expectedMethodTags, Arrays.toString(call.methodTags())));
             }
-            if (context.suffix() == null) {
+            if (call.suffix() == null) {
                 throw new VException("Suffix is null");
             }
-            if (context.localPrincipal() == null) {
+            if (call.localPrincipal() == null) {
                 throw new VException("Local principal is null");
             }
-            if (context.localBlessings() == null) {
+            if (call.localBlessings() == null) {
                 throw new VException("Local blessings are null");
             }
-            if (context.remoteBlessings() == null) {
+            if (call.remoteBlessings() == null) {
                 throw new VException("Remote blessings are null");
             }
-            if (context.localEndpoint() == null || context.localEndpoint().isEmpty()) {
+            if (call.localEndpoint() == null || call.localEndpoint().isEmpty()) {
                 throw new VException("Local endpoint is empty");
             }
-            if (context.remoteEndpoint() == null || context.remoteEndpoint().isEmpty()) {
+            if (call.remoteEndpoint() == null || call.remoteEndpoint().isEmpty()) {
                 throw new VException("Remote endpoint is empty");
             }
-            if (context.context() == null) {
+            if (call.context() == null) {
                 throw new VException("Vanadium context is null");
             }
         }
 
         @Override
-        public void noTags(ServerContext context) throws VException {}
+        public void noTags(ServerCall call) throws VException {}
     }
 
     public void testFortune() throws VException {

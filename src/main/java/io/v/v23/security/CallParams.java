@@ -2,26 +2,27 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 
 /**
- * VContextParams stores security-context creation parameters.  Here is an example of a simple
- * context creation:
+ * CallParams stores security-call creation parameters.  Here is an example of a simple
+ * call creation:
  * <code>
  *   ...
- *   final VContext ctx = Security.newContext(new VContextParams()
- *       .withLocalPrincipal(Security.newPrincipal())
- *       .withMethodName("test")
- *       .withTimestamp(DateTime.now());
+ *   final Call call = Security.newCall(new CallParams()
+ *           .withLocalPrincipal(Security.newPrincipal())
+ *           .withMethodName("test")
+ *           .withTimestamp(DateTime.now());
  *   ...
  * <code>
  *
- * VContextParams form a tree where derived params are children of the params from which they
+ * CallParams form a tree where derived params are children of the params from which they
  * were derived.  Children inherit all the properties of their parent except for the property being
  * replaced (the principal/method/timestamp in the example above).
  */
-public class VContextParams {
-    final VContextParams parent;
+public class CallParams {
+    final CallParams parent;
 
     private DateTime timestamp;
     private String method;
@@ -34,11 +35,11 @@ public class VContextParams {
     private Blessings remoteBlessings;
     private io.v.v23.context.VContext context;
 
-    public VContextParams() {
+    public CallParams() {
         this.parent = null;
     }
 
-    private VContextParams(VContextParams parent) {
+    private CallParams(CallParams parent) {
         this.parent = parent;
     }
 
@@ -48,8 +49,8 @@ public class VContextParams {
      * @param  time timestamp
      * @return      a child of the current params with the given timestamp attached
      */
-    public VContextParams withTimestamp(DateTime time) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withTimestamp(DateTime time) {
+        final CallParams ret = new CallParams(this);
         ret.timestamp = time;
         return ret;
     }
@@ -59,8 +60,8 @@ public class VContextParams {
      * @param  method method name
      * @return      a child of the current params with the given method name attached
      */
-    public VContextParams withMethod(String method) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withMethod(String method) {
+        final CallParams ret = new CallParams(this);
         ret.method = method;
         return ret;
     }
@@ -70,8 +71,8 @@ public class VContextParams {
      * @param  tags method tags
      * @return      a child of the current params with the given method tags attached
      */
-    public VContextParams withMethodTags(VdlValue... tags) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withMethodTags(VdlValue... tags) {
+        final CallParams ret = new CallParams(this);
         ret.methodTags = tags;
         return ret;
     }
@@ -81,8 +82,8 @@ public class VContextParams {
      * @param  suffix veyron name suffix
      * @return      a child of the current params with the given veyron name suffix attached
      */
-    public VContextParams withSuffix(String suffix) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withSuffix(String suffix) {
+        final CallParams ret = new CallParams(this);
         ret.suffix = suffix;
         return ret;
     }
@@ -92,8 +93,8 @@ public class VContextParams {
      * @param  endpoint local endpoint
      * @return      a child of the current params with the given local endpoint attached
      */
-    public VContextParams withLocalEndpoint(String endpoint) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withLocalEndpoint(String endpoint) {
+        final CallParams ret = new CallParams(this);
         ret.localEndpoint = endpoint;
         return ret;
     }
@@ -103,8 +104,8 @@ public class VContextParams {
      * @param  endpoint remote endpoint
      * @return      a child of the current params with the given remote endpoint attached
      */
-    public VContextParams withRemoteEndpoint(String endpoint) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withRemoteEndpoint(String endpoint) {
+        final CallParams ret = new CallParams(this);
         ret.remoteEndpoint = endpoint;
         return ret;
     }
@@ -114,8 +115,8 @@ public class VContextParams {
      * @param  principal local principal
      * @return      a child of the current params with the given local principal attached
      */
-    public VContextParams withLocalPrincipal(Principal principal) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withLocalPrincipal(Principal principal) {
+        final CallParams ret = new CallParams(this);
         ret.principal = principal;
         return ret;
     }
@@ -125,8 +126,8 @@ public class VContextParams {
      * @param  blessings local blessings
      * @return      a child of the current params with the given local blessings attached
      */
-    public VContextParams withLocalBlessings(Blessings blessings) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withLocalBlessings(Blessings blessings) {
+        final CallParams ret = new CallParams(this);
         ret.localBlessings = blessings;
         return ret;
     }
@@ -136,8 +137,8 @@ public class VContextParams {
      * @param  blessings remote blessings
      * @return      a child of the current params with the given remote blessings attached
      */
-    public VContextParams withRemoteBlessings(Blessings blessings) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withRemoteBlessings(Blessings blessings) {
+        final CallParams ret = new CallParams(this);
         ret.remoteBlessings = blessings;
         return ret;
     }
@@ -147,8 +148,8 @@ public class VContextParams {
      * @param  context Vanadium context
      * @return         a child of the current params with the given Vanadium context attached
      */
-    public VContextParams withContext(io.v.v23.context.VContext context) {
-        final VContextParams ret = new VContextParams(this);
+    public CallParams withContext(VContext context) {
+        final CallParams ret = new CallParams(this);
         ret.context = context;
         return ret;
     }
@@ -254,7 +255,7 @@ public class VContextParams {
      *
      * @return Vanadium context attached to the params
      */
-    public io.v.v23.context.VContext getContext() {
+    public VContext getContext() {
         if (this.context != null) return this.context;
         if (this.parent != null) return this.parent.getContext();
         return null;

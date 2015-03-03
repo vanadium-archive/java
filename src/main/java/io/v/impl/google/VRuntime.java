@@ -1,4 +1,4 @@
-package io.v.core.veyron.runtimes.google;
+package io.v.impl.google;
 
 import io.v.v23.Options;
 import io.v.v23.context.VContext;

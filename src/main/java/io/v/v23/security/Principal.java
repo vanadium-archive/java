@@ -78,8 +78,8 @@ public interface Principal {
      * to it from recognized authorities (i.e., blessing roots).
      *
      * This method does not validate caveats on the provided blessings and thus may NOT be
-     * valid in certain contexts.  (Use {@code Blessings.forContext(ctx)} to determine the set of
-     * valid blessing strings in a particular context.)
+     * valid in certain calls.  (Use {@code Blessings.forCall(call)} to determine the set of
+     * valid blessing strings in a particular call.)
      *
      * @param blessings blessings whose human-readable strings are to be returned.
      * @return          human-readable strings of the provided blessings, along with the caveats

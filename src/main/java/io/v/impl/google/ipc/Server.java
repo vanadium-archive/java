@@ -1,6 +1,6 @@
-package io.v.core.veyron.runtimes.google.ipc;
+package io.v.impl.google.ipc;
 
-import io.v.core.veyron.runtimes.google.InputChannel;
+import io.v.impl.google.InputChannel;
 import io.v.v23.ipc.Dispatcher;
 import io.v.v23.ipc.ListenSpec;
 import io.v.v23.ipc.NetworkChange;

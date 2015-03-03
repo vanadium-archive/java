@@ -7,11 +7,11 @@ import io.v.v23.verror.VException;
  */
 public interface Authorizer {
     /**
-     * Performs authorization checks on the provided context, throwing a VException
+     * Performs authorization checks on the provided call, throwing a VException
      * iff the checks fail.
      *
-     * @param  context         a context to be authorized.
-     * @throws VException      iff the context isn't authorized.
+     * @param  call            a call to be authorized.
+     * @throws VException      iff the call isn't authorized.
      */
-    public void authorize(VContext context) throws VException;
+    public void authorize(Call call) throws VException;
 }

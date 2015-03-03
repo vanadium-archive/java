@@ -1,4 +1,4 @@
-package io.v.core.veyron.runtimes.google.ipc;
+package io.v.impl.google.ipc;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -6,18 +6,18 @@ import com.google.common.reflect.TypeToken;
 
 import android.test.AndroidTestCase;
 
+import io.v.jni.test.fortune.ComplexErrorParam;
+import io.v.jni.test.fortune.Errors;
+import io.v.jni.test.fortune.FortuneServer;
 import io.v.v23.android.V;
 import io.v.v23.ipc.ServerCall;
-import io.v.v23.ipc.ServerContext;
+import io.v.v23.ipc.StreamServerCall;
 import io.v.v23.services.security.access.Constants;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-import io.v.jni.test.fortune.ComplexErrorParam;
-import io.v.jni.test.fortune.Errors;
-import io.v.jni.test.fortune.FortuneServer;
 
 import java.io.EOFException;
 import java.util.Arrays;
@@ -38,15 +38,15 @@ public class VDLInvokerTest extends AndroidTestCase {
   private static class TestFortuneImpl implements FortuneServer {
         String fortune = "";
         @Override
-        public String get(ServerContext context) throws VException {
+        public String get(ServerCall call) throws VException {
             return this.fortune;
         }
         @Override
-        public void add(ServerContext context, String fortune) throws VException {
+        public void add(ServerCall call, String fortune) throws VException {
             this.fortune = fortune;
         }
         @Override
-        public int streamingGet(ServerContext context, Stream<String, Boolean> stream)
+        public int streamingGet(ServerCall call, Stream<String, Boolean> stream)
                 throws VException {
             int numSent = 0;
             while (true) {
@@ -59,7 +59,7 @@ public class VDLInvokerTest extends AndroidTestCase {
                     break;
                 }
                 try {
-                    stream.send(get(context));
+                    stream.send(get(call));
                 } catch (VException e) {
                     throw new VException(
                             "Server couldn't send a string item: " + e.getMessage());
@@ -69,20 +69,20 @@ public class VDLInvokerTest extends AndroidTestCase {
             return numSent;
         }
         @Override
-        public void getComplexError(ServerContext context) throws VException {
+        public void getComplexError(ServerCall call) throws VException {
           throw COMPLEX_ERROR;
         }
 
         @Override
-        public void noTags(ServerContext context) throws VException {}
+        public void noTags(ServerCall call) throws VException {}
 
         @Override
-        public void testContext(ServerContext context) throws VException {}
+        public void testContext(ServerCall call) throws VException {}
     }
 
     public void testInvoke() throws VException {
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        final ServerCall call = null;
+        final StreamServerCall call = null;
         {
             final byte[][] args = new byte[][] {
                     VomUtil.encode("test fortune", new TypeToken<String>(){}.getType())

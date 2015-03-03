@@ -1,4 +1,4 @@
-package io.v.core.veyron.runtimes.google.ipc;
+package io.v.impl.google.ipc;
 
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;

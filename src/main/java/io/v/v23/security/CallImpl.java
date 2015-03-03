@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
-class VContextImpl implements io.v.v23.security.VContext {
+class CallImpl implements Call {
     private final long nativePtr;
 
     public native DateTime nativeTimestamp(long nativePtr) throws VException;
@@ -20,7 +20,7 @@ class VContextImpl implements io.v.v23.security.VContext {
     private native io.v.v23.context.VContext nativeContext(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    VContextImpl(long nativePtr) {
+    CallImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
     // Implements io.v.v23.security.VContext.

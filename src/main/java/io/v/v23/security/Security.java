@@ -122,17 +122,6 @@ public class Security {
     }
 
     /**
-     * Creates new blessings using the provided wire-encoded blessings.
-     *
-     * @param  wire            wire-encoded blessings.
-     * @return                 new blessings based on the wire-encoded blessings.
-     * @throws VException      if the blessings couldn't be created.
-     */
-    public static Blessings newBlessings(WireBlessings wire) throws VException {
-        return Blessings.create(wire);
-    }
-
-    /**
      * Returns a {@code Blessings} object that carries the union of the provided blessings.
      * All provided blessings must have the same public key.  Returns {@code null} if invoked
      * without arguments.
@@ -201,13 +190,13 @@ public class Security {
     }
 
     /**
-     * Returns a new security context that uses the provided params.
+     * Returns a new security call that uses the provided params.
      *
-     * @param params context params
-     * @return       new security context that uses the provided params.
+     * @param params call params
+     * @return       new security call that uses the provided params.
      */
-    public static VContext newContext(VContextParams params) {
-        return new VContextParamImpl(params);
+    public static Call newCall(CallParams params) {
+        return new CallParamsImpl(params);
     }
 
     /**
@@ -216,7 +205,7 @@ public class Security {
      * the set of relevant tags.
      *
      * The set of relevant tags is the subset of tags associated with the method
-     * ({@link io.v.v23.security.VContext#methodTags()}) that have the same type as
+     * ({@link io.v.v23.security.Call#methodTags()}) that have the same type as
      * the provided one.
      * Currently, tagType.Kind must be reflect.String, i.e., only tags that are
      * named string types are supported.
@@ -292,7 +281,7 @@ public class Security {
     public static Authorizer newAcceptAllAuthorizer() {
         return new Authorizer() {
             @Override
-            public void authorize(VContext context) throws VException {
+            public void authorize(Call call) throws VException {
                 // do nothing
             }
         };

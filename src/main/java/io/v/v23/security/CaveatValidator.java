@@ -8,11 +8,11 @@ import io.v.v23.verror.VException;
 public interface CaveatValidator {
     /**
      * Throws an exception iff the restriction encapsulated in the corresponding caveat parameter
-     * hasn't been satisfied by the provided context.
+     * hasn't been satisfied given the call.
      *
-     * @param  context         the context matched against the caveat
+     * @param  call            a call the caveat is matched against
      * @param  param           the (sole) caveat parameter
      * @throws VException      if the caveat couldn't be validated
      */
-    public void validate(VContext context, Object param) throws VException;
+    public void validate(Call call, Object param) throws VException;
 }
