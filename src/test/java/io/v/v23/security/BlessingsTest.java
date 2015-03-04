@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Tests the default Blessings implementation.
  */
 public class BlessingsTest extends AndroidTestCase {
-    public void testForContext() throws VException {
+    public void testForCall() throws VException {
         V.init(getContext(), null);
         final Principal p1 = Security.newPrincipal();
         final Principal p2 = Security.newPrincipal();
