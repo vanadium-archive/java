@@ -1,0 +1,20 @@
+/src/vdl/
+/bin/
+/vdl_bin/
+
+# Vanadium
+/.v23
+
+# Gradle
+.gradle/
+build/
+.idea/
+generated-src/
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# IntelliJ
+lib.iml

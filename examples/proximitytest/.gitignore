@@ -1,4 +1,5 @@
 .project
+local.properties
 project.properties
 bin/
 gen/

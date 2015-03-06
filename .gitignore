@@ -1,6 +1,15 @@
-/src/vdl/
-/bin/
-/vdl_bin/
+# Gradle dirs
+build/
+gradle/
+.gradle/
+local.properties
+
+# IntelliJ
+.idea/
+**/*.iml
+
+# Eclipse
+.settings/
 
 # Vanadium
-/.v23
+.v23/

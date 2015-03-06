@@ -1,0 +1,7 @@
+/.settings
+/.classpath
+/.project
+/build/
+/generated-src/
+/local.properties
+/proguard-project.txt

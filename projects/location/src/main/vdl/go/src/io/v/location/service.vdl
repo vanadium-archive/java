@@ -1,0 +1,9 @@
+package location
+
+type LatLng struct {
+	Lat, Lng float64
+}
+
+type Location interface {
+	Get() (LatLng | error)
+}
