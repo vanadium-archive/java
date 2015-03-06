@@ -11,7 +11,6 @@ import io.v.v23.security.ConstCaveatValidator;
 import io.v.v23.security.ExpiryCaveatValidator;
 import io.v.v23.security.MethodCaveatValidator;
 import io.v.v23.security.Principal;
-import io.v.v23.security.UnixTimeExpiryCaveatValidator;
 import io.v.v23.verror.VException;
 
 /**
@@ -74,9 +73,6 @@ public class V {
                 CaveatRegistry.register(
                         io.v.v23.security.Constants.CONST_CAVEAT,
                         new ConstCaveatValidator());
-                CaveatRegistry.register(
-                        io.v.v23.security.Constants.UNIX_TIME_EXPIRY_CAVEAT_X,
-                        new UnixTimeExpiryCaveatValidator());
                 CaveatRegistry.register(
                         io.v.v23.security.Constants.EXPIRY_CAVEAT_X,
                         new ExpiryCaveatValidator());
