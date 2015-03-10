@@ -8,11 +8,23 @@ buildscript {
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
+apply plugin: VdlPlugin
 
 android {
     buildToolsVersion '19.1.0'
     compileSdkVersion 19
+    lintOptions {
+        abortOnError false
+    }
+
+    sourceSets {
+        testDebug {
+            java {
+                srcDirs += vdl.outputPath
+            }
+        }
+    }
 }
 
 repositories {
@@ -21,4 +33,8 @@ repositories {
 
 dependencies {
     compile project(':lib')
+}
+
+vdl {
+    inputPath = System.env.VANADIUM_ROOT + '/release/go'
 }

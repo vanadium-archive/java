@@ -1,5 +1,7 @@
 package io.v.v23.i18n;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.test.AndroidTestCase;
 
 import io.v.v23.android.V;
@@ -14,6 +16,7 @@ public class LanguageTest extends AndroidTestCase {
         V.init();
     }
 
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     public void testLanguageFromContext() {
         final VContext dcWithoutLang = VContextImpl.create();
         final VContext dcWithEN = Language.contextWithLanguage(dcWithoutLang, "en");

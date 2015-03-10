@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 
 import io.v.v23.verror.VException;
 import io.v.v23.android.V;
-import io.v.jni.test.security.TestCaveatValidator;
+import io.v.x.jni.test.security.TestCaveatValidator;
 
 import java.util.Arrays;
 
@@ -72,11 +72,11 @@ public class CaveatTest extends AndroidTestCase {
     public void testCustomCaveat() {
         try {
             V.init(getContext(), null);
-            CaveatRegistry.register(io.v.jni.test.security.Constants.TEST_CAVEAT,
+            CaveatRegistry.register(io.v.x.jni.test.security.Constants.TEST_CAVEAT,
                     new TestCaveatValidator());
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf("alice",
-                    Security.newCaveat(io.v.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
+                    Security.newCaveat(io.v.x.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
             p1.addToRoots(alice);
             {
                 final Call call = Security.newCall(new CallParams()
