@@ -20,4 +20,7 @@ targetCompatibility = '1.7'
 
 vdl {
     inputPath = System.env.VANADIUM_ROOT + '/release/go'
+
+    // Everybody who depends on :lib will need the vdlroot classes too.
+    generateVdlRoot = true
 }
