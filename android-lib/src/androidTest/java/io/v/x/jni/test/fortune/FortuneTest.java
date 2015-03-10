@@ -1,10 +1,13 @@
-package io.v.jni.test.fortune;
-
-import com.google.common.collect.ImmutableList;
+package io.v.x.jni.test.fortune;
 
 import android.test.AndroidTestCase;
 
+import com.google.common.collect.ImmutableList;
+
 import org.joda.time.Duration;
+
+import java.io.EOFException;
+import java.util.Arrays;
 
 import io.v.v23.InputChannel;
 import io.v.v23.V;
@@ -18,9 +21,6 @@ import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
-
-import java.io.EOFException;
-import java.util.Arrays;
 
 public class FortuneTest extends AndroidTestCase {
     static {

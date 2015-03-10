@@ -21,30 +21,28 @@ class VdlPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create('vdl', VdlConfiguration)
         def buildTask = project.task('buildVdl', type: BuildVdlToolTask)
-	def generateTask = project.task('generateVdl', type: Exec) {
+        def generateTask = project.task('generateVdl', type: Exec) {
             group = "Build"
             description('Generates Java vdl source using the vdl tool')
-	}
-	def prepareTask = project.task('prepareVdl') {
-	    doLast {
+        }
+        def prepareTask = project.task('prepareVdl') {
+            doLast {
                 generateTask.environment(VDLPATH: project.vdl.inputPath)
                 generateTask.commandLine(System.env.VANADIUM_ROOT + '/release/go/bin/vdl', 'generate', '--lang=java', "--java_out_dir=${project.vdl.outputPath}", 'all')
-
-	    }
-	}
-	prepareTask.dependsOn(buildTask)
+            }
+        }
+        prepareTask.dependsOn(buildTask)
         generateTask.dependsOn(prepareTask)
         project.clean.delete(project.vdl.outputPath)
 
-	if (project.plugins.hasPlugin('java')) {
+        if (project.plugins.hasPlugin('java')) {
             project.compileJava.dependsOn(generateTask)
             project.sourceSets.main.java.srcDirs += project.vdl.outputPath
-	}
+        }
 
-	if (project.plugins.hasPlugin('android')) {
+        if (project.plugins.hasPlugin('android')) {
             project.tasks.'preBuild'.dependsOn(generateTask)
-            project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
-	}
+        }
     }
 }
 

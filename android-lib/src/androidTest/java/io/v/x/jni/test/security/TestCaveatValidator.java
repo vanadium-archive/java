@@ -1,4 +1,4 @@
-package io.v.jni.test.security;
+package io.v.x.jni.test.security;
 
 import io.v.v23.security.Call;
 import io.v.v23.security.CaveatValidator;

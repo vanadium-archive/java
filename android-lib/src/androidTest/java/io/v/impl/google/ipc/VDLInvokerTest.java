@@ -1,14 +1,18 @@
 package io.v.impl.google.ipc;
 
+import android.test.AndroidTestCase;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
-import android.test.AndroidTestCase;
+import java.io.EOFException;
+import java.util.Arrays;
+import java.util.Map;
 
-import io.v.jni.test.fortune.ComplexErrorParam;
-import io.v.jni.test.fortune.Errors;
-import io.v.jni.test.fortune.FortuneServer;
+import io.v.x.jni.test.fortune.ComplexErrorParam;
+import io.v.x.jni.test.fortune.Errors;
+import io.v.x.jni.test.fortune.FortuneServer;
 import io.v.v23.android.V;
 import io.v.v23.ipc.ServerCall;
 import io.v.v23.ipc.StreamServerCall;
@@ -18,10 +22,6 @@ import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-
-import java.io.EOFException;
-import java.util.Arrays;
-import java.util.Map;
 
 public class VDLInvokerTest extends AndroidTestCase {
   static {
