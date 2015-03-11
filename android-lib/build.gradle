@@ -33,6 +33,8 @@ repositories {
 
 dependencies {
     compile project(':lib')
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'com.google.truth:truth:0.25'
 }
 
 vdl {

@@ -2,12 +2,17 @@ package io.v.v23.ipc;
 
 import android.test.AndroidTestCase;
 
+import com.google.common.collect.Ordering;
+
+import static com.google.common.truth.Truth.assertThat;
+
 import io.v.v23.Options;
 import io.v.v23.verror.VException;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,32 +28,28 @@ public class ServerTest extends AndroidTestCase {
         };
     }
 
-    public void testAddRemoveName() {
+    public void testAddRemoveName() throws Exception {
         final VContext ctx = V.init(getContext(), new Options());
-        try {
-            final Server s = V.newServer(ctx);
-            s.serve("name1", dummyDispatcher);
-            s.addName("name2");
-            assertTrue(Arrays.equals(new String[]{ "name1", "name2" }, getNames(s)));
-            s.addName("name2");
-            assertTrue(Arrays.equals(new String[]{ "name1", "name2" }, getNames(s)));
-            s.addName("name3");
-            assertTrue(Arrays.equals(new String[]{ "name1", "name2", "name3" }, getNames(s)));
-            s.removeName("name2");
-            assertTrue(Arrays.equals(new String[]{ "name1", "name3" }, getNames(s)));
-            s.removeName("name2");
-            assertTrue(Arrays.equals(new String[]{ "name1", "name3" }, getNames(s)));
-        } catch (VException e) {
-            fail("Unexpected exception: " + e.getMessage());
-        }
+        final Server s = V.newServer(ctx);
+        s.listen(null);
+        s.serve("name1", dummyDispatcher);
+        s.addName("name2");
+        assertThat(getNames(s)).containsExactly("name1", "name2");
+        s.addName("name2");
+        assertThat(getNames(s)).containsExactly("name1", "name2");
+        s.addName("name3");
+        assertThat(getNames(s)).containsExactly("name1", "name2", "name3");
+        s.removeName("name2");
+        assertThat(getNames(s)).containsExactly("name1", "name3");
+        s.removeName("name2");
+        assertThat(getNames(s)).containsExactly("name1", "name3");
     }
 
-    private static String[] getNames(Server s) {
-        final MountStatus[] mounts = s.getStatus().getMounts();
-        final SortedSet<String> names = new TreeSet<String>();
-        for (int i = 0; i < mounts.length; ++i) {
-            names.add(mounts[i].getName());
+    private static List<String> getNames(Server s) {
+        List<String> names = new ArrayList<String>();
+        for (MountStatus mount : s.getStatus().getMounts()) {
+            names.add(mount.getName());
         }
-        return names.toArray(new String[0]);
+        return Ordering.natural().sortedCopy(names);
     }
 }
