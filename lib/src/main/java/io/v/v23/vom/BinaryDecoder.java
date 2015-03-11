@@ -26,6 +26,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -398,8 +399,12 @@ public class BinaryDecoder {
             Type targetElemType = getMapElemOrStructFieldType(target, key);
             Object elem;
             if (actualType.getKind() == Kind.SET) {
-                elem = ReflectUtil.createPrimitive(new ConversionTarget(targetElemType),
-                        true, Boolean.TYPE);
+                if (targetElemType == VdlAny.class) {
+                    elem = new VdlAny(Boolean.class, true);
+                } else {
+                    elem = ReflectUtil.createPrimitive(new ConversionTarget(targetElemType),
+                            true, Boolean.TYPE);
+                }
             } else {
                 elem = readValue(actualType.getElem(), targetElemType);
             }
@@ -412,18 +417,51 @@ public class BinaryDecoder {
             throws IOException, ConversionException {
         Object data = createMapOrSetOrStruct(target);
         Type targetKeyType = getTargetKeyType(target);
+        boolean[] seen = new boolean[actualType.getFields().size()];
+        Arrays.fill(seen, false);
         while (true) {
             if (peekFlag() == Constants.WIRE_CTRL_EOF) {
                 in.skip(1);
                 break;
             }
             int index = (int) BinaryUtil.decodeUint(in);
+            seen[index] = true;
             VdlField field = actualType.getFields().get(index);
             Type targetElemType = getMapElemOrStructFieldType(target, field.getName());
             Object key = ConvertUtil.convertFromBytes(BinaryUtil.getBytes(field.getName()),
                     new ConversionTarget(targetKeyType));
             Object elem = readValue(field.getType(), targetElemType);
             setMapElemOrStructField(target, data, key, elem, targetElemType);
+        }
+        // Now we need to fill zero values of struct if target is a map.
+        if (target.getKind() != Kind.MAP) {
+            return data;
+        }
+        for (int i = 0; i < actualType.getFields().size(); i++) {
+            if (seen[i]) {
+                continue;
+            }
+            VdlField field = actualType.getFields().get(i);
+            Type elemType = getMapElemOrStructFieldType(target, field.getName());
+            Object key = ConvertUtil.convertFromBytes(BinaryUtil.getBytes(field.getName()),
+                    new ConversionTarget(targetKeyType));
+            VdlType elemVdlType = target.getVdlType().getElem();
+            Object elem;
+            // All user-defined types and java primitives have a default constructor that returns
+            // a zero value. For lists, maps and sets it's OK to return a zero vdl.Value because
+            // it will be an empty list, map or set. In other cases we need to return a zero
+            // vdl.Value.
+            if (elemType instanceof Class
+                    && ((Class<?>) elemType).getSuperclass() != VdlValue.class) {
+                try {
+                    elem = ((Class<?>) elemType).newInstance();
+                } catch (Exception e) {
+                    throw new ConversionException(field.getType(), elemType);
+                }
+            } else {
+                elem = VdlValue.zeroValue(elemVdlType);
+            }
+            setMapElemOrStructField(target, data, key, elem, elemType);
         }
         return data;
     }
