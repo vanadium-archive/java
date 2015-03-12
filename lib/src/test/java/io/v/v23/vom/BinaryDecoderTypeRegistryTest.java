@@ -1,23 +1,13 @@
 package io.v.v23.vom;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.reflect.Reflection;
-
 import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runner.Runner;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.List;
 
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlBool;
@@ -35,7 +25,7 @@ public class BinaryDecoderTypeRegistryTest extends TestCase {
 
     @Test
     public void testGuessType() throws Exception {
-        VdlType vdlType = (VdlType) Types.named("v.io/v23/vom/testdata.NBool", Types.BOOL);
+        VdlType vdlType = Types.named("v.io/v23/vom/testdata.NBool", Types.BOOL);
         String encoded = TestUtil.encode(new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
         try {
@@ -64,7 +54,7 @@ public class BinaryDecoderTypeRegistryTest extends TestCase {
 
         public static class TestClassLoader extends URLClassLoader {
             public TestClassLoader() {
-                super(((URLClassLoader)getSystemClassLoader()).getURLs());
+                super(((URLClassLoader) getSystemClassLoader()).getURLs());
             }
 
             @Override
