@@ -23,7 +23,8 @@ class VdlPlugin implements Plugin<Project> {
         }
         def prepareTask = project.task('prepareVdl') {
             doLast {
-                buildTask.environment(VANADIUM_ROOT: project.vdl.getVanadiumRoot())
+                def runPath = System.env.PATH + File.pathSeparator + project.vdl.getVanadiumRoot() + '/bin'
+                buildTask.environment(PATH: runPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 buildTask.commandLine(project.vdl.getVanadiumRoot() + '/bin/v23', 'go', 'install', 'v.io/x/ref/cmd/vdl')
                 generateTask.environment(VDLPATH: project.vdl.inputPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 generateTask.commandLine(project.vdl.getVanadiumRoot() + '/release/go/bin/vdl',
@@ -71,6 +72,9 @@ class VdlConfiguration {
         if (System.properties.vanadiumRoot != null) {
             return System.properties.vanadiumRoot
         }
-        return System.env.VANADIUM_ROOT
+        if (System.env.VANADIUM_ROOT != null && !"".equals(System.env.VANADIUM_ROOT)) {
+            return System.env.VANADIUM_ROOT
+        }
+        throw new InvalidUserDataException("VANADIUM_ROOT not specified")
     }
 }
