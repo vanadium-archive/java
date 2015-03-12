@@ -23,9 +23,9 @@ class VdlPlugin implements Plugin<Project> {
         }
         def prepareTask = project.task('prepareVdl') {
             doLast {
+                buildTask.environment(VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 buildTask.commandLine(project.vdl.getVanadiumRoot() + '/bin/v23', 'go', 'install', 'v.io/x/ref/cmd/vdl')
-                println project.vdl.dump()
-                generateTask.environment(VDLPATH: project.vdl.inputPath)
+                generateTask.environment(VDLPATH: project.vdl.inputPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 generateTask.commandLine(project.vdl.getVanadiumRoot() + '/release/go/bin/vdl',
                     'generate', '--lang=java', "--java_out_dir=${project.vdl.outputPath}", 'all')
             }
