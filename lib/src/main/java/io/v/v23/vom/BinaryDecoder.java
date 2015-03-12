@@ -37,14 +37,14 @@ import java.util.Set;
  */
 public class BinaryDecoder {
     private final BufferedInputStream in;
-    private final Map<TypeID, VdlType> decodedTypes;
-    private final Map<TypeID, WireType> wireTypes;
+    private final Map<TypeId, VdlType> decodedTypes;
+    private final Map<TypeId, WireType> wireTypes;
     private boolean binaryMagicByteRead;
 
     public BinaryDecoder(InputStream in) {
         this.in = new BufferedInputStream(in);
-        this.decodedTypes = new HashMap<TypeID, VdlType>();
-        this.wireTypes = new HashMap<TypeID, WireType>();
+        this.decodedTypes = new HashMap<TypeId, VdlType>();
+        this.wireTypes = new HashMap<TypeId, WireType>();
         this.binaryMagicByteRead = false;
     }
 
@@ -116,15 +116,15 @@ public class BinaryDecoder {
             if (typeId == 0) {
                 throw new CorruptVomStreamException("Unexpected zero type ID");
             } else if (typeId > 0) {
-                return getType(new TypeID(typeId));
+                return getType(new TypeId(typeId));
             } else {
                 WireType wireType = (WireType) readValueMessage(WireType.VDL_TYPE, WireType.class);
-                wireTypes.put(new TypeID(-typeId), wireType);
+                wireTypes.put(new TypeId(-typeId), wireType);
             }
         }
     }
 
-    private VdlType lookupType(TypeID typeId) {
+    private VdlType lookupType(TypeId typeId) {
         VdlType type = BootstrapType.getBootstrapType(typeId);
         if (type != null) {
             return type;
@@ -135,7 +135,7 @@ public class BinaryDecoder {
         }
     }
 
-    private VdlType getType(TypeID typeId) throws CorruptVomStreamException {
+    private VdlType getType(TypeId typeId) throws CorruptVomStreamException {
         VdlType type = lookupType(typeId);
         if (type != null) {
             return type;
@@ -240,7 +240,7 @@ public class BinaryDecoder {
             in.skip(1);
             return createNullValue(target);
         }
-        VdlType actualType = getType(new TypeID(BinaryUtil.decodeUint(in)));
+        VdlType actualType = getType(new TypeId(BinaryUtil.decodeUint(in)));
         if (target.getKind() == Kind.ANY) {
             return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
         } else {
@@ -494,7 +494,7 @@ public class BinaryDecoder {
     }
 
     private Object readVdlTypeObject() throws IOException {
-        return new VdlTypeObject(getType(new TypeID(BinaryUtil.decodeUint(in))));
+        return new VdlTypeObject(getType(new TypeId(BinaryUtil.decodeUint(in))));
     }
 
     private byte peekFlag() throws IOException {
@@ -509,16 +509,16 @@ public class BinaryDecoder {
      */
     private final class WireToVdlTypeBuilder {
         private final Builder builder;
-        private final Map<TypeID, PendingType> pendingTypes;
+        private final Map<TypeId, PendingType> pendingTypes;
 
         public WireToVdlTypeBuilder() {
             builder = new Builder();
-            pendingTypes = new HashMap<TypeID, PendingType>();
+            pendingTypes = new HashMap<TypeId, PendingType>();
         }
 
         public void build() {
             builder.build();
-            for (Map.Entry<TypeID, PendingType> entry : pendingTypes.entrySet()) {
+            for (Map.Entry<TypeId, PendingType> entry : pendingTypes.entrySet()) {
                 VdlType vdlType = entry.getValue().built();
                 if (!Strings.isNullOrEmpty(vdlType.getName())) {
                     Types.loadClassForVdlName(vdlType.getName());
@@ -527,7 +527,7 @@ public class BinaryDecoder {
             }
         }
 
-        public PendingType lookupOrBuildPending(TypeID typeId) throws CorruptVomStreamException {
+        public PendingType lookupOrBuildPending(TypeId typeId) throws CorruptVomStreamException {
             PendingType vdlType = lookupType(typeId);
             if (vdlType != null) {
                 return vdlType;
@@ -535,7 +535,7 @@ public class BinaryDecoder {
             return buildPendingType(typeId);
         }
 
-        private PendingType lookupType(TypeID typeId) {
+        private PendingType lookupType(TypeId typeId) {
             VdlType type = BinaryDecoder.this.lookupType(typeId);
             if (type != null) {
                 return builder.builtPendingFromType(type);
@@ -545,7 +545,7 @@ public class BinaryDecoder {
             return null;
         }
 
-        private PendingType buildPendingType(TypeID typeId) throws CorruptVomStreamException {
+        private PendingType buildPendingType(TypeId typeId) throws CorruptVomStreamException {
             WireType wireType = BinaryDecoder.this.wireTypes.get(typeId);
             if (wireType == null) {
                 throw new CorruptVomStreamException("Unknown wire type " + typeId);

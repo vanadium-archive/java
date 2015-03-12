@@ -12,11 +12,11 @@ import java.util.Map;
  * corresponding VDL Type.
  */
 public final class BootstrapType {
-    private static final Map<VdlType, TypeID> typeToId;
-    private static final Map<TypeID, VdlType> idToType;
+    private static final Map<VdlType, TypeId> typeToId;
+    private static final Map<TypeId, VdlType> idToType;
 
     static {
-        typeToId = ImmutableMap.<VdlType, TypeID>builder()
+        typeToId = ImmutableMap.<VdlType, TypeId>builder()
                 // Primitive types.
                 .put(Types.BOOL, Constants.WIRE_ID_BOOL)
                 .put(Types.BYTE, Constants.WIRE_ID_BYTE)
@@ -39,9 +39,9 @@ public final class BootstrapType {
                 .put(Types.listOf(Types.STRING), Constants.WIRE_ID_STRING_LIST)
                 .build();
 
-        ImmutableMap.Builder<TypeID, VdlType> idToTypeBuilder =
-                ImmutableMap.<TypeID, VdlType>builder();
-        for (Map.Entry<VdlType, TypeID> typeToIdEntry : typeToId.entrySet()) {
+        ImmutableMap.Builder<TypeId, VdlType> idToTypeBuilder =
+                ImmutableMap.<TypeId, VdlType>builder();
+        for (Map.Entry<VdlType, TypeId> typeToIdEntry : typeToId.entrySet()) {
             idToTypeBuilder.put(typeToIdEntry.getValue(), typeToIdEntry.getKey());
         }
         idToType = idToTypeBuilder.build();
@@ -53,7 +53,7 @@ public final class BootstrapType {
      * @param typeId the typeId whose type is to be returned
      * @return a {@code VdlType} object or null if provided type id has no associated bootstrap type
      */
-    public static VdlType getBootstrapType(TypeID typeId) {
+    public static VdlType getBootstrapType(TypeId typeId) {
         return idToType.get(typeId);
     }
 
@@ -63,7 +63,7 @@ public final class BootstrapType {
      * @param type the type whose type id is to be returned
      * @return a {@code TypeID} object or null if provided type is not a bootstrap type
      */
-    public static TypeID getBootstrapTypeId(VdlType type) {
+    public static TypeId getBootstrapTypeId(VdlType type) {
         return typeToId.get(type);
     }
 }

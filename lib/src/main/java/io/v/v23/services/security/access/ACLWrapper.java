@@ -5,7 +5,7 @@ import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 public class ACLWrapper implements Authorizer {
-    private static native ACLWrapper nativeWrap(ACL acl) throws VException;
+    private static native ACLWrapper nativeWrap(AccessList acl) throws VException;
 
     /**
      * Wraps the provided ACL.
@@ -14,7 +14,7 @@ public class ACLWrapper implements Authorizer {
      * @return                 wrapped ACL.
      * @throws VException      if the ACL couldn't be wrapped.
      */
-    public static ACLWrapper wrap(ACL acl) throws VException {
+    public static ACLWrapper wrap(AccessList acl) throws VException {
         return nativeWrap(acl);
     }
 
@@ -23,9 +23,9 @@ public class ACLWrapper implements Authorizer {
     private native void nativeFinalize(long nativePtr);
 
     private long nativePtr;
-    private ACL acl;
+    private AccessList acl;
 
-    private ACLWrapper(long nativePtr, ACL acl) {
+    private ACLWrapper(long nativePtr, AccessList acl) {
         this.nativePtr = nativePtr;
         this.acl = acl;
     }
@@ -58,7 +58,7 @@ public class ACLWrapper implements Authorizer {
      *
      * @return the ACL contained in the wrapper.
      */
-    public ACL getACL() {
+    public AccessList getACL() {
         return this.acl;
     }
 
