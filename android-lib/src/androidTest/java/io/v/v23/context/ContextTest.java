@@ -36,7 +36,6 @@ public class ContextTest extends AndroidTestCase {
 
     public void testWithCancel() {
         final VContext ctx = V.init(getContext(), null);
-        assertEquals(null, ctx.done());
         final CancelableVContext ctxCancel = ctx.withCancel();
         final CountDownLatch done = ctxCancel.done();
         assertTrue(done != null);
