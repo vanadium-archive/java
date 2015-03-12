@@ -46,15 +46,15 @@ public class BinaryEncoder {
     private final EncodingStream valueBuffer;
     private final EncodingStream typeBuffer;
     private final OutputStream out;
-    private final Map<VdlType, TypeID> visitedTypes;
-    private TypeID nextTypeId;
+    private final Map<VdlType, TypeId> visitedTypes;
+    private TypeId nextTypeId;
     private boolean binaryMagicByteWritten;
 
     public BinaryEncoder(OutputStream out) {
         this.valueBuffer = new EncodingStream();
         this.typeBuffer = new EncodingStream();
         this.out = out;
-        this.visitedTypes = new HashMap<VdlType, TypeID>();
+        this.visitedTypes = new HashMap<VdlType, TypeId>();
         this.nextTypeId = Constants.WIRE_ID_FIRST_USER_TYPE;
         this.binaryMagicByteWritten = false;
     }
@@ -72,7 +72,7 @@ public class BinaryEncoder {
             out.write(BinaryUtil.BINARY_MAGIC_BYTE);
         }
         valueBuffer.reset();
-        TypeID typeId = getType(type);
+        TypeId typeId = getType(type);
         writeValue(valueBuffer, value, type);
         writeMessage(valueBuffer, typeId.getValue(), BinaryUtil.hasBinaryMsgLen(type));
     }
@@ -107,8 +107,8 @@ public class BinaryEncoder {
         buffer.writeTo(out);
     }
 
-    private TypeID getType(VdlType type) throws IOException {
-        TypeID typeId = BootstrapType.getBootstrapTypeId(type);
+    private TypeId getType(VdlType type) throws IOException {
+        TypeId typeId = BootstrapType.getBootstrapTypeId(type);
         if (typeId != null) {
             return typeId;
         } else if (visitedTypes.containsKey(type)) {
@@ -118,9 +118,9 @@ public class BinaryEncoder {
         }
     }
 
-    private TypeID encodeType(VdlType type) throws IOException {
-        TypeID typeId = nextTypeId;
-        nextTypeId = new TypeID(nextTypeId.getValue() + 1);
+    private TypeId encodeType(VdlType type) throws IOException {
+        TypeId typeId = nextTypeId;
+        nextTypeId = new TypeId(nextTypeId.getValue() + 1);
         visitedTypes.put(type, typeId);
 
         WireType wireType = convertToWireType(type);

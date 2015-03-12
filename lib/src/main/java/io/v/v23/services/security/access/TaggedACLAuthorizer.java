@@ -12,20 +12,20 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class TaggedACLAuthorizer implements Authorizer {
-    private final TaggedACLMap acls;  // non-null
+    private final Permissions acls;  // non-null
     private final VdlType tagType;  // non-null
 
-    public static TaggedACLAuthorizer create(TaggedACLMap acls, Type tagType) throws VException {
+    public static TaggedACLAuthorizer create(Permissions acls, Type tagType) throws VException {
         try {
             final VdlType type = Types.getVdlTypeFromReflect(tagType);
-            return new TaggedACLAuthorizer(acls != null ? acls : new TaggedACLMap(), type);
+            return new TaggedACLAuthorizer(acls != null ? acls : new Permissions(), type);
         } catch (IllegalArgumentException e) {
             throw new VException(String.format(
                 "Tag type %s does not have a corresponding VdlType: %s", tagType, e.getMessage()));
         }
     }
 
-    private TaggedACLAuthorizer(TaggedACLMap acls, VdlType tagType) {
+    private TaggedACLAuthorizer(Permissions acls, VdlType tagType) {
         this.acls = acls;
         this.tagType = tagType;
     }
@@ -55,7 +55,7 @@ public class TaggedACLAuthorizer implements Authorizer {
             if (tag == null || tag.vdlType() != this.tagType) {
                 continue;
             }
-            final ACL acl = this.acls.get(tag.toString());
+            final AccessList acl = this.acls.get(tag.toString());
             if (acl == null || !ACLWrapper.wrap(acl).includes(blessings)) {
                 errorACLMatch(blessings);
             }

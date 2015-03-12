@@ -16,8 +16,8 @@ class Util {
      * @param  acl  ACL to be encoded.
      * @return      VOM-encoded ACL.
      */
-    static byte[] encodeACL(ACL acl) throws VException {
-        return VomUtil.encode(acl, new TypeToken<ACL>(){}.getType());
+    static byte[] encodeACL(AccessList acl) throws VException {
+        return VomUtil.encode(acl, new TypeToken<AccessList>(){}.getType());
     }
 
     /**
@@ -27,10 +27,10 @@ class Util {
      * @return                 decoded ACL.
      * @throws VException      if the provided ACL couldn't be decoded.
      */
-    static ACL decodeACL(byte[] encoded) throws VException {
+    static AccessList decodeACL(byte[] encoded) throws VException {
         if (encoded == null || encoded.length == 0) {
             return null;
         }
-        return (ACL) VomUtil.decode(encoded, new TypeToken<ACL>(){}.getType());
+        return (AccessList) VomUtil.decode(encoded, new TypeToken<AccessList>(){}.getType());
     }
 }

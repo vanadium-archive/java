@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 
 import io.v.v23.services.security.access.TaggedACLAuthorizer;
-import io.v.v23.services.security.access.TaggedACLMap;
+import io.v.v23.services.security.access.Permissions;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -268,7 +268,7 @@ public class Security {
      * @return                 an above-described authorizer.
      * @throws VException      if the authorizer couldn't be created.
      */
-    public static Authorizer newTaggedACLAuthorizer(TaggedACLMap acls, Type type)
+    public static Authorizer newTaggedACLAuthorizer(Permissions acls, Type type)
         throws VException {
         return TaggedACLAuthorizer.create(acls, type);
     }
