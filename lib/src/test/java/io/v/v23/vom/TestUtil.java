@@ -1,11 +1,14 @@
 package io.v.v23.vom;
 
+import junit.framework.TestCase;
+
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 public class TestUtil {
     static String bytesToHexString(byte[] dat) {
@@ -54,5 +57,30 @@ public class TestUtil {
         BinaryEncoder encoder = new BinaryEncoder(out);
         encoder.encodeValue(type, value);
         return TestUtil.bytesToHexString(out.toByteArray());
+    }
+
+    static void assertEqual(Object expected, Object actual) {
+        if (expected.getClass().isArray()) {
+            Class<?> component = expected.getClass().getComponentType();
+            if (component == Boolean.TYPE) {
+                TestCase.assertTrue(Arrays.equals((boolean[]) expected, (boolean[]) actual));
+            } else if (component == Byte.TYPE) {
+                TestCase.assertTrue(Arrays.equals((byte[]) expected, (byte[]) actual));
+            } else if (component == Short.TYPE) {
+                TestCase.assertTrue(Arrays.equals((short[]) expected, (short[]) actual));
+            } else if (component == Integer.TYPE) {
+                TestCase.assertTrue(Arrays.equals((int[]) expected, (int[]) actual));
+            } else if (component == Long.TYPE) {
+                TestCase.assertTrue(Arrays.equals((long[]) expected, (long[]) actual));
+            } else if (component == Float.TYPE) {
+                TestCase.assertTrue(Arrays.equals((float[]) expected, (float[]) actual));
+            } else if (component == Double.TYPE) {
+                TestCase.assertTrue(Arrays.equals((double[]) expected, (double[]) actual));
+            } else {
+                TestCase.assertTrue(Arrays.equals((Object[]) expected, (Object[]) actual));
+            }
+        } else {
+            TestCase.assertEquals(expected, actual);
+        }
     }
 }

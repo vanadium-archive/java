@@ -24,31 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 public class BinaryDecoderTest extends TestCase {
-    private void assertEqual(Object expected, Object actual) {
-        if (expected.getClass().isArray()) {
-            Class<?> component = expected.getClass().getComponentType();
-            if (component == Boolean.TYPE) {
-                assertTrue(Arrays.equals((boolean[]) expected, (boolean[]) actual));
-            } else if (component == Byte.TYPE) {
-                assertTrue(Arrays.equals((byte[]) expected, (byte[]) actual));
-            } else if (component == Short.TYPE) {
-                assertTrue(Arrays.equals((short[]) expected, (short[]) actual));
-            } else if (component == Integer.TYPE) {
-                assertTrue(Arrays.equals((int[]) expected, (int[]) actual));
-            } else if (component == Long.TYPE) {
-                assertTrue(Arrays.equals((long[]) expected, (long[]) actual));
-            } else if (component == Float.TYPE) {
-                assertTrue(Arrays.equals((float[]) expected, (float[]) actual));
-            } else if (component == Double.TYPE) {
-                assertTrue(Arrays.equals((double[]) expected, (double[]) actual));
-            } else {
-                assertTrue(Arrays.equals((Object[]) expected, (Object[]) actual));
-            }
-        } else {
-            assertEquals(expected, actual);
-        }
-    }
-
     public void testDecode() throws Exception {
         for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
             byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
@@ -58,7 +33,7 @@ public class BinaryDecoderTest extends TestCase {
             } else {
                 value = TestUtil.decode(bytes);
             }
-            assertEqual(test.getValue().getElem(), value);
+            TestUtil.assertEqual(test.getValue().getElem(), value);
         }
     }
 

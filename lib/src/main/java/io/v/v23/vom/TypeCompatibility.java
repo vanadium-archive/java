@@ -86,8 +86,9 @@ public final class TypeCompatibility {
         // ensure it doesn't fall through to the standard array/list handling.  This
         // ensures that []byte isn't compatible with []uint16 and other lists or
         // arrays of numbers.
-        if (isStringEnumBytes(a)) {
-            return isStringEnumBytes(b);
+        boolean aIsBytes = isStringEnumBytes(a), bIsBytes = isStringEnumBytes(b);
+        if (aIsBytes|| bIsBytes) {
+            return aIsBytes && bIsBytes;
         }
         // Handle composite VDL.
         switch (a.getKind()) {

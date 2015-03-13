@@ -5,13 +5,20 @@ import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
 
+import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlInt32;
 import io.v.v23.vdl.VdlOptional;
+import io.v.v23.vdl.VdlType;
+import io.v.v23.vdl.VdlTypeObject;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
+import io.v.v23.vom.testdata.Constants;
+import io.v.v23.vom.testdata.ConvertGroup;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,12 +37,62 @@ public class ConversionTest extends TestCase {
             .put(new VdlUint32(), VdlAny.class)
             .build();
 
+    private static Object convert(VdlValue value, Type targetType) throws Exception {
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value));
+        return TestUtil.decode(encoded, targetType);
+    }
+
     public void testConversion() throws Exception {
         for (Map.Entry<VdlValue, Type> test : tests.entries()) {
             final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(test.getKey()));
             final Object decoded = TestUtil.decode(encoded, test.getValue());
             Class<?> targetClass = ReflectUtil.getRawClass(test.getValue());
             assertEquals(targetClass, decoded.getClass());
+        }
+
+        for (List<ConvertGroup> test : Constants.CONVERT_TESTS.values()) {
+            for (int i = 0; i < test.size(); i++) {
+                ConvertGroup g = test.get(i);
+                for (VdlAny value : g.getValues()) {
+                    // Everything inside a convert group is convertible.
+                    for (VdlAny otherValue : g.getValues()) {
+                        Type targetType;
+                        if (value.getElem().getClass().isArray()) {
+                            targetType = value.getElem().getClass();
+                        } else {
+                            targetType = Types.getReflectTypeForVdl(value.getElemType());
+                        }
+                        TestUtil.assertEqual(value.getElem(), convert(otherValue, targetType));
+                    }
+                    // Element of one convert group can't be converted to primary type of
+                    // previous groups.
+                    for (int j = 0; j < i; j++) {
+                        Type targetType = Types.getReflectTypeForVdl(
+                                test.get(j).getPrimaryType().getTypeObject());
+                        try {
+                            convert(value, targetType);
+                            fail("Converted " + value + " -> " + targetType);
+                        } catch (Exception expected) {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void testTypeCompatibility() throws Exception {
+        Map<VdlType, String> vdlTypes = new HashMap<VdlType, String>();
+        for (Map.Entry<String, List<VdlTypeObject>> testGroup : Constants.COMPAT_TESTS.entrySet()) {
+            for (VdlTypeObject type : testGroup.getValue()) {
+                vdlTypes.put(type.getTypeObject(), testGroup.getKey());
+            }
+        }
+        for (Map.Entry<VdlType, String> i : vdlTypes.entrySet()) {
+            for (Map.Entry<VdlType, String> j : vdlTypes.entrySet()) {
+                boolean compatible = TypeCompatibility.compatible(i.getKey(), j.getKey());
+                assertEquals("Types: " + i.getKey() + ", " + j.getKey(),
+                        i.getValue().equals(j.getValue()), compatible);
+            }
         }
     }
 }
