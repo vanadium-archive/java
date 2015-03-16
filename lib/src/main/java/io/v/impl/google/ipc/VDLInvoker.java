@@ -3,6 +3,7 @@ package io.v.impl.google.ipc;
 import io.v.v23.ipc.StreamServerCall;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.VeyronServer;
+import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -49,6 +50,9 @@ public final class VDLInvoker {
 
     private final Map<String, ServerMethod> invokableMethods = new HashMap<String, ServerMethod>();
 
+    private final Map<Class<?>, ServerMethod> signatureMethods
+            = new HashMap<Class<?>, ServerMethod>();
+
     private final Class<?> serverClass; // Only used to make exception messages more clear.
 
     /**
@@ -90,14 +94,15 @@ public final class VDLInvoker {
                     "Server class %s doesn't have the 'getMethodTags' method.",
                     c.getCanonicalName()));
             }
-            //TODO(spetrovic): Uncomment this code once we have the signature support back
-            //in the VDL.
-            //final Method signature = methods.get("signature");
-            //if (signature == null) {
-            //    throw new VException(String.format(
-            //        "Server class %s doesn't have the 'signature' method.",
-            //        c.getCanonicalName()));
-            //}
+
+            final Method signatureMethod = methods.get("signature");
+            if (signatureMethod == null) {
+                throw new VException(String.format(
+                    "Server class %s doesn't have the 'signature' method.",
+                    c.getCanonicalName()));
+            }
+            signatureMethods.put(c, new ServerMethod(wrapper, signatureMethod, new VdlValue[] {}));
+
             for (Entry<String, Method> m : methods.entrySet()) {
                 // Get the method tags.
                 VdlValue[] tags = null;
@@ -131,6 +136,26 @@ public final class VDLInvoker {
                     method, this.serverClass.getCanonicalName()));
         }
         return m.getTags();
+    }
+
+    public Interface[] getSignature(io.v.v23.ipc.ServerCall call) throws VException {
+        List<Interface> interfaces = new ArrayList<Interface>();
+
+        for (Map.Entry<Class<?>, ServerMethod> entry : signatureMethods.entrySet()) {
+            try {
+                interfaces.add((Interface) entry.getValue().invoke(call));
+            } catch (IllegalAccessException e) {
+                throw new VException(String.format(
+                        "Could not invoke signature method for server class %s: %s",
+                        serverClass.getName(), e.toString()));
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+                throw new VException(String.format(
+                        "Could not invoke signature method for server class %s: %s",
+                        serverClass.getName(), e.toString()));
+            }
+        }
+        return interfaces.toArray(new Interface[interfaces.size()]);
     }
 
     /**
