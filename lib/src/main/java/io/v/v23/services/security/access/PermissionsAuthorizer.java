@@ -11,21 +11,21 @@ import io.v.v23.verror.VException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 
-public class TaggedACLAuthorizer implements Authorizer {
+public class PermissionsAuthorizer implements Authorizer {
     private final Permissions acls;  // non-null
     private final VdlType tagType;  // non-null
 
-    public static TaggedACLAuthorizer create(Permissions acls, Type tagType) throws VException {
+    public static PermissionsAuthorizer create(Permissions acls, Type tagType) throws VException {
         try {
             final VdlType type = Types.getVdlTypeFromReflect(tagType);
-            return new TaggedACLAuthorizer(acls != null ? acls : new Permissions(), type);
+            return new PermissionsAuthorizer(acls != null ? acls : new Permissions(), type);
         } catch (IllegalArgumentException e) {
             throw new VException(String.format(
                 "Tag type %s does not have a corresponding VdlType: %s", tagType, e.getMessage()));
         }
     }
 
-    private TaggedACLAuthorizer(Permissions acls, VdlType tagType) {
+    private PermissionsAuthorizer(Permissions acls, VdlType tagType) {
         this.acls = acls;
         this.tagType = tagType;
     }
@@ -46,7 +46,7 @@ public class TaggedACLAuthorizer implements Authorizer {
             tags = new VdlValue[0];
         }
         if (tags.length == 0) {
-            throw new VException(String.format("TaggedACLAuthorizer.Authorize called with an " +
+            throw new VException(String.format("PermissionsAuthorizer.Authorize called with an " +
                     "object (%s, method %s) that has no method tags; this is likely " +
                     "unintentional", call.suffix(), call.method()));
         }

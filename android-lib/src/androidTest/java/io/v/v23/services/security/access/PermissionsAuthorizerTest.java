@@ -27,12 +27,12 @@ import java.util.List;
 /**
  * Tests the implementation of {@code TaggedACLAuthorizer}.
  */
-public class TaggedACLAuthorizerTest extends AndroidTestCase {
+public class PermissionsAuthorizerTest extends AndroidTestCase {
     private static class AuthorizeTestdata {
         Principal pServer;
         Principal pClient;
         Blessings server;
-        TaggedACLMap acl = null;
+        Permissions acl = null;
         List<TestCase> accept;
         List<TestCase> deny;
 
@@ -55,7 +55,7 @@ public class TaggedACLAuthorizerTest extends AndroidTestCase {
         }
 
         void runAuthorize(String method, Blessings client) throws VException {
-            final Authorizer authorizer = TaggedACLAuthorizer.create(this.acl, MyTag.class);
+            final Authorizer authorizer = PermissionsAuthorizer.create(this.acl, MyTag.class);
             final Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(this.pServer)
                     .withLocalBlessings(this.server)
@@ -72,18 +72,18 @@ public class TaggedACLAuthorizerTest extends AndroidTestCase {
         test.pServer = newPrincipal();
         test.pClient = newPrincipal();
         test.server = test.pServer.blessSelf("server");
-        test.acl = new TaggedACLMap(ImmutableMap.of(
-                "R", new ACL(
+        test.acl = new Permissions(ImmutableMap.of(
+                "R", new AccessList(
                         ImmutableList.of(Constants.ALL_PRINCIPALS),
                         null),
-                "W", new ACL(
+                "W", new AccessList(
                         ImmutableList.of(
                                 new BlessingPattern("ali/family"),
                                 new BlessingPattern("bob"),
                                 new BlessingPattern("che/$")),
                         ImmutableList.of(
                                 "bob/acquaintances")),
-                "X", new ACL(
+                "X", new AccessList(
                         ImmutableList.of(
                                 new BlessingPattern("ali/family/boss/$"),
                                 new BlessingPattern("superman/$")),
@@ -150,8 +150,8 @@ public class TaggedACLAuthorizerTest extends AndroidTestCase {
         final Principal p = newPrincipal();
         final Blessings client = p.blessSelf("client");
         final Blessings server = p.blessSelf("server");
-        final Authorizer authorizer = TaggedACLAuthorizer.create(new TaggedACLMap(ImmutableMap.of(
-                "R", new ACL(ImmutableList.of(new BlessingPattern("nobody/$")), null))),
+        final Authorizer authorizer = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
+                        "R", new AccessList(ImmutableList.of(new BlessingPattern("nobody/$")), null))),
                 MyTag.class);
         for (final String testCase : new String[]{ "put", "get", "resolve", "noTags", "allTags" }) {
             final Call call = Security.newCall(new CallParams()
