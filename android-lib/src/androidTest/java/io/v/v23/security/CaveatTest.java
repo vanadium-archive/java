@@ -22,9 +22,9 @@ public class CaveatTest extends AndroidTestCase {
             p1.addToRoots(alice);
             {
                 final Call call = Security.newCall(
-                        new CallParams().withLocalPrincipal(p1).withMethod("succeed"));
+                        new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = alice.forCall(call);
+                final String[] got = Blessings.getBlessingNames(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -33,7 +33,7 @@ public class CaveatTest extends AndroidTestCase {
             {
                 final Call call = Security.newCall(
                         new CallParams().withLocalPrincipal(p1).withMethod("fail"));
-                assertEquals(null, alice.forCall(call));
+                assertEquals(null, Blessings.getBlessingNames(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -50,9 +50,10 @@ public class CaveatTest extends AndroidTestCase {
             {
                 final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
+                        .withRemoteBlessings(alice)
                         .withTimestamp(DateTime.now()));
                 final String[] want = { "alice" };
-                final String[] got = alice.forCall(call);
+                final String[] got = Blessings.getBlessingNames(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -62,7 +63,7 @@ public class CaveatTest extends AndroidTestCase {
                 final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withTimestamp(DateTime.now().plusHours(2)));
-                assertEquals(null, alice.forCall(call));
+                assertEquals(null, Blessings.getBlessingNames(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -81,9 +82,10 @@ public class CaveatTest extends AndroidTestCase {
             {
                 final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
+                        .withRemoteBlessings(alice)
                         .withSuffix("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = alice.forCall(call);
+                final String[] got = Blessings.getBlessingNames(call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -92,8 +94,9 @@ public class CaveatTest extends AndroidTestCase {
             {
                 final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
+                        .withRemoteBlessings(alice)
                         .withSuffix("fail"));
-                assertEquals(null, alice.forCall(call));
+                assertEquals(null, Blessings.getBlessingNames(call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());

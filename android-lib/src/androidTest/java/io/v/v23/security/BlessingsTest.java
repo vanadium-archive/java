@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Tests the default Blessings implementation.
  */
 public class BlessingsTest extends AndroidTestCase {
-    public void testForCall() throws VException {
+    public void testBlessingNames() throws VException {
         V.init(getContext(), null);
         final Principal p1 = Security.newPrincipal();
         final Principal p2 = Security.newPrincipal();
@@ -21,8 +21,9 @@ public class BlessingsTest extends AndroidTestCase {
 
         final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                 alice, "work/friend", Security.newUnconstrainedUseCaveat());
-        final Call call = Security.newCall(new CallParams().withLocalPrincipal(p2));
-        final String[] blessings = aliceWorkFriend.forCall(call);
+        final Call call = Security.newCall(
+                new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
+        final String[] blessings = Blessings.getBlessingNames(call);
         if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));

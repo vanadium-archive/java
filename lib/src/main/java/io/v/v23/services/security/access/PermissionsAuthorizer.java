@@ -40,7 +40,7 @@ public class PermissionsAuthorizer implements Authorizer {
                 Arrays.equals(local.publicKey().getEncoded(), remote.publicKey().getEncoded())) {
             return;
         }
-        final String[] blessings = remote != null ? remote.forCall(call) : new String[0];
+        final String[] blessings = remote != null ? Blessings.getBlessingNames(call) : new String[0];
         VdlValue[] tags = call.methodTags();
         if (tags == null) {
             tags = new VdlValue[0];

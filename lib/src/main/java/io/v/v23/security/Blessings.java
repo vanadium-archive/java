@@ -14,6 +14,7 @@ import java.security.interfaces.ECPublicKey;
  * Blessings objects are immutable and multiple threads may invoke methods on them simultaneously.
  */
 public class Blessings {
+    private static native String[] nativeBlessingNames(Call call) throws VException;
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
@@ -31,7 +32,6 @@ public class Blessings {
     private final long nativePtr;
     private final WireBlessings wire;  // non-null
 
-    private native String[] nativeForCall(long nativePtr, Call call) throws VException;
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
@@ -54,11 +54,11 @@ public class Blessings {
      * @param  call            the call used to restrict the set of returned blessings
      * @return                 blessings satisfying the provided call
      */
-    public String[] forCall(Call call) {
+    public static String[] getBlessingNames(Call call) {
         try {
-            return nativeForCall(this.nativePtr, call);
+            return nativeBlessingNames(call);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get blessings for call: " + e.getMessage());
+            throw new RuntimeException("Couldn't get blessings for call", e);
         }
     }
 
