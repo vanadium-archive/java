@@ -2,7 +2,7 @@ package io.v.v23.naming.ns;
 
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
-import io.v.v23.naming.VDLMountEntry;
+import io.v.v23.naming.MountEntry;
 import io.v.v23.verror.VException;
 
 /**
@@ -18,5 +18,5 @@ public interface Namespace {
      * @return                 an input channel of MountEntry objects matching the provided pattern.
      * @throws VException      if an error is encountered.
      */
-    public InputChannel<VDLMountEntry> glob(VContext context, String pattern) throws VException;
+    public InputChannel<MountEntry> glob(VContext context, String pattern) throws VException;
 }

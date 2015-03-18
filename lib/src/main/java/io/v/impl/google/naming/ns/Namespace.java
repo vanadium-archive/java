@@ -3,12 +3,12 @@ package io.v.impl.google.naming.ns;
 import io.v.v23.InputChannel;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
-import io.v.v23.naming.VDLMountEntry;
+import io.v.v23.naming.MountEntry;
 
 public class Namespace implements io.v.v23.naming.ns.Namespace {
     private final long nativePtr;
 
-    private native InputChannel<VDLMountEntry> nativeGlob(
+    private native InputChannel<MountEntry> nativeGlob(
         long nativePtr, VContext context, String pattern) throws VException;
     private native void nativeFinalize(long nativePtr);
 
@@ -16,7 +16,7 @@ public class Namespace implements io.v.v23.naming.ns.Namespace {
         this.nativePtr = nativePtr;
     }
     @Override
-    public InputChannel<VDLMountEntry> glob(VContext context, String pattern) throws VException {
+    public InputChannel<MountEntry> glob(VContext context, String pattern) throws VException {
         return nativeGlob(this.nativePtr, context, pattern);
     }
     @Override
