@@ -420,7 +420,7 @@ public class BinaryDecoder {
         boolean[] seen = new boolean[actualType.getFields().size()];
         Arrays.fill(seen, false);
         while (true) {
-            if (peekFlag() == Constants.WIRE_CTRL_EOF) {
+            if (peekFlag() == Constants.WIRE_CTRL_END) {
                 in.skip(1);
                 break;
             }
