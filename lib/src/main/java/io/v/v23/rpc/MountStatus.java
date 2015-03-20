@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;

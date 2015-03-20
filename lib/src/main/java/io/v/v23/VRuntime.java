@@ -1,9 +1,9 @@
 package io.v.v23;
 
 import io.v.v23.context.VContext;
-import io.v.v23.ipc.Client;
-import io.v.v23.ipc.ListenSpec;
-import io.v.v23.ipc.Server;
+import io.v.v23.rpc.Client;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.Server;
 import io.v.v23.naming.ns.Namespace;
 import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;

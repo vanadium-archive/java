@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 /**
  * ServerState represents the state of the server.

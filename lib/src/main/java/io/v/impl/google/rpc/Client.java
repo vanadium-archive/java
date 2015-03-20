@@ -1,4 +1,4 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
@@ -7,10 +7,10 @@ import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Type;
 
-public class Client implements io.v.v23.ipc.Client {
+public class Client implements io.v.v23.rpc.Client {
     private final long nativePtr;
 
-    private native io.v.v23.ipc.Client.Call nativeStartCall(long nativePtr,
+    private native io.v.v23.rpc.Client.Call nativeStartCall(long nativePtr,
         VContext context, String name, String method, byte[][] vomArgs, Options opts)
         throws VException;
     private native void nativeClose(long nativePtr);
@@ -21,12 +21,12 @@ public class Client implements io.v.v23.ipc.Client {
     }
     // Implement io.v.v23.ipc.Client.
     @Override
-    public io.v.v23.ipc.Client.Call startCall(VContext context, String name,
+    public io.v.v23.rpc.Client.Call startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes) throws VException {
         return startCall(context, name, method, args, argTypes, null);
     }
     @Override
-    public io.v.v23.ipc.Client.Call startCall(VContext context, String name,
+    public io.v.v23.rpc.Client.Call startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes, Options opts) throws VException {
         if (opts == null) {
             opts = new Options();

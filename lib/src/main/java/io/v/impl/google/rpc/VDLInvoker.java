@@ -1,6 +1,6 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
-import io.v.v23.ipc.StreamServerCall;
+import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.VeyronServer;
 import io.v.v23.vdlroot.signature.Interface;
@@ -138,7 +138,7 @@ public final class VDLInvoker {
         return m.getTags();
     }
 
-    public Interface[] getSignature(io.v.v23.ipc.ServerCall call) throws VException {
+    public Interface[] getSignature(io.v.v23.rpc.ServerCall call) throws VException {
         List<Interface> interfaces = new ArrayList<Interface>();
 
         for (Map.Entry<Class<?>, ServerMethod> entry : signatureMethods.entrySet()) {

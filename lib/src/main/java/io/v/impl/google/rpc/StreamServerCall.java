@@ -1,4 +1,4 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
 import org.joda.time.DateTime;
 import io.v.v23.security.Blessings;
@@ -9,7 +9,7 @@ import io.v.v23.verror.VException;
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class StreamServerCall implements io.v.v23.ipc.StreamServerCall {
+public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     private final long nativePtr;
     private final Stream stream;
     private final io.v.v23.security.Call securityCall;

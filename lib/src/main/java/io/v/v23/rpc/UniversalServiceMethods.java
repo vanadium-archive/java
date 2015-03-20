@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 /**
  * UniversalServiceMethods defines the set of methods that are implemented on all services.

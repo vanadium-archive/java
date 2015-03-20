@@ -11,10 +11,10 @@ import android.util.Log;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
-import io.v.v23.ipc.Dispatcher;
-import io.v.v23.ipc.Server;
-import io.v.v23.ipc.ServerCall;
-import io.v.v23.ipc.ServiceObjectWithAuthorizer;
+import io.v.v23.rpc.Dispatcher;
+import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServerCall;
+import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.security.Security;
 import io.v.v23.verror.VException;
 

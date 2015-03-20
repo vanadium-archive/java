@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 /**
  * StreamServerCall defines the in-flight call state on the server, including methods

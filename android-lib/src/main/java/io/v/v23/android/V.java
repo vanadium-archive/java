@@ -3,7 +3,7 @@ package io.v.v23.android;
 import io.v.v23.Options;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
-import io.v.v23.ipc.ListenSpec;
+import io.v.v23.rpc.ListenSpec;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.ECDSASigner;
 import io.v.v23.security.Principal;

@@ -11,7 +11,7 @@ public class OptionDefs {
     public static String RUNTIME = "io.v.v23.RUNTIME";
 
     /**
-     * A key for an option of type {@link io.v.v23.ipc.Client} that
+     * A key for an option of type {@link io.v.v23.rpc.Client} that
      * specifies a client.
      */
     public static String CLIENT = "io.v.v23.CLIENT";

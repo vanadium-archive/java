@@ -1,4 +1,4 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -6,9 +6,9 @@ import io.v.v23.vom.VomUtil;
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Call implements io.v.v23.ipc.Client.Call {
+public class Call implements io.v.v23.rpc.Client.Call {
     private final long nativePtr;
-    private final io.v.v23.ipc.Stream stream;
+    private final io.v.v23.rpc.Stream stream;
 
     private native void nativeCloseSend() throws VException;
     private native byte[][] nativeFinish(long nativePtr, int numResults) throws VException;

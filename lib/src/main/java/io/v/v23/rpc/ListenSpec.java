@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 /**
  * ListenSpec specifies the information required to create a listening network endpoint for a server

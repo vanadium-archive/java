@@ -1,14 +1,14 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
 import io.v.impl.google.channel.InputChannel;
-import io.v.v23.ipc.Dispatcher;
-import io.v.v23.ipc.ListenSpec;
-import io.v.v23.ipc.NetworkChange;
-import io.v.v23.ipc.ServerStatus;
-import io.v.v23.ipc.ServiceObjectWithAuthorizer;
+import io.v.v23.rpc.Dispatcher;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.NetworkChange;
+import io.v.v23.rpc.ServerStatus;
+import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.verror.VException;
 
-public class Server implements io.v.v23.ipc.Server {
+public class Server implements io.v.v23.rpc.Server {
     private final long nativePtr;
     private final ListenSpec listenSpec;
 

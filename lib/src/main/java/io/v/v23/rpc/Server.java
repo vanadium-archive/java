@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 import io.v.v23.InputChannel;
 import io.v.v23.verror.VException;

@@ -1,4 +1,4 @@
-package io.v.impl.google.ipc;
+package io.v.impl.google.rpc;
 
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -6,7 +6,7 @@ import io.v.v23.vom.VomUtil;
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Stream implements io.v.v23.ipc.Stream {
+public class Stream implements io.v.v23.rpc.Stream {
     private final long nativePtr;
 
     private native void nativeSend(long nativePtr, byte[] vomItem) throws VException;

@@ -1,4 +1,4 @@
-package io.v.v23.ipc;
+package io.v.v23.rpc;
 
 import android.test.AndroidTestCase;
 
@@ -13,8 +13,6 @@ import io.v.v23.context.VContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class ServerTest extends AndroidTestCase {
     private final Dispatcher dummyDispatcher;
