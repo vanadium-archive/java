@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MethodCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(Call call, CallSide side, Object param) throws VException {
+    public void validate(Call call, Object param) throws VException {
         if (param == null) {
             param = new ArrayList<String>();
         }

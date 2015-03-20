@@ -1,7 +1,6 @@
 package io.v.x.jni.test.security;
 
 import io.v.v23.security.Call;
-import io.v.v23.security.CallSide;
 import io.v.v23.security.CaveatValidator;
 import io.v.v23.verror.VException;
 
@@ -11,7 +10,7 @@ import io.v.v23.verror.VException;
  */
 public class TestCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(Call call, CallSide side, Object param) throws VException {
+    public void validate(Call call, Object param) throws VException {
         if (param == null) param = "";
         if (!(param instanceof String)) {
             throw new VException(String.format(

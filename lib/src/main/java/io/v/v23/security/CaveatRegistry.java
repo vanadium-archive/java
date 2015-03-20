@@ -54,11 +54,10 @@ public class CaveatRegistry {
      * hasn't been satisfied given the call.
      *
      * @param  call        a call the caveat is matched against
-     * @param  side        the side (local or remote) of the caller
      * @param  caveat      security caveat
      * @throws VException  if the caveat couldn't be validated
      */
-    public static void validate(Call call, CallSide side, Caveat caveat) throws VException {
+    public static void validate(Call call, Caveat caveat) throws VException {
         final RegistryEntry entry = lookup(caveat.getId());
         if (entry == null) {
             throw Errors.makeCaveatNotRegistered(null, caveat.getId());
@@ -71,7 +70,7 @@ public class CaveatRegistry {
             throw new VException(e.getMessage());
         }
         // TODO(spetrovic): Once rogulenko@ is done, pass the type as well.
-        entry.validator.validate(call, side, param);
+        entry.validator.validate(call, param);
     }
 
     private static RegistryEntry lookup(Id id) {

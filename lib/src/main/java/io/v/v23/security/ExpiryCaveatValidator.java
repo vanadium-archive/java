@@ -6,7 +6,7 @@ import io.v.v23.verror.VException;
 
 public class ExpiryCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(Call call, CallSide side, Object param) throws VException {
+    public void validate(Call call, Object param) throws VException {
         if (param == null) param = new DateTime(0);
         if (!(param instanceof DateTime)) {
             throw new VException(String.format(
