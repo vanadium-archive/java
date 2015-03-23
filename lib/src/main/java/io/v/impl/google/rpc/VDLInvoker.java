@@ -138,12 +138,12 @@ public final class VDLInvoker {
         return m.getTags();
     }
 
-    public Interface[] getSignature(io.v.v23.rpc.ServerCall call) throws VException {
+    public Interface[] getSignature() throws VException {
         List<Interface> interfaces = new ArrayList<Interface>();
 
         for (Map.Entry<Class<?>, ServerMethod> entry : signatureMethods.entrySet()) {
             try {
-                interfaces.add((Interface) entry.getValue().invoke(call));
+                interfaces.add((Interface) entry.getValue().invoke());
             } catch (IllegalAccessException e) {
                 throw new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
@@ -156,6 +156,20 @@ public final class VDLInvoker {
             }
         }
         return interfaces.toArray(new Interface[interfaces.size()]);
+    }
+
+    public io.v.v23.vdlroot.signature.Method getMethodSignature(String methodName)
+            throws VException {
+        Interface[] interfaces = getSignature();
+        for (Interface iface : interfaces) {
+            for (io.v.v23.vdlroot.signature.Method method : iface.getMethods()) {
+                if (method.getName().equals(methodName)) {
+                    return method;
+                }
+            }
+        }
+
+        throw new VException(String.format("Could not find method %s", methodName));
     }
 
     /**

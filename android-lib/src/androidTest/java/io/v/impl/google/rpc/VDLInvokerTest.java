@@ -12,7 +12,6 @@ import java.io.EOFException;
 import java.util.Arrays;
 import java.util.Map;
 
-import io.v.impl.google.rpc.VDLInvoker;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.x.jni.test.fortune.ComplexErrorParam;
@@ -123,7 +122,7 @@ public class VDLInvokerTest extends AndroidTestCase {
 
     public void testGetSignature() throws VException {
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        Interface[] serverInterface = invoker.getSignature(null);
+        Interface[] serverInterface = invoker.getSignature();
         assertThat(serverInterface).hasLength(1);
         assertThat(serverInterface[0].getMethods()).hasSize(6);
         Function<Method, String> methodNameFunction = new Function<Method, String>() {
