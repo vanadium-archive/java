@@ -11,9 +11,8 @@ public interface CaveatValidator {
      * hasn't been satisfied given the call.
      *
      * @param  call            a call the caveat is matched against
-     * @param  side            the side (local or remote) of the caller
      * @param  param           the (sole) caveat parameter
      * @throws VException      if the caveat couldn't be validated
      */
-    public void validate(Call call, CallSide side, Object param) throws VException;
+    public void validate(Call call, Object param) throws VException;
 }
