@@ -498,7 +498,7 @@ public class BinaryEncoder {
                 out.setCount(prevCount);
             }
         }
-        writeVdlByte(out, Constants.WIRE_CTRL_EOF);
+        writeVdlByte(out, Constants.WIRE_CTRL_END);
         return hasNonZeroField;
     }
 
