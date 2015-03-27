@@ -6,7 +6,7 @@ package io.v.impl.google.rpc;
 
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.vdl.VeyronServer;
+import io.v.v23.vdl.VServer;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -187,7 +187,7 @@ public final class VDLInvoker {
     private List<Object> wrapServer(Object srv) throws VException {
         List<Object> stubs = new ArrayList<Object>();
         for (Class<?> iface : srv.getClass().getInterfaces()) {
-            final VeyronServer vs = iface.getAnnotation(VeyronServer.class);
+            final VServer vs = iface.getAnnotation(VServer.class);
             if (vs == null) {
                 continue;
             }
