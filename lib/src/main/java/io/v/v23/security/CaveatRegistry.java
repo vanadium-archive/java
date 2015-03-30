@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import io.v.v23.context.VContext;
 import io.v.v23.uniqueid.Id;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -55,13 +56,13 @@ public class CaveatRegistry {
 
     /**
      * Throws an exception iff the restriction encapsulated in the corresponding caveat
-     * hasn't been satisfied given the call.
+     * hasn't been satisfied given the context.
      *
-     * @param  call        a call the caveat is matched against
+     * @param  context     a call the caveat is matched against
      * @param  caveat      security caveat
      * @throws VException  if the caveat couldn't be validated
      */
-    public static void validate(Call call, Caveat caveat) throws VException {
+    public static void validate(VContext context, Caveat caveat) throws VException {
         final RegistryEntry entry = lookup(caveat.getId());
         if (entry == null) {
             throw Errors.makeCaveatNotRegistered(null, caveat.getId());
@@ -74,7 +75,7 @@ public class CaveatRegistry {
             throw new VException(e.getMessage());
         }
         // TODO(spetrovic): Once rogulenko@ is done, pass the type as well.
-        entry.validator.validate(call, param);
+        entry.validator.validate(context, param);
     }
 
     private static RegistryEntry lookup(Id id) {

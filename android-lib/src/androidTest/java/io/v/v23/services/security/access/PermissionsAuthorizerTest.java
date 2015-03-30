@@ -10,6 +10,8 @@ import com.google.common.collect.ImmutableMap;
 import android.test.AndroidTestCase;
 
 import io.v.v23.android.V;
+import io.v.v23.context.VContext;
+import io.v.v23.context.VContextImpl;
 import io.v.v23.security.Authorizer;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingRoots;
@@ -66,7 +68,8 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                     .withRemoteBlessings(client)
                     .withMethod(method)
                     .withMethodTags(getMethodTags(method)));
-            authorizer.authorize(call);
+            VContext context = Security.setCall(VContextImpl.create(), call);
+            authorizer.authorize(context);
         }
     }
 
@@ -108,7 +111,6 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                 .add(new AuthorizeTestdata.TestCase("resolve", test.blessings("superman")))
                 .add(new AuthorizeTestdata.TestCase("resolve", test.blessings("ali/family/boss")))
 
-                .add(new AuthorizeTestdata.TestCase("allTags", test.blessings("ali/family/boss")))
                 .build();
 
         test.deny = ImmutableList.<AuthorizeTestdata.TestCase>builder()
@@ -123,11 +125,6 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                 // empty ACL.  No client will have access.
                 .add(new AuthorizeTestdata.TestCase("noTags", test.blessings(
                         "ali", "ali/family/boss", "bob", "che", "superman")))
-                // On a method with multiple tags on it, all must be satisfied.
-                // In R and W, but not in X
-                .add(new AuthorizeTestdata.TestCase("allTags", test.blessings("che")))
-                 // In R and X, but not W
-                .add(new AuthorizeTestdata.TestCase("allTags", test.blessings("superman", "clark")))
                 .build();
 
         for (final AuthorizeTestdata.TestCase testCase : test.accept) {
@@ -164,8 +161,9 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                     .withRemoteBlessings(client)
                     .withMethod(testCase)
                     .withMethodTags(getMethodTags(testCase)));
+            VContext context = Security.setCall(VContextImpl.create(), call);
             try {
-                authorizer.authorize(call);
+                authorizer.authorize(context);
             } catch (VException e) {
                 fail(String.format("Access denied for method %s: %s", testCase, e.getMessage()));
             }

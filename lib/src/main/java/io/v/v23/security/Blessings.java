@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
@@ -18,7 +19,7 @@ import java.security.interfaces.ECPublicKey;
  * Blessings objects are immutable and multiple threads may invoke methods on them simultaneously.
  */
 public class Blessings {
-    private static native String[] nativeBlessingNames(Call call) throws VException;
+    private static native String[] nativeBlessingNames(VContext context) throws VException;
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
@@ -55,12 +56,12 @@ public class Blessings {
      * implementation can be found in the address space of the caller and {@code validate} doesn't
      * throw an exception.
      *
-     * @param  call            the call used to restrict the set of returned blessings
+     * @param  context            the call used to restrict the set of returned blessings
      * @return                 blessings satisfying the provided call
      */
-    public static String[] getBlessingNames(Call call) {
+    public static String[] getBlessingNames(VContext context) {
         try {
-            return nativeBlessingNames(call);
+            return nativeBlessingNames(context);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get blessings for call", e);
         }

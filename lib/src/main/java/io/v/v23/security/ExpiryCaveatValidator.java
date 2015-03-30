@@ -6,11 +6,13 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 public class ExpiryCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(Call call, Object param) throws VException {
+    public void validate(VContext context, Object param) throws VException {
+        Call call = Security.getCall(context);
         if (param == null) param = new DateTime(0);
         if (!(param instanceof DateTime)) {
             throw new VException(String.format(

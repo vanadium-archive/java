@@ -7,6 +7,8 @@ package io.v.v23.security;
 import android.test.AndroidTestCase;
 
 import io.v.v23.android.V;
+import io.v.v23.context.VContext;
+import io.v.v23.context.VContextImpl;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -27,7 +29,8 @@ public class BlessingsTest extends AndroidTestCase {
                 alice, "work/friend", Security.newUnconstrainedUseCaveat());
         final Call call = Security.newCall(
                 new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
-        final String[] blessings = Blessings.getBlessingNames(call);
+        final VContext context = Security.setCall(VContextImpl.create(), call);
+        final String[] blessings = Blessings.getBlessingNames(context);
         if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));

@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 /**
@@ -12,11 +13,11 @@ import io.v.v23.verror.VException;
 public interface CaveatValidator {
     /**
      * Throws an exception iff the restriction encapsulated in the corresponding caveat parameter
-     * hasn't been satisfied given the call.
+     * hasn't been satisfied given the context.
      *
-     * @param  call            a call the caveat is matched against
+     * @param  context         a context the caveat is matched against
      * @param  param           the (sole) caveat parameter
      * @throws VException      if the caveat couldn't be validated
      */
-    public void validate(Call call, Object param) throws VException;
+    public void validate(VContext context, Object param) throws VException;
 }

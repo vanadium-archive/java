@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 /**
@@ -11,11 +12,11 @@ import io.v.v23.verror.VException;
  */
 public interface Authorizer {
     /**
-     * Performs authorization checks on the provided call, throwing a VException
+     * Performs authorization checks on the provided context, throwing a VException
      * iff the checks fail.
      *
-     * @param  call            a call to be authorized.
+     * @param  ctx             the context representing the activity to be authorized.
      * @throws VException      iff the call isn't authorized.
      */
-    public void authorize(Call call) throws VException;
+    public void authorize(VContext ctx) throws VException;
 }
