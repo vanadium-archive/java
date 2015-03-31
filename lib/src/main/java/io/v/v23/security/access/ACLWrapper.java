@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.v23.services.security.access;
+package io.v.v23.security.access;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
-import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 public class ACLWrapper implements Authorizer {

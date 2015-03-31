@@ -9,8 +9,8 @@ import com.google.common.collect.ImmutableList;
 import io.v.v23.context.VContext;
 import org.joda.time.DateTime;
 
-import io.v.v23.services.security.access.PermissionsAuthorizer;
-import io.v.v23.services.security.access.Permissions;
+import io.v.v23.security.access.PermissionsAuthorizer;
+import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 

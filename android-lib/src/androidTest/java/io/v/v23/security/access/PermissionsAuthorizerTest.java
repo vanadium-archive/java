@@ -2,12 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.v23.services.security.access;
+package io.v.v23.security.access;
+
+import android.test.AndroidTestCase;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import android.test.AndroidTestCase;
+import java.security.interfaces.ECPublicKey;
+import java.util.List;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
@@ -26,9 +29,6 @@ import io.v.v23.services.security.access.test.MyObjectServerWrapper;
 import io.v.v23.services.security.access.test.MyTag;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
-
-import java.security.interfaces.ECPublicKey;
-import java.util.List;
 
 /**
  * Tests the implementation of {@code TaggedACLAuthorizer}.
