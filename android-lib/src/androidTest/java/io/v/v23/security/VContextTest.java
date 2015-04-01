@@ -51,6 +51,5 @@ public class VContextTest extends AndroidTestCase {
         assertEquals(remoteBlessings, call.remoteBlessings());
         assertEquals(localEndpoint, call.localEndpoint());
         assertEquals(remoteEndpoint, call.remoteEndpoint());
-        assertEquals(ctx, call.context());
     }
 }

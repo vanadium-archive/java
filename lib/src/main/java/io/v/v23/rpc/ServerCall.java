@@ -4,13 +4,29 @@
 
 package io.v.v23.rpc;
 
+import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 
 /**
  * ServerCall defines the in-flight call state on the server, not including methods
  * to stream args and results.
  */
-public interface ServerCall extends io.v.v23.security.Call {
+public interface ServerCall {
+    /**
+     * Returns the object name suffix for the request.
+     */
+    String suffix();
+
+    /**
+     * Returns the Endpoint at the local end of communication.
+     */
+    String localEndpoint();
+
+    /**
+     * Returns the Endpoint at the remote end of communication.
+     */
+    String remoteEndpoint();
+
     /**
      * Returns blessings bound to the server's private key (technically, the server principal's
      * private key) provided by the client of the RPC.
@@ -23,7 +39,15 @@ public interface ServerCall extends io.v.v23.security.Call {
      *
      * @return blessings bound to the server's private key.
      */
-    public Blessings blessings();
-    
-    // TODO(spetrovic): Add the server() method.
+    Blessings grantedBlessings();
+
+    /**
+     * Returns the {@link Server} that this call is associated with.
+     */
+    Server server();
+
+    /**
+     * Returns the {@link VContext} that this call is associated with.
+     */
+    VContext context();
 }

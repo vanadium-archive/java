@@ -52,8 +52,4 @@ class CallParamsImpl implements Call {
     public Blessings remoteBlessings() {
         return this.params.getRemoteBlessings();
     }
-    @Override
-    public VContext context() {
-        return this.params.getContext();
-    }
 }

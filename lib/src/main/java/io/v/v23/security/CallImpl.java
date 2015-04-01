@@ -21,7 +21,6 @@ class CallImpl implements Call {
     private native Principal nativeLocalPrincipal(long nativePtr) throws VException;
     private native Blessings nativeLocalBlessings(long nativePtr) throws VException;
     private native Blessings nativeRemoteBlessings(long nativePtr) throws VException;
-    private native io.v.v23.context.VContext nativeContext(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     CallImpl(long nativePtr) {
@@ -83,14 +82,6 @@ class CallImpl implements Call {
             return nativeRemoteBlessings(this.nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get remote Blessings: " + e.getMessage());
-        }
-    }
-    @Override
-    public io.v.v23.context.VContext context() {
-        try {
-            return nativeContext(this.nativePtr);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't get Vanadium context: " + e.getMessage());
         }
     }
     // Implements java.lang.Object.

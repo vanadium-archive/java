@@ -84,33 +84,12 @@ public class FortuneTest extends AndroidTestCase {
         }
 
         @Override
-        public void testContext(ServerCall call) throws VException {
+        public void testServerCall(ServerCall call) throws VException {
             if (call == null) {
-                throw new VException("Context is null");
-            }
-            if (call.timestamp() == null) {
-                throw new VException("Timestamp is null");
-            }
-            if (!"testContext".equals(call.method())) {
-                throw new VException(String.format("Wrong method, want \"testContext\", got %s",
-                        call.method()));
-            }
-            final VdlValue[] expectedMethodTags = new VdlValue[]{ Constants.READ };
-            if (!Arrays.equals(expectedMethodTags, call.methodTags())) {
-                throw new VException(String.format("Wrong method tags, want %s, got %s",
-                        expectedMethodTags, Arrays.toString(call.methodTags())));
+                throw new VException("ServerCall is null");
             }
             if (call.suffix() == null) {
                 throw new VException("Suffix is null");
-            }
-            if (call.localPrincipal() == null) {
-                throw new VException("Local principal is null");
-            }
-            if (call.localBlessings() == null) {
-                throw new VException("Local blessings are null");
-            }
-            if (call.remoteBlessings() == null) {
-                throw new VException("Remote blessings are null");
             }
             if (call.localEndpoint() == null || call.localEndpoint().isEmpty()) {
                 throw new VException("Local endpoint is empty");
@@ -222,7 +201,7 @@ public class FortuneTest extends AndroidTestCase {
         final FortuneClient client = FortuneClientFactory.bind(name);
         final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
-            client.testContext(ctxT);
+            client.testServerCall(ctxT);
         } catch (VException e) {
             fail("Context check failed: " + e.getMessage());
         }

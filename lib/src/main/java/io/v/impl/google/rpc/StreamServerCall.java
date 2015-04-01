@@ -5,6 +5,8 @@
 package io.v.impl.google.rpc;
 
 import org.joda.time.DateTime;
+
+import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Principal;
 import io.v.v23.vdl.VdlValue;
@@ -16,15 +18,14 @@ import java.lang.reflect.Type;
 public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     private final long nativePtr;
     private final Stream stream;
-    private final io.v.v23.security.Call securityCall;
+    private final ServerCall serverCall;
 
-    public native Blessings nativeBlessings(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private StreamServerCall(long nativePtr, Stream stream, io.v.v23.security.Call securityCall) {
+    private StreamServerCall(long nativePtr, Stream stream, ServerCall serverCall) {
         this.nativePtr = nativePtr;
         this.stream = stream;
-        this.securityCall = securityCall;
+        this.serverCall = serverCall;
     }
     // Implements io.v.v23.ipc.Stream.
     @Override
@@ -37,53 +38,31 @@ public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     }
     // Implements io.v.v23.ipc.ServerCall.
     @Override
-    public Blessings blessings() {
-        try {
-            return nativeBlessings(this.nativePtr);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't get blessings: " + e.getMessage());
-        }
+    public Blessings grantedBlessings() {
+        return serverCall.grantedBlessings();
     }
-    // Implements io.v.v23.security.Call.
+
     @Override
-    public DateTime timestamp() {
-        return this.securityCall.timestamp();
+    public Server server() {
+        return serverCall.server();
     }
-    @Override
-    public String method() {
-        return this.securityCall.method();
-    }
-    @Override
-    public VdlValue[] methodTags() {
-        return this.securityCall.methodTags();
-    }
+
+    // Implements io.v.v23.rpc.ServerCall.
     @Override
     public String suffix() {
-        return this.securityCall.suffix();
+        return this.serverCall.suffix();
     }
     @Override
     public String localEndpoint() {
-        return this.securityCall.localEndpoint();
+        return this.serverCall.localEndpoint();
     }
     @Override
     public String remoteEndpoint() {
-        return this.securityCall.remoteEndpoint();
-    }
-    @Override
-    public Principal localPrincipal() {
-        return this.securityCall.localPrincipal();
-    }
-    @Override
-    public Blessings localBlessings() {
-        return this.securityCall.localBlessings();
-        }
-    @Override
-    public Blessings remoteBlessings() {
-        return this.securityCall.remoteBlessings();
+        return this.serverCall.remoteEndpoint();
     }
     @Override
     public io.v.v23.context.VContext context() {
-        return this.securityCall.context();
+        return this.serverCall.context();
     }
     // Implements java.lang.Object.
     @Override

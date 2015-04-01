@@ -76,11 +76,4 @@ public interface Call {
      * @return endpoint of the principal at the remote end of the request.
      */
     public String remoteEndpoint();
-
-    /**
-     * Returns the associated Vanadium context.
-     *
-     * @return the associated Vanadium context
-     */
-    public VContext context();
 }

@@ -87,7 +87,7 @@ public class VDLInvokerTest extends AndroidTestCase {
         public void noTags(ServerCall call) throws VException {}
 
         @Override
-        public void testContext(ServerCall call) throws VException {}
+        public void testServerCall(ServerCall call) throws VException {}
     }
 
     public void testInvoke() throws VException {
@@ -135,9 +135,9 @@ public class VDLInvokerTest extends AndroidTestCase {
                 return input.getName();
             }
         };
-        assertThat(
-                Lists.transform(serverInterface[0].getMethods(), methodNameFunction)).containsAllOf(
-                        "get", "add", "streamingGet", "getComplexError", "noTags", "testContext");
+        assertThat(Lists.transform(
+                serverInterface[0].getMethods(), methodNameFunction)).containsAllOf(
+                "get", "add", "streamingGet", "getComplexError", "noTags", "testServerCall");
         assertThat(serverInterface[0].getName()).isEqualTo("Fortune");
     }
 
