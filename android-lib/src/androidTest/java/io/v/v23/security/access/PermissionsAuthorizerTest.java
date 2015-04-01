@@ -25,8 +25,8 @@ import io.v.v23.security.Constants;
 import io.v.v23.security.Principal;
 import io.v.v23.security.Security;
 import io.v.v23.security.Signer;
-import io.v.v23.services.security.access.test.MyObjectServerWrapper;
-import io.v.v23.services.security.access.test.MyTag;
+import io.v.v23.security.access.internal.MyObjectServerWrapper;
+import io.v.v23.security.access.internal.MyTag;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 

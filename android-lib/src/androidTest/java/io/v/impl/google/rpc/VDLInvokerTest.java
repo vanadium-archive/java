@@ -24,7 +24,7 @@ import io.v.x.jni.test.fortune.FortuneServer;
 import io.v.v23.android.V;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.StreamServerCall;
-import io.v.v23.services.security.access.Constants;
+import io.v.v23.security.access.Constants;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;

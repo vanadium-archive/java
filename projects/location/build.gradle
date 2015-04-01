@@ -36,5 +36,5 @@ dependencies {
 }
 
 vdl {
-    inputPath = 'src/main/vdl/go'
+    inputPaths += 'src/main/vdl/go'
 }

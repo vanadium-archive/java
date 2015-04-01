@@ -19,7 +19,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.services.security.access.Constants;
+import io.v.v23.security.access.Constants;
 import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;

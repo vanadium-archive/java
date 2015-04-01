@@ -26,7 +26,7 @@ class VdlPlugin implements Plugin<Project> {
                 def runPath = System.env.PATH + File.pathSeparator + project.vdl.getVanadiumRoot() + '/bin'
                 buildTask.environment(PATH: runPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 buildTask.commandLine(project.vdl.getVanadiumRoot() + '/bin/v23', 'go', 'install', 'v.io/x/ref/cmd/vdl')
-                generateTask.environment(VDLPATH: project.vdl.inputPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
+                generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"), VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 generateTask.commandLine(project.vdl.getVanadiumRoot() + '/release/go/bin/vdl',
                     'generate', '--lang=java', "--java_out_dir=${project.vdl.outputPath}", 'all')
             }
@@ -45,7 +45,7 @@ class VdlPlugin implements Plugin<Project> {
             project.sourceSets.main.java.srcDirs += project.vdl.outputPath
         }
 
-        if (project.plugins.hasPlugin('android')) {
+        if (project.plugins.hasPlugin('com.android.library')) {
             project.tasks.'preBuild'.dependsOn(removeVdlRootTask)
             project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
         }
@@ -54,15 +54,13 @@ class VdlPlugin implements Plugin<Project> {
 
 
 class VdlConfiguration {
-    String vanadiumRoot;
-    String inputPath = null;
-    String outputPath = "generated-src/vdl";
+    String vanadiumRoot
+    List<String> inputPaths = []
+    String outputPath = "generated-src/vdl"
 
     // If true, code generated for the vdlroot vdl package will be emitted.
     // Typically, users will want to leave this set to false as they will
     // already get the vdlroot package by depending on the :lib project.
-    // TODO(sjr): talk to toddw about whether we can do this in the vdl tool
-    // itself.
     boolean generateVdlRoot = false;
 
     def getVanadiumRoot() {
