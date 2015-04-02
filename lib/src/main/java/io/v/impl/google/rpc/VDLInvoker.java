@@ -147,7 +147,7 @@ public final class VDLInvoker {
 
         for (Map.Entry<Class<?>, ServerMethod> entry : signatureMethods.entrySet()) {
             try {
-                interfaces.add((Interface) entry.getValue().invoke());
+                interfaces.add((Interface) entry.getValue().invoke((Object) null));
             } catch (IllegalAccessException e) {
                 throw new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",

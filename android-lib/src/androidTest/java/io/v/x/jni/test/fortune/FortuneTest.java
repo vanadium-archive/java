@@ -24,7 +24,10 @@ import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
+import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
+
+import static com.google.common.truth.Truth.assertThat;
 
 public class FortuneTest extends AndroidTestCase {
     static {
@@ -205,5 +208,19 @@ public class FortuneTest extends AndroidTestCase {
         } catch (VException e) {
             fail("Context check failed: " + e.getMessage());
         }
+    }
+
+    public void testGetSignature() throws VException {
+        final VContext ctx = V.init();
+        final Server s = V.newServer(ctx);
+        final String[] endpoints = s.listen(null);
+        final FortuneServer server = new FortuneServerImpl();
+        s.serve("fortune", server);
+
+        final String name = "/" + endpoints[0];
+        final FortuneClient client = FortuneClientFactory.bind(name);
+        final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        final Interface signature = client.getSignature(ctxT);
+        assertThat(signature.getMethods()).isNotEmpty();
     }
 }
