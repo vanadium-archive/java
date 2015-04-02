@@ -28,7 +28,7 @@ class VdlPlugin implements Plugin<Project> {
                 buildTask.commandLine(project.vdl.getVanadiumRoot() + '/bin/v23', 'go', 'install', 'v.io/x/ref/cmd/vdl')
                 generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"), VANADIUM_ROOT: project.vdl.getVanadiumRoot())
                 generateTask.commandLine(project.vdl.getVanadiumRoot() + '/release/go/bin/vdl',
-                    'generate', '--lang=java', "--java_out_dir=${project.vdl.outputPath}", 'all')
+                    'generate', '--lang=java', "--java-out-dir=${project.vdl.outputPath}", 'all')
             }
         }
         def removeVdlRootTask = project.task('removeVdlRoot', type: Delete) {
