@@ -4,6 +4,11 @@
 
 package io.v.v23.rpc;
 
+import io.v.v23.Options;
+import io.v.v23.context.VContext;
+import io.v.v23.vdlroot.signature.Interface;
+import io.v.v23.verror.VException;
+
 /**
  * UniversalServiceMethods defines the set of methods that are implemented on all services.
  */
@@ -15,8 +20,7 @@ public interface UniversalServiceMethods {
      * @return                 description of the service.
      * @throws VException      if the description couldn't be fetched.
      */
-    // TODO(spetrovic): Re-enable once we can import the new Signature classes.
-    //public ServiceSignature getSignature(VContext context) throws VException;
+     public Interface getSignature(VContext context) throws VException;
 
 
     /**
@@ -27,6 +31,5 @@ public interface UniversalServiceMethods {
      * @return                 description of the service.
      * @throws VException      if the description couldn't be fetched.
      */
-    // TODO(spetrovic): Re-enable once we can import the new Signature classes.
-    //public ServiceSignature getSignature(VContext context, Options opts) throws VException;
+    public Interface getSignature(VContext context, Options opts) throws VException;
 }
