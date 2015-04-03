@@ -1,6 +1,5 @@
 # Gradle dirs
 build/
-gradle/
 .gradle/
 local.properties
 
