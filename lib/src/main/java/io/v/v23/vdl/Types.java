@@ -618,7 +618,8 @@ public final class Types {
                     .getActualTypeArguments()[0];
             pending.setElem(lookupOrBuildPending(elementType));
             try {
-                pending.setLength(klass.getField("LENGTH").getInt(null));
+                ArrayLength length = klass.getAnnotation(ArrayLength.class);
+                pending.setLength(length.value());
             } catch (Exception e) {
                 throw new IllegalArgumentException(
                         "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
