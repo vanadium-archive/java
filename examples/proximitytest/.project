@@ -34,7 +34,7 @@
 		<link>
 			<name>src/com</name>
 			<type>2</type>
-			<locationURI>$%7BVANADIUM_ROOT%7D/veyron/java/src/com</locationURI>
+			<locationURI>$%7BV23_ROOT%7D/veyron/java/src/com</locationURI>
 		</link>
 		<link>
 			<name>src/com/veyron/examples/proximitytest</name>

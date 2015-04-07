@@ -24,9 +24,9 @@ class VdlPlugin implements Plugin<Project> {
         def prepareTask = project.task('prepareVdl') {
             doLast {
                 def runPath = System.env.PATH + File.pathSeparator + project.vdl.getVanadiumRoot() + '/bin'
-                buildTask.environment(PATH: runPath, VANADIUM_ROOT: project.vdl.getVanadiumRoot())
+                buildTask.environment(PATH: runPath, V23_ROOT: project.vdl.getVanadiumRoot())
                 buildTask.commandLine(project.vdl.getVanadiumRoot() + '/bin/v23', 'go', 'install', 'v.io/x/ref/cmd/vdl')
-                generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"), VANADIUM_ROOT: project.vdl.getVanadiumRoot())
+                generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"), V23_ROOT: project.vdl.getVanadiumRoot())
                 generateTask.commandLine(project.vdl.getVanadiumRoot() + '/release/go/bin/vdl',
                     'generate', '--lang=java', "--java-out-dir=${project.vdl.outputPath}", 'all')
             }
@@ -70,9 +70,9 @@ class VdlConfiguration {
         if (System.properties.vanadiumRoot != null) {
             return System.properties.vanadiumRoot
         }
-        if (System.env.VANADIUM_ROOT != null && !"".equals(System.env.VANADIUM_ROOT)) {
-            return System.env.VANADIUM_ROOT
+        if (System.env.V23_ROOT != null && !"".equals(System.env.V23_ROOT)) {
+            return System.env.V23_ROOT
         }
-        throw new InvalidUserDataException("VANADIUM_ROOT not specified")
+        throw new InvalidUserDataException("V23_ROOT not specified")
     }
 }
