@@ -5,6 +5,7 @@
 package io.v.v23.vom;
 
 import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
 
 import io.v.v23.vdl.GeneratedFromVdl;
 import io.v.v23.vdl.Kind;
@@ -242,7 +243,7 @@ public class BinaryDecoder {
 
     private Object readVdlAny(ConversionTarget target) throws IOException, ConversionException {
         if (peekFlag() == Constants.WIRE_CTRL_NIL) {
-            in.skip(1);
+            ByteStreams.skipFully(in, 1);
             return createNullValue(target);
         }
         VdlType actualType = getType(new TypeId(BinaryUtil.decodeUint(in)));
@@ -425,7 +426,7 @@ public class BinaryDecoder {
         Arrays.fill(seen, false);
         while (true) {
             if (peekFlag() == Constants.WIRE_CTRL_END) {
-                in.skip(1);
+                ByteStreams.skipFully(in, 1);
                 break;
             }
             int index = (int) BinaryUtil.decodeUint(in);
@@ -512,7 +513,7 @@ public class BinaryDecoder {
     private Object readVdlOptional(VdlType actualType, ConversionTarget target) throws IOException,
             ConversionException {
         if (peekFlag() == Constants.WIRE_CTRL_NIL) {
-            in.skip(1);
+            ByteStreams.skipFully(in, 1);
             return createNullValue(target);
         } else {
             Type type = target.getTargetType();
