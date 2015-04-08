@@ -9,7 +9,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
-import io.v.v23.naming.ns.Namespace;
+import io.v.v23.namespace.Namespace;
 import io.v.v23.security.CaveatRegistry;
 import io.v.v23.security.ConstCaveatValidator;
 import io.v.v23.security.ExpiryCaveatValidator;

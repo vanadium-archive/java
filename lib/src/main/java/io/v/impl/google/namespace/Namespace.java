@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.impl.google.naming.ns;
+package io.v.impl.google.namespace;
 
 import io.v.v23.InputChannel;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.MountEntry;
 
-public class Namespace implements io.v.v23.naming.ns.Namespace {
+public class Namespace implements io.v.v23.namespace.Namespace {
     private final long nativePtr;
 
     private native InputChannel<MountEntry> nativeGlob(

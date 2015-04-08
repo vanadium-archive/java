@@ -7,7 +7,7 @@ package io.v.impl.google.rt;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.ListenSpec;
-import io.v.v23.naming.ns.Namespace;
+import io.v.v23.namespace.Namespace;
 import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
 

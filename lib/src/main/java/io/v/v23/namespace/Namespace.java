@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.v23.naming.ns;
+package io.v.v23.namespace;
 
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
