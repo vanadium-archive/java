@@ -4,8 +4,11 @@
 
 package io.v.impl.google.channel;
 
+import com.google.common.collect.AbstractIterator;
+
 import io.v.v23.verror.VException;
 import java.io.EOFException;
+import java.util.Iterator;
 
 public class InputChannel<T> implements io.v.v23.InputChannel<T> {
     private final long nativePtr;
@@ -54,4 +57,20 @@ public class InputChannel<T> implements io.v.v23.InputChannel<T> {
      * @return the native pointer to the Go channel that feeds the above Go channel of Java object
      */
     public long getSourceNativePtr() { return this.sourceNativePtr; }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new AbstractIterator<T>() {
+            @Override
+            protected T computeNext() {
+                try {
+                    return readValue();
+                } catch (EOFException e) {
+                    return endOfData();
+                } catch (VException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
 }
