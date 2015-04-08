@@ -18,6 +18,8 @@ class VdlPlugin implements Plugin<Project> {
             description('Builds the vdl tool')
         }
         def generateTask = project.task('generateVdl', type: Exec) {
+        }
+        def vdlTask = project.task('vdl') {
             group = "Build"
             description('Generates Java vdl source using the vdl tool')
         }
@@ -38,15 +40,16 @@ class VdlPlugin implements Plugin<Project> {
         buildTask.dependsOn(prepareTask)
         generateTask.dependsOn(buildTask)
         removeVdlRootTask.dependsOn(generateTask)
+        vdlTask.dependsOn(removeVdlRootTask)
         project.clean.delete(project.vdl.outputPath)
 
         if (project.plugins.hasPlugin('java')) {
-            project.compileJava.dependsOn(removeVdlRootTask)
+            project.compileJava.dependsOn(vdlTask)
             project.sourceSets.main.java.srcDirs += project.vdl.outputPath
         }
 
         if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
-            project.tasks.'preBuild'.dependsOn(removeVdlRootTask)
+            project.tasks.'preBuild'.dependsOn(vdlTask)
             project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
         }
     }
