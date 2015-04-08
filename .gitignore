@@ -10,5 +10,8 @@ local.properties
 # Eclipse
 .settings/
 
+# vdl files
+/src
+
 # Vanadium
-.v23/
+/.v23
