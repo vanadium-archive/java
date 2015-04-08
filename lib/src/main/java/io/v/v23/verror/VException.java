@@ -379,7 +379,8 @@ public class VException extends Exception {
         if (params.length != paramTypes.length) {
             System.err.println(String.format(
                     "Passed different number of types (%s) than parameters (%s) to VException. " +
-                    "Some params may be dropped.", paramTypes, params));
+                    "Some params may be dropped.",
+                    Arrays.toString(paramTypes), Arrays.toString(params)));
             final int length =
                     params.length < paramTypes.length ? params.length : paramTypes.length;
             params = Arrays.copyOf(params, length);
