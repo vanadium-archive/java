@@ -4,6 +4,10 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.OutputChannel;
+import io.v.v23.naming.GlobReply;
+import io.v.v23.rpc.Globber;
+import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.VServer;
@@ -57,7 +61,7 @@ public final class VDLInvoker {
     private final Map<Class<?>, ServerMethod> signatureMethods
             = new HashMap<Class<?>, ServerMethod>();
 
-    private final Class<?> serverClass; // Only used to make exception messages more clear.
+    private final Object server;
 
     /**
      * Creates a new invoker for the given object.
@@ -70,7 +74,7 @@ public final class VDLInvoker {
         if (obj == null) {
             throw new VException("Can't create VDLInvoker with a null object.");
         }
-        this.serverClass = obj.getClass();
+        this.server = obj;
 
         List<Object> serverWrappers = wrapServer(obj);
         for (Object wrapper : serverWrappers) {
@@ -137,7 +141,7 @@ public final class VDLInvoker {
         if (m == null) {
             throw new VException(String.format(
                     "Couldn't find method \"%s\" in class %s",
-                    method, this.serverClass.getCanonicalName()));
+                    method, server.getClass().getCanonicalName()));
         }
         return m.getTags();
     }
@@ -151,12 +155,12 @@ public final class VDLInvoker {
             } catch (IllegalAccessException e) {
                 throw new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
-                        serverClass.getName(), e.toString()));
+                        server.getClass().getName(), e.toString()));
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
                 throw new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
-                        serverClass.getName(), e.toString()));
+                        server.getClass().getName(), e.toString()));
             }
         }
         return interfaces.toArray(new Interface[interfaces.size()]);
@@ -241,7 +245,7 @@ public final class VDLInvoker {
         final ServerMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new VException(String.format("Couldn't find method %s in class %s",
-                    method, this.serverClass.getCanonicalName()));
+                    method, server.getClass().getCanonicalName()));
         }
 
         // VOM-decode arguments.
@@ -267,6 +271,25 @@ public final class VDLInvoker {
                     m.method.getName(), e.getMessage()));
         }
         return prepareReply(m, result, appError);
+    }
+
+    /**
+     * Implements the glob call. If the server implements the {@link Globber} interface, its {@link
+     * Globber#glob glob} method is called to service this request. Otherwise the response channel
+     * is simply closed without returning any entries.
+     *
+     * @param call            in-flight call information
+     * @param pattern         the glob pattern
+     * @param responseChannel the channel to which the glob reply should be sent
+     * @throws VException  if any error occurs in native Go code
+     */
+    public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)
+            throws VException {
+        if (server instanceof Globber) {
+            ((Globber) server).glob(call, pattern, responseChannel);
+        } else {
+            responseChannel.close();
+        }
     }
 
     private static Object[] prepareArgs(ServerMethod m, StreamServerCall call, byte[][] vomArgs)

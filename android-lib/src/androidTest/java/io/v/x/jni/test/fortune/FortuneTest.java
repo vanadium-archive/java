@@ -11,19 +11,23 @@ import com.google.common.collect.ImmutableList;
 import org.joda.time.Duration;
 
 import java.io.EOFException;
-import java.util.Arrays;
+import java.util.List;
 
 import io.v.v23.InputChannel;
+import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.naming.GlobError;
+import io.v.v23.naming.GlobReply;
+import io.v.v23.naming.MountEntry;
+import io.v.v23.naming.MountedServer;
+import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.security.access.Constants;
 import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
-import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
 
@@ -41,7 +45,7 @@ public class FortuneTest extends AndroidTestCase {
     private static final VException COMPLEX_ERROR = VException.explicitMake(
             Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
 
-    public static class FortuneServerImpl implements FortuneServer {
+    public static class FortuneServerImpl implements FortuneServer, Globber {
         private String lastAddedFortune;
 
         @Override
@@ -107,6 +111,18 @@ public class FortuneTest extends AndroidTestCase {
 
         @Override
         public void noTags(ServerCall call) throws VException {}
+
+        @Override
+        public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)
+                throws VException {
+            final GlobReply.Entry entry = new GlobReply.Entry(
+                    new MountEntry("helloworld", ImmutableList.<MountedServer>of(), false, false));
+            response.writeValue(entry);
+            final GlobReply.Error error = new GlobReply.Error(
+                    new GlobError("Hello, world!", new VException("Some error")));
+            response.writeValue(error);
+            response.close();
+        }
     }
 
     public void testFortune() throws VException {
@@ -222,5 +238,22 @@ public class FortuneTest extends AndroidTestCase {
         final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         final Interface signature = client.getSignature(ctxT);
         assertThat(signature.getMethods()).isNotEmpty();
+    }
+
+    public void testGlob() throws VException {
+        final VContext ctx = V.init();
+        final Server s = V.newServer(ctx);
+        final String[] endpoints = s.listen(null);
+        final FortuneServer server = new FortuneServerImpl();
+        s.serve("fortune", server);
+
+        final String name = "/" + endpoints[0];
+        final List<GlobReply> globResult
+                = ImmutableList.copyOf(V.getNamespace(ctx).glob(ctx, name + "/*"));
+        assertThat(globResult).hasSize(2);
+        assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
+        assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())
+                .isEqualTo(name + "/helloworld");
+        assertThat(globResult.get(1)).isInstanceOf(GlobReply.Error.class);
     }
 }

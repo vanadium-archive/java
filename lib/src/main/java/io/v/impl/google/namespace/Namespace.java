@@ -5,14 +5,14 @@
 package io.v.impl.google.namespace;
 
 import io.v.v23.InputChannel;
+import io.v.v23.naming.GlobReply;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
-import io.v.v23.naming.MountEntry;
 
 public class Namespace implements io.v.v23.namespace.Namespace {
     private final long nativePtr;
 
-    private native InputChannel<MountEntry> nativeGlob(
+    private native InputChannel<GlobReply> nativeGlob(
         long nativePtr, VContext context, String pattern) throws VException;
     private native void nativeFinalize(long nativePtr);
 
@@ -20,7 +20,7 @@ public class Namespace implements io.v.v23.namespace.Namespace {
         this.nativePtr = nativePtr;
     }
     @Override
-    public InputChannel<MountEntry> glob(VContext context, String pattern) throws VException {
+    public InputChannel<GlobReply> glob(VContext context, String pattern) throws VException {
         return nativeGlob(this.nativePtr, context, pattern);
     }
     @Override
