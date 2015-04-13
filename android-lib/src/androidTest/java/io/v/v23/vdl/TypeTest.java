@@ -116,10 +116,9 @@ public class TypeTest extends TestCase {
     }
 
     @GeneratedFromVdl(name = "MyArray12")
+    @ArrayLength(12)
     private static final class MyArray12 extends VdlArray<Set<MyUnion>> {
         private static final long serialVersionUID = 1L;
-        @SuppressWarnings("unused")
-        public static final int LENGTH = 12;
 
         public MyArray12(Set<MyUnion>[] value) {
             super(Types.getVdlTypeFromReflect(MyArray12.class), value);
