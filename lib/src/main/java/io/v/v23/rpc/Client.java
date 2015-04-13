@@ -28,7 +28,7 @@ public interface Client {
      * @return                 call object that manages streaming args and results.
      * @throws VException      if the call cannot be started.
      */
-    public Call startCall(VContext context, String name, String method,
+    Call startCall(VContext context, String name, String method,
         Object[] args, Type[] argTypes) throws VException;
 
     /**
@@ -48,14 +48,14 @@ public interface Client {
      * @return                 call object that manages streaming args and results.
      * @throws VException      if the call cannot be started.
      */
-    public Call startCall(VContext context, String name, String method,
+    Call startCall(VContext context, String name, String method,
         Object[] args, Type[] argTypes, Options opts) throws VException;
 
     /**
      * Discards all the state associated with this client.  In-flight calls may be terminated with
      * an error.
      */
-    public void close();
+    void close();
 
     /**
      * Call defines the interface for each in-flight call on the client.  Method {@code finish()}
@@ -70,7 +70,7 @@ public interface Client {
          *
          * @throws VException      if there was an error closing.
          */
-        public void closeSend() throws VException;
+        void closeSend() throws VException;
 
         /**
          * Blocks until the server has finished the call and returns the positional output arguments
@@ -80,6 +80,6 @@ public interface Client {
          * @return                 an array of output arguments.
          * @throws VException      if there was an error executing the call.
          */
-        public Object[] finish(Type[] types) throws VException;
+        Object[] finish(Type[] types) throws VException;
     }
 }

@@ -28,7 +28,7 @@ public interface InputChannel<T> extends Iterable<T> {
      *
      * @return true iff the next value can be read without blocking.
      */
-    public boolean available();
+    boolean available();
 
     /**
      * Reads the next value from the channel, blocking if the value is unavailable.
@@ -37,5 +37,5 @@ public interface InputChannel<T> extends Iterable<T> {
      * @throws EOFException    if the graceful EOF is reached.
      * @throws VException      if a read error is encountered.
      */
-    public T readValue() throws EOFException, VException;
+    T readValue() throws EOFException, VException;
 }

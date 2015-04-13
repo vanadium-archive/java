@@ -27,12 +27,12 @@ public interface Signer {
      * @return                 the message signature.
      * @throws VException      if the message cannot be signed.
      */
-    public Signature sign(byte[] purpose, byte[] message) throws VException;
+    Signature sign(byte[] purpose, byte[] message) throws VException;
 
     /**
      * Returns ECDSA public key corresponding to this signer's private key.
      *
      * @return  an ECDSA public key corresponding to this signer's private key.
      */
-    public ECPublicKey publicKey();
+    ECPublicKey publicKey();
 }

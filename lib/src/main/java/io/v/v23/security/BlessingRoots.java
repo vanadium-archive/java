@@ -22,7 +22,7 @@ public interface BlessingRoots {
      * @param  pattern         pattern for which we're assigning the authoratitative key.
      * @throws VException      if there was an error assigning the root.
      */
-    public void add(ECPublicKey root, BlessingPattern pattern) throws VException;
+    void add(ECPublicKey root, BlessingPattern pattern) throws VException;
 
     /**
      * Returns {@code null} iff the provided root is recognized as an authority on a pattern
@@ -33,7 +33,7 @@ public interface BlessingRoots {
      * @throws VException      if the provided root is not recognized as an authority for the
      *                         provided blessing.
      */
-    public void recognized(ECPublicKey root, String blessing) throws VException;
+    void recognized(ECPublicKey root, String blessing) throws VException;
 
     /**
      * Return a human-readable string description of the roots.  This description is detailed and
@@ -42,5 +42,5 @@ public interface BlessingRoots {
      *
      * @return human-readable string description of the roots.
      */
-    public String debugString();
+    String debugString();
 }

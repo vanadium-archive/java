@@ -33,7 +33,7 @@ public interface BlessingStore {
      * @return                 blessings previously associated with the specified pattern.
      * @throws VException      if there was an error making the association.
      */
-    public Blessings set(Blessings blessings, BlessingPattern forPeers) throws VException;
+    Blessings set(Blessings blessings, BlessingPattern forPeers) throws VException;
 
     /**
      * Returns the set of blessings that have been previously added to the store with an intent of
@@ -49,7 +49,7 @@ public interface BlessingStore {
      *                       an intent of being shared with peers that have at least one of the
      *                       provided (human-readable) blessings.
      */
-    public Blessings forPeer(String... peerBlessings);
+    Blessings forPeer(String... peerBlessings);
 
     /**
      * Sets up the blessings made available on a subsequent call to {@code defaultBlessings()}.
@@ -61,7 +61,7 @@ public interface BlessingStore {
      *                         {@code defaultBlessings()}.
      * @throws VException      if there was an error setting the default blessings.
      */
-    public void setDefaultBlessings(Blessings blessings) throws VException;
+    void setDefaultBlessings(Blessings blessings) throws VException;
 
     /**
      * Returns the blessings to be shared with peers for which no other information is
@@ -76,21 +76,21 @@ public interface BlessingStore {
      *
      * @return blessings to be shared with peers for which no other information is available.
      */
-    public Blessings defaultBlessings();
+    Blessings defaultBlessings();
 
     /**
      * Returns the public key of the principal for which this store hosts blessings.
      *
      * @return public key of the principal for which this store hosts blessings.
      */
-    public ECPublicKey publicKey();
+    ECPublicKey publicKey();
 
     /**
      * Returns all the blessings that the store currently holds for various peers.
      *
      * @return all the blessings that the store currently holds for various peers
      */
-    public Map<BlessingPattern, Blessings> peerBlessings();
+    Map<BlessingPattern, Blessings> peerBlessings();
 
     /**
      * Return a human-readable string description of the store.  This description is detailed and
@@ -99,5 +99,5 @@ public interface BlessingStore {
      *
      * @return human-readable string description of the store.
      */
-    public String debugString();
+    String debugString();
 }

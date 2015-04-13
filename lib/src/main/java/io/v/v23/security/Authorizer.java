@@ -18,5 +18,5 @@ public interface Authorizer {
      * @param  ctx             the context representing the activity to be authorized.
      * @throws VException      iff the call isn't authorized.
      */
-    public void authorize(VContext ctx) throws VException;
+    void authorize(VContext ctx) throws VException;
 }

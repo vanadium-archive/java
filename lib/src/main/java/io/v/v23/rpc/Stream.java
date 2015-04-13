@@ -20,7 +20,7 @@ public interface Stream {
      * @param  type            type of the provided item.
      * @throws VException      if there was an error sending the item.
      */
-    public void send(Object item, Type type) throws VException;
+    void send(Object item, Type type) throws VException;
 
     /**
      * Returns the next item in the input stream, blocking until an item is available.
@@ -31,5 +31,5 @@ public interface Stream {
      * @throws EOFException    if a graceful end of input has been reached.
      * @throws VException      if there was an error receving an item.
      */
-    public Object recv(Type type) throws EOFException, VException;
+    Object recv(Type type) throws EOFException, VException;
 }
