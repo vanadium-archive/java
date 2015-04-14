@@ -12,8 +12,8 @@ import android.os.IBinder;
  * Adapter class for making Authenticator available as a Service.
  */
 public class AuthenticatorService extends Service {
-  @Override
-  public IBinder onBind(Intent intent) {
-    return new Authenticator(this).getIBinder();
-  }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return new Authenticator(this).getIBinder();
+    }
 }

@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/expiry_caveat"
+              android:layout_width="wrap_content"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+
+    <EditText
+        android:id="@+id/expiry_units"
+        android:text="@string/expiry_caveat_default_number_units"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"/>
+
+    <Spinner
+        android:id="@+id/expiry_units_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
