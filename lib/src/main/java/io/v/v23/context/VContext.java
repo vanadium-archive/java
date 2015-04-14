@@ -70,7 +70,7 @@ public interface VContext {
      * @return the time at which this context will be automatically canceled or {@code null}
      *         if there is no deadline.
      */
-    public DateTime deadline();
+    DateTime deadline();
 
     /**
      * Returns a counter that will reach the count of zero when this context is canceled (either
@@ -83,7 +83,7 @@ public interface VContext {
      * @return a counter that reaches the count of zero when this context is canceled or exceeds
      *         its deadline, or {@code null} if the counter can never be canceled.
      */
-    public CountDownLatch done();
+    CountDownLatch done();
 
     /**
      * Returns data inside the context associated with the provided key.  See {@link #withValue}
@@ -92,7 +92,7 @@ public interface VContext {
      * @param  key a key value is associated with.
      * @return     value associated with the key.
      */
-    public Object value(Object key);
+    Object value(Object key);
 
     /**
      * Returns a child of the current context that can be canceled.  After {@code cancel()}
@@ -105,7 +105,7 @@ public interface VContext {
      *
      * @return a child of the current context that can be canceled.
      */
-    public CancelableVContext withCancel();
+    CancelableVContext withCancel();
 
     /**
      * Returns a child of the current context that is automatically canceled after the provided
@@ -121,7 +121,7 @@ public interface VContext {
      * @return          a child of the current context that is automatically canceled after the
      *                  provided deadline is reached.
      */
-    public CancelableVContext withDeadline(DateTime deadline);
+    CancelableVContext withDeadline(DateTime deadline);
 
     /**
      * Returns a child of the current context that is automatically canceled after the provided
@@ -137,7 +137,7 @@ public interface VContext {
      * @return         a child of the current context that is automatically canceled after the
      *                 provided duration of time.
      */
-    public CancelableVContext withTimeout(Duration timeout);
+    CancelableVContext withTimeout(Duration timeout);
 
     /**
      * Returns a child of the current context that additionally contains the given key and its
@@ -156,5 +156,5 @@ public interface VContext {
      * @return       a child of the current context that additionally contains the given key and its
      *               associated value
      */
-    public VContext withValue(Object key, Object value);
+    VContext withValue(Object key, Object value);
 }

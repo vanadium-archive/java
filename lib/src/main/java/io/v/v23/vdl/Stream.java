@@ -19,7 +19,7 @@ public interface Stream<SendT, RecvT> {
    * @param  item            an item to be sent
    * @throws VException      if there was an error sending the item.
    */
-  public void send(SendT item) throws VException;
+  void send(SendT item) throws VException;
 
   /**
    * Returns the next item in the input stream, blocking until an item is available.
@@ -29,5 +29,5 @@ public interface Stream<SendT, RecvT> {
    * @throws EOFException    if a graceful end of input has been reached
    * @throws VException      if there was an error receiving an item
    */
-  public RecvT recv() throws EOFException, VException;
+  RecvT recv() throws EOFException, VException;
 }

@@ -22,5 +22,5 @@ public interface Namespace {
      * @return                 an input channel of GlobReply objects matching the provided pattern.
      * @throws VException      if an error is encountered.
      */
-    public InputChannel<GlobReply> glob(VContext context, String pattern) throws VException;
+    InputChannel<GlobReply> glob(VContext context, String pattern) throws VException;
 }

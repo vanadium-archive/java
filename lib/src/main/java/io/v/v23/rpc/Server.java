@@ -28,7 +28,7 @@ public interface Server {
      * @return                 array of endpoint strings
      * @throws VException      if the server couldn't listen  provided protocol can't be listened on
      */
-    public String[] listen(ListenSpec spec) throws VException;
+    String[] listen(ListenSpec spec) throws VException;
 
     /**
      * Associates object with name by publishing the address of this server with the mount table
@@ -54,7 +54,7 @@ public interface Server {
      * @param  object   object to be published under the given name
      * @throws VException      if the object couldn't be published under the given name
      */
-    public void serve(String name, Object object) throws VException;
+    void serve(String name, Object object) throws VException;
 
     /**
      * Adds the specified name to the mount table for the object or {@code Dispatcher} served by
@@ -65,7 +65,7 @@ public interface Server {
      * @param  name            name to be added to the mount table
      * @throws VException      if the name couldn't be added to the mount table
      */
-    public void addName(String name) throws VException;
+    void addName(String name) throws VException;
 
     /**
      * Removes the specified name from the mount table.
@@ -74,14 +74,14 @@ public interface Server {
      *
      * @param name name to be removed from the mount table
      */
-    public void removeName(String name);
+    void removeName(String name);
 
     /**
      * Returns the current status of the server, see {@code ServerStatus} for details.
      *
      * @return the current status of the server
      */
-    public ServerStatus getStatus();
+    ServerStatus getStatus();
 
     /**
      * Returns a channel over which {@code NetworkChange} objects will be sent. The server will
@@ -90,14 +90,14 @@ public interface Server {
      *
      * @return a channel over which {@code NetworkChange} objects will be sent
      */
-    public InputChannel<NetworkChange> watchNetwork();
+    InputChannel<NetworkChange> watchNetwork();
 
     /**
      * Unregisters a channel previously registered using {@code watchNetwork}.
      *
      * @param channel a channel previously registered using {@code watchNetwork}
      */
-    public void unwatchNetwork(InputChannel<NetworkChange> channel);
+    void unwatchNetwork(InputChannel<NetworkChange> channel);
 
     /**
      * Gracefully stops all services on this server.  New calls are rejected, but any in-flight
@@ -106,5 +106,5 @@ public interface Server {
      *
      * @throws VException      if there was an error stopping the server
      */
-    public void stop() throws VException;
+    void stop() throws VException;
 }

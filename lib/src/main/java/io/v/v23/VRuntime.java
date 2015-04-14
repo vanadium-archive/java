@@ -31,7 +31,7 @@ public interface VRuntime {
      * @return                 child context to which the new client is attached
      * @throws VException      if a new client cannot be created
      */
-    public VContext setNewClient(VContext ctx, Options opts) throws VException;
+    VContext setNewClient(VContext ctx, Options opts) throws VException;
 
     /**
      * Returns the client attached to the given context.
@@ -39,7 +39,7 @@ public interface VRuntime {
      * @param  ctx current context
      * @return     the client attached to the given context
      */
-    public Client getClient(VContext ctx);
+    Client getClient(VContext ctx);
 
     /**
      * Creates a new server instance with the provided options.  A particular runtime
@@ -52,7 +52,7 @@ public interface VRuntime {
      * @return                 the new server instance
      * @throws VException      if a new server cannot be created
      */
-    public Server newServer(VContext ctx, Options opts) throws VException;
+    Server newServer(VContext ctx, Options opts) throws VException;
 
     /**
      * Attaches the given principal to a new context (that is derived from the given context).
@@ -62,7 +62,7 @@ public interface VRuntime {
      * @return                 child context to which the principal is attached
      * @throws VException      if the principal couldn't be attached
      */
-    public VContext setPrincipal(VContext ctx, Principal principal) throws VException;
+    VContext setPrincipal(VContext ctx, Principal principal) throws VException;
 
     /**
      * Returns the principal attached to the given context.
@@ -70,7 +70,7 @@ public interface VRuntime {
      * @param  ctx current context
      * @return     the principal attached to the given context
      */
-    public Principal getPrincipal(VContext ctx);
+    Principal getPrincipal(VContext ctx);
 
     /**
      * Creates a new namespace instance and attaches it to a new context.
@@ -80,7 +80,7 @@ public interface VRuntime {
      * @return                 child context to which the principal is attached
      * @throws VException      if the namespace couldn't be created
      */
-    public VContext setNewNamespace(VContext ctx, String... roots) throws VException;
+    VContext setNewNamespace(VContext ctx, String... roots) throws VException;
 
     /**
      * Returns the namespace attached to the given context.
@@ -88,7 +88,7 @@ public interface VRuntime {
      * @param  ctx current context
      * @return     the namespace attached to the given context.
      */
-    public Namespace getNamespace(VContext ctx);
+    Namespace getNamespace(VContext ctx);
 
     /**
      * Attaches the given {@code ListenSpec} to a new context (that is derived from the given
@@ -98,7 +98,7 @@ public interface VRuntime {
      * @param  spec {@code ListenSpec} to be attached
      * @return      child context to which the {@code ListenSpec} is attached
      */
-    public VContext setListenSpec(VContext ctx, ListenSpec spec);
+    VContext setListenSpec(VContext ctx, ListenSpec spec);
 
     /**
      * Returns the {@code ListenSpec} attached to the given context.
@@ -106,12 +106,12 @@ public interface VRuntime {
      * @param  ctx current context
      * @return     the {@code ListenSpec} attached to the given context
      */
-    public ListenSpec getListenSpec(VContext ctx);
+    ListenSpec getListenSpec(VContext ctx);
 
     /**
      * Returns the base context associated with the runtime.
      *
      * @return the base context associated with the runtime.
      */
-    public VContext getContext();
+    VContext getContext();
 }

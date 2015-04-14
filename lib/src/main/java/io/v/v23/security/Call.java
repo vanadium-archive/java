@@ -18,14 +18,14 @@ public interface Call {
      *
      * @return timestamp at which the authorization state is to be checked.
      */
-    public DateTime timestamp();
+    DateTime timestamp();
 
     /**
      * Returns the method being invoked.
      *
      * @return method being invoked.
      */
-    public String method();
+    String method();
 
     /**
      * Returns the tags attached to the method, typically through the interface specification
@@ -33,47 +33,47 @@ public interface Call {
      *
      * @return tags attached to the method.
      */
-    public VdlValue[] methodTags();
+    VdlValue[] methodTags();
 
     /**
      * Returns the veyron name suffix for the request.
      *
      * @return veyron name suffix for the request.
      */
-    public String suffix();
+    String suffix();
 
     /**
      * Returns the principal used to authenticate to the remote end.
      *
      * @return the principal used to authenticate to the remote end.
      */
-    public Principal localPrincipal();
+    Principal localPrincipal();
 
     /**
      * Returns the blessings sent to the remote end for authentication.
      *
      * @return the blessings sent to the remote end for authentication.
      */
-    public Blessings localBlessings();
+    Blessings localBlessings();
 
     /**
      * Returns the blessings received from the remote end during authentication.
      *
      * @return [description]
      */
-    public Blessings remoteBlessings();
+    Blessings remoteBlessings();
 
     /**
      * Returns the endpoint of the principal at the local end of the request.
      *
      * @return endpoint of the principal at the local end of the request.
      */
-    public String localEndpoint();
+    String localEndpoint();
 
     /**
      * Returns the endpoint of the principal at the remote end of the request.
      *
      * @return endpoint of the principal at the remote end of the request.
      */
-    public String remoteEndpoint();
+    String remoteEndpoint();
 }

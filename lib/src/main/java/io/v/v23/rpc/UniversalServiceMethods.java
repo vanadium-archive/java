@@ -20,7 +20,7 @@ public interface UniversalServiceMethods {
      * @return                 description of the service.
      * @throws VException      if the description couldn't be fetched.
      */
-     public Interface getSignature(VContext context) throws VException;
+    Interface getSignature(VContext context) throws VException;
 
 
     /**
@@ -31,5 +31,5 @@ public interface UniversalServiceMethods {
      * @return                 description of the service.
      * @throws VException      if the description couldn't be fetched.
      */
-    public Interface getSignature(VContext context, Options opts) throws VException;
+    Interface getSignature(VContext context, Options opts) throws VException;
 }

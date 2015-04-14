@@ -37,7 +37,7 @@ public interface Principal {
      * @return                   the resulting blessings.
      * @throws VException        if the blessee couldn't be blessed.
      */
-    public Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
+    Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
         Caveat... additionalCaveats) throws VException;
 
     /**
@@ -48,7 +48,7 @@ public interface Principal {
      * @return                 the resulting blessings.
      * @throws VException      if there was an error blessing self.
      */
-    public Blessings blessSelf(String name, Caveat... caveats) throws VException;
+    Blessings blessSelf(String name, Caveat... caveats) throws VException;
 
     /**
      * Uses the private key of the principal to sign message.
@@ -57,14 +57,14 @@ public interface Principal {
      * @return                 signature of the message.
      * @throws VException      if the message couldn't be signed.
      */
-    public Signature sign(byte[] message) throws VException;
+    Signature sign(byte[] message) throws VException;
 
     /**
      * Returns the public key counterpart of the private key held by the principal.
      *
      * @return the public key held by the principal.
      */
-    public ECPublicKey publicKey();
+    ECPublicKey publicKey();
 
     /**
      * Returns blessings granted to this principal from recognized authorities
@@ -74,7 +74,7 @@ public interface Principal {
      * @param  name a pattern against which blessings are matched.
      * @return      blessings whose human-readable strings match a given name pattern.
      */
-    public Blessings[] blessingsByName(BlessingPattern name);
+    Blessings[] blessingsByName(BlessingPattern name);
 
     /**
      * Returns human-readable strings for the provided blessings, along with the caveats associated
@@ -89,7 +89,7 @@ public interface Principal {
      * @return          human-readable strings of the provided blessings, along with the caveats
      *                  associated with them
      */
-    public Map<String, Caveat[]> blessingsInfo(Blessings blessings);
+    Map<String, Caveat[]> blessingsInfo(Blessings blessings);
 
     /**
      * Provides access to the BlessingStore containing blessings that have been granted to this
@@ -97,7 +97,7 @@ public interface Principal {
      *
      * @return BlessingStore containing blessings that have been granted to this principal.
      */
-    public BlessingStore blessingStore();
+    BlessingStore blessingStore();
 
     /**
      * Returns the set of recognized authorities (identified by their public keys) on blessings that
@@ -105,7 +105,7 @@ public interface Principal {
      *
      * @return set of recognized authorities on blessings that match specific patterns.
      */
-    public BlessingRoots roots();
+    BlessingRoots roots();
 
     /**
      * Marks the root principals of all blessing chains represented by {@code blessings} as an
@@ -121,5 +121,5 @@ public interface Principal {
      *                         those roots.
      * @throws VException      if there was an error assigning the said authorities.
      */
-    public void addToRoots(Blessings blessings) throws VException;
+    void addToRoots(Blessings blessings) throws VException;
 }

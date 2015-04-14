@@ -29,5 +29,5 @@ public interface Dispatcher {
      *                         if this dispatcher doesn't handle the object.
      * @throws VException      if the lookup error has occured.
      */
-    public ServiceObjectWithAuthorizer lookup(String suffix) throws VException;
+    ServiceObjectWithAuthorizer lookup(String suffix) throws VException;
 }
