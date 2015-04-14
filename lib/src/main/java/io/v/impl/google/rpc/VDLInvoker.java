@@ -15,6 +15,7 @@ import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -23,7 +23,7 @@ public class Blessings {
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
-    static Blessings create(WireBlessings wire) throws VException {
+    public static Blessings create(WireBlessings wire) throws VException {
         if (wire == null) {
             wire = new WireBlessings();
         }
