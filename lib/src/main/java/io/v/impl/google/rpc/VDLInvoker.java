@@ -5,6 +5,7 @@
 package io.v.impl.google.rpc;
 
 import io.v.v23.OutputChannel;
+import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.ServerCall;
@@ -152,7 +153,7 @@ public final class VDLInvoker {
 
         for (Map.Entry<Class<?>, ServerMethod> entry : signatureMethods.entrySet()) {
             try {
-                interfaces.add((Interface) entry.getValue().invoke((Object) null));
+                interfaces.add((Interface) entry.getValue().invoke((Object) null, (Object) null));
             } catch (IllegalAccessException e) {
                 throw new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
@@ -235,14 +236,15 @@ public final class VDLInvoker {
      * VOM-encodes the reply. Application errors are returned along with the reply, while any other
      * encountered errors are thrown as exceptions.
      *
-     * @param  method                   name of the method to be invoked
+     * @param  context                  the context to pass to the invoked method
      * @param  call                     in-flight call information
+     * @param  method                   name of the method to be invoked
      * @param  vomArgs                  VOM-encoded arguments to the method
      * @return InvokeReply              VOM-encoded invocation reply and application errors
      * @throws VException               if the method couldn't be invoked
      */
-    public InvokeReply invoke(String method, StreamServerCall call, byte[][] vomArgs)
-            throws VException {
+    public InvokeReply invoke(VContext context, StreamServerCall call, String method,
+                              byte[][] vomArgs) throws VException {
         final ServerMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new VException(String.format("Couldn't find method %s in class %s",
@@ -250,7 +252,7 @@ public final class VDLInvoker {
         }
 
         // VOM-decode arguments.
-        final Object[] args = prepareArgs(m, call, vomArgs);
+        final Object[] args = prepareArgs(m, context, call, vomArgs);
 
         // Invoke the method and process results.
         Object result = null;
@@ -293,10 +295,11 @@ public final class VDLInvoker {
         }
     }
 
-    private static Object[] prepareArgs(ServerMethod m, StreamServerCall call, byte[][] vomArgs)
+    private static Object[] prepareArgs(ServerMethod m, VContext context, StreamServerCall call,
+                                        byte[][] vomArgs)
             throws VException {
-        // The first argument is always the call, so we add it.
-        final int argsLength = vomArgs.length + 1;
+        // The first arguments are always the context and the call, so we add those.
+        final int argsLength = vomArgs.length + 2;
         final Type[] types = m.method.getGenericParameterTypes();
         if (argsLength != types.length) {
             throw new VException(String.format(
@@ -305,9 +308,10 @@ public final class VDLInvoker {
         }
 
         final Object[] ret = new Object[argsLength];
-        ret[0] = call;
+        ret[0] = context;
+        ret[1] = call;
         for (int i = 0; i < vomArgs.length; i++) {
-            ret[i + 1] = VomUtil.decode(vomArgs[i], types[i + 1]);
+            ret[i + 2] = VomUtil.decode(vomArgs[i], types[i + 2]);
         }
         return ret;
     }

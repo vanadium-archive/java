@@ -49,20 +49,20 @@ public class FortuneTest extends AndroidTestCase {
         private String lastAddedFortune;
 
         @Override
-        public String get(ServerCall call) throws VException {
+        public String get(VContext context, ServerCall call) throws VException {
             if (lastAddedFortune == null) {
-                throw VException.make(Errors.ERR_NO_FORTUNES, call.context());
+                throw VException.make(Errors.ERR_NO_FORTUNES, context);
             }
             return lastAddedFortune;
         }
 
         @Override
-        public void add(ServerCall call, String fortune) throws VException {
+        public void add(VContext context, ServerCall call, String fortune) throws VException {
             lastAddedFortune = fortune;
         }
 
         @Override
-        public int streamingGet(ServerCall call, Stream<String, Boolean> stream)
+        public int streamingGet(VContext context, ServerCall call, Stream<String, Boolean> stream)
                 throws VException {
             int numSent = 0;
             while (true) {
@@ -75,7 +75,7 @@ public class FortuneTest extends AndroidTestCase {
                     break;
                 }
                 try {
-                    stream.send(get(call));
+                    stream.send(get(context, call));
                 } catch (VException e) {
                     throw new VException(
                             "Server couldn't send a string item: " + e.getMessage());
@@ -86,12 +86,12 @@ public class FortuneTest extends AndroidTestCase {
         }
 
         @Override
-        public void getComplexError(ServerCall call) throws VException {
+        public void getComplexError(VContext context, ServerCall call) throws VException {
             throw COMPLEX_ERROR;
         }
 
         @Override
-        public void testServerCall(ServerCall call) throws VException {
+        public void testServerCall(VContext context, ServerCall call) throws VException {
             if (call == null) {
                 throw new VException("ServerCall is null");
             }
@@ -104,13 +104,13 @@ public class FortuneTest extends AndroidTestCase {
             if (call.remoteEndpoint() == null || call.remoteEndpoint().isEmpty()) {
                 throw new VException("Remote endpoint is empty");
             }
-            if (call.context() == null) {
+            if (context == null) {
                 throw new VException("Vanadium context is null");
             }
         }
 
         @Override
-        public void noTags(ServerCall call) throws VException {}
+        public void noTags(VContext context, ServerCall call) throws VException {}
 
         @Override
         public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)

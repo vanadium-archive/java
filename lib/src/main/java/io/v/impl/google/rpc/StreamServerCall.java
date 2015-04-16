@@ -60,10 +60,6 @@ public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     public String remoteEndpoint() {
         return this.serverCall.remoteEndpoint();
     }
-    @Override
-    public io.v.v23.context.VContext context() {
-        return this.serverCall.context();
-    }
     // Implements java.lang.Object.
     @Override
     protected void finalize() {

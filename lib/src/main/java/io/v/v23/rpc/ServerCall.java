@@ -45,9 +45,4 @@ public interface ServerCall {
      * Returns the {@link Server} that this call is associated with.
      */
     Server server();
-
-    /**
-     * Returns the {@link VContext} that this call is associated with.
-     */
-    VContext context();
 }

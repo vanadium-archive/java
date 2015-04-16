@@ -16,6 +16,7 @@ import java.io.EOFException;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.v.v23.context.VContext;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.x.jni.test.fortune.ComplexErrorParam;
@@ -48,15 +49,15 @@ public class VDLInvokerTest extends AndroidTestCase {
   private static class TestFortuneImpl implements FortuneServer {
         String fortune = "";
         @Override
-        public String get(ServerCall call) throws VException {
+        public String get(VContext context, ServerCall call) throws VException {
             return this.fortune;
         }
         @Override
-        public void add(ServerCall call, String fortune) throws VException {
+        public void add(VContext context, ServerCall call, String fortune) throws VException {
             this.fortune = fortune;
         }
         @Override
-        public int streamingGet(ServerCall call, Stream<String, Boolean> stream)
+        public int streamingGet(VContext context, ServerCall call, Stream<String, Boolean> stream)
                 throws VException {
             int numSent = 0;
             while (true) {
@@ -69,7 +70,7 @@ public class VDLInvokerTest extends AndroidTestCase {
                     break;
                 }
                 try {
-                    stream.send(get(call));
+                    stream.send(get(context, call));
                 } catch (VException e) {
                     throw new VException(
                             "Server couldn't send a string item: " + e.getMessage());
@@ -79,31 +80,32 @@ public class VDLInvokerTest extends AndroidTestCase {
             return numSent;
         }
         @Override
-        public void getComplexError(ServerCall call) throws VException {
+        public void getComplexError(VContext context, ServerCall call) throws VException {
           throw COMPLEX_ERROR;
         }
 
         @Override
-        public void noTags(ServerCall call) throws VException {}
+        public void noTags(VContext context, ServerCall call) throws VException {}
 
         @Override
-        public void testServerCall(ServerCall call) throws VException {}
+        public void testServerCall(VContext context, ServerCall call) throws VException {}
     }
 
     public void testInvoke() throws VException {
+        VContext context = V.init();
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
         final StreamServerCall call = null;
         {
             final byte[][] args = new byte[][] {
                     VomUtil.encode("test fortune", new TypeToken<String>(){}.getType())
             };
-            final VDLInvoker.InvokeReply reply = invoker.invoke("add", call, args);
+            final VDLInvoker.InvokeReply reply = invoker.invoke(context, call, "add", args);
             assertEquals(0, reply.results.length);
             assertEquals(null, reply.vomAppError);
         }
         {
             final byte[][] args = new byte[][] {};
-            final VDLInvoker.InvokeReply reply = invoker.invoke("get", call, args);
+            final VDLInvoker.InvokeReply reply = invoker.invoke(context, call, "get", args);
             assertEquals(1, reply.results.length);
             final String fortune = (String) VomUtil.decode(reply.results[0], String.class);
             assertEquals("test fortune", fortune);
@@ -112,7 +114,8 @@ public class VDLInvokerTest extends AndroidTestCase {
         {
             // Test error.
             final byte[][] args = new byte[][] {};
-            final VDLInvoker.InvokeReply reply = invoker.invoke("getComplexError", call, args);
+            final VDLInvoker.InvokeReply reply =
+                    invoker.invoke(context, call, "getComplexError", args);
             assertEquals(0, reply.results.length);
             if (reply.vomAppError == null) {
               fail("Expected error, got null");
