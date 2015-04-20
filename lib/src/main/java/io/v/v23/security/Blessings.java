@@ -8,6 +8,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.List;
 
 /**
  * Blessings encapsulates all the cryptographic operations required to prove that a set of blessings
@@ -78,7 +79,7 @@ public class Blessings {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Coudln't get public key: " + e.getMessage());
+            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
         }
     }
 
@@ -87,7 +88,7 @@ public class Blessings {
      *
      * @return wire format of the blessings.
      */
-    WireBlessings wireFormat() {
+    public WireBlessings wireFormat() {
         return this.wire;
     }
 
@@ -119,5 +120,9 @@ public class Blessings {
     @Override
     protected void finalize() {
         nativeFinalize(this.nativePtr);
+    }
+
+    public List<List<Certificate>> getCertificateChains() {
+        return wire.getCertificateChains();
     }
 }
