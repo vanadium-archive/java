@@ -37,8 +37,7 @@ public class PermissionsAuthorizer implements Authorizer {
     }
 
     @Override
-    public void authorize(VContext ctx) throws VException {
-        final Call call = Security.getCall(ctx);
+    public void authorize(VContext ctx, Call call) throws VException {
         final Blessings local = call.localBlessings();
         final Blessings remote = call.remoteBlessings();
         // Self-RPCs are always authorized.
@@ -47,7 +46,8 @@ public class PermissionsAuthorizer implements Authorizer {
                 Arrays.equals(local.publicKey().getEncoded(), remote.publicKey().getEncoded())) {
             return;
         }
-        final String[] blessings = remote != null ? Blessings.getBlessingNames(ctx) : new String[0];
+        final String[] blessings =
+                remote != null ? Blessings.getBlessingNames(ctx, call) : new String[0];
         VdlValue[] tags = call.methodTags();
         if (tags == null) {
             tags = new VdlValue[0];

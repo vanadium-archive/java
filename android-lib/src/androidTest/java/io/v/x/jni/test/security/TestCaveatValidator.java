@@ -16,8 +16,7 @@ import io.v.v23.verror.VException;
  */
 public class TestCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(VContext context, Object param) throws VException {
-        Call call = Security.getCall(context);
+    public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) param = "";
         if (!(param instanceof String)) {
             throw new VException(String.format(

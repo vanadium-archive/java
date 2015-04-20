@@ -60,7 +60,7 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
             return Security.unionOfBlessings(parts);
         }
 
-        void runAuthorize(String method, Blessings client) throws VException {
+        void runAuthorize(String method, Blessings client, VContext context) throws VException {
             final Authorizer authorizer = PermissionsAuthorizer.create(this.acl, MyTag.class);
             final Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(this.pServer)
@@ -68,13 +68,12 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                     .withRemoteBlessings(client)
                     .withMethod(method)
                     .withMethodTags(getMethodTags(method)));
-            VContext context = Security.setCall(VContextImpl.create(), call);
-            authorizer.authorize(context);
+            authorizer.authorize(context, call);
         }
     }
 
     public void testAuthorize() throws VException {
-        V.init(getContext(), null);
+        VContext context = V.init(getContext(), null);
         AuthorizeTestdata test = new AuthorizeTestdata();
         test.pServer = newPrincipal();
         test.pClient = newPrincipal();
@@ -129,7 +128,7 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
 
         for (final AuthorizeTestdata.TestCase testCase : test.accept) {
             try {
-                test.runAuthorize(testCase.method, testCase.client);
+                test.runAuthorize(testCase.method, testCase.client, context);
             } catch (VException e) {
                 fail(String.format("Access denied for method %s to %s: %s",
                         testCase.method, testCase.client, e.getMessage()));
@@ -138,7 +137,7 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
 
         for (final AuthorizeTestdata.TestCase testCase : test.deny) {
             try {
-                test.runAuthorize(testCase.method, testCase.client);
+                test.runAuthorize(testCase.method, testCase.client, context);
                 fail(String.format(
                         "Access granted for method %s to %s", testCase.method, testCase.client));
             } catch (VException e) {
@@ -148,6 +147,7 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
     }
 
     public void testSelfRPCs() throws VException {
+        VContext context = V.init(getContext(), null);
         final Principal p = newPrincipal();
         final Blessings client = p.blessSelf("client");
         final Blessings server = p.blessSelf("server");
@@ -161,9 +161,8 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                     .withRemoteBlessings(client)
                     .withMethod(testCase)
                     .withMethodTags(getMethodTags(testCase)));
-            VContext context = Security.setCall(VContextImpl.create(), call);
             try {
-                authorizer.authorize(context);
+                authorizer.authorize(context, call);
             } catch (VException e) {
                 fail(String.format("Access denied for method %s: %s", testCase, e.getMessage()));
             }

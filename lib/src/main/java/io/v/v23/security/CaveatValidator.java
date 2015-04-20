@@ -19,5 +19,5 @@ public interface CaveatValidator {
      * @param  param           the (sole) caveat parameter
      * @throws VException      if the caveat couldn't be validated
      */
-    void validate(VContext context, Object param) throws VException;
+    void validate(VContext context, Call call, Object param) throws VException;
 }

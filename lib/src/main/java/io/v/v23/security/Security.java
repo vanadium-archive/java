@@ -286,7 +286,7 @@ public class Security {
     public static Authorizer newAcceptAllAuthorizer() {
         return new Authorizer() {
             @Override
-            public void authorize(VContext ctx) throws VException {
+            public void authorize(VContext ctx, Call call) throws VException {
                 // do nothing
             }
         };
@@ -322,26 +322,5 @@ public class Security {
             throw new VException(
                 "Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
         }
-    }
-
-    /**
-     * Returns the {@link Call} associated with this context, or {@code null} if there is none.
-     */
-    public static Call getCall(VContext ctx) {
-        return (Call) ctx.value(CallKey.INSTANCE);
-    }
-
-    /**
-     * Sets the {@link Call} associated with the given context.
-     *
-     * Typically, you should not call this outside of unit tests. The Vanadium runtime will ensure
-     * that a call is associated with the context whenever appropriate.
-     */
-    public static VContext setCall(VContext ctx, Call call) {
-        return ctx.withValue(CallKey.INSTANCE, call);
-    }
-
-    private static final class CallKey {
-        private static final CallKey INSTANCE = new CallKey();
     }
 }

@@ -62,7 +62,7 @@ public class CaveatRegistry {
      * @param  caveat      security caveat
      * @throws VException  if the caveat couldn't be validated
      */
-    public static void validate(VContext context, Caveat caveat) throws VException {
+    public static void validate(VContext context, Call call, Caveat caveat) throws VException {
         final RegistryEntry entry = lookup(caveat.getId());
         if (entry == null) {
             throw Errors.makeCaveatNotRegistered(null, caveat.getId());
@@ -75,7 +75,7 @@ public class CaveatRegistry {
             throw new VException(e.getMessage());
         }
         // TODO(spetrovic): Once rogulenko@ is done, pass the type as well.
-        entry.validator.validate(context, param);
+        entry.validator.validate(context, call, param);
     }
 
     private static RegistryEntry lookup(Id id) {

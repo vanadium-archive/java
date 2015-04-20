@@ -9,7 +9,7 @@ import io.v.v23.verror.VException;
 
 public class ConstCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(VContext context, Object param) throws VException {
+    public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) param = Boolean.valueOf(false);
         if (!(param instanceof Boolean)) {
             throw new VException(String.format(

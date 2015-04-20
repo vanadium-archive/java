@@ -19,7 +19,7 @@ import java.util.Arrays;
  */
 public class BlessingsTest extends AndroidTestCase {
     public void testBlessingNames() throws VException {
-        V.init(getContext(), null);
+        VContext context = V.init(getContext(), null);
         final Principal p1 = Security.newPrincipal();
         final Principal p2 = Security.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
@@ -29,8 +29,7 @@ public class BlessingsTest extends AndroidTestCase {
                 alice, "work/friend", Security.newUnconstrainedUseCaveat());
         final Call call = Security.newCall(
                 new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
-        final VContext context = Security.setCall(VContextImpl.create(), call);
-        final String[] blessings = Blessings.getBlessingNames(context);
+        final String[] blessings = Blessings.getBlessingNames(context, call);
         if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));

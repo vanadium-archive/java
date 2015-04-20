@@ -12,8 +12,7 @@ import java.util.List;
 
 public class MethodCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(VContext context, Object param) throws VException {
-        Call call = Security.getCall(context);
+    public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) {
             param = new ArrayList<String>();
         }

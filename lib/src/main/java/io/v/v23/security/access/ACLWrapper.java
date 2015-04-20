@@ -6,6 +6,7 @@ package io.v.v23.security.access;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
+import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 public class ACLWrapper implements Authorizer {
@@ -23,7 +24,7 @@ public class ACLWrapper implements Authorizer {
     }
 
     private native boolean nativeIncludes(long nativePtr, String[] blessings);
-    private native void nativeAuthorize(long nativePtr, VContext context);
+    private native void nativeAuthorize(long nativePtr, VContext context, Call call);
     private native void nativeFinalize(long nativePtr);
 
     private long nativePtr;
@@ -50,11 +51,12 @@ public class ACLWrapper implements Authorizer {
      * are included in the ACL.
      *
      * @param  context the context being authorized
+     * @param  call    the call being authorized
      * @throws VException if the request is not authorized
      */
     @Override
-    public void authorize(VContext context) throws VException {
-        nativeAuthorize(this.nativePtr, context);
+    public void authorize(VContext context, Call call) throws VException {
+        nativeAuthorize(this.nativePtr, context, call);
     }
 
     /*

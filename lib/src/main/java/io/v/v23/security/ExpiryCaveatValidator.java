@@ -11,8 +11,7 @@ import io.v.v23.verror.VException;
 
 public class ExpiryCaveatValidator implements CaveatValidator {
     @Override
-    public void validate(VContext context, Object param) throws VException {
-        Call call = Security.getCall(context);
+    public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) param = new DateTime(0);
         if (!(param instanceof DateTime)) {
             throw new VException(String.format(

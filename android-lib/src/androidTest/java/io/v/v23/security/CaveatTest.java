@@ -22,16 +22,15 @@ import java.util.Arrays;
 public class CaveatTest extends AndroidTestCase {
     public void testMethodCaveat() {
         try {
-            V.init(getContext(), null);
+            VContext context = V.init(getContext(), null);
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf("alice", Security.newMethodCaveat("succeed"));
             p1.addToRoots(alice);
-            final VContext context = VContextImpl.create();
             {
                 final Call call = Security.newCall(
                         new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = Blessings.getBlessingNames(Security.setCall(context, call));
+                final String[] got = Blessings.getBlessingNames(context, call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -40,7 +39,7 @@ public class CaveatTest extends AndroidTestCase {
             {
                 final Call call = Security.newCall(
                         new CallParams().withLocalPrincipal(p1).withMethod("fail"));
-                assertEquals(null, Blessings.getBlessingNames(Security.setCall(context, call)));
+                assertEquals(null, Blessings.getBlessingNames(context, call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -49,11 +48,10 @@ public class CaveatTest extends AndroidTestCase {
 
     public void testExpiryCaveat() {
         try {
-            V.init(getContext(), null);
+            VContext context = V.init(getContext(), null);
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf(
                 "alice", Security.newExpiryCaveat(DateTime.now().plusHours(1)));
-            final VContext context = VContextImpl.create();
             p1.addToRoots(alice);
             {
                 final Call call = Security.newCall(new CallParams()
@@ -61,7 +59,7 @@ public class CaveatTest extends AndroidTestCase {
                         .withRemoteBlessings(alice)
                         .withTimestamp(DateTime.now()));
                 final String[] want = { "alice" };
-                final String[] got = Blessings.getBlessingNames(Security.setCall(context, call));
+                final String[] got = Blessings.getBlessingNames(context, call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -71,7 +69,7 @@ public class CaveatTest extends AndroidTestCase {
                 final Call call = Security.newCall(new CallParams()
                         .withLocalPrincipal(p1)
                         .withTimestamp(DateTime.now().plusHours(2)));
-                assertEquals(null, Blessings.getBlessingNames(Security.setCall(context, call)));
+                assertEquals(null, Blessings.getBlessingNames(context, call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
@@ -80,13 +78,12 @@ public class CaveatTest extends AndroidTestCase {
 
     public void testCustomCaveat() {
         try {
-            V.init(getContext(), null);
+            VContext context = V.init(getContext(), null);
             CaveatRegistry.register(io.v.x.jni.test.security.Constants.TEST_CAVEAT,
                     new TestCaveatValidator());
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf("alice",
                     Security.newCaveat(io.v.x.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
-            final VContext context = VContextImpl.create();
             p1.addToRoots(alice);
             {
                 final Call call = Security.newCall(new CallParams()
@@ -94,7 +91,7 @@ public class CaveatTest extends AndroidTestCase {
                         .withRemoteBlessings(alice)
                         .withSuffix("succeed"));
                 final String[] want = { "alice" };
-                final String[] got = Blessings.getBlessingNames(Security.setCall(context, call));
+                final String[] got = Blessings.getBlessingNames(context, call);
                 if (!Arrays.equals(want, got)) {
                     fail(String.format("Blessings differ, want %s, got %s",
                             Arrays.toString(want), Arrays.toString(got)));
@@ -105,7 +102,7 @@ public class CaveatTest extends AndroidTestCase {
                         .withLocalPrincipal(p1)
                         .withRemoteBlessings(alice)
                         .withSuffix("fail"));
-                assertEquals(null, Blessings.getBlessingNames(Security.setCall(context, call)));
+                assertEquals(null, Blessings.getBlessingNames(context, call));
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());

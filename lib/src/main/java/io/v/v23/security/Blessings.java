@@ -20,7 +20,8 @@ import java.util.List;
  * Blessings objects are immutable and multiple threads may invoke methods on them simultaneously.
  */
 public class Blessings {
-    private static native String[] nativeBlessingNames(VContext context) throws VException;
+    private static native String[] nativeBlessingNames(VContext context, Call call)
+            throws VException;
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
@@ -57,12 +58,13 @@ public class Blessings {
      * implementation can be found in the address space of the caller and {@code validate} doesn't
      * throw an exception.
      *
-     * @param  context            the call used to restrict the set of returned blessings
+     * @param  context            the context used to restrict the set of returned blessings
+     * @param  call               the call used to restrict the set of returned blessings
      * @return                 blessings satisfying the provided call
      */
-    public static String[] getBlessingNames(VContext context) {
+    public static String[] getBlessingNames(VContext context, Call call) {
         try {
-            return nativeBlessingNames(context);
+            return nativeBlessingNames(context, call);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get blessings for call", e);
         }
