@@ -233,6 +233,7 @@ public class MainActivity extends Activity {
             final Blessings blessings = Blessings.create(wire);
             final Principal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
+            p.addToRoots(blessings);
             mSelectedBlessing = blessingName;
         } catch (VException e) {
             final String msg = String.format(
@@ -323,8 +324,10 @@ public class MainActivity extends Activity {
                     }
                     final LinearLayout childView =
                             (entry.getServers() == null || entry.getServers().size() <= 0)
-                                    ? ViewUtil.createDirectoryView(text, reply, getLayoutInflater()) // sub-dir
-                                    : ViewUtil.createObjectView(text, reply, getLayoutInflater());   // object
+                                    ? ViewUtil.createDirectoryView(text, reply, getLayoutInflater())
+                                    // sub-dir
+                                    : ViewUtil.createObjectView(text, reply,
+                                    getLayoutInflater());   // object
                     dirView.addView(childView);
                 }
             }

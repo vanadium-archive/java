@@ -185,7 +185,9 @@ public class BlessingActivity extends AccountAuthenticatorActivity
                 continue;
             }
             Caveat caveat = null;
-            if (caveatType.equals("None")) continue;
+            if (caveatType.equals("None")) {
+                continue;
+            }
             if (caveatType.equals("Expiry")) {
                 if ((caveat = getExpiryCaveat(caveatView)) == null) {
                     android.util.Log.e(TAG, "Ignoring expiry caveat.");

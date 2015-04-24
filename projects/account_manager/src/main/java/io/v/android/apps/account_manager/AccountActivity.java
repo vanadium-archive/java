@@ -18,16 +18,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+
 import org.joda.time.Duration;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.interfaces.ECPublicKey;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Certificate;
+import io.v.v23.security.CryptoUtil;
 import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -43,11 +57,10 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
     private static final String PREF_VEYRON_IDENTITY_SERVICE = "pref_identity_service_name";
-    private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/google";
+    private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/root/google";
 
     VContext mBaseContext = null;
     String mAccountName = "", mAccountType = "";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +137,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 if (launch != null) {  // Needs user approval.
                     // NOTE(spetrovic): The returned intent has the wrong flag value
                     // FLAG_ACTIVITY_NEW_TASK set, which results in the launched intent replying
-                    // immediately with RESULE_CANCELED.  Hence, we clear the flag here.
+                    // immediately with RESULT_CANCELED.  Hence, we clear the flag here.
                     launch.setFlags(0);
                     startActivityForResult(launch, REQUEST_CODE_USER_APPROVAL);
                     return;
@@ -161,9 +174,25 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                     AccountActivity.this).getString(
                     PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
             try {
-                final OAuthBlesserClient blesser = OAuthBlesserClientFactory.bind(identityServiceName);
+                final URL url = new URL("https://dev.v.io/auth/blessing-root");
+                final JSONObject object = new JSONObject(CharStreams.toString(
+                        new InputStreamReader(url.openConnection().getInputStream(),
+                                Charsets.US_ASCII)));
+                final String publicKey = object.get("publicKey").toString();
+                final byte[] base64DecodedKey = Base64.decode(
+                        publicKey.getBytes(), Base64.URL_SAFE);
+                final ECPublicKey ecPublicKey = CryptoUtil.decodeECPublicKey(base64DecodedKey);
+                final JSONArray namesArray = (JSONArray) object.get("names");
+                for (int i = 0; i < namesArray.length(); i++) {
+                    String name = namesArray.getString(i);
+                    V.getPrincipal(mBaseContext).roots()
+                            .add(ecPublicKey, new BlessingPattern(name));
+                }
+                final OAuthBlesserClient blesser =
+                        OAuthBlesserClientFactory.bind(identityServiceName);
                 final VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-                final OAuthBlesserClient.BlessUsingAccessTokenOut reply = blesser.blessUsingAccessToken(ctx, tokens[0]);
+                final OAuthBlesserClient.BlessUsingAccessTokenOut reply =
+                        blesser.blessUsingAccessToken(ctx, tokens[0]);
                 final Blessings blessing = reply.blessing;
                 if (blessing == null || blessing.getCertificateChains() == null ||
                         blessing.getCertificateChains().size() <= 0) {
@@ -176,6 +205,15 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 }
                 return blessing;
             } catch (VException e) {
+                errorMsg = e.getMessage();
+                return null;
+            } catch (MalformedURLException e) {
+                errorMsg = e.getMessage();
+                return null;
+            } catch (JSONException e) {
+                errorMsg = e.getMessage();
+                return null;
+            } catch (IOException e) {
                 errorMsg = e.getMessage();
                 return null;
             }

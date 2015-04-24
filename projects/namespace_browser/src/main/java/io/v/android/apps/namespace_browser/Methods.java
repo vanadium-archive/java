@@ -33,14 +33,17 @@ public class Methods {
     public static List<String> get(String name, VContext ctx) throws VException {
         final Client client = V.getClient(ctx);
         final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        final Client.Call call = client.startCall(ctxT, name, "signature", new Object[0], new Type[0]);
-        final Type[] resultTypes = new Type[]{new TypeToken<Interface>() {
+        final Client.Call call =
+                client.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
+        final Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
         }.getType()};
-        final Interface sSign = (Interface) call.finish(resultTypes)[0];
+        final Interface[] sSign = (Interface[]) call.finish(resultTypes)[0];
         final List<String> ret = new ArrayList<String>();
-        if (sSign.getMethods() != null) {
-            for (Method method : sSign.getMethods()) {
-                ret.add(method.getName());
+        for (Interface iface : sSign) {
+            if (iface.getMethods() != null) {
+                for (Method method : iface.getMethods()) {
+                    ret.add(method.getName());
+                }
             }
         }
         return ret;
