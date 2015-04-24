@@ -93,31 +93,31 @@ public final class VdlType implements Serializable {
     }
 
     private Object readResolve() {
-        VdlType uniqueType = uniqueTypes.get(this.typeString);
-        if (uniqueType != null) {
-            return uniqueType;
-        } else {
-            return addUniqueType(this);
-        }
+        return getUniqueType(this);
     }
 
-    private static VdlType getUniqueType(VdlType type) {
-        type.typeString = typeString(type, new HashMap<String, VdlType>());
+    private static synchronized VdlType getUniqueType(VdlType type) {
+        if (type == null) {
+            return null;
+        }
+        if (type.typeString == null) {
+            type.typeString = typeString(type, new HashMap<String, VdlType>());
+        }
         VdlType uniqueType = uniqueTypes.get(type.typeString);
         if (uniqueType != null) {
             return uniqueType;
-        } else {
-            return addUniqueType(type);
         }
-    }
-
-    private static synchronized VdlType addUniqueType(VdlType type) {
-        VdlType uniqueType = uniqueTypes.get(type.typeString);
-        if (uniqueType == null) {
-            uniqueTypes.put(type.typeString, type);
-            uniqueType = type;
+        uniqueTypes.put(type.typeString, type);
+        type.key = getUniqueType(type.key);
+        type.elem = getUniqueType(type.elem);
+        if (type.fields != null) {
+            ImmutableList.Builder<VdlField> builder = new ImmutableList.Builder<VdlField>();
+            for (VdlField field : type.fields) {
+                builder.add(new VdlField(field.getName(), getUniqueType(field.getType())));
+            }
+            type.fields = builder.build();
         }
-        return uniqueType;
+        return type;
     }
 
     private VdlType() {}

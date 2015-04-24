@@ -309,4 +309,18 @@ public class TypeTest extends TestCase {
         } catch (IllegalArgumentException expected) {
         }
     }
+
+    public void testTypesUnique() {
+        VdlType.Builder builder = new VdlType.Builder();
+        PendingType p1 = builder.newPending(Kind.STRUCT);
+        builder.build();
+        VdlType t1 = p1.built();
+        builder = new VdlType.Builder();
+        PendingType p2 = builder.newPending(Kind.STRUCT);
+        PendingType p3 = builder.newPending(Kind.STRUCT);
+        p2.addField("SameAsT1", p3);
+        builder.build();
+        VdlType t2 = p2.built();
+        assertEquals(t1, t2.getFields().get(0).getType());
+    }
 }
