@@ -4,7 +4,6 @@
 
 package io.v.v23;
 
-import go.Go;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
@@ -33,9 +32,7 @@ import io.v.v23.verror.VException;
 public class V {
     private static native void nativeInit();
     static {
-        System.loadLibrary("jniwrapper");
-        System.loadLibrary("veyronjni");
-        Go.init();
+        System.loadLibrary("v23");
         nativeInit();
     }
 
@@ -78,9 +75,9 @@ public class V {
                         io.v.v23.security.Constants.CONST_CAVEAT,
                         new ConstCaveatValidator());
                 CaveatRegistry.register(
-                        io.v.v23.security.Constants.EXPIRY_CAVEAT_X,
+                        io.v.v23.security.Constants.EXPIRY_CAVEAT,
                         new ExpiryCaveatValidator());
-                CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT_X,
+                CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT,
                         new MethodCaveatValidator());
             } catch (VException e) {
                 throw new RuntimeException(

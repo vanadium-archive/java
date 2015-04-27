@@ -4,19 +4,18 @@
 
 package io.v.v23.verror;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
-import io.v.v23.android.V;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.context.VContextImpl;
 import io.v.v23.i18n.Catalog;
 import io.v.v23.i18n.Language;
-import io.v.v23.verror.Errors;
 
 /**
  * VExceptionTest tests the {@code VException} implementation.
  */
-public class VExceptionTest extends AndroidTestCase {
+public class VExceptionTest extends TestCase {
     // Some languages
     private static final String EN = "en";
     private static final String FR = "fr";
@@ -35,8 +34,8 @@ public class VExceptionTest extends AndroidTestCase {
 
     private static final VException bEN0;
     private static final VException bEN1;
-     private static final VException bFR0;
-     private static final VException bFR1;
+    private static final VException bFR0;
+    private static final VException bFR1;
     private static final VException bDE0;
     private static final VException bDE1;
 
@@ -133,49 +132,38 @@ public class VExceptionTest extends AndroidTestCase {
     }
 
     public static void testEqual() {
-        expectEqual(aEN0, aEN1, aDE0, aDE1, aDE0, aDE1);
-        expectEqual(bEN0, bEN1, bDE0, bDE1, bDE0, bDE1);
-        expectEqual(nEN0, nEN1, nDE0, nDE1, nDE0, nDE1);
+        assertAllEqual(aEN0, aEN1, aDE0, aDE1, aDE0, aDE1);
+        assertAllEqual(bEN0, bEN1, bDE0, bDE1, bDE0, bDE1);
+        assertAllEqual(nEN0, nEN1, nDE0, nDE1, nDE0, nDE1);
     }
 
     private static void expectBasic(
         VException error, VException.IDAction idAction, String msg, int tag) {
-        if (!error.getID().equals(idAction.getID())) {
-            fail(String.format("%d: (%s).getID(); got %s, want %s", tag, error, error.getID(),
-                    idAction.getID()));
-        }
-        if (!error.getAction().equals(idAction.getAction())) {
-            fail(String.format("%d: (%s).getAction(); got %s, want %s", tag, error,
-                    error.getAction(), idAction.getAction()));
-        }
-        if (!error.getMessage().equals(msg)) {
-            fail(String.format("%d: (%s).getMessage(); got %s, want %s", tag, error,
-                    error.getMessage(), msg));
-        }
-        if (!error.is(idAction.getID())) {
-            fail(String.format("%d: (%s).is(%s) == false, want true", tag, error,
-                    idAction.getID()));
-        }
-        if (!error.is(idAction)) {
-            fail(String.format("%d: (%s).is(%s) == false, want true", tag, error,
-                    idAction));
-        }
-        if (error.is(idActionC.getID())) {
-            fail(String.format("%d: (%s).is(%s) == true, want false", tag, error,
-                    idActionC.getID()));
-        }
-        if (error.is(idActionC)) {
-            fail(String.format("%d: (%s).is(%s) == true, want false", tag, error,
-                    idActionC));
-        }
+        assertEquals(String.format("%d: (%s).getID(); got %s, want %s",
+                tag, error, error.getID(), idAction.getID()),
+                idAction.getID(), error.getID());
+        assertEquals(String.format("%d: (%s).getAction(); got %s, want %s",
+                tag, error, error.getAction(), idAction.getAction()),
+                idAction.getAction(), error.getAction());
+        assertEquals(String.format(
+                "%d: (%s).getMessage(); got %s, want %s", tag, error, error.getMessage(), msg),
+                msg, error.getMessage());
+        assertTrue(String.format(
+                "%d: (%s).is(%s) == false, want true",tag, error, idAction.getID()),
+                error.is(idAction.getID()));   
+        assertTrue(String.format("%d: (%s).is(%s) == false, want true", tag, error, idAction),
+                error.is(idAction));
+        assertTrue(String.format(
+                "%d: (%s).is(%s) == true, want false", tag, error, idActionC.getID()),
+                !error.is(idActionC.getID()));
+        assertTrue(String.format("%d: (%s).is(%s) == true, want false", tag, error, idActionC),
+                !error.is(idActionC));
     }
 
-    private static void expectEqual(VException... errors) {
+    private static void assertAllEqual(VException... errors) {
         for (VException error1 : errors) {
             for (VException error2 : errors) {
-                if (!error1.equals(error2)) {
-                    fail(String.format("(%s) != (%s)", error1, error2));
-                }
+                assertEquals(error1, error2);
             }
         }
     }

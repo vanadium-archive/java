@@ -6,10 +6,10 @@ package io.v.v23.security;
 
 import com.google.common.collect.ImmutableMap;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
+import io.v.v23.V;
 import io.v.v23.verror.VException;
-import io.v.v23.android.V;
 
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -19,10 +19,10 @@ import java.util.Map;
 /**
  * Tests the default {@code BlessingRoot} implementation.
  */
-public class BlessingRootsTest extends AndroidTestCase {
+public class BlessingRootsTest extends TestCase {
     public void testRecognized() {
         try {
-            V.init(getContext(), null);
+            V.init();
             final Principal principal = Security.newPrincipal();
             final BlessingRoots roots = principal.roots();
             final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };

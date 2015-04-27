@@ -162,7 +162,7 @@ public class Security {
      * @throws VException      if the caveat couldn't be created
      */
     public static Caveat newExpiryCaveat(DateTime time) throws VException {
-        return newCaveat(Constants.EXPIRY_CAVEAT_X, time);
+        return newCaveat(Constants.EXPIRY_CAVEAT, time);
     }
 
     /**
@@ -181,7 +181,7 @@ public class Security {
                 .add(method)
                 .add(additionalMethods)
                 .build();
-        return newCaveat(Constants.METHOD_CAVEAT_X, methods);
+        return newCaveat(Constants.METHOD_CAVEAT, methods);
     }
 
     /**

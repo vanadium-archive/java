@@ -4,7 +4,7 @@
 
 package io.v.v23.security;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
 
@@ -18,7 +18,7 @@ import io.v.v23.verror.VException;
 /**
  * Tests the VContext implementations.
  */
-public class VContextTest extends AndroidTestCase {
+public class VContextTest extends TestCase {
     public void testContextParams() throws VException {
         final VContext ctx = V.init();
         final DateTime timestamp = new DateTime();

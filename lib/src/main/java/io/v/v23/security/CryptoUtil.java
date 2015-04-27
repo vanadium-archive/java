@@ -29,14 +29,12 @@ import java.util.Arrays;
 public class CryptoUtil {
     private static final String PK_ALGORITHM = "EC";
 
-    // NIST-192
     @SuppressWarnings("unused")
-    private static final ECParameterSpec EC_P192_PARAMS = getParameterSpec("prime192v1");
+    private static final ECParameterSpec EC_P192_PARAMS = getParameterSpec("secp192r1"); // NIST-192
     @SuppressWarnings("unused")
     private static final ECParameterSpec EC_P224_PARAMS = getParameterSpec("secp224r1"); // NIST-224
-    // NIST-256
     @SuppressWarnings("unused")
-    private static final ECParameterSpec EC_P256_PARAMS = getParameterSpec("prime256v1");
+    private static final ECParameterSpec EC_P256_PARAMS = getParameterSpec("secp256r1"); // NIST-256
     @SuppressWarnings("unused")
     private static final ECParameterSpec EC_P384_PARAMS = getParameterSpec("secp384r1"); // NIST-384
     @SuppressWarnings("unused")
@@ -45,7 +43,7 @@ public class CryptoUtil {
     private static ECParameterSpec getParameterSpec(String algorithm) {
         try {
             final KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-            final ECGenParameterSpec spec = new ECGenParameterSpec(algorithm);  // NIST P-256
+            final ECGenParameterSpec spec = new ECGenParameterSpec(algorithm);
             gen.initialize(spec);
             return ((ECPublicKey)gen.generateKeyPair().getPublic()).getParams();
         } catch (NoSuchAlgorithmException e) {

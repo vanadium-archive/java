@@ -4,14 +4,14 @@
 
 package io.v.v23.security;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
-import io.v.v23.context.VContext;
-import io.v.v23.context.VContextImpl;
 import org.joda.time.DateTime;
 
+import io.v.v23.V;
+import io.v.v23.context.VContext;
+import io.v.v23.context.VContextImpl;
 import io.v.v23.verror.VException;
-import io.v.v23.android.V;
 import io.v.x.jni.test.security.TestCaveatValidator;
 
 import java.util.Arrays;
@@ -19,10 +19,10 @@ import java.util.Arrays;
 /**
  * Tests the various caveat implementations.
  */
-public class CaveatTest extends AndroidTestCase {
+public class CaveatTest extends TestCase {
     public void testMethodCaveat() {
         try {
-            VContext context = V.init(getContext(), null);
+            final VContext context = V.init();
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf("alice", Security.newMethodCaveat("succeed"));
             p1.addToRoots(alice);
@@ -48,7 +48,7 @@ public class CaveatTest extends AndroidTestCase {
 
     public void testExpiryCaveat() {
         try {
-            VContext context = V.init(getContext(), null);
+            final VContext context = V.init();
             final Principal p1 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf(
                 "alice", Security.newExpiryCaveat(DateTime.now().plusHours(1)));
@@ -78,7 +78,7 @@ public class CaveatTest extends AndroidTestCase {
 
     public void testCustomCaveat() {
         try {
-            VContext context = V.init(getContext(), null);
+            final VContext context = V.init();
             CaveatRegistry.register(io.v.x.jni.test.security.Constants.TEST_CAVEAT,
                     new TestCaveatValidator());
             final Principal p1 = Security.newPrincipal();

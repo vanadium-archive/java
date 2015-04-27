@@ -4,49 +4,52 @@
 
 package io.v.impl.google.rpc;
 
-import android.test.AndroidTestCase;
-
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
-import java.io.EOFException;
-import java.util.Arrays;
-import java.util.Map;
+import junit.framework.TestCase;
 
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.x.jni.test.fortune.ComplexErrorParam;
 import io.v.x.jni.test.fortune.Errors;
 import io.v.x.jni.test.fortune.FortuneServer;
-import io.v.v23.android.V;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.security.access.Constants;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
+import io.v.v23.vdlroot.signature.Interface;
+import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
+import io.v.x.jni.test.fortune.ComplexErrorParam;
+import io.v.x.jni.test.fortune.Errors;
+import io.v.x.jni.test.fortune.FortuneServer;
+
+import java.io.EOFException;
+import java.util.Arrays;
+import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class VDLInvokerTest extends AndroidTestCase {
-  static {
-    V.init();
-  }
-  private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
-      "StrVal",
-      11,
-      ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
+public class VDLInvokerTest extends TestCase {
+    static {
+        V.init();
+    }
+    private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
+            "StrVal", 11, ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
 
-  private static final VException COMPLEX_ERROR = VException.explicitMake(
-          Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
+    private static final VException COMPLEX_ERROR = VException.explicitMake(
+            Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
 
-  private static class TestFortuneImpl implements FortuneServer {
+    private static class TestFortuneImpl implements FortuneServer {
         String fortune = "";
         @Override
         public String get(VContext context, ServerCall call) throws VException {
@@ -129,10 +132,10 @@ public class VDLInvokerTest extends AndroidTestCase {
 
     public void testGetSignature() throws VException {
         final VDLInvoker invoker = new VDLInvoker(new TestFortuneImpl());
-        Interface[] serverInterface = invoker.getSignature();
+        final Interface[] serverInterface = invoker.getSignature();
         assertThat(serverInterface).hasLength(1);
         assertThat(serverInterface[0].getMethods()).hasSize(6);
-        Function<Method, String> methodNameFunction = new Function<Method, String>() {
+        final Function<Method, String> methodNameFunction = new Function<Method, String>() {
             @Override
             public String apply(Method input) {
                 return input.getName();

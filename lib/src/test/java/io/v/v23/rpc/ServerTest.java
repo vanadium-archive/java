@@ -4,21 +4,21 @@
 
 package io.v.v23.rpc;
 
-import android.test.AndroidTestCase;
-
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
-import static com.google.common.truth.Truth.assertThat;
+import junit.framework.TestCase;
 
-import io.v.v23.Options;
-import io.v.v23.verror.VException;
-import io.v.v23.android.V;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.verror.VException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerTest extends AndroidTestCase {
+import static com.google.common.truth.Truth.assertThat;
+
+public class ServerTest extends TestCase {
     private final Dispatcher dummyDispatcher;
 
     public ServerTest() {
@@ -31,7 +31,7 @@ public class ServerTest extends AndroidTestCase {
     }
 
     public void testAddRemoveName() throws Exception {
-        final VContext ctx = V.init(getContext(), new Options());
+        final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         s.listen(null);
         s.serve("name1", dummyDispatcher);

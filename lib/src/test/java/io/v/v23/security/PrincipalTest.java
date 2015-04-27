@@ -6,10 +6,10 @@ package io.v.v23.security;
 
 import com.google.common.collect.ImmutableMap;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
+import io.v.v23.V;
 import io.v.v23.verror.VException;
-import io.v.v23.android.V;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -19,10 +19,10 @@ import java.util.Map;
 /**
  * Tests the default {@code Principal} implementation.
  */
-public class PrincipalTest extends AndroidTestCase {
+public class PrincipalTest extends TestCase {
     public void testBlessingsInfo() {
         try {
-            V.init(getContext(), null);
+            V.init();
             final Principal p1 = Security.newPrincipal();
             final Principal p2 = Security.newPrincipal();
             final Blessings alice = p1.blessSelf("alice");
@@ -71,7 +71,7 @@ public class PrincipalTest extends AndroidTestCase {
 
     public void testBlessingsByName() {
         try {
-            V.init(getContext(), null);
+            V.init();
             final Principal p1 = Security.newPrincipal();
             final Principal p2 = Security.newPrincipal();
             final Principal p3 = Security.newPrincipal();

@@ -6,20 +6,21 @@ package io.v.v23.security;
 
 import com.google.common.collect.ImmutableMap;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
+import io.v.v23.V;
 import io.v.v23.verror.VException;
-import io.v.v23.android.V;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
  * Tests the default {@code BlessingStore} implementation.
  */
-public class BlessingStoreTest extends AndroidTestCase {
+public class BlessingStoreTest extends TestCase {
     public void testSet() {
         try {
-            V.init(getContext(), null);
+            V.init();
             final Principal principal = Security.newPrincipal();
             final BlessingStore store = principal.blessingStore();
             final Blessings blessingA = newBlessing(principal, "root", "A");
@@ -57,10 +58,11 @@ public class BlessingStoreTest extends AndroidTestCase {
             fail("Unexpected exception: " + e.getMessage());
         }
     }
-
+    
     public void testSetDefault() {
         try {
-            V.init(getContext(), null);
+            System.err.println("testSetDefault()");
+            V.init();
             final Principal principal = Security.newPrincipal();
             final BlessingStore store = principal.blessingStore();
             final Blessings blessingA = newBlessing(principal, "root", "A");
@@ -70,6 +72,7 @@ public class BlessingStoreTest extends AndroidTestCase {
             assertEquals(blessingA, store.defaultBlessings());
             store.setDefaultBlessings(blessingB);
             assertEquals(blessingB, store.defaultBlessings());
+            System.err.println("done testSetDefault()");
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -77,7 +80,7 @@ public class BlessingStoreTest extends AndroidTestCase {
 
     public void testForPeer() {
         try {
-            V.init(getContext(), null);
+            V.init();       
             final Principal principal = Security.newPrincipal();
             final BlessingStore store = principal.blessingStore();
             final Blessings blessingFoo = newBlessing(principal, "foo", "A");
@@ -88,23 +91,26 @@ public class BlessingStoreTest extends AndroidTestCase {
             store.set(blessingBar, new BlessingPattern("bar/$"));
 
             final Map<String[], Blessings> testdata =
-                    ImmutableMap.<String[], Blessings>builder()
-                    .put(new String[] {}, blessingAll)
-                    .put(new String[]{ "baz" }, blessingAll)
-                    .put(new String[]{ "foo" }, Security.unionOfBlessings(blessingAll, blessingFoo))
-                    .put(new String[]{ "bar" }, Security.unionOfBlessings(blessingAll, blessingBar))
-                    .put(new String[]{ "foo/foo" },
-                            Security.unionOfBlessings(blessingAll, blessingFoo))
-                    .put(new String[] { "bar/baz" }, blessingAll)
-                    .put(new String[] { "foo/foo/bar" },
-                            Security.unionOfBlessings(blessingAll, blessingFoo))
-                    .put(new String[] { "bar/foo", "foo" },
-                            Security.unionOfBlessings(blessingAll, blessingFoo))
-                    .put(new String[] { "bar", "foo" },
-                            Security.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
-                    .build();
-            for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
-                assertEquals(entry.getValue(), store.forPeer(entry.getKey()));
+                   ImmutableMap.<String[], Blessings>builder()
+                   .put(new String[] {}, blessingAll)
+                   .put(new String[]{ "baz" }, blessingAll)
+                   .put(new String[]{ "foo" }, Security.unionOfBlessings(blessingAll, blessingFoo))
+                   .put(new String[]{ "bar" }, Security.unionOfBlessings(blessingAll, blessingBar))
+                   .put(new String[]{ "foo/foo" },
+                           Security.unionOfBlessings(blessingAll, blessingFoo))
+                   .put(new String[] { "bar/baz" }, blessingAll)
+                   .put(new String[] { "foo/foo/bar" },
+                           Security.unionOfBlessings(blessingAll, blessingFoo))
+                   .put(new String[] { "bar/foo", "foo" },
+                           Security.unionOfBlessings(blessingAll, blessingFoo))
+                   .put(new String[] { "bar", "foo" },
+                           Security.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
+                   .build();
+            for (int i = 0; i < 100; i++) {
+                for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
+                    store.forPeer(entry.getKey());
+                    assertEquals(entry.getValue(), store.forPeer(entry.getKey()));
+                }
             }
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());

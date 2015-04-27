@@ -4,9 +4,9 @@
 
 package io.v.v23.security;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
-import io.v.v23.android.V;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.context.VContextImpl;
 import io.v.v23.verror.VException;
@@ -17,9 +17,9 @@ import java.util.Arrays;
 /**
  * Tests the default Blessings implementation.
  */
-public class BlessingsTest extends AndroidTestCase {
+public class BlessingsTest extends TestCase {
     public void testBlessingNames() throws VException {
-        VContext context = V.init(getContext(), null);
+        final VContext context = V.init();
         final Principal p1 = Security.newPrincipal();
         final Principal p2 = Security.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
@@ -37,7 +37,7 @@ public class BlessingsTest extends AndroidTestCase {
     }
 
     public void testPublicKey() throws VException {
-        V.init(getContext(), null);
+        V.init();
         final Principal p1 = Security.newPrincipal();
         final Principal p2 = Security.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
@@ -54,7 +54,7 @@ public class BlessingsTest extends AndroidTestCase {
     }
 
     public void testVomEncodeDecode() throws VException {
-        V.init(getContext(), null);
+        V.init();
         final Principal p = Security.newPrincipal();
         final Blessings alice = p.blessSelf("alice");
         final byte[] data = VomUtil.encode(alice, Blessings.class);

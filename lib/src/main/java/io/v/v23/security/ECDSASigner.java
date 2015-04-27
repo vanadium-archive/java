@@ -14,8 +14,9 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
 public class ECDSASigner implements io.v.v23.security.Signer {
-    private static final String HASH_ALGORITHM = "SHA256";
-    private static final String SIGN_ALGORITHM = HASH_ALGORITHM + "withECDSA";
+    private static final String HASH_ALGORITHM = "SHA-256";
+    private static final String SIGN_ALGORITHM = "SHA256withECDSA";
+    private static final String HASH_ALGORITHM_NAME = "SHA256";
 
     private final PrivateKey privKey;
     private final ECPublicKey pubKey;
@@ -35,7 +36,7 @@ public class ECDSASigner implements io.v.v23.security.Signer {
             sig.initSign(this.privKey);
             sig.update(message);
             final byte[] asn1Sig = sig.sign();
-            return CryptoUtil.veyronSignature(HASH_ALGORITHM, purpose, asn1Sig);
+            return CryptoUtil.veyronSignature(HASH_ALGORITHM_NAME, purpose, asn1Sig);
         } catch (NoSuchAlgorithmException e) {
             throw new VException("Signing algorithm " + SIGN_ALGORITHM +
                 " not supported by the runtime: " + e.getMessage());

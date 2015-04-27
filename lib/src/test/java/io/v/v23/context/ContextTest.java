@@ -4,21 +4,21 @@
 
 package io.v.v23.context;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-import io.v.v23.android.V;
+import io.v.v23.V;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
  * ContextTest tests the default Context implementation.
  */
-public class ContextTest extends AndroidTestCase {
+public class ContextTest extends TestCase {
     public void testWithValue() {
-        final VContext ctx = V.init(getContext(), null);
+        final VContext ctx = V.init();
         assertEquals(null, ctx.value("A"));
         final VContext ctxA = ctx.withValue("A", 1);
         assertEquals(null, ctx.value("A"));
@@ -39,7 +39,7 @@ public class ContextTest extends AndroidTestCase {
     }
 
     public void testWithCancel() {
-        final VContext ctx = V.init(getContext(), null);
+        final VContext ctx = V.init();
         final CancelableVContext ctxCancel = ctx.withCancel();
         final CountDownLatch done = ctxCancel.done();
         assertTrue(done != null);
@@ -55,7 +55,7 @@ public class ContextTest extends AndroidTestCase {
     }
 
     public void testWithDeadline() {
-        final VContext ctx = V.init(getContext(), null);
+        final VContext ctx = V.init();
         {
             final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
             final CountDownLatch done = ctxD.done();
@@ -82,7 +82,7 @@ public class ContextTest extends AndroidTestCase {
     }
 
     public void testWithTimeout() {
-        final VContext ctx = V.init(getContext(), null);
+        final VContext ctx = V.init();
         {
             final CancelableVContext ctxT = ctx.withTimeout(new Duration(500));
             final CountDownLatch done = ctxT.done();

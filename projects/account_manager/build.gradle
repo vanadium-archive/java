@@ -13,8 +13,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 19
+    buildToolsVersion "21.0.2"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6

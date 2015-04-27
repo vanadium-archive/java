@@ -4,7 +4,7 @@
 
 package io.v.v23.i18n;
 
-import android.test.AndroidTestCase;
+import junit.framework.TestCase;
 
 import io.v.v23.V;
 
@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * CatalogTest tests the catalog implementation.
  */
-public class CatalogTest extends AndroidTestCase {
+public class CatalogTest extends TestCase {
     static {
         V.init();
     }
@@ -32,36 +32,22 @@ public class CatalogTest extends AndroidTestCase {
         expectLookup(cat, "", "en-US", "bar", 2);
         expectLookup(cat, "", "en", "foo", 3);
         expectLookup(cat, "", "en-US", "foo", 4);
-        if (!cat.set("en-US", "bar", want).isEmpty()) {
-            fail("set() found en-US/bar");
-        }
-        if (!cat.setWithBase("en-US", "foo", want).isEmpty()) {
-            fail("set() found en-US/foo");
-        }
+        assertTrue("set() found en-US/bar", cat.set("en-US", "bar", want).isEmpty());
+        assertTrue("set() found en-US/foo", cat.setWithBase("en-US", "foo", want).isEmpty());
         expectLookup(cat, "", "en", "bar", 5);
         expectLookup(cat, want, "en-US", "bar", 6);
         expectLookup(cat, want, "en", "foo", 7);
         expectLookup(cat, want, "en-US", "foo", 8);
         // Check that set(..., "") doesn't delete the base entry.
-        if (!cat.set("en", "bar", "other format").isEmpty()) {
-            fail("set found en/bar");
-        }
-        if (!cat.set("en-US", "bar", "").equals(want)) {
-            fail("set didn't find en-US/bar");
-        }
-        if (!cat.setWithBase("en-US", "foo", "").equals(want)) {
-            fail("set didn't find en-US/foo");
-        }
+        assertTrue("set found en/bar", cat.set("en", "bar", "other format").isEmpty());
+        assertEquals("set didn't find en-US/bar", want, cat.set("en-US", "bar", ""));
+        assertEquals("set didn't find en-US/foo", want, cat.setWithBase("en-US", "foo", ""));
         // The previous setWithBase will not have removed the base entry.
-        if (!cat.set("en", "foo", "").equals(want)) {
-            fail("set didn't find en/foo");
-        }
+        assertTrue("set didn't find en/foo", cat.set("en", "foo", "").equals(want));
         expectLookup(cat, "other format", "en", "bar", 9);
         // Test that a lookup of en-US finds the "en" entry.
         expectLookup(cat, "other format", "en-US", "bar", 10);
-        if (!cat.set("en", "bar", "").equals("other format")) {
-            fail("set didn't find en/bar");
-        }
+        assertEquals("set didn't find en/bar", "other format", cat.set("en", "bar", ""));
         expectLookup(cat, "", "en", "bar", 11);
         expectLookup(cat, "", "en-US", "bar", 12);
         expectLookup(cat, "", "en", "foo", 13);
@@ -187,30 +173,27 @@ public class CatalogTest extends AndroidTestCase {
         expectInSet(lines, "back bar \"{2} from bar {1}\"");
         expectInSet(lines, "back funny.msg.id \"{2} from funny msg id {1}\"");
         expectInSet(lines, "odd.lang.id funny.msg.id \"odd and\\b \\\"funny\\\"\"");
-        if (lines.size() != 5) {
-            fail(String.format(
-                    "Wrong number of lines in <%s>; got %d, want 5", lines, lines.size()));
-        }
+        assertTrue(String.format(
+                "Wrong number of lines in <%s>; got %d, want 5", lines, lines.size()),
+                lines.size() == 5);
     }
 
     private void expectLookup(Catalog cat, String want, String language, String msgID, int tag) {
         final String got = cat.lookup(language, msgID);
-        if (!want.equals(got)) {
-            fail(String.format(
-                    "%d: cat.lookup(%s, %s): got %s, want %s", tag, language, msgID, got, want));
-        }
+        assertEquals(String.format(
+                "%d: cat.lookup(%s, %s): got %s, want %s", tag, language, msgID, got, want),
+                want, got);
     }
 
     private void expectFormatParams(String want, String format, Object... params) {
         final String got = Catalog.formatParams(format, params);
-        if (!want.equals(got)) {
-            fail(String.format("formatParams(%s, %s): got %s, want %s", format, params, got, want));
-        }
+        assertEquals(String.format(
+                "formatParams(%s, %s): got %s, want %s", format, params, got, want),
+                want, got);
     }
 
     private void expectInSet(Set<String> set, String elem) {
-        if (!set.contains(elem)) {
-            fail(String.format("Set %s doesn't contain element: %s", set, elem));
-        }
+        assertTrue(String.format("Set %s doesn't contain element: %s", set, elem),
+                set.contains(elem));
     }
 }

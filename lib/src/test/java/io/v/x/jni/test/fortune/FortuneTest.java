@@ -4,15 +4,13 @@
 
 package io.v.x.jni.test.fortune;
 
-import android.test.AndroidTestCase;
-
 import com.google.common.collect.ImmutableList;
 
-import org.joda.time.Duration;
+import junit.framework.TestCase;
 
+import org.joda.time.Duration;
 import java.io.EOFException;
 import java.util.List;
-
 import io.v.v23.InputChannel;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
@@ -28,12 +26,12 @@ import io.v.v23.rpc.ServerCall;
 import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.Stream;
 import io.v.v23.vdl.VdlUint32;
-import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
+import io.v.v23.vdlroot.signature.Interface;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class FortuneTest extends AndroidTestCase {
+public class FortuneTest extends TestCase {
     static {
         V.init();
     }

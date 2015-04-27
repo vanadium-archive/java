@@ -4,15 +4,12 @@
 
 package io.v.v23.security.access;
 
-import android.test.AndroidTestCase;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.security.interfaces.ECPublicKey;
-import java.util.List;
+import junit.framework.TestCase;
 
-import io.v.v23.android.V;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.context.VContextImpl;
 import io.v.v23.security.Authorizer;
@@ -30,10 +27,13 @@ import io.v.v23.security.access.internal.MyTag;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
+import java.security.interfaces.ECPublicKey;
+import java.util.List;
+
 /**
  * Tests the implementation of {@code TaggedACLAuthorizer}.
  */
-public class PermissionsAuthorizerTest extends AndroidTestCase {
+public class PermissionsAuthorizerTest extends TestCase {
     private static class AuthorizeTestdata {
         Principal pServer;
         Principal pClient;
@@ -73,8 +73,8 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
     }
 
     public void testAuthorize() throws VException {
-        VContext context = V.init(getContext(), null);
-        AuthorizeTestdata test = new AuthorizeTestdata();
+        final VContext context = V.init();
+        final AuthorizeTestdata test = new AuthorizeTestdata();
         test.pServer = newPrincipal();
         test.pClient = newPrincipal();
         test.server = test.pServer.blessSelf("server");
@@ -111,7 +111,6 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
                 .add(new AuthorizeTestdata.TestCase("resolve", test.blessings("ali/family/boss")))
 
                 .build();
-
         test.deny = ImmutableList.<AuthorizeTestdata.TestCase>builder()
                 // Nobody is denied access to "get"
                 .add(new AuthorizeTestdata.TestCase("put", test.blessings(
@@ -147,7 +146,7 @@ public class PermissionsAuthorizerTest extends AndroidTestCase {
     }
 
     public void testSelfRPCs() throws VException {
-        VContext context = V.init(getContext(), null);
+        final VContext context = V.init();
         final Principal p = newPrincipal();
         final Blessings client = p.blessSelf("client");
         final Blessings server = p.blessSelf("server");
