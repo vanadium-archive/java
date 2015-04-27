@@ -58,10 +58,9 @@ public class BlessingStoreTest extends TestCase {
             fail("Unexpected exception: " + e.getMessage());
         }
     }
-    
+
     public void testSetDefault() {
         try {
-            System.err.println("testSetDefault()");
             V.init();
             final Principal principal = Security.newPrincipal();
             final BlessingStore store = principal.blessingStore();
@@ -72,7 +71,6 @@ public class BlessingStoreTest extends TestCase {
             assertEquals(blessingA, store.defaultBlessings());
             store.setDefaultBlessings(blessingB);
             assertEquals(blessingB, store.defaultBlessings());
-            System.err.println("done testSetDefault()");
         } catch (VException e) {
             fail("Unexpected exception: " + e.getMessage());
         }
@@ -80,7 +78,7 @@ public class BlessingStoreTest extends TestCase {
 
     public void testForPeer() {
         try {
-            V.init();       
+            V.init();
             final Principal principal = Security.newPrincipal();
             final BlessingStore store = principal.blessingStore();
             final Blessings blessingFoo = newBlessing(principal, "foo", "A");
