@@ -4,11 +4,11 @@
 
 package io.v.v23.rpc;
 
+import com.google.common.collect.ImmutableList;
+
 import org.joda.time.DateTime;
 
 import io.v.v23.verror.VException;
-
-import java.util.Arrays;
 
 /**
  * NetworkChange represents the changes made in response to a network setting change
@@ -17,16 +17,18 @@ import java.util.Arrays;
 public class NetworkChange {
     private final DateTime time;
     private final ServerState state;
-    private final String[] changedEndpoints;
-    private final String setting;
+    private final ImmutableList<String> changedEndpoints;
+    private final ImmutableList<NetworkAddress> addedAddrs;
+    private final ImmutableList<NetworkAddress> removedAddrs;
     private final VException error;
 
-    public NetworkChange(DateTime time,
-            ServerState state, String[] changedEndpoints, String setting, VException error) {
+    public NetworkChange(DateTime time, ServerState state, NetworkAddress[] addedAddrs,
+            NetworkAddress[] removedAddrs, String[] changedEndpoints, VException error) {
         this.time = time;
         this.state = state;
-        this.changedEndpoints = changedEndpoints;
-        this.setting = setting;
+        this.addedAddrs = ImmutableList.copyOf(addedAddrs);
+        this.removedAddrs = ImmutableList.copyOf(removedAddrs);
+        this.changedEndpoints = ImmutableList.copyOf(changedEndpoints);
         this.error = error;
     }
 
@@ -45,18 +47,25 @@ public class NetworkChange {
     public ServerState getState() { return this.state; }
 
     /**
-     * Returns the set of endpoints added/removed as a result of this change.
+     * Returns the addresses added since the last change.
      *
-     * @return set of endpoints added/removed as a result of this change
+     * @return list of addresses added since the last change
      */
-    public String[] getChangedEndpoints() { return this.changedEndpoints; }
+    public ImmutableList<NetworkAddress> getAddedAddresses() { return this.addedAddrs; }
 
     /**
-     * Returns the setting sent for the last change.
+     * Returns the addresses removed since the last change.
      *
-     * @return setting sent for the last change
+     * @return list of addresses removed since the last change
      */
-    public String getSetting() { return this.setting; }
+    public ImmutableList<NetworkAddress> getRemovedAddresses() { return this.removedAddrs; }
+
+    /**
+     * Returns the list of endpoints added/removed as a result of this change.
+     *
+     * @return list of endpoints added/removed as a result of this change
+     */
+    public ImmutableList<String> getChangedEndpoints() { return this.changedEndpoints; }
 
     /**
      * Returns any error encountered.
@@ -67,8 +76,8 @@ public class NetworkChange {
 
     @Override
     public String toString() {
-        return String.format("{Time: %s, State: %s, Setting: %s, Changed: %s, Error: %s}",
-                this.time, this.state, this.setting, Arrays.toString(this.changedEndpoints),
-                this.error);
+        return String.format("{Time: %s, State: %s, Added addrs: %s, Removed addrs: %s, " +
+            "Changed EPs: %s, Error: %s}", this.time, this.state, this.addedAddrs,
+            this.removedAddrs, this.changedEndpoints, this.error);
     }
 }
