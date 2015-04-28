@@ -26,3 +26,61 @@ vdl {
     // Everybody who depends on :lib will need the vdlroot classes too.
     generateVdlRoot = true
 }
+
+class VanadiumEnvironment {
+    File v23Root;
+    File v23Bin;
+
+    public static getVanadiumEnvironment() {
+        VanadiumEnvironment result = new VanadiumEnvironment()
+
+        // TODO(sjr): have this share code with VdlPlugin.
+        if (!System.getenv().containsKey('V23_ROOT')) {
+            throw new InvalidUserDataException("V23_ROOT is not set. "
+                    + "Please follow the Vanadium installation instructions at "
+                    + "https://v.io/installation/index.html")
+        }
+
+        result.v23Root = new File(System.getenv()['V23_ROOT'])
+        result.v23Bin = new File(result.v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
+        if (!result.v23Bin.exists() || !result.v23Bin.isFile() || !result.v23Bin.canExecute()) {
+            throw new InvalidUserDataException(
+                    result.v23Bin.toString() + " does not exist or is not an executable file. "
+                    + "Please follow the Vanadium installation instructions at "
+                    + "https://v.io/installation/index.html")
+        }
+        return result
+    }
+}
+
+task checkVanadiumEnvironment {
+    VanadiumEnvironment.getVanadiumEnvironment()
+
+    if (System.getenv('JDK_HOME') == null) {
+        throw new InvalidUserDataException("The JDK_HOME environment variable is not set. "
+                + "Please set it to the root of a JDK installation directory.")
+    }
+}
+
+task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
+    def env = VanadiumEnvironment.getVanadiumEnvironment()
+    def thirdPartyGo = new File(env.v23Root,
+            ['third_party', 'java', 'go', 'bin'].join(File.separator))
+    def existingPath = System.getenv('PATH')
+    if (existingPath == null) {
+        existingPath = ""
+    }
+
+    environment 'PATH': [thirdPartyGo.getAbsolutePath(), existingPath].join(File.pathSeparator)
+
+    commandLine env.v23Bin.getAbsolutePath(), 'go',
+            'build', '-buildmode=c-shared', '-v', '-a', '-tags', 'java',
+            '-o', 'build/libs/libv23.so', 'v.io/x/jni'
+}
+
+// Add shared library dependency to our tests.
+tasks.withType(Test) {
+    systemProperty "java.library.path", "build/libs"
+}
+
+tasks.'processTestResources'.dependsOn(buildVanadiumLib)
