@@ -41,7 +41,7 @@ public class LocationService extends Service {
         final VContext ctx = V.init(this);
         try {
             final Server s = V.newServer(ctx);
-            final String[] endpoints = s.listen(null);
+            final String[] endpoints = s.listen(V.getListenSpec(ctx));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
             final VeyronLocationService server =
                     new VeyronLocationService((LocationManager) getSystemService(Context.LOCATION_SERVICE));

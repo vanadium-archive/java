@@ -22,8 +22,6 @@ public interface Server {
      * is need to associate endpoints with specific listen addresses then {@code listen} should be
      * called separately for each one.
      *
-     * If the provided listen spec is {@code null}, default listen spec is used.
-     *
      * @param  spec            information on how to create the network endpoint(s)
      * @return                 array of endpoint strings
      * @throws VException      if the server couldn't listen  provided protocol can't be listened on

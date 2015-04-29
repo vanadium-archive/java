@@ -14,7 +14,6 @@ import io.v.v23.verror.VException;
 
 public class Server implements io.v.v23.rpc.Server {
     private final long nativePtr;
-    private final ListenSpec listenSpec;
 
     private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
     private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
@@ -28,19 +27,12 @@ public class Server implements io.v.v23.rpc.Server {
     private native void nativeStop(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private Server(long nativePtr, ListenSpec spec) {
+    private Server(long nativePtr) {
         this.nativePtr = nativePtr;
-        this.listenSpec = spec;
     }
     // Implement io.v.v23.ipc.Server.
     @Override
     public String[] listen(ListenSpec spec) throws VException {
-        if (spec == null) {
-            spec = this.listenSpec;
-        }
-        if (spec == null) {
-            spec = ListenSpec.DEFAULT;
-        }
         return nativeListen(this.nativePtr, spec);
     }
     @Override

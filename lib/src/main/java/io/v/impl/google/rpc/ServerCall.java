@@ -4,10 +4,9 @@
 
 package io.v.impl.google.rpc;
 
-import io.v.v23.context.VContext;
-import io.v.v23.rpc.*;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
+import io.v.v23.verror.VException;
 
 public class ServerCall implements io.v.v23.rpc.ServerCall {
     private final long nativePtr;
@@ -15,8 +14,8 @@ public class ServerCall implements io.v.v23.rpc.ServerCall {
     private static native String nativeSuffix(long nativePtr);
     private static native String nativeLocalEndpoint(long nativePtr);
     private static native String nativeRemoteEndpoint(long nativePtr);
-    private static native Blessings nativeGrantedBlessings(long nativePtr);
-    private static native Server nativeServer(long nativePtr);
+    private static native Blessings nativeGrantedBlessings(long nativePtr) throws VException;
+    private static native Server nativeServer(long nativePtr) throws VException;
     private static native void nativeFinalize(long nativePtr);
 
     private ServerCall(long nativePtr) {
@@ -40,12 +39,20 @@ public class ServerCall implements io.v.v23.rpc.ServerCall {
 
     @Override
     public Blessings grantedBlessings() {
-        return nativeGrantedBlessings(nativePtr);
+        try {
+            return nativeGrantedBlessings(nativePtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get granted blessings: ", e);
+        }
     }
 
     @Override
     public Server server() {
-        return nativeServer(nativePtr);
+        try {
+            return nativeServer(nativePtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get server: ", e);
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@
 package io.v.v23.rpc;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 
 import junit.framework.TestCase;
@@ -33,7 +34,7 @@ public class ServerTest extends TestCase {
     public void testAddRemoveName() throws Exception {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        s.listen(null);
+        s.listen(V.getListenSpec(ctx));
         s.serve("name1", dummyDispatcher);
         s.addName("name2");
         assertThat(getNames(s)).containsExactly("name1", "name2");
@@ -52,6 +53,7 @@ public class ServerTest extends TestCase {
         for (MountStatus mount : s.getStatus().getMounts()) {
             names.add(mount.getName());
         }
+        names = ImmutableSet.copyOf(names).asList();
         return Ordering.natural().sortedCopy(names);
     }
 }

@@ -7,7 +7,6 @@ package io.v.v23.android;
 import io.v.v23.Options;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.ListenSpec;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.ECDSASigner;
 import io.v.v23.security.Principal;
@@ -37,8 +36,6 @@ public class V extends io.v.v23.V {
     static {
         RedirectStderr.Start();
     }
-    private static final ListenSpec DEFAULT_LISTEN_SPEC = new ListenSpec(
-            new ListenSpec.Address("tcp", ":0"), "proxy", true);
     private static volatile VContext context = null;
 
     /**
@@ -69,7 +66,6 @@ public class V extends io.v.v23.V {
             // Attach principal and listen spec to the context.
             try {
                 context = V.setPrincipal(context, createPrincipal(androidCtx));
-                context = V.setListenSpec(context, DEFAULT_LISTEN_SPEC);
             } catch (VException e) {
                 throw new RuntimeException(
                         "Couldn't setup Vanadium Runtime options: " + e.getMessage());

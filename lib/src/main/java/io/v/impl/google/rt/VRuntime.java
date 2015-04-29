@@ -21,14 +21,14 @@ public class VRuntime implements io.v.v23.VRuntime {
             throws VException;
     private static native io.v.v23.rpc.Client nativeGetClient(VContext ctx)
             throws VException;
-    private static native io.v.v23.rpc.Server nativeNewServer(
-            VContext ctx, ListenSpec spec) throws VException;
+    private static native io.v.v23.rpc.Server nativeNewServer(VContext ctx) throws VException;
     private static native VContext nativeSetPrincipal(VContext ctx, Principal principal)
             throws VException;
     private static native Principal nativeGetPrincipal(VContext ctx) throws VException;
     private static native VContext nativeSetNewNamespace(VContext ctx, String... roots)
             throws VException;
     private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
+    private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
 
     /**
      * Returns a new runtime instance.
@@ -58,9 +58,7 @@ public class VRuntime implements io.v.v23.VRuntime {
     }
     @Override
     public io.v.v23.rpc.Server newServer(VContext ctx, Options opts) throws VException {
-        // Get a Java ListenSpec that is attached to this context (if any).
-        final ListenSpec spec = (ListenSpec) ctx.value(this);
-        return nativeNewServer(ctx, spec);
+        return nativeNewServer(ctx);
     }
     @Override
     public VContext setPrincipal(VContext ctx, Principal principal) throws VException {
@@ -87,18 +85,12 @@ public class VRuntime implements io.v.v23.VRuntime {
         }
     }
     @Override
-    public VContext setListenSpec(VContext ctx, ListenSpec spec) {
-        return ctx.withValue(this, spec);
-    }
-
-    @Override
     public ListenSpec getListenSpec(VContext ctx) {
-        // Get the ListenSpec attached to this context.
-        final ListenSpec spec = (ListenSpec) ctx.value(this);
-        if (spec == null) {
-            throw new RuntimeException("Couldn't get attached listen spec");
+        try {
+            return nativeGetListenSpec(ctx);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get listen spec: ", e);
         }
-        return spec;
     }
     @Override
     public VContext getContext() {

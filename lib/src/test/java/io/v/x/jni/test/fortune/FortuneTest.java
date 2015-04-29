@@ -126,7 +126,7 @@ public class FortuneTest extends TestCase {
     public void testFortune() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -150,7 +150,7 @@ public class FortuneTest extends TestCase {
     public void testStreaming() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -176,7 +176,7 @@ public class FortuneTest extends TestCase {
     public void testComplexError() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -197,7 +197,7 @@ public class FortuneTest extends TestCase {
     public void testWatchNetwork() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        s.listen(null);
+        s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -210,7 +210,7 @@ public class FortuneTest extends TestCase {
     public void testContext() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -227,7 +227,7 @@ public class FortuneTest extends TestCase {
     public void testGetSignature() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 
@@ -241,7 +241,7 @@ public class FortuneTest extends TestCase {
     public void testGlob() throws VException {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
-        final String[] endpoints = s.listen(null);
+        final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         s.serve("fortune", server);
 

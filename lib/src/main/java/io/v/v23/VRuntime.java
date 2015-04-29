@@ -91,16 +91,6 @@ public interface VRuntime {
     Namespace getNamespace(VContext ctx);
 
     /**
-     * Attaches the given {@code ListenSpec} to a new context (that is derived from the given
-     * context).
-     *
-     * @param  ctx  current context
-     * @param  spec {@code ListenSpec} to be attached
-     * @return      child context to which the {@code ListenSpec} is attached
-     */
-    VContext setListenSpec(VContext ctx, ListenSpec spec);
-
-    /**
      * Returns the {@code ListenSpec} attached to the given context.
      *
      * @param  ctx current context

@@ -212,18 +212,6 @@ public class V {
     }
 
     /**
-     * Attaches the given {@code ListenSpec} to a new context (that is derived from the given
-     * context).
-     *
-     * @param  ctx  current context
-     * @param  spec {@code ListenSpec} to be attached
-     * @return      child context to which the {@code ListenSpec} is attached
-     */
-    public static VContext setListenSpec(VContext ctx, ListenSpec spec) {
-        return getRuntime().setListenSpec(ctx, spec);
-    }
-
-    /**
      * Returns the {@code ListenSpec} attached to the given context.
      *
      * @param  ctx current context
