@@ -75,7 +75,7 @@ public class BlessingPatternWrapper {
         try {
             return nativeMakeNonExtendable(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't make glob: " + e.getMessage());
+            throw new RuntimeException("Couldn't make glob", e);
         }
     }
 

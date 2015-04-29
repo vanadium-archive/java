@@ -601,7 +601,7 @@ public final class Types {
                     type = unionClass.getDeclaredField("elem").getGenericType();
                 } catch (Exception e) {
                     throw new IllegalArgumentException(
-                            "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
+                            "Unable to create VDL Type for type " + klass, e);
                 }
                 String name = annotation.name().substring(annotation.name().lastIndexOf('$') + 1);
                 fields.put(annotation.index(),
@@ -622,7 +622,7 @@ public final class Types {
                 pending.setLength(length.value());
             } catch (Exception e) {
                 throw new IllegalArgumentException(
-                        "Unable to create VDL Type for type " + klass + " : " + e.getMessage());
+                        "Unable to create VDL Type for type " + klass, e);
             }
         }
 

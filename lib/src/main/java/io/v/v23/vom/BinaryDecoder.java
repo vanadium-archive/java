@@ -77,7 +77,7 @@ public class BinaryDecoder {
             try {
                 targetType = Types.getReflectTypeForVdl(actualType);
             } catch (IllegalArgumentException e) {
-                throw new ConversionException(e.getMessage());
+                throw new ConversionException(e);
             }
         }
         return readValueMessage(actualType, targetType);
@@ -371,7 +371,7 @@ public class BinaryDecoder {
                         ReflectUtil.getRawClass(elemType)).invoke(data, elem);
             } catch (Exception e) {
                 throw new ConversionException("Can't set field " + key + " to " + elem + " of "
-                        + target.getTargetType() + " : " + e.getMessage());
+                        + target.getTargetType(), e);
             }
         }
     }
@@ -506,7 +506,7 @@ public class BinaryDecoder {
             return fieldClass.getConstructor(ReflectUtil.getRawClass(elemType)).newInstance(
                     readValue(actualElemType, elemType));
         } catch (Exception e) {
-            throw new ConversionException(actualType, target.getTargetType(), e.getMessage());
+            throw new ConversionException(actualType, target.getTargetType(), e);
         }
     }
 

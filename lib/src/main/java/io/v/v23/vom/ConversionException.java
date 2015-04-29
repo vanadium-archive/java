@@ -7,7 +7,7 @@ package io.v.v23.vom;
 import java.lang.reflect.Type;
 
 /**
- * An exception occured during value conversion.
+ * An exception occurred during value conversion.
  */
 public class ConversionException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -16,11 +16,23 @@ public class ConversionException extends Exception {
         super(msg);
     }
 
-    public ConversionException(Object value, Type targetType) {
-        this("Can't convert from " + value + " to " + targetType);
+    public ConversionException(Throwable cause) {
+        super(cause);
     }
 
-    public ConversionException(Object value, Type targetType, String cause) {
-        this("Can't convert from " + value + " to " + targetType + " : " + cause);
+    public ConversionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public ConversionException(Object value, Type targetType) {
+        super("Can't convert from " + value + " to " + targetType);
+    }
+
+    public ConversionException(Object value, Type targetType, Throwable cause) {
+        super("Can't convert from " + value + " to " + targetType, cause);
+    }
+
+    public ConversionException(Object value, Type targetType, String msg) {
+        super("Can't convert from " + value + " to " + targetType + ": " + msg);
     }
 }

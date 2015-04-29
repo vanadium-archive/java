@@ -65,8 +65,7 @@ public class V {
                 try {
                     runtime = io.v.impl.google.rt.VRuntime.create();
                 } catch (VException e) {
-                    throw new RuntimeException(
-                        "Couldn't initialize Google Veyron Runtime: " + e.getMessage());
+                    throw new RuntimeException("Couldn't initialize Google Veyron Runtime", e);
                 }
             }
             // Register caveat validators.
@@ -80,8 +79,7 @@ public class V {
                 CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT,
                         new MethodCaveatValidator());
             } catch (VException e) {
-                throw new RuntimeException(
-                        "Couldn't register caveat validators: " + e.getMessage());
+                throw new RuntimeException("Couldn't register caveat validators", e);
             }
             context = runtime.getContext();
 

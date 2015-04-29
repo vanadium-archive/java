@@ -145,7 +145,7 @@ public class PermissionsAuthorizerTest extends TestCase {
         }
     }
 
-    public void testSelfRPCs() throws VException {
+    public void testSelfRPCs() throws Exception {
         final VContext context = V.init();
         final Principal p = newPrincipal();
         final Blessings client = p.blessSelf("client");
@@ -163,7 +163,7 @@ public class PermissionsAuthorizerTest extends TestCase {
             try {
                 authorizer.authorize(context, call);
             } catch (VException e) {
-                fail(String.format("Access denied for method %s: %s", testCase, e.getMessage()));
+                throw new Exception(String.format("Access denied for method %s", testCase), e);
             }
         }
     }

@@ -81,7 +81,7 @@ public class Blessings {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
+            throw new RuntimeException("Couldn't get public key", e);
         }
     }
 

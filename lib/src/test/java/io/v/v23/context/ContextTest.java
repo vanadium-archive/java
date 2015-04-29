@@ -4,6 +4,8 @@
 
 package io.v.v23.context;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
@@ -60,11 +62,7 @@ public class ContextTest extends TestCase {
             final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
             final CountDownLatch done = ctxD.done();
             assertTrue(done != null);
-            try {
-                done.await();
-            } catch (InterruptedException e) {
-                fail("Interrupted");
-            }
+            Uninterruptibles.awaitUninterruptibly(done);
             assertEquals(0, done.getCount());
         }
         {
