@@ -67,8 +67,7 @@ public class V extends io.v.v23.V {
             try {
                 context = V.setPrincipal(context, createPrincipal(androidCtx));
             } catch (VException e) {
-                throw new RuntimeException(
-                        "Couldn't setup Vanadium Runtime options: " + e.getMessage());
+                throw new RuntimeException("Couldn't setup Vanadium Runtime options", e);
             }
             // Set the VException component name to the Android context package name.
             context = VException.contextWithComponentName(context, androidCtx.getPackageName());

@@ -56,7 +56,7 @@ public class Server implements io.v.v23.rpc.Server {
         try {
             return nativeGetStatus(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get status: " + e.getMessage());
+            throw new RuntimeException("Couldn't get status", e);
         }
     }
     @Override
@@ -64,7 +64,7 @@ public class Server implements io.v.v23.rpc.Server {
         try {
             return nativeWatchNetwork(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't watch network: " + e.getMessage());
+            throw new RuntimeException("Couldn't watch network", e);
         }
     }
     @Override
@@ -75,7 +75,7 @@ public class Server implements io.v.v23.rpc.Server {
         try {
             nativeUnwatchNetwork(this.nativePtr, (InputChannel<NetworkChange>) channel);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't unwatch network: " + e.getMessage());
+            throw new RuntimeException("Couldn't unwatch network", e);
         }
     }
     @Override

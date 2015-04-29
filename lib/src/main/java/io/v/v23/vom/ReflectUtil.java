@@ -52,7 +52,7 @@ final class ReflectUtil {
                 return value;
             }
         } catch (Exception e) {
-            throw new ConversionException(value, targetClass, e.getMessage());
+            throw new ConversionException(value, targetClass, e);
         }
     }
 
@@ -77,7 +77,7 @@ final class ReflectUtil {
             }
         } catch (Exception e) {
             throw new ConversionException(
-                    new VdlComplex128(real, imag), targetClass, e.getMessage());
+                    new VdlComplex128(real, imag), targetClass, e);
         }
         throw new ConversionException(new VdlComplex128(real, imag), targetClass);
     }
@@ -94,7 +94,7 @@ final class ReflectUtil {
             return (VdlEnum) targetClass.getMethod("valueOf", String.class)
                     .invoke(null, label);
         } catch (Exception e) {
-            throw new ConversionException(label, targetClass, e.getMessage());
+            throw new ConversionException(label, targetClass, e);
         }
     }
 
@@ -111,7 +111,7 @@ final class ReflectUtil {
                 return targetClass.getConstructor(Set.class).newInstance(impl);
             }
         } catch (Exception e) {
-            throw new ConversionException(impl, targetClass, e.getMessage());
+            throw new ConversionException(impl, targetClass, e);
         }
         throw new ConversionException(impl, targetClass);
      }
@@ -156,7 +156,7 @@ final class ReflectUtil {
         try {
             return (AbstractVdlStruct) targetClass.newInstance();
         } catch (Exception e) {
-            throw new ConversionException(target.getVdlType(), targetClass, e.getMessage());
+            throw new ConversionException(target.getVdlType(), targetClass, e);
         }
     }
 

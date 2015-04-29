@@ -32,7 +32,7 @@ class CallImpl implements Call {
         try {
             return nativeTimestamp(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get timestamp: " + e.getMessage());
+            throw new RuntimeException("Couldn't get timestamp", e);
         }
     }
     @Override
@@ -45,7 +45,7 @@ class CallImpl implements Call {
             final VdlValue[] tags = nativeMethodTags(this.nativePtr);
             return tags != null ? tags : new VdlValue[0];
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get method tags: " + e.getMessage());
+            throw new RuntimeException("Couldn't get method tags", e);
         }
     }
     @Override
@@ -65,7 +65,7 @@ class CallImpl implements Call {
         try {
             return nativeLocalPrincipal(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get local Principal: " + e.getMessage());
+            throw new RuntimeException("Couldn't get local Principal", e);
         }
     }
     @Override
@@ -73,7 +73,7 @@ class CallImpl implements Call {
         try {
             return nativeLocalBlessings(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get local Blessings: " + e.getMessage());
+            throw new RuntimeException("Couldn't get local Blessings", e);
         }
     }
     @Override
@@ -81,7 +81,7 @@ class CallImpl implements Call {
         try {
             return nativeRemoteBlessings(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get remote Blessings: " + e.getMessage());
+            throw new RuntimeException("Couldn't get remote Blessings", e);
         }
     }
     // Implements java.lang.Object.

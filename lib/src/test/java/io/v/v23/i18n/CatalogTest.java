@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -132,15 +133,11 @@ public class CatalogTest extends TestCase {
             "back funny.msg.id \"{2} from funny msg id {1}\"\n" +
             "odd.lang.id funny.msg.id \"odd and\\b \\\"funny\\\"\"";
 
-    public void testMergeAndOutput() {
+    public void testMergeAndOutput() throws Exception {
         final Catalog cat = new Catalog();
 
         // Check that Merge() works.
-        try {
-            cat.merge(new ByteArrayInputStream(MERGE_DATA.getBytes("UTF-8")));
-        } catch (IOException e) {
-            fail("Error merging input: " + e.getMessage());
-        }
+        cat.merge(new ByteArrayInputStream(MERGE_DATA.getBytes("UTF-8")));
         expectLookup(cat, "{1} foo to {2}", "fwd", "foo", 1);
         expectLookup(cat, "", "back", "foo", 2);
         expectLookup(cat, "{1} bar to {2}", "fwd", "bar", 3);
@@ -150,23 +147,14 @@ public class CatalogTest extends TestCase {
 
         // Verify that the result of Output is as expected.
         final PipedInputStream in = new PipedInputStream();
-        PipedOutputStream out = null;
-        try {
-            out = new PipedOutputStream(in);
+        try (PipedOutputStream out = new PipedOutputStream(in)) {
             cat.output(out);
-        } catch (IOException e) {
-            fail("Error writing output: " + e.getMessage());
         }
-
         final Set<String> lines = new HashSet<String>();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            fail("Unexpected exception while reading the output: " + e.getMessage());
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
         }
         expectInSet(lines, "fwd foo \"{1} foo to {2}\"");
         expectInSet(lines, "fwd bar \"{1} bar to {2}\"");

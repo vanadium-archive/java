@@ -53,7 +53,7 @@ public class VRuntime implements io.v.v23.VRuntime {
         try {
             return nativeGetClient(ctx);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get client: " + e.getMessage());
+            throw new RuntimeException("Couldn't get client", e);
         }
     }
     @Override
@@ -69,7 +69,7 @@ public class VRuntime implements io.v.v23.VRuntime {
         try {
             return nativeGetPrincipal(ctx);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get principal: " + e.getMessage());
+            throw new RuntimeException("Couldn't get principal", e);
         }
     }
     @Override
@@ -81,7 +81,7 @@ public class VRuntime implements io.v.v23.VRuntime {
         try {
             return nativeGetNamespace(ctx);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get namespace: " + e.getMessage());
+            throw new RuntimeException("Couldn't get namespace", e);
         }
     }
     @Override

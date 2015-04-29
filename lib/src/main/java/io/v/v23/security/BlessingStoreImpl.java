@@ -39,7 +39,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativeForPeer(this.nativePtr, peerBlessings);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get blessings for peers: " + e.getMessage());
+            throw new RuntimeException("Couldn't get blessings for peers", e);
         }
     }
     @Override
@@ -51,7 +51,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativeDefaultBlessings(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get default blessings: " + e.getMessage());
+            throw new RuntimeException("Couldn't get default blessings", e);
         }
     }
     @Override
@@ -59,7 +59,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
+            throw new RuntimeException("Couldn't get public key", e);
         }
     }
     @Override
@@ -67,7 +67,7 @@ class BlessingStoreImpl implements BlessingStore {
         try {
             return nativePeerBlessings(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get peer blessings: " + e.getMessage());
+            throw new RuntimeException("Couldn't get peer blessings", e);
         }
     }
     @Override

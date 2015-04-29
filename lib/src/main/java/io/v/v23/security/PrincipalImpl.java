@@ -89,7 +89,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativePublicKey(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get public key: " + e.getMessage());
+            throw new RuntimeException("Couldn't get public key", e);
         }
     }
     @Override
@@ -97,7 +97,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeBlessingsByName(this.nativePtr, name);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get blessings for name: " + e.getMessage());
+            throw new RuntimeException("Couldn't get blessings for name", e);
         }
     }
     @Override
@@ -106,7 +106,7 @@ public class PrincipalImpl implements Principal {
             return nativeBlessingsInfo(this.nativePtr, blessings);
         } catch (VException e) {
             throw new RuntimeException(
-                    "Couldn't get human-readable strings for blessings: " + e.getMessage());
+                    "Couldn't get human-readable strings for blessings", e);
         }
     }
     @Override
@@ -117,7 +117,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeBlessingStore(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get Blessing Store: " + e.getMessage());
+            throw new RuntimeException("Couldn't get Blessing Store", e);
         }
     }
     @Override
@@ -128,7 +128,7 @@ public class PrincipalImpl implements Principal {
         try {
             return nativeRoots(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get Blessing Store: " + e.getMessage());
+            throw new RuntimeException("Couldn't get Blessing Store", e);
         }
     }
     @Override

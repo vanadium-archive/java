@@ -67,12 +67,12 @@ public abstract class VdlValue implements Serializable {
             return (VdlValue) decoder.decodeValue(VdlValue.class);
         } catch (IOException e) {
             throw new IllegalArgumentException(String.format(
-                "IO error while converting value %s of type %s into VdlValue: %s",
-                value, type, e.getMessage()));
+                "IO error while converting value %s of type %s into VdlValue",
+                value, type), e);
         } catch (ConversionException e) {
             throw new IllegalArgumentException(String.format(
-                "Couldn't convert value %s of type %s into VdlValue: %s",
-                value, type, e.getMessage()));
+                "Couldn't convert value %s of type %s into VdlValue",
+                value, type), e);
         }
     }
 

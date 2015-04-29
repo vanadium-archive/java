@@ -26,7 +26,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeCreate();
         } catch (VException e) {
-            throw new RuntimeException("Couldn't create new context: " + e.getMessage());
+            throw new RuntimeException("Couldn't create new context", e);
         }
     }
 
@@ -57,7 +57,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeDeadline(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get deadline: " + e.getMessage());
+            throw new RuntimeException("Couldn't get deadline", e);
         }
     }
     @Override
@@ -71,7 +71,7 @@ public class VContextImpl extends CancelableVContext {
                 this.doneLatch = nativeDone(this.nativePtr);
                 return this.doneLatch;
             } catch (VException e) {
-                throw new RuntimeException("Couldn't invoke done: " + e.getMessage());
+                throw new RuntimeException("Couldn't invoke done", e);
             }
         }
     }
@@ -80,7 +80,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeValue(this.nativePtr, key);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't get value: " + e.getMessage());
+            throw new RuntimeException("Couldn't get value: ", e);
         }
     }
     @Override
@@ -88,7 +88,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeWithCancel(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't create cancelable context: " + e.getMessage());
+            throw new RuntimeException("Couldn't create cancelable context", e);
         }
     }
     @Override
@@ -96,7 +96,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeWithDeadline(this.nativePtr, deadline);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't create context with deadline: " + e.getMessage());
+            throw new RuntimeException("Couldn't create context with deadline", e);
         }
     }
     @Override
@@ -104,7 +104,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeWithTimeout(this.nativePtr, timeout);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't create context with timeout: " + e.getMessage());
+            throw new RuntimeException("Couldn't create context with timeout", e);
         }
     }
     @Override
@@ -112,7 +112,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             return nativeWithValue(this.nativePtr, key, value);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't create context with data: " + e.getMessage());
+            throw new RuntimeException("Couldn't create context with data:", e);
         }
     }
     @Override
@@ -120,7 +120,7 @@ public class VContextImpl extends CancelableVContext {
         try {
             nativeCancel(this.nativeCancelPtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't cancel context: " + e.getMessage());
+            throw new RuntimeException("Couldn't cancel context", e);
         }
     }
     @Override
