@@ -30,6 +30,7 @@ vdl {
 class VanadiumEnvironment {
     File v23Root;
     File v23Bin;
+    File thirdPartyGoBinDir;
 
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
@@ -49,6 +50,16 @@ class VanadiumEnvironment {
                     + "Please follow the Vanadium installation instructions at "
                     + "https://v.io/installation/index.html")
         }
+
+        result.thirdPartyGoBinDir = new File(result.v23Root,
+                ['third_party', 'java', 'go', 'bin'].join(File.separator))
+        def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
+        if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
+            throw new InvalidUserDataException(
+                    thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
+                    + "You probably didn't setup the java profile. Try running\n\n"
+                    + "v23 profile setup java\n\nand then try building again.")
+        }
         return result
     }
 }
@@ -64,14 +75,12 @@ task checkVanadiumEnvironment {
 
 task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     def env = VanadiumEnvironment.getVanadiumEnvironment()
-    def thirdPartyGo = new File(env.v23Root,
-            ['third_party', 'java', 'go', 'bin'].join(File.separator))
     def existingPath = System.getenv('PATH')
     if (existingPath == null) {
         existingPath = ""
     }
 
-    environment 'PATH': [thirdPartyGo.getAbsolutePath(), existingPath].join(File.pathSeparator)
+    environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
     commandLine env.v23Bin.getAbsolutePath(), 'go',
             'build', '-buildmode=c-shared', '-v', '-a', '-tags', 'java',
