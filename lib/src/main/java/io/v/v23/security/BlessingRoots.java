@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import com.google.common.collect.Multimap;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
@@ -34,6 +35,14 @@ public interface BlessingRoots {
      *                         provided blessing.
      */
     void recognized(ECPublicKey root, String blessing) throws VException;
+
+    /**
+     * Returns the set of recognized roots as a map from {@link BlessingPattern} to the set
+     * of authoritative keys for that pattern.
+     *
+     * @throws VException      if there was an error preparing the dump
+     */
+    Multimap<BlessingPattern, ECPublicKey> dump() throws VException;
 
     /**
      * Return a human-readable string description of the roots.  This description is detailed and

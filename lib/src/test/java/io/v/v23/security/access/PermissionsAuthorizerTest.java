@@ -7,6 +7,8 @@ package io.v.v23.security.access;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import junit.framework.TestCase;
 
 import io.v.v23.V;
@@ -185,5 +187,9 @@ public class PermissionsAuthorizerTest extends TestCase {
         public void recognized(ECPublicKey root, String blessing) throws VException {}
         @Override
         public String debugString() { return TrustAllRoots.class.toString(); }
+        @Override
+        public Multimap<BlessingPattern, ECPublicKey> dump() {
+            return ImmutableMultimap.of();
+        }
     }
 }

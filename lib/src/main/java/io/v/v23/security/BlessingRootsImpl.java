@@ -4,6 +4,7 @@
 
 package io.v.v23.security;
 
+import com.google.common.collect.Multimap;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
@@ -17,6 +18,7 @@ class BlessingRootsImpl implements BlessingRoots {
         throws VException;
     private native String nativeDebugString(long nativePtr);
     private native String nativeToString(long nativePtr);
+    private native Multimap<BlessingPattern, ECPublicKey> nativeDump(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private BlessingRootsImpl(long nativePtr) {
@@ -35,6 +37,12 @@ class BlessingRootsImpl implements BlessingRoots {
     public String debugString() {
         return nativeDebugString(this.nativePtr);
     }
+
+    @Override
+    public Multimap<BlessingPattern, ECPublicKey> dump() throws VException {
+        return nativeDump(nativePtr);
+    }
+
     @Override
     public String toString() {
         return nativeToString(this.nativePtr);

@@ -6,6 +6,7 @@ package io.v.v23.security;
 
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Multimap;
 import junit.framework.TestCase;
 
 import io.v.v23.V;
@@ -15,6 +16,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
+
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * Tests the default {@code BlessingRoot} implementation.
@@ -67,6 +70,22 @@ public class BlessingRootsTest extends TestCase {
                 }
             }
         }
+    }
+
+    public void testDump() throws VException {
+        V.init();
+        final Principal principal = Security.newPrincipal();
+        final BlessingRoots roots = principal.roots();
+        final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey(), mintPublicKey() };
+        roots.add(keys[0], new BlessingPattern("veyron"));
+        roots.add(keys[1], new BlessingPattern("google/foo"));
+        roots.add(keys[0], new BlessingPattern("google/$"));
+        roots.add(keys[3], new BlessingPattern("google/$"));
+
+        final Multimap<BlessingPattern, ECPublicKey> map = roots.dump();
+        assertThat(map).hasSize(keys.length);
+        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/$"))).containsAllOf(keys[0], keys[3]);
+        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/foo"))).containsExactly(keys[1]);
     }
 
     private static ECPublicKey mintPublicKey() throws VException {
