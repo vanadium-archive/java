@@ -27,12 +27,14 @@ public class ServerStatus {
      * @param  proxies          status of all proxy connections maintained by this server
      */
     public ServerStatus(ServerState state, boolean servesMountTable, MountStatus[] mounts,
-        String[] endpoints, ProxyStatus[] proxies) {
+            String[] endpoints, ProxyStatus[] proxies) {
         this.state = state;
         this.servesMountTable = servesMountTable;
-        this.mounts = mounts;
-        this.endpoints = endpoints;
-        this.proxies = proxies;
+        this.mounts = mounts == null ? new MountStatus[0] : Arrays.copyOf(mounts, mounts.length);
+        this.endpoints = endpoints == null ?
+                new String[0] : Arrays.copyOf(endpoints, endpoints.length);
+        this.proxies = proxies == null ?
+                 new ProxyStatus[0] : Arrays.copyOf(proxies, proxies.length);
     }
 
     /**
@@ -61,7 +63,7 @@ public class ServerStatus {
      *         server address being published by this server
      */
     public MountStatus[] getMounts() {
-        return this.mounts;
+        return Arrays.copyOf(this.mounts, this.mounts.length);
     }
 
     /**
@@ -71,7 +73,7 @@ public class ServerStatus {
      * @return the set of endpoints currently registered with the mount table
      */
     public String[] getEndpoints() {
-        return this.endpoints;
+        return Arrays.copyOf(this.endpoints, this.endpoints.length);
     }
 
     /**
@@ -80,7 +82,7 @@ public class ServerStatus {
      * @return the status of all proxy connections maintained by this server
      */
     public ProxyStatus[] getProxies() {
-        return this.proxies;
+        return Arrays.copyOf(this.proxies, this.proxies.length);
     }
 
     @Override

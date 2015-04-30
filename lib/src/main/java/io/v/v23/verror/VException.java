@@ -374,15 +374,17 @@ public class VException extends Exception {
     public VException(IDAction id, String msg, Serializable[] params, VdlType[] paramTypes) {
         super(msg);
         this.id = id;
-        params = params != null ? params : new Serializable[0];
-        paramTypes = paramTypes != null ? paramTypes : new VdlType[0];
+        params = params != null ? Arrays.copyOf(params, params.length) : new Serializable[0];
+        paramTypes = paramTypes != null ?
+                Arrays.copyOf(paramTypes, paramTypes.length) : new VdlType[0];
+
         if (params.length != paramTypes.length) {
             System.err.println(String.format(
                     "Passed different number of types (%s) than parameters (%s) to VException. " +
                     "Some params may be dropped.",
                     Arrays.toString(paramTypes), Arrays.toString(params)));
             final int length =
-                    params.length < paramTypes.length ? params.length : paramTypes.length;
+                    params.length <= paramTypes.length ? params.length : paramTypes.length;
             params = Arrays.copyOf(params, length);
             paramTypes = Arrays.copyOf(paramTypes, length);
         }

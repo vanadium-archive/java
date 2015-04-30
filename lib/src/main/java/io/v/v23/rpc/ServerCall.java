@@ -4,7 +4,6 @@
 
 package io.v.v23.rpc;
 
-import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 
 /**

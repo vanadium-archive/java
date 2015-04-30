@@ -4,11 +4,11 @@
 
 package io.v.v23.rpc;
 
-import com.google.common.collect.ImmutableList;
-
 import org.joda.time.DateTime;
 
 import io.v.v23.verror.VException;
+
+import java.util.Arrays;
 
 /**
  * NetworkChange represents the changes made in response to a network setting change
@@ -17,18 +17,18 @@ import io.v.v23.verror.VException;
 public class NetworkChange {
     private final DateTime time;
     private final ServerState state;
-    private final ImmutableList<String> changedEndpoints;
-    private final ImmutableList<NetworkAddress> addedAddrs;
-    private final ImmutableList<NetworkAddress> removedAddrs;
+    private final NetworkAddress[] addedAddrs;
+    private final NetworkAddress[] removedAddrs;
+    private final String[] changedEndpoints;
     private final VException error;
 
     public NetworkChange(DateTime time, ServerState state, NetworkAddress[] addedAddrs,
             NetworkAddress[] removedAddrs, String[] changedEndpoints, VException error) {
         this.time = time;
         this.state = state;
-        this.addedAddrs = ImmutableList.copyOf(addedAddrs);
-        this.removedAddrs = ImmutableList.copyOf(removedAddrs);
-        this.changedEndpoints = ImmutableList.copyOf(changedEndpoints);
+        this.addedAddrs = Arrays.copyOf(addedAddrs, addedAddrs.length);
+        this.removedAddrs = Arrays.copyOf(removedAddrs, removedAddrs.length);
+        this.changedEndpoints = Arrays.copyOf(changedEndpoints, changedEndpoints.length);
         this.error = error;
     }
 
@@ -51,22 +51,26 @@ public class NetworkChange {
      *
      * @return list of addresses added since the last change
      */
-    public ImmutableList<NetworkAddress> getAddedAddresses() { return this.addedAddrs; }
+    public NetworkAddress[] getAddedAddresses() {
+        return Arrays.copyOf(this.addedAddrs, this.addedAddrs.length);
+    }
 
     /**
      * Returns the addresses removed since the last change.
      *
      * @return list of addresses removed since the last change
      */
-    public ImmutableList<NetworkAddress> getRemovedAddresses() { return this.removedAddrs; }
-
+    public NetworkAddress[] getRemovedAddresses() {
+        return Arrays.copyOf(this.removedAddrs, this.removedAddrs.length);
+    }
     /**
      * Returns the list of endpoints added/removed as a result of this change.
      *
      * @return list of endpoints added/removed as a result of this change
      */
-    public ImmutableList<String> getChangedEndpoints() { return this.changedEndpoints; }
-
+    public String[] getChangedEndpoints() {
+        return Arrays.copyOf(this.changedEndpoints, this.changedEndpoints.length);
+    }
     /**
      * Returns any error encountered.
      *

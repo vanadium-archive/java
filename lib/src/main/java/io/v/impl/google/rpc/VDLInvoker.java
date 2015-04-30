@@ -10,19 +10,19 @@ import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.StreamServerCall;
-import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdl.VServer;
+import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +47,12 @@ public final class VDLInvoker {
         public ServerMethod(Object wrappedServer, Method method, VdlValue[] tags) {
             this.wrappedServer = wrappedServer;
             this.method = method;
-            this.tags = tags != null ? tags : new VdlValue[0];
+            this.tags = tags != null ? Arrays.copyOf(tags, tags.length) : new VdlValue[0];
         }
 
-        public VdlValue[] getTags() { return this.tags; }
+        public VdlValue[] getTags() {
+            return Arrays.copyOf(this.tags, this.tags.length);
+        }
 
         public Object invoke(Object... args) throws IllegalAccessException,
                 IllegalArgumentException, InvocationTargetException {

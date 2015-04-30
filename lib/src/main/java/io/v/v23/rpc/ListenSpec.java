@@ -4,6 +4,8 @@
 
 package io.v.v23.rpc;
 
+import java.util.Arrays;
+
 /**
  * ListenSpec specifies the information required to create a listening network endpoint for a server
  * and, optionally, the name of a proxy to use in conjunction with that listener.
@@ -43,7 +45,7 @@ public class ListenSpec {
     private final AddressChooser chooser;  // non-null
 
     public ListenSpec(Address[] addrs, String proxy, AddressChooser chooser) {
-        this.addrs = addrs == null ? new Address[0] : addrs;
+        this.addrs = addrs == null ? new Address[0] : Arrays.copyOf(addrs, addrs.length);
         this.proxy = proxy == null ? "" : proxy;
         if (chooser == null) {
             throw new IllegalArgumentException(
@@ -61,7 +63,9 @@ public class ListenSpec {
      *
      * @return addresses the server should listen on
      */
-    public Address[] getAddresses() { return this.addrs; }
+    public Address[] getAddresses() {
+        return Arrays.copyOf(this.addrs, this.addrs.length);
+    }
 
     /**
      * Returns the name of the proxy.  If empty, the server isn't proxied.
