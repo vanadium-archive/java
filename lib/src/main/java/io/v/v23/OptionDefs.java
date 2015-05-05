@@ -15,8 +15,13 @@ public class OptionDefs {
     public static String RUNTIME = "io.v.v23.RUNTIME";
 
     /**
-     * A key for an option of type {@link io.v.v23.rpc.Client} that
-     * specifies a client.
+     * A key for an option of type {@code java.lang.Integer} that specifies the maximum number
+     * of CPUs that the default runtime should use.
+     */
+    public static String RUNTIME_NUM_CPUS = "io.v.v23.NUM_CPUS";
+
+    /**
+     * A key for an option of type {@link io.v.v23.rpc.Client} that specifies a client.
      */
     public static String CLIENT = "io.v.v23.CLIENT";
 }
