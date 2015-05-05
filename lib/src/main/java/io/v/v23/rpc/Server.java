@@ -45,10 +45,11 @@ public interface Server {
      * subsequent calls to Serve should pass in either the original value of the object or
      * {@code null}.
      *
-     * It is considered an error to call {@code listen} after {@code serve} If the name is an
+     * It is considered an error to call {@code listen} after {@code serve}. If the name is an
      * empty string, no attempt will made to publish that name to a mount table.
      *
-     * @param  name            name under which the supplied object should be published
+     * @param  name            name under which the supplied object should be published,
+     *                         or the empty string if the object should not be published
      * @param  object   object to be published under the given name
      * @throws VException      if the object couldn't be published under the given name
      */

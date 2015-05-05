@@ -128,7 +128,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final FortuneClient client = FortuneClientFactory.bind(name);
@@ -152,7 +152,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final FortuneClient client = FortuneClientFactory.bind(name);
@@ -178,7 +178,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final FortuneClient client = FortuneClientFactory.bind(name);
@@ -199,7 +199,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         // TODO(spetrovic): Figure out how to force network change in android and test that the
         // changes get announced on this channel.
@@ -212,7 +212,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final FortuneClient client = FortuneClientFactory.bind(name);
@@ -229,7 +229,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final FortuneClient client = FortuneClientFactory.bind(name);
@@ -243,7 +243,7 @@ public class FortuneTest extends TestCase {
         final Server s = V.newServer(ctx);
         final String[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
-        s.serve("fortune", server);
+        s.serve("", server);
 
         final String name = "/" + endpoints[0];
         final List<GlobReply> globResult
