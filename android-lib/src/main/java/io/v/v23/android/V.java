@@ -33,9 +33,6 @@ import java.security.interfaces.ECPublicKey;
  * and then delegates to the Java {@code V} methods.
  */
 public class V extends io.v.v23.V {
-    static {
-        RedirectStderr.Start();
-    }
     private static volatile VContext context = null;
 
     /**
@@ -63,6 +60,7 @@ public class V extends io.v.v23.V {
                 throw new RuntimeException("Android context must be non-null.");
             }
             context = io.v.v23.V.init(opts);
+            RedirectStderr.Start();
             // Attach principal and listen spec to the context.
             try {
                 context = V.setPrincipal(context, createPrincipal(androidCtx));
