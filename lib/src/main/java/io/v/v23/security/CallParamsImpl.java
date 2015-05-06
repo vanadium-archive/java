@@ -6,7 +6,6 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
-import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 
 class CallParamsImpl implements Call {

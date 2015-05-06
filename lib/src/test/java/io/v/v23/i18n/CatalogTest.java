@@ -10,11 +10,9 @@ import io.v.v23.V;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -147,9 +145,8 @@ public class CatalogTest extends TestCase {
 
         // Verify that the result of Output is as expected.
         final PipedInputStream in = new PipedInputStream();
-        try (PipedOutputStream out = new PipedOutputStream(in)) {
-            cat.output(out);
-        }
+        PipedOutputStream out = new PipedOutputStream(in);
+        cat.output(out);
         final Set<String> lines = new HashSet<String>();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;

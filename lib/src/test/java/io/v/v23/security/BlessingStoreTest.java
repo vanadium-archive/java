@@ -11,7 +11,6 @@ import junit.framework.TestCase;
 import io.v.v23.V;
 import io.v.v23.verror.VException;
 
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -95,11 +94,9 @@ public class BlessingStoreTest extends TestCase {
                .put(new String[] { "bar", "foo" },
                        Security.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
                .build();
-        for (int i = 0; i < 100; i++) {
-            for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
-                store.forPeer(entry.getKey());
-                assertEquals(entry.getValue(), store.forPeer(entry.getKey()));
-            }
+        for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
+            store.forPeer(entry.getKey());
+            assertEquals(entry.getValue(), store.forPeer(entry.getKey()));
         }
     }
 

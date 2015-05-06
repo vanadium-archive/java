@@ -15,32 +15,6 @@ import java.security.interfaces.ECPublicKey;
  */
 class Util {
     /**
-     * Encodes the provided BlessingPattern as a string.
-     *
-     * @param  pattern BlessingPattern to be encoded.
-     * @return         the encoded BlessingPattern.
-     */
-    static String encodeBlessingPattern(BlessingPattern pattern) {
-        if (pattern == null) {
-            return "";
-        }
-        return pattern.getValue();
-    }
-
-    /**
-     * Decodes the encoded BlessingPattern encoded as a string.
-     *
-     * @param  encoded         BlessingPattern encoded as a string.
-     * @return                 decoded BlessingPattern.
-     */
-    static BlessingPattern decodeBlessingPattern(String encoded) {
-        if (encoded == null || encoded.isEmpty()) {
-            return null;
-        }
-        return new BlessingPattern(encoded);
-    }
-
-    /**
      * VOM-encodes the provided Signature.
      *
      * @param  signature Signature to be encoded.

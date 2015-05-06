@@ -4,8 +4,6 @@
 
 package io.v.v23;
 
-import java.io.IOException;
-
 import io.v.v23.verror.VException;
 
 /**

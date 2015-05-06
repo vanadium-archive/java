@@ -20,12 +20,12 @@ import java.util.List;
  * Blessings objects are immutable and multiple threads may invoke methods on them simultaneously.
  */
 public class Blessings {
-    private static native String[] nativeBlessingNames(VContext context, Call call)
-            throws VException;
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
+    private static native String[] nativeBlessingNames(VContext context, Call call)
+            throws VException;
 
-    public static Blessings create(WireBlessings wire) throws VException {
+    static Blessings create(WireBlessings wire) throws VException {
         if (wire == null) {
             wire = new WireBlessings();
         }

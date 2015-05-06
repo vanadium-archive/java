@@ -4,12 +4,9 @@
 
 package io.v.impl.google.rpc;
 
-import org.joda.time.DateTime;
 
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.Principal;
-import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;

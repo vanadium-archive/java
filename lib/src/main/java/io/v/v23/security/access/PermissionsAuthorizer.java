@@ -8,7 +8,6 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
-import io.v.v23.security.Security;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -63,7 +62,7 @@ public class PermissionsAuthorizer implements Authorizer {
                 continue;
             }
             final AccessList acl = this.acls.get(tag.toString());
-            if (acl == null || !ACLWrapper.wrap(acl).includes(blessings)) {
+            if (acl == null || !acl.includes(blessings)) {
                 errorACLMatch(blessings);
             }
             grant = true;

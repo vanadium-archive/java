@@ -6,37 +6,36 @@ package io.v.v23.security;
 
 import io.v.v23.verror.VException;
 
-public class BlessingPatternWrapper {
-    private static native BlessingPatternWrapper nativeWrap(BlessingPattern pattern)
-            throws VException;
+/**
+ * BlessingPattern is a wrapper around WireBlessingPattern, providing additional functionality.
+ */
+public class BlessingPattern extends WireBlessingPattern {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * Wraps the provided blessing pattern.
-     *
-     * @param  pattern         the blessing pattern being wrapped.
-     * @return                 wrapped blessing pattern.
-     * @throws VException      if the blessing pattern couldn't be wrapped.
-     */
-    public static BlessingPatternWrapper wrap(BlessingPattern pattern) throws VException {
-        return nativeWrap(pattern);
-    }
+    private final long nativePtr;
 
+    private native long nativeCreate() throws VException;
     private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings);
     private native boolean nativeIsValid(long nativePtr);
-    private native BlessingPatternWrapper nativeMakeNonExtendable(long nativePtr) throws VException;
+    private native BlessingPattern nativeMakeNonExtendable(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private long nativePtr;
-    private BlessingPattern pattern;
+    public BlessingPattern(String value) {
+        super(value);
+        try {
+            this.nativePtr = nativeCreate();
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create native BlessingPattern", e);
+        }
+    }
 
-    private BlessingPatternWrapper(long nativePtr, BlessingPattern pattern) {
-        this.nativePtr = nativePtr;
-        this.pattern = pattern;
+    BlessingPattern(WireBlessingPattern wire) {
+        this(wire.getValue());
     }
 
     /**
      * Returns {@code true} iff one of the presented blessings matches this pattern as per
-     * the rules described in documentation for the {@code BlessingPattern} type.
+     * the rules described in documentation for the {@code WireBlessingPattern} type.
      *
      * @param  blessings blessings compared against this pattern.
      * @return           true iff one of the presented blessings matches this pattern.
@@ -61,31 +60,22 @@ public class BlessingPatternWrapper {
      *
      * For example:
      * <code>
-     *     final BlessingPatternWrapper onlyAlice = BlessingPatternWrapper.create(
-     *         new BlessingPattern("google/alice")).makeNonExtendable();
-     *     onlyAlice.MatchedBy("google");                  // Returns true
-     *     onlyAlice.MatchedBy("google/alice");            // Returns true
-     *     onlyAlice.MatchedBy("google/alice/bob");        // Returns false
+     *     final BlessingPattern onlyAlice =
+     *             new BlessingPattern("google/alice")).makeNonExtendable();
+     *     onlyAlice.isMatchedBy("google");                  // returns true
+     *     onlyAlice.isMatchedBy("google/alice");            // returns true
+     *     onlyAlice.isMatchedBy("google/alice/bob");        // returns false
      * </code>
      *
      * @return a pattern that matches all extensions of the blessings that are matched by this
      *         pattern.
      */
-    public BlessingPatternWrapper makeNonExtendable() {
+    public BlessingPattern makeNonExtendable() {
         try {
             return nativeMakeNonExtendable(this.nativePtr);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't make glob", e);
+            throw new RuntimeException("Couldn't make blessing pattern non-extendable", e);
         }
-    }
-
-    /*
-     * Returns the blessing pattern contained in the wrapper.
-     *
-     * @return the blessing pattern contained in the wrapper.
-     */
-    public BlessingPattern getPattern() {
-        return this.pattern;
     }
 
     @Override

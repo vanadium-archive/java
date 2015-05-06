@@ -6,33 +6,36 @@ package io.v.v23.security.access;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
-public class ACLWrapper implements Authorizer {
-    private static native ACLWrapper nativeWrap(AccessList acl) throws VException;
+import java.util.List;
 
-    /**
-     * Wraps the provided ACL.
-     *
-     * @param  acl             ACL being wrapped.
-     * @return                 wrapped ACL.
-     * @throws VException      if the ACL couldn't be wrapped.
-     */
-    public static ACLWrapper wrap(AccessList acl) throws VException {
-        return nativeWrap(acl);
-    }
+/**
+ * AccessList is a wrapper around WireAccessList, providing additional functionality.
+ */
+public class AccessList extends WireAccessList implements Authorizer {
+    private static final long serialVersionUID = 1L;
 
+    private final long nativePtr;
+
+    private native long nativeCreate() throws VException;
     private native boolean nativeIncludes(long nativePtr, String[] blessings);
     private native void nativeAuthorize(long nativePtr, VContext context, Call call);
     private native void nativeFinalize(long nativePtr);
 
-    private long nativePtr;
-    private AccessList acl;
+    public AccessList(List<BlessingPattern> in, List<String> notIn) {
+        super(in, notIn);
+        try {
+            this.nativePtr = nativeCreate();
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create native AccessList", e);
+        }
+    }
 
-    private ACLWrapper(long nativePtr, AccessList acl) {
-        this.nativePtr = nativePtr;
-        this.acl = acl;
+    AccessList(WireAccessList wire) {
+        this(wire.getIn(), wire.getNotIn());
     }
 
     /**
@@ -57,15 +60,6 @@ public class ACLWrapper implements Authorizer {
     @Override
     public void authorize(VContext context, Call call) throws VException {
         nativeAuthorize(this.nativePtr, context, call);
-    }
-
-    /*
-     * Returns the ACL contained in the wrapper.
-     *
-     * @return the ACL contained in the wrapper.
-     */
-    public AccessList getACL() {
-        return this.acl;
     }
 
     @Override

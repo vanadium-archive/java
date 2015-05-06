@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.context.VContextImpl;
 import io.v.v23.security.Authorizer;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingRoots;
