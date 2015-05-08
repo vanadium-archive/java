@@ -4,17 +4,27 @@
 
 package io.v.v23;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Resources;
 import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
-import io.v.v23.namespace.Namespace;
 import io.v.v23.security.CaveatRegistry;
 import io.v.v23.security.ConstCaveatValidator;
 import io.v.v23.security.ExpiryCaveatValidator;
 import io.v.v23.security.MethodCaveatValidator;
 import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate
@@ -31,18 +41,51 @@ import io.v.v23.verror.VException;
  */
 public class V {
     private static native void nativeInit();
-    static {
-        System.loadLibrary("v23");
-        nativeInit();
-    }
 
     private static volatile VContext context = null;
     private static volatile VRuntime runtime = null;
 
+    private static final Logger log = Logger.getLogger(V.class.getName());
+
+    private static void loadV23Library() {
+        // First, attempt to find the library in java.library.path.
+        List<Throwable> errors = new ArrayList<>();
+        try {
+            System.loadLibrary("v23");
+        } catch (UnsatisfiedLinkError ule) {
+            // Thrown if the library does not exist. In this case, try to find it in our classpath.
+            errors.add(new RuntimeException("loadLibrary attempt failed", ule));
+            try {
+                URL resource = Resources.getResource("libv23.so");
+                File file = File.createTempFile("libv23", "so");
+                file.deleteOnExit();
+                ByteStreams.copy(resource.openStream(), new FileOutputStream(file));
+                System.load(file.getAbsolutePath());
+            } catch (IllegalArgumentException iae) {
+                errors.add(new RuntimeException("couldn't locate libv23.so on the classpath", iae));
+                throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
+            } catch (IOException | UnsatisfiedLinkError e) {
+                errors.add(new RuntimeException("error while reading libv23.so from the classpath", e));
+                throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
+            }
+        }
+        nativeInit();
+    }
     /**
      * Initializes the Veyron environment, returning the base context.  Calling this method multiple
      * times will always return the result of the first call to {@code init()}, ignoring
      * subsequently provided options.
+     *
+     * This method loads the native Vanadium implementation if it has not already been loaded. This
+     * method searches for the native Vanadium library using {@link System#loadLibrary}. If that
+     * throws, then the method will look for the library in the root of the classpath. If it is
+     * found, the bytes of the library are extracted to a temporary file and loaded with
+     * {@link System#load}.
+     *
+     * If the above procedure fails to load the native implementation, a {@link RuntimeException}
+     * will be thrown. The {@link RuntimeException#getCause cause} of the exception will be a
+     * {@link VLoaderException} indicating the exceptions that occurred while attempting to load
+     * the library.
      *
      * A caller may pass the following option that specifies the runtime implementation to be used:
      *     {@code OptionDefs.RUNTIME}
@@ -56,6 +99,7 @@ public class V {
         if (context != null) return context;
         synchronized (V.class) {
             if (context != null) return context;
+            loadV23Library();
             if (opts == null) opts = new Options();
             // See if a runtime was provided as an option.
             if (opts.get(OptionDefs.RUNTIME) != null) {
