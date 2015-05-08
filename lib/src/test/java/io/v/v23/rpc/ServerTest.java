@@ -4,7 +4,6 @@
 
 package io.v.v23.rpc;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 

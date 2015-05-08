@@ -6,8 +6,10 @@ package io.v.impl.google.rpc;
 
 import io.v.impl.google.channel.InputChannel;
 import io.v.v23.rpc.Dispatcher;
+import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.NetworkChange;
+import io.v.v23.rpc.ReflectInvoker;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.verror.VException;
@@ -37,11 +39,15 @@ public class Server implements io.v.v23.rpc.Server {
     }
     @Override
     public void serve(String name, Object object) throws VException {
+        if (object == null) {
+            throw new VException("Serve called with a null object");
+        }
         if (object instanceof Dispatcher) {
             nativeServe(this.nativePtr, name, (Dispatcher)object);
-        } else {
-            nativeServe(this.nativePtr, name, new DefaultDispatcher(object));
+            return;
         }
+        Invoker invoker = object instanceof Invoker ? (Invoker) object : new ReflectInvoker(object);
+        nativeServe(this.nativePtr, name, new DefaultDispatcher(invoker));
     }
     @Override
     public void addName(String name) throws VException {
@@ -100,14 +106,14 @@ public class Server implements io.v.v23.rpc.Server {
     }
 
     private static class DefaultDispatcher implements Dispatcher {
-        private final Object obj;
+        private final Invoker invoker;
 
-        DefaultDispatcher(Object obj) {
-            this.obj = obj;
+        DefaultDispatcher(Invoker invoker) {
+            this.invoker = invoker;
         }
         @Override
         public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-            return new ServiceObjectWithAuthorizer(this.obj, null);
+            return new ServiceObjectWithAuthorizer(this.invoker, null);
         }
     }
 }

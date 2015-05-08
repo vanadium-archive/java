@@ -176,7 +176,7 @@ public class PermissionsAuthorizerTest extends TestCase {
 
     private static VdlValue[] getMethodTags(String method) throws VException {
         final MyObjectServerWrapper s = new MyObjectServerWrapper(null);
-        return s.getMethodTags(null, method);
+        return s.getMethodTags(method);
     }
 
     private static class TrustAllRoots implements BlessingRoots {

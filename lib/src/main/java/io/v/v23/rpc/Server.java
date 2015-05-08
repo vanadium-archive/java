@@ -40,6 +40,10 @@ public interface Server {
      * supplied name will be delivered directly to methods implemented by the supplied object.
      * In this case, default security authorizer will be used.
      *
+     * Reflection is used to match requests to the object's method set.  As a special-case, if the
+     * object implements the {@link Invoker} interface, the invoker is used to invoke methods
+     * directly, without reflection.
+     *
      * Serve may be called multiple times with different names to publish the object under different
      * names. The object may not be changed once it has been set to a non-{@code null} value:
      * subsequent calls to Serve should pass in either the original value of the object or
