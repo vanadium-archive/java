@@ -45,8 +45,6 @@ public class V {
     private static volatile VContext context = null;
     private static volatile VRuntime runtime = null;
 
-    private static final Logger log = Logger.getLogger(V.class.getName());
-
     private static void loadV23Library() {
         // First, attempt to find the library in java.library.path.
         List<Throwable> errors = new ArrayList<>();
@@ -57,7 +55,7 @@ public class V {
             errors.add(new RuntimeException("loadLibrary attempt failed", ule));
             try {
                 URL resource = Resources.getResource("libv23.so");
-                File file = File.createTempFile("libv23", "so");
+                File file = File.createTempFile("libv23-", ".so");
                 file.deleteOnExit();
                 ByteStreams.copy(resource.openStream(), new FileOutputStream(file));
                 System.load(file.getAbsolutePath());
@@ -76,7 +74,7 @@ public class V {
      * times will always return the result of the first call to {@code init()}, ignoring
      * subsequently provided options.
      *
-     * This method loads the native Vanadium implementation if it has not already been loaded. This
+     * This method loads the native Vanadium implementation if it has not already been loaded. It
      * method searches for the native Vanadium library using {@link System#loadLibrary}. If that
      * throws, then the method will look for the library in the root of the classpath. If it is
      * found, the bytes of the library are extracted to a temporary file and loaded with
