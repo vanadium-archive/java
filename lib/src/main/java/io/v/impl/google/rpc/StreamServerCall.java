@@ -7,6 +7,7 @@ package io.v.impl.google.rpc;
 
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;
@@ -45,6 +46,10 @@ public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     }
 
     // Implements io.v.v23.rpc.ServerCall.
+    @Override
+    public Call security() {
+        return serverCall.security();
+    }
     @Override
     public String suffix() {
         return this.serverCall.suffix();

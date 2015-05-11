@@ -5,12 +5,18 @@
 package io.v.v23.rpc;
 
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Call;
 
 /**
  * ServerCall defines the in-flight call state on the server, not including methods
  * to stream args and results.
  */
 public interface ServerCall {
+    /**
+     * Returns the security-related state associated with the call.
+     */
+    Call security();
+
     /**
      * Returns the object name suffix for the request.
      */

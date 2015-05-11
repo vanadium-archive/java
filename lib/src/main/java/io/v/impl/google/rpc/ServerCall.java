@@ -6,11 +6,13 @@ package io.v.impl.google.rpc;
 
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 public class ServerCall implements io.v.v23.rpc.ServerCall {
     private final long nativePtr;
 
+    private static native Call nativeSecurity(long nativePtr);
     private static native String nativeSuffix(long nativePtr);
     private static native String nativeLocalEndpoint(long nativePtr);
     private static native String nativeRemoteEndpoint(long nativePtr);
@@ -20,6 +22,11 @@ public class ServerCall implements io.v.v23.rpc.ServerCall {
 
     private ServerCall(long nativePtr) {
         this.nativePtr = nativePtr;
+    }
+
+    @Override
+    public Call security() {
+        return nativeSecurity(nativePtr);
     }
 
     @Override

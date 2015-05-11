@@ -258,6 +258,9 @@ public class FortuneTest extends TestCase {
         @Override
         public Object[] invoke(VContext ctx, StreamServerCall call, String method, Object[] args)
                 throws VException {
+            if (call.security() == null) {
+                throw new VException("Expected call.security() to return non-null");
+            }
             if (method.equals("get")) {
                 return new Object[] { TEST_INVOKER_FORTUNE };
             }
