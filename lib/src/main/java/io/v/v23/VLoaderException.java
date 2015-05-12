@@ -13,6 +13,8 @@ import java.util.List;
  * shared library.
  */
 public class VLoaderException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     private final List<Throwable> exceptions;
 
     VLoaderException(List<Throwable> exceptions) {

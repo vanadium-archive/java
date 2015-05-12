@@ -279,11 +279,11 @@ public class Security {
     }
 
     /**
-     * Returns an authorizer that accepts all requests.
+     * Returns an authorizer that allows all requests.
      *
-     * @return an authorizer that accepts all requests.
+     * @return an authorizer that allows all requests.
      */
-    public static Authorizer newAcceptAllAuthorizer() {
+    public static Authorizer newAllowEveryoneAuthorizer() {
         return new Authorizer() {
             @Override
             public void authorize(VContext ctx, Call call) throws VException {

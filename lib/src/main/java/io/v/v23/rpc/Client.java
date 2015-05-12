@@ -37,7 +37,7 @@ public interface Client {
      * streaming args and results and finishes the call.
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
-     *    CURRENTLY NO OPTIONS ARE MANDATED
+     *    SKIP_SERVER_ENDPOINT_AUTHORIZATION
      *
      * @param  context         client context.
      * @param  name            name of the server.
