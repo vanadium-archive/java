@@ -1,5 +1,0 @@
-// This is required to ensure that all projects in this multi-project build
-// depend on buildSrc.
-rootProject.dependencies {
-    runtime project(path)
-}

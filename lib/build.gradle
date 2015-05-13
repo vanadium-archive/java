@@ -1,5 +1,24 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+        }
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+    }
+}
+
 apply plugin: 'java'
-apply plugin: VdlPlugin
+apply plugin: 'maven-publish'
+apply plugin: 'io.v.vdl'
+
+dependencies {
+    compile group: 'joda-time', name: 'joda-time', version: '2.7'
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'com.google.truth', name: 'truth', version: '0.25'
+}
 
 repositories {
     mavenCentral()
@@ -7,13 +26,6 @@ repositories {
 
 clean {
     delete 'generated-src'
-}
-
-dependencies {
-    compile group: 'joda-time', name: 'joda-time', version: '2.7'
-    compile group: 'com.google.guava', name: 'guava', version: '18.0'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'com.google.truth', name: 'truth', version: '0.25'
 }
 
 sourceCompatibility = '1.7'
@@ -94,3 +106,54 @@ tasks.withType(Test) {
 }
 
 tasks.'processTestResources'.dependsOn(buildVanadiumLib)
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+javadoc {
+    if (JavaVersion.current().isJava8Compatible()) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+}
+
+task natives(type: Jar, dependsOn: buildVanadiumLib) {
+    from 'build/libs/libv23.so'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'io.v'
+            artifactId 'vanadium'
+            version '0.1-SNAPSHOT'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
+            artifact natives {
+                classifier "natives"
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+            url "http://jring.mtv:8081/nexus/content/repositories/test_repo"
+        }
+    }
+}

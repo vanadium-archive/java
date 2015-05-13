@@ -70,7 +70,7 @@ public class LocationService extends Service {
             this.manager = manager;
         }
         @Override
-        public LatLng get(ServerCall call) throws VException {
+        public LatLng get(VContext context, ServerCall call) throws VException {
             final Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.NO_REQUIREMENT);
             final String provider = manager.getBestProvider(criteria, true);

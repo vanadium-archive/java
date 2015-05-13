@@ -1,0 +1,13 @@
+// Copyright 2015 The Vanadium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package vdl
+
+// This defines the interface of the server that will be created to listen for
+// chat messages. For more information on the chat protocol, please see
+// https://github.com/vanadium/chat
+type Chat interface {
+	// SendMessage sends a message to a user.
+	SendMessage(text string) error {}
+}

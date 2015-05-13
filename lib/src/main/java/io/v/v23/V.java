@@ -6,6 +6,14 @@ package io.v.v23;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
@@ -17,13 +25,6 @@ import io.v.v23.security.ExpiryCaveatValidator;
 import io.v.v23.security.MethodCaveatValidator;
 import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate
@@ -76,8 +77,8 @@ public class V {
      * times will always return the result of the first call to {@code init()}, ignoring
      * subsequently provided options.
      *
-     * This method loads the native Vanadium implementation if it has not already been loaded. It
-     * method searches for the native Vanadium library using {@link System#loadLibrary}. If that
+     * This method loads the native Vanadium implementation if it has not already been loaded.
+     * It searches for the native Vanadium library using {@link System#loadLibrary}. If that
      * throws, then the method will look for the library in the root of the classpath. If it is
      * found, the bytes of the library are extracted to a temporary file and loaded with
      * {@link System#load}.

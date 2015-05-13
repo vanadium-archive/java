@@ -1,0 +1,41 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+        }
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+    }
+}
+
+apply plugin: 'application'
+apply plugin: 'io.v.vdl'
+apply plugin: 'java'
+
+mainClassName = 'io.v.chat.Main'
+
+repositories {
+    maven {
+        url "http://jring.mtv:8081/nexus/content/repositories/test_repo/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'io.v:vanadium:0.1-SNAPSHOT'
+    compile 'io.v:vanadium:0.1-SNAPSHOT:natives'
+    compile 'com.googlecode.lanterna:lanterna:2.1.9'
+    testCompile 'junit:junit:4.12'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+vdl {
+    inputPaths += 'src/main/vdl/go'
+}
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'

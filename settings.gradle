@@ -1,1 +1,1 @@
-include 'lib', 'android-lib', 'projects:location', 'projects:namespace_browser', 'projects:account_manager'
+include 'lib', 'android-lib', 'projects:namespace_browser', 'projects:account_manager'

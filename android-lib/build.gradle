@@ -9,6 +9,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     buildToolsVersion '21.0.2'
@@ -31,4 +32,30 @@ dependencies {
     compile project(':lib')
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
+
+publishing {
+    publications {
+        androidLibrary(MavenPublication) {
+            groupId 'io.v'
+            artifactId 'vanadium-android'
+            version '0.1-SNAPSHOT'
+            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/android-lib-release.aar")
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+            url "http://jring.mtv:8081/nexus/content/repositories/test_repo"
+        }
+    }
 }

@@ -1,0 +1,28 @@
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'io.v'
+            artifactId 'gradle-plugin'
+            version '0.1-SNAPSHOT'
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+            url "http://jring.mtv:8081/nexus/content/repositories/test_repo"
+        }
+    }
+}

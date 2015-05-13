@@ -1,16 +1,25 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.2'
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
     }
 }
+
 apply plugin: 'com.android.application'
-apply plugin: VdlPlugin
+apply plugin: 'io.v.vdl'
+apply plugin: 'wrapper'
 
 repositories {
     jcenter()
+    maven {
+        url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+    }
 }
 
 android {
@@ -29,12 +38,16 @@ android {
 }
 
 dependencies {
-    compile project(':lib')
-    compile project(':android-lib')
     compile 'com.google.guava:guava:17.0'
     compile 'joda-time:joda-time:2.7'
+    compile 'io.v:vanadium:0.1-SNAPSHOT'
+    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
 }
 
 vdl {
     inputPaths += 'src/main/vdl/go'
+}
+
+wrapper {
+    gradleVersion '2.3'
 }
