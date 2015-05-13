@@ -24,4 +24,13 @@ public class OptionDefs {
      * A key for an option of type {@link io.v.v23.rpc.Client} that specifies a client.
      */
     public static String CLIENT = "io.v.v23.CLIENT";
+
+    /**
+     * A key for an option of type {@code Boolean} that if provided and {@code true} causes clients
+     * to ignore the blessings in remote (server) endpoint during authorization. With this option
+     * enabled, clients are susceptible to man-in-the-middle attacks where an imposter server has
+     * taken over the network address of a real server.
+     */
+    public static String SKIP_SERVER_ENDPOINT_AUTHORIZATION =
+            "io.v.v23.SKIP_SERVER_ENDPOINT_AUTHORIZATION";
 }

@@ -46,7 +46,7 @@ public class V {
 
     private static void loadV23Library() {
         // First, attempt to find the library in java.library.path.
-        List<Throwable> errors = new ArrayList<>();
+        List<Throwable> errors = new ArrayList<Throwable>();
         try {
             System.loadLibrary("v23");
         } catch (UnsatisfiedLinkError ule) {
@@ -61,7 +61,10 @@ public class V {
             } catch (IllegalArgumentException iae) {
                 errors.add(new RuntimeException("couldn't locate libv23.so on the classpath", iae));
                 throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
-            } catch (IOException | UnsatisfiedLinkError e) {
+            } catch (IOException e) {
+                errors.add(new RuntimeException("error while reading libv23.so from the classpath", e));
+                throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
+            } catch (UnsatisfiedLinkError e) {
                 errors.add(new RuntimeException("error while reading libv23.so from the classpath", e));
                 throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
             }
