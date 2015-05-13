@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ import java.util.Set;
 /**
  * BinaryDecoder reads a VDL value from {@code InputStream} encoded in binary VOM format.
  */
+// TODO(sjr): make sure this works for all unexported VDL types.
 public class BinaryDecoder {
     private final BufferedInputStream in;
     private final Map<TypeId, VdlType> decodedTypes;
@@ -367,8 +369,10 @@ public class BinaryDecoder {
                 return;
             }
             try {
-                data.getClass().getDeclaredMethod("set" + (String) key,
-                        ReflectUtil.getRawClass(elemType)).invoke(data, elem);
+                Method method = data.getClass().getDeclaredMethod("set" + key,
+                        ReflectUtil.getRawClass(elemType));
+                method.setAccessible(true);
+                method.invoke(data, elem);
             } catch (Exception e) {
                 throw new ConversionException("Can't set field " + key + " to " + elem + " of "
                         + target.getTargetType(), e);

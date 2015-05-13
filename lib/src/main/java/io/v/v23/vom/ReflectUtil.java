@@ -17,7 +17,9 @@ import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -102,19 +104,28 @@ final class ReflectUtil {
             throws ConversionException {
         try {
             if (VdlArray.class.isAssignableFrom(targetClass)) {
-                return targetClass.getConstructor(impl.getClass()).newInstance(impl);
+                return construct(targetClass, impl.getClass(), impl);
             } else if (VdlList.class.isAssignableFrom(targetClass)) {
-                return targetClass.getConstructor(List.class).newInstance(impl);
+                return construct(targetClass, List.class, impl);
             } else if (VdlMap.class.isAssignableFrom(targetClass)) {
-                return targetClass.getConstructor(Map.class).newInstance(impl);
+                return construct(targetClass, Map.class, impl);
             } else if (VdlSet.class.isAssignableFrom(targetClass)) {
-                return targetClass.getConstructor(Set.class).newInstance(impl);
+                return construct(targetClass, Set.class, impl);
             }
         } catch (Exception e) {
             throw new ConversionException(impl, targetClass, e);
         }
         throw new ConversionException(impl, targetClass);
      }
+
+    private static Object construct(
+            Class<?> targetClass, Class<?> ctorParamType, Object... ctorArgs)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+                   InstantiationException {
+        Constructor<?> ctor = targetClass.getConstructor(ctorParamType);
+        ctor.setAccessible(true);
+        return ctor.newInstance(ctorArgs);
+    }
 
     /**
      * Creates an instance of generic type, one of array, list, map, set.
@@ -154,7 +165,9 @@ final class ReflectUtil {
             return new VdlStruct(target.getVdlType());
         }
         try {
-            return (AbstractVdlStruct) targetClass.newInstance();
+            Constructor<?> ctor = targetClass.getConstructor();
+            ctor.setAccessible(true);
+            return (AbstractVdlStruct) ctor.newInstance();
         } catch (Exception e) {
             throw new ConversionException(target.getVdlType(), targetClass, e);
         }

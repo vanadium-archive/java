@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Class {@code V} represents the local environment allowing clients and servers to communicate
