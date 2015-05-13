@@ -12,6 +12,7 @@ import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.ReflectInvoker;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
+import io.v.v23.security.Authorizer;
 import io.v.v23.verror.VException;
 
 public class Server implements io.v.v23.rpc.Server {
@@ -38,16 +39,16 @@ public class Server implements io.v.v23.rpc.Server {
         return nativeListen(this.nativePtr, spec);
     }
     @Override
-    public void serve(String name, Object object) throws VException {
+    public void serve(String name, Object object, Authorizer auth) throws VException {
         if (object == null) {
             throw new VException("Serve called with a null object");
         }
-        if (object instanceof Dispatcher) {
-            nativeServe(this.nativePtr, name, (Dispatcher)object);
-            return;
-        }
         Invoker invoker = object instanceof Invoker ? (Invoker) object : new ReflectInvoker(object);
-        nativeServe(this.nativePtr, name, new DefaultDispatcher(invoker));
+        nativeServe(this.nativePtr, name, new DefaultDispatcher(invoker, auth));
+    }
+    @Override
+    public void serveDispatcher(String name, Dispatcher disp) throws VException {
+        nativeServe(this.nativePtr, name, disp);
     }
     @Override
     public void addName(String name) throws VException {
@@ -107,13 +108,15 @@ public class Server implements io.v.v23.rpc.Server {
 
     private static class DefaultDispatcher implements Dispatcher {
         private final Invoker invoker;
+        private final Authorizer auth;
 
-        DefaultDispatcher(Invoker invoker) {
+        DefaultDispatcher(Invoker invoker, Authorizer auth) {
             this.invoker = invoker;
+            this.auth = auth;
         }
         @Override
         public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-            return new ServiceObjectWithAuthorizer(this.invoker, null);
+            return new ServiceObjectWithAuthorizer(this.invoker, this.auth);
         }
     }
 }

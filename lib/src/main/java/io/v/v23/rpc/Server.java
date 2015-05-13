@@ -5,6 +5,7 @@
 package io.v.v23.rpc;
 
 import io.v.v23.InputChannel;
+import io.v.v23.security.Authorizer;
 import io.v.v23.verror.VException;
 
 /**
@@ -30,34 +31,51 @@ public interface Server {
 
     /**
      * Associates object with name by publishing the address of this server with the mount table
-     * under the supplied name.
-     *
-     * If the supplied object implements a {@code Dispatcher} interface, RPCs invoked on the
-     * supplied name will be delivered to the supplied dispatcher's {@code lookup} method which will
-     * in turn return the object and security authorizer used to serve the actual RPC call.
-     *
-     * If the supplied object doesn't implement a {@code Dispatcher} interface, RPCs invoked on the
-     * supplied name will be delivered directly to methods implemented by the supplied object.
-     * In this case, default security authorizer will be used.
+     * under the supplied name and using the given authorizer to authorize access to it.  RPCs
+     * invoked on the supplied name will be delivered to methods implemented by the supplied object.
      *
      * Reflection is used to match requests to the object's method set.  As a special-case, if the
      * object implements the {@link Invoker} interface, the invoker is used to invoke methods
      * directly, without reflection.
      *
-     * Serve may be called multiple times with different names to publish the object under different
-     * names. The object may not be changed once it has been set to a non-{@code null} value:
-     * subsequent calls to Serve should pass in either the original value of the object or
-     * {@code null}.
+     * If name is an empty string, no attempt will made to publish that name to a mount table.
      *
-     * It is considered an error to call {@code listen} after {@code serve}. If the name is an
-     * empty string, no attempt will made to publish that name to a mount table.
+     * If the passed-in authorizer in {@code null}, the default authorizer will be used.  (The
+     * default authorizer uses the blessing chain derivation to determine if the client is
+     * authorized to access the object's methods.)
+     *
+     * It is an error to call {@link #serve} if {@link #serveDispatcher} has already been called.
+     * It is also an error to call {@link #serve} multiple times.  It is considered an error to call
+     * {@link #listen} after {@link #serve}.
      *
      * @param  name            name under which the supplied object should be published,
      *                         or the empty string if the object should not be published
-     * @param  object   object to be published under the given name
+     * @param  object          object to be published under the given name
      * @throws VException      if the object couldn't be published under the given name
      */
-    void serve(String name, Object object) throws VException;
+    void serve(String name, Object object, Authorizer auth) throws VException;
+
+    /**
+     * Associates dispatcher with the portion of the mount table's name space for which name is
+     * a prefix, by publishing the address of this dispatcher with the mount table under the
+     * supplied name.
+     *
+     * RPCs invoked on the supplied name will be delivered to the supplied dispatcher's
+     * {@link Dispatcher#lookup} method which will in turn return the object and
+     * {@link Authorizer} used to serve the actual RPC call.
+     * 
+     * If name is an empty string, no attempt will made to publish that name to a mount table.
+     *
+     * It is an error to call {@link #serveDispatcher} if {@link #serve} has already been called.
+     * It is also an error to call {@link #serveDispatcher} multiple times.  It is considered an
+     * error to call {@link #listen} after {@link #serveDispatcher}.
+     *
+     * @param  name            name under which the dispatcher should be published, or the empty
+     *                         string if the dispatcher should not be published
+     * @param  dispatcher      dispatcher to be published under the given name
+     * @throws VException      if the dispatcher couldn't be published under the given name
+     */
+    void serveDispatcher(String name, Dispatcher disp) throws VException;
 
     /**
      * Adds the specified name to the mount table for the object or {@code Dispatcher} served by

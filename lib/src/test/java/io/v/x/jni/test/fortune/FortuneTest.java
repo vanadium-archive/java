@@ -49,7 +49,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -73,7 +73,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -99,27 +99,26 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
-        
+
         FortuneClient.MultipleGetOut ret = client.multipleGet(ctxT);
         assertEquals(firstMessage, ret.fortune);
         assertEquals(firstMessage, ret.another);
         s.stop();
     }
-    
-    
+
     public void testComplexError() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -140,7 +139,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         // TODO(spetrovic): Figure out how to force network change in android and test that the
         // changes get announced on this channel.
@@ -153,7 +152,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -170,7 +169,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         Client c = V.getClient(ctx);
@@ -188,7 +187,7 @@ public class FortuneTest extends TestCase {
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server);
+        s.serve("", server, null);
 
         String name = "/" + endpoints[0];
         List<GlobReply> globResult
@@ -204,7 +203,7 @@ public class FortuneTest extends TestCase {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
-        s.serve("", new TestInvoker());
+        s.serve("", new TestInvoker(), null);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -224,7 +223,7 @@ public class FortuneTest extends TestCase {
                 return new ServiceObjectWithAuthorizer(server, null);
             }
         };
-        s.serve("", dispatcher);
+        s.serveDispatcher("", dispatcher);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);
@@ -245,7 +244,7 @@ public class FortuneTest extends TestCase {
                 return new ServiceObjectWithAuthorizer(new TestInvoker(), null);
             }
         };
-        s.serve("", dispatcher);
+        s.serveDispatcher("", dispatcher);
 
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.bind(name);

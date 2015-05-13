@@ -35,8 +35,8 @@ class Util {
     }
 
     // Helper function for invoking a method on the provided invoker.
-    static byte[][] invoke(Invoker invoker,
-            VContext ctx, io.v.v23.rpc.StreamServerCall call, String method, byte[][] vomArgs) throws VException {
+    static byte[][] invoke(Invoker invoker, VContext ctx, io.v.v23.rpc.StreamServerCall call,
+            String method, byte[][] vomArgs) throws VException {
         Type[] argTypes = invoker.getArgumentTypes(method);
         if (argTypes.length != vomArgs.length) {
             throw new VException(String.format(

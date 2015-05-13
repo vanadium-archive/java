@@ -34,7 +34,7 @@ public class ServerTest extends TestCase {
         final VContext ctx = V.init();
         final Server s = V.newServer(ctx);
         s.listen(V.getListenSpec(ctx));
-        s.serve("name1", dummyDispatcher);
+        s.serveDispatcher("name1", dummyDispatcher);
         s.addName("name2");
         assertThat(getNames(s)).containsExactly("name1", "name2");
         s.addName("name2");
