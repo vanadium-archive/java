@@ -76,9 +76,10 @@ public class BinaryDecoderTest extends TestCase {
                 new TypeToken<List<String>>(){}.getType(),
                 new TypeToken<Map<String, String>>(){}.getType()
         };
-        final VException v = new VException(new VException.IDAction(
-                "io.v.v23.vom.Testing", VException.ActionCode.NO_RETRY),
-                "1 2 [3] 4=", params, paramTypes);
+        final VException.IDAction id = VException.register(
+                "io.v.v23.vom.BinaryDecoderTest.testDecodeVException",
+                VException.ActionCode.NO_RETRY, "{1} {2} {_}");
+        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
         final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
         final Object decoded = TestUtil.decode(encoded);
         if (!v.deepEquals(decoded)) {
@@ -95,14 +96,13 @@ public class BinaryDecoderTest extends TestCase {
                 List.class,
                 Map.class
         };
-        final VException v = new VException(new VException.IDAction(
-                "io.v.v23.vom.Testing", VException.ActionCode.NO_RETRY),
-                "1 2 [3] 4=", params, paramTypes);
+        final VException.IDAction id = VException.register(
+                "io.v.v23.vom.BinaryDecoderTest.testDecodeVExceptionBadParams",
+                VException.ActionCode.NO_RETRY, "{1} {2} {_}");
+        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
         final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
         final Object decoded = TestUtil.decode(encoded);
-        final VException expected = new VException(new VException.IDAction(
-                "io.v.v23.vom.Testing", VException.ActionCode.NO_RETRY),
-                "1 2 [3] 4=", null, new Type[0]);
+        final VException expected = new VException(id, "en", "test", "test");
         if (!expected.deepEquals(decoded)) {
             fail(String.format("Expected error %s, got %s", v, decoded));
         }
@@ -121,9 +121,10 @@ public class BinaryDecoderTest extends TestCase {
                 new TypeToken<List<String>>(){}.getType(),
                 new TypeToken<Map<String, String>>(){}.getType()
         };
-        final VException v = new VException(new VException.IDAction(
-                "io.v.v23.vom.Testing", VException.ActionCode.NO_RETRY),
-                "1 2 [3] 4=", params, paramTypes);
+        final VException.IDAction id = VException.register(
+                "io.v.v23.vom.BinaryDecoderTest.testDecodeEncodeVException",
+                VException.ActionCode.NO_RETRY, "{1} {2} {_}");
+        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
         final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
         final Object decoded = TestUtil.decode(encoded);
         if (!(decoded instanceof VException)) {

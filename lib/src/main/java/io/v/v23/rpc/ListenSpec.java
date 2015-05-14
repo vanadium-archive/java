@@ -7,12 +7,12 @@ package io.v.v23.rpc;
 import java.util.Arrays;
 
 /**
- * ListenSpec specifies the information required to create a listening network endpoint for a server
+ * Stores the information required to create a listening network endpoint for a server
  * and, optionally, the name of a proxy to use in conjunction with that listener.
  */
 public class ListenSpec {
     /**
-     * Address is a pair of (network protocol, address) that the server should listen on.
+     * A pair of (network protocol, address) that the server should listen on.
      * For TCP, the address must be in {@code ip:port} format. The {@code ip} may be omitted, but
      * the {@code port} can not (choose a port of {@code 0} to have the system allocate one).
      */
@@ -20,6 +20,12 @@ public class ListenSpec {
         private final String protocol;
         private final String address;
 
+        /**
+         * Creates a new {@link Address} with the given protocol and address.
+         *
+         * @param  protocol network protocol (e.g., {@code "tcp"})
+         * @param  address  network address (e.g., {@code "localhost:32786"})
+         */
         public Address(String protocol, String address) {
             this.protocol = protocol;
             this.address = address;
@@ -27,15 +33,11 @@ public class ListenSpec {
 
         /**
          * Returns the network protocol.
-          *
-          * @return the network protocol.
-          */
+         */
         public String getProtocol() { return this.protocol; }
 
         /**
          * Returns the network address.
-         *
-         * @return the network address.
          */
         public String getAddress() { return this.address; }
     }
@@ -44,6 +46,15 @@ public class ListenSpec {
     private final String proxy;  // non-null
     private final AddressChooser chooser;  // non-null
 
+    /**
+     * Creates a new {@link ListenSpec} with the given addresses, proxy,
+     * and {@link AddressChooser}.
+     *
+     * @param  addrs   {@link Address}es that the server should listen on
+     * @param  proxy   proxy that the server should use to proxy the connection
+     * @param  chooser {@link AddressChooser} used for selecting addresses to publish with the
+     *                 mount table from a candidate set of addresses
+     */
     public ListenSpec(Address[] addrs, String proxy, AddressChooser chooser) {
         this.addrs = addrs == null ? new Address[0] : Arrays.copyOf(addrs, addrs.length);
         this.proxy = proxy == null ? "" : proxy;
@@ -54,14 +65,16 @@ public class ListenSpec {
         this.chooser = chooser;
     }
 
+    /**
+     * Same as {@link #ListenSpec(Address[],String,AddressChooser)}, only with a
+     * single listening {@link Address}.
+     */
     public ListenSpec(Address addr, String proxy, AddressChooser chooser) {
         this(new Address[]{ addr }, proxy, chooser);
     }
 
     /**
      * Returns the addresses the server should listen on.
-     *
-     * @return addresses the server should listen on
      */
     public Address[] getAddresses() {
         return Arrays.copyOf(this.addrs, this.addrs.length);
@@ -69,16 +82,18 @@ public class ListenSpec {
 
     /**
      * Returns the name of the proxy.  If empty, the server isn't proxied.
-     *
-     * @return the name of the proxy
      */
     public String getProxy() { return this.proxy; }
 
     /**
      * Returns the address chooser that is used to choose the preferred address
      * to publish with the mount table when one is not otherwise specified.
-     *
-     * @return the address chooser
      */
     public AddressChooser getChooser() { return this.chooser; }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(this.addrs) +
+                (this.proxy.isEmpty() ? "" : "proxy(" + this.proxy + ")");
+    }
 }

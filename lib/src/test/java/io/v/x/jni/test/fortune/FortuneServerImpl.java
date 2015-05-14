@@ -26,7 +26,7 @@ public class FortuneServerImpl implements FortuneServer, Globber {
             11,
             ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
 
-    public static final VException COMPLEX_ERROR = VException.explicitMake(
+    public static final VException COMPLEX_ERROR = new VException(
             Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
 
     private String lastAddedFortune;
@@ -34,7 +34,7 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     @Override
     public String get(VContext context, ServerCall call) throws VException {
         if (lastAddedFortune == null) {
-            throw VException.make(Errors.ERR_NO_FORTUNES, context);
+            throw new VException(Errors.ERR_NO_FORTUNES, context);
         }
         return lastAddedFortune;
     }
@@ -71,7 +71,7 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     @Override
     public MultipleGetOut multipleGet(VContext context, ServerCall call) throws VException {
         if (lastAddedFortune == null) {
-            throw VException.make(Errors.ERR_NO_FORTUNES, context);
+            throw new VException(Errors.ERR_NO_FORTUNES, context);
         }
         MultipleGetOut ret = new MultipleGetOut();
         ret.fortune = lastAddedFortune;
