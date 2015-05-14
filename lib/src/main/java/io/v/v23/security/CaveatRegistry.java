@@ -65,7 +65,7 @@ public class CaveatRegistry {
     public static void validate(VContext context, Call call, Caveat caveat) throws VException {
         final RegistryEntry entry = lookup(caveat.getId());
         if (entry == null) {
-            throw Errors.makeCaveatNotRegistered(null, caveat.getId());
+            throw Errors.newCaveatNotRegistered(null, caveat.getId());
         }
         Object param = null;
         try {

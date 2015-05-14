@@ -7,10 +7,12 @@ package io.v.v23.i18n;
 import io.v.v23.context.VContext;
 
 /**
- * Language class provides various language-related utilities.
+ * Provides various language-related utilities.
  */
 public class Language {
     private static Catalog defaultCatalog = new Catalog();
+
+    private Language() {}
 
     /**
      * Returns a child of the given context that has the provided language attached to it.
@@ -40,9 +42,7 @@ public class Language {
     }
 
     /**
-     * Returns the default catalog.
-     *
-     * @return the default catalog
+     * Returns the default {@link Catalog}.
      */
     public static Catalog getDefaultCatalog() {
         return defaultCatalog;

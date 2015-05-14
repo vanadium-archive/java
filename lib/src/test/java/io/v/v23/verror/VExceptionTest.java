@@ -84,28 +84,28 @@ public class VExceptionTest extends TestCase {
         ctx = VException.contextWithComponentName(ctx, "FooServer");
 
         // A first IDAction in various languages.
-        aEN0 = VException.explicitMake(idActionA, EN, "server", "aEN0", 0);
-        aEN1 = VException.explicitMake(idActionA, EN, "server", "aEN1", 1, 2);
-        aFR0 = VException.explicitMake(idActionA, FR, "server", "aFR0", 0);
-        aFR1 = VException.make(idActionA, ctx, 1, 2);
-        aDE0 = VException.explicitMake(idActionA, DE, "server", "aDE0", 0);
-        aDE1 = VException.explicitMake(idActionA, DE, "server", "aDE1", 1, 2);
+        aEN0 = new VException(idActionA, EN, "server", "aEN0", 0);
+        aEN1 = new VException(idActionA, EN, "server", "aEN1", 1, 2);
+        aFR0 = new VException(idActionA, FR, "server", "aFR0", 0);
+        aFR1 = new VException(idActionA, ctx, 1, 2);
+        aDE0 = new VException(idActionA, DE, "server", "aDE0", 0);
+        aDE1 = new VException(idActionA, DE, "server", "aDE1", 1, 2);
 
         // A second IDAction in various languages.
-        bEN0 = VException.explicitMake(idActionB, EN, "server", "bEN0", 0);
-        bEN1 = VException.explicitMake(idActionB, EN, "server", "bEN1", 1, 2);
-        bFR0 = VException.explicitMake(idActionB, FR, "server", "bFR0", 0);
-        bFR1 = VException.explicitMake(idActionB, FR, "server", "bFR1", 1, 2);
-        bDE0 = VException.explicitMake(idActionB, DE, "server", "bDE0", 0);
-        bDE1 = VException.explicitMake(idActionB, DE, "server", "bDE1", 1, 2);
+        bEN0 = new VException(idActionB, EN, "server", "bEN0", 0);
+        bEN1 = new VException(idActionB, EN, "server", "bEN1", 1, 2);
+        bFR0 = new VException(idActionB, FR, "server", "bFR0", 0);
+        bFR1 = new VException(idActionB, FR, "server", "bFR1", 1, 2);
+        bDE0 = new VException(idActionB, DE, "server", "bDE0", 0);
+        bDE1 = new VException(idActionB, DE, "server", "bDE1", 1, 2);
 
         // The NoExist error in various languages.
-        nEN0 = VException.explicitMake(Errors.NO_EXIST, EN, "server", "nEN0", 0);
-        nEN1 = VException.explicitMake(Errors.NO_EXIST, EN, "server", "nEN1", 1, 2);
-        nFR0 = VException.explicitMake(Errors.NO_EXIST, FR, "server", "nFR0", 0);
-        nFR1 = VException.explicitMake(Errors.NO_EXIST, FR, "server", "nFR1", 1, 2);
-        nDE0 = VException.explicitMake(Errors.NO_EXIST, DE, "server", "nDE0", 0);
-        nDE1 = VException.explicitMake(Errors.NO_EXIST, DE, "server", "nDE1", 1, 2);
+        nEN0 = new VException(Errors.NO_EXIST, EN, "server", "nEN0", 0);
+        nEN1 = new VException(Errors.NO_EXIST, EN, "server", "nEN1", 1, 2);
+        nFR0 = new VException(Errors.NO_EXIST, FR, "server", "nFR0", 0);
+        nFR1 = new VException(Errors.NO_EXIST, FR, "server", "nFR1", 1, 2);
+        nDE0 = new VException(Errors.NO_EXIST, DE, "server", "nDE0", 0);
+        nDE1 = new VException(Errors.NO_EXIST, DE, "server", "nDE1", 1, 2);
     }
 
     public static void testBasic() {
