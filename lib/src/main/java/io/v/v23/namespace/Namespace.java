@@ -10,17 +10,18 @@ import io.v.v23.naming.GlobReply;
 import io.v.v23.verror.VException;
 
 /**
- * Namespace provides translation from object names to server object addresses.  It represents the
- * interface to a client side library for the MountTable service.
+ * Translation from object names to server object addresses.  It represents the interface to a
+ * client side library for the {@code MountTable} service.
  */
 public interface Namespace {
     /**
      * Returns all names matching the provided pattern.
      *
-     * @param  context         a client context.
-     * @param  pattern         a pattern that should be matched.
-     * @return                 an input channel of GlobReply objects matching the provided pattern.
-     * @throws VException      if an error is encountered.
+     * @param  context         a client context
+     * @param  pattern         a pattern that should be matched
+     * @return                 an input channel of {@link GlobReply} objects matching the
+     *                         provided pattern
+     * @throws VException      if an error is encountered
      */
     InputChannel<GlobReply> glob(VContext context, String pattern) throws VException;
 }

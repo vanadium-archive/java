@@ -7,8 +7,7 @@ package io.v.v23.rpc;
 import io.v.v23.verror.VException;
 
 /**
- * Dispatcher defines the interface that a server must implement to handle method invocations on
- * named objects.
+ * Interface that a server must implement to handle method invocations on named objects.
  */
 public interface Dispatcher {
     /**
@@ -17,16 +16,16 @@ public interface Dispatcher {
      * allows control over authorization checks.  Returning a {@code null}
      * container indicates that this dispatcher does handle the object - the
      * framework should try other dispatchers.
-     *
+     * <p>
      * Reflection is used to match requests to the service object's method set.
      * As a special-case, if the returned object implements the {@link Invoker}
      * interface, the invoker is used to invoke methods directly, without
      * reflection.
-     *
+     * <p>
      * A thrown exception indicates the dispatch lookup has failed.  The error
      * will be delivered back to the client and no further dispatch lookups will
      * be performed.
-     *
+     * <p>
      * This method may be invoked concurrently by the underlying RPC system and
      * hence must be thread-safe.
      *

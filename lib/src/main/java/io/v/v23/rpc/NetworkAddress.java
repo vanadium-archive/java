@@ -4,10 +4,18 @@
 
 package io.v.v23.rpc;
 
-// NetworkAddress represents the network endpoint address.
+/**
+ * The network endpoint address.
+ */
 public class NetworkAddress {
     private final String network, address;
 
+    /**
+     * Creates a new {@link NetworkAddress} given the network description and address.
+     *
+     * @param  network network description
+     * @param  address network address
+     */
     public NetworkAddress(String network, String address) {
         this.network = network;
         this.address = address;
@@ -15,15 +23,11 @@ public class NetworkAddress {
 
     /**
      * Returns the description of the network.
-     *
-     * @return the description of the network
      */
     public String network() { return this.network; }
 
     /**
      * Returns the network address.
-     *
-     * @return the network address
      */
     public String address() { return this.address; }
 

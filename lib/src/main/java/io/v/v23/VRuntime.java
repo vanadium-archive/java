@@ -13,18 +13,20 @@ import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
 
 /**
- * VRuntime is a base interface for all runtime implementations.
+ * The base interface for all runtime implementations.
  *
- * Methods in this class aren't meant to be invoked directly; instead, {@code V}
+ * Methods in this class aren't meant to be invoked directly; instead, {@link V}
  * should be initialized with an instance of this class, passed in through the
- * {@code OptionDefs.RUNTIME} option.
+ * {@link OptionDefs#RUNTIME} option.
  */
 public interface VRuntime {
     /**
      * Creates a new client instance with the provided options and attaches it to a new context.
      * A particular runtime implementation chooses which options to support, but at the minimum must
      * handle the following options:
-     *     CURRENTLY NO OPTIONS ARE MANDATED
+     * <p><ul>
+     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     * </ul>
      *
      * @param  ctx             current context
      * @param  opts            client options
@@ -45,7 +47,9 @@ public interface VRuntime {
      * Creates a new server instance with the provided options.  A particular runtime
      * implementation chooses which options to support, but at the minimum it must handle
      * the following options:
-     *     CURRENTLY NO OPTIONS ARE MANDATED
+     * <p><ul>
+     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     * </ul>
      *
      * @param  ctx             current context
      * @param  opts            server options

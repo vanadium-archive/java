@@ -23,7 +23,7 @@ import java.util.Calendar;
 import javax.security.auth.x500.X500Principal;
 
 /**
- * KeyStoreUtil provides convenience routines for working with keys stored in Android KeyStore.
+ * Convenience routines for working with keys stored in Android KeyStore.
  */
 public class KeyStoreUtil {
     private static final String KEYSTORE = "AndroidKeyStore";
@@ -75,7 +75,7 @@ public class KeyStoreUtil {
     }
 
     /**
-     * Returns the private key if it exists in the Android KeyStore or null if it doesn't exist.
+     * Returns the private key if it exists in the Android KeyStore or {@code null} if it doesn't.
      * Throws an exception on an error.
      *
      * @param  alias           alias of the key in the KeyStore.
@@ -109,4 +109,6 @@ public class KeyStoreUtil {
             throw new VException("Couldn't get keystore entry: " + e.getMessage());
         }
     }
+
+    private KeyStoreUtil() {}
 }

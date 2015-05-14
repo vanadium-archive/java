@@ -8,8 +8,7 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 
 /**
- * ServerCall defines the in-flight call state on the server, not including methods
- * to stream args and results.
+ * The in-flight call state on the server, not including methods to stream args and results.
  */
 public interface ServerCall {
     /**
@@ -23,22 +22,22 @@ public interface ServerCall {
     String suffix();
 
     /**
-     * Returns the Endpoint at the local end of communication.
+     * Returns the endpoint at the local end of communication.
      */
     String localEndpoint();
 
     /**
-     * Returns the Endpoint at the remote end of communication.
+     * Returns the endpoint at the remote end of communication.
      */
     String remoteEndpoint();
 
     /**
      * Returns blessings bound to the server's private key (technically, the server principal's
      * private key) provided by the client of the RPC.
-     *
+     * <p>
      * This method can return {@code null}, which indicates that the client did not provide any
      * blessings to the server with the request.
-     *
+     * <p>
      * Note that these blessings are distinct from the blessings used by the client and
      * server to authenticate with each other (RemoteBlessings and LocalBlessings respectively).
      *

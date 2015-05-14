@@ -8,18 +8,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Options is a holder for options used by various Veyron methods.  Each option has a String key
+ * Placeholder for Vanadium options.  Each option has a {@link java.lang.String} key
  * and an arbitrary option value.
  */
 public class Options {
     private Map<String, Object> options = new HashMap<String, Object>();
 
     /**
-     * Returns true iff the option with the provided key exists.  (Note that if the option exists
-     * but its value is {@code null}, this method will return {@code true}.)
+     * Returns {@code true} iff the option with the provided key exists.  (Note that if the
+     * option exists but its value is {@code null}, this method will return {@code true}.)
      *
-     * @param  key key of the option whose existance is checked.
-     * @return     {@code true} iff the option with the above key exists.
+     * @param  key key of the option whose existance is checked
+     * @return     {@code true} iff the option with the above key exists
      */
     public boolean has(String key) {
         return this.options.containsKey(key);
@@ -28,8 +28,8 @@ public class Options {
     /**
      * Returns the option with the provided key.
      *
-     * @param  key key of the option we want to get.
-     * @return     an option with the provided key, or {@code null} if no such option exists.
+     * @param  key key of the option we want to get
+     * @return     an option with the provided key, or {@code null} if no such option exists
      */
     public Object get(String key) {
         return this.options.get(key);
@@ -38,10 +38,10 @@ public class Options {
     /**
      * Returns the option of the provided type with the given key.
      *
-     * @param key              key of the option we want to get.
-     * @param type             type of the option we want to get.
+     * @param key              key of the option we want to get
+     * @param type             type of the option we want to get
      * @return                 an option with the provided key, or {@code null} if no such
-     *                         option exists.
+     *                         option exists
      */
     public <T> T get(String key, Class<T> type) {
         final Object opt = this.options.get(key);
@@ -57,8 +57,8 @@ public class Options {
      * Associates option value with the provided key.  If an option with the same key already exist,
      * its value will be overwritten.
      *
-     * @param key   key of the option we are setting.
-     * @param value an option we are setting.
+     * @param key   key of the option we are setting
+     * @param value an option we are setting
      */
     public void set(String key, Object value) {
         this.options.put(key, value);
@@ -67,7 +67,7 @@ public class Options {
     /**
      * Removes the option with a given key.  This method is a no-op if the option doesn't exist.
      *
-     * @param key a key of an option to be removed.
+     * @param key a key of an option to be removed
      */
     public void remove(String key) {
         this.options.remove(key);

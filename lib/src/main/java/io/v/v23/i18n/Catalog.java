@@ -37,27 +37,27 @@ import java.util.regex.Pattern;
  * or {@code {:_:}} and the corresponding parameters are not the empty string, the parameter is
  * preceded by {@code ": "} or followed by {@code ":"}  or both, respectively.  For example, if the
  * format:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * {3:} foo {2} bar{:_} ({3})
- * }</pre>
+ * </pre></blockquote><p>
  * is used with arguments:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * "1st", "2nd", "3rd", "4th"
- * }</pre>
+ * </pre></blockquote><p>
  * it yields:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * 3rd: foo 2nd bar: 1st 4th (3rd)
- * }</pre>
+ * </pre></blockquote><p>
  *
  * The positional parameters may have any type and are printed in their default formatting.
  * If a particular formatting is desired, the parameter should be converted to a string first.
  * In principle, the default formating for a parameter may depend on a language tag.
  *
  * A typical usage pattern of this class goes like:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * Catalog cat = Language.getDefaultCatalog();
  * String output = cat.format(language, msgID, "1st", "2nd", "3rd", "4th");
- * }</pre>
+ * </pre></blockquote><p>
  */
 public class Catalog {
     private static native String nativeFormatParams(String format, String[] params);
@@ -205,9 +205,9 @@ public class Catalog {
     /**
      * Merges the data in the lines from the provided input stream into the catalog.
      * Each line from the input stream is expected to be in the following format:
-     * <p><pre>{@code
-     *      <language> <message ID> "<escaped format string>"
-     * }</pre>
+     * <p><blockquote><pre>
+     *      {@literal <language> <message ID> "<escaped format string>"}
+     * </pre></blockquote><p>
      * If a line starts with a {@code #} or cannot be parsed, the line is ignored.
      *
      * @param  in          input stream containing lines in the above format

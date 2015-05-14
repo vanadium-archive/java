@@ -13,8 +13,8 @@ import io.v.v23.verror.VException;
 import java.lang.reflect.Type;
 
 /**
- * Invoker defines the interface used by the server for invoking methods on named objects.
- * Typically {@code ReflectInvoker(object)} is used, which makes all public methods on the given
+ * Interface used by the server for invoking methods on named objects. Typically
+ * {@link ReflectInvoker} is used, which makes all public methods on the given
  * object invokable.
  */
 public interface Invoker extends Globber {

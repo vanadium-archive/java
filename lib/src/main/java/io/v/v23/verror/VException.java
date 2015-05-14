@@ -26,12 +26,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p>
  * To define a new error identifier, for example {@code "someNewError"}, client code is
  * expected to declare a variable like this:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * IDAction someNewError = VException.register(
  *         "my/package/name.someNewError",
  *         VException.ActionCode.NO_RETRY,
  *         "{1} {2} English text for new error");
- * }</pre>
+ * </pre></blockquote><p>
  * Error identifier strings should start with the package path to ensure uniqueness.  Note that the
  * package paths are separated with {@code "/"} delimiter; this is a chosen convention to make
  * the error uniquely identifiable across various programming languages.
@@ -48,29 +48,29 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * identify the object(s) on which the error occurred.  This convention is normally applied by
  * {@link #VException(IDAction,VContext,Serializable...)}, which fetches the language, component name
  * and operation name from the current context:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * VException e = new VException(someNewError, ctx, "object_on_which_error_occurred");
- * }</pre>
+ * </pre></blockquote><p>
  * The {@link #VException(IDAction,String,String,String,Serializable...)} constructor can be used
  * to specify these things explicitly:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  * VException e = new VException(
  *         someNewError, "en", "my_component", "op_name", "procedure_name", "object_name");
- * }</pre>
+ * </pre></blockquote><p>
  * If the language, component and/or operation name are unknown, use an empty string.
  * <p>
  * Because of the convention for the first two parameters, error messages in the catalog typically
  * look like this (at least for left-to-right languages):
- * <p><pre>{@code
+ * <p><blockquote><pre>
  *      {1} {2} The new error {_}
- * }</pre>
+ * </pre></blockquote><p>
  * Tokens {@code {1}}, {@code {2}}, etc.  refer to the first and second positional
  * parameters respectively, while {@code {_}} is replaced by the positional parameters not
  * explicitly referred to elsewhere in the message.  Thus, given the parameters above, this would
  * lead to the output:
- * <p><pre>{@code
+ * <p><blockquote><pre>
  *      my_component op_name The new error object_name
- * }</pre>
+ * </pre></blockquote><p>
  * If a substring is of the form {@code {:<number>}, {<number>:}, {:<number>:},
  * {:_}, {_:}, or {:_:}} and the corresponding parameters are not the empty string, the parameter is
  * preceded by {@code ": "} or followed by {@code ":"} or both, respectively.

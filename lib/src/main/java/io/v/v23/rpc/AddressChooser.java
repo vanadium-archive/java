@@ -7,13 +7,12 @@ package io.v.v23.rpc;
 import io.v.v23.verror.VException;
 
 /**
- * AddressChooser is an interface for choosing addresses to publish with the
- * mount table from a candidate set of addresses.
+ * Interface for choosing addresses to publish with the mount table from a candidate
+ * set of addresses.
  */
 public interface AddressChooser {
     /**
-     * Chooses preferred addresses to publish with the mount table from the
-     * given candidate set.
+     * Returns preferred addresses to publish with the mount table from the given candidate set.
      *
      * @param  protocol   network protocol
      * @param  candidates candidate set of addresses

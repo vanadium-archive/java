@@ -27,17 +27,16 @@ import io.v.v23.security.Principal;
 import io.v.v23.verror.VException;
 
 /**
- * Class {@code V} represents the local environment allowing clients and servers to communicate
- * with one another.  The expected usage pattern of this class goes something like this:
- * <code>
- *    ...
- *    final VContext ctx = V.init(opts);
- *    ...
- *    final Server s = V.newServer(ctx);
- *    ...
- *    final Client c = V.getClient(ctx);
- *    ...
- * </code>
+ * The local environment allowing clients and servers to communicate with one another.  The expected
+ * usage pattern of this class goes something like this:
+ * <p><blockquote><pre>
+ *     VContext ctx = V.init(opts);
+ *     ...
+ *     Server s = V.newServer(ctx);
+ *     ...
+ *     Client c = V.getClient(ctx);
+ *     ...
+ * </pre></blockquote><p>
  */
 public class V {
     private static native void nativeInit();
@@ -73,24 +72,25 @@ public class V {
         nativeInit();
     }
     /**
-     * Initializes the Veyron environment, returning the base context.  Calling this method multiple
-     * times will always return the result of the first call to {@code init()}, ignoring
-     * subsequently provided options.
-     *
-     * This method loads the native Vanadium implementation if it has not already been loaded.
-     * It searches for the native Vanadium library using {@link System#loadLibrary}. If that
-     * throws, then the method will look for the library in the root of the classpath. If it is
-     * found, the bytes of the library are extracted to a temporary file and loaded with
-     * {@link System#load}.
-     *
+     * Initializes the Vanadium environment, returning the base context.  Calling this method
+     * multiple times will always return the result of the first call to {@link #init init},
+     * ignoring subsequently provided options.
+     * <p>
+     * This method loads the native Vanadium implementation if it has not already been loaded. It
+     * searches for the native Vanadium library using {@link java.lang.System#loadLibrary}.
+     * If that throws, then the method will look for the library in the root of the classpath.
+     * If it is found, the bytes of the library are extracted to a temporary file and loaded with
+     * {@link java.lang.System#load}.
+     * <p>
      * If the above procedure fails to load the native implementation, a {@link RuntimeException}
      * will be thrown. The {@link RuntimeException#getCause cause} of the exception will be a
      * {@link VLoaderException} indicating the exceptions that occurred while attempting to load
      * the library.
-     *
+     * <p>
      * A caller may pass the following option that specifies the runtime implementation to be used:
-     *     {@code OptionDefs.RUNTIME}
-     *
+     * <p><ul>
+     *     <li>{@link OptionDefs.RUNTIME}</li>
+     * </ul><p>
      * If this option isn't provided, the default runtime implementation is used.
      *
      * @param  opts options
@@ -136,7 +136,7 @@ public class V {
     }
 
     /**
-     * Initializes the Veyron environment without options.  See {@code init(Options)} for more
+     * Initializes the Veyron environment without options.  See {@link #init(Options)} for more
      * information.
      *
      * @return base context
@@ -160,7 +160,9 @@ public class V {
      * Creates a new client instance with the provided options and attaches it to a new context.
      * A particular runtime implementation chooses which options to support, but at the minimum must
      * handle the following options:
-     *     CURRENTLY NO OPTIONS ARE MANDATED
+     * <p><ul>
+     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     * </ul>
      *
      * @param  ctx             current context
      * @param  opts            client options
@@ -197,7 +199,9 @@ public class V {
      * Creates a new server instance with the provided options.  A particular runtime
      * implementation chooses which options to support, but at the minimum it must handle
      * the following options:
-     *     CURRENTLY NO OPTIONS ARE MANDATED
+     * <p><ul>
+     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     * </ul>
      *
      * @param  ctx             current context
      * @param  opts            server options
@@ -208,7 +212,6 @@ public class V {
         if (opts == null) opts = new Options();
         return getRuntime().newServer(ctx, opts);
     }
-
 
     /**
      * Attaches the given principal to a new context (that is derived from the given context).
@@ -268,4 +271,6 @@ public class V {
         init(null);
         return runtime;
     }
+
+    protected V() {}
 }

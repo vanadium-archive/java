@@ -7,7 +7,7 @@ package io.v.v23.rpc;
 import java.util.Arrays;
 
 /**
- * ServerStatus represents the current status of the server.
+ * The current status of the server.
  */
 public class ServerStatus {
     private ServerState state;
@@ -17,7 +17,7 @@ public class ServerStatus {
     private final ProxyStatus[] proxies;
 
     /**
-     * Creates a new server status object.
+     * Creates a new {@link ServerStatus} object.
      *
      * @param  state            the current state of the server
      * @param  servesMountTable whether this server serves a mount table
@@ -39,8 +39,6 @@ public class ServerStatus {
 
     /**
      * Returns the current state of the server.
-     *
-     * @return the current state of the server
      */
     public ServerState getState() {
         return this.state;
@@ -48,8 +46,6 @@ public class ServerStatus {
 
     /**
      * Returns true iff this server serves a mount table.
-     *
-     * @return true iff this server serves a mount table
      */
     public boolean servesMountTable() {
         return this.servesMountTable;
@@ -58,9 +54,6 @@ public class ServerStatus {
     /**
      * Returns the status of the last mount or unmount operation for every combination of name and
      * server address being published by this server.
-     *
-     * @return the status of the last mount or unmount operation for every combination of name and
-     *         server address being published by this server
      */
     public MountStatus[] getMounts() {
         return Arrays.copyOf(this.mounts, this.mounts.length);
@@ -69,8 +62,6 @@ public class ServerStatus {
     /**
      * Returns the set of endpoints currently registered with the mount table for the names
      * published using this server but excluding those used for serving proxied requests.
-     *
-     * @return the set of endpoints currently registered with the mount table
      */
     public String[] getEndpoints() {
         return Arrays.copyOf(this.endpoints, this.endpoints.length);
@@ -78,8 +69,6 @@ public class ServerStatus {
 
     /**
      * Returns the status of all proxy connections maintained by this server.
-     *
-     * @return the status of all proxy connections maintained by this server
      */
     public ProxyStatus[] getProxies() {
         return Arrays.copyOf(this.proxies, this.proxies.length);

@@ -7,7 +7,6 @@ package io.v.v23.security;
 import junit.framework.TestCase;
 
 import io.v.v23.V;
-import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -17,24 +16,6 @@ import java.util.Arrays;
  * Tests the default Blessings implementation.
  */
 public class BlessingsTest extends TestCase {
-    public void testBlessingNames() throws VException {
-        final VContext context = V.init();
-        final Principal p1 = Security.newPrincipal();
-        final Principal p2 = Security.newPrincipal();
-        final Blessings alice = p1.blessSelf("alice");
-        p2.addToRoots(alice);
-
-        final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
-        final Call call = Security.newCall(
-                new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
-        final String[] blessings = Blessings.getBlessingNames(context, call);
-        if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
-            fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
-                    Arrays.toString(blessings)));
-        }
-    }
-
     public void testPublicKey() throws VException {
         V.init();
         final Principal p1 = Security.newPrincipal();

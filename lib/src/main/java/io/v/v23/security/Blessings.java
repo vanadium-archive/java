@@ -22,8 +22,6 @@ import java.util.List;
 public class Blessings {
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
-    private static native String[] nativeBlessingNames(VContext context, Call call)
-            throws VException;
 
     static Blessings create(WireBlessings wire) throws VException {
         if (wire == null) {
@@ -45,29 +43,6 @@ public class Blessings {
     private Blessings(long nativePtr, WireBlessings wire) {
         this.nativePtr = nativePtr;
         this.wire = wire;
-    }
-
-    /**
-     * Returns a validated set of (human-readable string) blessings presented by the principal.
-     * These returned blessings (strings) are guaranteed to:
-     *
-     * (1) Satisfy all the caveats given the call.
-     * (2) Be rooted in {@code call.LocalPrincipal().Roots()}.
-     *
-     * Caveats are considered satisfied in the given call if the {@code CaveatValidator}
-     * implementation can be found in the address space of the caller and {@code validate} doesn't
-     * throw an exception.
-     *
-     * @param  context            the context used to restrict the set of returned blessings
-     * @param  call               the call used to restrict the set of returned blessings
-     * @return                 blessings satisfying the provided call
-     */
-    public static String[] getBlessingNames(VContext context, Call call) {
-        try {
-            return nativeBlessingNames(context, call);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't get blessings for call", e);
-        }
     }
 
     /**

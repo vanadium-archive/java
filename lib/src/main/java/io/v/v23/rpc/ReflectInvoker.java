@@ -26,83 +26,85 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * ReflectInvoker is an {@code Invoker} that uses reflection to make each
- * compatible exported method in the provided object available.
+ * An {@link Invoker} that uses reflection to make each compatible exported method in the provided
+ * object available.
  *
- * The provided object must implement interface(s) whose methods satisfy
- * the following constraints:
- *     (1) The first in-arg must be a VContext.
- *     (2) The second in-arg must be a ServerCall.
- *     (3) For streaming methods, the third in-arg must be a vdl.Stream.
- *     (4) If the return value is a class annotated with {@code @MultiReturn}
- *         annotation, the fields of that class are interpreted as multiple
- *         return values for that method; otherwise, return values are
- *         interpreted as-is.
- *     (5) VException must be thrown on error.
- *
+ * The provided object must implement interface(s) whose methods satisfy the following constraints:
+ * <p><ol>
+ *     <li>The first in-arg must be a {@link VContext}.</li>
+ *     <li>The second in-arg must be a {@link ServerCall}.</li>
+ *     <li>For streaming methods, the third in-arg must be a {@link io.v.v23.vdl.Stream}.</li>
+ *     <li>If the return value is a class annotated with
+ *         {@link io.v.v23.vdl.MultiReturn @MultiReturn} annotation, the fields of that class are
+ *         interpreted as multiple return values for that method; otherwise, return values are
+ *         interpreted as-is.</li>
+ *     <li>{@link VException} must be thrown on error.</li>
+ * </ol>
+ * <p>
  * In addition, the interface must have a corresponding wrapper object and point
- * to it via a vdl.VServer annotation.  This wrapper object unifies the
+ * to it via a {@link io.v.v23.vdl.VServer @VServer} annotation.  This wrapper object unifies the
  * streaming and non-streaming methods under the same set of constraints:
- *     (1) The first in-arg must be VContext.
- *     (2) The second in-arg must be StreamServerCall.
- *     (3) VException is thrown on error.
- *
- * Each wrapper method should invoke the corresponding interface method.
- * In addition, a wrapper must provide a constructor that takes the interface
- * as an argument.
- *
+ * <p><ol>
+ *     <li>The first in-arg must be {@link VContext}.
+ *     <li>The second in-arg must be {@link StreamServerCall}.
+ *     <li>{@link VException} is thrown on error.
+ * </ol>
+ * <p>
+ * Each wrapper method should invoke the corresponding interface method.  In addition, a wrapper
+ * must provide a constructor that takes the interface as an argument.
+ * <p>
  * A wrapper may optionally implement the following methods:
- *     - signature(), which returns the signatures of all server methods, and
- *     - getMethodTags(method), which returns tags for the given method.
+ * <p><ul>
+ *     <li>{@code signature()}, which returns the signatures of all server methods.</li>
+ *     <li>{@code getMethodTags(method)}, which returns tags for the given method.</li>
+ * </ul><p>
+ * If a server implements {@link Globber} interface, its {@link Globber#glob glob} method will be
+ * invoked on all {@link #glob glob} calls on the {@link Invoker}.
+ * <p>
+ * Here is an example implementation for the object, as well as the interface and the wrapper.
+ * <p>
+ * Object:
+ * <p><blockquote><pre>
+ * public class Server implements ServerInterface, Globber {
+ *     public String notStreaming(VContext context, ServerCall call) throws VException { ... }
+ *     public String streaming(VContext context, ServerCall call, Stream stream)
+ *             throws VException { ... }
+ *     public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)
+ *             throws VException { ... }
+ * }</pre></blockquote><p>
+ * Interface:
+ * <p><blockquote><pre>
+ * {@literal @}io.v.v23.vdl.VServer(
+ *     serverWrapper = ServerWrapper.class
+ * )
+ * public interface ServerInterface {
+ *     String notStreaming(VContext context, ServerCall call) throws VException;
+ *     String streaming(VContext context, ServerCall call, Stream stream) throws VException;
+ * }
+ * </pre></blockquote><p>
+ * Wrapper:
+ * <p><blockquote><pre>
+ * public class ServerWrapper {
+ *     public ServerWrapper(ServerInterface server) { this.server = server; }
+ *     public String notStreaming(VContext context, StreamServerCall call) throws VException {
+ *         return this.server.notStreaming(context, call);
+ *     }
+ *     public String streaming(VContext context, StreamServerCall call) throws VException {
+ *         // Generate vdl.Stream
+ *         return this.server.streaming(context, call, stream);
  *
- * If a server implements Globber interface, its glob() method will be invoked
- * on all glob() calls on the invoker.
- *
- * Here is an example implementation for the object, as well as the interface
- * and the wrapper.
- *
- * Object: <code>
- *     public class Server implements ServerInterface, Globber {
- *         public String notStreaming(VContext context, ServerCall call) throws VException { ... }
- *         public String streaming(VContext context, ServerCall call, Stream stream)
- *                 throws VException { ... }
- *         public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)
- *                 throws VException { ... }
- *     } </code>
- *
- * Interface: <code>
- *     @io.v.v23.vdl.VServer(
- *         serverWrapper = ServerWrapper.class
- *     )
- *     public interface ServerInterface {
- *         String notStreaming(VContext context, ServerCall call) throws VException;
- *         String streaming(VContext context, ServerCall call, Stream stream) throws VException;
- *     } </code>
- *
- * Wrapper: <code>
- *     public class ServerWrapper {
- *         public ServerWrapper(ServerInterface server) { this.server = server; }
- *         public String notStreaming(VContext context, StreamServerCall call) throws VException {
- *             return this.server.notStreaming(context, call);
- *         }
- *         public String streaming(VContext context, StreamServerCall call) throws VException {
- *             // Generate vdl.Stream
- *             return this.server.streaming(context, call, stream);
- *
- *         public Interface signature() {
- *             // Generate signatures for methods streaming() and notStreaming().
- *             return signatures;
- *         }
- *         public VdlValue[] getMethodTags(String method) throws VException {
- *             if ("notStreaming".equals(method)) { return ... }
- *             if ("streaming".equals(method)) { return ... }
- *             throw new VException("Unrecognized method: " + method);
- *         }
- *     } </code>
- *
- * Typically, the interface and the wrapper will be provided by the vdl
- * generator: users would implement only the object above.
- *
+ *     public Interface signature() {
+ *         // Generate signatures for methods streaming() and notStreaming().
+ *         return signatures;
+ *     }
+ *     public VdlValue[] getMethodTags(String method) throws VException {
+ *         if ("notStreaming".equals(method)) { return ... }
+ *         if ("streaming".equals(method)) { return ... }
+ *         throw new VException("Unrecognized method: " + method);
+ *     }
+ * }</pre></blockquote><p>
+ * Typically, the interface and the wrapper will be provided by the vdl generator: users would
+ * implement only the object above.
  */
 public final class ReflectInvoker implements Invoker {
     // A cache of ClassInfo objects, aiming to reduce the cost of expensive
@@ -162,12 +164,17 @@ public final class ReflectInvoker implements Invoker {
 
     private final Object server;
 
+    /**
+     * Creates a new {@link ReflectInvoker} object.
+     *
+     * @param  obj        object whose methods will be invoked
+     * @throws VException if the {@link ReflectInvoker} couldn't be created
+     */
     public ReflectInvoker(Object obj) throws VException {
         if (obj == null) {
             throw new VException("Can't create ReflectInvoker with a null object.");
         }
         this.server = obj;
-
         List<Object> serverWrappers = wrapServer(obj);
         for (Object wrapper : serverWrappers) {
             final Class<?> c = wrapper.getClass();

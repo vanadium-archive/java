@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation indicating that the provided class represents a multiple-return
- * value of a VDL method.
+ * value of a VDL method.  Used by {@link io.v.v23.rpc.ReflectInvoker}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

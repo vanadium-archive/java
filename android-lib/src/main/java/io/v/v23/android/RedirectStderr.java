@@ -24,9 +24,8 @@ import android.util.Log;
  * under the tag "VeyronNativeLog".
  * When go panics, it outputs the panic message to stderr and RedirectStderr enables us to log these
  * panic messages to logcat.
- * TODO(bprosnitz) Make a more elegant panic catcher
  */
-public final class RedirectStderr {
+final class RedirectStderr {
     /**
      * Start redirecting android's stderr
      */

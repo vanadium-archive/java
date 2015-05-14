@@ -7,20 +7,18 @@ package io.v.v23.rpc;
 import io.v.v23.security.Authorizer;
 
 /**
- * ServiceObjectWithAuthorizer is a container holding: (1) a Veyron service object that has
- * invokable methods, and (2) an authorizer that allows control over authorization checks.
+ * A pair of (1) a service object that has invokable methods, and (2) an {@link Authorizer} that
+ * allows control over authorization checks.
  */
 public class ServiceObjectWithAuthorizer {
     private final Object service;
     private final Authorizer auth;
 
     /**
-     * Class constructor specifying the Veyron service object and the authorizer that allows
-     * control over authorization checks.  A {@code null} authorizer indicates that the
-     * default authorization policy should be used.
+     * Creates a new {@link ServiceObjectWithAuthorizer} object.
      *
-     * @param  service  the Veyron service object.
-     * @param  auth     the authorizer.
+     * @param  service  service object that has invokable methods
+     * @param  auth     {@link Authorizer} that allows control over authorization checks
      */
     public ServiceObjectWithAuthorizer(Object service, Authorizer auth) {
         this.service = service;
@@ -28,16 +26,12 @@ public class ServiceObjectWithAuthorizer {
     }
 
     /**
-     * Returns the Veyron service object.
-     *
-     * @return the Veyron service object.
+     * Returns the service object.
      */
     public Object getServiceObject() { return this.service; }
 
     /**
-     * Returns the authorizer.
-     *
-     * @return the authorizer.
+     * Returns the {@link Authorizer}.
      */
     public Authorizer getAuthorizer() { return this.auth; }
 }

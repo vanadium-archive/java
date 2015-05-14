@@ -7,7 +7,7 @@ package io.v.v23.rpc;
 import io.v.v23.verror.VException;
 
 /**
- * ProxyStatus represents the status of a proxy connection maintained by a server.
+ * The status of a proxy connection maintained by a server.
  */
 public class ProxyStatus {
     private final String proxy;
@@ -15,7 +15,7 @@ public class ProxyStatus {
     private final VException error;
 
     /**
-     * Creates a new proxy status object.
+     * Creates a new {@link ProxyStatus} object.
      *
      * @param  proxy    name of the proxy
      * @param  endpoint name of the endpoint that the server is using to receive proxied requests on
@@ -29,8 +29,6 @@ public class ProxyStatus {
 
     /**
      * Returns the name of the proxy.
-     *
-     * @return the name of the proxy
      */
     public String getProxy() {
         return this.proxy;
@@ -39,8 +37,6 @@ public class ProxyStatus {
     /**
      * Returns the name of the endpoint that the server is using to receive proxied
      * requests on. The endpoint of the proxy itself can be obtained by resolving its name.
-     *
-     * @return the name of the endpoint that the server is using to receive proxied requests on
      */
     public String getEndpoint() {
         return this.endpoint;
@@ -49,8 +45,6 @@ public class ProxyStatus {
     /**
      * Returns the error status of the connection to the proxy.  It returns {@code null} if the
      * connection is currently correctly established, or the most recent error otherwise.
-     *
-     * @return the error status of the connection to the proxy
      */
     public VException getError() {
         return this.error;

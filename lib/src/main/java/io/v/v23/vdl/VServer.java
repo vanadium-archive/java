@@ -9,8 +9,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation specifying the wrapper object for a (server) interface.  Used by
+ * {@link io.v.v23.rpc.ReflectInvoker}.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface VServer {
+    /**
+     * Returns the wrapper object for a (server) interface.
+     */
     Class<?> serverWrapper();
 }

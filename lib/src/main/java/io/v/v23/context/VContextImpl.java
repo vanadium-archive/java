@@ -11,12 +11,15 @@ import io.v.v23.verror.VException;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * An implementation of the {@link CancelableVContext} interface.
+ */
 public class VContextImpl extends CancelableVContext {
     private static native CancelableVContext nativeCreate() throws VException;
 
     /**
      * Creates a new context with no data attached.
-     *
+     * <p>
      * This function is meant for use in tests only - the preferred way of obtaining a fully
      * initialized context is through the Vanadium runtime.
      *

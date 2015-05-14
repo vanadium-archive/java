@@ -5,11 +5,24 @@
 package io.v.v23.rpc;
 
 /**
- * ServerState represents the state of the server.
+ * The state of the server.
  */
 public enum ServerState {
-    SERVER_INIT,      // initial state of the server
-    SERVER_ACTIVE,    // server is active: listen, serve, addName, or removeName have been called
-    SERVER_STOPPING,  // server has been asked to stop and is in the process of doing so
-    SERVER_STOPPED    // server has stopped
+    /**
+     * Initial state of the server.
+     */
+    SERVER_INIT,
+    /**
+     * Server is active: {@link Server#listen listen}, {@link Server#serve serve},
+     * {@link Server#addName addName}, or {@link Server#removeName removeName} have been called.
+     */
+    SERVER_ACTIVE,
+    /**
+     * Server has been asked to {@link Server#stop stop} and is in the process of doing so.
+     */
+    SERVER_STOPPING,
+    /**
+     * Server has stopped.
+     */
+    SERVER_STOPPED
 }

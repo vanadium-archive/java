@@ -7,13 +7,14 @@ package io.v.v23;
 import io.v.v23.verror.VException;
 
 /**
- * Represents the write-end of a channel of T. Calls to {@link #writeValue} may block until the
- * receiver has read the value.
+ * The write-end of a channel of {@code T}. Calls to {@link #writeValue writeValue} may block until
+ * the receiver has read the value.
  */
 public interface OutputChannel<T> extends AutoCloseable {
     /**
-     * Writes the given value to the channel. Implementations of this method may block until the
-     * receiver has read the value.
+     * Writes the given value to the channel.
+     * <p>
+     * Implementations of this method may block until the receiver has read the value.
      *
      * @param value the value to write
      * @throws VException if there was an error writing to the channel

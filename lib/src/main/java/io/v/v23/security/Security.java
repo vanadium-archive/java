@@ -30,6 +30,10 @@ import java.util.List;
  * primitives.
  */
 public class Security {
+    private static native String[] nativeGetRemoteBlessingNames(VContext context, Call call)
+            throws VException;
+    private static native String[] nativeGetLocalBlessingNames(VContext context, Call call)
+            throws VException;
 
     /**
      * Mints a new private key and creates a signer based on this key.  The key is stored
@@ -137,6 +141,50 @@ public class Security {
      */
     public static Blessings unionOfBlessings(Blessings... blessings) throws VException {
         return Blessings.createUnion(blessings);
+    }
+
+    /**
+     * Returns a validated set of blessing names presented by the remote end of a call.
+     * <p>
+     * These returned blessings (strings) are guaranteed to:
+     * <p><ol>
+     *     <li>Satisfy all the caveats given the call.</li>
+     *     <li>Be rooted in {@code call.localPrincipal().roots()}.</li>
+     * </ol>
+     * <p>
+     * Caveats are considered satisfied in the given call if the {@link CaveatValidator}
+     * implementation can be found in the address space of the caller and
+     * {@link CaveatValidator#validate validate} doesn't throw an exception.
+     *
+     * @param  context  vanadium context
+     * @param  call     security-related state associated with the call
+     * @return          validated set of blessing names presented by the remote end of a call
+     */
+    public static String[] getRemoteBlessingNames(VContext context, Call call) {
+        try {
+            return nativeGetRemoteBlessingNames(context, call);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get blessings for call", e);
+        }
+    }
+
+    /**
+     * Returns the set of human-readable blessing names presented by the local end of the call.
+     * <p>
+     * The blessing names are guaranteed to be rooted in {@code call.localPrincipal().roots()}.
+     * <p>
+     * This method does not validate caveats on the blessing names.
+     *
+     * @param  context vanadium context
+     * @param  call    security-related state associated with the call
+     * @return         set of blessing names presented by the local end of the call
+     */
+    public static String[] getLocalBlessingNames(VContext context, Call call) {
+        try {
+            return nativeGetLocalBlessingNames(context, call);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get blessings for call", e);
+        }
     }
 
     /**
@@ -323,4 +371,6 @@ public class Security {
                 "Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
         }
     }
+
+    private Security() {}
 }

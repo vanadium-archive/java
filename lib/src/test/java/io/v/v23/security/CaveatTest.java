@@ -28,7 +28,7 @@ public class CaveatTest extends TestCase {
             final Call call = Security.newCall(
                     new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
             final String[] want = { "alice" };
-            final String[] got = Blessings.getBlessingNames(context, call);
+            final String[] got = Security.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
@@ -37,7 +37,7 @@ public class CaveatTest extends TestCase {
         {
             final Call call = Security.newCall(
                     new CallParams().withLocalPrincipal(p1).withMethod("fail"));
-            assertEquals(null, Blessings.getBlessingNames(context, call));
+            assertEquals(null, Security.getRemoteBlessingNames(context, call));
         }
     }
 
@@ -53,7 +53,7 @@ public class CaveatTest extends TestCase {
                     .withRemoteBlessings(alice)
                     .withTimestamp(DateTime.now()));
             final String[] want = { "alice" };
-            final String[] got = Blessings.getBlessingNames(context, call);
+            final String[] got = Security.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
@@ -63,7 +63,7 @@ public class CaveatTest extends TestCase {
             final Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withTimestamp(DateTime.now().plusHours(2)));
-            assertEquals(null, Blessings.getBlessingNames(context, call));
+            assertEquals(null, Security.getRemoteBlessingNames(context, call));
         }
     }
 
@@ -81,7 +81,7 @@ public class CaveatTest extends TestCase {
                     .withRemoteBlessings(alice)
                     .withSuffix("succeed"));
             final String[] want = { "alice" };
-            final String[] got = Blessings.getBlessingNames(context, call);
+            final String[] got = Security.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
@@ -92,7 +92,7 @@ public class CaveatTest extends TestCase {
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withSuffix("fail"));
-            assertEquals(null, Blessings.getBlessingNames(context, call));
+            assertEquals(null, Security.getRemoteBlessingNames(context, call));
         }
     }
 }

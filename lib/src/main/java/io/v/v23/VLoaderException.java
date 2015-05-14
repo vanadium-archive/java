@@ -9,8 +9,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /**
- * Instances of this exception indicate that an error has occurred while loading the Vanadium native
- * shared library.
+ * An error that has occurred while loading the Vanadium native shared library.
  */
 public class VLoaderException extends RuntimeException {
     private static final long serialVersionUID = 1L;
@@ -22,8 +21,8 @@ public class VLoaderException extends RuntimeException {
     }
 
     /**
-     * Returns the list of exceptions that were encountered when trying to load the native
-     * libraries.
+     * Returns the list of exceptions that were encountered when trying to load the native shared
+     * library.
      */
     public List<Throwable> getExceptions() {
         return exceptions;

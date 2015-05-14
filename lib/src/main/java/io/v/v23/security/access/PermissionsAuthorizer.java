@@ -8,6 +8,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
+import io.v.v23.security.Security;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -46,7 +47,7 @@ public class PermissionsAuthorizer implements Authorizer {
             return;
         }
         final String[] blessings =
-                remote != null ? Blessings.getBlessingNames(ctx, call) : new String[0];
+                remote != null ? Security.getRemoteBlessingNames(ctx, call) : new String[0];
         VdlValue[] tags = call.methodTags();
         if (tags == null) {
             tags = new VdlValue[0];

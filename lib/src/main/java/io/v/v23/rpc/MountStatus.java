@@ -10,7 +10,7 @@ import org.joda.time.Duration;
 import io.v.v23.verror.VException;
 
 /**
- * MountStatus represents the status of the last mount or unmount operation for a server.
+ * The status of the last mount or unmount operation for a server.
  */
 public class MountStatus {
     private final String name;
@@ -22,7 +22,7 @@ public class MountStatus {
     private final VException lastUnmountError;
 
     /**
-     * Creates a new mount status object.
+     * Creates a new {@link MountStatus} object.
      *
      * @param  name             name under which server is mounted
      * @param  server           address under which server is mounted
@@ -46,8 +46,6 @@ public class MountStatus {
 
     /**
      * Returns the name under which server is mounted.
-     *
-     * @return the server name
      */
     public String getName() {
         return this.name;
@@ -55,8 +53,6 @@ public class MountStatus {
 
     /**
      * Returns the address under which server is mounted.
-     *
-     * @return the server address
      */
     public String getServer() {
         return this.server;
@@ -64,8 +60,6 @@ public class MountStatus {
 
     /**
      * Returns the time of the last attempted mount request.
-     *
-     * @return the time of the last attempted mount request
      */
     public DateTime getLastMount() {
         return this.lastMount;
@@ -73,8 +67,6 @@ public class MountStatus {
 
     /**
      * Returns any error reported by the last attempted mount.
-     *
-     * @return an error reported by the last attempted mount
      */
     public VException getLastMountError() {
         return this.lastMountError;
@@ -82,8 +74,6 @@ public class MountStatus {
 
     /**
      * Returns the TTL supplied for the last mount request.
-     *
-     * @return the TTL supplied for the last mount request
      */
     public Duration getTTL() {
         return this.ttl;
@@ -91,8 +81,6 @@ public class MountStatus {
 
     /**
      * Returns the time of the last attempted unmount request.
-     *
-     * @return the time of the last attempted unmount request
      */
     public DateTime getLastUnmount() {
         return this.lastUnmount;
@@ -100,8 +88,6 @@ public class MountStatus {
 
     /**
      * Returns any error reported by the last attempted unmount.
-     *
-     * @return an error reported by the last attempted unmount
      */
     public VException getLastUnmountError() {
         return this.lastUnmountError;

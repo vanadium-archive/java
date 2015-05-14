@@ -18,35 +18,33 @@ import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 
 /**
- * Class {@code V} represents the local android environment allowing clients and servers to
- * communicate with one another. The expected usage pattern of this class goes something like this:
- * <code>
- *    ...
+ * The local android environment allowing clients and servers to communicate with one another.
+ * The expected usage pattern of this class goes something like this:
+ * <p><blockquote><pre>
  *    final VContext ctx = V.init(getApplicationContext(), opts);
  *    ...
  *    final Server s = V.newServer(ctx);
  *    ...
  *    final Client c = V.getClient(ctx);
  *    ...
- * </code>
+ * </pre></blockquote><p>
  * This class is a convenience wrapper for android users.  It provides Android-related setup
- * and then delegates to the Java {@code V} methods.
+ * and then delegates to the Java {@link io.v.v23.V} methods.
  */
 public class V extends io.v.v23.V {
     private static volatile VContext context = null;
 
     /**
-     * Initializes the Veyron environment, returning the base context.  Calling this method multiple
-     * times will always return the result of the first call to {@code init()}, ignoring
-     * subsequently provided options.
-     *
+     * Initializes the Vanadium environment, returning the base context.  Calling this method
+     * multiple times will always return the result of the first call to {@link #init init},
+     * ignoring subsequently provided options.
+     * <p>
      * A caller may pass the following option that specifies the runtime implementation to be used:
-     *   {@code OptionDefs.RUNTIME}
-     *
-     * If this option isn't provided, the default runtime implementation is used.  The rest of
-     * the options are passed to this runtime.  Currently, only the following options are
-     * recognized:
-     *   CURRENTLY NO OPTIONS ARE SUPPORTED
+     * <p><ul>
+     *     <li>{@link OptionDefs.RUNTIME}</li>
+     * </ul><p>
+     * <p>
+     * If this option isn't provided, the default runtime implementation is used.
      *
      * @param  androidCtx  Android application context
      * @param  opts        options for the default runtime
@@ -74,8 +72,8 @@ public class V extends io.v.v23.V {
     }
 
     /**
-     * Initializes the Veyron environment without options.  See {@code init(Options)} for more
-     * information.
+     * Initializes the Veyron environment without options.  See
+     * {@link #init(android.content.Context,Options)} for more information.
      *
      * @return base context
      */
@@ -101,4 +99,6 @@ public class V extends io.v.v23.V {
         principal.addToRoots(blessings);
         return principal;
     }
+
+    private V() {}
 }
