@@ -11,7 +11,7 @@ import io.v.v23.security.Security;
 import io.v.v23.verror.VException;
 
 /**
- * Validator for {@code TestCaveat} that validates the context if its veyron suffix
+ * Validator for {@code TestCaveat} that validates the context if its name suffix
  * matches the provided suffix.
  */
 public class TestCaveatValidator implements CaveatValidator {

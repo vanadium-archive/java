@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * Value is the generic representation of any value expressible in veyron.  All values are typed.
+ * Value is the generic representation of any value expressible in Vanadium.  All values are typed.
  */
 public abstract class VdlValue implements Serializable {
     private static final long serialVersionUID = 1L;

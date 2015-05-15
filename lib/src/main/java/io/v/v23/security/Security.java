@@ -298,7 +298,7 @@ public class Security {
     /**
      * Verifies the provides signature of the given message, using the supplied public key.
      *
-     * @param  sig             signature in the veyron format
+     * @param  sig             signature in the Vanadium format
      * @param  key             public key
      * @param  message         message whose signature is verified
      * @throws VException      iff the signature doesn't verify

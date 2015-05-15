@@ -182,7 +182,7 @@ public class CallParams {
         return null;
     }
     /**
-     * Returns a veyron suffix attached to the params, or {@code null} if no veyron suffix is
+     * Returns a name suffix attached to the params, or {@code null} if no name suffix is
      * attached.
      */
     public String getSuffix() {

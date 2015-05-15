@@ -71,7 +71,7 @@ public class V extends io.v.v23.V {
     }
 
     /**
-     * Initializes the Veyron environment without options.  See
+     * Initializes the Vanadium environment without options.  See
      * {@link #init(android.content.Context,Options)} for more information.
      *
      * @return base context

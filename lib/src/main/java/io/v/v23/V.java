@@ -110,7 +110,7 @@ public class V {
                 try {
                     runtime = io.v.impl.google.rt.VRuntime.create(opts);
                 } catch (VException e) {
-                    throw new RuntimeException("Couldn't initialize Google Veyron Runtime", e);
+                    throw new RuntimeException("Couldn't initialize Google Vanadium Runtime", e);
                 }
             }
             // Register caveat validators.
@@ -136,7 +136,7 @@ public class V {
     }
 
     /**
-     * Initializes the Veyron environment without options.  See {@link #init(Options)} for more
+     * Initializes the Vanadium environment without options.  See {@link #init(Options)} for more
      * information.
      *
      * @return base context

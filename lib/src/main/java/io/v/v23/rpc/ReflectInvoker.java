@@ -344,7 +344,7 @@ public final class ReflectInvoker implements Invoker {
     }
 
     /**
-     * Iterates through the veyron servers the object implements and generates
+     * Iterates through the Vanadium servers the object implements and generates
      * server wrappers for each.
      */
     private List<Object> wrapServer(Object srv) throws VException {
