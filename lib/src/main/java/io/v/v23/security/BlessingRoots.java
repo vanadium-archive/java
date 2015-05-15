@@ -10,7 +10,9 @@ import io.v.v23.verror.VException;
 import java.security.interfaces.ECPublicKey;
 
 /**
- * BlessingRoots hosts the set of authoritative public keys for roots of blessings.
+ * The set of authoritative public keys for roots of blessings.
+ * <p>
+ * See also: <a href="https://v.io/glossary.html#blessing-root">https://v.io/glossary.html#blessing-root</a>.
  */
 public interface BlessingRoots {
     /**
@@ -19,9 +21,9 @@ public interface BlessingRoots {
      * Multiple keys can be added for the same pattern, in which case all those keys are considered
      * authoritative for blessings that match the pattern.
      *
-     * @param  root            root that is deemed an authoritiative key for the provided pattern.
-     * @param  pattern         pattern for which we're assigning the authoratitative key.
-     * @throws VException      if there was an error assigning the root.
+     * @param  root            root that is deemed an authoritiative key for the provided pattern
+     * @param  pattern         pattern for which we're assigning the authoratitative key
+     * @throws VException      if there was an error assigning the root
      */
     void add(ECPublicKey root, BlessingPattern pattern) throws VException;
 
@@ -29,10 +31,10 @@ public interface BlessingRoots {
      * Returns {@code null} iff the provided root is recognized as an authority on a pattern
      * that is matched by the blessing.
      *
-     * @param  root            the root key we're checking for authority.
-     * @param  blessing        the blessing we're checking against the root.
+     * @param  root            the root key we're checking for authority
+     * @param  blessing        the blessing we're checking against the root
      * @throws VException      if the provided root is not recognized as an authority for the
-     *                         provided blessing.
+     *                         provided blessing
      */
     void recognized(ECPublicKey root, String blessing) throws VException;
 
@@ -46,10 +48,10 @@ public interface BlessingRoots {
 
     /**
      * Return a human-readable string description of the roots.  This description is detailed and
-     * lists out the contents of the roots.  Use {@code toString()} method for a more succinct
-     * description.
+     * lists out the contents of the roots.  Use {@link Object#toString} method for a more
+     * succinct description.
      *
-     * @return human-readable string description of the roots.
+     * @return human-readable string description of the roots
      */
     String debugString();
 }

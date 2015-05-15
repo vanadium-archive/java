@@ -7,7 +7,16 @@ package io.v.v23.security;
 import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
+/**
+ * Validator for {@link Constants#CONST_CAVEAT} caveat, which represents a caveat that either
+ * always validates or never validates.
+ */
 public class ConstCaveatValidator implements CaveatValidator {
+    /**
+     * A singleton instance of {@link ConstCaveatValidator}.
+     */
+    public static final ConstCaveatValidator INSTANCE = new ConstCaveatValidator();
+
     @Override
     public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) param = Boolean.valueOf(false);
@@ -19,4 +28,6 @@ public class ConstCaveatValidator implements CaveatValidator {
             throw new VException(String.format("ConstCaveat(%s) failed validation.", param));
         }
     }
+
+    private ConstCaveatValidator() {}
 }

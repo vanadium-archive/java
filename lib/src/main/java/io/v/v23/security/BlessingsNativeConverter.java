@@ -10,8 +10,14 @@ import io.v.v23.verror.VException;
 
 /**
  * Converter that translates blessings into their wire representation and vice-versa.
+ * <p>
+ * This class is used by the VOM encoder to automatically convert the wire
+ * type into its Java native type and vice-versa.
  */
 public final class BlessingsNativeConverter extends NativeTypes.Converter {
+    /**
+     * Singleton instance of the {@link BlessingsNativeConverter}.
+     */
     public static final BlessingsNativeConverter INSTANCE = new BlessingsNativeConverter();
 
     private BlessingsNativeConverter() {

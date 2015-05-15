@@ -24,7 +24,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
 /**
- * CryptoUtil implements various cryptographic utilities.
+ * Various cryptographic utilities.
  */
 public class CryptoUtil {
     private static final String PK_ALGORITHM = "EC";
@@ -52,9 +52,9 @@ public class CryptoUtil {
     /**
      * Decodes the provided DER-encoded ECDSA public key.
      *
-     * @param  encodedKey      DER-encoded ECDSA public key.
-     * @return                 ECDSA public key.
-     * @throws VException      if the public key could not be decoded.
+     * @param  encodedKey      DER-encoded ECDSA public key
+     * @return                 ECDSA public key
+     * @throws VException      if the public key could not be decoded
      */
     public static ECPublicKey decodeECPublicKey(byte[] encodedKey) throws VException {
         try {
@@ -75,8 +75,8 @@ public class CryptoUtil {
      *
      * @param curve            EC curve
      * @param point            EC point
-     * @return                 ANSI X9.62-encoded EC point.
-     * @throws VException      if the curve and the point are incompatible.
+     * @return                 ANSI X9.62-encoded EC point
+     * @throws VException      if the curve and the point are incompatible
      */
     public static byte[] encodeECPoint(EllipticCurve curve, ECPoint point) throws VException {
         final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
@@ -100,9 +100,9 @@ public class CryptoUtil {
     /**
      * Decodes ANSI X9.62-encoded (uncompressed) EC point.
      *
-     * @param  xy              ANSI X9.62-encoded EC point.
-     * @return                 EC point.
-     * @throws VException      if the EC point couldn't be decoded.
+     * @param  xy              ANSI X9.62-encoded EC point
+     * @return                 EC point
+     * @throws VException      if the EC point couldn't be decoded
      */
     public static ECPoint decodeECPoint(EllipticCurve curve, byte[] xy) throws VException {
         final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
@@ -121,10 +121,10 @@ public class CryptoUtil {
     /**
      * Applies the specified cryptographic hash function on the provided message.
      *
-     * @param  hashAlgorithm   name of the hash algorithm to use.
-     * @param  message         message to apply the hash function on.
-     * @return                 hashed message.
-     * @throws VException      if the message couldn't be hashed.
+     * @param  hashAlgorithm   name of the hash algorithm to use
+     * @param  message         message to apply the hash function on
+     * @return                 hashed message
+     * @throws VException      if the message couldn't be hashed
      */
     public static byte[] hash(String hashAlgorithm, byte[] message) throws VException {
         try {
@@ -145,11 +145,11 @@ public class CryptoUtil {
      * Creates a digest for the following message and the specified purpose, using the provided
      * hash algorithm.
      *
-     * @param  hashAlgorithm   name of the hash algorithm to use.
-     * @param  message         message that is part of the digest.
-     * @param  purpose         purpose that is part of the digest.
-     * @return                 digest for the specified message and digest.
-     * @throws VException      if there was an error creating a digest.
+     * @param  hashAlgorithm   name of the hash algorithm to use
+     * @param  message         message that is part of the digest
+     * @param  purpose         purpose that is part of the digest
+     * @return                 digest for the specified message and digest
+     * @throws VException      if there was an error creating a digest
      */
     static byte[] messageDigest(String hashAlgorithm,
         byte[] message, byte[] purpose) throws VException {
@@ -175,11 +175,11 @@ public class CryptoUtil {
     }
 
     /**
-     * Converts the provided Veyron signature into the ASN.1 format (used by Java).
+     * Converts the provided Vanadium signature into the ASN.1 format (used by Java).
      *
-     * @param  sig             signature in Veyron format.
-     * @return                 signature in ASN.1 format.
-     * @throws VException      if the signature couldn't be converted.
+     * @param  sig             signature in Vanadium format
+     * @return                 signature in ASN.1 format
+     * @throws VException      if the signature couldn't be converted
      */
     public static byte[] javaSignature(Signature sig) throws VException {
         // The ASN.1 format of the signature should be:
@@ -213,16 +213,16 @@ public class CryptoUtil {
     }
 
     /**
-     * Converts the provided Java signature (ASN.1 format) into the Veyron format.
+     * Converts the provided Java signature (ASN.1 format) into the Vanadium format.
      *
-     * @param  hashAlgorithm   hash algorithm used when generating the signature.
-     * @param  purpose         purpose of the generated signature.
-     * @param  sig             signature in ASN.1 format.
-     * @return                 signature in Veyron format.
-     * @throws VException      if the signature couldn't be converted.
+     * @param  hashAlgorithm   hash algorithm used when generating the signature
+     * @param  purpose         purpose of the generated signature
+     * @param  sig             signature in ASN.1 format
+     * @return                 signature in Vanadium format
+     * @throws VException      if the signature couldn't be converted
      */
-    public static Signature veyronSignature(String hashAlgorithm, byte[] purpose, byte[] sig)
-        throws VException {
+    public static Signature vanadiumSignature(String hashAlgorithm, byte[] purpose, byte[] sig)
+            throws VException {
         byte[] r, s;
         // The ASN.1 format of the signature should be:
         //    Signature ::= SEQUENCE {
@@ -264,4 +264,6 @@ public class CryptoUtil {
         }
         return new Signature(purpose, new Hash(hashAlgorithm), r, s);
     }
+
+    private CryptoUtil() {}
 }

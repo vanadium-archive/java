@@ -117,12 +117,12 @@ public class V {
             try {
                 CaveatRegistry.register(
                         io.v.v23.security.Constants.CONST_CAVEAT,
-                        new ConstCaveatValidator());
+                        ConstCaveatValidator.INSTANCE);
                 CaveatRegistry.register(
                         io.v.v23.security.Constants.EXPIRY_CAVEAT,
-                        new ExpiryCaveatValidator());
+                        ExpiryCaveatValidator.INSTANCE);
                 CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT,
-                        new MethodCaveatValidator());
+                        MethodCaveatValidator.INSTANCE);
             } catch (VException e) {
                 throw new RuntimeException("Couldn't register caveat validators", e);
             }

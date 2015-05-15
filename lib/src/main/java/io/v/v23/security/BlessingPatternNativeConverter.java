@@ -9,8 +9,14 @@ import io.v.v23.vdl.VdlValue;
 
 /**
  * Converts blessing patterns into their wire representations and vice-versa.
+ * <p>
+ * This class is used by the VOM encoder to automatically convert the wire
+ * type into its Java native type and vice-versa.
  */
 public final class BlessingPatternNativeConverter extends NativeTypes.Converter {
+    /**
+     * Singleton instance of the {@link BlessingPatternNativeConverter}.
+     */
     public static final BlessingPatternNativeConverter INSTANCE =
             new BlessingPatternNativeConverter();
 

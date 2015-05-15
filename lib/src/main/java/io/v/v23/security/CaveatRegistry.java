@@ -16,24 +16,24 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * CaveatRegistry implements a singleton global registry that maps the unique id of a caveat to its
- * validator.
- *
- * It is safe to invoke methods on CaveatRegistry concurrently.
+ * A singleton global registry that maps the unique ids of caveats to their validators.
+ * <p>
+ * It is safe to invoke methods on {@link CaveatRegistry} concurrently.
  */
 public class CaveatRegistry {
     private static final Map<Id, RegistryEntry> validators = new HashMap<Id, RegistryEntry>();
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
-     * Associates a the caveat descriptor with the validator that is used for validating
+     * Associates a caveat descriptor with the validator that is used for validating
      * all caveats with the same identifier as the descriptor.
+     * <p>
      * This method may be called at most once per unique identifier and will throw an exception
      * on duplicate registrations.
      *
-     * @param  desc       caveat descriptor
-     * @param  validator  caveat validator
-     * @throws VException      if the given caveat validator and descriptor couldn't be registered
+     * @param  desc        caveat descriptor
+     * @param  validator   caveat validator
+     * @throws VException  if the given caveat validator and descriptor couldn't be registered
      */
     public static void register(CaveatDescriptor desc, CaveatValidator validator)
             throws VException {
@@ -58,7 +58,7 @@ public class CaveatRegistry {
      * Throws an exception iff the restriction encapsulated in the corresponding caveat
      * hasn't been satisfied given the context.
      *
-     * @param  context     a call the caveat is matched against
+     * @param  context     a vanadium context
      * @param  caveat      security caveat
      * @throws VException  if the caveat couldn't be validated
      */
@@ -113,4 +113,6 @@ public class CaveatRegistry {
         Type getParamType() { return this.paramType; }
         String getRegisterer() { return this.registerer; }
     }
+
+    private CaveatRegistry() {}
 }

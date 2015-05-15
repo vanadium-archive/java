@@ -9,7 +9,7 @@ import io.v.v23.verror.VException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
 
-public class PrincipalImpl implements Principal {
+class PrincipalImpl implements Principal {
     private final long nativePtr;
     private final Signer signer;
     private final BlessingStore store;

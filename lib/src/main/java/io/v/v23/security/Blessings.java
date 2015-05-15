@@ -11,13 +11,18 @@ import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
 /**
- * Blessings encapsulates all the cryptographic operations required to prove that a set of blessings
+ * Encapsulator of all the cryptographic operations required to prove that a set of blessings
  * (human-readable strings) have been bound to a principal in a specific call.
- *
- * Blessings objects are meant to be presented to other principals to authenticate and authorize
- * actions.
- *
- * Blessings objects are immutable and multiple threads may invoke methods on them simultaneously.
+ * <p>
+ * {@link Blessings} objects are meant to be presented to other principals to authenticate
+ * and authorize actions.  Functions {@link Security#getLocalBlessingNames} and
+ * {@link Security#getRemoteBlessingNames} can be used to uncover the blessing names encapsulated
+ * in these objects.
+ * <p>
+ * {@link Blessings} objects are immutable and multiple threads may invoke methods on
+ * them simultaneously.
+ * <p>
+ * See also: <a href="https://v.io/glossary.html#blessing">https://v.io/glossary.html#blessing</a>.
  */
 public class Blessings {
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
@@ -48,9 +53,6 @@ public class Blessings {
     /**
      * Returns the public key of the principal to which blessings in this object are bound.
      * The return value may be {@code null} if the blessings are empty.
-     *
-     * @return public key of the principal to whom the blessings are bound or {@code null}
-     *         if the blessings are empty
      */
     public ECPublicKey publicKey() {
         try {
@@ -62,17 +64,13 @@ public class Blessings {
 
     /**
      * Returns the blessings in the wire format.
-     *
-     * @return wire format of the blessings.
      */
     public WireBlessings wireFormat() {
         return this.wire;
     }
 
     /**
-     * Returns true iff the blessings are empty.
-     *
-     * @return true iff the blessings are empty
+     * Returns {@code true} iff the blessings are empty.
      */
     public boolean isEmpty() {
         return this.wire.getCertificateChains().isEmpty();

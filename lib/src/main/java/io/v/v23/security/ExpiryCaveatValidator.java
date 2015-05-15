@@ -9,7 +9,16 @@ import org.joda.time.DateTime;
 import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
+/**
+ * Validator for {@link Constants#EXPIRY_CAVEAT} caveat, which represents a caveat that validates
+ * iff the current time is no later than the time specified in the caveat.
+ */
 public class ExpiryCaveatValidator implements CaveatValidator {
+    /**
+     * A singleton instance of {@link ExpiryCaveatValidator}.
+     */
+    public static final ExpiryCaveatValidator INSTANCE = new ExpiryCaveatValidator();
+
     @Override
     public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) param = new DateTime(0);
@@ -24,4 +33,6 @@ public class ExpiryCaveatValidator implements CaveatValidator {
                 "ExpiryCaveat(%s) failed validation at %s", expiry, now));
         }
     }
+
+    private ExpiryCaveatValidator() {}
 }

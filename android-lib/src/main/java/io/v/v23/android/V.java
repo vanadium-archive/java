@@ -8,7 +8,6 @@ import io.v.v23.Options;
 import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.ECDSASigner;
 import io.v.v23.security.Principal;
 import io.v.v23.security.Security;
 import io.v.v23.security.Constants;
@@ -90,7 +89,7 @@ public class V extends io.v.v23.V {
             // Generate a new private key.
             keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
         }
-        final Signer signer = new ECDSASigner(
+        final Signer signer = Security.newSigner(
                 keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
         final Principal principal = Security.newPrincipal(signer);
         final Blessings blessings = principal.blessSelf(ctx.getPackageName());

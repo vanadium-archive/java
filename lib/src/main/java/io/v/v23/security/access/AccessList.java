@@ -13,7 +13,7 @@ import io.v.v23.verror.VException;
 import java.util.List;
 
 /**
- * AccessList is a wrapper around WireAccessList, providing additional functionality.
+ * A wrapper around WireAccessList, providing additional functionality.
  */
 public class AccessList extends WireAccessList implements Authorizer {
     private static final long serialVersionUID = 1L;
@@ -25,6 +25,12 @@ public class AccessList extends WireAccessList implements Authorizer {
     private native void nativeAuthorize(long nativePtr, VContext context, Call call);
     private native void nativeFinalize(long nativePtr);
 
+    /**
+     * Creates a new {@link AccessList} object.
+     *
+     * @param  in    blessings that should be allowed
+     * @param  notIn blessings that should be denied
+     */
     public AccessList(List<BlessingPattern> in, List<String> notIn) {
         super(in, notIn);
         try {
@@ -39,22 +45,22 @@ public class AccessList extends WireAccessList implements Authorizer {
     }
 
     /**
-     * Returns true iff the ACL grants access to a principal that presents these blessings.
+     * Returns {@code true} iff the access list grants access to a principal that presents
+     * these blessings.
      *
-     * @param  blessings blessings we are getting access for.
+     * @param  blessings blessings we are getting access for
      * @return           true iff the ACL grants access to a principal that presents these
-     *                   blessings.
+     *                   blessings
      */
     public boolean includes(String... blessings) {
         return nativeIncludes(this.nativePtr, blessings);
     }
 
     /**
-     * Implements {@code Authorizer} where the request is authorized only if the remote blessings
-     * are included in the ACL.
+     * Authorizes only if the remote blessings are included in the access list.
      *
-     * @param  context the context being authorized
-     * @param  call    the call being authorized
+     * @param  context    vanadium context
+     * @param  call       the call being authorized
      * @throws VException if the request is not authorized
      */
     @Override

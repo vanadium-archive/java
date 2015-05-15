@@ -9,10 +9,6 @@ import io.v.v23.vom.VomUtil;
 
 import java.security.interfaces.ECPublicKey;
 
-/**
- * Util provides utilities for encoding/decoding various Veyron formats.  The encoding format
- * used here must match the encoding format used by the corresponding JNI Go library.
- */
 class Util {
     /**
      * VOM-encodes the provided Signature.

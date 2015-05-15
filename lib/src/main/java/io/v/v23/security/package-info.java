@@ -4,7 +4,7 @@
 
 /**
  * Package security defines types and utilities associated with security.
- * <ul><p>
+ * <p><ul>
  *   <li>Concept: <a href="https://v.io/concepts/security.html">https://v.io/concepts/security.html</a></li>
  *   <li>Tutorial: <a href="https://v.io/tutorials/security/overview.html">https://v.io/tutorials/security/overview.html</a></li>
  * </ul><p>

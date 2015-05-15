@@ -26,8 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Security class implements various functions used for creating and managing Vanadium security
- * primitives.
+ * Various functions used for creating and managing Vanadium security primitives.
  */
 public class Security {
     private static native String[] nativeGetRemoteBlessingNames(VContext context, Call call)
@@ -36,7 +35,22 @@ public class Security {
             throws VException;
 
     /**
-     * Mints a new private key and creates a signer based on this key.  The key is stored
+     * Creates a new instance of {@link Signer} using the provided public/private key pair.
+     * <p>
+     * The returned {@link Signer} respests the location of the private key: if the key
+     * is stored in a safe place (e.g., hardware token), it will remain secure.
+     *
+     * @param  privKey private key
+     * @param  pubKey  corresponding public key
+     * @return         new instance of {@link Signer} that uses the provided key pair to
+     *                 do the signing
+     */
+    public static Signer newSigner(PrivateKey privKey, ECPublicKey pubKey) {
+        return new ECDSASigner(privKey, pubKey);
+    }
+
+    /**
+     * Mints a new private key and creates a {@link Signer} based on this key.  The key is stored
      * in the clear in memory of the running process.
      */
     public static Signer newInMemorySigner() throws VException {
@@ -54,7 +68,7 @@ public class Security {
 
     /**
      * Mints a new private key and generates a principal based on this key, storing its
-     * BlessingRoots and BlessingStore in memory.
+     * blessing roots and blessing store in memory.
      *
      * @return                 in-memory principal using the newly minted private key
      * @throws VException      if the principal couldn't be created
@@ -64,12 +78,12 @@ public class Security {
     }
 
     /**
-     * Creates a principal using the provided signer, storing its BlessingRoots and BlessingStore
-     * in memory.
+     * Creates a principal using the provided signer, storing its blessing roots and
+     * blessing store in memory.
      *
-     * @param  signer          signer to be used by the new principal.
-     * @return                 in-memory principal using the provided signer.
-     * @throws VException      if the principal couldn't be created.
+     * @param  signer          signer to be used by the new principal
+     * @return                 in-memory principal using the provided signer
+     * @throws VException      if the principal couldn't be created
      */
     public static Principal newPrincipal(Signer signer) throws VException {
         return PrincipalImpl.create(signer);
@@ -79,12 +93,12 @@ public class Security {
      * Creates a principal using the provided signer, blessing store, and blessing roots.  If the
      * provided store is {@code null}, the principal will use a store whose every opration will
      * fail.  If the provided roots are {@code null}, the principal will not trust any public keys
-     * and all subsequent {@code addToRoots} operations will fail.
+     * and all subsequent {@link Principal#addToRoots} operations will fail.
      *
-     * @param  signer signer to be used by the principal.
-     * @param  store  blessing store to be used by the principal.
-     * @param  roots  blessing roots to be used by the principal.
-     * @return        newly created principal.
+     * @param  signer signer to be used by the principal
+     * @param  store  blessing store to be used by the principal
+     * @param  roots  blessing roots to be used by the principal
+     * @return        newly created principal
      */
     public static Principal newPrincipal(Signer signer, BlessingStore store, BlessingRoots roots)
         throws VException {
@@ -92,17 +106,17 @@ public class Security {
     }
 
     /**
-     * Reads the entire state for a principal (i.e., private key, BlessingRoots, BlessingStore) from
-     * the provided directory {@code dir} and commits all state changes to the same directory.
-     *
+     * Reads the entire state for a principal (i.e., private key, blessing roots, blessing store)
+     * from the provided directory {@code dir} and commits all state changes to the same directory.
+     * <p>
      * If the directory does not contain state, a new private key is minted and all state of the
      * principal is committed to {@code dir}. If the directory does not exist, it is created.
      *
-     * @param  passphrase      passphrase used to encrypt the private key.  If empty, no encryption
-     *                         is done.
-     * @param  dir             directory where the state for a principal is to be persisted.
-     * @return                 principal whose state is persisted in the provided directory.
-     * @throws VException      if the principal couldn't be created.
+     * @param  passphrase      passphrase used to encrypt the private key; if empty, no encryption
+     *                         is done
+     * @param  dir             directory where the state for a principal is to be persisted
+     * @return                 principal whose state is persisted in the provided directory
+     * @throws VException      if the principal couldn't be created
      */
     public static Principal newPersistentPrincipal(String passphrase, String dir)
             throws VException {
@@ -110,20 +124,19 @@ public class Security {
     }
 
     /**
-     * Creates a new principal using the provided signer and a partial state (i.e., BlessingRoots,
-     * BlessingStore) that is read from the provided directory {@code dir}.  Changes to the
+     * Creates a new principal using the provided signer and a partial state (i.e., blessing roots,
+     * blessing store) that is read from the provided directory {@code dir}.  Changes to the
      * partial state are persisted and commited to the same directory.  The provided signer isn't
-     * persisted: the caller is expected to persist it separately or use the
-     * {@code newPersistentPrincipal()} method instead.
-     *
+     * persisted: the caller is expected to persist it separately.
+     * <p>
      * If the directory does not contain any partial state, a new partial state instances are
      * created and subsequently commited to {@code dir}.  If the directory does not exist, it
      * is created.
      *
-     * @param  signer          signer to be used by the new principal.
-     * @param  dir             directory where the partial state for a principal is to be persisted.
-     * @return                 principal whose partial state is persisted in the provided directory.
-     * @throws VException      if the principal couldn't be created.
+     * @param  signer          signer to be used by the new principal
+     * @param  dir             directory where the partial state for a principal is to be persisted
+     * @return                 principal whose partial state is persisted in the provided directory
+     * @throws VException      if the principal couldn't be created
      */
     public static Principal newPersistentPrincipal(Signer signer, String dir)
         throws VException {
@@ -131,13 +144,13 @@ public class Security {
     }
 
     /**
-     * Returns a {@code Blessings} object that carries the union of the provided blessings.
+     * Returns a {@link Blessings} object that carries the union of the provided blessings.
      * All provided blessings must have the same public key.  Returns {@code null} if invoked
      * without arguments.
      *
-     * @param  blessings       blessings that will be merged.
-     * @return                 the union of the provided blessings.
-     * @throws VException      if there was an error creating an union.
+     * @param  blessings       blessings that will be merged
+     * @return                 the union of the provided blessings
+     * @throws VException      if there was an error creating an union
      */
     public static Blessings unionOfBlessings(Blessings... blessings) throws VException {
         return Blessings.createUnion(blessings);
@@ -236,7 +249,7 @@ public class Security {
      * Returns a caveat that never fails to validate. This is useful only for providing
      * unconstrained blessings to another principal.
      *
-     * @return a caveat that never fails to validate.
+     * @return a caveat that never fails to validate
      */
     public static Caveat newUnconstrainedUseCaveat() throws VException {
         return newCaveat(Constants.CONST_CAVEAT, true);
@@ -246,7 +259,7 @@ public class Security {
      * Returns a new security call that uses the provided params.
      *
      * @param params call params
-     * @return       new security call that uses the provided params.
+     * @return       new security call that uses the provided params
      */
     public static Call newCall(CallParams params) {
         return new CallParamsImpl(params);
@@ -256,80 +269,22 @@ public class Security {
      * Returns an authorizer that subscribes to an authorization policy where access is granted if
      * the remote end presents blessings included in the Access Control Lists (ACLs) associated with
      * the set of relevant tags.
+     * <p>
+     * See {@link io.v.v23.security.access.PermissionsAuthorizer} for a more detailed description
+     * of this authorizer.
      *
-     * The set of relevant tags is the subset of tags associated with the method
-     * ({@link io.v.v23.security.Call#methodTags()}) that have the same type as
-     * the provided one.
-     * Currently, tagType.Kind must be reflect.String, i.e., only tags that are
-     * named string types are supported.
-     *
-     * If multiple tags of the provided type are associated with the method, then access is granted
-     * if the peer presents blessings that match the ACLs of each one of those tags. If no tags of
-     * the provided are associated with the method, then access is denied.
-     *
-     * If the TaggedACLMap provided is {@code null}, then an authorizer that rejects all remote
-     * ends is returned.
-     *
-     * Sample usage:
-     *
-     * (1) Attach tags to methods in the VDL (eg. myservice.vdl)
-     * <code>
-     *   package myservice
-     *
-     *   type MyTag string
-     *   const (
-     *     ReadAccess  = MyTag("R")
-     *     WriteAccess = MyTag("W")
-     *   )
-     *
-     *   type MyService interface {
-     *     Get() ([]string, error)       {ReadAccess}
-     *     GetIndex(int) (string, error) {ReadAccess}
-     *
-     *     Set([]string) error           {WriteAccess}
-     *     SetIndex(int, string) error   {WriteAccess}
-     *
-     *     GetAndSet([]string) ([]string, error) {ReadAccess, WriteAccess}
-     *   }
-     * </code>
-     * (2) Setup the dispatcher to use the {@code TaggedACLAuthorizer}
-     * <code>
-     *   public class MyDispatcher implements io.v.v23.ipc.Dispatcher {
-     *     @Override
-     *     public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-     *       final TaggedACLMap acls = new TaggedACLMap(ImmutableMap.of(
-     *         "R", new ACL(ImmutableList.of(new BlessingPattern("alice/friends/..."),
-     *                                       new BlessingPattern("alice/family/...")),
-     *                      null),
-     *           "W", new ACL(ImmutableList.of(new BlessingPattern("alice/family/..."),
-     *                                         new BlessingPattern("alice/colleagues/...")),
-     *                      null)));
-     *       return new ServiceObjectWithAuthorizer(
-     *          newInvoker(), Security.newTaggedACLAuthorizer(acls, MyTag.class));
-     *   }
-     * </code>
-     *
-     * With the above dispatcher, the server will grant access to a peer with the blessing
-     * {@code "alice/friend/bob"} access only to the {@code Get} and {@code GetIndex} methods.
-     * A peer presenting the blessing "alice/colleague/carol" will get access only to the
-     * {@code Set} and {@code SetIndex} methods. A peer presenting {@code "alice/family/mom"} will
-     * get access to all methods, even {@code GetAndSet} - which requires that the blessing appear
-     * in the ACLs for both the {@code ReadAccess} and {@code WriteAccess} tags.
-     *
-     * @param  acls            ACLs containing authorization rules.
-     * @param  type            type of the method tags this authorizer checks.
-     * @return                 an above-described authorizer.
-     * @throws VException      if the authorizer couldn't be created.
+     * @param  acls            ACLs containing authorization rules
+     * @param  type            type of the method tags this authorizer checks
+     * @return                 a newly created authorizer
+     * @throws VException      if the authorizer couldn't be created
      */
-    public static Authorizer newTaggedACLAuthorizer(Permissions acls, Type type)
+    public static Authorizer newPermissionsAuthorizer(Permissions acls, Type type)
         throws VException {
         return PermissionsAuthorizer.create(acls, type);
     }
 
     /**
      * Returns an authorizer that allows all requests.
-     *
-     * @return an authorizer that allows all requests.
      */
     public static Authorizer newAllowEveryoneAuthorizer() {
         return new Authorizer() {
@@ -343,10 +298,10 @@ public class Security {
     /**
      * Verifies the provides signature of the given message, using the supplied public key.
      *
-     * @param  sig             signature in the veyron format.
-     * @param  key             public key.
-     * @param  message         message whose signature is verified.
-     * @throws VException      iff the signature doesn't verify.
+     * @param  sig             signature in the veyron format
+     * @param  key             public key
+     * @param  message         message whose signature is verified
+     * @throws VException      iff the signature doesn't verify
      */
     public static void verifySignature(Signature sig, ECPublicKey key, byte[] message)
         throws VException {

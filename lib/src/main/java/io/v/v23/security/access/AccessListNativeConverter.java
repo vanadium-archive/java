@@ -8,9 +8,15 @@ import io.v.v23.vdl.NativeTypes;
 import io.v.v23.vdl.VdlValue;
 
 /**
- * Converts blessing patterns into their wire representations and vice-versa.
+ * Converts access lists into their wire representations and vice-versa.
+ * <p>
+ * This class is used by the VOM encoder to automatically convert the wire
+ * type into its Java native type and vice-versa.
  */
 public final class AccessListNativeConverter extends NativeTypes.Converter {
+    /**
+     * Singleton instance of {@link AccessListNativeConverter}.
+     */
     public static final AccessListNativeConverter INSTANCE = new AccessListNativeConverter();
 
     private AccessListNativeConverter() {

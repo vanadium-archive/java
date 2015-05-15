@@ -10,7 +10,16 @@ import io.v.v23.verror.VException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Validator for {@link Constants#METHOD_CAVEAT} caveat, which represents a caveat that validates
+ * iff the method being invoked is included in the caveat-specified list.
+ */
 public class MethodCaveatValidator implements CaveatValidator {
+    /**
+     * A singleton instance of {@link MethodCaveatValidator}.
+     */
+    public static final MethodCaveatValidator INSTANCE = new MethodCaveatValidator();
+
     @Override
     public void validate(VContext context, Call call, Object param) throws VException {
         if (param == null) {
@@ -36,4 +45,6 @@ public class MethodCaveatValidator implements CaveatValidator {
         throw new VException(String.format(
             "MethodCaveat(%s) failed validation for method %s", param, call.method()));
     }
+
+    private MethodCaveatValidator() {}
 }
