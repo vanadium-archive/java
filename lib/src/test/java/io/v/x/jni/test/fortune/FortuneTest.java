@@ -216,7 +216,7 @@ public class FortuneTest extends TestCase {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
         String[] endpoints = s.listen(V.getListenSpec(ctx));
-        FortuneServer server = new FortuneServerImpl();
+        final FortuneServer server = new FortuneServerImpl();
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
