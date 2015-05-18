@@ -54,7 +54,7 @@ public class PermissionsAuthorizerTest extends TestCase {
         }
 
         Blessings blessings(String... names) throws VException {
-            final Blessings[] parts = new Blessings[names.length];
+            Blessings[] parts = new Blessings[names.length];
             for (int i = 0; i < names.length; ++i) {
                 parts[i] = this.pClient.blessSelf(names[i]);
             }
@@ -62,8 +62,8 @@ public class PermissionsAuthorizerTest extends TestCase {
         }
 
         void runAuthorize(String method, Blessings client, VContext context) throws VException {
-            final Authorizer authorizer = PermissionsAuthorizer.create(this.acl, MyTag.class);
-            final Call call = Security.newCall(new CallParams()
+            Authorizer authorizer = PermissionsAuthorizer.create(this.acl, MyTag.class);
+            Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(this.pServer)
                     .withLocalBlessings(this.server)
                     .withRemoteBlessings(client)
@@ -74,8 +74,8 @@ public class PermissionsAuthorizerTest extends TestCase {
     }
 
     public void testAuthorize() throws VException {
-        final VContext context = V.init();
-        final AuthorizeTestdata test = new AuthorizeTestdata();
+        VContext context = V.init();
+        AuthorizeTestdata test = new AuthorizeTestdata();
         test.pServer = newPrincipal();
         test.pClient = newPrincipal();
         test.server = test.pServer.blessSelf("server");
@@ -126,7 +126,7 @@ public class PermissionsAuthorizerTest extends TestCase {
                         "ali", "ali/family/boss", "bob", "che", "superman")))
                 .build();
 
-        for (final AuthorizeTestdata.TestCase testCase : test.accept) {
+        for (AuthorizeTestdata.TestCase testCase : test.accept) {
             try {
                 test.runAuthorize(testCase.method, testCase.client, context);
             } catch (VException e) {
@@ -135,7 +135,7 @@ public class PermissionsAuthorizerTest extends TestCase {
             }
         }
 
-        for (final AuthorizeTestdata.TestCase testCase : test.deny) {
+        for (AuthorizeTestdata.TestCase testCase : test.deny) {
             try {
                 test.runAuthorize(testCase.method, testCase.client, context);
                 fail(String.format(
@@ -147,15 +147,15 @@ public class PermissionsAuthorizerTest extends TestCase {
     }
 
     public void testSelfRPCs() throws Exception {
-        final VContext context = V.init();
-        final Principal p = newPrincipal();
-        final Blessings client = p.blessSelf("client");
-        final Blessings server = p.blessSelf("server");
-        final Authorizer authorizer = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
+        VContext context = V.init();
+        Principal p = newPrincipal();
+        Blessings client = p.blessSelf("client");
+        Blessings server = p.blessSelf("server");
+        Authorizer authorizer = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
                         "R", new AccessList(ImmutableList.of(new BlessingPattern("nobody/$")), null))),
                 MyTag.class);
-        for (final String testCase : new String[]{ "put", "get", "resolve", "noTags", "allTags" }) {
-            final Call call = Security.newCall(new CallParams()
+        for (String testCase : new String[]{ "put", "get", "resolve", "noTags", "allTags" }) {
+            Call call = Security.newCall(new CallParams()
                     .withLocalPrincipal(p)
                     .withLocalBlessings(server)
                     .withRemoteBlessings(client)
@@ -170,12 +170,12 @@ public class PermissionsAuthorizerTest extends TestCase {
     }
 
     private static Principal newPrincipal() throws VException {
-        final Signer signer = Security.newInMemorySigner();
+        Signer signer = Security.newInMemorySigner();
         return Security.newPrincipal(signer, null, new TrustAllRoots());
     }
 
     private static VdlValue[] getMethodTags(String method) throws VException {
-        final MyObjectServerWrapper s = new MyObjectServerWrapper(null);
+        MyObjectServerWrapper s = new MyObjectServerWrapper(null);
         return s.getMethodTags(method);
     }
 

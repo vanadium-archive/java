@@ -38,8 +38,8 @@ public class CryptoUtil {
 
     private static ECParameterSpec getParameterSpec(String algorithm) {
         try {
-            final KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
-            final ECGenParameterSpec spec = new ECGenParameterSpec(algorithm);
+            KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec spec = new ECGenParameterSpec(algorithm);
             gen.initialize(spec);
             return ((ECPublicKey)gen.generateKeyPair().getPublic()).getParams();
         } catch (NoSuchAlgorithmException e) {
@@ -58,8 +58,8 @@ public class CryptoUtil {
      */
     public static ECPublicKey decodeECPublicKey(byte[] encodedKey) throws VException {
         try {
-            final X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedKey);
-            final KeyFactory factory = KeyFactory.getInstance(PK_ALGORITHM);
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(encodedKey);
+            KeyFactory factory = KeyFactory.getInstance(PK_ALGORITHM);
             return (ECPublicKey)factory.generatePublic(spec);
         } catch (NoSuchAlgorithmException e) {
             throw new VException(
@@ -79,9 +79,9 @@ public class CryptoUtil {
      * @throws VException      if the curve and the point are incompatible
      */
     public static byte[] encodeECPoint(EllipticCurve curve, ECPoint point) throws VException {
-        final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
-        final byte[] x = point.getAffineX().toByteArray();
-        final byte[] y = point.getAffineY().toByteArray();
+        int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
+        byte[] x = point.getAffineX().toByteArray();
+        byte[] y = point.getAffineY().toByteArray();
         if (x.length != byteLen) {
             throw new VException(String.format(
                     "Illegal length for X axis of EC point, want %d have %d", byteLen, x.length));
@@ -90,7 +90,7 @@ public class CryptoUtil {
             throw new VException(String.format(
                     "Illegal length for Y axis of EC point, want %d have %d", byteLen, y.length));
         }
-        final byte[] xy = new byte[1 + 2 * byteLen];
+        byte[] xy = new byte[1 + 2 * byteLen];
         xy[0] = 4;
         System.arraycopy(x, 0, xy, 1, byteLen);
         System.arraycopy(y, 0, xy, 1 + byteLen, byteLen);
@@ -105,7 +105,7 @@ public class CryptoUtil {
      * @throws VException      if the EC point couldn't be decoded
      */
     public static ECPoint decodeECPoint(EllipticCurve curve, byte[] xy) throws VException {
-        final int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
+        int byteLen = (curve.getField().getFieldSize() + 7)  >> 3;
         if (xy.length != (1 + 2 * byteLen)) {
             throw new VException(String.format(
                     "Data length mismatch: want %d have %d", (1 + 2 * byteLen), xy.length));
@@ -113,8 +113,8 @@ public class CryptoUtil {
         if (xy[0] != 4) { // compressed form
             throw new VException("Compressed curve formats not supported");
         }
-        final BigInteger x = new BigInteger(Arrays.copyOfRange(xy, 1, 1 + byteLen));
-        final BigInteger y = new BigInteger(Arrays.copyOfRange(xy, 1 + byteLen, xy.length));
+        BigInteger x = new BigInteger(Arrays.copyOfRange(xy, 1, 1 + byteLen));
+        BigInteger y = new BigInteger(Arrays.copyOfRange(xy, 1 + byteLen, xy.length));
         return new ECPoint(x, y);
     }
 
@@ -128,9 +128,9 @@ public class CryptoUtil {
      */
     public static byte[] hash(String hashAlgorithm, byte[] message) throws VException {
         try {
-            final MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
+            MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
             md.update(message);
-            final byte[] ret = md.digest();
+            byte[] ret = md.digest();
             if (ret == null || ret.length == 0) {
                 throw new VException("Got empty message after a hash using " + hashAlgorithm);
             }
@@ -161,14 +161,14 @@ public class CryptoUtil {
         }
         message = hash(hashAlgorithm, message);
         purpose = hash(hashAlgorithm, purpose);
-        final byte[] ret = join(message, purpose);
+        byte[] ret = join(message, purpose);
         return ret;
     }
 
     private static byte[] join(byte[] a, byte[] b) {
         if (a == null || a.length == 0) return b;
         if (b == null || b.length == 0) return a;
-        final byte[] c = new byte[a.length + b.length];
+        byte[] c = new byte[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
@@ -192,15 +192,15 @@ public class CryptoUtil {
         //
         // Note that we could have used BouncyCastle or an ASN1-decoding package to decode
         // the byte sequence, but the encoding is simple enough that we can do it by hand.
-        final byte[] r = sig.getR();
-        final byte[] s = sig.getS();
+        byte[] r = sig.getR();
+        byte[] s = sig.getS();
         if (r == null || r.length == 0) {
             throw new VException("Empty R component of signature.");
         }
         if (s == null || s.length == 0) {
             throw new VException("Empty S component of signature.");
         }
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(0x30);
         out.write(4 + r.length + s.length);
         out.write(0x02);
@@ -234,7 +234,7 @@ public class CryptoUtil {
         //
         // Note that we could have used BouncyCastle or an ASN1-decoding package to decode
         // the byte sequence, but the encoding is simple enough that we can do it by hand.
-        final ByteArrayInputStream in = new ByteArrayInputStream(sig);
+        ByteArrayInputStream in = new ByteArrayInputStream(sig);
         int b;
         if ((b = in.read()) != 0x30) {
             throw new VException(String.format("Invalid signature type, want SEQUENCE (0x30), got 0x%02X", b));

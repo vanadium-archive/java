@@ -39,10 +39,10 @@ public final class VExceptionVdlConverter extends Converter {
     @Override
     public WireError vdlValueFromNative(Object nativeValue) {
         assertInstanceOf(nativeValue, VException.class);
-        final VException e = (VException) nativeValue;
-        final List<VdlAny> paramVals = new ArrayList<VdlAny>();
-        final Serializable[] params = e.getParams();
-        final VdlType[] paramTypes = e.getParamTypes();
+        VException e = (VException) nativeValue;
+        List<VdlAny> paramVals = new ArrayList<VdlAny>();
+        Serializable[] params = e.getParams();
+        VdlType[] paramTypes = e.getParamTypes();
         for (int i = 0; i < params.length; ++i) {
             if (paramTypes[i] == null) {
                 continue;  // dropping the param.
@@ -55,15 +55,15 @@ public final class VExceptionVdlConverter extends Converter {
     @Override
     public VException nativeFromVdlValue(VdlValue value) {
         assertInstanceOf(value, WireError.class);
-        final WireError error = (WireError) value;
-        final VException.IDAction idAction = new VException.IDAction(error.getId(),
+        WireError error = (WireError) value;
+        VException.IDAction idAction = new VException.IDAction(error.getId(),
                 VException.ActionCode.fromValue(error.getRetryCode().ordinal()));
 
-        final List<VdlAny> paramVals = error.getParamList();
-        final Serializable[] params = new Serializable[paramVals.size()];
-        final VdlType[] paramTypes = new VdlType[paramVals.size()];
+        List<VdlAny> paramVals = error.getParamList();
+        Serializable[] params = new Serializable[paramVals.size()];
+        VdlType[] paramTypes = new VdlType[paramVals.size()];
         for (int i = 0; i < paramVals.size(); ++i) {
-            final VdlAny paramVal = paramVals.get(i);
+            VdlAny paramVal = paramVals.get(i);
             params[i] = paramVal.getElem();
             paramTypes[i] = paramVal.getElemType();
         }

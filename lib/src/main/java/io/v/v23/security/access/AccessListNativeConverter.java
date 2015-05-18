@@ -29,7 +29,7 @@ public final class AccessListNativeConverter extends NativeTypes.Converter {
         // Can't simply cast here as the VOM encoder expects the returned
         // value's getClass() method to return WireAccessList.  (With casting
         // it would return AccessList.)
-        final AccessList acl = (AccessList) nativeValue;
+        AccessList acl = (AccessList) nativeValue;
         return new WireAccessList(acl.getIn(), acl.getNotIn());
     }
 

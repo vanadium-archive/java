@@ -109,10 +109,10 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     @Override
     public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)
             throws VException {
-        final GlobReply.Entry entry = new GlobReply.Entry(
+        GlobReply.Entry entry = new GlobReply.Entry(
                 new MountEntry("helloworld", ImmutableList.<MountedServer>of(), false, false));
         response.writeValue(entry);
-        final GlobReply.Error error = new GlobReply.Error(
+        GlobReply.Error error = new GlobReply.Error(
                 new GlobError("Hello, world!", new VException("Some error")));
         response.writeValue(error);
         response.close();

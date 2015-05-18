@@ -38,7 +38,7 @@ public class VdlUint16 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlUint16)) return false;
-        final VdlUint16 other = (VdlUint16) obj;
+        VdlUint16 other = (VdlUint16) obj;
         return value == other.value;
     }
 

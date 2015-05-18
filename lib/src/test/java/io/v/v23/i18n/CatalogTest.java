@@ -25,8 +25,8 @@ public class CatalogTest extends TestCase {
     }
 
     public void testLookupSetAndRemove() {
-        final String want = "expected format";
-        final Catalog cat = new Catalog();
+        String want = "expected format";
+        Catalog cat = new Catalog();
         expectLookup(cat, "", "en", "bar", 1);
         expectLookup(cat, "", "en-US", "bar", 2);
         expectLookup(cat, "", "en", "foo", 3);
@@ -132,7 +132,7 @@ public class CatalogTest extends TestCase {
             "odd.lang.id funny.msg.id \"odd and\\b \\\"funny\\\"\"";
 
     public void testMergeAndOutput() throws Exception {
-        final Catalog cat = new Catalog();
+        Catalog cat = new Catalog();
 
         // Check that Merge() works.
         cat.merge(new ByteArrayInputStream(MERGE_DATA.getBytes("UTF-8")));
@@ -144,11 +144,11 @@ public class CatalogTest extends TestCase {
         expectLookup(cat, "odd and\\b \\\"funny\\\"", "odd.lang.id", "funny.msg.id", 6);
 
         // Verify that the result of Output is as expected.
-        final PipedInputStream in = new PipedInputStream();
+        PipedInputStream in = new PipedInputStream();
         PipedOutputStream out = new PipedOutputStream(in);
         cat.output(out);
-        final Set<String> lines = new HashSet<String>();
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        Set<String> lines = new HashSet<String>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;
         while ((line = reader.readLine()) != null) {
             lines.add(line);
@@ -164,14 +164,14 @@ public class CatalogTest extends TestCase {
     }
 
     private void expectLookup(Catalog cat, String want, String language, String msgID, int tag) {
-        final String got = cat.lookup(language, msgID);
+        String got = cat.lookup(language, msgID);
         assertEquals(String.format(
                 "%d: cat.lookup(%s, %s): got %s, want %s", tag, language, msgID, got, want),
                 want, got);
     }
 
     private void expectFormatParams(String want, String format, Object... params) {
-        final String got = Catalog.formatParams(format, params);
+        String got = Catalog.formatParams(format, params);
         assertEquals(String.format(
                 "formatParams(%s, %s): got %s, want %s", format, params, got, want),
                 want, got);

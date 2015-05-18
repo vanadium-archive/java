@@ -38,7 +38,7 @@ public class VdlInt64 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlInt64)) return false;
-        final VdlInt64 other = (VdlInt64) obj;
+        VdlInt64 other = (VdlInt64) obj;
         return value == other.value;
     }
 

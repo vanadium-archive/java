@@ -154,7 +154,7 @@ public class VException extends Exception {
             if (this == obj) return true;
             if (obj == null) return false;
             if (this.getClass() != obj.getClass()) return false;
-            final IDAction other = (IDAction) obj;
+            IDAction other = (IDAction) obj;
             if (!this.id.equals(other.id)) return false;
             if (this.action != other.action) return false;
             return true;
@@ -163,7 +163,7 @@ public class VException extends Exception {
         @Override
         public int hashCode() {
             int result = 1;
-            final int prime = 31;
+            int prime = 31;
             result = prime * result + id.hashCode();
             result = prime * result + action.hashCode();
             return result;
@@ -230,15 +230,15 @@ public class VException extends Exception {
             paramTypes = Arrays.copyOf(paramTypes, length);
         }
         // Append componentName and opName to params.
-        final Serializable[] newParams = new Serializable[params.length + 2];
-        final VdlType[] newParamTypes = new VdlType[paramTypes.length + 2];
+        Serializable[] newParams = new Serializable[params.length + 2];
+        VdlType[] newParamTypes = new VdlType[paramTypes.length + 2];
         newParams[0] = componentName;
         newParamTypes[0] = Types.STRING;
         newParams[1] = opName;
         newParamTypes[1] = Types.STRING;
         System.arraycopy(params, 0, newParams, 2, params.length);
         System.arraycopy(paramTypes, 0, newParamTypes, 2, params.length);
-        final String msg = Language.getDefaultCatalog().format(
+        String msg = Language.getDefaultCatalog().format(
                     language, idAction.getID(), (Object[]) newParams);
         return new VException(idAction, msg, newParams, newParamTypes);
     }
@@ -251,7 +251,7 @@ public class VException extends Exception {
         }
         String componentName = "";
         if (ctx != null) {
-            final Object value = ctx.value(new ComponentNameKey());
+            Object value = ctx.value(new ComponentNameKey());
             if (value != null && value instanceof String) {
                 componentName = (String) value;
             }
@@ -282,7 +282,7 @@ public class VException extends Exception {
     }
 
     private static Type[] createParamTypes(Serializable[] params) {
-        final Type[] ret = new Type[params.length];
+        Type[] ret = new Type[params.length];
         for (int i = 0; i < params.length; ++i) {
             ret[i] = params[i] == null ? String.class : params[i].getClass();
         }
@@ -293,7 +293,7 @@ public class VException extends Exception {
         if (types == null) {
             return null;
         }
-        final VdlType[] vdlTypes = new VdlType[types.length];
+        VdlType[] vdlTypes = new VdlType[types.length];
         for (int i = 0; i < types.length; ++i) {
             try {
                 vdlTypes[i] = Types.getVdlTypeFromReflect(types[i]);
@@ -427,7 +427,7 @@ public class VException extends Exception {
      */
     public boolean deepEquals(Object obj) {
         if (!equals(obj)) return false;
-        final VException other = (VException) obj;
+        VException other = (VException) obj;
         // equals() has already compared the IDs.
         if (!getAction().equals(other.getAction())) return false;
         if (!Arrays.deepEquals(getParams(), other.getParams())) return false;
@@ -446,7 +446,7 @@ public class VException extends Exception {
         if (this == obj) return true;
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        final VException other = (VException) obj;
+        VException other = (VException) obj;
         return this.getID().equals(other.getID());
     }
 

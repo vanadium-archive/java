@@ -34,7 +34,7 @@ public class Language {
      */
     public static String languageFromContext(VContext context) {
         if (context == null) return "";
-        final Object value = context.value(new LanguageTagKey());
+        Object value = context.value(new LanguageTagKey());
         if (value == null || !(value instanceof String)) {
             return "";
         }
@@ -56,7 +56,7 @@ public class Language {
      * @return          base language of the input language
      */
     public static String baseLanguage(String language) {
-        final int idx = language.indexOf('-');
+        int idx = language.indexOf('-');
         if (idx == -1) return language;
         return language.substring(0, idx);
     }

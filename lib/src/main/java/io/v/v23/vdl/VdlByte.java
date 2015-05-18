@@ -38,7 +38,7 @@ public class VdlByte extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlByte)) return false;
-        final VdlByte other = (VdlByte) obj;
+        VdlByte other = (VdlByte) obj;
         return value == other.value;
     }
 

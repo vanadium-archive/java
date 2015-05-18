@@ -14,8 +14,8 @@ public interface ClientStream<SendT, RecvT, FinishT> extends Stream<SendT, RecvT
   /**
    * Closes the stream, returning the final stream result.
    *
-   * @return FinishT         the final stream result.
-   * @throws VException      if there was an error closing the stream.
+   * @return FinishT         the final stream result
+   * @throws VException      if there was an error closing the stream
    */
   FinishT finish() throws VException;
 }

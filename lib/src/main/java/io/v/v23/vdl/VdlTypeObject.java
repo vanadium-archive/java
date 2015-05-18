@@ -36,7 +36,7 @@ public final class VdlTypeObject extends VdlValue {
         if (this == obj) return true;
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        final VdlTypeObject other = (VdlTypeObject) obj;
+        VdlTypeObject other = (VdlTypeObject) obj;
         return typeObject.equals(other.typeObject);
     }
 

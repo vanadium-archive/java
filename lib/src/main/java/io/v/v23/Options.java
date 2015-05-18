@@ -44,7 +44,7 @@ public class Options {
      *                         option exists
      */
     public <T> T get(String key, Class<T> type) {
-        final Object opt = this.options.get(key);
+        Object opt = this.options.get(key);
         if (opt == null) return null;
         if (!type.isAssignableFrom(opt.getClass())) {
             throw new RuntimeException(String.format(

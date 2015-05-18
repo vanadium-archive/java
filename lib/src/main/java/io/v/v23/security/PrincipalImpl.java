@@ -76,7 +76,7 @@ class PrincipalImpl implements Principal {
     @Override
     public Signature sign(byte[] message) throws VException {
         if (this.signer != null) {
-            final byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
+            byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
             return this.signer.sign(purpose, message);
         }
         return nativeSign(this.nativePtr, message);

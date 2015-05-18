@@ -47,7 +47,7 @@ public final class VdlAny extends VdlValue {
         if (this == obj) return true;
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        final VdlAny other = (VdlAny) obj;
+        VdlAny other = (VdlAny) obj;
         return elem == null ? other.elem == null : elem.equals(other.elem);
     }
 

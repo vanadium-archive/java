@@ -38,7 +38,7 @@ public class VdlFloat32 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlFloat32)) return false;
-        final VdlFloat32 other = (VdlFloat32) obj;
+        VdlFloat32 other = (VdlFloat32) obj;
         return value == other.value;
     }
 

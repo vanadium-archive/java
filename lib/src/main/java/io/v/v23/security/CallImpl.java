@@ -42,7 +42,7 @@ class CallImpl implements Call {
     @Override
     public VdlValue[] methodTags() {
         try {
-            final VdlValue[] tags = nativeMethodTags(this.nativePtr);
+            VdlValue[] tags = nativeMethodTags(this.nativePtr);
             return tags != null ? tags : new VdlValue[0];
         } catch (VException e) {
             throw new RuntimeException("Couldn't get method tags", e);

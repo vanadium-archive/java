@@ -19,18 +19,18 @@ import java.util.Map;
 public class BlessingStoreTest extends TestCase {
     public void testSet() throws VException {
         V.init();
-        final Principal principal = Security.newPrincipal();
-        final BlessingStore store = principal.blessingStore();
-        final Blessings blessingA = newBlessing(principal, "root", "A");
-        final Blessings blessingB = newBlessing(principal, "root", "B");
-        final Blessings blessingOther = Security.newPrincipal().blessSelf("other");
-        final Map<BlessingPattern, Blessings> want =
+        Principal principal = Security.newPrincipal();
+        BlessingStore store = principal.blessingStore();
+        Blessings blessingA = newBlessing(principal, "root", "A");
+        Blessings blessingB = newBlessing(principal, "root", "B");
+        Blessings blessingOther = Security.newPrincipal().blessSelf("other");
+        Map<BlessingPattern, Blessings> want =
                 ImmutableMap.<BlessingPattern, Blessings>builder()
                 .put(new BlessingPattern("..."), blessingA)
                 .put(new BlessingPattern("foo"), blessingA)
                 .put(new BlessingPattern("bar"), blessingB)
                 .build();
-        final Map<BlessingPattern, Blessings> errors =
+        Map<BlessingPattern, Blessings> errors =
                 ImmutableMap.<BlessingPattern, Blessings>builder()
                 .put(new BlessingPattern("..."), blessingOther)
                 .put(new BlessingPattern(""), blessingA)
@@ -50,16 +50,16 @@ public class BlessingStoreTest extends TestCase {
                 // OK
             }
         }
-        final Map<BlessingPattern, Blessings> actual = store.peerBlessings();
+        Map<BlessingPattern, Blessings> actual = store.peerBlessings();
         assertEquals(want, actual);
     }
 
     public void testSetDefault() throws VException {
         V.init();
-        final Principal principal = Security.newPrincipal();
-        final BlessingStore store = principal.blessingStore();
-        final Blessings blessingA = newBlessing(principal, "root", "A");
-        final Blessings blessingB = newBlessing(principal, "root", "B");
+        Principal principal = Security.newPrincipal();
+        BlessingStore store = principal.blessingStore();
+        Blessings blessingA = newBlessing(principal, "root", "A");
+        Blessings blessingB = newBlessing(principal, "root", "B");
         assertTrue(store.defaultBlessings().isEmpty());
         store.setDefaultBlessings(blessingA);
         assertEquals(blessingA, store.defaultBlessings());
@@ -69,16 +69,16 @@ public class BlessingStoreTest extends TestCase {
 
     public void testForPeer() throws VException {
         V.init();
-        final Principal principal = Security.newPrincipal();
-        final BlessingStore store = principal.blessingStore();
-        final Blessings blessingFoo = newBlessing(principal, "foo", "A");
-        final Blessings blessingBar = newBlessing(principal, "bar", "B");
-        final Blessings blessingAll = newBlessing(principal, "all", "C");
+        Principal principal = Security.newPrincipal();
+        BlessingStore store = principal.blessingStore();
+        Blessings blessingFoo = newBlessing(principal, "foo", "A");
+        Blessings blessingBar = newBlessing(principal, "bar", "B");
+        Blessings blessingAll = newBlessing(principal, "all", "C");
         store.set(blessingAll, new BlessingPattern("..."));
         store.set(blessingFoo, new BlessingPattern("foo"));
         store.set(blessingBar, new BlessingPattern("bar/$"));
 
-        final Map<String[], Blessings> testdata =
+        Map<String[], Blessings> testdata =
                ImmutableMap.<String[], Blessings>builder()
                .put(new String[] {}, blessingAll)
                .put(new String[]{ "baz" }, blessingAll)
@@ -102,7 +102,7 @@ public class BlessingStoreTest extends TestCase {
 
     private static Blessings newBlessing(Principal blessee, String root, String extension)
             throws VException {
-        final Principal blesser = Security.newPrincipal();
+        Principal blesser = Security.newPrincipal();
         return blesser.bless(blessee.publicKey(), blesser.blessSelf(root), extension,
                 Security.newUnconstrainedUseCaveat());
     }

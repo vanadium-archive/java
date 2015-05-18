@@ -31,8 +31,8 @@ public class ServerTest extends TestCase {
     }
 
     public void testAddRemoveName() throws Exception {
-        final VContext ctx = V.init();
-        final Server s = V.newServer(ctx);
+        VContext ctx = V.init();
+        Server s = V.newServer(ctx);
         s.listen(V.getListenSpec(ctx));
         s.serveDispatcher("name1", dummyDispatcher);
         s.addName("name2");

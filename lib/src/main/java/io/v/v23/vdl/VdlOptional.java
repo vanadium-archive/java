@@ -69,7 +69,7 @@ public class VdlOptional<T> extends VdlValue {
         if (this == obj) return true;
         if (obj == null) return false;
         if (!(obj instanceof VdlOptional)) return false;
-        final VdlOptional<?> other = (VdlOptional<?>) obj;
+        VdlOptional<?> other = (VdlOptional<?>) obj;
         return elem == null ? other.elem == null : elem.equals(other.elem);
     }
 

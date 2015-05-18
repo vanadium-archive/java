@@ -38,7 +38,7 @@ public class VdlUint32 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlUint32)) return false;
-        final VdlUint32 other = (VdlUint32) obj;
+        VdlUint32 other = (VdlUint32) obj;
         return value == other.value;
     }
 

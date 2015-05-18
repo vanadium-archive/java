@@ -57,7 +57,7 @@ public class VdlStruct extends AbstractVdlStruct {
         if (this == obj) return true;
         if (obj == null) return false;
         if (this.getClass() != obj.getClass()) return false;
-        final VdlStruct other = (VdlStruct) obj;
+        VdlStruct other = (VdlStruct) obj;
         return fields.equals(other.fields);
     }
 

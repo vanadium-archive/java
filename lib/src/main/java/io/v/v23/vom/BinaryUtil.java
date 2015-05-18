@@ -59,7 +59,7 @@ final class BinaryUtil {
     }
 
     public static long decodeUint(InputStream in) throws IOException {
-        final int firstByte = in.read();
+        int firstByte = in.read();
         if (firstByte == -1) {
             // EOF.
             throw new CorruptVomStreamException(END_OF_STREAM_MESSAGE);
@@ -97,7 +97,7 @@ final class BinaryUtil {
     }
 
     public static long decodeInt(InputStream in) throws IOException {
-        final long uint = decodeUint(in);
+        long uint = decodeUint(in);
         if ((uint & 1) == 1) {
             return ~(uint >>> 1);
         } else {

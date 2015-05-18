@@ -54,7 +54,7 @@ public class CallParams {
      * @return      a child of the current params with the given timestamp attached
      */
     public CallParams withTimestamp(DateTime time) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.timestamp = time;
         return ret;
     }
@@ -65,7 +65,7 @@ public class CallParams {
      * @return        a child of the current params with the given method name attached
      */
     public CallParams withMethod(String method) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.method = method;
         return ret;
     }
@@ -76,7 +76,7 @@ public class CallParams {
      * @return      a child of the current params with the given method tags attached
      */
     public CallParams withMethodTags(VdlValue... tags) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.methodTags = tags;
         return ret;
     }
@@ -87,7 +87,7 @@ public class CallParams {
      * @return        a child of the current params with the given vanadium name suffix attached
      */
     public CallParams withSuffix(String suffix) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.suffix = suffix;
         return ret;
     }
@@ -98,7 +98,7 @@ public class CallParams {
      * @return          a child of the current params with the given local endpoint attached
      */
     public CallParams withLocalEndpoint(String endpoint) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.localEndpoint = endpoint;
         return ret;
     }
@@ -109,7 +109,7 @@ public class CallParams {
      * @return          a child of the current params with the given remote endpoint attached
      */
     public CallParams withRemoteEndpoint(String endpoint) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.remoteEndpoint = endpoint;
         return ret;
     }
@@ -120,7 +120,7 @@ public class CallParams {
      * @return           a child of the current params with the given local principal attached
      */
     public CallParams withLocalPrincipal(Principal principal) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.principal = principal;
         return ret;
     }
@@ -131,7 +131,7 @@ public class CallParams {
      * @return           a child of the current params with the given local blessings attached
      */
     public CallParams withLocalBlessings(Blessings blessings) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.localBlessings = blessings;
         return ret;
     }
@@ -142,7 +142,7 @@ public class CallParams {
      * @return           a child of the current params with the given remote blessings attached
      */
     public CallParams withRemoteBlessings(Blessings blessings) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.remoteBlessings = blessings;
         return ret;
     }
@@ -153,7 +153,7 @@ public class CallParams {
      * @return         a child of the current params with the given Vanadium context attached
      */
     public CallParams withContext(VContext context) {
-        final CallParams ret = new CallParams(this);
+        CallParams ret = new CallParams(this);
         ret.context = context;
         return ret;
     }

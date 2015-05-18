@@ -37,9 +37,9 @@ public class CaveatRegistry {
      */
     public static void register(CaveatDescriptor desc, CaveatValidator validator)
             throws VException {
-        final String registerer = getRegisterer();
+        String registerer = getRegisterer();
         lock.writeLock().lock();
-        final RegistryEntry existing = validators.get(desc.getId());
+        RegistryEntry existing = validators.get(desc.getId());
         if (existing != null) {
             lock.writeLock().unlock();
             throw new VException(String.format("Caveat with UUID %s registered twice. " +
@@ -48,8 +48,8 @@ public class CaveatRegistry {
                 existing.getRegisterer(), desc.getParamType(), validator, registerer));
         }
         // TODO(spetrovic): Once rogulenko@ is done, get the Type from desc.getParamType().
-        final Type paramType = null;
-        final RegistryEntry entry = new RegistryEntry(desc, validator, paramType, registerer);
+        Type paramType = null;
+        RegistryEntry entry = new RegistryEntry(desc, validator, paramType, registerer);
         validators.put(desc.getId(), entry);
         lock.writeLock().unlock();
     }
@@ -63,7 +63,7 @@ public class CaveatRegistry {
      * @throws VException  if the caveat couldn't be validated
      */
     public static void validate(VContext context, Call call, Caveat caveat) throws VException {
-        final RegistryEntry entry = lookup(caveat.getId());
+        RegistryEntry entry = lookup(caveat.getId());
         if (entry == null) {
             throw Errors.newCaveatNotRegistered(null, caveat.getId());
         }
@@ -80,17 +80,17 @@ public class CaveatRegistry {
 
     private static RegistryEntry lookup(Id id) {
         lock.readLock().lock();
-        final RegistryEntry entry = validators.get(id);
+        RegistryEntry entry = validators.get(id);
         lock.readLock().unlock();
         return entry;
     }
 
     private static String getRegisterer() {
-        final StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         if (stack == null || stack.length < 2) {
             return "";
         }
-        final StackTraceElement registerer = stack[stack.length - 2];
+        StackTraceElement registerer = stack[stack.length - 2];
         return String.format("%s:%d", registerer.getFileName(), registerer.getLineNumber());
     }
 

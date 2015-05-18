@@ -97,7 +97,7 @@ public class PermissionsAuthorizer implements Authorizer {
      */
     public static PermissionsAuthorizer create(Permissions acls, Type tagType) throws VException {
         try {
-            final VdlType type = Types.getVdlTypeFromReflect(tagType);
+            VdlType type = Types.getVdlTypeFromReflect(tagType);
             return new PermissionsAuthorizer(acls != null ? acls : new Permissions(), type);
         } catch (IllegalArgumentException e) {
             throw new VException(String.format(
@@ -112,15 +112,15 @@ public class PermissionsAuthorizer implements Authorizer {
 
     @Override
     public void authorize(VContext ctx, Call call) throws VException {
-        final Blessings local = call.localBlessings();
-        final Blessings remote = call.remoteBlessings();
+        Blessings local = call.localBlessings();
+        Blessings remote = call.remoteBlessings();
         // Self-RPCs are always authorized.
         if (local != null && local.publicKey() != null &&
                 remote != null && remote.publicKey() != null &&
                 Arrays.equals(local.publicKey().getEncoded(), remote.publicKey().getEncoded())) {
             return;
         }
-        final String[] blessings =
+        String[] blessings =
                 remote != null ? Security.getRemoteBlessingNames(ctx, call) : new String[0];
         VdlValue[] tags = call.methodTags();
         if (tags == null) {
@@ -136,7 +136,7 @@ public class PermissionsAuthorizer implements Authorizer {
             if (tag == null || tag.vdlType() != this.tagType) {
                 continue;
             }
-            final AccessList acl = this.acls.get(tag.toString());
+            AccessList acl = this.acls.get(tag.toString());
             if (acl == null || !acl.includes(blessings)) {
                 errorACLMatch(blessings);
             }

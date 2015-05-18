@@ -30,14 +30,14 @@ public class Call implements io.v.v23.rpc.Client.Call {
     }
     @Override
     public Object[] finish(Type[] types) throws VException {
-        final byte[][] vomResults = nativeFinish(this.nativePtr, types.length);
+        byte[][] vomResults = nativeFinish(this.nativePtr, types.length);
         if (vomResults.length != types.length) {
             throw new VException(String.format(
                 "Mismatch in number of results, want %s, have %s",
                 types.length, vomResults.length));
         }
         // VOM-decode results.
-        final Object[] ret = new Object[types.length];
+        Object[] ret = new Object[types.length];
         for (int i = 0; i < types.length; i++) {
             ret[i] = VomUtil.decode(vomResults[i], types[i]);
         }

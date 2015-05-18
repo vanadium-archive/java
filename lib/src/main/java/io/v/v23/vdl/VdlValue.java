@@ -57,13 +57,12 @@ public abstract class VdlValue implements Serializable {
     public static VdlValue valueOf(Object value, VdlType type) {
         try {
             // VOM-Encode.
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final BinaryEncoder encoder = new BinaryEncoder(out);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            BinaryEncoder encoder = new BinaryEncoder(out);
             encoder.encodeValue(type, value);
 
             // VOM-Decode to VdlValue.
-            final BinaryDecoder decoder =
-                    new BinaryDecoder(new ByteArrayInputStream(out.toByteArray()));
+            BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(out.toByteArray()));
             return (VdlValue) decoder.decodeValue(VdlValue.class);
         } catch (IOException e) {
             throw new IllegalArgumentException(String.format(

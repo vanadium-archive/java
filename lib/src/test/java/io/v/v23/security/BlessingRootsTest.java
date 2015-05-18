@@ -25,21 +25,21 @@ import static com.google.common.truth.Truth.assertThat;
 public class BlessingRootsTest extends TestCase {
     public void testRecognized() throws VException {
         V.init();
-        final Principal principal = Security.newPrincipal();
-        final BlessingRoots roots = principal.roots();
-        final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };
+        Principal principal = Security.newPrincipal();
+        BlessingRoots roots = principal.roots();
+        ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));
         roots.add(keys[1], new BlessingPattern("google/foo"));
         roots.add(keys[0], new BlessingPattern("google/$"));
 
-        final Map<ECPublicKey, String[]> recognized =
+        Map<ECPublicKey, String[]> recognized =
                 ImmutableMap.<ECPublicKey, String[]>builder()
                 .put(keys[0], new String[]{
                         "vanadium", "vanadium/foo", "vanadium/foo/bar", "google" })
                 .put(keys[1], new String[]{ "google/foo", "google/foo/bar" })
                 .put(keys[2], new String[]{ })
                 .build();
-        final Map<ECPublicKey, String[]> notRecognized =
+        Map<ECPublicKey, String[]> notRecognized =
                 ImmutableMap.<ECPublicKey, String[]>builder()
                 .put(keys[0], new String[]{ "google/foo", "foo", "foo/bar" })
                 .put(keys[1], new String[]{
@@ -48,7 +48,7 @@ public class BlessingRootsTest extends TestCase {
                         "google/foo", "google/bar", "foo", "foo/bar" })
                 .build();
         for (Map.Entry<ECPublicKey, String[]> entry : recognized.entrySet()) {
-            final ECPublicKey key = entry.getKey();
+            ECPublicKey key = entry.getKey();
             for (String blessing : entry.getValue()) {
                 try {
                     roots.recognized(key, blessing);
@@ -59,7 +59,7 @@ public class BlessingRootsTest extends TestCase {
             }
         }
         for (Map.Entry<ECPublicKey, String[]> entry : notRecognized.entrySet()) {
-            final ECPublicKey key = entry.getKey();
+            ECPublicKey key = entry.getKey();
             for (String blessing : entry.getValue()) {
                 try {
                     roots.recognized(key, blessing);
@@ -74,15 +74,15 @@ public class BlessingRootsTest extends TestCase {
 
     public void testDump() throws VException {
         V.init();
-        final Principal principal = Security.newPrincipal();
-        final BlessingRoots roots = principal.roots();
-        final ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey(), mintPublicKey() };
+        Principal principal = Security.newPrincipal();
+        BlessingRoots roots = principal.roots();
+        ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));
         roots.add(keys[1], new BlessingPattern("google/foo"));
         roots.add(keys[0], new BlessingPattern("google/$"));
         roots.add(keys[3], new BlessingPattern("google/$"));
 
-        final Multimap<BlessingPattern, ECPublicKey> map = roots.dump();
+        Multimap<BlessingPattern, ECPublicKey> map = roots.dump();
         assertThat(map).hasSize(keys.length);
         assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/$"))).containsAllOf(keys[0], keys[3]);
         assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/foo"))).containsExactly(keys[1]);
@@ -90,7 +90,7 @@ public class BlessingRootsTest extends TestCase {
 
     private static ECPublicKey mintPublicKey() throws VException {
         try {
-            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
             keyGen.initialize(256);
             return (ECPublicKey) keyGen.generateKeyPair().getPublic();
         } catch (NoSuchAlgorithmException e) {

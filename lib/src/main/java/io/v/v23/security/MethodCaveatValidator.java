@@ -29,7 +29,7 @@ public class MethodCaveatValidator implements CaveatValidator {
             throw new VException(String.format(
                     "Caveat param %s of wrong type: want List<?>", param));
         }
-        final List<?> methods = (List<?>) param;
+        List<?> methods = (List<?>) param;
         if (call.method().isEmpty() && methods.size() == 0) {
             return;
         }

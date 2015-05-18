@@ -29,8 +29,8 @@ public class VomUtil {
      * @throws VException      if there was an error encoding the value
      */
     public static byte[] encode(Object value, Type type) throws VException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final BinaryEncoder encoder = new BinaryEncoder(out);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BinaryEncoder encoder = new BinaryEncoder(out);
         try {
             encoder.encodeValue(type, value);
         } catch (IOException e) {
@@ -48,8 +48,8 @@ public class VomUtil {
      * @throws VException      if there was an error encoding the value
      */
     public static byte[] encode(Object value, VdlType type) throws VException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final BinaryEncoder encoder = new BinaryEncoder(out);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BinaryEncoder encoder = new BinaryEncoder(out);
         try {
             encoder.encodeValue(type, value);
         } catch (IOException e) {
@@ -67,7 +67,7 @@ public class VomUtil {
      * @throws VException      if there was an error encoding the value
      */
     public static String encodeToString(Object value, Type type) throws VException {
-        final byte[] data = encode(value, type);
+        byte[] data = encode(value, type);
         return bytesToHexString(data);
     }
 
@@ -79,8 +79,8 @@ public class VomUtil {
      * @throws VException      if there was an error encoding the value
      */
     public static byte[] encode(VdlValue value) throws VException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final BinaryEncoder encoder = new BinaryEncoder(out);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BinaryEncoder encoder = new BinaryEncoder(out);
         try {
             encoder.encodeValue(value);
         } catch (IOException e) {
@@ -99,7 +99,7 @@ public class VomUtil {
      * @throws VException      if there was an error decoding the data
      */
     public static Object decode(byte[] data, Type type) throws VException {
-        final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
+        BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
         try {
             return decoder.decodeValue(type);
         } catch (IOException e) {
@@ -118,7 +118,7 @@ public class VomUtil {
      * @throws VException      if there was an error decoding the data
      */
     public static Object decode(byte[] data) throws VException {
-        final BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
+        BinaryDecoder decoder = new BinaryDecoder(new ByteArrayInputStream(data));
         try {
             return decoder.decodeValue();
         } catch (IOException e) {
@@ -137,12 +137,12 @@ public class VomUtil {
      * @throws VException      if there was an error decoding the data
      */
     public static Object decodeFromString(String hex, Type type) throws VException {
-        final byte[] data = hexStringToBytes(hex);
+        byte[] data = hexStringToBytes(hex);
         return decode(data, type);
     }
 
     private static String bytesToHexString(byte[] data) {
-        final StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (byte b : data) {
             builder.append(String.format("%02x", b));
         }
@@ -153,8 +153,8 @@ public class VomUtil {
         if (hex.length() % 2 != 0) {
             throw new VException("Hex strings must be multiples of 2 in length");
         }
-        final int outLen = hex.length() / 2;
-        final byte[] dat = new byte[outLen];
+        int outLen = hex.length() / 2;
+        byte[] dat = new byte[outLen];
         for (int i = 0; i < outLen; i++) {
             dat[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
         }

@@ -55,12 +55,12 @@ public class Security {
      */
     public static Signer newInMemorySigner() throws VException {
         try {
-            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
             keyGen.initialize(256);
-            final KeyPair keyPair = keyGen.generateKeyPair();
-             final PrivateKey privKey = keyPair.getPrivate();
-             final ECPublicKey pubKey = (ECPublicKey) keyPair.getPublic();
-             return new ECDSASigner(privKey, pubKey);
+            KeyPair keyPair = keyGen.generateKeyPair();
+            PrivateKey privKey = keyPair.getPrivate();
+            ECPublicKey pubKey = (ECPublicKey) keyPair.getPublic();
+            return new ECDSASigner(privKey, pubKey);
         } catch (NoSuchAlgorithmException e) {
             throw new VException("Couldn't mint private key: " + e.getMessage());
         }
@@ -211,7 +211,7 @@ public class Security {
      * @throws VException      if the caveat couldn't be created
      */
     public static Caveat newCaveat(CaveatDescriptor desc, Object param) throws VException {
-        final byte[] paramVOM = VomUtil.encode(param, desc.getParamType().getTypeObject());
+        byte[] paramVOM = VomUtil.encode(param, desc.getParamType().getTypeObject());
         return new Caveat(desc.getId(), paramVOM);
     }
 
@@ -238,7 +238,7 @@ public class Security {
      */
     public static Caveat newMethodCaveat(String method, String... additionalMethods)
             throws VException {
-        final List<String> methods = ImmutableList.<String>builder()
+        List<String> methods = ImmutableList.<String>builder()
                 .add(method)
                 .add(additionalMethods)
                 .build();
@@ -305,12 +305,12 @@ public class Security {
      */
     public static void verifySignature(Signature sig, ECPublicKey key, byte[] message)
         throws VException {
-        final String hashAlgorithm = sig.getHash().getValue();
-        final String verifyAlgorithm = hashAlgorithm + "withECDSA";
+        String hashAlgorithm = sig.getHash().getValue();
+        String verifyAlgorithm = hashAlgorithm + "withECDSA";
         try {
             message = CryptoUtil.messageDigest(hashAlgorithm, message, sig.getPurpose());
-            final byte[] jSig = CryptoUtil.javaSignature(sig);
-            final java.security.Signature verifier = java.security.Signature.getInstance(hashAlgorithm + "withECDSA");
+            byte[] jSig = CryptoUtil.javaSignature(sig);
+            java.security.Signature verifier = java.security.Signature.getInstance(hashAlgorithm + "withECDSA");
             verifier.initVerify(key);
             verifier.update(message);
             if (!verifier.verify(jSig)) {

@@ -19,9 +19,9 @@ public class LanguageTest extends TestCase {
     }
 
     public void testLanguageFromContext() {
-        final VContext dcWithoutLang = VContextImpl.create();
-        final VContext dcWithEN = Language.contextWithLanguage(dcWithoutLang, "en");
-        final VContext dcWithFR = Language.contextWithLanguage(dcWithEN, "fr");
+        VContext dcWithoutLang = VContextImpl.create();
+        VContext dcWithEN = Language.contextWithLanguage(dcWithoutLang, "en");
+        VContext dcWithFR = Language.contextWithLanguage(dcWithEN, "fr");
         assertTrue(Language.languageFromContext(dcWithoutLang).isEmpty());
         assertEquals("en", Language.languageFromContext(dcWithEN));
         assertEquals("fr", Language.languageFromContext(dcWithFR));

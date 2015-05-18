@@ -38,7 +38,7 @@ public class VdlFloat64 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlFloat64)) return false;
-        final VdlFloat64 other = (VdlFloat64) obj;
+        VdlFloat64 other = (VdlFloat64) obj;
         return value == other.value;
     }
 

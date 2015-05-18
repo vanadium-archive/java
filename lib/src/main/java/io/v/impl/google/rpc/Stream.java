@@ -22,13 +22,13 @@ public class Stream implements io.v.v23.rpc.Stream {
     }
     @Override
     public void send(Object item, Type type) throws VException {
-        final byte[] vomItem = VomUtil.encode(item, type);
+        byte[] vomItem = VomUtil.encode(item, type);
         nativeSend(nativePtr, vomItem);
     }
 
     @Override
     public Object recv(Type type) throws EOFException, VException {
-        final byte[] result = nativeRecv(nativePtr);
+        byte[] result = nativeRecv(nativePtr);
         return VomUtil.decode(result, type);
     }
     @Override

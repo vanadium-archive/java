@@ -35,7 +35,7 @@ public class VdlEnum extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlEnum)) return false;
-        final VdlEnum other = (VdlEnum) obj;
+        VdlEnum other = (VdlEnum) obj;
         return name.equals(other.name);
     }
 

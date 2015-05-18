@@ -32,10 +32,10 @@ class ECDSASigner implements Signer {
         // Sign.  Note that the signer will first apply another hash on the message, resulting in:
         // ECDSA.Sign(Hash(Hash(message) + Hash(purpose))).
         try {
-            final java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGORITHM);
+            java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGORITHM);
             sig.initSign(this.privKey);
             sig.update(message);
-            final byte[] asn1Sig = sig.sign();
+            byte[] asn1Sig = sig.sign();
             return CryptoUtil.vanadiumSignature(HASH_ALGORITHM_NAME, purpose, asn1Sig);
         } catch (NoSuchAlgorithmException e) {
             throw new VException("Signing algorithm " + SIGN_ALGORITHM +

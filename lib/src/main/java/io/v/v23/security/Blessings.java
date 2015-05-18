@@ -81,7 +81,7 @@ public class Blessings {
         if (this == obj) return true;
         if (obj == null) return false;
         if (!(obj instanceof Blessings)) return false;
-        final Blessings other = (Blessings) obj;
+        Blessings other = (Blessings) obj;
         return this.wireFormat().equals(other.wireFormat());
     }
     @Override

@@ -131,7 +131,7 @@ public final class ReflectInvoker implements Invoker {
                 this.resultTypes = new Type[0];
             } else if (returnType.getAnnotation(MultiReturn.class) != null) {
                 // Multiple return values.
-                final Field[] fields = returnType.getFields();
+                Field[] fields = returnType.getFields();
                 this.resultTypes = new Type[fields.length];
                 for (int i = 0; i < fields.length; ++i) {
                     this.resultTypes[i] = fields[i].getGenericType();
@@ -177,7 +177,7 @@ public final class ReflectInvoker implements Invoker {
         this.server = obj;
         List<Object> serverWrappers = wrapServer(obj);
         for (Object wrapper : serverWrappers) {
-            final Class<?> c = wrapper.getClass();
+            Class<?> c = wrapper.getClass();
             ClassInfo cInfo;
             synchronized (ReflectInvoker.this) {
                 cInfo = ReflectInvoker.serverWrapperClasses.get(c);
@@ -314,7 +314,7 @@ public final class ReflectInvoker implements Invoker {
     }
 
     private ServerMethod findMethod(String method) throws VException {
-        final ServerMethod m = this.invokableMethods.get(method);
+        ServerMethod m = this.invokableMethods.get(method);
         if (m == null) {
             throw new VException(String.format("Couldn't find method \"%s\" in class %s",
                     method, server.getClass().getCanonicalName()));
@@ -350,7 +350,7 @@ public final class ReflectInvoker implements Invoker {
     private List<Object> wrapServer(Object srv) throws VException {
         List<Object> stubs = new ArrayList<Object>();
         for (Class<?> iface : srv.getClass().getInterfaces()) {
-            final VServer vs = iface.getAnnotation(VServer.class);
+            VServer vs = iface.getAnnotation(VServer.class);
             if (vs == null) {
                 continue;
             }
@@ -359,7 +359,7 @@ public final class ReflectInvoker implements Invoker {
                 throw new RuntimeException(
                         "Expected ServerWrapper to only have a single constructor");
             }
-            final Constructor<?> constructor = vs.serverWrapper().getConstructors()[0];
+            Constructor<?> constructor = vs.serverWrapper().getConstructors()[0];
 
             try {
                 stubs.add(constructor.newInstance(srv));
@@ -382,9 +382,9 @@ public final class ReflectInvoker implements Invoker {
         final Map<String, Method> methods = new HashMap<String, Method>();
 
         ClassInfo(Class<?> c) throws VException {
-            final Method[] methodList = c.getDeclaredMethods();
+            Method[] methodList = c.getDeclaredMethods();
             for (int i = 0; i < methodList.length; i++) {
-                final Method method = methodList[i];
+                Method method = methodList[i];
                 Method oldval = null;
                 try {
                     oldval = this.methods.put(method.getName(), method);

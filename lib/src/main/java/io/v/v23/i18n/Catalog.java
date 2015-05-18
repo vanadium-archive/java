@@ -78,7 +78,7 @@ public class Catalog {
     }
 
     private static String[] convertParamsToStr(Object... params) {
-        final String[] ret = new String[params.length];
+        String[] ret = new String[params.length];
         for (int i = 0; i < params.length; ++i) {
             ret[i] = "" + params[i];
         }
@@ -117,11 +117,11 @@ public class Catalog {
     }
 
     private String lookupUnlocked(String language, String msgID) {
-        final Map<String, String> msgFmtMap = this.formats.get(language);
+        Map<String, String> msgFmtMap = this.formats.get(language);
         if (msgFmtMap == null) {
             return "";
         }
-        final String fmt = msgFmtMap.get(msgID);
+        String fmt = msgFmtMap.get(msgID);
         return fmt == null ? "" : fmt;
     }
 
@@ -157,7 +157,7 @@ public class Catalog {
      */
     public String set(String language, String msgID, String newFormat) {
         this.lock.writeLock().lock();
-        final String oldFormat = setUnlocked(language, msgID, newFormat);
+        String oldFormat = setUnlocked(language, msgID, newFormat);
         this.lock.writeLock().unlock();
         return oldFormat;
     }
@@ -174,9 +174,9 @@ public class Catalog {
      */
     public String setWithBase(String language, String msgID, String newFormat) {
         this.lock.writeLock().lock();
-        final String oldFormat = setUnlocked(language, msgID, newFormat);
-        final String baseLang = Language.baseLanguage(language);
-        final String baseFmt = lookupUnlocked(baseLang, msgID);
+        String oldFormat = setUnlocked(language, msgID, newFormat);
+        String baseLang = Language.baseLanguage(language);
+        String baseFmt = lookupUnlocked(baseLang, msgID);
         if (baseFmt.isEmpty() && !newFormat.isEmpty() && !baseLang.equals(language)) {
             setUnlocked(baseLang, msgID, newFormat);
         }
@@ -190,7 +190,7 @@ public class Catalog {
             msgFmtMap = new HashMap<String, String>();
             this.formats.put(language, msgFmtMap);
         }
-        final String oldFormat = msgFmtMap.get(msgID);
+        String oldFormat = msgFmtMap.get(msgID);
         if (newFormat != null && !newFormat.isEmpty()) {
             msgFmtMap.put(msgID, newFormat);
         } else {
@@ -214,17 +214,17 @@ public class Catalog {
      * @throws IOException if there was an error reading the input stream
      */
     public void merge(InputStream in) throws IOException {
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String line = null;
-        final Pattern pattern =
+        Pattern pattern =
                 Pattern.compile("^\\s*([^\\s\"]+)\\s+([^\\s\"]+)\\s+\"((?:[^\"]|\\\")*)\".*$");
         while ((line = reader.readLine()) != null) {
-            final Matcher matcher = pattern.matcher(line);
+            Matcher matcher = pattern.matcher(line);
             if (matcher.matches() &&
                 matcher.groupCount() == 3 && !matcher.group(1).startsWith("#")) {
-                final String language = matcher.group(1);
-                final String msgID = matcher.group(2);
-                final String format = matcher.group(3);
+                String language = matcher.group(1);
+                String msgID = matcher.group(2);
+                String format = matcher.group(3);
                 set(language, msgID, format);
             }
         }
@@ -239,13 +239,13 @@ public class Catalog {
      * @throws IOException if there was an error writing to the output stream
      */
     public void output(OutputStream out) throws IOException {
-        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
         this.lock.readLock().lock();
         for (Map.Entry<String, Map<String, String>> entry : this.formats.entrySet()) {
-            final String language = entry.getKey();
+            String language = entry.getKey();
             for (Map.Entry<String, String> idFmt : entry.getValue().entrySet()) {
-                final String msgID = idFmt.getKey();
-                final String format = idFmt.getValue();
+                String msgID = idFmt.getKey();
+                String format = idFmt.getValue();
                 writer.write(String.format("%s %s \"%s\"\n", language, msgID, format));
             }
         }

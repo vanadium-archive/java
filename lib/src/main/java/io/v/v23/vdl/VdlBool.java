@@ -38,7 +38,7 @@ public class VdlBool extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlBool)) return false;
-        final VdlBool other = (VdlBool) obj;
+        VdlBool other = (VdlBool) obj;
         return value == other.value;
     }
 

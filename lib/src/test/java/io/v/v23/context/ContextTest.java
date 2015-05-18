@@ -20,30 +20,30 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ContextTest extends TestCase {
     public void testWithValue() {
-        final VContext ctx = V.init();
+        VContext ctx = V.init();
         assertEquals(null, ctx.value("A"));
-        final VContext ctxA = ctx.withValue("A", 1);
+        VContext ctxA = ctx.withValue("A", 1);
         assertEquals(null, ctx.value("A"));
         assertEquals(1, ctxA.value("A"));
         assertEquals(null, ctx.value("B"));
         assertEquals(null, ctxA.value("B"));
-        final VContext ctxAB = ctxA.withValue("B", 2);
+        VContext ctxAB = ctxA.withValue("B", 2);
         assertEquals(null, ctx.value("A"));
         assertEquals(1, ctxA.value("A"));
         assertEquals(null, ctx.value("B"));
         assertEquals(null, ctxA.value("B"));
         assertEquals(1, ctxAB.value("A"));
         assertEquals(2, ctxAB.value("B"));
-        final VContext ctxNull = ctxAB.withValue("C", null);
+        VContext ctxNull = ctxAB.withValue("C", null);
         assertEquals(null, ctxNull.value("C"));
         assertEquals(1, ctxAB.value("A"));
         assertEquals(2, ctxAB.value("B"));
     }
 
     public void testWithCancel() {
-        final VContext ctx = V.init();
-        final CancelableVContext ctxCancel = ctx.withCancel();
-        final CountDownLatch done = ctxCancel.done();
+        VContext ctx = V.init();
+        CancelableVContext ctxCancel = ctx.withCancel();
+        CountDownLatch done = ctxCancel.done();
         assertTrue(done != null);
         assertEquals(done, ctxCancel.done());  // same value returned
         assertEquals(1, done.getCount());
@@ -57,17 +57,17 @@ public class ContextTest extends TestCase {
     }
 
     public void testWithDeadline() {
-        final VContext ctx = V.init();
+        VContext ctx = V.init();
         {
-            final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
-            final CountDownLatch done = ctxD.done();
+            CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
+            CountDownLatch done = ctxD.done();
             assertTrue(done != null);
             Uninterruptibles.awaitUninterruptibly(done);
             assertEquals(0, done.getCount());
         }
         {
-            final CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(100000));
-            final CountDownLatch done = ctxD.done();
+            CancelableVContext ctxD = ctx.withDeadline(DateTime.now().plus(100000));
+            CountDownLatch done = ctxD.done();
             assertTrue(done != null);
             ctxD.cancel();
             try {
@@ -80,10 +80,10 @@ public class ContextTest extends TestCase {
     }
 
     public void testWithTimeout() {
-        final VContext ctx = V.init();
+        VContext ctx = V.init();
         {
-            final CancelableVContext ctxT = ctx.withTimeout(new Duration(500));
-            final CountDownLatch done = ctxT.done();
+            CancelableVContext ctxT = ctx.withTimeout(new Duration(500));
+            CountDownLatch done = ctxT.done();
             assertTrue(done != null);
             try {
                 done.await();
@@ -93,8 +93,8 @@ public class ContextTest extends TestCase {
             assertEquals(0, done.getCount());
         }
         {
-            final CancelableVContext ctxT = ctx.withTimeout(new Duration(100000));
-            final CountDownLatch done = ctxT.done();
+            CancelableVContext ctxT = ctx.withTimeout(new Duration(100000));
+            CountDownLatch done = ctxT.done();
             assertTrue(done != null);
             ctxT.cancel();
             try {

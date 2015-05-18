@@ -186,7 +186,7 @@ public class BinaryDecoder {
         // Convert native value.
         NativeTypes.Converter converter = Types.getNativeTypeConverter(target.getTargetType());
         if (converter != null) {
-            final VdlValue value = (VdlValue) readValue(actualType, converter.getWireType());
+            VdlValue value = (VdlValue) readValue(actualType, converter.getWireType());
             return converter.nativeFromVdlValue(value);
         }
         switch (actualType.getKind()) {

@@ -10,7 +10,7 @@ import java.util.Arrays;
  * The current status of the server.
  */
 public class ServerStatus {
-    private ServerState state;
+    private final ServerState state;
     private final boolean servesMountTable;
     private final MountStatus[] mounts;
     private final String[] endpoints;

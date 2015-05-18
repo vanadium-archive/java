@@ -195,7 +195,7 @@ public class BinaryEncoder {
         // Convert native value.
         NativeTypes.Converter converter = Types.getNativeTypeConverter(value.getClass());
         if (converter != null) {
-            final VdlValue vdlValue = converter.vdlValueFromNative(value);
+            VdlValue vdlValue = converter.vdlValueFromNative(value);
             return writeValue(out, vdlValue, type);
         }
         switch (type.getKind()) {

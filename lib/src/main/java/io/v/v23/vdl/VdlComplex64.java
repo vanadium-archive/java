@@ -44,7 +44,7 @@ public class VdlComplex64 extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlComplex64)) return false;
-        final VdlComplex64 other = (VdlComplex64) obj;
+        VdlComplex64 other = (VdlComplex64) obj;
         return real == other.real && imag == other.imag;
     }
 

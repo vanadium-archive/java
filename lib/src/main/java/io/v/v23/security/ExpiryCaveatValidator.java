@@ -26,8 +26,8 @@ public class ExpiryCaveatValidator implements CaveatValidator {
             throw new VException(String.format(
                     "Caveat param %s of wrong type: want %s", param, DateTime.class));
         }
-        final DateTime expiry = (DateTime) param;
-        final DateTime now = call.timestamp();
+        DateTime expiry = (DateTime) param;
+        DateTime now = call.timestamp();
         if (now.isAfter(expiry)) {
             throw new VException(String.format(
                 "ExpiryCaveat(%s) failed validation at %s", expiry, now));

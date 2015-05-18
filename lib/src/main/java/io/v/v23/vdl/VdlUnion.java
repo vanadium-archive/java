@@ -48,7 +48,7 @@ public class VdlUnion extends VdlValue {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof VdlUnion)) return false;
-        final VdlUnion other = (VdlUnion) obj;
+        VdlUnion other = (VdlUnion) obj;
         return getElem().equals(other.getElem());
     }
 
