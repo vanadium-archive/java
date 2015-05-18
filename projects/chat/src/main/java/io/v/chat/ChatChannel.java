@@ -80,7 +80,7 @@ public class ChatChannel {
             if (reply instanceof GlobReply.Entry) {
                 MountEntry entry = ((GlobReply.Entry) reply).getElem();
                 for (MountedServer server : entry.getServers()) {
-                    ChatClient client = ChatClientFactory.bind("/" + server.getServer());
+                    ChatClient client = ChatClientFactory.getChatClient("/" + server.getServer());
                     try {
                         client.sendMessage(context, s);
                         break;

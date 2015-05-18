@@ -72,7 +72,7 @@ public interface Server {
      *
      * @param  name            name under which the dispatcher should be published, or the empty
      *                         string if the dispatcher should not be published
-     * @param  dispatcher      dispatcher to be published under the given name
+     * @param  disp            dispatcher to be published under the given name
      * @throws VException      if the dispatcher couldn't be published under the given name
      */
     void serveDispatcher(String name, Dispatcher disp) throws VException;

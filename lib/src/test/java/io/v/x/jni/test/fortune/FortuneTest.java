@@ -52,7 +52,7 @@ public class FortuneTest extends TestCase {
         s.serve("", server, null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.get(ctxT);
@@ -76,7 +76,7 @@ public class FortuneTest extends TestCase {
         s.serve("", server, null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
@@ -102,7 +102,7 @@ public class FortuneTest extends TestCase {
         s.serve("", server, null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
@@ -121,7 +121,7 @@ public class FortuneTest extends TestCase {
         s.serve("", server, null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.getComplexError(ctxT);
@@ -155,7 +155,7 @@ public class FortuneTest extends TestCase {
         s.serve("", server, null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.testServerCall(ctxT);
@@ -206,7 +206,7 @@ public class FortuneTest extends TestCase {
         s.serve("", new TestInvoker(), null);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
         s.stop();
@@ -226,7 +226,7 @@ public class FortuneTest extends TestCase {
         s.serveDispatcher("", dispatcher);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
@@ -247,7 +247,7 @@ public class FortuneTest extends TestCase {
         s.serveDispatcher("", dispatcher);
 
         String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.bind(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
         s.stop();

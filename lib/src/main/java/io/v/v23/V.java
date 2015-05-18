@@ -89,7 +89,7 @@ public class V {
      * <p>
      * A caller may pass the following option that specifies the runtime implementation to be used:
      * <p><ul>
-     *     <li>{@link OptionDefs.RUNTIME}</li>
+     *     <li>{@link OptionDefs#RUNTIME}</li>
      * </ul><p>
      * If this option isn't provided, the default runtime implementation is used.
      *

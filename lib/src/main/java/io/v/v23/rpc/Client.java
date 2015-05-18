@@ -39,7 +39,7 @@ public interface Client {
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
      * <ul>
-     *     <li>SKIP_SERVER_ENDPOINT_AUTHORIZATION</li>
+     *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
      * </ul>
      *
      * @param  context         client context

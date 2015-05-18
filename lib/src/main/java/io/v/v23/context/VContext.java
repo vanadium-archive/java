@@ -104,13 +104,15 @@ public interface VContext {
     Object value(Object key);
 
     /**
-     * Returns a child of the current context that can be canceled.  After {@link #cancel cancel}
-     * is invoked on the new context, the counter returned by its {@link #done done} method (and all
-     * contexts further derived from it) will be set to zero.
+     * Returns a child of the current context that can be canceled.  After
+     * {@link CancelableVContext#cancel cancel} is invoked on the new context, the counter returned
+     * by its {@link #done done} method (and all contexts further derived from it) will be set to
+     * zero.
      * <p>
      * It is expected that the new context will be canceled only by the caller that created it.
      * This is the reason that the extended interface {@link CancelableVContext} exists:
-     * to discourage {@link #cancel cancel} from being invoked by anybody other than the creator.
+     * to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody other
+     * than the creator.
      *
      * @return a child of the current context that can be canceled.
      */
@@ -123,8 +125,8 @@ public interface VContext {
      * <p>
      * It is expected that the new context will be (explicitly) canceled only by the caller that
      * created it.  This is the reason that the extended interface {@link CancelableVContext}
-     * exists: to discourage {@link #cancel cancel} from being invoked by anybody other than the
-     * creator.
+     * exists: to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody
+     * other than the creator.
      *
      * @param  deadline an absolute time after which the context will be canceled.
      * @return          a child of the current context that is automatically canceled after the
@@ -139,8 +141,8 @@ public interface VContext {
      * <p>
      * It is expected that the new context will be (explicitly) canceled only by the caller that
      * created it.  This is the reason that the extended interface {@link CancelableVContext}
-     * exists: to discourage {@link #cancel cancel} from being invoked by anybody other than the
-     * creator.
+     * exists: to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody
+     * other than the creator.
      *
      * @param  timeout a duration of time after which the context will be canceled.
      * @return         a child of the current context that is automatically canceled after the

@@ -354,8 +354,6 @@ public class VException extends Exception {
      * @param  componentName error component name
      * @param  opName        error operation name
      * @param  params        error message parameters
-     * @return               an error with the given identifier and an error string in the given
-     *                       language
      */
     public VException(IDAction idAction, String language, String componentName, String opName,
             Serializable... params) {

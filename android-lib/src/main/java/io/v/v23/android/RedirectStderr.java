@@ -21,7 +21,7 @@ import android.util.Log;
 /**
  * RedirectStderr redirects standard error to a file named stderr.log in the app's internal store.
  * On initialization, it will check for previously written stderr messages and output them to logcat
- * under the tag "VeyronNativeLog".
+ * under the tag "VNativeLog".
  * When go panics, it outputs the panic message to stderr and RedirectStderr enables us to log these
  * panic messages to logcat.
  */
@@ -66,7 +66,7 @@ final class RedirectStderr {
     private static native void nativeStart(int fileno);
 
     /**
-     * Redirects stderr of the veyron JNI code to a file. (Assumes a specific
+     * Redirects stderr of the vanadium JNI code to a file. (Assumes a specific
      * implementation of FileDescriptor).
      */
     private static void redirectStderr() {
@@ -129,7 +129,7 @@ final class RedirectStderr {
                 break;
             }
 
-            Log.i("VeyronNativeLog", line);
+            Log.i("VNativeLog", line);
         }
 
         try {

@@ -189,7 +189,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                             .add(ecPublicKey, new BlessingPattern(name));
                 }
                 final OAuthBlesserClient blesser =
-                        OAuthBlesserClientFactory.bind(identityServiceName);
+                        OAuthBlesserClientFactory.getOAuthBlesserClient(identityServiceName);
                 final VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
                 final OAuthBlesserClient.BlessUsingAccessTokenOut reply =
                         blesser.blessUsingAccessToken(ctx, tokens[0]);
