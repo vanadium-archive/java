@@ -19,11 +19,15 @@ import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
+import io.v.v23.security.Call;
 import io.v.v23.security.CaveatRegistry;
+import io.v.v23.security.CaveatValidator;
 import io.v.v23.security.ConstCaveatValidator;
+import io.v.v23.security.Constants;
 import io.v.v23.security.ExpiryCaveatValidator;
 import io.v.v23.security.MethodCaveatValidator;
 import io.v.v23.security.Principal;
+import io.v.v23.security.PublicKeyThirdPartyCaveatValidator;
 import io.v.v23.verror.VException;
 
 /**
@@ -123,6 +127,8 @@ public class V {
                         ExpiryCaveatValidator.INSTANCE);
                 CaveatRegistry.register(io.v.v23.security.Constants.METHOD_CAVEAT,
                         MethodCaveatValidator.INSTANCE);
+                CaveatRegistry.register(Constants.PUBLIC_KEY_THIRD_PARTY_CAVEAT,
+                        PublicKeyThirdPartyCaveatValidator.INSTANCE);
             } catch (VException e) {
                 throw new RuntimeException("Couldn't register caveat validators", e);
             }

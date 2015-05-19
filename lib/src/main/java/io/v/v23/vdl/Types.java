@@ -7,20 +7,6 @@ package io.v.v23.vdl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
-import io.v.v23.security.Blessings;
-import io.v.v23.security.BlessingsNativeConverter;
-import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.BlessingPatternNativeConverter;
-import io.v.v23.security.access.AccessList;
-import io.v.v23.security.access.AccessListNativeConverter;
-import io.v.v23.vdl.NativeTime.DateTimeConverter;
-import io.v.v23.vdl.NativeTime.DurationConverter;
-import io.v.v23.vdl.NativeTypes.Converter;
-import io.v.v23.vdl.VdlType.Builder;
-import io.v.v23.vdl.VdlType.PendingType;
-import io.v.v23.verror.VException;
-import io.v.v23.verror.VExceptionVdlConverter;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -33,6 +19,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+
+import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.BlessingPatternNativeConverter;
+import io.v.v23.security.Blessings;
+import io.v.v23.security.BlessingsNativeConverter;
+import io.v.v23.security.Discharge;
+import io.v.v23.security.DischargeNativeConverter;
+import io.v.v23.security.access.AccessList;
+import io.v.v23.security.access.AccessListNativeConverter;
+import io.v.v23.vdl.NativeTime.DateTimeConverter;
+import io.v.v23.vdl.NativeTime.DurationConverter;
+import io.v.v23.vdl.NativeTypes.Converter;
+import io.v.v23.vdl.VdlType.Builder;
+import io.v.v23.vdl.VdlType.PendingType;
+import io.v.v23.verror.VException;
+import io.v.v23.verror.VExceptionVdlConverter;
 
 /**
  * Types provides helpers to create VDL types.
@@ -151,9 +153,13 @@ public final class Types {
         typeCache.put(Double.class, FLOAT64);
         typeCache.put(String.class, STRING);
 
+        // When registering native types, make sure to register "child" types first. For example,
+        // if VDL type A contains VDL type B and both have native types that you want to register
+        // here, you must register A before B.
         registerNativeType(VException.class, VExceptionVdlConverter.INSTANCE);
         registerNativeType(org.joda.time.DateTime.class, DateTimeConverter.INSTANCE);
         registerNativeType(org.joda.time.Duration.class, DurationConverter.INSTANCE);
+        registerNativeType(Discharge.class, DischargeNativeConverter.INSTANCE);
         registerNativeType(Blessings.class, BlessingsNativeConverter.INSTANCE);
         registerNativeType(BlessingPattern.class, BlessingPatternNativeConverter.INSTANCE);
         registerNativeType(AccessList.class, AccessListNativeConverter.INSTANCE);

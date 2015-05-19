@@ -36,7 +36,7 @@ public final class BlessingsNativeConverter extends NativeTypes.Converter {
         try {
             return Blessings.create((WireBlessings) value);
         } catch (VException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            throw new IllegalArgumentException(e);
         }
     }
 }

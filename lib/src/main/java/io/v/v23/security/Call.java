@@ -6,6 +6,8 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import java.util.Map;
+
 import io.v.v23.vdl.VdlValue;
 
 /**
@@ -32,6 +34,18 @@ public interface Call {
      * Returns the Vanadium name suffix for the request.
      */
     String suffix();
+
+    /**
+     * Returns the discharges for third-party caveats presented by the local end of the call,
+     * mapping a third-party caveat identifier to the corresponding discharge.
+     */
+    Map<String, Discharge> localDischarges();
+
+    /**
+     * Returns the discharges for third-party caveats presented by the remote end of the call,
+     * mapping a third-party caveat identifier to the corresponding discharge.
+     */
+    Map<String, Discharge> remoteDischarges();
 
     /**
      * Returns the principal used to authenticate to the remote end.

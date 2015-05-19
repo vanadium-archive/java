@@ -6,6 +6,8 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import java.util.Map;
+
 import io.v.v23.vdl.VdlValue;
 
 class CallParamsImpl implements Call {
@@ -30,6 +32,14 @@ class CallParamsImpl implements Call {
     @Override
     public String suffix() {
         return this.params.getSuffix();
+    }
+    @Override
+    public Map<String, Discharge> localDischarges() {
+        return params.getLocalDischarges();
+    }
+    @Override
+    public Map<String, Discharge> remoteDischarges() {
+        return params.getRemoteDischarges();
     }
     @Override
     public String localEndpoint() {

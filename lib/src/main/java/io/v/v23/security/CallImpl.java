@@ -6,6 +6,8 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import java.util.Map;
+
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
@@ -16,6 +18,8 @@ class CallImpl implements Call {
     public native String nativeMethod(long nativePtr);
     public native VdlValue[] nativeMethodTags(long nativePtr) throws VException;
     private native String nativeSuffix(long nativePtr);
+    private native Map<String, Discharge> nativeLocalDischarges(long nativePtr);
+    private native Map<String, Discharge> nativeRemoteDischarges(long nativePtr);
     private native String nativeLocalEndpoint(long nativePtr);
     private native String nativeRemoteEndpoint(long nativePtr);
     private native Principal nativeLocalPrincipal(long nativePtr) throws VException;
@@ -51,6 +55,14 @@ class CallImpl implements Call {
     @Override
     public String suffix() {
         return nativeSuffix(this.nativePtr);
+    }
+    @Override
+    public Map<String, Discharge> localDischarges() {
+        return nativeLocalDischarges(nativePtr);
+    }
+    @Override
+    public Map<String, Discharge> remoteDischarges() {
+        return nativeRemoteDischarges(nativePtr);
     }
     @Override
     public String localEndpoint() {

@@ -6,6 +6,8 @@ package io.v.v23.security;
 
 import org.joda.time.DateTime;
 
+import java.util.Map;
+
 import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 
@@ -29,6 +31,8 @@ public class CallParams {
     private String method;
     private VdlValue[] methodTags;
     private String suffix;
+    private Map<String, Discharge> localDischarges;
+    private Map<String, Discharge> remoteDischarges;
     private String localEndpoint;
     private String remoteEndpoint;
     private Principal principal;
@@ -189,6 +193,20 @@ public class CallParams {
         if (this.suffix != null) return this.suffix;
         if (this.parent != null) return this.parent.getSuffix();
         return null;
+    }
+    /**
+     * Returns the discharges for third-party caveats presented by the local end of the call. It
+     * maps a third-party caveat identifier to the corresponding discharge.
+     */
+    public Map<String, Discharge> getLocalDischarges() {
+        return localDischarges;
+    }
+    /**
+     * Returns the discharges for third-party caveats presented by the remote end of the call. It
+     * maps a third-party caveat identifier to the corresponding discharge.
+     */
+    public Map<String, Discharge> getRemoteDischarges() {
+        return remoteDischarges;
     }
     /**
      * Returns a local endpoint attached to the params, or {@code null} if no local endpoint is
