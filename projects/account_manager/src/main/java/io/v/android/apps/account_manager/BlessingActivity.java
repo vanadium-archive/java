@@ -37,9 +37,9 @@ import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Caveat;
-import io.v.v23.security.Certificate;
-import io.v.v23.security.Principal;
-import io.v.v23.security.Security;
+import io.v.v23.security.VCertificate;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -198,7 +198,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
         }
         // No caveats selected: add an unconstrained caveat.
         if (ret.isEmpty()) {
-            ret.add(Security.newUnconstrainedUseCaveat());
+            ret.add(VSecurity.newUnconstrainedUseCaveat());
         }
         return ret;
     }
@@ -238,7 +238,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
             return null;
         }
         try {
-            return Security.newExpiryCaveat(expiry);
+            return VSecurity.newExpiryCaveat(expiry);
         } catch (VException e) {
             android.util.Log.e(TAG, "Couldn't create expiry caveat: " + e.getMessage());
             return null;
@@ -290,7 +290,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
                     wireVom, new TypeToken<WireBlessings>() {
             }.getType());
             final Blessings with = Blessings.create(wire);
-            final Principal principal = V.getPrincipal(mBaseContext);
+            final VPrincipal principal = V.getPrincipal(mBaseContext);
             final List<Caveat> caveats = getCaveats();
             final Blessings retBlessing = principal.bless(mBlesseePubKey, with, mBlesseeName,
                     caveats.get(0), caveats.subList(1, caveats.size()).toArray(new Caveat[0]));
@@ -312,7 +312,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
                 replyWithError("Expected single certificate chain, got: " + retWire.toString());
                 return;
             }
-            final List<Certificate> chain = retWire.getCertificateChains().get(0);
+            final List<VCertificate> chain = retWire.getCertificateChains().get(0);
             if (chain == null || chain.size() <= 0) {
                 replyWithError("Empty certificate chain");
                 return;

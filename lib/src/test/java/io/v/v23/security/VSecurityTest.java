@@ -13,21 +13,21 @@ import io.v.v23.verror.VException;
 import java.util.Arrays;
 
 /**
- * Tests for the {@link Security} utility methods.
+ * Tests for the {@link VSecurity} utility methods.
  */
-public class SecurityTest extends TestCase {
+public class VSecurityTest extends TestCase {
     public void testGetRemoteBlessingNames() throws Exception {
         VContext context = V.init();
-        Principal p1 = Security.newPrincipal();
-        Principal p2 = Security.newPrincipal();
+        VPrincipal p1 = VSecurity.newPrincipal();
+        VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
         p2.addToRoots(alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
-        Call call = Security.newCall(
+                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
+        Call call = VSecurity.newCall(
                 new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
-        String[] blessings = Security.getRemoteBlessingNames(context, call);
+        String[] blessings = VSecurity.getRemoteBlessingNames(context, call);
         if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));
@@ -36,19 +36,31 @@ public class SecurityTest extends TestCase {
 
     public void testGetLocalBlessingNames() throws Exception {
         VContext context = V.init();
-        Principal p1 = Security.newPrincipal();
-        Principal p2 = Security.newPrincipal();
+        VPrincipal p1 = VSecurity.newPrincipal();
+        VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
         p2.addToRoots(alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
-        Call call = Security.newCall(
+                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
+        Call call = VSecurity.newCall(
                 new CallParams().withLocalBlessings(aliceWorkFriend).withLocalPrincipal(p2));
-        String[] blessings = Security.getLocalBlessingNames(context, call);
+        String[] blessings = VSecurity.getLocalBlessingNames(context, call);
         if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));
+        }
+    }
+
+    public void testSigning() throws Exception {
+        VSigner signer = VSecurity.newInMemorySigner();
+        byte[] purpose = (new String("test")).getBytes();
+        byte[] msg = (new String("this is a signing test message")).getBytes();
+        VSignature signature = signer.sign(purpose, msg);
+        try {
+            VSecurity.verifySignature(signature, signer.publicKey(), msg);
+        } catch (VException e) {
+            fail(String.format("Couldn't verify signature: %s", e.getMessage()));
         }
     }
 }

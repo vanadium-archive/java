@@ -9,7 +9,7 @@ import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.namespace.Namespace;
-import io.v.v23.security.Principal;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.verror.VException;
 
 /**
@@ -66,7 +66,7 @@ public interface VRuntime {
      * @return                 child context to which the principal is attached
      * @throws VException      if the principal couldn't be attached
      */
-    VContext setPrincipal(VContext ctx, Principal principal) throws VException;
+    VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException;
 
     /**
      * Returns the principal attached to the given context.
@@ -74,7 +74,7 @@ public interface VRuntime {
      * @param  ctx current context
      * @return     the principal attached to the given context
      */
-    Principal getPrincipal(VContext ctx);
+    VPrincipal getPrincipal(VContext ctx);
 
     /**
      * Creates a new namespace instance and attaches it to a new context.

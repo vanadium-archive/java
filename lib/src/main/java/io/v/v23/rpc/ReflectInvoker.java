@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  * <p><ol>
  *     <li>The first in-arg must be a {@link VContext}.</li>
  *     <li>The second in-arg must be a {@link ServerCall}.</li>
- *     <li>For streaming methods, the third in-arg must be a {@link io.v.v23.vdl.Stream}.</li>
+ *     <li>For streaming methods, the third in-arg must be a {@link io.v.v23.vdl.TypedStream}.</li>
  *     <li>If the return value is a class annotated with
  *         {@link io.v.v23.vdl.MultiReturn @MultiReturn} annotation, the fields of that class are
  *         interpreted as multiple return values for that method; otherwise, return values are

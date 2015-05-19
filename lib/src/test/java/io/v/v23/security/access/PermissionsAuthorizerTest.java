@@ -20,9 +20,9 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 import io.v.v23.security.CallParams;
 import io.v.v23.security.Constants;
-import io.v.v23.security.Principal;
-import io.v.v23.security.Security;
-import io.v.v23.security.Signer;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
+import io.v.v23.security.VSigner;
 import io.v.v23.security.access.internal.MyObjectServerWrapper;
 import io.v.v23.security.access.internal.MyTag;
 import io.v.v23.vdl.VdlValue;
@@ -36,8 +36,8 @@ import java.util.List;
  */
 public class PermissionsAuthorizerTest extends TestCase {
     private static class AuthorizeTestdata {
-        Principal pServer;
-        Principal pClient;
+        VPrincipal pServer;
+        VPrincipal pClient;
         Blessings server;
         Permissions acl = null;
         List<TestCase> accept;
@@ -58,12 +58,12 @@ public class PermissionsAuthorizerTest extends TestCase {
             for (int i = 0; i < names.length; ++i) {
                 parts[i] = this.pClient.blessSelf(names[i]);
             }
-            return Security.unionOfBlessings(parts);
+            return VSecurity.unionOfBlessings(parts);
         }
 
         void runAuthorize(String method, Blessings client, VContext context) throws VException {
             Authorizer authorizer = PermissionsAuthorizer.create(this.acl, MyTag.class);
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(this.pServer)
                     .withLocalBlessings(this.server)
                     .withRemoteBlessings(client)
@@ -148,14 +148,14 @@ public class PermissionsAuthorizerTest extends TestCase {
 
     public void testSelfRPCs() throws Exception {
         VContext context = V.init();
-        Principal p = newPrincipal();
+        VPrincipal p = newPrincipal();
         Blessings client = p.blessSelf("client");
         Blessings server = p.blessSelf("server");
         Authorizer authorizer = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
                         "R", new AccessList(ImmutableList.of(new BlessingPattern("nobody/$")), null))),
                 MyTag.class);
         for (String testCase : new String[]{ "put", "get", "resolve", "noTags", "allTags" }) {
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p)
                     .withLocalBlessings(server)
                     .withRemoteBlessings(client)
@@ -169,9 +169,9 @@ public class PermissionsAuthorizerTest extends TestCase {
         }
     }
 
-    private static Principal newPrincipal() throws VException {
-        Signer signer = Security.newInMemorySigner();
-        return Security.newPrincipal(signer, null, new TrustAllRoots());
+    private static VPrincipal newPrincipal() throws VException {
+        VSigner signer = VSecurity.newInMemorySigner();
+        return VSecurity.newPrincipal(signer, null, new TrustAllRoots());
     }
 
     private static VdlValue[] getMethodTags(String method) throws VException {

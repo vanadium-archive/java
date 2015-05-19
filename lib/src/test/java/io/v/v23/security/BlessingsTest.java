@@ -18,14 +18,14 @@ import java.util.Arrays;
 public class BlessingsTest extends TestCase {
     public void testPublicKey() throws VException {
         V.init();
-        Principal p1 = Security.newPrincipal();
-        Principal p2 = Security.newPrincipal();
+        VPrincipal p1 = VSecurity.newPrincipal();
+        VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
         assertTrue(Arrays.equals(p1.publicKey().getEncoded(), alice.publicKey().getEncoded()));
         p2.addToRoots(alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
+                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
         if (!Arrays.equals(
                 aliceWorkFriend.publicKey().getEncoded(), p2.publicKey().getEncoded())) {
             fail(String.format("Expected public key: %s, got %s",
@@ -35,7 +35,7 @@ public class BlessingsTest extends TestCase {
 
     public void testVomEncodeDecode() throws VException {
         V.init();
-        Principal p = Security.newPrincipal();
+        VPrincipal p = VSecurity.newPrincipal();
         Blessings alice = p.blessSelf("alice");
         byte[] data = VomUtil.encode(alice, Blessings.class);
         Blessings aliceCopy = (Blessings) VomUtil.decode(data, Blessings.class);

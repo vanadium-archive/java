@@ -50,7 +50,7 @@ class CallParamsImpl implements Call {
         return this.params.getRemoteEndpoint();
     }
     @Override
-    public Principal localPrincipal() {
+    public VPrincipal localPrincipal() {
         return this.params.getLocalPrincipal();
     }
     @Override

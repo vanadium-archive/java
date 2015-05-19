@@ -35,7 +35,7 @@ import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.Principal;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 
@@ -231,7 +231,7 @@ public class MainActivity extends Activity {
         try {
             final WireBlessings wire = mBlessingsManager.get(blessingName);
             final Blessings blessings = Blessings.create(wire);
-            final Principal p = V.getPrincipal(mBaseContext);
+            final VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.addToRoots(blessings);
             mSelectedBlessing = blessingName;

@@ -4,33 +4,39 @@
 
 package io.v.impl.google.rpc;
 
-import io.v.v23.Options;
 import io.v.v23.OptionDefs;
+import io.v.v23.Options;
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Client;
+import io.v.v23.rpc.ClientCall;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Type;
 
-public class Client implements io.v.v23.rpc.Client {
+/**
+ * An implementation of the {@link Client} interface that calls to native code for most of its
+ * functionalities.
+ */
+public class ClientImpl implements Client {
     private final long nativePtr;
 
-    private native io.v.v23.rpc.Client.Call nativeStartCall(long nativePtr, VContext context,
+    private native ClientCall nativeStartCall(long nativePtr, VContext context,
         String name, String method, byte[][] vomArgs, boolean skipServerAuth) throws VException;
     private native void nativeClose(long nativePtr);
     private native void nativeFinalize(long nativePtr);
 
-    private Client(long nativePtr) {
+    private ClientImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
-    // Implement io.v.v23.ipc.Client.
+    // Implement io.v.v23.rpc.Client.
     @Override
-    public io.v.v23.rpc.Client.Call startCall(VContext context, String name,
+    public ClientCall startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes) throws VException {
         return startCall(context, name, method, args, argTypes, null);
     }
     @Override
-    public io.v.v23.rpc.Client.Call startCall(VContext context, String name,
+    public ClientCall startCall(VContext context, String name,
             String method, Object[] args, Type[] argTypes, Options opts) throws VException {
         if (opts == null) {
             opts = new Options();
@@ -68,7 +74,7 @@ public class Client implements io.v.v23.rpc.Client {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((Client) other).nativePtr;
+        return this.nativePtr == ((ClientImpl) other).nativePtr;
     }
     @Override
     public int hashCode() {

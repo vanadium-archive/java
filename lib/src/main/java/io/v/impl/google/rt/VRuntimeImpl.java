@@ -4,28 +4,31 @@
 
 package io.v.impl.google.rt;
 
-import io.v.v23.Options;
 import io.v.v23.OptionDefs;
+import io.v.v23.Options;
+import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.ListenSpec;
 import io.v.v23.namespace.Namespace;
-import io.v.v23.security.Principal;
+import io.v.v23.rpc.Client;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.Server;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.verror.VException;
 
 /**
- * VRuntime is an implementation of {@code io.v.v23.VRuntime} that calls to native Go
+ * An implementation of {@link io.v.v23.VRuntime} interface that calls to native
  * code for most of its functionalities.
  */
-public class VRuntime implements io.v.v23.VRuntime {
+public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeInit(int numCpus) throws VException;
     private static native VContext nativeSetNewClient(VContext ctx, Options opts)
             throws VException;
-    private static native io.v.v23.rpc.Client nativeGetClient(VContext ctx)
+    private static native Client nativeGetClient(VContext ctx)
             throws VException;
-    private static native io.v.v23.rpc.Server nativeNewServer(VContext ctx) throws VException;
-    private static native VContext nativeSetPrincipal(VContext ctx, Principal principal)
+    private static native Server nativeNewServer(VContext ctx) throws VException;
+    private static native VContext nativeSetPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
-    private static native Principal nativeGetPrincipal(VContext ctx) throws VException;
+    private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
     private static native VContext nativeSetNewNamespace(VContext ctx, String... roots)
             throws VException;
     private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
@@ -33,22 +36,20 @@ public class VRuntime implements io.v.v23.VRuntime {
 
     /**
      * Returns a new runtime instance.
-     *
-     * @return      a new runtime instance
      */
-    public static VRuntime create(Options opts) throws VException {
+    public static VRuntimeImpl create(Options opts) throws VException {
         int numCpus = opts.has(OptionDefs.RUNTIME_NUM_CPUS)
                 ? opts.get(OptionDefs.RUNTIME_NUM_CPUS, Integer.class)
                 : 1;
         if (numCpus < 1) {
             numCpus = 1;
         }
-        return new VRuntime(nativeInit(numCpus));
+        return new VRuntimeImpl(nativeInit(numCpus));
     }
 
     private final VContext ctx;  // non-null
 
-    private VRuntime(VContext ctx) {
+    private VRuntimeImpl(VContext ctx) {
         this.ctx = ctx;
     }
     @Override
@@ -56,7 +57,7 @@ public class VRuntime implements io.v.v23.VRuntime {
         return nativeSetNewClient(ctx, opts);
     }
     @Override
-    public io.v.v23.rpc.Client getClient(VContext ctx) {
+    public Client getClient(VContext ctx) {
         try {
             return nativeGetClient(ctx);
         } catch (VException e) {
@@ -64,15 +65,15 @@ public class VRuntime implements io.v.v23.VRuntime {
         }
     }
     @Override
-    public io.v.v23.rpc.Server newServer(VContext ctx, Options opts) throws VException {
+    public Server newServer(VContext ctx, Options opts) throws VException {
         return nativeNewServer(ctx);
     }
     @Override
-    public VContext setPrincipal(VContext ctx, Principal principal) throws VException {
+    public VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException {
         return nativeSetPrincipal(ctx, principal);
     }
     @Override
-    public Principal getPrincipal(VContext ctx) {
+    public VPrincipal getPrincipal(VContext ctx) {
         try {
             return nativeGetPrincipal(ctx);
         } catch (VException e) {

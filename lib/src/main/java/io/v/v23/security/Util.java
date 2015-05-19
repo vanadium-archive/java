@@ -10,36 +10,20 @@ import io.v.v23.vom.VomUtil;
 import java.security.interfaces.ECPublicKey;
 
 class Util {
-    /**
-     * VOM-encodes the provided Signature.
-     *
-     * @param  signature Signature to be encoded.
-     * @return           the encoded Signature.
-     */
-    static byte[] encodeSignature(Signature signature) throws VException {
-        return VomUtil.encode(signature, Signature.class);
+    // VOM-encodes the provided VSignature.
+    static byte[] encodeSignature(VSignature signature) throws VException {
+        return VomUtil.encode(signature, VSignature.class);
     }
 
-    /**
-     * VOM-decodes the VOM-encoded Signature.
-     *
-     * @param  encoded         VOM-encoded Signature.
-     * @return                 decoded Signature.
-     * @throws VException      if the provided Signature couldn't be decoded.
-     */
-    static Signature decodeSignature(byte[] encoded) throws VException {
+    // VOM-decodes the VOM-encoded VSignature.
+    static VSignature decodeSignature(byte[] encoded) throws VException {
         if (encoded == null || encoded.length == 0) {
             return null;
         }
-        return (Signature) VomUtil.decode(encoded, Signature.class);
+        return (VSignature) VomUtil.decode(encoded, VSignature.class);
     }
 
-    /**
-     * DER-encodes the provided ECPublicKey.
-     *
-     * @param  key ECPublicKey to be encoded.
-     * @return     the encoded ECPublicKey.
-     */
+    // DER-encodes the provided ECPublicKey.
     static byte[] encodePublicKey(ECPublicKey key) {
         if (key == null) {
             return new byte[0];
@@ -47,13 +31,7 @@ class Util {
         return key.getEncoded();
     }
 
-    /**
-     * Decodes the DER-encoded ECPublicKey.
-     *
-     * @param  encoded         DER-encoded ECPublicKey.
-     * @return                 decoded ECPublicKey.
-     * @throws VException      if the provided ECPublicKey couldn't be decoded.
-     */
+    // Decodes the DER-encoded ECPublicKey.
     static ECPublicKey decodePublicKey(byte[] encoded) throws VException {
         if (encoded == null || encoded.length == 0) {
             return null;

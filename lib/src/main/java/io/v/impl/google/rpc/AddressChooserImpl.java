@@ -4,17 +4,22 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.rpc.AddressChooser;
 import io.v.v23.rpc.NetworkAddress;
 import io.v.v23.verror.VException;
 
-public class AddressChooser implements io.v.v23.rpc.AddressChooser {
+/**
+ * An implementation of {@link AddressChooser} interface that calls to native
+ * code for most of its functionalities.
+ */
+public class AddressChooserImpl implements AddressChooser {
     private final long nativePtr;
 
     private native NetworkAddress[] nativeChoose(long nativePtr,
             String protocol, NetworkAddress[] candidates) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private AddressChooser(long nativePtr) {
+    private AddressChooserImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
     @Override

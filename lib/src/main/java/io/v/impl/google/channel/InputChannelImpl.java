@@ -6,11 +6,17 @@ package io.v.impl.google.channel;
 
 import com.google.common.collect.AbstractIterator;
 
+import io.v.v23.InputChannel;
 import io.v.v23.verror.VException;
+
 import java.io.EOFException;
 import java.util.Iterator;
 
-public class InputChannel<T> implements io.v.v23.InputChannel<T> {
+/**
+ * An implementation of {@link InputChannel} that calls to native code for most
+ * of its functionalities.
+ */
+public class InputChannelImpl<T> implements InputChannel<T> {
     private final long nativePtr;
     private final long sourceNativePtr;
 
@@ -18,14 +24,7 @@ public class InputChannel<T> implements io.v.v23.InputChannel<T> {
     private native Object nativeReadValue(long nativePtr) throws EOFException, VException;
     private native void nativeFinalize(long nativePtr, long sourceNativePtr);
 
-    /**
-     * Creates a new instance of {@code InputChannel}.
-     *
-     * @param  nativePtr       native pointer to the Go channel of Java objects
-     * @param  sourceNativePtr native pointer to the Go channel that feeds the above Go channel
-     *                         of Java object
-     */
-    public InputChannel(long nativePtr, long sourceNativePtr) {
+    private InputChannelImpl(long nativePtr, long sourceNativePtr) {
         this.nativePtr = nativePtr;
         this.sourceNativePtr = sourceNativePtr;
     }
@@ -35,7 +34,6 @@ public class InputChannel<T> implements io.v.v23.InputChannel<T> {
         return nativeAvailable(this.nativePtr);
     }
 
-    @Override
     @SuppressWarnings("unchecked")
     public T readValue() throws EOFException, VException {
         return (T) nativeReadValue(this.nativePtr);

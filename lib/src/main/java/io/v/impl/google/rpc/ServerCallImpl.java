@@ -5,11 +5,12 @@
 package io.v.impl.google.rpc;
 
 import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
-public class ServerCall implements io.v.v23.rpc.ServerCall {
+public class ServerCallImpl implements ServerCall {
     private final long nativePtr;
 
     private static native Call nativeSecurity(long nativePtr);
@@ -20,7 +21,7 @@ public class ServerCall implements io.v.v23.rpc.ServerCall {
     private static native Server nativeServer(long nativePtr) throws VException;
     private static native void nativeFinalize(long nativePtr);
 
-    private ServerCall(long nativePtr) {
+    private ServerCallImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
 

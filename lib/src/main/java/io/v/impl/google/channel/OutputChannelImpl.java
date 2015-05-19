@@ -4,19 +4,21 @@
 
 package io.v.impl.google.channel;
 
+import io.v.v23.OutputChannel;
 import io.v.v23.verror.VException;
 
 /**
- * An implementation of {@link io.v.v23.OutputChannel} that writes to a Go channel.
+ * An implementation of {@link OutputChannel} that calls to native code for most
+ * of its functionalities.
  */
-public class OutputChannel<T> implements io.v.v23.OutputChannel<T> {
+public class OutputChannelImpl<T> implements OutputChannel<T> {
     private final long nativePtr;
 
     private static native <T> void nativeWriteValue(long nativePtr, T value) throws VException;
     private static native <T> void nativeClose(long nativePtr) throws VException;
     private static native <T> void nativeFinalize(long nativePtr);
 
-    private OutputChannel(long nativePtr) {
+    private OutputChannelImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
 

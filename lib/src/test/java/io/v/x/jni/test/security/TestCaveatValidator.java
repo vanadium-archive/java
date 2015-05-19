@@ -7,7 +7,6 @@ package io.v.x.jni.test.security;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Call;
 import io.v.v23.security.CaveatValidator;
-import io.v.v23.security.Security;
 import io.v.v23.verror.VException;
 
 /**

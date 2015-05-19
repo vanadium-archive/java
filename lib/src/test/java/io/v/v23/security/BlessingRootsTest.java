@@ -25,7 +25,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class BlessingRootsTest extends TestCase {
     public void testRecognized() throws VException {
         V.init();
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         BlessingRoots roots = principal.roots();
         ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));
@@ -74,7 +74,7 @@ public class BlessingRootsTest extends TestCase {
 
     public void testDump() throws VException {
         V.init();
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         BlessingRoots roots = principal.roots();
         ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));

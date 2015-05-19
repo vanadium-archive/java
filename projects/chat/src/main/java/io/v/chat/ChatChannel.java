@@ -17,7 +17,7 @@ import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.Security;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.x.chat.vdl.ChatClient;
 import io.v.x.chat.vdl.ChatClientFactory;
@@ -60,7 +60,8 @@ public class ChatChannel {
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-                return new ServiceObjectWithAuthorizer(chatServer, Security.newAllowEveryoneAuthorizer());
+                return new ServiceObjectWithAuthorizer(
+                        chatServer, VSecurity.newAllowEveryoneAuthorizer());
             }
         };
         server = V.newServer(ctx);

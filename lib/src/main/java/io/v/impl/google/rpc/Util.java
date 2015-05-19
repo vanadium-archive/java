@@ -8,6 +8,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
+import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.security.Authorizer;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
@@ -35,7 +36,7 @@ class Util {
     }
 
     // Helper function for invoking a method on the provided invoker.
-    static byte[][] invoke(Invoker invoker, VContext ctx, io.v.v23.rpc.StreamServerCall call,
+    static byte[][] invoke(Invoker invoker, VContext ctx, StreamServerCall call,
             String method, byte[][] vomArgs) throws VException {
         Type[] argTypes = invoker.getArgumentTypes(method);
         if (argTypes.length != vomArgs.length) {

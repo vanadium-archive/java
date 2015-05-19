@@ -15,8 +15,8 @@ import io.v.v23.vdl.VdlValue;
  * Container for {@link Call} creation parameters.  Here is an example of a simple
  * call creation:
  * <p><blockquote><pre>
- *     Call call = Security.newCall(new CallParams()
- *           .withLocalPrincipal(Security.newPrincipal())
+ *     Call call = VSecurity.newCall(new CallParams()
+ *           .withLocalPrincipal(VSecurity.newPrincipal())
  *           .withMethodName("test")
  *           .withTimestamp(DateTime.now());
  * </pre></blockquote><p>
@@ -35,7 +35,7 @@ public class CallParams {
     private Map<String, Discharge> remoteDischarges;
     private String localEndpoint;
     private String remoteEndpoint;
-    private Principal principal;
+    private VPrincipal principal;
     private Blessings localBlessings;
     private Blessings remoteBlessings;
     private io.v.v23.context.VContext context;
@@ -123,7 +123,7 @@ public class CallParams {
      * @param  principal local principal
      * @return           a child of the current params with the given local principal attached
      */
-    public CallParams withLocalPrincipal(Principal principal) {
+    public CallParams withLocalPrincipal(VPrincipal principal) {
         CallParams ret = new CallParams(this);
         ret.principal = principal;
         return ret;
@@ -230,7 +230,7 @@ public class CallParams {
      * Returns a local principal attached to the params, or {@code null} if no local principal is
      * attached.
      */
-    public Principal getLocalPrincipal() {
+    public VPrincipal getLocalPrincipal() {
         if (this.principal != null) return this.principal;
         if (this.parent != null) return this.parent.getLocalPrincipal();
         return null;

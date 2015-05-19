@@ -19,7 +19,7 @@ import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Client;
-import io.v.v23.rpc.Client.Call;
+import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.NetworkChange;
@@ -27,7 +27,7 @@ import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
-import io.v.v23.vdl.ClientStream;
+import io.v.v23.vdl.TypedClientStream;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
@@ -78,7 +78,7 @@ public class FortuneTest extends TestCase {
         String name = "/" + endpoints[0];
         FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
+        TypedClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
         client.add(ctxT, msg);
         try {
@@ -174,7 +174,7 @@ public class FortuneTest extends TestCase {
         String name = "/" + endpoints[0];
         Client c = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        Call call = c.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
+        ClientCall call = c.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
         Object[] results = call.finish(new Type[] { new TypeToken<Interface[]>() {}.getType() });
         assertThat(results.length == 1).isTrue();
         Interface[] signature = (Interface[]) results[0];

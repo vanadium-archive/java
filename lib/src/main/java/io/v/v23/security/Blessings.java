@@ -4,7 +4,6 @@
 
 package io.v.v23.security;
 
-import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
@@ -15,8 +14,8 @@ import java.util.List;
  * (human-readable strings) have been bound to a principal in a specific call.
  * <p>
  * {@link Blessings} objects are meant to be presented to other principals to authenticate
- * and authorize actions.  Functions {@link Security#getLocalBlessingNames} and
- * {@link Security#getRemoteBlessingNames} can be used to uncover the blessing names encapsulated
+ * and authorize actions.  Functions {@link VSecurity#getLocalBlessingNames} and
+ * {@link VSecurity#getRemoteBlessingNames} can be used to uncover the blessing names encapsulated
  * in these objects.
  * <p>
  * {@link Blessings} objects are immutable and multiple threads may invoke methods on
@@ -97,7 +96,7 @@ public class Blessings {
         nativeFinalize(this.nativePtr);
     }
 
-    public List<List<Certificate>> getCertificateChains() {
+    public List<List<VCertificate>> getCertificateChains() {
         return wire.getCertificateChains();
     }
 }

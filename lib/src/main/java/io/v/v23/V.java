@@ -7,28 +7,27 @@ package io.v.v23;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 
+import io.v.impl.google.rt.VRuntimeImpl;
+import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
+import io.v.v23.rpc.Client;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.Server;
+import io.v.v23.security.CaveatRegistry;
+import io.v.v23.security.ConstCaveatValidator;
+import io.v.v23.security.Constants;
+import io.v.v23.security.ExpiryCaveatValidator;
+import io.v.v23.security.MethodCaveatValidator;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.PublicKeyThirdPartyCaveatValidator;
+import io.v.v23.verror.VException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.v.v23.context.VContext;
-import io.v.v23.namespace.Namespace;
-import io.v.v23.rpc.Client;
-import io.v.v23.rpc.ListenSpec;
-import io.v.v23.rpc.Server;
-import io.v.v23.security.Call;
-import io.v.v23.security.CaveatRegistry;
-import io.v.v23.security.CaveatValidator;
-import io.v.v23.security.ConstCaveatValidator;
-import io.v.v23.security.Constants;
-import io.v.v23.security.ExpiryCaveatValidator;
-import io.v.v23.security.MethodCaveatValidator;
-import io.v.v23.security.Principal;
-import io.v.v23.security.PublicKeyThirdPartyCaveatValidator;
-import io.v.v23.verror.VException;
 
 /**
  * The local environment allowing clients and servers to communicate with one another.  The expected
@@ -112,7 +111,7 @@ public class V {
             } else {
                 // Use the default runtime implementation.
                 try {
-                    runtime = io.v.impl.google.rt.VRuntime.create(opts);
+                    runtime = VRuntimeImpl.create(opts);
                 } catch (VException e) {
                     throw new RuntimeException("Couldn't initialize Google Vanadium Runtime", e);
                 }
@@ -227,7 +226,7 @@ public class V {
      * @return                 child context to which the principal is attached
      * @throws VException      if the principal couldn't be attached
      */
-    public static VContext setPrincipal(VContext ctx, Principal principal) throws VException {
+    public static VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException {
         return getRuntime().setPrincipal(ctx, principal);
     }
 
@@ -237,7 +236,7 @@ public class V {
      * @param  ctx current context
      * @return     the principal attached to the given context
      */
-    public static Principal getPrincipal(VContext ctx) {
+    public static VPrincipal getPrincipal(VContext ctx) {
         return getRuntime().getPrincipal(ctx);
     }
 

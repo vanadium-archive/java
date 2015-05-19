@@ -28,32 +28,32 @@ import java.util.List;
 /**
  * Various functions used for creating and managing Vanadium security primitives.
  */
-public class Security {
+public class VSecurity {
     private static native String[] nativeGetRemoteBlessingNames(VContext context, Call call)
             throws VException;
     private static native String[] nativeGetLocalBlessingNames(VContext context, Call call)
             throws VException;
 
     /**
-     * Creates a new instance of {@link Signer} using the provided public/private key pair.
+     * Creates a new instance of {@link VSigner} using the provided public/private key pair.
      * <p>
-     * The returned {@link Signer} respests the location of the private key: if the key
+     * The returned {@link VSigner} respests the location of the private key: if the key
      * is stored in a safe place (e.g., hardware token), it will remain secure.
      *
      * @param  privKey private key
      * @param  pubKey  corresponding public key
-     * @return         new instance of {@link Signer} that uses the provided key pair to
+     * @return         new instance of {@link VSigner} that uses the provided key pair to
      *                 do the signing
      */
-    public static Signer newSigner(PrivateKey privKey, ECPublicKey pubKey) {
+    public static VSigner newSigner(PrivateKey privKey, ECPublicKey pubKey) {
         return new ECDSASigner(privKey, pubKey);
     }
 
     /**
-     * Mints a new private key and creates a {@link Signer} based on this key.  The key is stored
+     * Mints a new private key and creates a {@link VSigner} based on this key.  The key is stored
      * in the clear in memory of the running process.
      */
-    public static Signer newInMemorySigner() throws VException {
+    public static VSigner newInMemorySigner() throws VException {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC");
             keyGen.initialize(256);
@@ -73,8 +73,8 @@ public class Security {
      * @return                 in-memory principal using the newly minted private key
      * @throws VException      if the principal couldn't be created
      */
-    public static Principal newPrincipal() throws VException {
-        return PrincipalImpl.create();
+    public static VPrincipal newPrincipal() throws VException {
+        return VPrincipalImpl.create();
     }
 
     /**
@@ -85,24 +85,24 @@ public class Security {
      * @return                 in-memory principal using the provided signer
      * @throws VException      if the principal couldn't be created
      */
-    public static Principal newPrincipal(Signer signer) throws VException {
-        return PrincipalImpl.create(signer);
+    public static VPrincipal newPrincipal(VSigner signer) throws VException {
+        return VPrincipalImpl.create(signer);
     }
 
     /**
      * Creates a principal using the provided signer, blessing store, and blessing roots.  If the
      * provided store is {@code null}, the principal will use a store whose every opration will
      * fail.  If the provided roots are {@code null}, the principal will not trust any public keys
-     * and all subsequent {@link Principal#addToRoots} operations will fail.
+     * and all subsequent {@link VPrincipal#addToRoots} operations will fail.
      *
      * @param  signer signer to be used by the principal
      * @param  store  blessing store to be used by the principal
      * @param  roots  blessing roots to be used by the principal
      * @return        newly created principal
      */
-    public static Principal newPrincipal(Signer signer, BlessingStore store, BlessingRoots roots)
+    public static VPrincipal newPrincipal(VSigner signer, BlessingStore store, BlessingRoots roots)
         throws VException {
-        return PrincipalImpl.create(signer, store, roots);
+        return VPrincipalImpl.create(signer, store, roots);
     }
 
     /**
@@ -118,9 +118,9 @@ public class Security {
      * @return                 principal whose state is persisted in the provided directory
      * @throws VException      if the principal couldn't be created
      */
-    public static Principal newPersistentPrincipal(String passphrase, String dir)
+    public static VPrincipal newPersistentPrincipal(String passphrase, String dir)
             throws VException {
-        return PrincipalImpl.createPersistent(passphrase, dir);
+        return VPrincipalImpl.createPersistent(passphrase, dir);
     }
 
     /**
@@ -138,9 +138,9 @@ public class Security {
      * @return                 principal whose partial state is persisted in the provided directory
      * @throws VException      if the principal couldn't be created
      */
-    public static Principal newPersistentPrincipal(Signer signer, String dir)
+    public static VPrincipal newPersistentPrincipal(VSigner signer, String dir)
         throws VException {
-        return PrincipalImpl.createPersistent(signer, dir);
+        return VPrincipalImpl.createPersistent(signer, dir);
     }
 
     /**
@@ -303,14 +303,14 @@ public class Security {
      * @param  message         message whose signature is verified
      * @throws VException      iff the signature doesn't verify
      */
-    public static void verifySignature(Signature sig, ECPublicKey key, byte[] message)
+    public static void verifySignature(VSignature sig, ECPublicKey key, byte[] message)
         throws VException {
-        String hashAlgorithm = sig.getHash().getValue();
-        String verifyAlgorithm = hashAlgorithm + "withECDSA";
+        String vHashAlgorithm = sig.getHash().getValue();
+        String verifyAlgorithm = CryptoUtil.javaSigningAlgorithm(vHashAlgorithm);
         try {
-            message = CryptoUtil.messageDigest(hashAlgorithm, message, sig.getPurpose());
+            message = CryptoUtil.messageDigest(vHashAlgorithm, message, sig.getPurpose());
             byte[] jSig = CryptoUtil.javaSignature(sig);
-            java.security.Signature verifier = java.security.Signature.getInstance(hashAlgorithm + "withECDSA");
+            java.security.Signature verifier = java.security.Signature.getInstance(verifyAlgorithm);
             verifier.initVerify(key);
             verifier.update(message);
             if (!verifier.verify(jSig)) {
@@ -327,5 +327,5 @@ public class Security {
         }
     }
 
-    private Security() {}
+    private VSecurity() {}
 }

@@ -7,10 +7,9 @@ package io.v.v23.vdl;
 import io.v.v23.verror.VException;
 
 /**
- * ClientStream defines a bidirectional stream with send/receive/finish arguments
- * of the specified type.
-**/
-public interface ClientStream<SendT, RecvT, FinishT> extends Stream<SendT, RecvT> {
+ * A bidirectional stream with send/receive/finish arguments of the specified type.
+ */
+public interface TypedClientStream<SendT, RecvT, FinishT> extends TypedStream<SendT, RecvT> {
   /**
    * Closes the stream, returning the final stream result.
    *

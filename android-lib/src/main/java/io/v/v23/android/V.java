@@ -4,14 +4,16 @@
 
 package io.v.v23.android;
 
+import android.content.Context;
+
 import io.v.v23.Options;
-import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.Principal;
-import io.v.v23.security.Security;
 import io.v.v23.security.Constants;
-import io.v.v23.security.Signer;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
+import io.v.v23.security.VSigner;
+import io.v.v23.verror.VException;
 
 import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
@@ -49,7 +51,7 @@ public class V extends io.v.v23.V {
      * @param  opts        options for the default runtime
      * @return             base context
      */
-    public static VContext init(android.content.Context androidCtx, Options opts) {
+    public static VContext init(Context androidCtx, Options opts) {
         if (context != null) return context;
         synchronized (V.class) {
             if (context != null) return context;
@@ -72,15 +74,15 @@ public class V extends io.v.v23.V {
 
     /**
      * Initializes the Vanadium environment without options.  See
-     * {@link #init(android.content.Context,Options)} for more information.
+     * {@link #init(Context,Options)} for more information.
      *
      * @return base context
      */
-    public static VContext init(android.content.Context ctx) {
+    public static VContext init(Context ctx) {
         return V.init(ctx, null);
     }
 
-    private static Principal createPrincipal(android.content.Context ctx) throws VException {
+    private static VPrincipal createPrincipal(Context ctx) throws VException {
         // Check if the private key has already been generated for this package.
         // (NOTE: Android package names are unique.)
         KeyStore.PrivateKeyEntry keyEntry =
@@ -89,9 +91,9 @@ public class V extends io.v.v23.V {
             // Generate a new private key.
             keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
         }
-        final Signer signer = Security.newSigner(
+        final VSigner signer = VSecurity.newSigner(
                 keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
-        final Principal principal = Security.newPrincipal(signer);
+        final VPrincipal principal = VSecurity.newPrincipal(signer);
         final Blessings blessings = principal.blessSelf(ctx.getPackageName());
         principal.blessingStore().setDefaultBlessings(blessings);
         principal.blessingStore().set(blessings, Constants.ALL_PRINCIPALS);

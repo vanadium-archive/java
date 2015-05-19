@@ -40,7 +40,7 @@ import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.Certificate;
+import io.v.v23.security.VCertificate;
 import io.v.v23.security.CryptoUtil;
 import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
@@ -265,7 +265,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             return "";
         }
         String ret = "";
-        for (Certificate c : blessing.getCertificateChains().get(0)) {
+        for (VCertificate c : blessing.getCertificateChains().get(0)) {
             if (!ret.isEmpty()) {
                 ret += "/";
             }

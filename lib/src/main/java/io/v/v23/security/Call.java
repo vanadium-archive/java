@@ -50,7 +50,7 @@ public interface Call {
     /**
      * Returns the principal used to authenticate to the remote end.
      */
-    Principal localPrincipal();
+    VPrincipal localPrincipal();
 
     /**
      * Returns the blessings sent to the remote end for authentication.

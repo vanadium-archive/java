@@ -19,7 +19,7 @@ import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
-import io.v.v23.security.Security;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
 public class LocationService extends Service {
@@ -48,7 +48,8 @@ public class LocationService extends Service {
             final Dispatcher dispatcher = new Dispatcher() {
                 @Override
                 public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-                    return new ServiceObjectWithAuthorizer(server, Security.newAcceptAllAuthorizer());
+                    return new ServiceObjectWithAuthorizer(
+                            server, VSecurity.newAcceptAllAuthorizer());
                 }
             };
             s.serve("spetrovic/location", dispatcher);

@@ -8,10 +8,9 @@ import io.v.v23.verror.VException;
 import java.io.EOFException;
 
 /**
- * Stream interfice defines a bidirectional stream with send/receive arguments
- * of the specified type.
+ * A bidirectional stream with send/receive arguments of the specified type.
 **/
-public interface Stream<SendT, RecvT> {
+public interface TypedStream<SendT, RecvT> {
   /**
    * Places the item onto the output stream, blocking if there is no buffer
    * space available.

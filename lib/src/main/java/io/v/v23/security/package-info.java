@@ -42,11 +42,11 @@
  * <p>
  * We recommend the following order in order to introduce yourself to the API:
  * <p><ul>
- *   <li>{@link io.v.v23.security.Principal}</li>
+ *   <li>{@link io.v.v23.security.VPrincipal}</li>
  *   <li>{@link io.v.v23.security.Blessings}</li>
  *   <li>{@link io.v.v23.security.BlessingStore}</li>
  *   <li>{@link io.v.v23.security.BlessingRoots}</li>
- *   <li>{@link io.v.v23.security.Security}</li>
+ *   <li>{@link io.v.v23.security.VSecurity}</li>
  * </ul>
  * <p>
  * <strong>Examples</strong>
@@ -54,7 +54,7 @@
  * A principal can decide to name itself anything it wants:
  * <p><blockquote><pre>
  *  // (in process A)
- *  Principal p1 = Security.newPrincipal();
+ *  VPrincipal p1 = VSecurity.newPrincipal();
  *  Blessings alice := p1.blessSelf("alice");
  * </pre></blockquote><p>
  * This {@code alice} blessing can be presented to to another principal (typically a
@@ -63,8 +63,8 @@
  *  // (in process B)
  *  // context = current context
  *  // call = current security state
- *  Principal p2 = Security.newPrincipal();
- *  String[] names = Security.getRemoteBlessingNames(ctx, call);
+ *  VPrincipal p2 = VSecurity.newPrincipal();
+ *  String[] names = VSecurity.getRemoteBlessingNames(ctx, call);
  *  System.out.println(Arrays.toString(names));  // Will print {@code ""}
  * </pre></blockquote><p>
  * However, {@code p2} can decide to trust the roots of the {@code "alice"} blessing and then it
@@ -72,7 +72,7 @@
  * <p><blockquote><pre>
  *  // (in process B)
  *  p2.addToRoots(call.remoteBlessings());
- *  String[] names = Security.getRemoteBlessingNames(ctx, call);
+ *  String[] names = VSecurity.getRemoteBlessingNames(ctx, call);
  *  System.out.println(Arrays.toString(names));  // Will print {@code "alice"}
  * </pre></blockquote><p>
  * Furthermore, {@code p2} can seek a blessing from {@code "alice"}:
@@ -80,7 +80,7 @@
  *  // (in process A)
  *  // call = call under which p2 is seeking a blessing from alice, call.localPrincipal() = p1
  *  ECPublicKey key2 = call.remoteBlessings().publicKey();
- *  Caveat onlyFor10Minutes = Security.newExpiryCaveat(DateTime.now().plus(10000));
+ *  Caveat onlyFor10Minutes = VSecurity.newExpiryCaveat(DateTime.now().plus(10000));
  *  Blessings aliceFriend = p1.bless(key2, alice, "friend", onlyFor10Minutes);
  *  sendBlessingToProcessB(aliceFriend);
  * </pre></blockquote><p>
@@ -94,7 +94,7 @@
  *  <p><blockquote><pre>
  *  // (in process B)
  *  Blessings charlieFriend = receiveBlessingFromSomewhere();
- *  Blessings union = Security.unionOfBlessings(aliceFriend, charlieFriend);
+ *  Blessings union = VSecurity.unionOfBlessings(aliceFriend, charlieFriend);
  *  p2.blessingStore().set(union, new BlessingPattern("alice/mom"));
  * </pre></blockquote><p>
  * Thus, when communicating with a server that presents the blessing {@code "alice/mom"},
@@ -105,7 +105,7 @@
  * as a "server", (i.e., when it does not know who the peer is):
  * <p><blockquote><pre>
  * // (in process B)
- * Blessings default = Security.unionOfBlessings(aliceFriend, charlieFriend);
+ * Blessings default = VSecurity.unionOfBlessings(aliceFriend, charlieFriend);
  * p2.blessingStore().SetDefault(default);
  * </pre></blockquote><p>
  */

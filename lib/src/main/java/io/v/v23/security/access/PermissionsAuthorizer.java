@@ -8,7 +8,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
-import io.v.v23.security.Security;
+import io.v.v23.security.VSecurity;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -71,7 +71,7 @@ import java.util.Arrays;
  *                                                  new BlessingPattern("alice/colleagues/...")),
  *                                 null)));
  *             return new ServiceObjectWithAuthorizer(
- *                     newInvoker(), Security.newPermissionsAuthorizer(acls, MyTag.class));
+ *                     newInvoker(), VSecurity.newPermissionsAuthorizer(acls, MyTag.class));
  *   }
  * </pre></blockquote><p>
  * </li>
@@ -121,7 +121,7 @@ public class PermissionsAuthorizer implements Authorizer {
             return;
         }
         String[] blessings =
-                remote != null ? Security.getRemoteBlessingNames(ctx, call) : new String[0];
+                remote != null ? VSecurity.getRemoteBlessingNames(ctx, call) : new String[0];
         VdlValue[] tags = call.methodTags();
         if (tags == null) {
             tags = new VdlValue[0];

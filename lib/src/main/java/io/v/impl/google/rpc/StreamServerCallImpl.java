@@ -6,6 +6,9 @@ package io.v.impl.google.rpc;
 
 
 import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServerCall;
+import io.v.v23.rpc.Stream;
+import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
@@ -13,19 +16,19 @@ import io.v.v23.verror.VException;
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
+public class StreamServerCallImpl implements StreamServerCall {
     private final long nativePtr;
     private final Stream stream;
     private final ServerCall serverCall;
 
     private native void nativeFinalize(long nativePtr);
 
-    private StreamServerCall(long nativePtr, Stream stream, ServerCall serverCall) {
+    private StreamServerCallImpl(long nativePtr, Stream stream, ServerCall serverCall) {
         this.nativePtr = nativePtr;
         this.stream = stream;
         this.serverCall = serverCall;
     }
-    // Implements io.v.v23.ipc.Stream.
+    // Implements io.v.v23.rpc.Stream.
     @Override
     public void send(Object item, Type type) throws VException {
         this.stream.send(item, type);
@@ -34,7 +37,7 @@ public class StreamServerCall implements io.v.v23.rpc.StreamServerCall {
     public Object recv(Type type) throws EOFException, VException {
         return this.stream.recv(type);
     }
-    // Implements io.v.v23.ipc.ServerCall.
+    // Implements io.v.v23.rpc.ServerCall.
     @Override
     public Blessings grantedBlessings() {
         return serverCall.grantedBlessings();

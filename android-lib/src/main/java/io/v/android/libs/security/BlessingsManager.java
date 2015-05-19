@@ -14,7 +14,7 @@ import android.content.SharedPreferences;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
-import io.v.v23.security.Certificate;
+import io.v.v23.security.VCertificate;
 import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -176,13 +176,13 @@ public class BlessingsManager {
         if (blessings == null || blessings.getCertificateChains() == null) {
             return new WireBlessings[0];
         }
-        final List<List<Certificate>> chains = blessings.getCertificateChains();
+        final List<List<VCertificate>> chains = blessings.getCertificateChains();
         if (chains.size() == 1) {
             return new WireBlessings[] { blessings };
         }
         final WireBlessings[] ret = new WireBlessings[chains.size()];
         for (int i = 0; i < chains.size(); ++i) {
-            ret[i] = new WireBlessings(ImmutableList.<List<Certificate>>of(chains.get(i)));
+            ret[i] = new WireBlessings(ImmutableList.<List<VCertificate>>of(chains.get(i)));
         }
         return ret;
     }
@@ -191,7 +191,7 @@ public class BlessingsManager {
         if (blessing == null) {
             return "";
         }
-        final List<Certificate> chain = blessing.getCertificateChains().get(0);
+        final List<VCertificate> chain = blessing.getCertificateChains().get(0);
         String ret = "";
         for (int i = 0; i < chain.size(); ++i) {
             ret += chain.get(i).getExtension();

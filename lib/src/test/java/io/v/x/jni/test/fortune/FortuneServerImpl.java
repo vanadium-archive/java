@@ -14,7 +14,7 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.vdl.Stream;
+import io.v.v23.vdl.TypedStream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
 
@@ -45,7 +45,7 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     }
 
     @Override
-    public int streamingGet(VContext context, ServerCall call, Stream<String, Boolean> stream)
+    public int streamingGet(VContext context, ServerCall call, TypedStream<String, Boolean> stream)
             throws VException {
         int numSent = 0;
         while (true) {

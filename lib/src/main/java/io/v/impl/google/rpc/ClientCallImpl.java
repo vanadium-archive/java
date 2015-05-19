@@ -4,26 +4,28 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.rpc.ClientCall;
+import io.v.v23.rpc.Stream;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Call implements io.v.v23.rpc.Client.Call {
+public class ClientCallImpl implements ClientCall {
     private final long nativePtr;
-    private final io.v.v23.rpc.Stream stream;
+    private final Stream stream;
 
     private native void nativeCloseSend() throws VException;
     private native byte[][] nativeFinish(long nativePtr, int numResults) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private Call(long nativePtr, Stream stream) {
+    private ClientCallImpl(long nativePtr, Stream stream) {
         this.nativePtr = nativePtr;
         this.stream = stream;
     }
 
-    // Implements io.v.v23.ipc.Client.Call.
+    // Implements io.v.v23.rpc.ClientCall.
     @Override
     public void closeSend() throws VException {
         nativeCloseSend();
@@ -43,7 +45,7 @@ public class Call implements io.v.v23.rpc.Client.Call {
         }
         return ret;
     }
-    // Implements io.v.v23.ipc.Stream.
+    // Implements io.v.v23.rpc.Stream.
     @Override
     public void send(Object item, Type type) throws VException {
         this.stream.send(item, type);

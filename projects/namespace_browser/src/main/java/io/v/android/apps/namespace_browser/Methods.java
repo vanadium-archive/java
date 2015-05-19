@@ -15,6 +15,7 @@ import java.util.List;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Client;
+import io.v.v23.rpc.ClientCall;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.VException;
@@ -33,7 +34,7 @@ public class Methods {
     public static List<String> get(String name, VContext ctx) throws VException {
         final Client client = V.getClient(ctx);
         final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        final Client.Call call =
+        final ClientCall call =
                 client.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
         final Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
         }.getType()};

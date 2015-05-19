@@ -21,49 +21,49 @@ import java.util.Arrays;
 public class CaveatTest extends TestCase {
     public void testMethodCaveat() throws VException {
         VContext context = V.init();
-        Principal p1 = Security.newPrincipal();
-        Blessings alice = p1.blessSelf("alice", Security.newMethodCaveat("succeed"));
+        VPrincipal p1 = VSecurity.newPrincipal();
+        Blessings alice = p1.blessSelf("alice", VSecurity.newMethodCaveat("succeed"));
         p1.addToRoots(alice);
         {
-            Call call = Security.newCall(
+            Call call = VSecurity.newCall(
                     new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
             String[] want = { "alice" };
-            String[] got = Security.getRemoteBlessingNames(context, call);
+            String[] got = VSecurity.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
             }
         }
         {
-            Call call = Security.newCall(
+            Call call = VSecurity.newCall(
                     new CallParams().withLocalPrincipal(p1).withMethod("fail"));
-            assertEquals(null, Security.getRemoteBlessingNames(context, call));
+            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
         }
     }
 
     public void testExpiryCaveat() throws VException {
         VContext context = V.init();
-        Principal p1 = Security.newPrincipal();
+        VPrincipal p1 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf(
-            "alice", Security.newExpiryCaveat(DateTime.now().plusHours(1)));
+            "alice", VSecurity.newExpiryCaveat(DateTime.now().plusHours(1)));
         p1.addToRoots(alice);
         {
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withTimestamp(DateTime.now()));
             String[] want = { "alice" };
-            String[] got = Security.getRemoteBlessingNames(context, call);
+            String[] got = VSecurity.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
             }
         }
         {
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withTimestamp(DateTime.now().plusHours(2)));
-            assertEquals(null, Security.getRemoteBlessingNames(context, call));
+            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
         }
     }
 
@@ -71,28 +71,28 @@ public class CaveatTest extends TestCase {
         VContext context = V.init();
         CaveatRegistry.register(io.v.x.jni.test.security.Constants.TEST_CAVEAT,
                 new TestCaveatValidator());
-        Principal p1 = Security.newPrincipal();
+        VPrincipal p1 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice",
-                Security.newCaveat(io.v.x.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
+                VSecurity.newCaveat(io.v.x.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
         p1.addToRoots(alice);
         {
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withSuffix("succeed"));
             String[] want = { "alice" };
-            String[] got = Security.getRemoteBlessingNames(context, call);
+            String[] got = VSecurity.getRemoteBlessingNames(context, call);
             if (!Arrays.equals(want, got)) {
                 fail(String.format("Blessings differ, want %s, got %s",
                         Arrays.toString(want), Arrays.toString(got)));
             }
         }
         {
-            Call call = Security.newCall(new CallParams()
+            Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withSuffix("fail"));
-            assertEquals(null, Security.getRemoteBlessingNames(context, call));
+            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
         }
     }
 }

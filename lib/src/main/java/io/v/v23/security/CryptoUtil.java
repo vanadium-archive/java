@@ -119,15 +119,17 @@ public class CryptoUtil {
     }
 
     /**
-     * Applies the specified cryptographic hash function on the provided message.
+     * Applies the specified cryptographic hash function on the provided message, using the
+     * provided hashing algorithm.
      *
-     * @param  hashAlgorithm   name of the hash algorithm to use
+     * @param  vHashAlgorithm  name of the Vanadium hash algorithm to use
      * @param  message         message to apply the hash function on
      * @return                 hashed message
      * @throws VException      if the message couldn't be hashed
      */
-    public static byte[] hash(String hashAlgorithm, byte[] message) throws VException {
+    public static byte[] hash(String vHashAlgorithm, byte[] message) throws VException {
         try {
+            String hashAlgorithm = javaHashAlgorithm(vHashAlgorithm);
             MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
             md.update(message);
             byte[] ret = md.digest();
@@ -136,7 +138,7 @@ public class CryptoUtil {
             }
             return ret;
         } catch (NoSuchAlgorithmException e) {
-            throw new VException("Hashing algorithm " + hashAlgorithm + " not " +
+            throw new VException("Hashing algorithm " + vHashAlgorithm + " not " +
                 "supported by the runtime: " + e.getMessage());
         }
     }
@@ -145,22 +147,22 @@ public class CryptoUtil {
      * Creates a digest for the following message and the specified purpose, using the provided
      * hash algorithm.
      *
-     * @param  hashAlgorithm   name of the hash algorithm to use
+     * @param  vHashAlgorithm  name of the Vanadium hash algorithm to use
      * @param  message         message that is part of the digest
      * @param  purpose         purpose that is part of the digest
      * @return                 digest for the specified message and digest
      * @throws VException      if there was an error creating a digest
      */
-    static byte[] messageDigest(String hashAlgorithm,
-        byte[] message, byte[] purpose) throws VException {
+    static byte[] messageDigest(String vHashAlgorithm, byte[] message, byte[] purpose)
+            throws VException {
         if (message == null) {
             throw new VException("Empty message.");
         }
         if (purpose == null) {
             throw new VException("Empty purpose.");
         }
-        message = hash(hashAlgorithm, message);
-        purpose = hash(hashAlgorithm, purpose);
+        message = hash(vHashAlgorithm, message);
+        purpose = hash(vHashAlgorithm, purpose);
         byte[] ret = join(message, purpose);
         return ret;
     }
@@ -181,7 +183,7 @@ public class CryptoUtil {
      * @return                 signature in ASN.1 format
      * @throws VException      if the signature couldn't be converted
      */
-    public static byte[] javaSignature(Signature sig) throws VException {
+    public static byte[] javaSignature(VSignature sig) throws VException {
         // The ASN.1 format of the signature should be:
         //    Signature ::= SEQUENCE {
         //       r   INTEGER,
@@ -215,13 +217,13 @@ public class CryptoUtil {
     /**
      * Converts the provided Java signature (ASN.1 format) into the Vanadium format.
      *
-     * @param  hashAlgorithm   hash algorithm used when generating the signature
+     * @param  vHashAlgorithm  Vanadium hash algorithm used when generating the signature
      * @param  purpose         purpose of the generated signature
      * @param  sig             signature in ASN.1 format
      * @return                 signature in Vanadium format
      * @throws VException      if the signature couldn't be converted
      */
-    public static Signature vanadiumSignature(String hashAlgorithm, byte[] purpose, byte[] sig)
+    public static VSignature vanadiumSignature(String vHashAlgorithm, byte[] purpose, byte[] sig)
             throws VException {
         byte[] r, s;
         // The ASN.1 format of the signature should be:
@@ -262,7 +264,52 @@ public class CryptoUtil {
         if (in.read(s, 0, b) != b) {
             throw new VException(String.format("Error reading %d bytes of S from signature", b));
         }
-        return new Signature(purpose, new Hash(hashAlgorithm), r, s);
+        return new VSignature(purpose, new Hash(vHashAlgorithm), r, s);
+    }
+
+    /**
+     * Returns a Java hash algorithm corresponding to the given Vanadium hash algorithm.
+     *
+     * @param  vHashAlgorithm Vanadium hash algorithm
+     * @throws VException     if the hash algorithm isn't supported
+     */
+    static String javaHashAlgorithm(String vHashAlgorithm) throws VException {
+        if (vHashAlgorithm.equals("SHA1")) {
+            return "SHA-1";
+        }
+        if (vHashAlgorithm.equals("SHA256")) {
+            return "SHA-256";
+        }
+        if (vHashAlgorithm.equals("SHA384")) {
+            return "SHA-384";
+        }
+        if (vHashAlgorithm.equals("SHA512")) {
+            return "SHA-512";
+        }
+        throw new VException("Java currently doesn't support hashing algorithm: " + vHashAlgorithm);
+    }
+
+    /**
+     * Returns a Java ECDSA signing algorithm corrsponding to the given Vanadium hash algorithm.
+     *
+     * @param  hashAlgorithm Vanadium hash algorithm
+     * @throws VException    if the hash/signing algorithm isn't supported
+     */
+    static String javaSigningAlgorithm(String vHashAlgorithm) throws VException {
+        if (vHashAlgorithm.equals("SHA1")) {
+            return "SHA1withECDSA";
+        }
+        if (vHashAlgorithm.equals("SHA256")) {
+            return "SHA256withECDSA";
+        }
+        if (vHashAlgorithm.equals("SHA384")) {
+            return "SHA384withECDSA";
+        }
+        if (vHashAlgorithm.equals("SHA512")) {
+            return "SHA512withECDSA";
+        }
+        throw new VException("Java Vanadium currently doesn't support hashing algorithm: " +
+                vHashAlgorithm);
     }
 
     private CryptoUtil() {}

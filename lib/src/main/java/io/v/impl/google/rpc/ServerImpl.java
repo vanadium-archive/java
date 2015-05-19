@@ -4,18 +4,19 @@
 
 package io.v.impl.google.rpc;
 
-import io.v.impl.google.channel.InputChannel;
+import io.v.v23.InputChannel;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.ReflectInvoker;
+import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.security.Authorizer;
 import io.v.v23.verror.VException;
 
-public class Server implements io.v.v23.rpc.Server {
+public class ServerImpl implements Server {
     private final long nativePtr;
 
     private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
@@ -30,10 +31,10 @@ public class Server implements io.v.v23.rpc.Server {
     private native void nativeStop(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private Server(long nativePtr) {
+    private ServerImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
-    // Implement io.v.v23.ipc.Server.
+    // Implement io.v.v23.rpc.Server.
     @Override
     public String[] listen(ListenSpec spec) throws VException {
         return nativeListen(this.nativePtr, spec);
@@ -67,7 +68,7 @@ public class Server implements io.v.v23.rpc.Server {
         }
     }
     @Override
-    public io.v.v23.InputChannel<NetworkChange> watchNetwork() {
+    public InputChannel<NetworkChange> watchNetwork() {
         try {
             return nativeWatchNetwork(this.nativePtr);
         } catch (VException e) {
@@ -75,7 +76,7 @@ public class Server implements io.v.v23.rpc.Server {
         }
     }
     @Override
-    public void unwatchNetwork(io.v.v23.InputChannel<NetworkChange> channel) {
+    public void unwatchNetwork(InputChannel<NetworkChange> channel) {
         if (!(channel instanceof InputChannel)) {  // also handles channel == null
             return;
         }
@@ -95,7 +96,7 @@ public class Server implements io.v.v23.rpc.Server {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((Server) other).nativePtr;
+        return this.nativePtr == ((ServerImpl) other).nativePtr;
     }
     @Override
     public int hashCode() {

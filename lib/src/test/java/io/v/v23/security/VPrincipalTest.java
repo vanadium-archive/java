@@ -17,31 +17,31 @@ import java.util.Map;
 
 
 /**
- * Tests the default {@code Principal} implementation.
+ * Tests the default {@code VPrincipal} implementation.
  */
-public class PrincipalTest extends TestCase {
+public class VPrincipalTest extends TestCase {
     public void testBlessingsInfo() throws VException {
         V.init();
-        final Principal p1 = Security.newPrincipal();
-        final Principal p2 = Security.newPrincipal();
+        final VPrincipal p1 = VSecurity.newPrincipal();
+        final VPrincipal p2 = VSecurity.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
         p2.addToRoots(alice);
 
         final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
+                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
         final Blessings aliceGymFriend = p1.bless(p2.publicKey(),
-                alice, "gym/friend", Security.newUnconstrainedUseCaveat());
-        final Blessings aliceAllFriends = Security.unionOfBlessings(
+                alice, "gym/friend", VSecurity.newUnconstrainedUseCaveat());
+        final Blessings aliceAllFriends = VSecurity.unionOfBlessings(
             aliceWorkFriend, aliceGymFriend);
         assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                .put("alice/work/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
+                .put("alice/work/friend", new Caveat[]{VSecurity.newUnconstrainedUseCaveat()})
                 .build(), p2.blessingsInfo(aliceWorkFriend));
         assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                .put("alice/gym/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
+                .put("alice/gym/friend", new Caveat[]{VSecurity.newUnconstrainedUseCaveat()})
                 .build(), p2.blessingsInfo(aliceGymFriend));
         assertInfoMapsEqual(ImmutableMap.<String, Caveat[]>builder()
-                .put("alice/work/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
-                .put("alice/gym/friend", new Caveat[]{Security.newUnconstrainedUseCaveat()})
+                .put("alice/work/friend", new Caveat[]{VSecurity.newUnconstrainedUseCaveat()})
+                .put("alice/gym/friend", new Caveat[]{VSecurity.newUnconstrainedUseCaveat()})
                 .build(), p2.blessingsInfo(aliceAllFriends));
     }
 
@@ -67,20 +67,20 @@ public class PrincipalTest extends TestCase {
 
     public void testBlessingsByName() throws VException {
         V.init();
-        final Principal p1 = Security.newPrincipal();
-        final Principal p2 = Security.newPrincipal();
-        final Principal p3 = Security.newPrincipal();
+        final VPrincipal p1 = VSecurity.newPrincipal();
+        final VPrincipal p2 = VSecurity.newPrincipal();
+        final VPrincipal p3 = VSecurity.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
         final Blessings fake = p3.blessSelf("alice");
 
         final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", Security.newUnconstrainedUseCaveat());
+                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
         final Blessings aliceGymFriend = p1.bless(p2.publicKey(),
-                alice, "gym/friend", Security.newUnconstrainedUseCaveat());
+                alice, "gym/friend", VSecurity.newUnconstrainedUseCaveat());
         final Blessings aliceWorkBoss = p1.bless(p2.publicKey(),
-                alice, "work/boss", Security.newUnconstrainedUseCaveat());
+                alice, "work/boss", VSecurity.newUnconstrainedUseCaveat());
         final Blessings fakeFriend = p3.bless(p2.publicKey(),
-                fake, "work/friend", Security.newUnconstrainedUseCaveat());
+                fake, "work/friend", VSecurity.newUnconstrainedUseCaveat());
 
         p2.addToRoots(alice);
         p2.blessingStore().set(aliceWorkFriend, new BlessingPattern("alice/work/friend"));

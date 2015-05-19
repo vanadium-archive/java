@@ -25,7 +25,7 @@ public class CallTest extends TestCase {
         String method = "bono";
         VdlValue[] methodTags = { new VdlUint32(12), new VdlString("edge") };
         String suffix = "larry";
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         Blessings localBlessings = principal.blessSelf("adam");
         Blessings remoteBlessings = principal.blessSelf("u2");
         String localEndpoint = "@3@tcp@10.0.0.0:1000@";
@@ -41,7 +41,7 @@ public class CallTest extends TestCase {
                 .withLocalBlessings(localBlessings)
                 .withRemoteBlessings(remoteBlessings)
                 .withContext(ctx);
-        Call call = Security.newCall(params);
+        Call call = VSecurity.newCall(params);
         assertEquals(timestamp, call.timestamp());
         assertEquals(method, call.method());
         assertEquals(methodTags, call.methodTags());

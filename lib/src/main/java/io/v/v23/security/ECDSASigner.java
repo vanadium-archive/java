@@ -13,10 +13,8 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 
-class ECDSASigner implements Signer {
-    private static final String HASH_ALGORITHM = "SHA-256";
-    private static final String SIGN_ALGORITHM = "SHA256withECDSA";
-    private static final String HASH_ALGORITHM_NAME = "SHA256";
+class ECDSASigner implements VSigner {
+    private static final String VANADIUM_HASH_ALGORITHM = "SHA256";
 
     private final PrivateKey privKey;
     private final ECPublicKey pubKey;
@@ -27,18 +25,19 @@ class ECDSASigner implements Signer {
     }
 
     @Override
-    public Signature sign(byte[] purpose, byte[] message) throws VException {
-        message = CryptoUtil.messageDigest(HASH_ALGORITHM, message, purpose);
+    public VSignature sign(byte[] purpose, byte[] message) throws VException {
+        String javaSignAlgorithm = CryptoUtil.javaSigningAlgorithm(VANADIUM_HASH_ALGORITHM);
+        message = CryptoUtil.messageDigest(VANADIUM_HASH_ALGORITHM, message, purpose);
         // Sign.  Note that the signer will first apply another hash on the message, resulting in:
         // ECDSA.Sign(Hash(Hash(message) + Hash(purpose))).
         try {
-            java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGORITHM);
+            java.security.Signature sig = java.security.Signature.getInstance(javaSignAlgorithm);
             sig.initSign(this.privKey);
             sig.update(message);
             byte[] asn1Sig = sig.sign();
-            return CryptoUtil.vanadiumSignature(HASH_ALGORITHM_NAME, purpose, asn1Sig);
+            return CryptoUtil.vanadiumSignature(VANADIUM_HASH_ALGORITHM, purpose, asn1Sig);
         } catch (NoSuchAlgorithmException e) {
-            throw new VException("Signing algorithm " + SIGN_ALGORITHM +
+            throw new VException("Signing algorithm " + javaSignAlgorithm +
                 " not supported by the runtime: " + e.getMessage());
         } catch (InvalidKeyException e) {
             throw new VException("Invalid private key: " + e.getMessage());

@@ -10,14 +10,14 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Map;
 
 /**
- * An entity capable of making or receiving RPCs.  {@link Principal}s have a unique
+ * An entity capable of making or receiving RPCs.  {@link VPrincipal}s have a unique
  * (public, private) key pair, have blessings bound to them, and can bless other principals.
  * <p>
- * Multiple goroutines may invoke methods on a {@link Principal} simultaneously.
+ * Multiple goroutines may invoke methods on a {@link VPrincipal} simultaneously.
  * <p>
  * See also: <a href="https://v.io/glossary.html#principal">https://v.io/glossary.html#principal</a>.
  */
-public interface Principal {
+public interface VPrincipal {
     /**
      * Binds extensions of blessings held by this principal to another principal (represented by
      * its public key).
@@ -30,7 +30,7 @@ public interface Principal {
      * </pre></blockquote><p>
      * To discourage unconstrained delegation of authority, the interface requires at least one
      * caveat to be provided. If unconstrained delegation is desired, the
-     * {@link Security#newUnconstrainedUseCaveat} method can be used to produce this argument.
+     * {@link VSecurity#newUnconstrainedUseCaveat} method can be used to produce this argument.
      * <p>
      * {@code with.publicKey()} must be the same as the principal's public key.
      *
@@ -63,7 +63,7 @@ public interface Principal {
      * @return                 signature of the message
      * @throws VException      if the message couldn't be signed
      */
-    Signature sign(byte[] message) throws VException;
+    VSignature sign(byte[] message) throws VException;
 
     /**
      * Returns the public key counterpart of the private key held by the principal.
@@ -86,8 +86,9 @@ public interface Principal {
      * to it from recognized authorities (i.e., blessing roots).
      * <p>
      * This method does not validate caveats on the provided blessings and thus may
-     * <strong>not</strong> be valid in certain calls.  (Use {@link Security#getRemoteBlessingNames}
-     * to determine the set of valid blessing strings in a particular call.)
+     * <strong>not</strong> be valid in certain calls.  (Use
+     * {@link VSecurity#getRemoteBlessingNames} to determine the set of valid blessing strings in a
+     * particular call.)
      *
      * @param blessings blessings whose human-readable strings are to be returned
      * @return          human-readable strings of the provided blessings, along with the caveats

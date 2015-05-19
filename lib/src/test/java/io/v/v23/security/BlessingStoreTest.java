@@ -19,11 +19,11 @@ import java.util.Map;
 public class BlessingStoreTest extends TestCase {
     public void testSet() throws VException {
         V.init();
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         BlessingStore store = principal.blessingStore();
         Blessings blessingA = newBlessing(principal, "root", "A");
         Blessings blessingB = newBlessing(principal, "root", "B");
-        Blessings blessingOther = Security.newPrincipal().blessSelf("other");
+        Blessings blessingOther = VSecurity.newPrincipal().blessSelf("other");
         Map<BlessingPattern, Blessings> want =
                 ImmutableMap.<BlessingPattern, Blessings>builder()
                 .put(new BlessingPattern("..."), blessingA)
@@ -56,7 +56,7 @@ public class BlessingStoreTest extends TestCase {
 
     public void testSetDefault() throws VException {
         V.init();
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         BlessingStore store = principal.blessingStore();
         Blessings blessingA = newBlessing(principal, "root", "A");
         Blessings blessingB = newBlessing(principal, "root", "B");
@@ -69,7 +69,7 @@ public class BlessingStoreTest extends TestCase {
 
     public void testForPeer() throws VException {
         V.init();
-        Principal principal = Security.newPrincipal();
+        VPrincipal principal = VSecurity.newPrincipal();
         BlessingStore store = principal.blessingStore();
         Blessings blessingFoo = newBlessing(principal, "foo", "A");
         Blessings blessingBar = newBlessing(principal, "bar", "B");
@@ -82,17 +82,17 @@ public class BlessingStoreTest extends TestCase {
                ImmutableMap.<String[], Blessings>builder()
                .put(new String[] {}, blessingAll)
                .put(new String[]{ "baz" }, blessingAll)
-               .put(new String[]{ "foo" }, Security.unionOfBlessings(blessingAll, blessingFoo))
-               .put(new String[]{ "bar" }, Security.unionOfBlessings(blessingAll, blessingBar))
+               .put(new String[]{ "foo" }, VSecurity.unionOfBlessings(blessingAll, blessingFoo))
+               .put(new String[]{ "bar" }, VSecurity.unionOfBlessings(blessingAll, blessingBar))
                .put(new String[]{ "foo/foo" },
-                       Security.unionOfBlessings(blessingAll, blessingFoo))
+                       VSecurity.unionOfBlessings(blessingAll, blessingFoo))
                .put(new String[] { "bar/baz" }, blessingAll)
                .put(new String[] { "foo/foo/bar" },
-                       Security.unionOfBlessings(blessingAll, blessingFoo))
+                       VSecurity.unionOfBlessings(blessingAll, blessingFoo))
                .put(new String[] { "bar/foo", "foo" },
-                       Security.unionOfBlessings(blessingAll, blessingFoo))
+                       VSecurity.unionOfBlessings(blessingAll, blessingFoo))
                .put(new String[] { "bar", "foo" },
-                       Security.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
+                       VSecurity.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
                .build();
         for (Map.Entry<String[], Blessings> entry : testdata.entrySet()) {
             store.forPeer(entry.getKey());
@@ -100,10 +100,10 @@ public class BlessingStoreTest extends TestCase {
         }
     }
 
-    private static Blessings newBlessing(Principal blessee, String root, String extension)
+    private static Blessings newBlessing(VPrincipal blessee, String root, String extension)
             throws VException {
-        Principal blesser = Security.newPrincipal();
+        VPrincipal blesser = VSecurity.newPrincipal();
         return blesser.bless(blessee.publicKey(), blesser.blessSelf(root), extension,
-                Security.newUnconstrainedUseCaveat());
+                VSecurity.newUnconstrainedUseCaveat());
     }
 }

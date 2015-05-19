@@ -5,14 +5,14 @@
 package io.v.v23.security;
 
 import io.v.v23.verror.VException;
-import io.v.v23.security.Signature;
+import io.v.v23.security.VSignature;
 
 import java.security.interfaces.ECPublicKey;
 
 /**
  * The interface for signing arbitrary length messages using ECDSA private keys.
  */
-public interface Signer {
+public interface VSigner {
     /**
      * Signs an arbitrary length message (often the hash of a larger message) using the private
      * key associated with this signer.
@@ -27,7 +27,7 @@ public interface Signer {
      * @return                 the message signature
      * @throws VException      if the message cannot be signed
      */
-    Signature sign(byte[] purpose, byte[] message) throws VException;
+    VSignature sign(byte[] purpose, byte[] message) throws VException;
 
     /**
      * Returns ECDSA public key corresponding to this signer's private key.

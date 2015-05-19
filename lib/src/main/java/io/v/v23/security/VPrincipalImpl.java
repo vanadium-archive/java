@@ -9,35 +9,35 @@ import io.v.v23.verror.VException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Map;
 
-class PrincipalImpl implements Principal {
+class VPrincipalImpl implements VPrincipal {
     private final long nativePtr;
-    private final Signer signer;
+    private final VSigner signer;
     private final BlessingStore store;
     private final BlessingRoots roots;
 
-    private static native PrincipalImpl nativeCreate() throws VException;
-    private static native PrincipalImpl nativeCreateForSigner(Signer signer) throws VException;
-    private static native PrincipalImpl nativeCreateForAll(Signer signer, BlessingStore store,
+    private static native VPrincipalImpl nativeCreate() throws VException;
+    private static native VPrincipalImpl nativeCreateForSigner(VSigner signer) throws VException;
+    private static native VPrincipalImpl nativeCreateForAll(VSigner signer, BlessingStore store,
         BlessingRoots roots) throws VException;
-    private static native PrincipalImpl nativeCreatePersistent(String passphrase, String dir)
+    private static native VPrincipalImpl nativeCreatePersistent(String passphrase, String dir)
             throws VException;
-    private static native PrincipalImpl nativeCreatePersistentForSigner(Signer signer, String dir)
+    private static native VPrincipalImpl nativeCreatePersistentForSigner(VSigner signer, String dir)
             throws VException;
 
-    static PrincipalImpl create() throws VException {
+    static VPrincipalImpl create() throws VException {
         return nativeCreate();
     }
-    static PrincipalImpl create(Signer signer) throws VException {
+    static VPrincipalImpl create(VSigner signer) throws VException {
         return nativeCreateForSigner(signer);
     }
-    static PrincipalImpl create(Signer signer, BlessingStore store, BlessingRoots roots)
+    static VPrincipalImpl create(VSigner signer, BlessingStore store, BlessingRoots roots)
         throws VException {
         return nativeCreateForAll(signer, store, roots);
     }
-    static PrincipalImpl createPersistent(String passphrase, String dir) throws VException {
+    static VPrincipalImpl createPersistent(String passphrase, String dir) throws VException {
         return nativeCreatePersistent(passphrase, dir);
     }
-    static PrincipalImpl createPersistent(Signer signer, String dir) throws VException {
+    static VPrincipalImpl createPersistent(VSigner signer, String dir) throws VException {
         return nativeCreatePersistentForSigner(signer, dir);
     }
 
@@ -45,7 +45,7 @@ class PrincipalImpl implements Principal {
         String extension, Caveat caveat, Caveat[] additionalCaveats) throws VException;
     private native Blessings nativeBlessSelf(long nativePtr, String name, Caveat[] caveats)
             throws VException;
-    private native Signature nativeSign(long nativePtr, byte[] message) throws VException;
+    private native VSignature nativeSign(long nativePtr, byte[] message) throws VException;
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native Blessings[] nativeBlessingsByName(long nativePtr, BlessingPattern name)
             throws VException;
@@ -57,7 +57,8 @@ class PrincipalImpl implements Principal {
             throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    private PrincipalImpl(long nativePtr, Signer signer, BlessingStore store, BlessingRoots roots) {
+    private VPrincipalImpl(
+            long nativePtr, VSigner signer, BlessingStore store, BlessingRoots roots) {
         this.nativePtr = nativePtr;
         this.signer = signer;
         this.store = store;
@@ -74,7 +75,7 @@ class PrincipalImpl implements Principal {
         return nativeBlessSelf(this.nativePtr, name, caveats);
     }
     @Override
-    public Signature sign(byte[] message) throws VException {
+    public VSignature sign(byte[] message) throws VException {
         if (this.signer != null) {
             byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
             return this.signer.sign(purpose, message);
@@ -140,7 +141,7 @@ class PrincipalImpl implements Principal {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((PrincipalImpl) other).nativePtr;
+        return this.nativePtr == ((VPrincipalImpl) other).nativePtr;
     }
     @Override
     public int hashCode() {

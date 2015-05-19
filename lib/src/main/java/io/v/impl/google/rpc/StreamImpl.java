@@ -4,20 +4,21 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.rpc.Stream;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
 
-public class Stream implements io.v.v23.rpc.Stream {
+public class StreamImpl implements Stream {
     private final long nativePtr;
 
     private native void nativeSend(long nativePtr, byte[] vomItem) throws VException;
     private native byte[] nativeRecv(long nativePtr) throws EOFException, VException;
     private native void nativeFinalize(long nativePtr);
 
-    private Stream(long nativePtr) {
+    private StreamImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
     @Override
