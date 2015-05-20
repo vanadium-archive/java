@@ -14,7 +14,6 @@ import com.googlecode.lanterna.gui.component.Button;
 import com.googlecode.lanterna.gui.component.Panel;
 import com.googlecode.lanterna.gui.component.TextArea;
 import com.googlecode.lanterna.gui.component.TextBox;
-import com.googlecode.lanterna.gui.dialog.MessageBox;
 import com.googlecode.lanterna.gui.layout.BorderLayout;
 import com.googlecode.lanterna.gui.layout.HorisontalLayout;
 import com.googlecode.lanterna.gui.layout.VerticalLayout;
@@ -22,8 +21,9 @@ import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.ExecutorService;
+import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
@@ -32,11 +32,13 @@ import io.v.v23.verror.VException;
 public class Main {
     private final TextArea chatArea;
     private final TextBox sendTextBox;
+    private final Button participantsButton;
+    private final ParticipantsPanel participantsPanel;
     private final ChatChannel channel;
-    private final ExecutorService service = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     private boolean firstMessage = true;
     private int messageCount = 0;
-
+    private final GUIScreen screen = TerminalFacade.createGUIScreen();
 
     public static void main(String[] args) throws VException {
         Main main = new Main();
@@ -46,7 +48,6 @@ public class Main {
         String channelName = "users/vanadium.bot@gmail.com/apps/chat/public";
         VContext ctx = V.init();
         final FocusableWindow w = new FocusableWindow("Channel: " + channelName);
-        final GUIScreen screen = TerminalFacade.createGUIScreen();
 
         sendTextBox = new TextBox() {
             @Override
@@ -73,10 +74,17 @@ public class Main {
         mainPanel.addComponent(chatArea);
         panel.addComponent(mainPanel, BorderLayout.CENTER);
 
-        channel = new ChatChannel(ctx, channelName, new ChatMessageListener() {
+        channel = new ChatChannel(service, ctx, channelName, new ChatChannelListener() {
             @Override
             public void messageReceived(String whom, String message) {
                 processMessage(whom, message);
+            }
+
+            @Override
+            public void participantsUpdated(List<Participant> participants) {
+                participantsButton
+                        .setText(String.format("Show %d participant(s)", participants.size()));
+                participantsPanel.setParticipants(participants);
             }
         });
 
@@ -93,7 +101,7 @@ public class Main {
                 doSendAction();
             }
         }));
-        buttonPanel.addComponent(new Button("Participants", new Action() {
+        buttonPanel.addComponent(participantsButton = new Button("Participants", new Action() {
             @Override
             public void doAction() {
                 doShowParticipantsAction();
@@ -114,13 +122,10 @@ public class Main {
         w.setFocus(sendTextBox);
 
         screen.getScreen().startScreen();
+        participantsPanel = new ParticipantsPanel(channel);
         channel.join();
         screen.showWindow(w);
         channel.leave();
-    }
-
-    private void doShowParticipantsAction() {
-        MessageBox box;
     }
 
     private void processMessage(String whom, String message) {
@@ -136,8 +141,10 @@ public class Main {
     }
 
     private void maybeScrollChatArea() {
-        // Lanterna doesn't support auto-scrolling text areas, nor does it give any way to change the visible text
-        // area. The state it uses to represent the scroll location is all private. We work around all this using
+        // Lanterna doesn't support auto-scrolling text areas, nor does it give any way to change
+        // the visible text
+        // area. The state it uses to represent the scroll location is all private. We work
+        // around all this using
         // reflection to update the text area's internal state... Yuck.
         try {
             Field lastSize = TextArea.class.getDeclaredField("lastSize");
@@ -169,6 +176,10 @@ public class Main {
 
             }
         });
+    }
+
+    private void doShowParticipantsAction() {
+        participantsPanel.showParticipantsWindow(screen);
     }
 
     private static class FocusableWindow extends Window {
