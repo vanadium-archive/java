@@ -32,14 +32,14 @@ public class Methods {
      * @throws VException if there was an error getting the list of names.
      */
     public static List<String> get(String name, VContext ctx) throws VException {
-        final Client client = V.getClient(ctx);
-        final VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        final ClientCall call =
+        Client client = V.getClient(ctx);
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        ClientCall call =
                 client.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
-        final Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
+        Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
         }.getType()};
-        final Interface[] sSign = (Interface[]) call.finish(resultTypes)[0];
-        final List<String> ret = new ArrayList<String>();
+        Interface[] sSign = (Interface[]) call.finish(resultTypes)[0];
+        List<String> ret = new ArrayList<String>();
         for (Interface iface : sSign) {
             if (iface.getMethods() != null) {
                 for (Method method : iface.getMethods()) {

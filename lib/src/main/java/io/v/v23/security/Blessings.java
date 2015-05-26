@@ -6,6 +6,7 @@ package io.v.v23.security;
 
 import io.v.v23.verror.VException;
 
+import java.io.Serializable;
 import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
@@ -23,15 +24,18 @@ import java.util.List;
  * <p>
  * See also: <a href="https://v.io/glossary.html#blessing">https://v.io/glossary.html#blessing</a>.
  */
-public class Blessings {
+public class Blessings implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
-    static Blessings create(WireBlessings wire) throws VException {
-        if (wire == null) {
-            wire = new WireBlessings();
+    static Blessings create(WireBlessings wire) {
+        try {
+            return nativeCreate(wire);
+        } catch (VException e) {
+            throw new RuntimeException(e);
         }
-        return nativeCreate(wire);
     }
 
     static Blessings createUnion(Blessings... blessings) throws VException {
@@ -44,9 +48,30 @@ public class Blessings {
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
+    /**
+     * Creates new {@link Blessings} from the provided certificate chains.
+     *
+     * @param  chains certificate chains constituting these blessings
+     */
+    public Blessings(List<List<VCertificate>> chains) {
+        this(Blessings.create(new WireBlessings(chains)));
+    }
+
+    /**
+     * Creates new empty {@link Blessings}.
+     */
+    public Blessings() {
+        this(Blessings.create(new WireBlessings()));
+    }
+
     private Blessings(long nativePtr, WireBlessings wire) {
         this.nativePtr = nativePtr;
         this.wire = wire;
+    }
+
+    private Blessings(Blessings other) {
+        this.nativePtr = other.nativePtr;
+        this.wire = other.wire;
     }
 
     /**

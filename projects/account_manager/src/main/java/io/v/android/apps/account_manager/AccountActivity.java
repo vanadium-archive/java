@@ -42,14 +42,13 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.CryptoUtil;
-import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 import io.v.x.ref.services.identity.OAuthBlesserClient;
 import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 
 public class AccountActivity extends AccountAuthenticatorActivity {
-    public static final String TAG = "io.v.android.apps.account_manager";
+    public static final String TAG = "AccountActivity";
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
@@ -67,7 +66,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
         mBaseContext = V.init(this);
-        final Intent intent = AccountManager.newChooseAccountIntent(
+        Intent intent = AccountManager.newChooseAccountIntent(
                 null, null, new String[]{"com.google"}, true, null, null, null, null);
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
     }
@@ -101,7 +100,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             replyWithError("Empty account type.");
             return;
         }
-        final Account[] accounts = AccountManager.get(this).getAccounts();
+        Account[] accounts = AccountManager.get(this).getAccounts();
         Account account = null;
         for (int i = 0; i < accounts.length; i++) {
             if (accounts[i].name.equals(mAccountName) && accounts[i].type.equals(mAccountType)) {
@@ -132,8 +131,8 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         @Override
         public void run(AccountManagerFuture<Bundle> result) {
             try {
-                final Bundle bundle = result.getResult();
-                final Intent launch = (Intent) bundle.get(AccountManager.KEY_INTENT);
+                Bundle bundle = result.getResult();
+                Intent launch = (Intent) bundle.get(AccountManager.KEY_INTENT);
                 if (launch != null) {  // Needs user approval.
                     // NOTE(spetrovic): The returned intent has the wrong flag value
                     // FLAG_ACTIVITY_NEW_TASK set, which results in the launched intent replying
@@ -142,7 +141,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                     startActivityForResult(launch, REQUEST_CODE_USER_APPROVAL);
                     return;
                 }
-                final String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                String token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
                 (new BlessingFetcher()).execute(token);
             } catch (AuthenticatorException e) {
                 replyWithError("Couldn't authorize: " + e.getMessage());
@@ -155,7 +154,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     }
 
     private class BlessingFetcher extends AsyncTask<String, Void, Blessings> {
-        final ProgressDialog progressDialog = new ProgressDialog(AccountActivity.this);
+        ProgressDialog progressDialog = new ProgressDialog(AccountActivity.this);
         String errorMsg = null;
 
         @Override
@@ -170,30 +169,30 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 errorMsg = "Empty OAuth token.";
                 return null;
             }
-            final String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
+            String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
                     AccountActivity.this).getString(
                     PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
             try {
-                final URL url = new URL("https://dev.v.io/auth/blessing-root");
-                final JSONObject object = new JSONObject(CharStreams.toString(
+                URL url = new URL("https://dev.v.io/auth/blessing-root");
+                JSONObject object = new JSONObject(CharStreams.toString(
                         new InputStreamReader(url.openConnection().getInputStream(),
                                 Charsets.US_ASCII)));
-                final String publicKey = object.get("publicKey").toString();
-                final byte[] base64DecodedKey = Base64.decode(
+                String publicKey = object.get("publicKey").toString();
+                byte[] base64DecodedKey = Base64.decode(
                         publicKey.getBytes(), Base64.URL_SAFE);
-                final ECPublicKey ecPublicKey = CryptoUtil.decodeECPublicKey(base64DecodedKey);
-                final JSONArray namesArray = (JSONArray) object.get("names");
+                ECPublicKey ecPublicKey = CryptoUtil.decodeECPublicKey(base64DecodedKey);
+                JSONArray namesArray = (JSONArray) object.get("names");
                 for (int i = 0; i < namesArray.length(); i++) {
                     String name = namesArray.getString(i);
                     V.getPrincipal(mBaseContext).roots()
                             .add(ecPublicKey, new BlessingPattern(name));
                 }
-                final OAuthBlesserClient blesser =
+                OAuthBlesserClient blesser =
                         OAuthBlesserClientFactory.getOAuthBlesserClient(identityServiceName);
-                final VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-                final OAuthBlesserClient.BlessUsingAccessTokenOut reply =
+                VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
+                OAuthBlesserClient.BlessUsingAccessTokenOut reply =
                         blesser.blessUsingAccessToken(ctx, tokens[0]);
-                final Blessings blessing = reply.blessing;
+                Blessings blessing = reply.blessing;
                 if (blessing == null || blessing.getCertificateChains() == null ||
                         blessing.getCertificateChains().size() <= 0) {
                     errorMsg = "Received empty blessing from Vanadium identity servers.";
@@ -228,7 +227,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             }
             // VOM-encode the blessing.
             try {
-                final String encoded = VomUtil.encodeToString(blessing, WireBlessings.class);
+                String encoded = VomUtil.encodeToString(blessing, Blessings.class);
                 replyWithSuccess(blessing, encoded);
             } catch (VException e) {
                 replyWithError("Couldn't encode identity obtained from Vanadium " +
@@ -240,22 +239,21 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error creating account: " + error);
         setResult(RESULT_CANCELED);
-        final String text = "Couldn't create account: " + error;
-        final Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
+        String text = "Couldn't create account: " + error;
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
         toast.show();
         finish();
     }
 
     private void replyWithSuccess(Blessings blessing, String encoded) {
-        final String userName = userNameFromBlessing(blessing);
-        final Account account = new Account(
-                userName, getResources().getString(R.string.authenticator_account_type));
-        final AccountManager am = AccountManager.get(this);
+        String userName = userNameFromBlessing(blessing);
+        Account account = new Account(userName, getResources().getString(R.string.authenticator_account_type));
+        AccountManager am = AccountManager.get(this);
         am.addAccountExplicitly(account, null, null);
-        am.setAuthToken(account, "WireBlessings", encoded);
+        am.setAuthToken(account, "Blessings", encoded);
         setAccountAuthenticatorResult(new Intent().getExtras());
         setResult(RESULT_OK);
-        final Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);
         toast.show();
         finish();
     }

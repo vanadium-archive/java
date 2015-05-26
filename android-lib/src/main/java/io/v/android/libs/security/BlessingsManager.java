@@ -14,8 +14,8 @@ import android.content.SharedPreferences;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
+import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
-import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * BlessingsManager manages blessings for a given Android application, persisting them in its
+ * Manages blessings for a given Android application, persisting them in its
  * shared preferences.
  */
 public class BlessingsManager {
-    private static final String TAG = "io.v.android.apps.namespace_browser";
+    private static final String TAG = "BlessingsManager";
 
     private static final String BLESSING_PKG = "io.v.android.apps.account_manager";
     private static final String BLESSING_ACTIVITY = "BlessingActivity";
@@ -48,9 +48,9 @@ public class BlessingsManager {
      * @return    intent used to obtaining blessings from the Vanadium Account Manager
      */
     public static Intent createIntent(Context ctx) {
-        final VContext vCtx = V.init(ctx);
-        final ECPublicKey key = V.getPrincipal(vCtx).publicKey();
-        final Intent intent = new Intent();
+        VContext vCtx = V.init(ctx);
+        ECPublicKey key = V.getPrincipal(vCtx).publicKey();
+        Intent intent = new Intent();
         intent.setComponent(new ComponentName(
                 BLESSING_PKG, BLESSING_PKG + "." + BLESSING_ACTIVITY));
         intent.putExtra(BLESSEE_PUBKEY_KEY, key);
@@ -66,24 +66,25 @@ public class BlessingsManager {
      * @return                 the blessings stored in the reply
      * @throws VException      if the blessings couldn't be extracted from the reply
      */
-    public static WireBlessings processReply(int resultCode, Intent data) throws VException {
+    public static Blessings processReply(int resultCode, Intent data) throws VException {
         if (data == null) {
             throw new VException("NULL blessing response");
         }
         if (resultCode != Activity.RESULT_OK) {
             throw new VException("Error getting blessing: " + data.getStringExtra(ERROR));
         }
-        final WireBlessings wire = (WireBlessings) data.getSerializableExtra(REPLY);
-        if (wire == null) {
+        Blessings blessings = (Blessings) data.getSerializableExtra(REPLY);
+        if (blessings == null) {
             throw new VException("Got null blessings.");
         }
-        if (wire.getCertificateChains() == null || wire.getCertificateChains().size() <= 0) {
+        if (blessings.getCertificateChains() == null ||
+                blessings.getCertificateChains().size() <= 0) {
             throw new VException("Got empty blessings.");
         }
-        return wire;
+        return blessings;
     }
 
-    private final Map<String, WireBlessings> mBlessings;
+    private final Map<String, Blessings> mBlessings;
     private final SharedPreferences mPrefs;
 
     /**
@@ -93,7 +94,7 @@ public class BlessingsManager {
      * @param prefs shared preferences used for persisting blessings
      */
     public BlessingsManager(SharedPreferences prefs) {
-        mBlessings = new HashMap<String, WireBlessings>();
+        mBlessings = new HashMap<String, Blessings>();
         mPrefs = prefs;
         loadPrefs();
     }
@@ -112,10 +113,10 @@ public class BlessingsManager {
      *
      * @param blessings the blessings to be added to the manager
      */
-    public synchronized void add(WireBlessings blessings) {
-        final WireBlessings[] splitBlessings = splitBlessings(blessings);
-        for (WireBlessings blessing : splitBlessings) {
-            final String name = getBlessingName(blessing);
+    public synchronized void add(Blessings blessings) {
+        Blessings[] splitBlessings = splitBlessings(blessings);
+        for (Blessings blessing : splitBlessings) {
+            String name = getBlessingName(blessing);
             if (mBlessings.containsKey(name) && mBlessings.get(name).equals(blessing)) {
                 // Nothing to update.
                 return;
@@ -140,17 +141,17 @@ public class BlessingsManager {
      *
      * @return blessing with the given name
      */
-    public synchronized WireBlessings get(String name) {
+    public synchronized Blessings get(String name) {
         return mBlessings.get(name);
     }
 
     private void loadPrefs() {
-        final Set<String> blessings = mPrefs.getStringSet(BLESSINGS_PREF_KEY, null);
+        Set<String> blessings = mPrefs.getStringSet(BLESSINGS_PREF_KEY, null);
         if (blessings == null) return;
         for (String blessingStr : blessings) {
             try {
-                final WireBlessings blessing = vomDecodeBlessing(blessingStr);
-                final String name = getBlessingName(blessing);
+                Blessings blessing = vomDecodeBlessing(blessingStr);
+                String name = getBlessingName(blessing);
                 mBlessings.put(name, blessing);
             } catch (VException e) {
                 android.util.Log.e(TAG, "Couldn't decode blessing, skipping: " + blessingStr);
@@ -159,39 +160,39 @@ public class BlessingsManager {
     }
 
     private void storePrefs() {
-        final Set<String> blessings = new HashSet<String>();
-        for (WireBlessings blessing : mBlessings.values()) {
+        Set<String> blessings = new HashSet<String>();
+        for (Blessings blessing : mBlessings.values()) {
             try {
                 blessings.add(vomEncodeBlessing(blessing));
             } catch (VException e) {
                 android.util.Log.e(TAG, "Couldn't encode blessing: " + blessing);
             }
         }
-        final SharedPreferences.Editor editor = mPrefs.edit();
+        SharedPreferences.Editor editor = mPrefs.edit();
         editor.putStringSet(BLESSINGS_PREF_KEY, blessings);
         editor.commit();
     }
 
-    private static WireBlessings[] splitBlessings(WireBlessings blessings) {
+    private static Blessings[] splitBlessings(Blessings blessings) {
         if (blessings == null || blessings.getCertificateChains() == null) {
-            return new WireBlessings[0];
+            return new Blessings[0];
         }
-        final List<List<VCertificate>> chains = blessings.getCertificateChains();
+        List<List<VCertificate>> chains = blessings.getCertificateChains();
         if (chains.size() == 1) {
-            return new WireBlessings[] { blessings };
+            return new Blessings[] { blessings };
         }
-        final WireBlessings[] ret = new WireBlessings[chains.size()];
+        Blessings[] ret = new Blessings[chains.size()];
         for (int i = 0; i < chains.size(); ++i) {
-            ret[i] = new WireBlessings(ImmutableList.<List<VCertificate>>of(chains.get(i)));
+            ret[i] = new Blessings(ImmutableList.<List<VCertificate>>of(chains.get(i)));
         }
         return ret;
     }
 
-    private static String getBlessingName(WireBlessings blessing) {
+    private static String getBlessingName(Blessings blessing) {
         if (blessing == null) {
             return "";
         }
-        final List<VCertificate> chain = blessing.getCertificateChains().get(0);
+        List<VCertificate> chain = blessing.getCertificateChains().get(0);
         String ret = "";
         for (int i = 0; i < chain.size(); ++i) {
             ret += chain.get(i).getExtension();
@@ -200,11 +201,11 @@ public class BlessingsManager {
         return ret;
     }
 
-    private static String vomEncodeBlessing(WireBlessings wire) throws VException {
-        return VomUtil.encodeToString(wire, WireBlessings.class);
+    private static String vomEncodeBlessing(Blessings blessings) throws VException {
+        return VomUtil.encodeToString(blessings, Blessings.class);
     }
 
-    private static WireBlessings vomDecodeBlessing(String encoded) throws VException {
-        return (WireBlessings) VomUtil.decodeFromString(encoded, WireBlessings.class);
+    private static Blessings vomDecodeBlessing(String encoded) throws VException {
+        return (Blessings) VomUtil.decodeFromString(encoded, Blessings.class);
     }
 }

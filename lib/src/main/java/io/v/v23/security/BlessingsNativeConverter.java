@@ -6,7 +6,6 @@ package io.v.v23.security;
 
 import io.v.v23.vdl.NativeTypes;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.verror.VException;
 
 /**
  * Converter that translates blessings into their wire representation and vice-versa.
@@ -33,10 +32,6 @@ public final class BlessingsNativeConverter extends NativeTypes.Converter {
     @Override
     public Object nativeFromVdlValue(VdlValue value) {
         assertInstanceOf(value, WireBlessings.class);
-        try {
-            return Blessings.create((WireBlessings) value);
-        } catch (VException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return Blessings.create((WireBlessings) value);
     }
 }

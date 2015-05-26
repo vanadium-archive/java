@@ -23,7 +23,7 @@ import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
 public class LocationService extends Service {
-    private static final String TAG = "io.veyron.location";
+    private static final String TAG = "LocationService";
 
     private volatile boolean mStarted = false;
     @Override
@@ -38,21 +38,14 @@ public class LocationService extends Service {
     }
 
     private void startLocationService() {
-        final VContext ctx = V.init(this);
+        VContext ctx = V.init(this);
         try {
-            final Server s = V.newServer(ctx);
-            final String[] endpoints = s.listen(V.getListenSpec(ctx));
+            Server s = V.newServer(ctx);
+            String[] endpoints = s.listen(V.getListenSpec(ctx));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
-            final VeyronLocationService server =
-                    new VeyronLocationService((LocationManager) getSystemService(Context.LOCATION_SERVICE));
-            final Dispatcher dispatcher = new Dispatcher() {
-                @Override
-                public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
-                    return new ServiceObjectWithAuthorizer(
-                            server, VSecurity.newAcceptAllAuthorizer());
-                }
-            };
-            s.serve("spetrovic/location", dispatcher);
+            VeyronLocationService server = new VeyronLocationService(
+                    (LocationManager) getSystemService(Context.LOCATION_SERVICE));
+            s.serve("spetrovic/location", server, VSecurity.newAllowEveryoneAuthorizer());
         } catch (VException e) {
             Log.e(TAG, "Couldn't start location service: " + e.getMessage());
         }
@@ -72,14 +65,13 @@ public class LocationService extends Service {
         }
         @Override
         public LatLng get(VContext context, ServerCall call) throws VException {
-            final Criteria criteria = new Criteria();
+            Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.NO_REQUIREMENT);
-            final String provider = manager.getBestProvider(criteria, true);
+            String provider = manager.getBestProvider(criteria, true);
             if (provider == null || provider.isEmpty()) {
                 throw new VException("Couldn't find any location providers on the device.");
             }
-            Log.i(TAG, "Using location provider: " + provider);
-            final Location location = manager.getLastKnownLocation(provider);
+            Location location = manager.getLastKnownLocation(provider);
             if (location == null) {
                 throw new VException("Got null location.");
             }

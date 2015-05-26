@@ -4,6 +4,8 @@
 
 package io.v.impl.google.namespace;
 
+import io.v.v23.OptionDefs;
+import io.v.v23.Options;
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
@@ -17,8 +19,8 @@ import io.v.v23.verror.VException;
 public class NamespaceImpl implements Namespace {
     private final long nativePtr;
 
-    private native InputChannel<GlobReply> nativeGlob(
-        long nativePtr, VContext context, String pattern) throws VException;
+    private native InputChannel<GlobReply> nativeGlob(long nativePtr, VContext context,
+            String pattern, boolean skipServerAuth) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private NamespaceImpl(long nativePtr) {
@@ -26,7 +28,18 @@ public class NamespaceImpl implements Namespace {
     }
     @Override
     public InputChannel<GlobReply> glob(VContext context, String pattern) throws VException {
-        return nativeGlob(this.nativePtr, context, pattern);
+        return glob(context, pattern, null);
+    }
+    @Override
+    public InputChannel<GlobReply> glob(VContext context, String pattern, Options opts)
+            throws VException {
+        if (opts == null) {
+            opts = new Options();
+        }
+        boolean skipServerAuth = !opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION)
+                ? false
+                : opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class);
+        return nativeGlob(this.nativePtr, context, pattern, skipServerAuth);
     }
     @Override
     public boolean equals(Object other) {

@@ -11,6 +11,8 @@ import org.joda.time.Duration;
 import java.util.List;
 
 import io.v.v23.InputChannel;
+import io.v.v23.OptionDefs;
+import io.v.v23.Options;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
@@ -28,9 +30,11 @@ public class Namespace {
      * @throws VException if there was an error fetching the entries.
      */
     public static List<GlobReply> glob(String root, VContext ctx) throws VException {
-        final io.v.v23.namespace.Namespace n = V.getNamespace(ctx);
-        final VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        final InputChannel<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*");
+        io.v.v23.namespace.Namespace n = V.getNamespace(ctx);
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        Options opts = new Options();
+        opts.set(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, new Boolean(true));
+        InputChannel<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*", opts);
         return ImmutableList.copyOf(chan);
     }
 }

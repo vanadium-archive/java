@@ -18,11 +18,9 @@ import io.v.v23.naming.GlobReply;
  * ViewUtil contains utilities for managing View types used in the Veyron namespace browser.
  */
 public class ViewUtil {
-    private static final String TAG = "io.v.android.apps.namespace_browser";
-
     public static LinearLayout createDirectoryView(String text, GlobReply entry,
                                                    LayoutInflater inflater) {
-        final LinearLayout dirView = (LinearLayout) inflater.inflate(R.layout.directory_item, null);
+        LinearLayout dirView = (LinearLayout) inflater.inflate(R.layout.directory_item, null);
         dirView.setTag(entry);
         ((TextView) dirView.findViewById(R.id.name)).setText(text);
         updateDirectoryView(dirView, false);
@@ -31,7 +29,7 @@ public class ViewUtil {
 
     public static LinearLayout createObjectView(String text, GlobReply entry,
                                                 LayoutInflater inflater) {
-        final LinearLayout objView = (LinearLayout) inflater.inflate(R.layout.object_item, null);
+        LinearLayout objView = (LinearLayout) inflater.inflate(R.layout.object_item, null);
         objView.setTag(entry);
         ((TextView) objView.findViewById(R.id.name)).setText(text);
         updateObjectView(objView, false);
@@ -40,7 +38,7 @@ public class ViewUtil {
 
     public static LinearLayout createMethodView(String text, GlobReply entry,
                                                 LayoutInflater inflater) {
-        final LinearLayout methodView = (LinearLayout) inflater.inflate(R.layout.method_item, null);
+        LinearLayout methodView = (LinearLayout) inflater.inflate(R.layout.method_item, null);
         methodView.setTag(entry);
         ((TextView) methodView.findViewById(R.id.name)).setText(text);
         return methodView;
@@ -62,7 +60,7 @@ public class ViewUtil {
     }
 
     public static void serializeView(View view, Parcel parcel) {
-        final int id = view.getId();
+        int id = view.getId();
         parcel.writeInt(id);
         switch (id) {
             case R.id.directory:
@@ -80,7 +78,7 @@ public class ViewUtil {
     }
 
     public static View deserializeView(Parcel parcel, LayoutInflater inflater) {
-        final int id = parcel.readInt();
+        int id = parcel.readInt();
         switch (id) {
             case R.id.directory:
                 return deserializeDirectoryView(parcel, inflater);
@@ -98,7 +96,7 @@ public class ViewUtil {
         parcel.writeString(((TextView) dirView.findViewById(R.id.name)).getText().toString());
         parcel.writeByte((byte) (dirView.isActivated() ? 1 : 0));
         parcel.writeInt(dirView.getChildCount());
-        final GlobReply entry = (GlobReply) dirView.getTag();
+        GlobReply entry = (GlobReply) dirView.getTag();
         parcel.writeSerializable(entry);
 
         // Save child view state.
@@ -112,7 +110,7 @@ public class ViewUtil {
         parcel.writeString(((TextView) objView.findViewById(R.id.name)).getText().toString());
         parcel.writeByte((byte) (objView.isActivated() ? 1 : 0));
         parcel.writeInt(objView.getChildCount());
-        final GlobReply entry = (GlobReply) objView.getTag();
+        GlobReply entry = (GlobReply) objView.getTag();
         parcel.writeSerializable(entry);
 
         // Save child view state.
@@ -126,7 +124,7 @@ public class ViewUtil {
         parcel.writeString(((TextView) methodView.findViewById(R.id.name)).getText().toString());
         parcel.writeByte((byte) (methodView.isActivated() ? 1 : 0));
         parcel.writeInt(methodView.getChildCount());
-        final GlobReply entry = (GlobReply) methodView.getTag();
+        GlobReply entry = (GlobReply) methodView.getTag();
         parcel.writeSerializable(entry);
 
         // Save child view state.
@@ -137,11 +135,11 @@ public class ViewUtil {
 
     private static LinearLayout deserializeDirectoryView(Parcel parcel, LayoutInflater inflater) {
         // Restore own view state.
-        final String text = parcel.readString();
-        final boolean isActivated = (parcel.readByte() == 1);
-        final int numChildren = parcel.readInt();
-        final GlobReply entry = (GlobReply) parcel.readSerializable();
-        final LinearLayout dirView = createDirectoryView(text, entry, inflater);
+        String text = parcel.readString();
+        boolean isActivated = (parcel.readByte() == 1);
+        int numChildren = parcel.readInt();
+        GlobReply entry = (GlobReply) parcel.readSerializable();
+        LinearLayout dirView = createDirectoryView(text, entry, inflater);
         updateDirectoryView(dirView, isActivated);
 
         // Restore child view state.
@@ -153,11 +151,11 @@ public class ViewUtil {
 
     private static LinearLayout deserializeObjectView(Parcel parcel, LayoutInflater inflater) {
         // Restore own view state.
-        final String text = parcel.readString();
-        final boolean isActivated = (parcel.readByte() == 1);
-        final int numChildren = parcel.readInt();
-        final GlobReply entry = (GlobReply) parcel.readSerializable();
-        final LinearLayout objView = createObjectView(text, entry, inflater);
+        String text = parcel.readString();
+        boolean isActivated = (parcel.readByte() == 1);
+        int numChildren = parcel.readInt();
+        GlobReply entry = (GlobReply) parcel.readSerializable();
+        LinearLayout objView = createObjectView(text, entry, inflater);
         updateObjectView(objView, isActivated);
 
         // Restore child view state.
@@ -169,12 +167,12 @@ public class ViewUtil {
 
     private static LinearLayout deserializeMethodView(Parcel parcel, LayoutInflater inflater) {
         // Restore own view state.
-        final String text = parcel.readString();
+        String text = parcel.readString();
         @SuppressWarnings("unused")
-        final boolean isActivated = (parcel.readByte() == 1);
-        final int numChildren = parcel.readInt();
-        final GlobReply entry = (GlobReply) parcel.readSerializable();
-        final LinearLayout methodView = createMethodView(text, entry, inflater);
+        boolean isActivated = (parcel.readByte() == 1);
+        int numChildren = parcel.readInt();
+        GlobReply entry = (GlobReply) parcel.readSerializable();
+        LinearLayout methodView = createMethodView(text, entry, inflater);
 
         // Restore child view state.
         for (int i = 1; i < numChildren; i++) {

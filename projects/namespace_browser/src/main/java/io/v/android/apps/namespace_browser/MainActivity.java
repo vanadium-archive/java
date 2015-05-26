@@ -40,7 +40,7 @@ import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 
 public class MainActivity extends Activity {
-    private static final String TAG = "io.v.android.apps.namespace_browser";
+    private static final String TAG = "MainActivity";
     private static final String PREF_NAMESPACE_GLOB_ROOT = "pref_namespace_glob_root";
     private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "";
     private static final String SAVED_VIEW_STATE_KEY = "browser_viewstate";
@@ -55,14 +55,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
+        String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 PREF_NAMESPACE_GLOB_ROOT, DEFAULT_NAMESPACE_GLOB_ROOT);
-        final View dirView = findViewById(R.id.directory);
+        View dirView = findViewById(R.id.directory);
         dirView.setPadding(  // remove left padding for the root.
                 0, dirView.getPaddingTop(), dirView.getPaddingRight(), dirView.getPaddingBottom());
         dirView.setTag(new GlobReply.Entry(
                 new MountEntry(root, ImmutableList.<MountedServer>of(), true, false)));
-        final TextView nameView = (TextView) dirView.findViewById(R.id.name);
+        TextView nameView = (TextView) dirView.findViewById(R.id.name);
         nameView.setText("/");
 
         mBaseContext = V.init(this);
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        final Parcel parcel = Parcel.obtain();
+        Parcel parcel = Parcel.obtain();
         ViewUtil.serializeView(findViewById(R.id.directory), parcel);
         savedInstanceState.putByteArray(SAVED_VIEW_STATE_KEY, parcel.marshall());
         parcel.recycle();
@@ -88,17 +88,17 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        final byte[] data = savedInstanceState.getByteArray(SAVED_VIEW_STATE_KEY);
-        final Parcel parcel = Parcel.obtain();
+        byte[] data = savedInstanceState.getByteArray(SAVED_VIEW_STATE_KEY);
+        Parcel parcel = Parcel.obtain();
         parcel.unmarshall(data, 0, data.length);
         parcel.setDataPosition(0);
-        final LinearLayout dirView =
+        LinearLayout dirView =
                 (LinearLayout) ViewUtil.deserializeView(parcel, getLayoutInflater());
         parcel.recycle();
         // Replace old directory view with the new one.
-        final LinearLayout oldDirView = (LinearLayout) findViewById(R.id.directory);
-        final ViewGroup parent = (ViewGroup) oldDirView.getParent();
-        final int index = parent.indexOfChild(oldDirView);
+        LinearLayout oldDirView = (LinearLayout) findViewById(R.id.directory);
+        ViewGroup parent = (ViewGroup) oldDirView.getParent();
+        int index = parent.indexOfChild(oldDirView);
         parent.removeView(oldDirView);
         parent.addView(dirView, index);
         super.onRestoreInstanceState(savedInstanceState);
@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
     }
 
     private void handleDirectoryClick(View view) {
-        final LinearLayout dirView = (LinearLayout) view;
+        LinearLayout dirView = (LinearLayout) view;
         if (!dirView.isActivated()) {
             // Add new views.
             new NameFetcher(dirView).execute();
@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
     }
 
     private void handleObjectClick(View view) {
-        final LinearLayout objView = (LinearLayout) view;
+        LinearLayout objView = (LinearLayout) view;
         if (!objView.isActivated()) {
             // Add new views.
             new MethodFetcher(objView).execute();
@@ -152,13 +152,13 @@ public class MainActivity extends Activity {
     }
 
     private void handleMethodClick(View view) {
-        final LinearLayout methodView = (LinearLayout) view;
+        LinearLayout methodView = (LinearLayout) view;
         // Add claiming logic here.
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -167,7 +167,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                final Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -180,27 +180,28 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case BLESSING_REQUEST:
                 try {
-                    final WireBlessings blessings = BlessingsManager.processReply(resultCode, data);
+                    Blessings blessings = BlessingsManager.processReply(resultCode, data);
                     mBlessingsManager.add(blessings);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     updateBlessingsView();
                 } catch (VException e) {
-                    final String msg = "Couldn't derive blessing: " + e.getMessage();
+                    String msg = "Couldn't derive blessing: " + e.getMessage();
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                    android.util.Log.e(TAG, msg);
                 }
                 return;
         }
     }
 
     private void createDeriveAndAddBlessing() {
-        final Intent intent = BlessingsManager.createIntent(this);
+        Intent intent = BlessingsManager.createIntent(this);
         startActivityForResult(intent, BLESSING_REQUEST);
     }
 
     private void updateBlessingsView() {
-        final LinearLayout blessingView =
+        LinearLayout blessingView =
                 (LinearLayout) getLayoutInflater().inflate(R.layout.action_account, null);
-        final Set<String> blessingNames = mBlessingsManager.getNames();
+        Set<String> blessingNames = mBlessingsManager.getNames();
         if (blessingNames.isEmpty()) {  // No blessings for this app.
             blessingView.addView(getLayoutInflater().inflate(R.layout.action_account_add, null));
             blessingView.setOnClickListener(new OnClickListener() {
@@ -213,7 +214,7 @@ public class MainActivity extends Activity {
             if (mSelectedBlessing == null) {
                 updateSelectedBlessing(blessingNames.iterator().next());
             }
-            final LinearLayout view = (LinearLayout) getLayoutInflater().inflate(
+            LinearLayout view = (LinearLayout) getLayoutInflater().inflate(
                     R.layout.action_account_existing, null);
             ((TextView) view.findViewById(R.id.blessing_name)).setText(mSelectedBlessing);
             blessingView.addView(view);
@@ -229,24 +230,24 @@ public class MainActivity extends Activity {
 
     private void updateSelectedBlessing(String blessingName) {
         try {
-            final WireBlessings wire = mBlessingsManager.get(blessingName);
-            final Blessings blessings = Blessings.create(wire);
-            final VPrincipal p = V.getPrincipal(mBaseContext);
+            Blessings blessings = mBlessingsManager.get(blessingName);
+            VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.addToRoots(blessings);
             mSelectedBlessing = blessingName;
         } catch (VException e) {
-            final String msg = String.format(
+            String msg = String.format(
                     "Couldn't set blessing %s: %s", blessingName, e.getMessage());
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            android.util.Log.e(TAG, msg);
         }
     }
 
     private void showBlessingsPopup(View v) {
-        final PopupMenu popup = new PopupMenu(this, v);
-        final Set<String> blessingNames = mBlessingsManager.getNames();
+        PopupMenu popup = new PopupMenu(this, v);
+        Set<String> blessingNames = mBlessingsManager.getNames();
         for (final String blessingName : blessingNames) {
-            final MenuItem item = popup.getMenu().add(blessingName);
+            MenuItem item = popup.getMenu().add(blessingName);
             item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -256,7 +257,7 @@ public class MainActivity extends Activity {
                 }
             });
         }
-        final MenuItem item =
+        MenuItem item =
                 popup.getMenu().add(getResources().getString(R.string.action_account_add));
         item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
@@ -285,7 +286,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected List<GlobReply> doInBackground(Void... args) {
-            final GlobReply entry = (GlobReply) dirView.getTag();
+            GlobReply entry = (GlobReply) dirView.getTag();
             if (!(entry instanceof GlobReply.Entry)) {
                 return ImmutableList.<GlobReply>of();
             }
@@ -303,9 +304,10 @@ public class MainActivity extends Activity {
             ViewUtil.updateDirectoryView(dirView, true);
             if (replies == null) {
                 Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                android.util.Log.e(TAG, errorMsg);
                 return;
             }
-            final GlobReply.Entry parentEntry = (GlobReply.Entry) dirView.getTag();
+            GlobReply.Entry parentEntry = (GlobReply.Entry) dirView.getTag();
             for (GlobReply reply : replies) {
                 if (reply instanceof GlobReply.Entry) {
                     MountEntry entry = ((GlobReply.Entry) reply).getElem();
@@ -322,13 +324,19 @@ public class MainActivity extends Activity {
                         }
                         text = entry.getName();
                     }
-                    final LinearLayout childView =
+                    LinearLayout childView =
                             (entry.getServers() == null || entry.getServers().size() <= 0)
                                     ? ViewUtil.createDirectoryView(text, reply, getLayoutInflater())
                                     // sub-dir
                                     : ViewUtil.createObjectView(text, reply,
                                     getLayoutInflater());   // object
                     dirView.addView(childView);
+                } else if (reply instanceof GlobReply.Error) {
+                    String msg = String.format("Couldn't fetch namespace subtree \"%s\": %s",
+                            ((GlobReply.Error) reply).getElem().getName(),
+                            ((GlobReply.Error) reply).getElem().getError().getMessage());
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                    android.util.Log.e(TAG, msg);
                 }
             }
         }
@@ -351,7 +359,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected List<String> doInBackground(Void... args) {
-            final GlobReply entry = (GlobReply) objView.getTag();
+            GlobReply entry = (GlobReply) objView.getTag();
             if (!(entry instanceof GlobReply.Entry)) {
                 return ImmutableList.<String>of();
             }
@@ -370,11 +378,12 @@ public class MainActivity extends Activity {
             ViewUtil.updateObjectView(objView, true);
             if (methods == null) {
                 Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                android.util.Log.e(TAG, errorMsg);
                 return;
             }
-            final GlobReply reply = (GlobReply) objView.getTag();
+            GlobReply reply = (GlobReply) objView.getTag();
             for (String method : methods) {
-                final LinearLayout childView =
+                LinearLayout childView =
                         ViewUtil.createMethodView(method, reply, getLayoutInflater());
                 objView.addView(childView);
             }

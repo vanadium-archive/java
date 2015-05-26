@@ -5,6 +5,7 @@
 package io.v.v23.namespace;
 
 import io.v.v23.InputChannel;
+import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.verror.VException;
@@ -24,4 +25,22 @@ public interface Namespace {
      * @throws VException      if an error is encountered
      */
     InputChannel<GlobReply> glob(VContext context, String pattern) throws VException;
+
+    /**
+     * Same as {@link #glob(VContext,String)} but makes the call using the provided options.
+     * <p>
+     * A particular implementation of this interface chooses which options to support,
+     * but at the minimum it must handle the following pre-defined options:
+     * <ul>
+     *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
+     * </ul>
+     *
+     * @param  context         a client context
+     * @param  pattern         a pattern that should be matched
+     * @param  opts            client options for the glob call
+     * @return                 an input channel of {@link GlobReply} objects matching the
+     *                         provided pattern
+     * @throws VException      if an error is encountered
+     */
+    InputChannel<GlobReply> glob(VContext context, String pattern, Options opts) throws VException;
 }
