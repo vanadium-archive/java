@@ -92,11 +92,11 @@ public class FortuneServerImpl implements FortuneServer, Globber {
         if (call.suffix() == null) {
             throw new VException("Suffix is null");
         }
-        if (call.localEndpoint() == null || call.localEndpoint().isEmpty()) {
-            throw new VException("Local endpoint is empty");
+        if (call.localEndpoint() == null) {
+            throw new VException("Local endpoint is null");
         }
-        if (call.remoteEndpoint() == null || call.remoteEndpoint().isEmpty()) {
-            throw new VException("Remote endpoint is empty");
+        if (call.remoteEndpoint() == null) {
+            throw new VException("Remote endpoint is null");
         }
         if (context == null) {
             throw new VException("Vanadium context is null");

@@ -17,6 +17,7 @@ import io.v.v23.InputChannel;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.naming.Endpoint;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
@@ -47,7 +48,7 @@ public class FortuneTest extends TestCase {
     public void testFortune() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -71,7 +72,7 @@ public class FortuneTest extends TestCase {
     public void testStreaming() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -97,7 +98,7 @@ public class FortuneTest extends TestCase {
     public void testMultiple() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -116,7 +117,7 @@ public class FortuneTest extends TestCase {
     public void testComplexError() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -150,7 +151,7 @@ public class FortuneTest extends TestCase {
     public void testContext() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -167,7 +168,7 @@ public class FortuneTest extends TestCase {
     public void testGetSignature() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -185,7 +186,7 @@ public class FortuneTest extends TestCase {
     public void testGlob() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -202,7 +203,7 @@ public class FortuneTest extends TestCase {
     public void testCustomInvoker() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         s.serve("", new TestInvoker(), null);
 
         String name = "/" + endpoints[0];
@@ -215,7 +216,7 @@ public class FortuneTest extends TestCase {
     public void testCustomDispatcherReturningAServer() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         Dispatcher dispatcher = new Dispatcher() {
             @Override
@@ -237,7 +238,7 @@ public class FortuneTest extends TestCase {
     public void testCustomDispatcherReturningAnInvoker() throws Exception {
         VContext ctx = V.init();
         Server s = V.newServer(ctx);
-        String[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
@@ -259,6 +260,11 @@ public class FortuneTest extends TestCase {
                 throws VException {
             if (call.security() == null) {
                 throw new VException("Expected call.security() to return non-null");
+            }
+            if (call.remoteEndpoint() == null) {
+                throw new VException("Expected remoteEndpoint() to return non-null");
+            } else if (!call.remoteEndpoint().name().contains("127.0.0.1")) {
+                throw new VException("Expected the remote endpoint to be on localhost");
             }
             if (method.equals("get")) {
                 return new Object[] { TEST_INVOKER_FORTUNE };

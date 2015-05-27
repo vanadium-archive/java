@@ -4,6 +4,7 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.Blessings;
@@ -15,8 +16,8 @@ public class ServerCallImpl implements ServerCall {
 
     private static native Call nativeSecurity(long nativePtr);
     private static native String nativeSuffix(long nativePtr);
-    private static native String nativeLocalEndpoint(long nativePtr);
-    private static native String nativeRemoteEndpoint(long nativePtr);
+    private static native Endpoint nativeLocalEndpoint(long nativePtr);
+    private static native Endpoint nativeRemoteEndpoint(long nativePtr);
     private static native Blessings nativeGrantedBlessings(long nativePtr) throws VException;
     private static native Server nativeServer(long nativePtr) throws VException;
     private static native void nativeFinalize(long nativePtr);
@@ -36,12 +37,12 @@ public class ServerCallImpl implements ServerCall {
     }
 
     @Override
-    public String localEndpoint() {
+    public Endpoint localEndpoint() {
         return nativeLocalEndpoint(nativePtr);
     }
 
     @Override
-    public String remoteEndpoint() {
+    public Endpoint remoteEndpoint() {
         return nativeRemoteEndpoint(nativePtr);
     }
 

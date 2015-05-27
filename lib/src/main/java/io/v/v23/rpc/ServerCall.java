@@ -4,6 +4,7 @@
 
 package io.v.v23.rpc;
 
+import io.v.v23.naming.Endpoint;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 
@@ -24,12 +25,12 @@ public interface ServerCall {
     /**
      * Returns the endpoint at the local end of communication.
      */
-    String localEndpoint();
+    Endpoint localEndpoint();
 
     /**
      * Returns the endpoint at the remote end of communication.
      */
-    String remoteEndpoint();
+    Endpoint remoteEndpoint();
 
     /**
      * Returns blessings bound to the server's private key (technically, the server principal's

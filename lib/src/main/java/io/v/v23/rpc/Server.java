@@ -5,6 +5,7 @@
 package io.v.v23.rpc;
 
 import io.v.v23.InputChannel;
+import io.v.v23.naming.Endpoint;
 import io.v.v23.security.Authorizer;
 import io.v.v23.verror.VException;
 
@@ -27,7 +28,7 @@ public interface Server {
      * @return                 endpoints the server is listening on
      * @throws VException      if the server couldn't listen provided protocol can't be listened on
      */
-    String[] listen(ListenSpec spec) throws VException;
+    Endpoint[] listen(ListenSpec spec) throws VException;
 
     /**
      * Associates object with name by publishing the address of this server with the mount table

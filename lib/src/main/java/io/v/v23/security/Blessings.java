@@ -30,7 +30,7 @@ public class Blessings implements Serializable {
     private static native Blessings nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
-    static Blessings create(WireBlessings wire) {
+    public static Blessings create(WireBlessings wire) {
         try {
             return nativeCreate(wire);
         } catch (VException e) {

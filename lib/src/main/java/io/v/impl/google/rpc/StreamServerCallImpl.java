@@ -5,6 +5,7 @@
 package io.v.impl.google.rpc;
 
 
+import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.Stream;
@@ -58,11 +59,11 @@ public class StreamServerCallImpl implements StreamServerCall {
         return this.serverCall.suffix();
     }
     @Override
-    public String localEndpoint() {
+    public Endpoint localEndpoint() {
         return this.serverCall.localEndpoint();
     }
     @Override
-    public String remoteEndpoint() {
+    public Endpoint remoteEndpoint() {
         return this.serverCall.remoteEndpoint();
     }
     // Implements java.lang.Object.

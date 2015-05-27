@@ -15,10 +15,9 @@ import android.util.Log;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Dispatcher;
+import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
@@ -41,7 +40,7 @@ public class LocationService extends Service {
         VContext ctx = V.init(this);
         try {
             Server s = V.newServer(ctx);
-            String[] endpoints = s.listen(V.getListenSpec(ctx));
+            Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
             VeyronLocationService server = new VeyronLocationService(
                     (LocationManager) getSystemService(Context.LOCATION_SERVICE));

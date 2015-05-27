@@ -5,6 +5,7 @@
 package io.v.impl.google.rpc;
 
 import io.v.v23.InputChannel;
+import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
@@ -19,7 +20,7 @@ import io.v.v23.verror.VException;
 public class ServerImpl implements Server {
     private final long nativePtr;
 
-    private native String[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
+    private native Endpoint[] nativeListen(long nativePtr, ListenSpec spec) throws VException;
     private native void nativeServe(long nativePtr, String name, Dispatcher dispatcher)
         throws VException;
     private native void nativeAddName(long nativePtr, String name) throws VException;
@@ -36,7 +37,7 @@ public class ServerImpl implements Server {
     }
     // Implement io.v.v23.rpc.Server.
     @Override
-    public String[] listen(ListenSpec spec) throws VException {
+    public Endpoint[] listen(ListenSpec spec) throws VException {
         return nativeListen(this.nativePtr, spec);
     }
     @Override
