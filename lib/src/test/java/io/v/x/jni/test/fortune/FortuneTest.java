@@ -4,14 +4,16 @@
 
 package io.v.x.jni.test.fortune;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
 
 import org.joda.time.Duration;
+
+import java.io.EOFException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import io.v.v23.InputChannel;
 import io.v.v23.OutputChannel;
@@ -34,15 +36,14 @@ import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.VException;
 
-import java.io.EOFException;
-import java.lang.reflect.Type;
-import java.util.List;
+import static com.google.common.truth.Truth.assertThat;
 
 public class FortuneTest extends TestCase {
     private static final String TEST_INVOKER_FORTUNE = "Test invoker fortune";
 
-    static {
-        V.init();
+    @Override
+    protected void tearDown() throws Exception {
+        V.shutdown();
     }
 
     public void testFortune() throws Exception {

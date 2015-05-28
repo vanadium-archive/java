@@ -4,6 +4,8 @@
 
 package io.v.v23;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,22 +56,33 @@ public class Options {
     }
 
     /**
-     * Associates option value with the provided key.  If an option with the same key already exist,
-     * its value will be overwritten.
+     * Associates option value with the provided key.  If an option with the same key already
+     * exists, its value will be overwritten.
      *
      * @param key   key of the option we are setting
      * @param value an option we are setting
+     * @return this {@code Options} object
      */
-    public void set(String key, Object value) {
-        this.options.put(key, value);
+    public Options set(String key, Object value) {
+        options.put(key, value);
+        return this;
     }
 
     /**
      * Removes the option with a given key.  This method is a no-op if the option doesn't exist.
      *
      * @param key a key of an option to be removed
+     * @return this {@code Options} object
      */
-    public void remove(String key) {
-        this.options.remove(key);
+    public Options remove(String key) {
+        options.remove(key);
+        return this;
+    }
+
+    /**
+     * Returns an immutable copy of this {@code Options} object represented as a map.
+     */
+    public Map<String, Object> asMap() {
+        return ImmutableMap.copyOf(options);
     }
 }

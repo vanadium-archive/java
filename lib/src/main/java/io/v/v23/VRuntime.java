@@ -5,10 +5,10 @@
 package io.v.v23;
 
 import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
-import io.v.v23.namespace.Namespace;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.verror.VException;
 
@@ -108,4 +108,10 @@ public interface VRuntime {
      * @return the base context associated with the runtime.
      */
     VContext getContext();
+
+    /**
+     * Shuts down the runtime, allowing the runtime to release resources, shutdown services and
+     * the like.
+     */
+    void shutdown();
 }

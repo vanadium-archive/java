@@ -21,6 +21,7 @@ import io.v.v23.verror.VException;
  */
 public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeInit(int numCpus) throws VException;
+    private static native void nativeShutdown(VContext context);
     private static native VContext nativeSetNewClient(VContext ctx, Options opts)
             throws VException;
     private static native Client nativeGetClient(VContext ctx)
@@ -103,5 +104,9 @@ public class VRuntimeImpl implements VRuntime {
     @Override
     public VContext getContext() {
         return this.ctx;
+    }
+    @Override
+    public void shutdown() {
+        nativeShutdown(ctx);
     }
 }
