@@ -73,10 +73,11 @@ public class BlessingsManager {
         if (resultCode != Activity.RESULT_OK) {
             throw new VException("Error getting blessing: " + data.getStringExtra(ERROR));
         }
-        Blessings blessings = (Blessings) data.getSerializableExtra(REPLY);
-        if (blessings == null) {
+        String blessingsVom = (String) data.getStringExtra(REPLY);
+        if (blessingsVom == null || blessingsVom.isEmpty()) {
             throw new VException("Got null blessings.");
         }
+        Blessings blessings = (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
         if (blessings.getCertificateChains() == null ||
                 blessings.getCertificateChains().size() <= 0) {
             throw new VException("Got empty blessings.");

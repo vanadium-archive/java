@@ -56,7 +56,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
     private static final String PREF_VEYRON_IDENTITY_SERVICE = "pref_identity_service_name";
-    private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/root/google";
+    private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/u/google";
 
     VContext mBaseContext = null;
     String mAccountName = "", mAccountType = "";

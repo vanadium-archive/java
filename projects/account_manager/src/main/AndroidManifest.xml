@@ -8,12 +8,12 @@
         android:minSdkVersion="19"
         android:targetSdkVersion="20"/>
 
+    <!--  Needed for Security -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!--  Needed for Security -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!--  Needed for Security -->
-    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Needed for RPC -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Needed for Account Management -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
@@ -21,7 +21,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/launchericon"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo">
         <service

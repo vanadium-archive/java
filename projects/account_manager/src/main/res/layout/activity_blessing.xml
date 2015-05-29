@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:layout_height="100dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_launcher"
+            android:src="@drawable/launchericon"
             android:contentDescription="Vanadium sign"/>
 
         <TextView

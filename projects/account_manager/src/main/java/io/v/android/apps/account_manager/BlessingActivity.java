@@ -24,11 +24,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.common.reflect.TypeToken;
-
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.List;
@@ -252,7 +251,7 @@ public class BlessingActivity extends AccountAuthenticatorActivity
 
     private void blessAccount() {
         AccountManager.get(this).getAuthToken(
-                mAccount, "WireBlessings", null, this, new OnTokenAcquired(),
+                mAccount, "Blessings", null, this, new OnTokenAcquired(),
                 new Handler(new Handler.Callback() {
                     @Override
                     public boolean handleMessage(Message msg) {
@@ -296,33 +295,29 @@ public class BlessingActivity extends AccountAuthenticatorActivity
                 replyWithError("Got null blessings after bless().");
                 return;
             }
-            WireBlessings retWire = retBlessing.wireFormat();
-            if (retWire == null) {
-                replyWithError("Got null wire blessings even though blessings are non-null");
-                return;
-            }
-            if (retWire.getCertificateChains().size() <= 0) {
+            if (retBlessing.getCertificateChains().size() <= 0) {
                 replyWithError("Got empty certificate chains.");
                 return;
             }
-            if (retWire.getCertificateChains().size() > 1) {
-                replyWithError("Expected single certificate chain, got: " + retWire.toString());
+            if (retBlessing.getCertificateChains().size() > 1) {
+                replyWithError("Expected single certificate chain, got: " + retBlessing.toString());
                 return;
             }
-            List<VCertificate> chain = retWire.getCertificateChains().get(0);
+            List<VCertificate> chain = retBlessing.getCertificateChains().get(0);
             if (chain == null || chain.size() <= 0) {
                 replyWithError("Empty certificate chain");
                 return;
             }
-            replyWithSuccess(retWire);
+            String retBlessingsVom = VomUtil.encodeToString(retBlessing, Blessings.class);
+            replyWithSuccess(retBlessingsVom);
         } catch (VException e) {
             replyWithError("Couldn't bless: " + e.getMessage());
         }
     }
 
-    private void replyWithSuccess(WireBlessings wire) {
+    private void replyWithSuccess(String blessingsVom) {
         Intent intent = new Intent();
-        intent.putExtra(REPLY, wire);
+        intent.putExtra(REPLY, blessingsVom);
         setResult(RESULT_OK, intent);
         finish();
     }

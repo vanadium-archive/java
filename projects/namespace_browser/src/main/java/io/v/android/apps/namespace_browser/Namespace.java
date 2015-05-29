@@ -32,9 +32,7 @@ public class Namespace {
     public static List<GlobReply> glob(String root, VContext ctx) throws VException {
         io.v.v23.namespace.Namespace n = V.getNamespace(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        Options opts = new Options();
-        opts.set(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, new Boolean(true));
-        InputChannel<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*", opts);
+        InputChannel<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*");
         return ImmutableList.copyOf(chan);
     }
 }

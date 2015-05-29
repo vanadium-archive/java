@@ -257,8 +257,7 @@ public class MainActivity extends Activity {
                 }
             });
         }
-        MenuItem item =
-                popup.getMenu().add(getResources().getString(R.string.action_account_add));
+        MenuItem item = popup.getMenu().add(getResources().getString(R.string.action_account_add));
         item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
