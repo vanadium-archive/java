@@ -18,6 +18,8 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'com.google.truth', name: 'truth', version: '0.25'
+    testCompile project(':tests')
+    testCompile 'org.reflections:reflections:0.9.9-RC1'
 }
 
 repositories {

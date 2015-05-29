@@ -1,1 +1,1 @@
-include 'lib', 'android-lib', 'projects:namespace_browser'
+include 'lib', 'android-lib', 'tests', 'projects:namespace_browser'

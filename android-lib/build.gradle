@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.2'
+        classpath 'com.android.tools.build:gradle:1.2.3'
     }
 }
 
@@ -12,7 +12,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 android {
-    buildToolsVersion '21.0.2'
+    buildToolsVersion '21.1.2'
     compileSdkVersion 19
 
     defaultConfig {
@@ -22,6 +22,10 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    defaultConfig {
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
 }
 
 repositories {
@@ -30,8 +34,12 @@ repositories {
 
 dependencies {
     compile project(':lib')
+    androidTestCompile project(':tests')
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
+    androidTestCompile('com.android.support.test:runner:0.2') {
+        exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
+    }
 }
 
 task sourceJar(type: Jar) {
