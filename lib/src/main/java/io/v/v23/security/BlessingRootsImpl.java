@@ -48,7 +48,7 @@ class BlessingRootsImpl implements BlessingRoots {
         return nativeToString(this.nativePtr);
     }
     @Override
-    public void finalize() {
+    protected void finalize() {
         nativeFinalize(this.nativePtr);
     }
 }

@@ -148,7 +148,7 @@ class VPrincipalImpl implements VPrincipal {
         return Long.valueOf(this.nativePtr).hashCode();
     }
     @Override
-    public void finalize() {
+    protected void finalize() {
         nativeFinalize(this.nativePtr);
     }
 }

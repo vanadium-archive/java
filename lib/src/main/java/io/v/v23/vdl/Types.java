@@ -393,7 +393,6 @@ public final class Types {
                 }
                 throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
             case MAP:
-                type = new ParameterizedTypeImpl(VdlMap.class);
                 key = getReflectTypeForVdl(vdlType.getKey());
                 elem = getReflectTypeForVdl(vdlType.getElem());
                 if (key != null && elem != null) {

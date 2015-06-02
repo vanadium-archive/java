@@ -78,7 +78,7 @@ public class NetworkChange {
     @Override
     public String toString() {
         return String.format("{Time: %s, State: %s, Added addrs: %s, Removed addrs: %s, " +
-            "Changed EPs: %s, Error: %s}", this.time, this.state, this.addedAddrs,
-            this.removedAddrs, this.changedEndpoints, this.error);
+            "Changed EPs: %s, Error: %s}", this.time, this.state, Arrays.toString(this.addedAddrs),
+            Arrays.toString(this.removedAddrs), Arrays.toString(this.changedEndpoints), this.error);
     }
 }

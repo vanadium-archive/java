@@ -31,13 +31,9 @@ class EndpointImpl implements Endpoint {
     private final boolean isLeaf;
 
     static Endpoint fromString(String s) {
-        // We have to guess this is a mount table if we don't know.
-        boolean isMountTable = true;
-
         Matcher matcher = hostPortPattern.matcher(s);
         if (matcher.matches()) {
             List<String> blessings = new ArrayList<>(1);
-            String blessing = null;
             // If the endpoint does not end in a @, it must be in [blessing@]host:port format.
             HostAndPort hostPort = HostAndPort.fromString(matcher.group(matcher.groupCount()));
             if (matcher.group(1) != null) {
@@ -56,7 +52,7 @@ class EndpointImpl implements Endpoint {
         }
 
         List<String> parts = Splitter.on('@').splitToList(s);
-        int version = Integer.valueOf(parts.get(0));
+        int version = Integer.parseInt(parts.get(0));
         switch (version) {
             case 5:
                 return fromV5String(parts);
