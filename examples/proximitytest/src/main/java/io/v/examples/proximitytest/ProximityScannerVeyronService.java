@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 
-package com.veyron2.services.proximity.scanner;
+package io.v.examples.proximitytest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,15 +13,15 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothManager;
 import android.util.Log;
 
-import com.veyron2.ipc.ServerContext;
-import com.veyron2.VeyronException;
-import com.veyron2.services.proximity.Device;
-import com.veyron2.services.proximity.ProximityScannerService;
+import io.v.v23.context.VContext;
+import io.v.v23.rpc.ServerCall;
+import io.v.v23.verror.VException;
 
-public class ProximityScannerVeyronService implements ProximityScannerService {
+public class ProximityScannerVeyronService implements ProximityScannerServer {
 
     private final BluetoothScanner scanner;
 
@@ -67,24 +67,23 @@ public class ProximityScannerVeyronService implements ProximityScannerService {
 
     // Implements nearbyDevices() in proximity.vdl.
     @Override
-    public ArrayList<Device> nearbyDevices(ServerContext context) throws VeyronException {
+    public ArrayList<Device> nearbyDevices(VContext context, ServerCall serverCall) throws VException {
         Collection<BluetoothScanner.Device> bDevices = scanner.getDevices();
         ArrayList<Device> devices = new ArrayList<Device>();
         for (BluetoothScanner.Device bDevice : bDevices) {
             ArrayList<String> names = new ArrayList<String>();
             names.add(bDevice.device.getName());
-            devices.add(new Device(bDevice.device.getAddress(),
+            devices.add(new Device(computeAverageDBm(bDevice.readings),
                     names,
-                    Integer.toString(computeAverageDBm(bDevice.readings))));
+                    bDevice.device.getAddress()));
         }
         Collections.sort(devices, new Comparator<Device>() {
             @Override
             public int compare(Device d1, Device d2) {
-                if (d1 == null || d1.getDistance() == null || d2 == null
-                        || d2.getDistance() == null) {
+                if (d1 == null || d2 == null) {
                     return 0;
                 }
-                return Integer.parseInt(d2.getDistance()) - Integer.parseInt(d1.getDistance());
+                return (int)(d2.getDistance() - d1.getDistance());
             }
         });
         return devices;

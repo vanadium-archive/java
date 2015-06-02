@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 
-package com.veyron2.services.proximity.scanner;
+package io.v.examples.proximitytest;
 
 import android.app.Service;
 import android.bluetooth.BluetoothManager;
@@ -12,16 +12,22 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.veyron2.RuntimeFactory;
-import com.veyron2.ipc.Dispatcher;
-import com.veyron2.ipc.ServiceObjectWithAuthorizer;
-import com.veyron2.VeyronException;
-import com.veyron2.services.proximity.scanner.ProximityScannerVeyronService.BluetoothNotEnabledException;
+import io.v.v23.V;
+import io.v.v23.context.VContext;
+import io.v.v23.naming.Endpoint;
+import io.v.v23.rpc.AddressChooser;
+import io.v.v23.rpc.Dispatcher;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServiceObjectWithAuthorizer;
+import io.v.v23.security.Authorizer;
+import io.v.v23.security.Call;
+import io.v.v23.verror.VException;
 
 public class ProximityScannerAndroidService extends Service {
     private ProximityScannerVeyronService proxService;
-    private com.veyron2.ipc.Server s;
-    public String endpoint;
+    private Server s;
+    public Endpoint[] endpoints;
 
     public class BluetoothTestBinder extends Binder {
         public ProximityScannerAndroidService getService() {
@@ -29,15 +35,16 @@ public class ProximityScannerAndroidService extends Service {
         }
     }
 
-    public void start() throws VeyronException, BluetoothNotEnabledException {
+    public void start() throws VException, ProximityScannerVeyronService.BluetoothNotEnabledException {
         proxService = ProximityScannerVeyronService
                 .create((BluetoothManager) getSystemService(BLUETOOTH_SERVICE));
-        s = RuntimeFactory.defaultRuntime().newServer();
-        endpoint = s.listen("tcp", "127.0.0.1:8100");
-        s.serve("proximity", new Dispatcher() {
+        VContext ctx = V.init();
+        s = V.newServer(ctx);
+        endpoints = s.listen(V.getListenSpec(ctx));
+        s.serve("proximity", proxService, new Authorizer() {
             @Override
-            public ServiceObjectWithAuthorizer lookup(String suffix) throws VeyronException {
-                return new ServiceObjectWithAuthorizer(proxService, null);
+            public void authorize(VContext ctx, Call call) throws VException {
+                // always authorize
             }
         });
     }
@@ -47,11 +54,11 @@ public class ProximityScannerAndroidService extends Service {
             if (s != null) {
                 s.stop();
             }
-        } catch (VeyronException e) {
+        } catch (VException e) {
             // We don't expect this exception to occur.
             Log.e("ProximityScannerAndroidService", "Failed to stop veyron service: " + e);
         }
-        endpoint = null;
+        endpoints = null;
         proxService = null;
         s = null;
     }
