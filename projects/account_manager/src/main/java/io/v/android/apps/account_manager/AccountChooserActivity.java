@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class AccountChooserActivity extends Activity {
     public static final String TAG = "AccountChooserActivity";
     private static final String ACCOUNT_TYPE = "io.vanadium";
+    private static final int CREATE_ACCOUNT_REQUEST = 1;
 
     public static final String ERROR = "ERROR";
     public static final String REPLY = "REPLY";
@@ -30,24 +31,52 @@ public class AccountChooserActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_chooser);
+        if (hasAccounts()) {
+            listAccounts();
+        } else {
+            // No Vanadium accounts available: prompt the user to create a new account.
+            createAccount();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case CREATE_ACCOUNT_REQUEST:
+                if (resultCode != RESULT_OK && !hasAccounts()) {
+                    // No accounts to display.  To avoid putting the user into a potentially
+                    // infinite account creation loop, we reply with an error here.
+                    replyWithError("Couldn't create a Vanadium account.");
+                    return;
+                }
+                listAccounts();
+        }
+    }
+
+    private void listAccounts() {
         Account[] accounts = AccountManager.get(this).getAccountsByType(ACCOUNT_TYPE);
         if (accounts.length == 0) {
-            // No Vanadium accounts available.
-            createAccount();
+            replyWithError("Couldn't find newly created Vanadium accounts?!");
             return;
         }
+        LinearLayout accountsView = (LinearLayout) findViewById(R.id.chooser_accounts);
+        accountsView.removeAllViews();
         for (Account account : accounts) {
             LinearLayout accountView =
                     (LinearLayout) getLayoutInflater().inflate(R.layout.chooser_account, null);
             ((CheckedTextView) accountView.findViewById(R.id.chooser_account)).setText(
                     account.name);
-            ((LinearLayout) findViewById(R.id.chooser_accounts)).addView(accountView);
+            accountsView.addView(accountView);
         }
     }
 
     // Starts the account creation activity.
     private void createAccount() {
-        startActivity(new Intent(this, AccountActivity.class));
+        startActivityForResult(new Intent(this, AccountActivity.class), CREATE_ACCOUNT_REQUEST);
+    }
+
+    private boolean hasAccounts() {
+        return AccountManager.get(this).getAccountsByType(ACCOUNT_TYPE).length > 0;
     }
 
     public void onAccountSelected(View v) {

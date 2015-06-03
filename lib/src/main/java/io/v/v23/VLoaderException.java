@@ -17,6 +17,7 @@ public class VLoaderException extends RuntimeException {
     private final List<Throwable> exceptions;
 
     VLoaderException(List<Throwable> exceptions) {
+        super(getMessages(exceptions));
         this.exceptions = ImmutableList.copyOf(exceptions);
     }
 
@@ -26,5 +27,19 @@ public class VLoaderException extends RuntimeException {
      */
     public List<Throwable> getExceptions() {
         return exceptions;
+    }
+
+    private static String getMessages(List<Throwable> exceptions) {
+        String ret = "";
+        for (Throwable e : exceptions) {
+            if (!ret.isEmpty()) {
+                ret += "; ";
+            }
+            ret += e.getMessage();
+            if (e.getCause() != null) {
+                ret += ": " + e.getCause().getMessage();
+            }
+        }
+        return ret;
     }
 }
