@@ -4,6 +4,8 @@
 
 package io.v.v23.security;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -93,6 +95,22 @@ public class CallParams {
     public CallParams withSuffix(String suffix) {
         CallParams ret = new CallParams(this);
         ret.suffix = suffix;
+        return ret;
+    }
+    /**
+     * Returns a child of the current params with the given local discharges.
+     */
+    public CallParams withLocalDischarges(Map<String, Discharge> localDischarges) {
+        CallParams ret = new CallParams(this);
+        ret.localDischarges = ImmutableMap.copyOf(localDischarges);
+        return ret;
+    }
+    /**
+     * Returns a child of the current params with the given remote discharges.
+     */
+    public CallParams withRemoteDischarges(Map<String, Discharge> remoteDischarges) {
+        CallParams ret = new CallParams(this);
+        ret.remoteDischarges = ImmutableMap.copyOf(remoteDischarges);
         return ret;
     }
     /**

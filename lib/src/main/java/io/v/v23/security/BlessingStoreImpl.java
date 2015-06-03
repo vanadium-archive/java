@@ -79,7 +79,7 @@ class BlessingStoreImpl implements BlessingStore {
         return nativeToString(this.nativePtr);
     }
     @Override
-    public void finalize() {
+    protected void finalize() {
         nativeFinalize(this.nativePtr);
     }
 }

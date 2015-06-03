@@ -78,11 +78,11 @@ public class ServerImpl implements Server {
     }
     @Override
     public void unwatchNetwork(InputChannel<NetworkChange> channel) {
-        if (!(channel instanceof InputChannel)) {  // also handles channel == null
+        if (channel == null) {
             return;
         }
         try {
-            nativeUnwatchNetwork(this.nativePtr, (InputChannel<NetworkChange>) channel);
+            nativeUnwatchNetwork(this.nativePtr, channel);
         } catch (VException e) {
             throw new RuntimeException("Couldn't unwatch network", e);
         }
