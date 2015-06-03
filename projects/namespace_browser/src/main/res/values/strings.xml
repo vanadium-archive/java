@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name">Veyron Namespace Browser</string>
     <string name="title_activity_settings">Browser Settings</string>
-    <string name="action_account">VanadiumIdentity</string>
-    <string name="action_account_title">Identity</string>
-    <string name="action_account_add">+ Add Account</string>
+    <string name="action_account">Vanadium Identity</string>
     <string name="action_settings">Settings</string>
 </resources>

@@ -4,5 +4,5 @@
         android:key="pref_identity_service_name"
         android:title="@string/pref_identity_service_name"
         android:summary="@string/pref_identity_service_name_summ"
-        android:defaultValue="identity/dev.v.io/google"/>
+        android:defaultValue="identity/dev.v.io/u/google"/>
 </PreferenceScreen>

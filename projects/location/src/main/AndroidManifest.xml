@@ -31,8 +31,7 @@
           android:name=".LocationService"
           android:exported="false"
           android:label="Location Service"
-          android:process=":LocationService"
-           >
+          android:process=":LocationService">
         </service>
     </application>
 

@@ -7,6 +7,9 @@ package io.v.android.apps.namespace_browser;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.LightingColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -14,19 +17,15 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
-import java.util.Set;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.v23.android.V;
@@ -36,7 +35,6 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;
-import io.v.v23.security.WireBlessings;
 import io.v.v23.verror.VException;
 
 public class MainActivity extends Activity {
@@ -47,9 +45,7 @@ public class MainActivity extends Activity {
 
     private static final int BLESSING_REQUEST = 1;
 
-    VContext mBaseContext = null;
-    BlessingsManager mBlessingsManager = null;
-    String mSelectedBlessing = null;
+    private VContext mBaseContext = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +60,10 @@ public class MainActivity extends Activity {
                 new MountEntry(root, ImmutableList.<MountedServer>of(), true, false)));
         TextView nameView = (TextView) dirView.findViewById(R.id.name);
         nameView.setText("/");
-
         mBaseContext = V.init(this);
-        mBlessingsManager = new BlessingsManager(getPreferences(MODE_PRIVATE));
-        mSelectedBlessing = null;
-
-        updateBlessingsView();
+        Drawable d = getResources().getDrawable(R.drawable.ic_account_box_black_36dp);
+        d.setColorFilter(new LightingColorFilter(Color.BLACK, Color.GRAY));
+        getBlessings();
     }
 
     @Override
@@ -166,10 +160,15 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
+            case R.id.action_account: {
+                refreshBlessings();
+                return true;
+            }
+            case R.id.action_settings: {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -180,10 +179,10 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case BLESSING_REQUEST:
                 try {
-                    Blessings blessings = BlessingsManager.processReply(resultCode, data);
-                    mBlessingsManager.add(blessings);
+                    Blessings blessings = BlessingsManager.processBlessingsReply(resultCode, data);
+                    BlessingsManager.addBlessings(this, blessings);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-                    updateBlessingsView();
+                    getBlessings();
                 } catch (VException e) {
                     String msg = "Couldn't derive blessing: " + e.getMessage();
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -193,79 +192,39 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void createDeriveAndAddBlessing() {
-        Intent intent = BlessingsManager.createIntent(this);
+    private void refreshBlessings() {
+        Intent intent = BlessingsManager.newRefreshBlessingsIntent(this);
         startActivityForResult(intent, BLESSING_REQUEST);
     }
 
-    private void updateBlessingsView() {
-        LinearLayout blessingView =
-                (LinearLayout) getLayoutInflater().inflate(R.layout.action_account, null);
-        Set<String> blessingNames = mBlessingsManager.getNames();
-        if (blessingNames.isEmpty()) {  // No blessings for this app.
-            blessingView.addView(getLayoutInflater().inflate(R.layout.action_account_add, null));
-            blessingView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    createDeriveAndAddBlessing();
-                }
-            });
-        } else {
-            if (mSelectedBlessing == null) {
-                updateSelectedBlessing(blessingNames.iterator().next());
-            }
-            LinearLayout view = (LinearLayout) getLayoutInflater().inflate(
-                    R.layout.action_account_existing, null);
-            ((TextView) view.findViewById(R.id.blessing_name)).setText(mSelectedBlessing);
-            blessingView.addView(view);
-            blessingView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showBlessingsPopup(v);
-                }
-            });
-        }
-        getActionBar().setCustomView(blessingView);
-    }
-
-    private void updateSelectedBlessing(String blessingName) {
+    private void getBlessings() {
+        Blessings blessings = null;
         try {
-            Blessings blessings = mBlessingsManager.get(blessingName);
+            // See if there are blessings stored in shared preferences.
+            blessings = BlessingsManager.getBlessings(this);
+        } catch (VException e) {
+            String msg = "Error getting blessings from shared preferences " + e.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            android.util.Log.e(TAG, msg);
+        }
+        if (blessings == null) {
+            // Request new blessings from the account manager.  If successful, this will eventually
+            // trigger another call to this method, with BlessingsManager.getBlessings() returning
+            // non-null blessings.
+            refreshBlessings();
+            return;
+        }
+        try {
+            // Update local state with the new blessings.
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.addToRoots(blessings);
-            mSelectedBlessing = blessingName;
         } catch (VException e) {
             String msg = String.format(
-                    "Couldn't set blessing %s: %s", blessingName, e.getMessage());
+                    "Couldn't set local blessing %s: %s", blessings, e.getMessage());
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             android.util.Log.e(TAG, msg);
         }
-    }
-
-    private void showBlessingsPopup(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        Set<String> blessingNames = mBlessingsManager.getNames();
-        for (final String blessingName : blessingNames) {
-            MenuItem item = popup.getMenu().add(blessingName);
-            item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    updateSelectedBlessing(blessingName);
-                    updateBlessingsView();
-                    return true;
-                }
-            });
-        }
-        MenuItem item = popup.getMenu().add(getResources().getString(R.string.action_account_add));
-        item.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                createDeriveAndAddBlessing();
-                return true;
-            }
-        });
-        popup.show();
     }
 
     private class NameFetcher extends AsyncTask<Void, Void, List<GlobReply>> {

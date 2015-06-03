@@ -38,8 +38,6 @@ android {
 }
 
 dependencies {
-    compile 'com.google.guava:guava:17.0'
-    compile 'joda-time:joda-time:2.7'
     compile 'io.v:vanadium:0.1-SNAPSHOT'
     compile 'io.v:vanadium-android:0.1-SNAPSHOT'
 }

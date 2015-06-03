@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    tools:context=".AccountChooserActivity">
+    <LinearLayout
+        android:id="@+id/layer_accounts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true">
+
+        <ScrollView
+            android:id="@+id/scroll_accounts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/chooser_accounts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Account layouts will be added here programatically. -->
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layer_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/layer_accounts">
+
+        <Button
+            android:id="@+id/button_add"
+            android:text="@string/chooser_button_add"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:onClick="onAdd"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <include layout="@layout/vertical_separator"/>
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:text="@string/chooser_button_cancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:onClick="onCancel"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <include layout="@layout/vertical_separator"/>
+
+        <Button
+            android:id="@+id/button_ok"
+            android:text="@string/chooser_button_ok"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:onClick="onOK"
+            style="?android:attr/borderlessButtonStyle"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

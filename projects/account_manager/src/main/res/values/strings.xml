@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Vanadium Account Service</string>
     <string name="title_activity_account">Add a Vanadium Account</string>
     <string name="title_activity_blessing">Bless a Vanadium Account</string>
+    <string name="title_activity_account_chooser">"Choose Account(s) "</string>
     <string name="title_activity_settings">Vanadium Settings</string>
     <string name="action_settings">Settings</string>
-    <string name="blessing_text_blessing">Above application wants a blessing from Vanadium account: </string>
+    <string name="blessing_text_blessing">Above application wants blessings from Vanadium account(s): </string>
     <string name="blessing_button_accept">Accept</string>
     <string name="blessing_button_deny">Deny</string>
     <string name="blessing_text_caveat">Apply the following caveats to the blessing: </string>
+    <string name="chooser_button_add">Add</string>
+    <string name="chooser_button_cancel">Cancel</string>
+    <string name="chooser_button_ok">OK</string>
     <string name="expiry_caveat_default_number_units">1</string>
-
 </resources>

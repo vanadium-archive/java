@@ -2,8 +2,9 @@
 <resources>
 
     <string name="app_name">Location Service</string>
-    <string name="hello_world">Hello world!!!</string>
+    <string name="action_account">Vanadium Identity</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_location">LocationActivity</string>
+    <string name="location_start">Start</string>
 
 </resources>

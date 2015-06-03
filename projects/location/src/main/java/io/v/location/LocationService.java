@@ -12,41 +12,69 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
+import io.v.v23.security.Blessings;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 public class LocationService extends Service {
     private static final String TAG = "LocationService";
 
-    private volatile boolean mStarted = false;
+    VContext mBaseContext;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (mStarted) return START_STICKY;
-        synchronized (this) {
-            if (mStarted) return START_STICKY;
-            mStarted = true;
-            startLocationService();
+        mBaseContext = V.init(this);
+        String blessingsVom = intent.getStringExtra(LocationActivity.BLESSINGS_KEY);
+        if (blessingsVom == null || blessingsVom.isEmpty()) {
+            String msg = "Couldn't start LocationService: null or empty encoded blessings.";
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            android.util.Log.i(TAG, msg);
+            return START_STICKY;
+        }
+        try {
+            Blessings blessings =
+                    (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
+            if (blessings == null) {
+                String msg = "Couldn't start LocationService: null blessings.";
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                android.util.Log.i(TAG, msg);
+                return START_STICKY;
+            }
+            startLocationService(blessings);
+        } catch (VException e) {
+            String msg = "Couldn't start LocationService: " + e.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            android.util.Log.i(TAG, msg);
         }
         return START_STICKY;
     }
 
-    private void startLocationService() {
-        VContext ctx = V.init(this);
+    private void startLocationService(Blessings blessings) {
         try {
-            Server s = V.newServer(ctx);
-            Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+            // Update vanadium state with the new blessings.
+            VPrincipal p = V.getPrincipal(mBaseContext);
+            p.blessingStore().setDefaultBlessings(blessings);
+            p.addToRoots(blessings);
+            Server s = V.newServer(mBaseContext);
+            Endpoint[] endpoints = s.listen(V.getListenSpec(mBaseContext));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
             VeyronLocationService server = new VeyronLocationService(
                     (LocationManager) getSystemService(Context.LOCATION_SERVICE));
             s.serve("spetrovic/location", server, VSecurity.newAllowEveryoneAuthorizer());
+            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
         } catch (VException e) {
-            Log.e(TAG, "Couldn't start location service: " + e.getMessage());
+            String msg = "Couldn't start LocationService: " + e.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            android.util.Log.i(TAG, msg);
         }
     }
 

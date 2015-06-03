@@ -11,8 +11,6 @@ import org.joda.time.Duration;
 import java.util.List;
 
 import io.v.v23.InputChannel;
-import io.v.v23.OptionDefs;
-import io.v.v23.Options;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;

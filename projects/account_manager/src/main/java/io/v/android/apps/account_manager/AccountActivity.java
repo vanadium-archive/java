@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.common.base.Charsets;
@@ -47,15 +46,18 @@ import io.v.v23.vom.VomUtil;
 import io.v.x.ref.services.identity.OAuthBlesserClient;
 import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 
+/**
+ * Creates a new Vanadium account, using the Google accounts present on the device.
+ */
 public class AccountActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "AccountActivity";
-    private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
+    private static final int REQUEST_CODE_PICK_ACCOUNTS = 1000;
     private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
     private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
-    private static final String PREF_VEYRON_IDENTITY_SERVICE = "pref_identity_service_name";
+    private static final String PREF_VANADIUM_IDENTITY_SERVICE = "pref_identity_service_name";
     private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/u/google";
 
     VContext mBaseContext = null;
@@ -68,12 +70,12 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         mBaseContext = V.init(this);
         Intent intent = AccountManager.newChooseAccountIntent(
                 null, null, new String[]{"com.google"}, true, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
+        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNTS);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
+        if (requestCode == REQUEST_CODE_PICK_ACCOUNTS) {
             if (resultCode != RESULT_OK) {
                 replyWithError("User didn't pick account.");
                 return;
@@ -171,7 +173,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             }
             String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
                     AccountActivity.this).getString(
-                    PREF_VEYRON_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
+                    PREF_VANADIUM_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
             try {
                 URL url = new URL("https://dev.v.io/auth/blessing-root");
                 JSONObject object = new JSONObject(CharStreams.toString(
@@ -240,8 +242,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         android.util.Log.e(TAG, "Error creating account: " + error);
         setResult(RESULT_CANCELED);
         String text = "Couldn't create account: " + error;
-        Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-        toast.show();
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -253,8 +254,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         am.setAuthToken(account, "Blessings", encoded);
         setAccountAuthenticatorResult(new Intent().getExtras());
         setResult(RESULT_OK);
-        Toast toast = Toast.makeText(this, "Success.", Toast.LENGTH_SHORT);
-        toast.show();
+        Toast.makeText(this, "Success.", Toast.LENGTH_SHORT).show();
         finish();
     }
 
