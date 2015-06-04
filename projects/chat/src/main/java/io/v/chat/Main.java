@@ -41,7 +41,7 @@ public class Main {
     private final GUIScreen screen = TerminalFacade.createGUIScreen();
 
     public static void main(String[] args) throws VException {
-        Main main = new Main();
+        new Main();
     }
 
     public Main() throws VException {
@@ -142,10 +142,9 @@ public class Main {
 
     private void maybeScrollChatArea() {
         // Lanterna doesn't support auto-scrolling text areas, nor does it give any way to change
-        // the visible text
-        // area. The state it uses to represent the scroll location is all private. We work
-        // around all this using
-        // reflection to update the text area's internal state... Yuck.
+        // the visible text area. The state it uses to represent the scroll location is all
+        // private. We work around all this using reflection to update the text area's internal
+        // state... Yuck.
         try {
             Field lastSize = TextArea.class.getDeclaredField("lastSize");
             lastSize.setAccessible(true);

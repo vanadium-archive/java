@@ -4,18 +4,20 @@
 
 package io.v.chat;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList;
 
 import org.joda.time.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,9 +29,13 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.VCertificate;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
+import io.v.v23.security.access.AccessList;
+import io.v.v23.security.access.Permissions;
+import io.v.v23.services.mounttable.Constants;
 import io.v.v23.verror.VException;
 import io.v.x.chat.vdl.ChatServer;
 
@@ -37,6 +43,9 @@ public class ChatChannel {
     private final String name;
     private final VContext ctx;
     private final ChatChannelListener listener;
+
+    private static final int MAX_NAME_RETRIES = 25;
+    private static final Logger logger = Logger.getLogger(ChatChannel.class.getName());
 
     private Server server;
 
@@ -78,23 +87,48 @@ public class ChatChannel {
         server = V.newServer(ctx);
         server.listen(V.getListenSpec(ctx));
 
-        // TODO(sjr): use the Namespace API to choose a better endpoint
-        String mountPath = name + "/javatest";
-        server.serve(mountPath, chatServer, VSecurity.newAllowEveryoneAuthorizer());
+        String mountPath = getLockedPath(ctx);
+        if (mountPath != null) {
+            server.serve(mountPath, chatServer, VSecurity.newAllowEveryoneAuthorizer());
+        } else {
+            throw new VException("Could not find an appropriate path name for the chat server");
+        }
     }
 
-    private static String blessingsName(Blessings blessings) {
-        Function<VCertificate, String> extensionFunc = new Function<VCertificate, String>() {
-            @Override
-            public String apply(VCertificate input) {
-                return input.getExtension();
-            }
-        };
-        List<String> names = new ArrayList<>(blessings.getCertificateChains().size());
-        for (List<VCertificate> chain : blessings.getCertificateChains()) {
-            names.add(Joiner.on('/').join(Iterables.transform(chain, extensionFunc)));
+    /**
+     * Returns a path to which a chat server may be bound, or {@code null} if no appropriate path
+     * could be found.
+     */
+    private String getLockedPath(VContext ctx) {
+        VPrincipal principal = V.getPrincipal(ctx);
+        Blessings defaultBlessings = principal.blessingStore().defaultBlessings();
+        List<BlessingPattern> patterns = new ArrayList<>();
+        for (String key : principal.blessingsInfo(defaultBlessings).keySet()) {
+            patterns.add(new BlessingPattern(key));
         }
-        return Joiner.on(',').join(names);
+        AccessList myAcl = new AccessList(patterns, ImmutableList.<String>of());
+        AccessList openAcl = new AccessList(ImmutableList.of(new BlessingPattern("...")),
+                ImmutableList.<String>of());
+        Permissions perms = new Permissions();
+        perms.put(Constants.ADMIN.getValue(), myAcl);
+        perms.put(Constants.CREATE.getValue(), myAcl);
+        perms.put(Constants.MOUNT.getValue(), myAcl);
+
+        // Let anybody read and resolve the name.
+        perms.put(Constants.RESOLVE.getValue(), openAcl);
+        perms.put(Constants.READ.getValue(), openAcl);
+
+        for (int i = 0; i < MAX_NAME_RETRIES; i++) {
+            String path = name + "/" + UUID.randomUUID().toString();
+            try {
+                V.getNamespace(ctx).setPermissions(ctx, path, perms, "");
+                return path;
+            } catch (VException e) {
+                logger.log(Level.WARNING, "retry #" + (i + 1) + " failed", e);
+                // It failed, try another name!
+            }
+        }
+        return null;
     }
 
     public void leave() throws VException {
@@ -126,8 +160,8 @@ public class ChatChannel {
             if (reply instanceof GlobReply.Entry) {
                 MountEntry entry = ((GlobReply.Entry) reply).getElem();
                 for (MountedServer server : entry.getServers()) {
-                    participants
-                            .add(new Participant(endpointUsername(server.getServer()), server.getServer()));
+                    participants.add(new Participant(endpointUsername(server.getServer()),
+                            server.getServer()));
                     break;
                 }
             }
