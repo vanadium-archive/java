@@ -6,6 +6,21 @@ dependencies {
     compile localGroovy()
 }
 
+task buildVdl(type: Exec) {
+    description 'Build the VDL tool'
+    commandLine 'v23', 'go', 'build', '-o', 'build/vdltool/vdl', 'v.io/x/ref/cmd/vdl'
+}
+
+sourceSets {
+    main {
+        resources {
+	    srcDir 'build/vdltool'
+	}
+    }
+}
+
+tasks.'processResources'.dependsOn(buildVdl)
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -22,7 +37,7 @@ publishing {
                 username 'admin'
                 password 'admin123'
             }
-            url "http://jring.mtv:8081/nexus/content/repositories/test_repo"
+            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
         }
     }
 }
