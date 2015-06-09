@@ -43,7 +43,7 @@ dependencies {
 }
 
 vdl {
-    inputPaths += 'src/main/vdl/go'
+    inputPaths += 'src/main/java'
 }
 
 wrapper {

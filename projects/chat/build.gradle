@@ -34,7 +34,7 @@ task wrapper(type: Wrapper) {
 }
 
 vdl {
-    inputPaths += 'src/main/vdl/go'
+    inputPaths += 'src/main/java'
 }
 
 sourceCompatibility = '1.7'
