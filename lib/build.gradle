@@ -33,9 +33,11 @@ clean {
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
+def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
+
 vdl {
-    inputPaths += getVanadiumRoot() + '/release/go'
-    inputPaths += getVanadiumRoot() + '/roadmap/go'
+    inputPaths += v23Root + '/release/go/src'
+    inputPaths += v23Root + '/roadmap/go/src'
 
     // Everybody who depends on :lib will need the vdlroot classes too.
     generateVdlRoot = true

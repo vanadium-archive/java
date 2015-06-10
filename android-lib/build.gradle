@@ -5,9 +5,11 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
 
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
@@ -37,7 +39,10 @@ dependencies {
     androidTestCompile project(':tests')
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
-    androidTestCompile('com.android.support.test:runner:0.2') {
+    // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
+    // should be fixed when http://git.io/vIXec is checked in and a release is made.
+    androidTestCompile('com.android.support:support-v4:21.0.0')
+    androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
     }
 }
