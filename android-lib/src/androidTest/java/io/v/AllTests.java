@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import dalvik.system.DexFile;
-import io.v.impl.google.naming.NamingUtilCleanTest;
+import io.v.testing.SkipOnAndroid;
 
 @RunWith(org.junit.runners.AllTests.class)
 public class AllTests {
@@ -33,7 +33,9 @@ public class AllTests {
                 // Load the class.
                 try {
                     Class<?> testClass = Class.forName(name);
-                    if (TestCase.class.isAssignableFrom(testClass)) {
+                    if (testClass.isAnnotationPresent(SkipOnAndroid.class)) {
+                        continue;
+                    } else if (TestCase.class.isAssignableFrom(testClass)) {
                         // It's a JUnit3 test class.
                         suite.addTestSuite((Class<TestCase>) testClass);
                     } else if (testClass.isAnnotationPresent(RunWith.class)) {

@@ -41,14 +41,24 @@ import static com.google.common.truth.Truth.assertThat;
 public class FortuneTest extends TestCase {
     private static final String TEST_INVOKER_FORTUNE = "Test invoker fortune";
 
+    private Server s;
+    private VContext ctx;
+
+    @Override
+    protected void setUp() throws Exception {
+        ctx = V.init();
+        s = V.newServer(ctx);
+    }
+
     @Override
     protected void tearDown() throws Exception {
+        if (s != null) {
+            s.stop();
+        }
         V.shutdown();
     }
 
     public void testFortune() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -67,12 +77,9 @@ public class FortuneTest extends TestCase {
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
         assertEquals(firstMessage, client.get(ctxT));
-        s.stop();
     }
 
     public void testStreaming() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -93,12 +100,9 @@ public class FortuneTest extends TestCase {
         }
         int total = stream.finish();
         assertEquals(5, total);
-        s.stop();
     }
 
     public void testMultiple() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -112,12 +116,9 @@ public class FortuneTest extends TestCase {
         FortuneClient.MultipleGetOut ret = client.multipleGet(ctxT);
         assertEquals(firstMessage, ret.fortune);
         assertEquals(firstMessage, ret.another);
-        s.stop();
     }
 
     public void testComplexError() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -133,12 +134,9 @@ public class FortuneTest extends TestCase {
                 fail(String.format("Expected error %s, got %s", FortuneServerImpl.COMPLEX_ERROR, e));
             }
         }
-        s.stop();
     }
 
     public void testWatchNetwork() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -150,8 +148,6 @@ public class FortuneTest extends TestCase {
     }
 
     public void testContext() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -167,8 +163,6 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGetSignature() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -185,8 +179,6 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGlob() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
@@ -202,8 +194,6 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomInvoker() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         s.serve("", new TestInvoker(), null);
 
@@ -211,12 +201,9 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
-        s.stop();
     }
 
     public void testCustomDispatcherReturningAServer() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         final FortuneServer server = new FortuneServerImpl();
         Dispatcher dispatcher = new Dispatcher() {
@@ -233,12 +220,9 @@ public class FortuneTest extends TestCase {
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
         assertEquals(firstMessage, client.get(ctxT));
-        s.stop();
     }
 
     public void testCustomDispatcherReturningAnInvoker() throws Exception {
-        VContext ctx = V.init();
-        Server s = V.newServer(ctx);
         Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
         Dispatcher dispatcher = new Dispatcher() {
             @Override
@@ -252,7 +236,6 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
-        s.stop();
     }
 
     private static class TestInvoker implements Invoker {
@@ -264,8 +247,6 @@ public class FortuneTest extends TestCase {
             }
             if (call.remoteEndpoint() == null) {
                 throw new VException("Expected remoteEndpoint() to return non-null");
-            } else if (!call.remoteEndpoint().name().contains("127.0.0.1")) {
-                throw new VException("Expected the remote endpoint to be on localhost");
             }
             if (method.equals("get")) {
                 return new Object[] { TEST_INVOKER_FORTUNE };
