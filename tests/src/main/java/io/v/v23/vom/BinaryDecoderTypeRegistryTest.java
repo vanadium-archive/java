@@ -4,8 +4,6 @@
 
 package io.v.v23.vom;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -13,10 +11,14 @@ import org.junit.runners.model.InitializationError;
 
 import java.net.URLClassLoader;
 
+import io.v.testing.SkipOnAndroid;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlBool;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vom.testdata.NBool;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * These tests test that BinaryDecoder automatically registers type generated from VDL.
@@ -25,7 +27,8 @@ import io.v.v23.vom.testdata.NBool;
 // to ensure that tests that have run before this test didn't cause the static initializers to run
 // already.
 @RunWith(BinaryDecoderTypeRegistryTest.SeparateClassloaderTestRunner.class)
-public class BinaryDecoderTypeRegistryTest extends TestCase {
+@SkipOnAndroid
+public class BinaryDecoderTypeRegistryTest {
 
     @Test
     public void testGuessType() throws Exception {
