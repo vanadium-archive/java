@@ -141,7 +141,13 @@ public class VomUtil {
         return decode(data, type);
     }
 
-    private static String bytesToHexString(byte[] data) {
+    /**
+     * Encodes the provided byte array of data as a hex string.
+     *
+     * @param  data            arbitrary byte array
+     * @return                 hex string representation of the byte array
+     */
+    public static String bytesToHexString(byte[] data) {
         StringBuilder builder = new StringBuilder();
         for (byte b : data) {
             builder.append(String.format("%02x", b));
@@ -149,7 +155,15 @@ public class VomUtil {
         return builder.toString();
     }
 
-    private static byte[] hexStringToBytes(String hex) throws VException {
+    /**
+     * Decodes the provided data (stored as a hex string) into a byte array.
+     *
+     * @param  hex             hex string encoding of a byte array 
+     *                         (encoded using {@link #bytesToHexString})
+     * @return                 decoded byte array
+     * @throws VException      if there was an error decoding the hex string
+     */
+    public static byte[] hexStringToBytes(String hex) throws VException {
         if (hex.length() % 2 != 0) {
             throw new VException("Hex strings must be multiples of 2 in length");
         }

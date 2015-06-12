@@ -8,4 +8,12 @@
             android:targetClass="io.v.android.apps.account_manager.SettingsActivity"
             android:action="io.v.android.apps.account_manager.SETTINGS"/>
     </Preference>
+
+    <Preference
+        android:title="@string/pref_status_subcategory">
+        <intent
+            android:targetPackage="io.v.android.apps.account_manager"
+            android:targetClass="io.v.android.apps.account_manager.BlessedPackagesDisplayActivity"
+            android:action="io.v.android.apps.account_manager.BLESSED_PACKAGES_DISPLAY"/>
+    </Preference>
 </PreferenceScreen>

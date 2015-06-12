@@ -62,10 +62,25 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".BlessedPackagesDisplayActivity"
+            android:label="@string/title_activity_blessed_packages_display" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.BLESSED_PACKAGES_DISPLAY" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BlessingEventsDisplayActivity"
+            android:label="@string/title_activity_blessing_events_display" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.BLESSING_EVENTS_DISPLAY" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".AccountChooserActivity"
             android:label="@string/title_activity_account_chooser"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
+
     </application>
 
 </manifest>

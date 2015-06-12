@@ -13,6 +13,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,11 +54,47 @@ public class BlessingActivity extends AccountAuthenticatorActivity
     public static final String ERROR = "ERROR";
     public static final String REPLY = "REPLY";
 
+    /* The logging scheme for blessings is as follows.
+     *      The SharedPreferences file LOG_PACKAGES stores the package names of blessed apps.
+     *      The SharedPreferences file LOG_BLESSINGS stores serialized data for the blessings
+     *          that the apps were blessed with.
+     *
+     *      LOG_PACKAGES is structured as follows:
+     *          The NUM_PACKAGES_KEY has an int value n that corresponds to the number of packages
+     *              blessed hereto by the account manager app.
+     *          The names of these packages are keyed by PACKAGE_KEY_0 ... PACKAGE_KEY_(n-1),
+     *              where PACKAGE_KEY is the static string defined below.
+     *
+     *      LOG_BLESSINGS contains the actual blessing data indexed as follows:
+     *          For a package - pkgName - listed in LOG_PACKAGES, the number of blessings
+     *              given out to the corresponding app is keyed by pkgName. Let us say m blessings
+     *              were given out.
+     *          Only MAX_BLESSINGS_FOR_PACKAGE blessing events are maintained, so the string serializations
+     *              of stored blessing events are keyed by
+     *              pkgName_(m - MAX_BLESSINGS_FOR_PACKAGE) ... pkgName_(m-1), if m is greater
+     *              than MAX_BLESSINGS_FOR_PACKAGE, and pkgName_0 ... pkgName_(m-1) otherwise.
+     *
+     * Rationale for the scheme:
+     *      A seemingly simpler implementation would have maintained a map of the form:
+     *          pkgName --> Set of Blessings
+     *          in the shared preferences file; however this would make adding to the log take
+     *          linear time, as the stored set could not be added to directly.  Therefore, in order
+     *          to add to the set one would need to copy the whole set, add to the copy, and then
+     *          re-insert the new set in the map.
+     *      Our scheme clearly cuts this time complexity down tremendously.
+     */
+    public static final String LOG_BLESSINGS     = "LOG_BLESSINGS";
+    public static final String LOG_PACKAGES      = "LOG_PACKAGES";
+    public static final String NUM_PACKAGES_KEY  = "numPkgs";
+    public static final String PACKAGE_KEY       = "pkg";
+    public static final int MAX_BLESSINGS_FOR_PACKAGE = 50;
+
     private static final String ACCOUNT_TYPE = "io.vanadium";
     private static final int ACCOUNT_CHOOSING_REQUEST = 1;
 
     VContext mBaseContext = null;
     String mBlesseeName = "";
+    String mBlesseePkgName = "";
     ECPublicKey mBlesseePubKey = null;
     Account[] mAccounts;
     volatile Blessings[] mBlessings;
@@ -78,10 +115,17 @@ public class BlessingActivity extends AccountAuthenticatorActivity
         }
         mBlesseeName = getCallingActivity().getClassName();
         if (mBlesseeName == null || mBlesseeName.isEmpty()) {
-            replyWithError("Empty blesee name.");
+            replyWithError("Empty blessee name.");
             return;
         }
         ((TextView) findViewById(R.id.text_application)).setText(mBlesseeName);
+
+        // Get callee package name.
+        mBlesseePkgName = getCallingActivity().getPackageName();
+        if (mBlesseePkgName == null || mBlesseeName.isEmpty()) {
+            replyWithError("Empty blessee package name.");
+            return;
+        }
 
         // Get the public key of the application invoking this activity.
         Bundle b = getIntent().getExtras();
@@ -355,6 +399,8 @@ public class BlessingActivity extends AccountAuthenticatorActivity
                     mError = "Got empty certificate chains after bless().";
                     return null;
                 }
+                String blessingVom = VomUtil.encodeToString(with, Blessings.class);
+                log(blessingVom, caveats);
                 return VomUtil.encodeToString(retBlessing, Blessings.class);
             } catch (VException e) {
                 mError = "Couldn't bless: " + e.getMessage();
@@ -400,5 +446,46 @@ public class BlessingActivity extends AccountAuthenticatorActivity
             }
         }
         return null;
+    }
+
+    private void log(String blessingsVom, List<Caveat> caveats) {
+        BlessingEvent newBlessingEvent =
+                new BlessingEvent(blessingsVom, DateTime.now(), caveats, mBlesseeName);
+
+        SharedPreferences blessingsLog = getSharedPreferences(LOG_BLESSINGS, MODE_PRIVATE);
+        SharedPreferences.Editor blessingsLogEditor = blessingsLog.edit();
+        SharedPreferences pkgLog = getSharedPreferences(LOG_PACKAGES, MODE_PRIVATE);
+        SharedPreferences.Editor pkgLogEditor = pkgLog.edit();
+
+        try {
+            int numEvents = blessingsLog.getInt(mBlesseePkgName, 0);
+
+            // Save the newBlessingEvent in the LOG_BLESSINGS file.
+            String strNewEvent = newBlessingEvent.encodeToString();
+            blessingsLogEditor.putString(mBlesseePkgName + "_" + numEvents, strNewEvent);
+            blessingsLogEditor.putInt(mBlesseePkgName, numEvents + 1);
+            if (!blessingsLogEditor.commit()) {
+                throw new Exception("Failed to commit log changes");
+            }
+
+            // Delete stale blessing entry, if there are too many entries for the app.
+            String keyToDelete = mBlesseePkgName+ "_" + (numEvents - MAX_BLESSINGS_FOR_PACKAGE);
+            if (numEvents > MAX_BLESSINGS_FOR_PACKAGE && blessingsLog.contains(keyToDelete)) {
+                blessingsLogEditor.remove(keyToDelete);
+                blessingsLogEditor.apply();
+            }
+
+            // Record that the app with the package name mBlesseePkgName has been blessed in the
+            // LOG_PACKAGES file if this has not already been done.
+            if (numEvents <= 0) {
+                int numPkgs = pkgLog.getInt(NUM_PACKAGES_KEY, 0);
+                String pkgKey = PACKAGE_KEY + "_" + numPkgs;
+                pkgLogEditor.putString(pkgKey, mBlesseePkgName);
+                pkgLogEditor.putInt(NUM_PACKAGES_KEY, numPkgs + 1);
+                pkgLogEditor.apply();
+            }
+        } catch (Exception e) {
+            replyWithError("Failed to Add new Blessing Event: " + e);
+        }
     }
 }

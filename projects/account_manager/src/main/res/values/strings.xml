@@ -5,6 +5,8 @@
     <string name="title_activity_blessing">Bless a Vanadium Account</string>
     <string name="title_activity_account_chooser">"Choose Account(s) "</string>
     <string name="title_activity_settings">Vanadium Settings</string>
+    <string name="title_activity_blessed_packages_display">Blessed Packages</string>
+    <string name="title_activity_blessing_events_display">Recent Blessings</string>
     <string name="action_settings">Settings</string>
     <string name="blessing_text_blessing">Above application wants blessings from Vanadium account(s): </string>
     <string name="blessing_button_accept">Accept</string>
