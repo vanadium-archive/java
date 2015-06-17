@@ -35,6 +35,18 @@ targetCompatibility = '1.7'
 
 def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
 
+public static isDarwin() {
+    return System.properties['os.name'].toLowerCase().contains("os x")
+}
+
+public static isLinux() {
+    return System.properties['os.name'].toLowerCase().contains("linux")
+}
+
+public static isAmd64() {
+    return System.properties['os.arch'].toLowerCase().contains("x86_64")
+}
+
 vdl {
     inputPaths += v23Root + '/release/go/src'
     inputPaths += v23Root + '/roadmap/go/src'
@@ -83,9 +95,15 @@ class VanadiumEnvironment {
 task checkVanadiumEnvironment {
     VanadiumEnvironment.getVanadiumEnvironment()
 
-    if (System.getenv('JDK_HOME') == null) {
-        throw new InvalidUserDataException("The JDK_HOME environment variable is not set. "
-                + "Please set it to the root of a JDK installation directory.")
+    if (System.getenv('JAVA_HOME') == null) {
+        throw new InvalidUserDataException("The JAVA_HOME environment variable is not set. "
+                + "Please set it to the root of a JDK installation directory.  If JDK isn't "
+                + "installed, you probably didn't setup the java profile: try running\n\n"
+                + "v23 profile setup java\n\nand then try building again.")
+    }
+    if (!isAmd64()) {
+        throw new InvalidUserDataException("Java Vanadium builds only enabled on AMD64 "
+                + "architectures.")
     }
 }
 
@@ -99,9 +117,25 @@ task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     environment 'V23_PROFILE': 'java'
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
-    commandLine env.v23Bin.getAbsolutePath(), 'go',
-            'build', '-buildmode=c-shared', '-v', '-a', '-tags', 'java',
-            '-o', 'build/libs/libv23.so', 'v.io/x/jni'
+    commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
+            '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni'
+
+    // Copy the shared library to its ultimate destination.
+    if (isLinux()) {
+        copy {
+            from v23Root + '/roadmap/go/pkg/linux_amd64_shared/v.io/x'
+            into 'build/libs'
+            include 'jni.a'
+            rename 'jni.a', 'libv23.so'
+        }
+    } else {
+        copy {
+            from v23Root + '/roadmap/go/pkg/darwin_amd64/v.io/x'
+            into 'build/libs'
+            include 'jni.a'
+            rename 'jni.a', 'libv23.dylib'
+        }
+    }
 }
 
 // Add shared library dependency to our tests.
