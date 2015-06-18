@@ -34,16 +34,23 @@ sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
 public static isDarwin() {
-    return System.properties['os.name'].toLowerCase().contains("os x")
+    return getOS().contains("os x")
 }
 
 public static isLinux() {
-    return System.properties['os.name'].toLowerCase().contains("linux")
+    return getOS().contains("linux")
 }
 
 public static isAmd64() {
-    String arch = System.properties['os.arch'].toLowerCase()
-    return arch.contains("x86_64") || arch.contains("amd64")
+    return getArch().contains("x86_64") || getArch().contains("amd64")
+}
+
+public static getArch() {
+    return System.properties['os.arch'].toLowerCase()
+}
+
+public static getOS() {
+    return System.properties['os.name'].toLowerCase()
 }
 
 def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
@@ -103,8 +110,12 @@ task checkVanadiumEnvironment {
                 + "v23 profile setup java\n\nand then try building again.")
     }
     if (!isAmd64()) {
-        throw new InvalidUserDataException("Java Vanadium builds only enabled on AMD64 "
-                + "architectures.")
+        throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
+                + "architectures, not: " + getArch())
+    }
+    if (!isLinux() && !isDarwin()) {
+        throw new InvalidUserDataException("Java Vanadium builds only enabled on "
+                + "linux/darwin systems, not: " + getOS())
     }
 }
 
@@ -129,7 +140,7 @@ task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
             include 'jni.a'
             rename 'jni.a', 'libv23.so'
         }
-    } else {
+    } else {  // darwin
         copy {
             from v23Root + '/roadmap/go/pkg/darwin_amd64/v.io/x'
             into 'build/libs'
