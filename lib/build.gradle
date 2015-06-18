@@ -33,8 +33,6 @@ clean {
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
-
 public static isDarwin() {
     return System.properties['os.name'].toLowerCase().contains("os x")
 }
@@ -44,8 +42,11 @@ public static isLinux() {
 }
 
 public static isAmd64() {
-    return System.properties['os.arch'].toLowerCase().contains("x86_64")
+    String arch = System.properties['os.arch'].toLowerCase()
+    return arch.contains("x86_64") || arch.contains("amd64")
 }
+
+def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
 
 vdl {
     inputPaths += v23Root + '/release/go/src'
