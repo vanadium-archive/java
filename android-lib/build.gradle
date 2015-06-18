@@ -12,6 +12,7 @@ buildscript {
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
+apply plugin: 'wrapper'
 
 android {
     buildToolsVersion '21.1.2'
@@ -32,11 +33,14 @@ android {
 
 repositories {
     mavenCentral()
+
+    maven {
+        url "http://jring.mtv:8081/nexus/content/repositories/test_repo/"
+    }
 }
 
 dependencies {
-    compile project(':lib')
-    androidTestCompile project(':tests')
+    compile 'io.v:vanadium:0.1-SNAPSHOT'
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
     // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
@@ -71,6 +75,10 @@ publishing {
             url "http://jring.mtv:8081/nexus/content/repositories/test_repo"
         }
     }
+}
+
+wrapper {
+    gradleVersion = '2.4'
 }
 
 tasks.'publish'.dependsOn(tasks.'assemble')
