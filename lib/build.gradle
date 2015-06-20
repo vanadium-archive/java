@@ -1,17 +1,5 @@
-buildscript {
-    repositories {
-        maven {
-            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
-        }
-    }
-    dependencies {
-        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
-    }
-}
-
 apply plugin: 'java'
 apply plugin: 'maven-publish'
-apply plugin: 'io.v.vdl'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.7'
@@ -54,14 +42,24 @@ public static getOS() {
 }
 
 def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
+def v23Bin = new File(v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
 
-vdl {
-    inputPaths += v23Root + '/release/go/src'
-    inputPaths += v23Root + '/roadmap/go/src'
-
-    // Everybody who depends on :lib will need the vdlroot classes too.
-    generateVdlRoot = true
+task buildVdlTool(type: Exec) {
+    commandLine v23Bin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
 }
+
+def vdlPath = [ [v23Root, 'release', 'go', 'src'].join(File.separator),
+                [v23Root, 'roadmap', 'go', 'src'].join(File.separator) ].join(':')
+
+def vdlBin = [v23Root, 'release', 'go', 'bin', 'vdl'].join(File.separator)
+
+task generateVdl(type: Exec) {
+    environment VDLPATH: vdlPath
+    commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
+}
+
+sourceSets.main.java.srcDirs += 'generated-src/vdl'
+tasks.'compileJava'.dependsOn(generateVdl)
 
 class VanadiumEnvironment {
     File v23Root;
@@ -71,7 +69,6 @@ class VanadiumEnvironment {
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
 
-        // TODO(sjr): have this share code with VdlPlugin.
         if (!System.getenv().containsKey('V23_ROOT')) {
             throw new InvalidUserDataException("V23_ROOT is not set. "
                     + "Please follow the Vanadium installation instructions at "
@@ -131,22 +128,22 @@ task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
     commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
             '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni'
+}
 
-    // Copy the shared library to its ultimate destination.
-    if (isLinux()) {
-        copy {
-            from v23Root + '/roadmap/go/pkg/linux_amd64_shared/v.io/x'
-            into 'build/libs'
-            include 'jni.a'
-            rename 'jni.a', 'libv23.so'
-        }
-    } else {  // darwin
-        copy {
-            from v23Root + '/roadmap/go/pkg/darwin_amd64/v.io/x'
-            into 'build/libs'
-            include 'jni.a'
-            rename 'jni.a', 'libv23.dylib'
-        }
+// Copy the shared library to its ultimate destination.
+if (isLinux()) {
+    task copyVanadiumLib(type: Copy) {
+        from v23Root + '/roadmap/go/pkg/linux_amd64_shared/v.io/x'
+        into 'build/libs'
+        include 'jni.a'
+        rename 'jni.a', 'libv23.so'
+    }
+} else {  // darwin
+    task copyVanadiumLib(type: Copy) {
+        from v23Root + '/roadmap/go/pkg/darwin_amd64/v.io/x'
+        into 'build/libs'
+        include 'jni.a'
+        rename 'jni.a', 'libv23.dylib'
     }
 }
 
@@ -155,7 +152,7 @@ tasks.withType(Test) {
     systemProperty "java.library.path", "build/libs"
 }
 
-tasks.'processTestResources'.dependsOn(buildVanadiumLib)
+tasks.'processTestResources'.dependsOn(copyVanadiumLib)
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
