@@ -132,15 +132,15 @@ task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
 // Copy the shared library to its ultimate destination.
 if (isLinux()) {
-    task copyVanadiumLib(type: Copy) {
-        from v23Root + '/roadmap/go/pkg/linux_amd64_shared/v.io/x'
+    task copyVanadiumLib(type: Copy, dependsOn: buildVanadiumLib) {
+        from v23Root + '/release/go/pkg/linux_amd64_shared/v.io/x'
         into 'build/libs'
         include 'jni.a'
         rename 'jni.a', 'libv23.so'
     }
 } else {  // darwin
-    task copyVanadiumLib(type: Copy) {
-        from v23Root + '/roadmap/go/pkg/darwin_amd64/v.io/x'
+    task copyVanadiumLib(type: Copy, dependsOn: buildVanadiumLib) {
+        from v23Root + '/release/go/pkg/darwin_amd64/v.io/x'
         into 'build/libs'
         include 'jni.a'
         rename 'jni.a', 'libv23.dylib'
