@@ -53,7 +53,7 @@ def vdlPath = [ [v23Root, 'release', 'go', 'src'].join(File.separator),
 
 def vdlBin = [v23Root, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 
-task generateVdl(type: Exec) {
+task generateVdl(type: Exec, dependsOn: buildVdlTool) {
     environment VDLPATH: vdlPath
     commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
 }
