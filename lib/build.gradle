@@ -154,6 +154,11 @@ tasks.withType(Test) {
 
 tasks.'processTestResources'.dependsOn(copyVanadiumLib)
 
+// We cannot reliably determine whether the native vanadium lib is up-to-date.
+// Therefore we always run the tests even if Gradle thinks that there is no
+// need.
+tasks.'test'.outputs.upToDateWhen({ false })
+
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
 }
