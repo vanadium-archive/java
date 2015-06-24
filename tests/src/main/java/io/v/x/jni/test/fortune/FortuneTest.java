@@ -6,15 +6,6 @@ package io.v.x.jni.test.fortune;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-
-import junit.framework.TestCase;
-
-import org.joda.time.Duration;
-
-import java.io.EOFException;
-import java.lang.reflect.Type;
-import java.util.List;
-
 import io.v.v23.InputChannel;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
@@ -25,6 +16,7 @@ import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
+import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
@@ -35,6 +27,12 @@ import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.VException;
+import junit.framework.TestCase;
+import org.joda.time.Duration;
+
+import java.io.EOFException;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -43,11 +41,13 @@ public class FortuneTest extends TestCase {
 
     private Server s;
     private VContext ctx;
+    private ListenSpec listenSpec;
 
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
         s = V.newServer(ctx);
+        listenSpec = V.getListenSpec(ctx).withAddress(new ListenSpec.Address("tcp", "127.0.0.1:0"));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testFortune() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -80,7 +80,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testStreaming() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -103,7 +103,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testMultiple() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -119,7 +119,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testComplexError() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -137,7 +137,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testWatchNetwork() throws Exception {
-        s.listen(V.getListenSpec(ctx));
+        s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -148,7 +148,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testContext() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -163,7 +163,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGetSignature() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -179,7 +179,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGlob() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
         s.serve("", server, null);
 
@@ -194,7 +194,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomInvoker() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         s.serve("", new TestInvoker(), null);
 
         String name = "/" + endpoints[0];
@@ -204,7 +204,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomDispatcherReturningAServer() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         final FortuneServer server = new FortuneServerImpl();
         Dispatcher dispatcher = new Dispatcher() {
             @Override
@@ -223,7 +223,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomDispatcherReturningAnInvoker() throws Exception {
-        Endpoint[] endpoints = s.listen(V.getListenSpec(ctx));
+        Endpoint[] endpoints = s.listen(listenSpec);
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
