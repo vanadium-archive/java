@@ -149,6 +149,12 @@ if (isLinux()) {
 
 // Add shared library dependency to our tests.
 tasks.withType(Test) {
+    if (isDarwin()) {
+	// TODO(sjr): remove these when
+	// https://github.com/vanadium/issues/issues/567 is resolved.
+        jvmArgs '-XX:+UnlockDiagnosticVMOptions'
+        jvmArgs '-XX:-LogEvents'
+    }
     systemProperty "java.library.path", "build/libs"
 }
 
