@@ -444,7 +444,7 @@ public final class Types {
             // lookup and load class
             Class.forName(className);
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             return false;
         }
     }
