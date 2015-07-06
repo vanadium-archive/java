@@ -51,6 +51,30 @@ dependencies {
     }
 }
 
+task cleanNativeLibOutputs(type: Delete) {
+    delete 'src/main/jniLibs/armeabi-v7a/libv23.h'
+}
+
+task buildNativeLib(type: Exec, dependsOn: cleanNativeLibOutputs) {
+    def v23Root = System.getenv('V23_ROOT')
+    if (v23Root == null) {
+        throw new InvalidUserDataException('V23_ROOT environment variable is not set, did you follow the Vanadium installation instructions?')
+    }
+    def oldPath = System.getenv('PATH')
+    if (oldPath == null) {
+        oldPath = ''
+    }
+    environment 'GOOS', 'android'
+    environment 'GOARCH', 'arm'
+    environment 'GOARM', '7'
+    environment 'PATH', v23Root + '/third_party/android/go/bin:' + oldPath
+    commandLine v23Root + '/devtools/bin/v23', 'go', 'build', '-o', 'src/main/jniLibs/armeabi-v7a/libv23.so', '-buildmode=c-shared', '-v', '-a', '-tags', 'android', 'v.io/x/jni'
+}
+
+clean {
+    delete 'src/main/jniLibs/armeabi-v7a/libv23.so'
+}
+
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier "source"
@@ -81,4 +105,5 @@ wrapper {
     gradleVersion = '2.4'
 }
 
+tasks.'assemble'.dependsOn(buildNativeLib)
 tasks.'publish'.dependsOn(tasks.'assemble')
