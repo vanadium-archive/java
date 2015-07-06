@@ -64,6 +64,8 @@ public class LocationService extends Service {
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.addToRoots(blessings);
+            Log.i(TAG, "Added " + blessings + " to root");
+//            Log.i(TAG, p.blessingStore().debugString());
             Server s = V.newServer(mBaseContext);
             Endpoint[] endpoints = s.listen(V.getListenSpec(mBaseContext));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
