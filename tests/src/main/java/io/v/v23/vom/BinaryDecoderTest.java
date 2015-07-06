@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import io.v.v23.V;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
@@ -28,6 +29,17 @@ import java.util.List;
 import java.util.Map;
 
 public class BinaryDecoderTest extends TestCase {
+
+    @Override
+    protected void setUp() throws Exception {
+        V.init();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        V.shutdown();
+    }
+
     public void testDecode() throws Exception {
         for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
             byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
