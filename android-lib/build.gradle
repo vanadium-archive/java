@@ -105,5 +105,5 @@ wrapper {
     gradleVersion = '2.4'
 }
 
-tasks.'assemble'.dependsOn(buildNativeLib)
+tasks.'preBuild'.dependsOn(buildNativeLib)
 tasks.'publish'.dependsOn(tasks.'assemble')
