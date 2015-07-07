@@ -4,10 +4,11 @@
 
 package io.v.v23.security;
 
-import io.v.v23.verror.VException;
-
 import java.security.interfaces.ECPublicKey;
+import java.util.List;
 import java.util.Map;
+
+import io.v.v23.verror.VException;
 
 class BlessingStoreImpl implements BlessingStore {
     private final long nativePtr;
@@ -22,6 +23,11 @@ class BlessingStoreImpl implements BlessingStore {
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native Map<BlessingPattern, Blessings> nativePeerBlessings(long nativePtr)
             throws VException;
+    private native void nativeCacheDischarge(long nativePtr, Discharge discharge, Caveat caveat,
+                                             DischargeImpetus impetus);
+    private native void nativeClearDischarges(long nativePtr, Object[] discharges);
+    private native Discharge nativeDischarge(long nativePtr, Caveat caveat,
+                                             DischargeImpetus impetus);
     private native String nativeDebugString(long nativePtr);
     private native String nativeToString(long nativePtr);
     private native void nativeFinalize(long nativePtr);
@@ -69,6 +75,18 @@ class BlessingStoreImpl implements BlessingStore {
         } catch (VException e) {
             throw new RuntimeException("Couldn't get peer blessings", e);
         }
+    }
+    @Override
+    public void cacheDischarge(Discharge discharge, Caveat caveat, DischargeImpetus impetus) {
+        nativeCacheDischarge(nativePtr, discharge, caveat, impetus);
+    }
+    @Override
+    public void clearDischarges(List<Discharge> discharges) {
+        nativeClearDischarges(nativePtr, discharges.toArray());
+    }
+    @Override
+    public Discharge discharge(Caveat caveat, DischargeImpetus impetus) {
+        return nativeDischarge(nativePtr, caveat, impetus);
     }
     @Override
     public String debugString() {

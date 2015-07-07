@@ -4,10 +4,11 @@
 
 package io.v.v23.security;
 
-import io.v.v23.verror.VException;
-
 import java.security.interfaces.ECPublicKey;
+import java.util.List;
 import java.util.Map;
+
+import io.v.v23.verror.VException;
 
 /**
  * The interface for storing blessings bound to a principal and managing the subset of blessings to
@@ -89,6 +90,22 @@ public interface BlessingStore {
      * Returns all the blessings that the store currently holds for various peers.
      */
     Map<BlessingPattern, Blessings> peerBlessings();
+
+    /**
+     * Inserts the discharge for the provided impetus and caveat into the cache.
+     */
+    void cacheDischarge(Discharge discharge, Caveat caveat, DischargeImpetus impetus);
+
+    /**
+     * Clears the input discharges from the BlessingStore's discharge cache.
+     */
+    void clearDischarges(List<Discharge> discharges);
+
+    /**
+     * Takes a caveat and DischargeImpetus and returns a cached discharge, returning a {@link
+     * WireDischarge#zeroValue zero value} if no corresponding cached discharge can be found.
+     */
+    Discharge discharge(Caveat caveat, DischargeImpetus impetus);
 
     /**
      * Return a human-readable string description of the store.  This description is detailed and

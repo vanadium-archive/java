@@ -116,7 +116,7 @@ task checkVanadiumEnvironment {
     }
 }
 
-task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
+task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     def env = VanadiumEnvironment.getVanadiumEnvironment()
     def existingPath = System.getenv('PATH')
     if (existingPath == null) {
@@ -132,14 +132,14 @@ task buildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
 // Copy the shared library to its ultimate destination.
 if (isLinux()) {
-    task copyVanadiumLib(type: Copy, dependsOn: buildVanadiumLib) {
+    task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
         from v23Root + '/release/go/pkg/linux_amd64_shared/v.io/x'
         into 'build/libs'
         include 'jni.a'
         rename 'jni.a', 'libv23.so'
     }
 } else {  // darwin
-    task copyVanadiumLib(type: Copy, dependsOn: buildVanadiumLib) {
+    task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
         from v23Root + '/release/go/pkg/darwin_amd64/v.io/x'
         into 'build/libs'
         include 'jni.a'
@@ -164,6 +164,8 @@ tasks.'processTestResources'.dependsOn(copyVanadiumLib)
 // Therefore we always run the tests even if Gradle thinks that there is no
 // need.
 tasks.'test'.outputs.upToDateWhen({ false })
+
+task buildVanadiumLib(dependsOn: copyVanadiumLib) {}
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
