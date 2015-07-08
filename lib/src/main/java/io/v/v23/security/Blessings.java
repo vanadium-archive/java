@@ -4,11 +4,14 @@
 
 package io.v.v23.security;
 
-import io.v.v23.verror.VException;
+import com.google.common.base.Joiner;
 
 import java.io.Serializable;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.List;
+
+import io.v.v23.verror.VException;
 
 /**
  * Encapsulator of all the cryptographic operations required to prove that a set of blessings
@@ -114,7 +117,15 @@ public class Blessings implements Serializable {
     }
     @Override
     public String toString() {
-        return this.wire.toString();
+        List<String> chains = new ArrayList<>(getCertificateChains().size());
+        for (List<VCertificate> certificateChain : getCertificateChains()) {
+            List<String> certificateNames = new ArrayList<>(certificateChain.size());
+            for (VCertificate certificate : certificateChain) {
+                certificateNames.add(certificate.getExtension());
+            }
+            chains.add(Joiner.on("/").join(certificateNames));
+        }
+        return Joiner.on(",").join(chains);
     }
     @Override
     protected void finalize() {
