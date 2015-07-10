@@ -90,8 +90,8 @@ class VanadiumEnvironment {
         if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
             throw new InvalidUserDataException(
                     thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
-                    + "You probably didn't setup the java profile. Try running\n\n"
-                    + "v23 profile setup java\n\nand then try building again.")
+                    + "You probably didn't install the java profile. Try running\n\n"
+                    + "v23 profile install java\n\nand then try building again.")
         }
         return result
     }
@@ -103,8 +103,8 @@ task checkVanadiumEnvironment {
     if (System.getenv('JAVA_HOME') == null) {
         throw new InvalidUserDataException("The JAVA_HOME environment variable is not set. "
                 + "Please set it to the root of a JDK installation directory.  If JDK isn't "
-                + "installed, you probably didn't setup the java profile: try running\n\n"
-                + "v23 profile setup java\n\nand then try building again.")
+                + "installed, you probably didn't install the java profile: try running\n\n"
+                + "v23 profile install java\n\nand then try building again.")
     }
     if (!isAmd64()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
