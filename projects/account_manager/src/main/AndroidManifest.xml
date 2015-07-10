@@ -18,6 +18,9 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <!-- Needed for NFC and Android Beam Message Sending -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -76,10 +79,48 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".BeamBlessingActivity"
+            android:label="@string/title_activity_beam_blessing" >
+            <intent-filter>
+                <action android:name="android.nfc.action.BEAM_BLESSING" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BeamedBlessingReceiverActivity"
+            android:label="@string/title_activity_beamed_blessing_receiver" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="vanadium/mime/blessing/string"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BeamIdentityActivity"
+            android:label="@string/title_activity_beam_identity" >
+            <intent-filter>
+                <action android:name="android.nfc.action.BEAM_IDENTITY" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BeamedIdentityReceiverActivity"
+            android:label="@string/title_activity_beamed_identity_receiver" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="vanadium/mime/identity/string"/>
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".AccountChooserActivity"
             android:label="@string/title_activity_account_chooser"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
+        <activity
+            android:name=".StringInputActivity"
+            android:label="@string/title_activity_string_input"
+            android:theme="@android:style/Theme.Holo.Dialog">
+        </activity>
+
 
     </application>
 

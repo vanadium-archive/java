@@ -16,4 +16,12 @@
             android:targetClass="io.v.android.apps.account_manager.BlessedPackagesDisplayActivity"
             android:action="io.v.android.apps.account_manager.BLESSED_PACKAGES_DISPLAY"/>
     </Preference>
+
+    <Preference
+        android:title="@string/pref_beam_identity_subcategory">
+        <intent
+            android:targetPackage="io.v.android.apps.account_manager"
+            android:targetClass="io.v.android.apps.account_manager.BeamIdentityActivity"
+            android:action="io.v.android.apps.account_manager.BEAM_IDENTITY"/>
+    </Preference>
 </PreferenceScreen>
