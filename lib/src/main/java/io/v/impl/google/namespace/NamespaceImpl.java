@@ -4,8 +4,6 @@
 
 package io.v.impl.google.namespace;
 
-import io.v.v23.OptionDefs;
-import io.v.v23.Options;
 import org.joda.time.Duration;
 
 import java.util.List;
@@ -48,7 +46,8 @@ public class NamespaceImpl implements Namespace {
     private static native MountEntry nativeResolve(long nativePtr, VContext context, String name,
                                                    Options options) throws VException;
 
-    private static native boolean nativeFlushCacheEntry(long nativePtr, String name);
+    private static native boolean nativeFlushCacheEntry(long nativePtr, VContext context,
+                                                        String name);
 
     private static native void nativeSetRoots(long nativePtr, List<String> roots) throws VException;
 
@@ -125,8 +124,8 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public boolean flushCacheEntry(String name) {
-        return nativeFlushCacheEntry(nativePtr, name);
+    public boolean flushCacheEntry(VContext context, String name) {
+        return nativeFlushCacheEntry(nativePtr, context, name);
     }
 
     @Override

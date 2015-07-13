@@ -163,11 +163,12 @@ public interface Namespace {
      * Flushes resolution information cached for the given name. If anything was flushed it returns
      * {@code true}.
      *
+     * @param context a client context
      * @param name a Vanadium name, see also <a href="https://v.io/glossary.html#object-name">the
      *             Name entry</a> in the glossary
      * @return {@code true} if resolution information was for the name was flushed
      */
-    boolean flushCacheEntry(String name);
+    boolean flushCacheEntry(VContext context, String name);
 
     /**
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
