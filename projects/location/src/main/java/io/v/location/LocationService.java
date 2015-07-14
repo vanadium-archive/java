@@ -14,12 +14,18 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
@@ -38,7 +44,7 @@ public class LocationService extends Service {
             String msg = "Couldn't start LocationService: null or empty encoded blessings.";
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             android.util.Log.i(TAG, msg);
-            return START_STICKY;
+            return START_REDELIVER_INTENT;
         }
         try {
             Blessings blessings =
@@ -47,7 +53,7 @@ public class LocationService extends Service {
                 String msg = "Couldn't start LocationService: null blessings.";
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                 android.util.Log.i(TAG, msg);
-                return START_STICKY;
+                return START_REDELIVER_INTENT;
             }
             startLocationService(blessings);
         } catch (VException e) {
@@ -55,7 +61,7 @@ public class LocationService extends Service {
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             android.util.Log.i(TAG, msg);
         }
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void startLocationService(Blessings blessings) {
@@ -63,15 +69,23 @@ public class LocationService extends Service {
             // Update vanadium state with the new blessings.
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
+            p.blessingStore().set(blessings, new BlessingPattern("..."));
             p.addToRoots(blessings);
-            Log.i(TAG, "Added " + blessings + " to root");
-//            Log.i(TAG, p.blessingStore().debugString());
             Server s = V.newServer(mBaseContext);
-            Endpoint[] endpoints = s.listen(V.getListenSpec(mBaseContext));
+            Endpoint[] endpoints = s.listen(V.getListenSpec(mBaseContext).withProxy("proxy"));
             Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
+            String mountPoint;
+            String prefix = mountNameFromBlessings(blessings);
+            if ("".equals(prefix)) {
+                mountPoint = "";
+                Log.w(TAG, "Could not determine mount point from blessings '" + blessings + "'");
+            } else {
+                mountPoint = "users/" + prefix + "/location";
+                Log.i(TAG, "Mounting server at " + mountPoint);
+            }
             VeyronLocationService server = new VeyronLocationService(
                     (LocationManager) getSystemService(Context.LOCATION_SERVICE));
-            s.serve("spetrovic/location", server, VSecurity.newAllowEveryoneAuthorizer());
+            s.serve(mountPoint, server, VSecurity.newAllowEveryoneAuthorizer());
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
         } catch (VException e) {
             String msg = "Couldn't start LocationService: " + e.getMessage();
@@ -86,7 +100,7 @@ public class LocationService extends Service {
         return null;
     }
 
-    private class VeyronLocationService implements LocationServer  {
+    private static class VeyronLocationService implements LocationServer  {
         private final LocationManager manager;
 
         private VeyronLocationService(LocationManager manager) {
@@ -106,5 +120,16 @@ public class LocationService extends Service {
             }
             return new LatLng(location.getLatitude(), location.getLongitude());
         }
+    }
+
+    private static String mountNameFromBlessings(Blessings blessings) {
+        for (List<VCertificate> chain : blessings.getCertificateChains()) {
+            for (VCertificate certificate : Lists.reverse(chain)) {
+                if (certificate.getExtension().contains("@")) {
+                    return certificate.getExtension();
+                }
+            }
+        }
+        return "";
     }
 }
