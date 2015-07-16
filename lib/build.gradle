@@ -42,7 +42,7 @@ public static getOS() {
 }
 
 def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
-def v23Bin = new File(v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
+def v23Bin = VanadiumEnvironment.getVanadiumEnvironment().v23Bin.getAbsolutePath()
 
 task buildVdlTool(type: Exec) {
     commandLine v23Bin, 'go', 'install', 'v.io/x/ref/cmd/vdl'

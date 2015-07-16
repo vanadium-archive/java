@@ -51,24 +51,96 @@ dependencies {
     }
 }
 
-task cleanNativeLibOutputs(type: Delete) {
-    delete 'src/main/jniLibs/armeabi-v7a/libv23.h'
+public static isDarwin() {
+    return getOS().contains("os x")
 }
 
-task buildNativeLib(type: Exec, dependsOn: cleanNativeLibOutputs) {
-    def v23Root = System.getenv('V23_ROOT')
-    if (v23Root == null) {
-        throw new InvalidUserDataException('V23_ROOT environment variable is not set, did you follow the Vanadium installation instructions?')
+public static isLinux() {
+    return getOS().contains("linux")
+}
+
+public static isAmd64() {
+    return getArch().contains("x86_64") || getArch().contains("amd64")
+}
+
+public static getArch() {
+    return System.properties['os.arch'].toLowerCase()
+}
+
+public static getOS() {
+    return System.properties['os.name'].toLowerCase()
+}
+
+def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
+
+class VanadiumEnvironment {
+    File v23Root;
+    File v23Bin;
+    File thirdPartyGoBinDir;
+
+    public static getVanadiumEnvironment() {
+        VanadiumEnvironment result = new VanadiumEnvironment()
+
+        if (!System.getenv().containsKey('V23_ROOT')) {
+            throw new InvalidUserDataException("V23_ROOT is not set. "
+                    + "Please follow the Vanadium installation instructions at "
+                    + "https://v.io/installation/index.html")
+        }
+
+        result.v23Root = new File(System.getenv()['V23_ROOT'])
+        result.v23Bin = new File(result.v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
+        if (!result.v23Bin.exists() || !result.v23Bin.isFile() || !result.v23Bin.canExecute()) {
+            throw new InvalidUserDataException(
+                    result.v23Bin.toString() + " does not exist or is not an executable file. "
+                    + "Please follow the Vanadium installation instructions at "
+                    + "https://v.io/installation/index.html")
+        }
+
+        result.thirdPartyGoBinDir = new File(result.v23Root,
+                ['third_party', 'android', 'go', 'bin'].join(File.separator))
+        def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
+        if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
+            throw new InvalidUserDataException(
+                    thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
+                    + "You probably didn't install the android profile. Try running\n\n"
+                    + "v23 profile install android\n\nand then try building again.")
+        }
+        return result
     }
-    def oldPath = System.getenv('PATH')
-    if (oldPath == null) {
-        oldPath = ''
+}
+
+task checkVanadiumEnvironment {
+    VanadiumEnvironment.getVanadiumEnvironment()
+    if (!isAmd64()) {
+        throw new InvalidUserDataException("Android Vanadium builds only enabled on amd64 "
+                + "architectures, not: " + getArch())
     }
-    environment 'GOOS', 'android'
-    environment 'GOARCH', 'arm'
-    environment 'GOARM', '7'
-    environment 'PATH', v23Root + '/third_party/android/go/bin:' + oldPath
-    commandLine v23Root + '/devtools/bin/v23', 'go', 'build', '-o', 'src/main/jniLibs/armeabi-v7a/libv23.so', '-buildmode=c-shared', '-v', '-a', '-tags', 'android', 'v.io/x/jni'
+    if (!isLinux() && !isDarwin()) {
+        throw new InvalidUserDataException("Android Vanadium builds only enabled on "
+                + "linux/darwin systems, not: " + getOS())
+    }
+}
+
+task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
+    def env = VanadiumEnvironment.getVanadiumEnvironment()
+    def existingPath = System.getenv('PATH')
+    if (existingPath == null) {
+        existingPath = ""
+    }
+
+    environment 'V23_PROFILE': 'android'
+    environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
+
+    commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
+            '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni'
+}
+
+// Copy the shared library to its ultimate destination.
+task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
+    from v23Root + '/release/go/pkg/android_arm/v.io/x'
+    into 'src/main/jniLibs/armeabi-v7a'
+    include 'jni.a'
+    rename 'jni.a', 'libv23.so'
 }
 
 clean {
@@ -105,5 +177,5 @@ wrapper {
     gradleVersion = '2.4'
 }
 
-tasks.'preBuild'.dependsOn(buildNativeLib)
+tasks.'preBuild'.dependsOn(copyVanadiumLib)
 tasks.'publish'.dependsOn(tasks.'assemble')
