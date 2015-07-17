@@ -87,7 +87,8 @@ public interface BlessingStore {
     ECPublicKey publicKey();
 
     /**
-     * Returns all the blessings that the store currently holds for various peers.
+     * Returns all the blessings that the store currently holds for various peers.  Never returns
+     * {@code null}.
      */
     Map<BlessingPattern, Blessings> peerBlessings();
 

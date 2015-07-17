@@ -8,7 +8,9 @@ import android.content.Context;
 
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Constants;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
@@ -17,6 +19,7 @@ import io.v.v23.verror.VException;
 
 import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
+import java.util.Map;
 
 /**
  * The local android environment allowing clients and servers to communicate with one another.
@@ -91,13 +94,18 @@ public class V extends io.v.v23.V {
             // Generate a new private key.
             keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
         }
-        final VSigner signer = VSecurity.newSigner(
+        VSigner signer = VSecurity.newSigner(
                 keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
-        final VPrincipal principal = VSecurity.newPrincipal(signer);
-        final Blessings blessings = principal.blessSelf(ctx.getPackageName());
-        principal.blessingStore().setDefaultBlessings(blessings);
-        principal.blessingStore().set(blessings, Constants.ALL_PRINCIPALS);
-        principal.addToRoots(blessings);
+        VPrincipal principal =
+                VSecurity.newPersistentPrincipal(signer, ctx.getFilesDir().getAbsolutePath());
+        // Make sure we have at least one (i.e., self-signed) blessing in the store.
+        BlessingStore store = principal.blessingStore();
+        if (store.peerBlessings().isEmpty()) {
+            Blessings self = principal.blessSelf(ctx.getPackageName());
+            store.setDefaultBlessings(self);
+            store.set(self, Constants.ALL_PRINCIPALS);
+            principal.addToRoots(self);
+        }
         return principal;
     }
 

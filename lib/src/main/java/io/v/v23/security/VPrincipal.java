@@ -98,7 +98,7 @@ public interface VPrincipal {
 
     /**
      * Provides access to the {@link BlessingStore} containing blessings that have been granted to
-     * this principal.
+     * this principal.  The returned {@link BlessingStore} is never {@code null}.
      *
      * @return a {@link BlessingStore} containing blessings that have been granted to this principal
      */
@@ -106,7 +106,7 @@ public interface VPrincipal {
 
     /**
      * Returns the set of recognized authorities (identified by their public keys) on blessings that
-     * match specific patterns.
+     * match specific patterns.  Never returns {@code null}.
      */
     BlessingRoots roots();
 
