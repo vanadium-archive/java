@@ -3,8 +3,8 @@
     <string name="pref_category">Settings</string>
     <string name="pref_vanadium_subcategory">Vanadium</string>
     <string name="pref_status_subcategory">Audit Log</string>
-    <string name="pref_beam_blessing_subcategory">Beam Blessing</string> // Newly Added
-    <string name="pref_beam_identity_subcategory">Get Blessed Via NFC</string> // Newly Added
+    <string name="pref_blessing_store_subcategory">Blessing Store</string>
+    <string name="pref_blessing_request_subcategory">Request Blessings</string>
     <string name="pref_identity_service_name">Identity Service</string>
     <string name="pref_identity_service_name_summ">Name of the Vanadium Identity Service</string>
 </resources>

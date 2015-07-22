@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vanadium Account Service</string>
+
     <string name="title_activity_account">Add a Vanadium Account</string>
-    <string name="title_activity_blessing">Bless a Vanadium Account</string>
+    <string name="title_activity_blessing">Bless a Vanadium Application</string>
     <string name="title_activity_account_chooser">"Choose Account(s) "</string>
-    <string name="title_activity_string_input">"Choose Name"</string>
+    <string name="title_activity_blessing_chooser">"Choose Blessing(s) "</string>
+    <string name="title_activity_text_input">"Choose Name"</string>
     <string name="title_activity_settings">Vanadium Settings</string>
     <string name="title_activity_blessed_packages_display">Blessed Packages</string>
+    <string name="title_activity_blessing_store_display">Blessing Store</string>
+    <string name="title_activity_blessing_display">Blessing Details</string>
+    <string name="title_activity_certificate_display">Certificate Details</string>
     <string name="title_activity_blessing_events_display">Recent Blessings</string>
-    <string name="title_activity_beam_blessing">Beam Blessings</string>
-    <string name="title_activity_beam_identity">Beam Identity</string>
-    <string name="title_activity_beamed_blessing_receiver">Received Beamed Blessing</string>
-    <string name="title_activity_beamed_identity_receiver">Received Beamed Identity</string>
+    <string name="title_activity_grant_blessings">Grant Blessings</string>
+    <string name="title_activity_request_blessings">Request Blessings</string>
+    <string name="title_activity_nfc_blessee_send">Request Blessings Via NFC</string>
+    <string name="title_activity_nfc_blesser_send">Send Blessings Via NFC</string>
+    <string name="title_activity_bless">Specify Extending Certificate</string>
+    <string name="title_activity_blessee_request">Generate Blessing Request</string>
+    <string name="title_activity_blessee_recv">Received Granted Blessings</string>
+    <string name="title_activity_blesser_recv">Received Request for Blessings</string>
+    <string name="title_activity_store_blessings">Received Request for Blessings</string>
+
     <string name="action_settings">Settings</string>
-    <string name="blessing_text_blessing">Above application wants blessings from Vanadium account(s): </string>
-    <string name="blessing_button_accept">Accept</string>
-    <string name="blessing_button_deny">Deny</string>
-    <string name="blessing_text_caveat">Apply the following caveats to the blessing: </string>
+
+    <string name="bless_edittext_extension">ext</string>
+    <string name="bless_text_blessing">Extend the following blessing(s) for the above:</string>
+    <string name="bless_text_extension">Name to extend with:</string>
+    <string name="bless_button_accept">Bless</string>
+    <string name="bless_button_deny">Deny</string>
+    <string name="bless_text_caveat">Caveats to apply: </string>
+
     <string name="chooser_button_add">Add</string>
     <string name="chooser_button_cancel">Cancel</string>
     <string name="chooser_button_ok">OK</string>
+
     <string name="expiry_caveat_default_number_units">1</string>
 </resources>

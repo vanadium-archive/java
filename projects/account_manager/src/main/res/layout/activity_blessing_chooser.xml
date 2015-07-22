@@ -6,38 +6,50 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
-    tools:context=".StringInputActivity"
-    android:id="@+id/containerBox">
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/input_layout"
+    tools:context=".BlessingChooserActivity">
+    <LinearLayout
+        android:id="@+id/layer_blessings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentTop="true">
 
+        <ScrollView
+            android:id="@+id/scroll_blessings"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/chooser_blessings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <EditText
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:inputType="textPersonName"
-            android:text="@string/bless_edittext_extension"
-            android:ems="10"
-            android:id="@+id/nameEditText" />
-
+                <!-- Blessing layouts will be added here programatically. -->
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
-
-
     <LinearLayout
         android:id="@+id/layer_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="3.0"
         android:orientation="horizontal"
-        android:paddingTop="60dp">
+        android:layout_below="@id/layer_blessings">
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/button_add"
+            android:text="@string/chooser_button_add"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:onClick="onAdd"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <include layout="@layout/vertical_separator"/>
+
+        <Button
+            android:id="@+id/button_cancel"
             android:text="@string/chooser_button_cancel"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -48,15 +60,14 @@
         <include layout="@layout/vertical_separator"/>
 
         <Button
-            android:id="@+id/okButton"
+            android:id="@+id/button_ok"
             android:text="@string/chooser_button_ok"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:onClick="onOK"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            style="?android:attr/borderlessButtonStyle"/>
     </LinearLayout>
+
 
 </RelativeLayout>

@@ -79,35 +79,77 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BeamBlessingActivity"
-            android:label="@string/title_activity_beam_blessing" >
+            android:name=".BlessingStoreDisplayActivity"
+            android:label="@string/title_activity_blessing_store_display" >
             <intent-filter>
-                <action android:name="android.nfc.action.BEAM_BLESSING" />
+                <action android:name="io.v.android.apps.account_manager.BLESSING_STORE_DISPLAY" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".BeamedBlessingReceiverActivity"
-            android:label="@string/title_activity_beamed_blessing_receiver" >
+            android:name=".BlessingDisplayActivity"
+            android:label="@string/title_activity_blessing_display" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.DISPLAY_BLESSING" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CertificateDisplayActivity"
+            android:label="@string/title_activity_certificate_display" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.DISPLAY_CERTIFICATE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BlesseeRequestActivity"
+            android:label="@string/title_activity_blessee_request" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.REQUEST_BLESSINGS" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NfcBlesseeSendActivity"
+            android:label="@string/title_activity_nfc_blessee_send" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NFC_BLESSEE_SEND" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NfcBlesserRecvActivity"
+            android:label="@string/title_activity_blesser_recv" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vanadium/mime/blessing/string"/>
+                <data android:mimeType="vanadium/mime/request/blessing/string"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".BeamIdentityActivity"
-            android:label="@string/title_activity_beam_identity" >
+            android:name=".BlessActivity"
+            android:label="@string/title_activity_bless" >
             <intent-filter>
-                <action android:name="android.nfc.action.BEAM_IDENTITY" />
+                <action android:name="io.v.android.apps.account_manager.BLESS" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".BeamedIdentityReceiverActivity"
-            android:label="@string/title_activity_beamed_identity_receiver" >
+            android:name=".NfcBlesserSendActivity"
+            android:label="@string/title_activity_nfc_blesser_send" >
+            <intent-filter>
+                <action android:name="android.nfc.action.NFC_BLESSER_SEND" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NfcBlesseeRecvActivity"
+            android:label="@string/title_activity_blessee_recv" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vanadium/mime/identity/string"/>
+                <data android:mimeType="vanadium/mime/grant/blessing/string"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".StoreBlessingsActivity"
+            android:label="@string/title_activity_store_blessings" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.STORE" />
             </intent-filter>
         </activity>
         <activity
@@ -116,11 +158,15 @@
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
         <activity
-            android:name=".StringInputActivity"
-            android:label="@string/title_activity_string_input"
+            android:name=".BlessingChooserActivity"
+            android:label="@string/title_activity_blessing_chooser"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
-
+        <activity
+            android:name=".TextInputActivity"
+            android:label="@string/title_activity_text_input"
+            android:theme="@android:style/Theme.Holo.Dialog">
+        </activity>
 
     </application>
 

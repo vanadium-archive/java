@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// TODO(sjayanti): Merge with BlessActivity.
+
+
 package io.v.android.apps.account_manager;
 
 import android.accounts.Account;

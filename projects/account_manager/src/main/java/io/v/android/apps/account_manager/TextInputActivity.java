@@ -9,52 +9,54 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Prompts user to choose among potentially many Vanadium accounts.
+ * Prompts user to input a string.
  */
-public class StringInputActivity extends Activity {
-    public static final String TAG = "StringInputActivity";
-
+public class TextInputActivity extends Activity {
+    public static final String TAG = "BlessingExtensionInput";
     public static final String ERROR = "ERROR";
     public static final String REPLY = "REPLY";
+    public static final String TITLE = "TITLE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_string_input);
+        String title = getIntent().getExtras().getString(TITLE);
+        if (title != null) {
+            this.setTitle(title);
+        }
     }
 
     public void onOK(View v) {
-        LinearLayout inputView = (LinearLayout) findViewById(R.id.input_layout);
         TextView textView = (EditText) findViewById(R.id.nameEditText);
-        String name = textView.getText().toString();
+        String text = textView.getText().toString();
 
-        if (name.isEmpty()) {
-            Toast.makeText(this, "Must enter non-empty name.", Toast.LENGTH_LONG).show();
+        if (text.isEmpty()) {
+            Toast.makeText(this, "Must enter non-empty text.", Toast.LENGTH_LONG).show();
             return;
         } else {
-            replyWithSuccess(name);
+            replyWithSuccess(text);
         }
     }
 
     public void onCancel(View v) {
-        replyWithError("User canceled account selection.");
+        replyWithError("User canceled text input.");
     }
 
-    private void replyWithSuccess(String name) {
+    private void replyWithSuccess(String text) {
         Intent intent = new Intent();
-        intent.putExtra(REPLY, name);
+        intent.putExtra(REPLY, text);
         setResult(RESULT_OK, intent);
         finish();
     }
 
     private void replyWithError(String error) {
-        android.util.Log.e(TAG, "Account choosing error: " + error);
+        android.util.Log.e(TAG, "Text input error: " + error);
         Intent intent = new Intent();
         intent.putExtra(ERROR, error);
         setResult(RESULT_CANCELED, intent);

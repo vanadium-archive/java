@@ -18,10 +18,19 @@
     </Preference>
 
     <Preference
-        android:title="@string/pref_beam_identity_subcategory">
+        android:title="@string/pref_blessing_store_subcategory">
         <intent
             android:targetPackage="io.v.android.apps.account_manager"
-            android:targetClass="io.v.android.apps.account_manager.BeamIdentityActivity"
-            android:action="io.v.android.apps.account_manager.BEAM_IDENTITY"/>
+            android:targetClass="io.v.android.apps.account_manager.BlessingStoreDisplayActivity"
+            android:action="io.v.android.apps.account_manager.BLESSING_STORE_DISPLAY"/>
     </Preference>
+
+    <Preference
+        android:title="@string/pref_blessing_request_subcategory">
+        <intent
+            android:targetPackage="io.v.android.apps.account_manager"
+            android:targetClass="io.v.android.apps.account_manager.BlesseeRequestActivity"
+            android:action="io.v.android.apps.account_manager.REQUEST_BLESSINGS"/>
+    </Preference>
+
 </PreferenceScreen>

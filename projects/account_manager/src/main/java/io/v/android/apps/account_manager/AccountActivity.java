@@ -38,17 +38,19 @@ import java.security.interfaces.ECPublicKey;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.VCertificate;
 import io.v.v23.security.CryptoUtil;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.VomUtil;
 import io.v.x.ref.services.identity.OAuthBlesserClient;
 import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 
 /**
  * Creates a new Vanadium account, using the Google accounts present on the device.
  */
+// TODO: Change to BlessingCreationActivity.
 public class AccountActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "AccountActivity";
     private static final int REQUEST_CODE_PICK_ACCOUNTS = 1000;
@@ -227,48 +229,35 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 replyWithError("Couldn't get identity from Vanadium identity servers: " + errorMsg);
                 return;
             }
-            // VOM-encode the blessing.
-            try {
-                String encoded = VomUtil.encodeToString(blessing, Blessings.class);
-                replyWithSuccess(blessing, encoded);
-            } catch (VException e) {
-                replyWithError("Couldn't encode identity obtained from Vanadium " +
-                        "identity servers: " + e.getMessage());
-            }
+
+            replyWithSuccess(blessing);
         }
     }
 
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error creating account: " + error);
         setResult(RESULT_CANCELED);
-        String text = "Couldn't create account: " + error;
+        String text = "Couldn't create blessing: " + error;
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         finish();
     }
 
-    private void replyWithSuccess(Blessings blessing, String encoded) {
-        String userName = userNameFromBlessing(blessing);
-        Account account = new Account(userName, getResources().getString(R.string.authenticator_account_type));
-        AccountManager am = AccountManager.get(this);
-        am.addAccountExplicitly(account, null, null);
-        am.setAuthToken(account, "Blessings", encoded);
-        setAccountAuthenticatorResult(new Intent().getExtras());
+    private void replyWithSuccess(Blessings blessing) {
+        // Store the obtained blessing from identity server.
+        try {
+            VPrincipal principal = V.getPrincipal(mBaseContext);
+            BlessingStore blessingStore = principal.blessingStore();
+
+            Blessings oldBlessings = blessingStore.forPeer("...");
+            Blessings newBlessings =
+                    VSecurity.unionOfBlessings(new Blessings[]{oldBlessings, blessing});
+            blessingStore.set(newBlessings, new BlessingPattern("..."));
+        } catch (VException e) {
+            replyWithError("Couldn't store obtained blessing: " + e.getMessage());
+        }
+
         setResult(RESULT_OK);
         Toast.makeText(this, "Success.", Toast.LENGTH_SHORT).show();
         finish();
-    }
-
-    private static String userNameFromBlessing(Blessings blessing) {
-        if (blessing.getCertificateChains().size() != 1) {  // should never happen.
-            return "";
-        }
-        String ret = "";
-        for (VCertificate c : blessing.getCertificateChains().get(0)) {
-            if (!ret.isEmpty()) {
-                ret += "/";
-            }
-            ret += c.getExtension();
-        }
-        return ret;
     }
 }
