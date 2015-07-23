@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Positioning</string>
+    <string name="action_settings">Settings</string>
+    <string name="vanadium_identity">Vanadium Identity</string>
+    <!-- Main Activity -->
+    <string name="record_my_location">Record my GPS location</string>
+    <string name="find_and_record_devices">Find and record devices</string>
+    <!-- Finding Devices with Bluetooth -->
+    <string name="positioning_with_bluetooth">Positioning with Bluetooth</string>
+    <string name="finding_devices">Finding devices...</string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="discovery_finished">Discovery finished</string>
+    <string name="recorded_devices">Recorded Devices</string>
+    <string name="find_devices">Find devices</string>
+</resources>
