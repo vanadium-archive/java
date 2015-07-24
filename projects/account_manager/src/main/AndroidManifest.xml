@@ -138,7 +138,8 @@
         </activity>
         <activity
             android:name=".NfcBlesseeRecvActivity"
-            android:label="@string/title_activity_blessee_recv" >
+            android:label="@string/title_activity_blessee_recv"
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -147,15 +148,11 @@
         </activity>
         <activity
             android:name=".StoreBlessingsActivity"
-            android:label="@string/title_activity_store_blessings" >
+            android:label="@string/title_activity_store_blessings"
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.STORE" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".AccountChooserActivity"
-            android:label="@string/title_activity_account_chooser"
-            android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
         <activity
             android:name=".BlessingChooserActivity"
