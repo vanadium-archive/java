@@ -56,6 +56,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     private static final int REQUEST_CODE_PICK_ACCOUNTS = 1000;
     private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
+    private static final String ACCOUNT_TYPE = "io.vanadium";
     private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
@@ -229,7 +230,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 replyWithError("Couldn't get identity from Vanadium identity servers: " + errorMsg);
                 return;
             }
-
             replyWithSuccess(blessing);
         }
     }
@@ -243,6 +243,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     }
 
     private void replyWithSuccess(Blessings blessing) {
+        enforceAccountExists();
         // Store the obtained blessing from identity server.
         try {
             VPrincipal principal = V.getPrincipal(mBaseContext);
@@ -259,5 +260,15 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         setResult(RESULT_OK);
         Toast.makeText(this, "Success.", Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    private void enforceAccountExists() {
+        if (AccountManager.get(this).getAccountsByType(ACCOUNT_TYPE).length <= 0){
+            String name = "Vanadium";
+            Account account = new Account(name, getResources().getString(
+                    R.string.authenticator_account_type));
+            AccountManager am = AccountManager.get(this);
+            am.addAccountExplicitly(account, null, null);
+        }
     }
 }

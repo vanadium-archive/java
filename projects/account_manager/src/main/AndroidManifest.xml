@@ -162,11 +162,6 @@
             android:label="@string/title_activity_blessing_chooser"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
-        <activity
-            android:name=".TextInputActivity"
-            android:label="@string/title_activity_text_input"
-            android:theme="@android:style/Theme.Holo.Dialog">
-        </activity>
 
     </application>
 

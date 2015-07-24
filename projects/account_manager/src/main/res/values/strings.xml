@@ -6,7 +6,6 @@
     <string name="title_activity_local_blessing">Bless a Vanadium Application</string>
     <string name="title_activity_account_chooser">"Choose Account(s) "</string>
     <string name="title_activity_blessing_chooser">"Choose Blessing(s) "</string>
-    <string name="title_activity_text_input">"Choose Name"</string>
     <string name="title_activity_settings">Vanadium Settings</string>
     <string name="title_activity_blessed_principals_display">Blessed Vanadium Principal Logs</string>
     <string name="title_activity_blessing_store_display">Blessing Store</string>
