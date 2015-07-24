@@ -37,7 +37,7 @@ public class BlessingsManager {
     private static final String PREF_KEY = "VanadiumBlessings";
 
     private static final String BLESSING_PKG = "io.v.android.apps.account_manager";
-    private static final String BLESSING_ACTIVITY = "BlessingActivity";
+    private static final String BLESSING_ACTIVITY = "LocalBlessingActivity";
     private static final String BLESSEE_PUBKEY_KEY = "BLESSEE_PUBKEY";
     private static final String ERROR = "ERROR";
     private static final String REPLY = "REPLY";

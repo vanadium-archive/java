@@ -9,14 +9,7 @@
             android:action="io.v.android.apps.account_manager.SETTINGS"/>
     </Preference>
 
-    <Preference
-        android:title="@string/pref_status_subcategory">
-        <intent
-            android:targetPackage="io.v.android.apps.account_manager"
-            android:targetClass="io.v.android.apps.account_manager.BlessedPackagesDisplayActivity"
-            android:action="io.v.android.apps.account_manager.BLESSED_PACKAGES_DISPLAY"/>
-    </Preference>
-
+    <PreferenceCategory android:title="@string/pref_blessing_management"/>
     <Preference
         android:title="@string/pref_blessing_store_subcategory">
         <intent
@@ -33,4 +26,11 @@
             android:action="io.v.android.apps.account_manager.REQUEST_BLESSINGS"/>
     </Preference>
 
+    <Preference
+        android:title="@string/pref_blessed_principals_logs_subcategory">
+        <intent
+            android:targetPackage="io.v.android.apps.account_manager"
+            android:targetClass="io.v.android.apps.account_manager.BlessedPrincipalsDisplayActivity"
+            android:action="io.v.android.apps.account_manager.BLESSED_PRINCIPALS_DISPLAY"/>
+    </Preference>
 </PreferenceScreen>

@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// TODO(sjayanti): Merge with BlessingActivity.
 package io.v.android.apps.account_manager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -21,9 +21,14 @@ import android.widget.Toast;
 
 import org.joda.time.DateTime;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
@@ -40,20 +45,69 @@ import io.v.v23.vom.VomUtil;
  *      1) local blessings,
  *      2) caveats, and
  *      3) extension.
+ * The activity subsequently attempts to log this blessing event; it does not fail if logging is
+ * unsuccessful.
  */
 public class BlessActivity extends Activity implements AdapterView.OnItemSelectedListener {
     public static final String TAG = "BlessActivity";
     public static final String ERROR = "ERROR";
     public static final String REPLY = "REPLY";
 
+    // Names of intent extras that BlessActivity is expecting to receive when invoked.
+    public static final String BLESSEE_PUBLIC_KEY = "BLESSEE_PUBLIC_KEY";
+    public static final String BLESSEE_NAMES      = "BLESSEE_NAMES";
+    public static final String BLESSEE_EXTENSION  = "BLESSEE_EXTENSION";
+    public static final String BLESSEE_EXTENSION_MUTABLE = "BLESSEE_EXTENSION_MUTABLE";
+
+    /* The logging scheme for remote blessings is as follows. **************************************
+     *      The SharedPreferences file LOG_REMOTE_PRINCIPALS stores the public keys of blessed
+     *          principals.
+     *      The SharedPreferences file LOG_REMOTE_BLESSINGS stores serialized data for the blessings
+     *          that the principals were blessed with.
+     *
+     *      LOG_REMOTE_PRINCIPALS is structured as follows:
+     *          The NUM_REMOTE_PRINCIPALS_KEY has an int value n that corresponds to the number of
+     *              principals blessed hereto by the account manager app.
+     *          The public keys of these principals are keyed by
+     *              REMOTE_PRINCIPAL_KEY_0 ... REMOTE_PRINCIPAL_KEY_(n-1),
+     *              where REMOTE_PRINCIPAL_KEY is the static string defined below.
+     *          Furthermore, the blessing names that the holder presented initially to get blessed
+     *              are stored at REMOTE_PRINCIPAL_NAMES_KEY_0 ... REMOTE_PRINCIPAL_NAMES_KEY_(n-1).
+     *
+     *      LOG_REMOTE_BLESSINGS contains the actual blessing data indexed as follows:
+     *          The number of blessings given to a principal with public key - pk - is listed in
+     *              LOG_REMOTE_PRINCIPALS.  Let us say m blessings were given out.
+     *          Only MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL blessing events are maintained, so the
+     *              string serializations of stored blessing events are keyed by
+     *              pk_(m - MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL) ... pk_(m-1), if m is greater than
+     *              MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL, and pk_0 ... pk_(m-1) otherwise.
+     *
+     * Rationale for the scheme:
+     *      A seemingly simpler implementation would have maintained a map of the form:
+     *          pk --> Set of Blessings
+     *          in the shared preferences file; however this would make adding to the log take
+     *          linear time, as the stored set could not be added to directly.  Therefore, in order
+     *          to add to the set one would need to copy the whole set, add to the copy, and then
+     *          re-insert the new set in the map.
+     *      Our scheme clearly cuts this time complexity down.
+     **********************************************************************************************/
+    public static final String LOG_PRINCIPALS = "LOG_PRINCIPALS";
+    public static final String LOG_BLESSINGS  = "LOG_BLESSINGS";
+    public static final String NUM_PRINCIPALS_KEY  = "numRemotePrincipals";
+    public static final String PRINCIPAL_KEY       = "principal";
+    public static final String PRINCIPAL_NAMES_KEY = "principalName";
+    public static final int MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL = 50;
+
     private static final int BLESSING_CHOOSING_REQUEST = 1;
 
     VContext mBaseContext = null;
     Blessings mWithBlessings = null;
     ECPublicKey mBlesseePublicKey = null;
-    String[] mRemoteEndNames = null;
+    String[] mBlesseeNames = null;
+    String mExtension = "";
+    boolean mExtensionMutable = true;
     ProgressDialog mDialog = null;
-    String mBlessingsVom = null;
+    String mBlessingsVom = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +115,30 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         mBaseContext = V.init(this);
 
         Intent intent = getIntent();
-        mRemoteEndNames = intent.getStringArrayExtra(NfcBlesserRecvActivity.REMOTE_END_NAMES);
-        mBlesseePublicKey = (ECPublicKey)
-                intent.getExtras().get(NfcBlesserRecvActivity.REMOTE_END_PUBLIC_KEY);
+        if (intent == null) {
+            replyWithError("Intent not found.");
+            return;
+        }
+        Bundle extras = intent.getExtras();
+        if (extras == null) {
+            replyWithError("No extras received.");
+            return;
+        }
+        mBlesseeNames = intent.getStringArrayExtra(BLESSEE_NAMES);
+        if (mBlesseeNames == null || mBlesseeNames.length <= 0) {
+            replyWithError("Blessee names not received.");
+            return;
+        }
+        mBlesseePublicKey = (ECPublicKey) extras.get(BLESSEE_PUBLIC_KEY);
+        if (mBlesseePublicKey == null) {
+            replyWithError("No public key received");
+            return;
+        }
+        mExtension = intent.getStringExtra(BLESSEE_EXTENSION);
+        if (mExtension == null) {
+            mExtension = "";
+        }
+        mExtensionMutable = intent.getBooleanExtra(BLESSEE_EXTENSION_MUTABLE, true);
 
         // Choose blessings to extend.
         startActivityForResult(
@@ -98,11 +173,28 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
                 Toast.makeText(this, "Must enter non-empty extension.", Toast.LENGTH_LONG).show();
                 return;
             } else {
+                try {
+                    log(VomUtil.encodeToString(mWithBlessings, Blessings.class), caveats,
+                            extension);
+                } catch (Exception e) {
+                    String msg = "Couldn't log blessing event: " + e.getMessage();
+                    android.util.Log.e(TAG, msg);
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                }
                 bless(extension, caveats);
             }
         } catch (VException e) {
             replyWithError("Could not get caveats.");
         }
+    }
+    private String encodePubKeyToString(ECPublicKey publicKey) throws IOException{
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+        objOut.writeObject(publicKey);
+        objOut.close();
+        byte[] byteArray = byteOut.toByteArray();
+        String stringEncoding = VomUtil.bytesToHexString(byteArray);
+        return stringEncoding;
     }
 
     public void onDeny(View view) {
@@ -248,12 +340,10 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         setContentView(R.layout.activity_bless);
 
         TextView blesseeNames = (TextView) findViewById(R.id.text_application);
-
         String names = "Blessee Names:";
-        for (String name: mRemoteEndNames) {
+        for (String name : mBlesseeNames) {
             names += "\n" + name;
         }
-
         blesseeNames.setText(names);
 
         String[] blessingNames = mWithBlessings.toString().split(",");
@@ -272,6 +362,10 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         } catch (Exception e) {
             replyWithError("Failed to get caveats.");
         }
+
+        EditText extensionText = (EditText) findViewById(R.id.nameEditText);
+        extensionText.setText(mExtension);
+        extensionText.setEnabled(mExtensionMutable);
     }
 
     private void bless(String extension, List<Caveat> caveats) {
@@ -331,6 +425,53 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
                 mDialog.dismiss();
             }
             replyWithSuccess(mBlessingsVom);
+        }
+    }
+
+    private void log(String blessingsVom, List<Caveat> caveats, String extension)
+            throws Exception{
+        BlessingEvent newBlessingEvent =
+                new BlessingEvent(mBlesseeNames, blessingsVom, DateTime.now(), caveats, extension);
+        String pubKey = encodePubKeyToString(mBlesseePublicKey);
+
+        SharedPreferences blessingsLog = getSharedPreferences(LOG_BLESSINGS, MODE_PRIVATE);
+        SharedPreferences.Editor blessingsLogEditor = blessingsLog.edit();
+        SharedPreferences principalsLog = getSharedPreferences(LOG_PRINCIPALS, MODE_PRIVATE);
+        SharedPreferences.Editor principalsLogEditor = principalsLog.edit();
+
+        int numEvents = blessingsLog.getInt(pubKey, 0);
+
+        // Save the newBlessingEvent in the LOG_REMOTE_BLESSINGS file.
+        String strNewEvent = newBlessingEvent.encodeToString();
+        blessingsLogEditor.putString(pubKey + "_" + numEvents, strNewEvent);
+        blessingsLogEditor.putInt(pubKey, numEvents + 1);
+        if (!blessingsLogEditor.commit()) {
+            throw new Exception("Failed to commit log changes");
+        }
+
+        // Delete stale blessing entry, if there are too many entries for the principal.
+        String keyToDelete = pubKey + "_" + (numEvents - MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL);
+        if (numEvents > MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL && blessingsLog.contains(keyToDelete)) {
+            blessingsLogEditor.remove(keyToDelete);
+            blessingsLogEditor.apply();
+        }
+
+        // Record that the principal with the public key pubKey and names mBlesseeNames has been
+        // blessed in the LOG_REMOTE_PRINCIPALS file if this has not already been done.
+        if (numEvents <= 0) {
+            int numPrincipals = principalsLog.getInt(NUM_PRINCIPALS_KEY, 0);
+            String principalsKey = PRINCIPAL_KEY + "_" + numPrincipals;
+            String principalNamesKey = PRINCIPAL_NAMES_KEY + "_" + numPrincipals;
+            principalsLogEditor.putString(principalsKey, pubKey);
+            principalsLogEditor.putInt(NUM_PRINCIPALS_KEY, numPrincipals + 1);
+
+            Set<String> blesseeNameSet = new HashSet<>();
+            for (String name: mBlesseeNames) {
+                blesseeNameSet.add(name);
+            }
+
+            principalsLogEditor.putStringSet(principalNamesKey, blesseeNameSet);
+            principalsLogEditor.apply();
         }
     }
 

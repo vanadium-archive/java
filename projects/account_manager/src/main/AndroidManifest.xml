@@ -50,8 +50,8 @@
              the keyboard input from moving layout views around.
         -->
         <activity
-            android:name=".BlessingActivity"
-            android:label="@string/title_activity_blessing"
+            android:name=".LocalBlessingActivity"
+            android:label="@string/title_activity_local_blessing"
             android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.BLESS" />
@@ -65,10 +65,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BlessedPackagesDisplayActivity"
-            android:label="@string/title_activity_blessed_packages_display" >
+            android:name=".BlessedPrincipalsDisplayActivity"
+            android:label="@string/title_activity_blessed_principals_display" >
             <intent-filter>
-                <action android:name="io.v.android.apps.account_manager.BLESSED_PACKAGES_DISPLAY" />
+                <action android:name="io.v.android.apps.account_manager.BLESSED_PRINCIPALS_DISPLAY" />
             </intent-filter>
         </activity>
         <activity

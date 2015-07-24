@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.widget.Toast;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,10 +22,10 @@ import io.v.v23.security.VPrincipal;
 import io.v.v23.vom.VomUtil;
 
 /**
- * Lists all the blessings given to a particular app.
+ * Lists all the blessings given to a particular principal.
  */
 public class BlessingEventsDisplayActivity extends PreferenceActivity {
-    private static final String TAG = "BlessingEventsDisplay"; // bounded by 23 character limit
+    private static final String TAG = "BlessingEventsDisplay"; // 23 character limit
     VContext mBaseContext = null;
 
     @Override
@@ -33,15 +34,16 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
         mBaseContext = V.init(this);
 
         SharedPreferences blessingsLog =
-                getSharedPreferences(BlessingActivity.LOG_BLESSINGS, MODE_PRIVATE);
-        String callingPkgName =
-                getIntent().getExtras().getString(BlessedPackagesDisplayActivity.PACKAGE_NAME_KEY);
+                getSharedPreferences(BlessActivity.LOG_BLESSINGS, MODE_PRIVATE);
+        String principalPublicKey =
+                getIntent().getStringExtra(BlessedPrincipalsDisplayActivity.PUBLIC_KEY);
 
         PreferenceScreen prefScreen = getPreferenceManager().createPreferenceScreen(this);
-        int n = blessingsLog.getInt(callingPkgName, 0);
+        int n = blessingsLog.getInt(principalPublicKey, 0);
 
-        for (int i = Math.max(0, n - BlessingActivity.MAX_BLESSINGS_FOR_PACKAGE); i < n; i++) {
-            String key = callingPkgName + "_" + i;
+        for (int i = Math.max(0, n - BlessActivity.MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL); i < n; i++)
+        {
+            String key = principalPublicKey + "_" + i;
 
             if (blessingsLog.contains(key)) {
                 String encoded = blessingsLog.getString(key, "");
@@ -65,7 +67,9 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
                         prefScreen.addPreference(currentPref);
                     }
                 } catch (Exception e) {
-                    android.util.Log.e(TAG, "BlessingEvent not found or improperly serialized.");
+                    String msg = "BlessingEvent not found or improperly serialized.";
+                    android.util.Log.e(TAG, msg);
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                 }
             }
         }

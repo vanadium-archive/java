@@ -19,12 +19,15 @@ import io.v.v23.security.Caveat;
 
 /** A ({@link io.v.v23.security.Blessings}, timestamp) blessing event. */
 class BlessingEvent implements Serializable {
+    String[] mBlesseeNames;
     String   mBlessingsVom;
     DateTime mTimeStamp;
     List<Caveat> mCaveats;
     String   mExtension;
 
-    BlessingEvent(String blessingsVom, DateTime timeStamp, List<Caveat> caveats, String extension) {
+    BlessingEvent(String[] blesseeNames, String blessingsVom, DateTime timeStamp,
+                  List<Caveat> caveats, String extension) {
+        mBlesseeNames = blesseeNames;
         mBlessingsVom = blessingsVom;
         mTimeStamp = timeStamp;
         mCaveats = caveats;
@@ -36,6 +39,13 @@ class BlessingEvent implements Serializable {
      */
     public DateTime getTimeStamp() {
         return mTimeStamp;
+    }
+
+    /**
+     * Returns the blessee names.
+     */
+    public String[] getBlesseeNames() {
+        return mBlesseeNames;
     }
 
     /**

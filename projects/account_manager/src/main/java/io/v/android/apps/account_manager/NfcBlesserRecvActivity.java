@@ -28,10 +28,9 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
     public static final String TAG = "NfcBlesserRecvActivity";
     public static final String ERROR = "ERROR";
     public static final String REPLY = "REPLY";
-    public static final String REMOTE_END_PUBLIC_KEY = "REMOTE_END_PUBLIC_KEY";
-    public static final String REMOTE_END_NAMES      = "REMOTE_END_NAMES";
     public static final String BLESSINGS_VOM = "BLESSINGS_VOM";
 
+    private static final String DEFAULT_EXTENSION = "ext";
     private static final int BLESS_REQUEST = 1;
 
     Blessings mRemoteBlessings = null;
@@ -68,7 +67,7 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
     private void display(Intent intent) {
         // Retrieve the beamed public key of the remote end.
         Parcelable[] rawMessages = intent.getParcelableArrayExtra(
-                    NfcAdapter.EXTRA_NDEF_MESSAGES);
+                NfcAdapter.EXTRA_NDEF_MESSAGES);
         if (rawMessages == null || rawMessages.length == 0) {
             Toast.makeText(this, "Did not receive blessing(s).", Toast.LENGTH_LONG).show();
             return;
@@ -90,8 +89,10 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
 
         // Invoke the bless activity if user wishes to bless the blessee.
         Intent i = new Intent(this, BlessActivity.class);
-        i.putExtra(REMOTE_END_PUBLIC_KEY, mRemotePublicKey);
-        i.putExtra(REMOTE_END_NAMES, mRemoteBlessings.toString().split(","));
+        i.putExtra(BlessActivity.BLESSEE_PUBLIC_KEY, mRemotePublicKey);
+        i.putExtra(BlessActivity.BLESSEE_NAMES, mRemoteBlessings.toString().split(","));
+        i.putExtra(BlessActivity.BLESSEE_EXTENSION, DEFAULT_EXTENSION);
+        i.putExtra(BlessActivity.BLESSEE_EXTENSION_MUTABLE, true);
 
         PreferenceScreen prefScreen = this.getPreferenceManager().createPreferenceScreen(this);
         prefScreen.setOnPreferenceClickListener(mPreferenceListener);

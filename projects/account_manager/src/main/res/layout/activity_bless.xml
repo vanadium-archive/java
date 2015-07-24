@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!--<ImageView
+        <ImageView
             android:id="@+id/image_vanadium"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -22,7 +22,7 @@
             android:scaleType="fitCenter"
             android:src="@drawable/launchericon"
             android:contentDescription="Vanadium sign"/>
-        -->
+
         <TextView
             android:id="@+id/text_application"
             android:textStyle="bold"
