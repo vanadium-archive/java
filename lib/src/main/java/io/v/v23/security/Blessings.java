@@ -41,6 +41,10 @@ public class Blessings implements Serializable {
         }
     }
 
+    public static Blessings create(List<List<VCertificate>> certChains) {
+        return create(new WireBlessings(certChains));
+    }
+
     static Blessings createUnion(Blessings... blessings) throws VException {
         return nativeCreateUnion(blessings);
     }
@@ -51,30 +55,9 @@ public class Blessings implements Serializable {
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
-    /**
-     * Creates new {@link Blessings} from the provided certificate chains.
-     *
-     * @param  chains certificate chains constituting these blessings
-     */
-    public Blessings(List<List<VCertificate>> chains) {
-        this(Blessings.create(new WireBlessings(chains)));
-    }
-
-    /**
-     * Creates new empty {@link Blessings}.
-     */
-    public Blessings() {
-        this(Blessings.create(new WireBlessings()));
-    }
-
     private Blessings(long nativePtr, WireBlessings wire) {
         this.nativePtr = nativePtr;
         this.wire = wire;
-    }
-
-    private Blessings(Blessings other) {
-        this.nativePtr = other.nativePtr;
-        this.wire = other.wire;
     }
 
     /**

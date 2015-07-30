@@ -82,9 +82,9 @@ public class BlessingChooserActivity extends Activity {
 
             for (BlessingPattern pattern: peerMap.keySet()) {
                 for (List<VCertificate> certChain: peerMap.get(pattern).getCertificateChains()) {
-                    ArrayList<List<VCertificate>> certChains = new ArrayList<List<VCertificate>>();
+                    List<List<VCertificate>> certChains = new ArrayList<List<VCertificate>>();
                     certChains.add(certChain);
-                    Blessings blessing = new Blessings(certChains);
+                    Blessings blessing = Blessings.create(certChains);
                     mBlessings.put(blessingsView.getChildCount(), blessing);
 
                     LinearLayout blessingView =
