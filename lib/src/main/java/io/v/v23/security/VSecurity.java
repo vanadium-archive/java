@@ -172,6 +172,7 @@ public class VSecurity {
      * @param  context  vanadium context
      * @param  call     security-related state associated with the call
      * @return          validated set of blessing names presented by the remote end of a call
+     *                  (possibly empty, but never {@code null})
      */
     public static String[] getRemoteBlessingNames(VContext context, Call call) {
         try {
@@ -191,6 +192,7 @@ public class VSecurity {
      * @param  context vanadium context
      * @param  call    security-related state associated with the call
      * @return         set of blessing names presented by the local end of the call
+     *                 (possibly empty, but never {@code null})
      */
     public static String[] getLocalBlessingNames(VContext context, Call call) {
         try {

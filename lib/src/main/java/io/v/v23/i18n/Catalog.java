@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import io.v.v23.verror.VException;
 
 /**
  * Catalog maps language names and message identifiers to message format strings.  The intent is
@@ -60,7 +61,8 @@ import java.util.regex.Pattern;
  * </pre></blockquote><p>
  */
 public class Catalog {
-    private static native String nativeFormatParams(String format, String[] params);
+    private static native String nativeFormatParams(String format, String[] params)
+            throws VException;
 
     /**
      * Returns a copy of format with instances of {@code {1}}, {@code {2}}, etc replaced by the
@@ -74,7 +76,11 @@ public class Catalog {
      * @return        the result of applying the parameters to the given format
      */
     public static String formatParams(String format, Object... params) {
-        return nativeFormatParams(format, convertParamsToStr(params));
+        try {
+            return nativeFormatParams(format, convertParamsToStr(params));
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't format params.", e);
+        }
     }
 
     private static String[] convertParamsToStr(Object... params) {

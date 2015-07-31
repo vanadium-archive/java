@@ -4,6 +4,9 @@
 
 package io.v.v23.security;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assert_;
+
 import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
@@ -27,17 +30,15 @@ public class CaveatTest extends TestCase {
         {
             Call call = VSecurity.newCall(
                     new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
-            String[] want = { "alice" };
-            String[] got = VSecurity.getRemoteBlessingNames(context, call);
-            if (!Arrays.equals(want, got)) {
-                fail(String.format("Blessings differ, want %s, got %s",
-                        Arrays.toString(want), Arrays.toString(got)));
-            }
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(Arrays.asList(result)).containsExactly("alice");
         }
         {
             Call call = VSecurity.newCall(
                     new CallParams().withLocalPrincipal(p1).withMethod("fail"));
-            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(result != null).isTrue();
+            assertThat(Arrays.asList(result)).containsExactly();
         }
     }
 
@@ -52,18 +53,17 @@ public class CaveatTest extends TestCase {
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withTimestamp(DateTime.now()));
-            String[] want = { "alice" };
-            String[] got = VSecurity.getRemoteBlessingNames(context, call);
-            if (!Arrays.equals(want, got)) {
-                fail(String.format("Blessings differ, want %s, got %s",
-                        Arrays.toString(want), Arrays.toString(got)));
-            }
+
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(Arrays.asList(result)).containsExactly("alice");
         }
         {
             Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withTimestamp(DateTime.now().plusHours(2)));
-            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(result != null).isTrue();
+            assertThat(Arrays.asList(result)).containsExactly();
         }
     }
 
@@ -80,19 +80,17 @@ public class CaveatTest extends TestCase {
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withSuffix("succeed"));
-            String[] want = { "alice" };
-            String[] got = VSecurity.getRemoteBlessingNames(context, call);
-            if (!Arrays.equals(want, got)) {
-                fail(String.format("Blessings differ, want %s, got %s",
-                        Arrays.toString(want), Arrays.toString(got)));
-            }
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(Arrays.asList(result)).containsExactly("alice");
         }
         {
             Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
                     .withRemoteBlessings(alice)
                     .withSuffix("fail"));
-            assertEquals(null, VSecurity.getRemoteBlessingNames(context, call));
+            String[] result = VSecurity.getRemoteBlessingNames(context, call);
+            assertThat(result != null).isTrue();
+            assertThat(Arrays.asList(result)).containsExactly();
         }
     }
 }

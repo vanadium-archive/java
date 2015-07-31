@@ -21,7 +21,7 @@ public class AccessList extends WireAccessList implements Authorizer {
     private final long nativePtr;
 
     private native long nativeCreate() throws VException;
-    private native boolean nativeIncludes(long nativePtr, String[] blessings);
+    private native boolean nativeIncludes(long nativePtr, String[] blessings) throws VException;
     private native void nativeAuthorize(long nativePtr, VContext context, Call call);
     private native void nativeFinalize(long nativePtr);
 
@@ -53,7 +53,11 @@ public class AccessList extends WireAccessList implements Authorizer {
      *                   blessings
      */
     public boolean includes(String... blessings) {
-        return nativeIncludes(this.nativePtr, blessings);
+        try {
+            return nativeIncludes(this.nativePtr, blessings);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't test for access list inclusion", e);
+        }
     }
 
     /**

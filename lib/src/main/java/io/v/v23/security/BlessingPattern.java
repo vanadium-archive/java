@@ -15,7 +15,7 @@ public class BlessingPattern extends WireBlessingPattern {
     private final long nativePtr;
 
     private native long nativeCreate() throws VException;
-    private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings);
+    private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings) throws VException;
     private native boolean nativeIsValid(long nativePtr);
     private native BlessingPattern nativeMakeNonExtendable(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
@@ -45,7 +45,11 @@ public class BlessingPattern extends WireBlessingPattern {
      * @param  blessings blessings compared against this pattern
      */
     public boolean isMatchedBy(String... blessings) {
-        return nativeIsMatchedBy(this.nativePtr, blessings);
+        try {
+            return nativeIsMatchedBy(this.nativePtr, blessings);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't check blessings match", e);
+        }
     }
 
     /**
