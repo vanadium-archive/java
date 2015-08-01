@@ -27,9 +27,9 @@ class ECDSASigner implements VSigner {
     @Override
     public VSignature sign(byte[] purpose, byte[] message) throws VException {
         String javaSignAlgorithm = CryptoUtil.javaSigningAlgorithm(VANADIUM_HASH_ALGORITHM);
-        message = CryptoUtil.messageDigest(VANADIUM_HASH_ALGORITHM, message, purpose);
+        message = CryptoUtil.messageDigest(VANADIUM_HASH_ALGORITHM, message, purpose, this.pubKey);
         // Sign.  Note that the signer will first apply another hash on the message, resulting in:
-        // ECDSA.Sign(Hash(Hash(message) + Hash(purpose))).
+        // ECDSA.Sign(Hash(Hash(publicKey) +Hash(message) + Hash(purpose))).
         try {
             java.security.Signature sig = java.security.Signature.getInstance(javaSignAlgorithm);
             sig.initSign(this.privKey);

@@ -144,16 +144,17 @@ public class CryptoUtil {
     }
 
     /**
-     * Creates a digest for the following message and the specified purpose, using the provided
-     * hash algorithm.
+     * Returns a digest of the provided (message, purpose) pair which is meant
+     * to be signed by the private counterpart of key.
      *
      * @param  vHashAlgorithm  name of the Vanadium hash algorithm to use
      * @param  message         message that is part of the digest
      * @param  purpose         purpose that is part of the digest
+     * @param  key             public key of the signer of the returned digest
      * @return                 digest for the specified message and digest
      * @throws VException      if there was an error creating a digest
      */
-    static byte[] messageDigest(String vHashAlgorithm, byte[] message, byte[] purpose)
+    static byte[] messageDigest(String vHashAlgorithm, byte[] message, byte[] purpose, ECPublicKey key)
             throws VException {
         if (message == null) {
             throw new VException("Empty message.");
@@ -161,9 +162,20 @@ public class CryptoUtil {
         if (purpose == null) {
             throw new VException("Empty purpose.");
         }
+        // TODO(ashankar): Remove this if once https://github.com/vanadium/issues/issues/619 is resolved.
+        String purposeStr = purpose.toString();
+        byte[] keyBytes = null;
+        if (!purposeStr.equals(Constants.SIGNATURE_FOR_BLESSING_CERTIFICATES_V_0) &&
+               !purposeStr.equals(Constants.SIGNATURE_FOR_DISCHARGE_V_0) &&
+               !purposeStr.equals(Constants.SIGNATURE_FOR_MESSAGE_SIGNING_V_0)) {
+            if (key == null) {
+                    throw new VException("PublicKey of signer not provided.");
+            }
+            keyBytes = hash(vHashAlgorithm, key.getEncoded());
+        }
         message = hash(vHashAlgorithm, message);
         purpose = hash(vHashAlgorithm, purpose);
-        byte[] ret = join(message, purpose);
+        byte[] ret = join(join(keyBytes, message), purpose);
         return ret;
     }
 

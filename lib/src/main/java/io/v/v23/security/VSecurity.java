@@ -310,7 +310,7 @@ public class VSecurity {
         String vHashAlgorithm = sig.getHash().getValue();
         String verifyAlgorithm = CryptoUtil.javaSigningAlgorithm(vHashAlgorithm);
         try {
-            message = CryptoUtil.messageDigest(vHashAlgorithm, message, sig.getPurpose());
+            message = CryptoUtil.messageDigest(vHashAlgorithm, message, sig.getPurpose(), key);
             byte[] jSig = CryptoUtil.javaSignature(sig);
             java.security.Signature verifier = java.security.Signature.getInstance(verifyAlgorithm);
             verifier.initVerify(key);
