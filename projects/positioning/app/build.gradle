@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
         }
     }
     dependencies {
@@ -12,7 +12,7 @@ buildscript {
 repositories {
     jcenter()
     maven {
-        url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+        url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
     }
 }
 apply plugin: 'com.android.application'

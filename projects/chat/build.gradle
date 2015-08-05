@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         maven {
-            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
         }
     }
     dependencies {
@@ -17,7 +17,7 @@ mainClassName = 'io.v.chat.Main'
 
 repositories {
     maven {
-        url "http://jring.mtv:8081/nexus/content/repositories/test_repo/"
+        url "http://srdjan.mtv:8081/nexus/content/repositories/test_repo/"
     }
     mavenCentral()
 }

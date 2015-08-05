@@ -90,7 +90,7 @@ publishing {
                 username 'admin'
                 password 'admin123'
             }
-            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
         }
     }
 }

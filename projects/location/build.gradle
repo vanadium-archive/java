@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
         }
     }
     dependencies {
@@ -18,7 +18,7 @@ apply plugin: 'wrapper'
 repositories {
     jcenter()
     maven {
-        url 'http://jring.mtv:8081/nexus/content/repositories/test_repo'
+        url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
     }
 }
 
