@@ -1,10 +1,16 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/identity_blessing"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:onClick="getIdentityBlessing"
+        android:title="@string/pref_get_identity_blessing_subcategory"/>
+    <item
+        android:id="@+id/blessing_logs"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:onClick="showGrantedBlessingsLogs"
+        android:title="@string/pref_blessed_principals_logs_subcategory"/>
 
 </menu>

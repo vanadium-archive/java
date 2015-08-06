@@ -17,8 +17,6 @@ import android.widget.Toast;
  */
 public class BlesseeRequestActivity extends PreferenceActivity {
     public static final String TAG = "BlesseeRequestActivity";
-    public static final String ERROR = "ERROR";
-    public static final String REPLY = "REPLY";
     public static final String BLESSINGS_VOM = "BLESSINGS_VOM";
 
     private static final String CHANNEL_TITLE = "Request Via";
@@ -43,10 +41,11 @@ public class BlesseeRequestActivity extends PreferenceActivity {
         switch (requestCode) {
             case BLESSING_CHOOSING_REQUEST:
                 if (resultCode != RESULT_OK) {
-                    handleError("Error choosing blessings: " + data.getStringExtra(ERROR));
+                    handleError("Error choosing blessings: " +
+                            data.getStringExtra(Constants.ERROR));
                     return;
                 }
-                String blessingsVom = data.getStringExtra(REPLY);
+                String blessingsVom = data.getStringExtra(Constants.REPLY);
                 if (blessingsVom == null || blessingsVom.isEmpty()) {
                     handleError("No blessings selected.");
                     return;
@@ -82,6 +81,20 @@ public class BlesseeRequestActivity extends PreferenceActivity {
         nfcIntent.putExtra(BLESSINGS_VOM, blessingsVom);
         nfcPref.setIntent(nfcIntent);
         channelCategory.addPreference(nfcPref);
+
+        // Bluetooth
+        Preference bluetoothPref = new Preference(this);
+        bluetoothPref.setSummary("BLUETOOTH");
+        bluetoothPref.setEnabled(true);
+
+        Intent bluetoothIntent = new Intent();
+        bluetoothIntent.setPackage("io.v.android.apps.account_manager");
+        bluetoothIntent.setClassName("io.v.android.apps.account_manager",
+                "io.v.android.apps.account_manager.BluetoothBlesseeActivity");
+        bluetoothIntent.setAction("io.v.android.apps.account_manager.BLUETOOTH_BLESSEE_SEND");
+        bluetoothIntent.putExtra(BLESSINGS_VOM, blessingsVom);
+        bluetoothPref.setIntent(bluetoothIntent);
+        channelCategory.addPreference(bluetoothPref);
 
         setPreferenceScreen(preferenceScreen);
     }

@@ -16,7 +16,6 @@ import android.widget.Toast;
  */
 public class NfcBlesseeSendActivity extends PreferenceActivity
         implements NfcAdapter.CreateNdefMessageCallback {
-    public static final String TAG = "NfcBlesseeSendActivity";
     public static final String MIME_REQUEST = "vanadium/mime/request/blessing/string";
 
     private static final String READY_MESSAGE  = "BEAM TO REQUEST BLESSINGS!";

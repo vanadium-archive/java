@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/pref_category"/>
+    <PreferenceCategory android:title="@string/pref_category_settings"/>
     <Preference
-        android:title="@string/pref_vanadium_subcategory">
+        android:title="@string/pref_identity_service_subcategory">
         <intent
             android:targetPackage="io.v.android.apps.account_manager"
             android:targetClass="io.v.android.apps.account_manager.SettingsActivity"
             android:action="io.v.android.apps.account_manager.SETTINGS"/>
     </Preference>
 
-    <PreferenceCategory android:title="@string/pref_blessing_management"/>
-    <Preference
-        android:title="@string/pref_blessing_store_subcategory">
-        <intent
-            android:targetPackage="io.v.android.apps.account_manager"
-            android:targetClass="io.v.android.apps.account_manager.BlessingStoreDisplayActivity"
-            android:action="io.v.android.apps.account_manager.BLESSING_STORE_DISPLAY"/>
-    </Preference>
-
+    <PreferenceCategory android:title="@string/pref_category_blessing_management"/>
     <Preference
         android:title="@string/pref_blessing_request_subcategory">
         <intent
@@ -27,10 +19,18 @@
     </Preference>
 
     <Preference
-        android:title="@string/pref_blessed_principals_logs_subcategory">
+        android:title="@string/pref_blesser_grant">
         <intent
             android:targetPackage="io.v.android.apps.account_manager"
-            android:targetClass="io.v.android.apps.account_manager.BlessedPrincipalsDisplayActivity"
-            android:action="io.v.android.apps.account_manager.BLESSED_PRINCIPALS_DISPLAY"/>
+            android:targetClass="io.v.android.apps.account_manager.BlesserGrantActivity"
+            android:action="io.v.android.apps.account_manager.GRANT_BLESSINGS"/>
+    </Preference>
+
+    <Preference
+        android:title="@string/pref_blessing_store_subcategory">
+        <intent
+            android:targetPackage="io.v.android.apps.account_manager"
+            android:targetClass="io.v.android.apps.account_manager.BlessingStoreDisplayActivity"
+            android:action="io.v.android.apps.account_manager.BLESSING_STORE_DISPLAY"/>
     </Preference>
 </PreferenceScreen>

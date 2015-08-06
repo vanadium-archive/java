@@ -18,7 +18,6 @@ import io.v.v23.security.Blessings;
 public class LocalBlessingActivity extends Activity {
     public static final String TAG = "LocalBlessingActivity";
     public static final String BLESSEE_PUBKEY_KEY = "BLESSEE_PUBKEY";
-    public static final String ERROR = "ERROR";
 
     private static final int BLESS_REQUEST = 1;
 
@@ -70,7 +69,7 @@ public class LocalBlessingActivity extends Activity {
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Blessing error: " + error);
         Intent intent = new Intent();
-        intent.putExtra(ERROR, error);
+        intent.putExtra(Constants.ERROR, error);
         setResult(RESULT_CANCELED, intent);
         finish();
     }

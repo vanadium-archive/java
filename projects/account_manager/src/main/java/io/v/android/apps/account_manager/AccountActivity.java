@@ -56,7 +56,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     private static final int REQUEST_CODE_PICK_ACCOUNTS = 1000;
     private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
-    private static final String ACCOUNT_TYPE = "io.vanadium";
     private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
@@ -263,7 +262,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     }
 
     private void enforceAccountExists() {
-        if (AccountManager.get(this).getAccountsByType(ACCOUNT_TYPE).length <= 0){
+        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length <= 0){
             String name = "Vanadium";
             Account account = new Account(name, getResources().getString(
                     R.string.authenticator_account_type));

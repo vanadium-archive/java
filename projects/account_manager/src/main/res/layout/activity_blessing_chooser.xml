@@ -17,7 +17,7 @@
         <ScrollView
             android:id="@+id/scroll_blessings"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <LinearLayout
                 android:id="@+id/chooser_blessings"
