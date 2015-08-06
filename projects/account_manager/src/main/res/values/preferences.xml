@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_category">Settings</string>
-    <string name="pref_vanadium_subcategory">Vanadium</string>
-    <string name="pref_blessed_principals_logs_subcategory">Blessed Principals Logs</string>
-    <string name="pref_blessing_store_subcategory">Blessing Store</string>
-    <string name="pref_blessing_request_subcategory">Request Blessings</string>
+    <!-- Vanadium Settings -->
+    <string name="pref_category_settings">Settings</string>
+    <string name="pref_identity_service_subcategory">Identity Service</string>
     <string name="pref_identity_service_name">Identity Service</string>
     <string name="pref_identity_service_name_summ">Name of the Vanadium Identity Service</string>
-    <string name="pref_blessing_management">Blessing Management</string>
+
+    <!-- Vanadium Blessing Management -->
+    <string name="pref_category_blessing_management">Blessing Management</string>
+    <string name="pref_blessing_request_subcategory">Request Blessings</string>
+    <string name="pref_blesser_grant">Grant Blessings</string>
+    <string name="pref_blessing_store_subcategory">Blessing Store</string>
+
+    <!-- Action bar -->
+    <string name="pref_get_identity_blessing_subcategory">Get Identity Blessing</string>
+    <string name="pref_blessed_principals_logs_subcategory">Blessings Granted</string>
 </resources>

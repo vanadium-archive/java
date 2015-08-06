@@ -50,8 +50,6 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessActivity extends Activity implements AdapterView.OnItemSelectedListener {
     public static final String TAG = "BlessActivity";
-    public static final String ERROR = "ERROR";
-    public static final String REPLY = "REPLY";
 
     // Names of intent extras that BlessActivity is expecting to receive when invoked.
     public static final String BLESSEE_PUBLIC_KEY = "BLESSEE_PUBLIC_KEY";
@@ -314,10 +312,11 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         switch (requestCode) {
             case BLESSING_CHOOSING_REQUEST:
                 if (resultCode != RESULT_OK) {
-                    replyWithError("Error choosing blessings: " + data.getStringExtra(ERROR));
+                    replyWithError("Error choosing blessings: " +
+                            data.getStringExtra(Constants.ERROR));
                     return;
                 }
-                String blessingsVom = data.getStringExtra(REPLY);
+                String blessingsVom = data.getStringExtra(Constants.REPLY);
                 if (blessingsVom == null || blessingsVom.isEmpty()) {
                     replyWithError("No blessings selected.");
                     return;
@@ -478,14 +477,14 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error while blessing: " + error);
         Intent intent = new Intent();
-        intent.putExtra(ERROR, error);
+        intent.putExtra(Constants.ERROR, error);
         setResult(RESULT_CANCELED, intent);
         finish();
     }
 
     private void replyWithSuccess(String blessingsVom) {
         Intent intent = new Intent();
-        intent.putExtra(REPLY, blessingsVom);
+        intent.putExtra(Constants.REPLY, blessingsVom);
         setResult(RESULT_OK, intent);
         finish();
     }

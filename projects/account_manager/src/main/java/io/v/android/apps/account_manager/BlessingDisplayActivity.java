@@ -10,10 +10,18 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.common.reflect.TypeToken;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.v.v23.android.V;
-import io.v.v23.security.VCertificate;
+import io.v.v23.security.*;
+import io.v.v23.uniqueid.Id;
+import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 /**
@@ -25,6 +33,9 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
 
     private static final String PEERS_TITLE = "Peers";
     private static final String CERTIFICATES_TITLE = "Certificates";
+    private static final String CAVEATS_TITLE = "Caveats";
+
+    DateTime mExpiryTime = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +77,10 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
         certificatesCategory.setTitle(CERTIFICATES_TITLE);
         prefScreen.addPreference(certificatesCategory);
 
+        PreferenceCategory caveatsCategory = new PreferenceCategory(this);
+        caveatsCategory.setTitle(CAVEATS_TITLE);
+        prefScreen.addPreference(caveatsCategory);
+
         for (VCertificate certificate: certChain) {
             Preference currentPreference = new Preference(this);
             currentPreference.setSummary(certificate.getExtension());
@@ -82,14 +97,44 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
             intent.setPackage("io.v.android.apps.account_manager");
             intent.setClassName("io.v.android.apps.account_manager",
                     "io.v.android.apps.account_manager.CertificateDisplayActivity");
-            intent.setAction(
-                    "io.v.android.apps.account_manager.DISPLAY_CERTIFICATE");
+            intent.setAction("io.v.android.apps.account_manager.DISPLAY_CERTIFICATE");
             intent.putExtra(CERTIFICATE_VOM, certificateVom);
             currentPreference.setIntent(intent);
 
             certificatesCategory.addPreference(currentPreference);
+
+            for (Caveat caveat: certificate.getCaveats()) {
+                if (caveat.getId().equals(io.v.v23.security.Constants.EXPIRY_CAVEAT.getId())) {
+                    updateExpiryTime(caveat);
+                } else {
+                    String caveatDescription = CertificateDisplayActivity.caveatText(caveat);
+                    Preference caveatPreference = new Preference(this);
+                    caveatPreference.setSummary(caveatDescription);
+                    caveatPreference.setEnabled(true);
+                    caveatsCategory.addPreference(caveatPreference);
+                }
+            }
+        }
+        if (mExpiryTime != null) {
+            Preference expiryPref = new Preference(this);
+            expiryPref.setSummary("Expiry Caveat: " +
+                    mExpiryTime.toString(DateTimeFormat.mediumDateTime()));
+            expiryPref.setEnabled(true);
+            caveatsCategory.addPreference(expiryPref);
         }
         setPreferenceScreen(prefScreen);
+    }
+
+    private void updateExpiryTime(Caveat caveat) {
+        try {
+            DateTime expiry = CertificateDisplayActivity.expiryCaveatPayload(caveat);
+            if (expiry.isBefore(mExpiryTime)) {
+                mExpiryTime = expiry;
+            }
+        } catch (VException e) {
+            handleError("Could not get expiry time: " + e.getMessage());
+            return;
+        }
     }
 
     private void handleError(String error) {

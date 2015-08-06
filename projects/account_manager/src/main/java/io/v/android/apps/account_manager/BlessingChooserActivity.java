@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -32,8 +34,6 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingChooserActivity extends Activity {
     public static final String TAG = "BlessingChooserActivity";
-    public static final String ERROR = "ERROR";
-    public static final String REPLY = "REPLY";
 
     private static final int CREATE_BLESSING_REQUEST = 1;
 
@@ -50,12 +50,31 @@ public class BlessingChooserActivity extends Activity {
         mBlessings = new HashMap<>();
 
         setContentView(R.layout.activity_blessing_chooser);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_blessings);
+        scrollView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new OnViewGlobalLayoutListener(scrollView));
         if (hasBlessings()) {
             display();
         } else {
             // No Vanadium blessings available: prompt the user to fetch an blessing from his/her
             // identity service.
             createBlessings();
+        }
+    }
+
+    private class OnViewGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+        private static final int MAX_HEIGHT = 600;
+        View mmView = null;
+
+        public OnViewGlobalLayoutListener(ScrollView v) {
+            mmView = v;
+        }
+
+        @Override
+        public void onGlobalLayout() {
+            if (mmView.getHeight() > MAX_HEIGHT) {
+                mmView.getLayoutParams().height = MAX_HEIGHT;
+            }
         }
     }
 
@@ -146,7 +165,7 @@ public class BlessingChooserActivity extends Activity {
         Intent intent = new Intent();
         try {
             Blessings union = VSecurity.unionOfBlessings(blessings);
-            intent.putExtra(REPLY, VomUtil.encodeToString(union, Blessings.class));
+            intent.putExtra(Constants.REPLY, VomUtil.encodeToString(union, Blessings.class));
             setResult(RESULT_OK, intent);
             finish();
         } catch (Exception e) {
@@ -158,7 +177,7 @@ public class BlessingChooserActivity extends Activity {
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error choosing blessings: " + error);
         Intent intent = new Intent();
-        intent.putExtra(ERROR, error);
+        intent.putExtra(Constants.ERROR, error);
         setResult(RESULT_CANCELED, intent);
         finish();
     }

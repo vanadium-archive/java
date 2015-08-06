@@ -21,6 +21,9 @@
     <!-- Needed for NFC and Android Beam Message Sending -->
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
+    <!-- Needed for Bluetooth -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
         android:allowBackup="true"
@@ -107,6 +110,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".BlesserGrantActivity"
+            android:label="@string/title_activity_blesser_grant" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.GRANT_BLESSINGS" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".NfcBlesseeSendActivity"
             android:label="@string/title_activity_nfc_blessee_send" >
             <intent-filter>
@@ -147,6 +157,28 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".NfcBlesserActivity"
+            android:label="@string/title_activity_nfc_blesser"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.nfc.action.WAIT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BluetoothBlesseeActivity"
+            android:label="@string/title_activity_bluetooth_blessee" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.BLUETOOTH_BLESSEE_SEND" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BluetoothBlesserActivity"
+            android:label="@string/title_activity_bluetooth_blesser" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.BLUETOOTH_BLESSER_SEND" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".StoreBlessingsActivity"
             android:label="@string/title_activity_store_blessings"
             android:noHistory="true" >
@@ -159,7 +191,14 @@
             android:label="@string/title_activity_blessing_chooser"
             android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
-
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" >
+            <intent-filter>
+                <action android:name="io.v.android.apps.account_manager.START" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
-
 </manifest>

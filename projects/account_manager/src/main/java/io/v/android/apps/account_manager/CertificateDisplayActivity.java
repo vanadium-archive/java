@@ -74,7 +74,13 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
         setPreferenceScreen(prefScreen);
     }
 
-    private static String caveatText(Caveat caveat) {
+    /**
+     * Returns a human-readable description of a caveat.
+     *
+     * @param caveat        the caveat to be examined
+     * @return              a human-readable description of the caveat
+     */
+    public static String caveatText(Caveat caveat) {
         Id caveatId = caveat.getId();
         if (caveatId.equals(Constants.CONST_CAVEAT.getId())) {
             return "Const Caveat";
@@ -109,7 +115,15 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
         }
     }
 
-    private static DateTime expiryCaveatPayload(Caveat caveat) throws VException {
+    /**
+     * Returns expiry time that the caveat restricts the blessing usage to.
+     *
+     * @param caveat            the caveat to be examined.
+     * @return                  expiry time
+     * @throws VException       if the given caveat is not a method caveat, or if there
+     *                          was a problem getting the method names
+     */
+    public static DateTime expiryCaveatPayload(Caveat caveat) throws VException {
         Object param = VomUtil.decode(caveat.getParamVom());
         if (param == null) {
             param = new DateTime(0);
@@ -121,7 +135,15 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
         return (DateTime) param;
     }
 
-    private static List<String> methodCaveatPayload(Caveat caveat) throws VException {
+    /**
+     * Returns method names that the caveat restricts the blessing usage to.
+     *
+     * @param caveat            the caveat to be examined.
+     * @return                  list of methods that the blessing is valid for
+     * @throws VException       if the given caveat is not a method caveat, or if there
+     *                          was a problem getting the method names
+     */
+    public static List<String> methodCaveatPayload(Caveat caveat) throws VException {
         Object param = VomUtil.decode(caveat.getParamVom());
         if (param == null) {
             param = new ArrayList<String>();

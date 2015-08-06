@@ -26,11 +26,9 @@ import io.v.v23.vom.VomUtil;
  */
 public class NfcBlesserRecvActivity extends PreferenceActivity {
     public static final String TAG = "NfcBlesserRecvActivity";
-    public static final String ERROR = "ERROR";
-    public static final String REPLY = "REPLY";
     public static final String BLESSINGS_VOM = "BLESSINGS_VOM";
 
-    private static final String DEFAULT_EXTENSION = "ext";
+    private static final String DEFAULT_EXTENSION = "extension";
     private static final int BLESS_REQUEST = 1;
 
     Blessings mRemoteBlessings = null;
@@ -113,14 +111,14 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
         switch (requestCode) {
             case BLESS_REQUEST:
                 if (resultCode != RESULT_OK) {
-                    String error = data.getStringExtra(ERROR);
+                    String error = data.getStringExtra(Constants.ERROR);
                     String msg = "Bless operation failed: " +
                             (error != null ? error : "Error not found");
                     android.util.Log.e(TAG, msg);
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     return;
                 }
-                String blessingsVom = data.getStringExtra(REPLY);
+                String blessingsVom = data.getStringExtra(Constants.REPLY);
                 if (blessingsVom == null || blessingsVom.isEmpty()) {
                     String msg = "Received empty blessings";
                     android.util.Log.e(TAG, msg);

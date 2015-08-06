@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Vanadium Account Service</string>
 
+    <string name="title_activity_main">Vanadium</string>
     <string name="title_activity_account">Add a Vanadium Account</string>
     <string name="title_activity_local_blessing">Bless a Vanadium Application</string>
     <string name="title_activity_account_chooser">"Choose Account(s) "</string>
@@ -15,15 +16,20 @@
     <string name="title_activity_grant_blessings">Grant Blessings</string>
     <string name="title_activity_request_blessings">Request Blessings</string>
     <string name="title_activity_nfc_blessee_send">Request Blessings Via NFC</string>
-    <string name="title_activity_nfc_blesser_send">Send Blessings Via NFC</string>
+    <string name="title_activity_bluetooth_blessee">Request Blessings Via Bluetooth</string>
+    <string name="title_activity_bluetooth_blesser">Grant Blessings Via Bluetooth</string>
+    <string name="title_activity_nfc_blesser_send">Grant Blessings Via NFC</string>
+    <string name="title_activity_nfc_blesser">Grant Blessings Via NFC</string>
     <string name="title_activity_bless">Bless a Vanadium Principal</string>
     <string name="title_activity_blessee_request">Generate Blessing Request</string>
+    <string name="title_activity_blesser_grant">Grant Blessings</string>
     <string name="title_activity_blessee_recv">Received Granted Blessings</string>
     <string name="title_activity_blesser_recv">Received Request for Blessings</string>
     <string name="title_activity_store_blessings">Received Request for Blessings</string>
 
     <string name="action_settings">Settings</string>
 
+    <!-- Bless Activity -->
     <string name="bless_edittext_extension">ext</string>
     <string name="bless_text_blessing">The above principal wants to extend the following blessing(s):</string>
     <string name="bless_text_extension">With the extension:</string>
@@ -31,6 +37,7 @@
     <string name="bless_button_deny">Deny</string>
     <string name="bless_text_caveat">Apply the following caveat(s):</string>
 
+    <!-- Blessing Chooser Activity -->
     <string name="chooser_button_add">Add</string>
     <string name="chooser_button_cancel">Cancel</string>
     <string name="chooser_button_ok">OK</string>
