@@ -23,4 +23,11 @@
         android:onClick="onFindAndRecordDevices"
         android:text="@string/find_and_record_devices" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:onClick="onUltrasound"
+        android:text="@string/ultrasound" />
+
 </LinearLayout>

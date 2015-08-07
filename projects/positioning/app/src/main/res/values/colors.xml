@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="vanadium" type="color">#00838F</item>
+    <!-- Vanadium colors-->
+    <item name="window_background" type="color">#FFFFFF</item>
+    <item name="primary" type="color">#ECEFF1</item>
+    <item name="primary_dark" type="color">#1D9DA8</item>
+    <item name="navigation_bar_color" type="color">#00838F</item>
 </resources>

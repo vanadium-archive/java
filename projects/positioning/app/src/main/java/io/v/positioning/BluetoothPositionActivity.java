@@ -35,7 +35,7 @@ import io.v.positioning.gae.ServletPostAsyncTask;
  */
 public class BluetoothPositionActivity extends Activity {
 
-    private static final String TAG = "BluetoothPositionA";
+    private static final String TAG = BluetoothPositionActivity.class.getSimpleName();
     private BluetoothAdapter mBtAdapter;
     private ArrayAdapter<String> mRecordedDevices;
 

@@ -6,6 +6,7 @@ package io.v.positioning;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -27,7 +28,7 @@ import io.v.positioning.gae.ServletPostAsyncTask;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private String mLatitude;
@@ -37,11 +38,20 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Check whether BLE is supported on the device
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+        }
         buildGoogleApiClient();
     }
 
     public void onFindAndRecordDevices(View view) {
         startActivity(new Intent(this, BluetoothPositionActivity.class));
+    }
+
+    public void onUltrasound(View view) {
+        startActivity(new Intent(this, UltrasoundActivity.class));
     }
 
     public void onRecordMyLocation(View view) {

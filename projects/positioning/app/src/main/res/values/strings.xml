@@ -5,6 +5,9 @@
     <!-- Main Activity -->
     <string name="record_my_location">Record my GPS location</string>
     <string name="find_and_record_devices">Find and record devices</string>
+    <string name="advertise">Advertise</string>
+    <string name="stop_advertising">Stop Advertising</string>
+    <string name="ble_not_supported">BLE is not supported on this device.</string>
     <!-- Finding Devices with Bluetooth -->
     <string name="positioning_with_bluetooth">Positioning with Bluetooth</string>
     <string name="finding_devices">Finding devices...</string>
@@ -12,4 +15,10 @@
     <string name="discovery_finished">Discovery finished</string>
     <string name="recorded_devices">Recorded Devices</string>
     <string name="find_devices">Find devices</string>
+    <!-- Ultrasound -->
+    <string name="title_activity_ultrasound">UltrasoundActivity</string>
+    <string name="ultrasound">Ultrasound</string>
+    <string name="send_ultrasound">Send ultrasound</string>
+    <string name="start_receiving_ultrasound">Start receiving ultrasound</string>
+    <string name="stop_receiving_ultrasound">Stop receiving ultrasound</string>
 </resources>
