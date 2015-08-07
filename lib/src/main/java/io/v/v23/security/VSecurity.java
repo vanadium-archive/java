@@ -33,6 +33,8 @@ public class VSecurity {
             throws VException;
     private static native String[] nativeGetLocalBlessingNames(VContext context, Call call)
             throws VException;
+    private static native String[] nativeGetSigningBlessingNames(VContext context,
+            VPrincipal principal, Blessings blessings) throws VException;
 
     /**
      * Creates a new instance of {@link VSigner} using the provided public/private key pair.
@@ -199,6 +201,34 @@ public class VSecurity {
             return nativeGetLocalBlessingNames(context, call);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get blessings for call", e);
+        }
+    }
+
+    /**
+     * Returns the set of validated human-readable signing blessing names encapsulated in the
+     * provided blessings object, as determined by the provided principal.  Only names that are
+     * available for signing are returned by this method, even though the given blessings object
+     * might have more blessing names that are valid at the time. (The name on a certificate chain
+     * is valid if all the caveats on the chain are signing caveats, and the chain's validity can
+     * be checked by the given principal).
+     * <p>
+     * The blessing names are guaranteed to be rooted in {@code call.localPrincipal().roots()}.
+     * <p>
+     * This method does not validate caveats on the blessing names.
+     *
+     * @param  context      vanadium context
+     * @param  principal    vanadium principal
+     * @param  blessings    vanadium blessings
+     * @return              validated set of human-readable blessing names encapsulated in the
+     *                      provided signing blessings object, as determined by the provided
+     *                      {@link VPrincipal} (possibly empty, but never {@code null})
+     */
+    public static String[] getSigningBlessingNames(VContext context, VPrincipal principal,
+            Blessings blessings) {
+        try {
+            return nativeGetSigningBlessingNames(context, principal, blessings);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get signing blessing names", e);
         }
     }
 

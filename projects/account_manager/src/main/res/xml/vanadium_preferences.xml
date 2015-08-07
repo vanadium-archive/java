@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Preferences added programatically -->
     <EditTextPreference
+        android:id="@+id/identity_service_preference"
         android:key="pref_identity_service_name"
         android:title="@string/pref_identity_service_name"
         android:summary="@string/pref_identity_service_name_summ"

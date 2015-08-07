@@ -53,6 +53,7 @@ public class Blessings implements Serializable {
     private final WireBlessings wire;  // non-null
 
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
+    private native Blessings nativeSigningBlessings(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private Blessings(long nativePtr, WireBlessings wire) {
@@ -70,6 +71,19 @@ public class Blessings implements Serializable {
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
         }
+    }
+
+    /**
+     * Returns the signing blessings in this object. (Signing blessings are blessings whose
+     * caveats are universally understood and verifiable without third party discharges.)
+     * The return value may be {@code null} if the blessings are empty.
+     */
+    public Blessings signingBlessings() {
+      try {
+          return nativeSigningBlessings(this.nativePtr);
+      } catch (VException e) {
+          throw new RuntimeException("Couldn't get signing blessings", e);
+      }
     }
 
     /**

@@ -6,11 +6,20 @@ package io.v.v23.security;
 
 import junit.framework.TestCase;
 
+import org.joda.time.DateTime;
+
+import com.google.common.collect.ImmutableList;
+import static com.google.common.truth.Truth.assertThat;
+
 import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.context.VContextImpl;
 import io.v.v23.verror.VException;
 
 import java.util.Arrays;
+import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests for the {@link VSecurity} utility methods.
@@ -62,5 +71,29 @@ public class VSecurityTest extends TestCase {
         } catch (VException e) {
             fail(String.format("Couldn't verify signature: %s", e.getMessage()));
         }
+    }
+
+    public void testGetSigningBlessingNames() throws VException {
+        VContext context = V.init();
+        VPrincipal p = VSecurity.newPrincipal();
+        ECPublicKey pk = p.publicKey();
+        List<Caveat> passingCaveats = ImmutableList.of(
+                VSecurity.newExpiryCaveat(DateTime.now().plusDays(1)),
+                VSecurity.newExpiryCaveat(DateTime.now().plusYears(1)));
+        List<Caveat> failingCaveats = ImmutableList.of(
+                VSecurity.newMethodCaveat("MethodName"),
+                VSecurity.newExpiryCaveat(DateTime.now()));
+
+        Blessings b1 = p.blessSelf("alice");
+        Blessings b2 = p.blessSelf("alice");
+        Blessings passing = p.bless(pk, b1, "passing", passingCaveats.get(0),
+            passingCaveats.subList(1, passingCaveats.size()).toArray(new Caveat[0]));
+        Blessings failing = p.bless(pk, b2, "failing", failingCaveats.get(0),
+            failingCaveats.subList(1, failingCaveats.size()).toArray(new Caveat[0]));
+        Blessings union = VSecurity.unionOfBlessings(new Blessings[]{passing, failing});
+        p.addToRoots(passing);
+
+        String[] signingBlessingNames = VSecurity.getSigningBlessingNames(context, p, union);
+        assertThat(Arrays.asList(signingBlessingNames)).containsExactly("alice/passing");
     }
 }
