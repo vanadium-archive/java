@@ -34,11 +34,14 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingChooserActivity extends Activity {
     public static final String TAG = "BlessingChooserActivity";
+    public static final String CANCELED_REQUEST = "User Canceled Blessing Selection";
+    public static final String EXTRA_SIGNING_ONLY = "SIGNING_ONLY";
 
     private static final int CREATE_BLESSING_REQUEST = 1;
 
     BlessingStore mBlessingStore = null;
     HashMap<Integer, Blessings> mBlessings = null;
+    boolean mSigningOnly = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,13 @@ public class BlessingChooserActivity extends Activity {
         VPrincipal principal = V.getPrincipal(context);
         mBlessingStore = principal.blessingStore();
         mBlessings = new HashMap<>();
+
+        Intent intent = getIntent();
+        if (intent == null) {
+            replyWithError("No intent found");
+            return;
+        }
+        mSigningOnly = intent.getBooleanExtra(EXTRA_SIGNING_ONLY, false);
 
         setContentView(R.layout.activity_blessing_chooser);
         ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_blessings);
@@ -100,7 +110,13 @@ public class BlessingChooserActivity extends Activity {
             Map<BlessingPattern, Blessings> peerMap = mBlessingStore.peerBlessings();
 
             for (BlessingPattern pattern: peerMap.keySet()) {
-                for (List<VCertificate> certChain: peerMap.get(pattern).getCertificateChains()) {
+                List<List<VCertificate>> chains = null;
+                if (mSigningOnly) {
+                    chains =  peerMap.get(pattern).signingBlessings().getCertificateChains();
+                } else {
+                    chains = peerMap.get(pattern).getCertificateChains();
+                }
+                for (List<VCertificate> certChain: chains) {
                     List<List<VCertificate>> certChains = new ArrayList<List<VCertificate>>();
                     certChains.add(certChain);
                     Blessings blessing = Blessings.create(certChains);
@@ -154,7 +170,7 @@ public class BlessingChooserActivity extends Activity {
     }
 
     public void onCancel(View v) {
-        replyWithError("User canceled blessing selection.");
+        replyWithError(CANCELED_REQUEST);
     }
 
     public void onAdd(View v) {

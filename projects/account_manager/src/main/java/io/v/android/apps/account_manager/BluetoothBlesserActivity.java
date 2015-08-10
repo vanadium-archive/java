@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,7 +25,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.v.v23.android.V;
+import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.VSecurity;
 import io.v.v23.vom.VomUtil;
 
 /**
@@ -45,6 +48,7 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
     ProgressDialog mDialog = null;
     PreferenceScreen mPreferenceScreen;
     Set<BluetoothDevice> mNeighboringDevices = null;
+    VContext mBaseContext = null;
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -107,7 +111,7 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        V.init(this);
+        mBaseContext = V.init(this);
 
         mPreferenceScreen = this.getPreferenceManager().createPreferenceScreen(this);
         mPreferenceScreen.bind(new ListView(this));
@@ -243,22 +247,36 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
 
     private void display(Blessings remoteBlessings, ECPublicKey remotePublicKey) {
         // Invoke the bless activity if user wishes to bless the blessee.
+        String[] blesseeNames = VSecurity.getSigningBlessingNames(mBaseContext,
+                V.getPrincipal(mBaseContext), remoteBlessings);
+        String blesseeTitles = "";
+        if (blesseeNames == null || blesseeNames.length == 0) {
+            blesseeTitles = "Principal: Not Recognized.";
+        } else {
+            blesseeTitles = blesseeNames[0];
+            for (int j = 1; j < blesseeNames.length; j++) {
+                blesseeTitles += "\n" + blesseeNames[j];
+            }
+        }
         Intent i = new Intent(this, BlessActivity.class);
         i.putExtra(BlessActivity.BLESSEE_PUBLIC_KEY, remotePublicKey);
-        i.putExtra(BlessActivity.BLESSEE_NAMES, remoteBlessings.toString().split(","));
+        i.putExtra(BlessActivity.BLESSEE_NAMES, blesseeNames);
         i.putExtra(BlessActivity.BLESSEE_EXTENSION, DEFAULT_EXTENSION);
         i.putExtra(BlessActivity.BLESSEE_EXTENSION_MUTABLE, true);
 
         PreferenceScreen prefScreen = this.getPreferenceManager().createPreferenceScreen(this);
         prefScreen.setOnPreferenceClickListener(mBlesseePreferenceListener);
-        Preference pref = new Preference(this);
+        PreferenceCategory sendCat = new PreferenceCategory(this);
+        sendCat.setTitle("Send Blessings To:");
+        prefScreen.addPreference(sendCat);
 
         // Display the names on the blessings sent by the requester.
-        pref.setSummary("Send Blessings To:\n" + remoteBlessings.toString());
+        Preference pref = new Preference(this);
+        pref.setSummary(blesseeTitles);
         pref.setEnabled(true);
         pref.setIntent(i);
         pref.setOnPreferenceClickListener(mBlesseePreferenceListener);
-        prefScreen.addPreference(pref);
+        sendCat.addPreference(pref);
 
         setPreferenceScreen(prefScreen);
     }

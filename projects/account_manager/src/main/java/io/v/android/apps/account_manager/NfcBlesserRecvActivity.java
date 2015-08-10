@@ -11,13 +11,17 @@ import android.nfc.NfcAdapter;
 import android.os.Parcelable;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import java.security.interfaces.ECPublicKey;
 
 import io.v.v23.android.V;
+import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -33,6 +37,7 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
 
     Blessings mRemoteBlessings = null;
     ECPublicKey mRemotePublicKey = null;
+    VContext mBaseContext = null;
 
     Preference.OnPreferenceClickListener mPreferenceListener =
             new Preference.OnPreferenceClickListener() {
@@ -50,7 +55,7 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
     @Override
     public void onResume() {
         super.onResume();
-        V.init(this);
+        mBaseContext = V.init(this);
 
         // Check to see that the activity started due to a beam, and process the obtained blessings.
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
@@ -84,24 +89,37 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
         } catch (VException e) {
             android.util.Log.e(TAG, "Didn't Receive blessings from remote end: " + e);
         }
-
         // Invoke the bless activity if user wishes to bless the blessee.
+        String[] blesseeNames = VSecurity.getSigningBlessingNames(mBaseContext,
+                V.getPrincipal(mBaseContext), mRemoteBlessings);
+        String blesseeTitles = "";
+        if (blesseeNames == null || blesseeNames.length == 0) {
+            blesseeTitles = "Principal: Not Recognized.";
+        } else {
+            blesseeTitles = blesseeNames[0];
+            for (int j = 1; j < blesseeNames.length; j++) {
+                blesseeTitles += "\n" + blesseeNames[j];
+            }
+        }
         Intent i = new Intent(this, BlessActivity.class);
         i.putExtra(BlessActivity.BLESSEE_PUBLIC_KEY, mRemotePublicKey);
-        i.putExtra(BlessActivity.BLESSEE_NAMES, mRemoteBlessings.toString().split(","));
+        i.putExtra(BlessActivity.BLESSEE_NAMES, blesseeNames);
         i.putExtra(BlessActivity.BLESSEE_EXTENSION, DEFAULT_EXTENSION);
         i.putExtra(BlessActivity.BLESSEE_EXTENSION_MUTABLE, true);
 
         PreferenceScreen prefScreen = this.getPreferenceManager().createPreferenceScreen(this);
         prefScreen.setOnPreferenceClickListener(mPreferenceListener);
-        Preference sendBlessingPref = new Preference(this);
+        PreferenceCategory sendCat = new PreferenceCategory(this);
+        sendCat.setTitle("Send Blessings To:");
+        prefScreen.addPreference(sendCat);
 
         // Display the names on the blessings sent by the requester.
-        sendBlessingPref.setSummary("Send Blessings To:\n" + mRemoteBlessings.toString());
+        Preference sendBlessingPref = new Preference(this);
+        sendBlessingPref.setSummary(blesseeTitles);
         sendBlessingPref.setEnabled(true);
         sendBlessingPref.setIntent(i);
         sendBlessingPref.setOnPreferenceClickListener(mPreferenceListener);
-        prefScreen.addPreference(sendBlessingPref);
+        sendCat.addPreference(sendBlessingPref);
 
         setPreferenceScreen(prefScreen);
     }

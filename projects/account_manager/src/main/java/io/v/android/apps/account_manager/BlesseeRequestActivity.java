@@ -27,8 +27,9 @@ public class BlesseeRequestActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
 
         // Ask the user to choose the Vanadium blessing(s) to identify itself with.
-        startActivityForResult(
-                new Intent(this, BlessingChooserActivity.class), BLESSING_CHOOSING_REQUEST);
+        Intent intent = new Intent(this, BlessingChooserActivity.class);
+        intent.putExtra(BlessingChooserActivity.EXTRA_SIGNING_ONLY, true);
+        startActivityForResult(intent, BLESSING_CHOOSING_REQUEST);
     }
 
     @Override
@@ -41,8 +42,14 @@ public class BlesseeRequestActivity extends PreferenceActivity {
         switch (requestCode) {
             case BLESSING_CHOOSING_REQUEST:
                 if (resultCode != RESULT_OK) {
-                    handleError("Error choosing blessings: " +
-                            data.getStringExtra(Constants.ERROR));
+                    String error = data.getStringExtra(Constants.ERROR);
+                    if (error == null) {
+                        handleError("Error choosing blessings: error not found.");
+                    } else if (error.equals(BlessingChooserActivity.CANCELED_REQUEST)) {
+                        finish();
+                    } else {
+                        handleError("Error choosing blessings: " + error);
+                    }
                     return;
                 }
                 String blessingsVom = data.getStringExtra(Constants.REPLY);

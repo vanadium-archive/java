@@ -124,8 +124,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         }
         mBlesseeNames = intent.getStringArrayExtra(BLESSEE_NAMES);
         if (mBlesseeNames == null || mBlesseeNames.length <= 0) {
-            replyWithError("Blessee names not received.");
-            return;
+            mBlesseeNames = new String[]{"Principal: Not Recognized"};
         }
         mBlesseePublicKey = (ECPublicKey) extras.get(BLESSEE_PUBLIC_KEY);
         if (mBlesseePublicKey == null) {

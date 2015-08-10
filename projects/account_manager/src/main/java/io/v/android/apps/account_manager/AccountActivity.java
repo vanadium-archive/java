@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,12 +35,15 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Caveat;
 import io.v.v23.security.CryptoUtil;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
@@ -194,8 +198,11 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 OAuthBlesserClient blesser =
                         OAuthBlesserClientFactory.getOAuthBlesserClient(identityServiceName);
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-                OAuthBlesserClient.BlessUsingAccessTokenOut reply =
-                        blesser.blessUsingAccessToken(ctx, tokens[0]);
+
+                List<Caveat> caveats = new ArrayList<>();
+                caveats.add(VSecurity.newExpiryCaveat(DateTime.now().plusDays(1)));
+                OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
+                        blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0], caveats);
                 Blessings blessing = reply.blessing;
                 if (blessing == null || blessing.getCertificateChains() == null ||
                         blessing.getCertificateChains().size() <= 0) {
