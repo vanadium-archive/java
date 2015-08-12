@@ -104,28 +104,32 @@
         </activity>
         <activity
             android:name=".BlesseeRequestActivity"
-            android:label="@string/title_activity_blessee_request" >
+            android:label="@string/title_activity_blessee_request"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.REQUEST_BLESSINGS" />
             </intent-filter>
         </activity>
         <activity
             android:name=".BlesserGrantActivity"
-            android:label="@string/title_activity_blesser_grant" >
+            android:label="@string/title_activity_blesser_grant"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.GRANT_BLESSINGS" />
             </intent-filter>
         </activity>
         <activity
             android:name=".NfcBlesseeSendActivity"
-            android:label="@string/title_activity_nfc_blessee_send" >
+            android:label="@string/title_activity_nfc_blessee_send"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NFC_BLESSEE_SEND" />
             </intent-filter>
         </activity>
         <activity
             android:name=".NfcBlesserRecvActivity"
-            android:label="@string/title_activity_blesser_recv" >
+            android:label="@string/title_activity_blesser_recv"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -141,7 +145,8 @@
         </activity>
         <activity
             android:name=".NfcBlesserSendActivity"
-            android:label="@string/title_activity_nfc_blesser_send" >
+            android:label="@string/title_activity_nfc_blesser_send"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NFC_BLESSER_SEND" />
             </intent-filter>
@@ -149,7 +154,8 @@
         <activity
             android:name=".NfcBlesseeRecvActivity"
             android:label="@string/title_activity_blessee_recv"
-            android:noHistory="true" >
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -159,21 +165,24 @@
         <activity
             android:name=".NfcBlesserActivity"
             android:label="@string/title_activity_nfc_blesser"
-            android:noHistory="true" >
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.nfc.action.WAIT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".BluetoothBlesseeActivity"
-            android:label="@string/title_activity_bluetooth_blessee" >
+            android:label="@string/title_activity_bluetooth_blessee"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.BLUETOOTH_BLESSEE_SEND" />
             </intent-filter>
         </activity>
         <activity
             android:name=".BluetoothBlesserActivity"
-            android:label="@string/title_activity_bluetooth_blesser" >
+            android:label="@string/title_activity_bluetooth_blesser"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="io.v.android.apps.account_manager.BLUETOOTH_BLESSER_SEND" />
             </intent-filter>

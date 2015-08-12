@@ -26,7 +26,9 @@ import io.v.v23.uniqueid.Id;
  */
 public class CertificateDisplayActivity extends PreferenceActivity  {
     public static final String TAG = "BlessingDetailsDisplay";
+    public static final String EXTRA_CERTIFICATE_VOM = "EXTRA_CERTIFICATE_VOM";
 
+    private static final String NAME_TITLE = "Name";
     private static final String PUBLIC_KEY_TITLE = "Public Key";
     private static final String CAVEATS_TITLE = "Caveats";
 
@@ -35,7 +37,7 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
         super.onCreate(savedInstanceState);
 
         String certificateVom =
-                getIntent().getExtras().getString(BlessingDisplayActivity.CERTIFICATE_VOM);
+                getIntent().getExtras().getString(EXTRA_CERTIFICATE_VOM);
         VCertificate certificate = null;
         try {
             certificate = (VCertificate)
@@ -48,6 +50,15 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
         PreferenceScreen prefScreen = getPreferenceManager().createPreferenceScreen(this);
         ListView listView = new ListView(this);
         prefScreen.bind(listView);
+
+        PreferenceCategory nameCategory = new PreferenceCategory(this);
+        nameCategory.setTitle(NAME_TITLE);
+        prefScreen.addPreference(nameCategory);
+
+        Preference namePref  = new Preference(this);
+        namePref.setTitle(certificate.getExtension());
+        namePref.setEnabled(false);
+        nameCategory.addPreference(namePref);
 
         PreferenceCategory publicKeyCategory = new PreferenceCategory(this);
         publicKeyCategory.setTitle(PUBLIC_KEY_TITLE);
@@ -71,6 +82,7 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
             caveatPreference.setEnabled(true);
             caveatsCategory.addPreference(caveatPreference);
         }
+
         setPreferenceScreen(prefScreen);
     }
 

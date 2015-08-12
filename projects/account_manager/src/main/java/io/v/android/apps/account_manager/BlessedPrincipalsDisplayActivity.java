@@ -18,8 +18,6 @@ import java.util.Set;
  * Lists all the remote principals ever blessed by the account manager.
  */
 public class BlessedPrincipalsDisplayActivity extends PreferenceActivity {
-    public static final String PUBLIC_KEY = "PUBLIC_KEY";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +49,7 @@ public class BlessedPrincipalsDisplayActivity extends PreferenceActivity {
                     "io.v.android.apps.account_manager.BlessingEventsDisplayActivity");
             curPrincipalIntent.setAction(
                     "io.v.android.apps.account_manager.BLESSING_EVENTS_DISPLAY");
-            curPrincipalIntent.putExtra(PUBLIC_KEY,
+            curPrincipalIntent.putExtra(BlessingEventsDisplayActivity.EXTRA_PUBLIC_KEY,
                     principalsLog.getString(BlessActivity.PRINCIPAL_KEY + "_" + i, ""));
             curPrincipalPref.setIntent(curPrincipalIntent);
 

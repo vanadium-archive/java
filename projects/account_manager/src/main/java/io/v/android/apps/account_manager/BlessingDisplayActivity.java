@@ -14,13 +14,11 @@ import com.google.common.reflect.TypeToken;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.v.v23.android.V;
-import io.v.v23.security.*;
-import io.v.v23.uniqueid.Id;
+import io.v.v23.security.Caveat;
+import io.v.v23.security.VCertificate;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -29,7 +27,8 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingDisplayActivity extends PreferenceActivity  {
     public static final String TAG = "BlessingDisplayActivity";
-    public static final String CERTIFICATE_VOM = "CERTIFICATE_VOM";
+    public static final String EXTRA_CERTIFICATE_CHAIN_VOM = "EXTRA_CERTIFICATE_CHAIN_VOM";
+    public static final String EXTRA_BLESSING_PATTERN = "EXTRA_BLESSING_PATTERN";
 
     private static final String PEERS_TITLE = "Peers";
     private static final String CERTIFICATES_TITLE = "Certificates";
@@ -45,9 +44,9 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
         Bundle extras = getIntent().getExtras();
 
         String certChainVom =
-                extras.getString(BlessingStoreDisplayActivity.CERTIFICATE_CHAIN_VOM);
+                extras.getString(EXTRA_CERTIFICATE_CHAIN_VOM);
         String pattern =
-                extras.getString(BlessingStoreDisplayActivity.BLESSING_PATTERN);
+                extras.getString(EXTRA_BLESSING_PATTERN);
         if (pattern == null) {
             pattern = "Pattern not found";
         }
@@ -98,7 +97,7 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
             intent.setClassName("io.v.android.apps.account_manager",
                     "io.v.android.apps.account_manager.CertificateDisplayActivity");
             intent.setAction("io.v.android.apps.account_manager.DISPLAY_CERTIFICATE");
-            intent.putExtra(CERTIFICATE_VOM, certificateVom);
+            intent.putExtra(CertificateDisplayActivity.EXTRA_CERTIFICATE_VOM, certificateVom);
             currentPreference.setIntent(intent);
 
             certificatesCategory.addPreference(currentPreference);
@@ -128,7 +127,9 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
     private void updateExpiryTime(Caveat caveat) {
         try {
             DateTime expiry = CertificateDisplayActivity.expiryCaveatPayload(caveat);
-            if (expiry.isBefore(mExpiryTime)) {
+            if (mExpiryTime == null) {
+                mExpiryTime = expiry;
+            } else if (expiry.isBefore(mExpiryTime)) {
                 mExpiryTime = expiry;
             }
         } catch (VException e) {

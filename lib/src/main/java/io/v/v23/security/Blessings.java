@@ -55,6 +55,7 @@ public class Blessings implements Serializable {
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native Blessings nativeSigningBlessings(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
+    // TODO(sjayanti): a method to get all the non-signing blessings in a given blessings object.
 
     private Blessings(long nativePtr, WireBlessings wire) {
         this.nativePtr = nativePtr;

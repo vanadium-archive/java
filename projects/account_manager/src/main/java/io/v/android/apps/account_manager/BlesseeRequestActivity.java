@@ -28,7 +28,8 @@ public class BlesseeRequestActivity extends PreferenceActivity {
 
         // Ask the user to choose the Vanadium blessing(s) to identify itself with.
         Intent intent = new Intent(this, BlessingChooserActivity.class);
-        intent.putExtra(BlessingChooserActivity.EXTRA_SIGNING_ONLY, true);
+        intent.putExtra(BlessingChooserActivity.EXTRA_BLESSING_SET,
+                BlessingChooserActivity.SIGNING_BLESSINGS);
         startActivityForResult(intent, BLESSING_CHOOSING_REQUEST);
     }
 

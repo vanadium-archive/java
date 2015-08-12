@@ -35,13 +35,16 @@ import io.v.v23.vom.VomUtil;
 public class BlessingChooserActivity extends Activity {
     public static final String TAG = "BlessingChooserActivity";
     public static final String CANCELED_REQUEST = "User Canceled Blessing Selection";
-    public static final String EXTRA_SIGNING_ONLY = "SIGNING_ONLY";
+
+    public static final String EXTRA_BLESSING_SET = "EXTRA_BLESSING_SET";
+    public static final int ALL_BLESSINGS = 1;
+    public static final int SIGNING_BLESSINGS = 2;
 
     private static final int CREATE_BLESSING_REQUEST = 1;
 
     BlessingStore mBlessingStore = null;
     HashMap<Integer, Blessings> mBlessings = null;
-    boolean mSigningOnly = false;
+    int mBlessingSet = ALL_BLESSINGS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,7 @@ public class BlessingChooserActivity extends Activity {
             replyWithError("No intent found");
             return;
         }
-        mSigningOnly = intent.getBooleanExtra(EXTRA_SIGNING_ONLY, false);
+        mBlessingSet = intent.getIntExtra(EXTRA_BLESSING_SET, ALL_BLESSINGS);
 
         setContentView(R.layout.activity_blessing_chooser);
         ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_blessings);
@@ -111,11 +114,18 @@ public class BlessingChooserActivity extends Activity {
 
             for (BlessingPattern pattern: peerMap.keySet()) {
                 List<List<VCertificate>> chains = null;
-                if (mSigningOnly) {
-                    chains =  peerMap.get(pattern).signingBlessings().getCertificateChains();
-                } else {
-                    chains = peerMap.get(pattern).getCertificateChains();
+                switch (mBlessingSet) {
+                    case ALL_BLESSINGS:
+                        chains = peerMap.get(pattern).getCertificateChains();
+                        break;
+                    case SIGNING_BLESSINGS:
+                        chains = peerMap.get(pattern).signingBlessings().getCertificateChains();
+                        break;
+                    default:
+                        chains = peerMap.get(pattern).getCertificateChains();
+                        break;
                 }
+
                 for (List<VCertificate> certChain: chains) {
                     List<List<VCertificate>> certChains = new ArrayList<List<VCertificate>>();
                     certChains.add(certChain);

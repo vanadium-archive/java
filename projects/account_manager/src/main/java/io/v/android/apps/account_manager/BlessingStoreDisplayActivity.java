@@ -13,6 +13,7 @@ import com.google.common.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import io.v.v23.android.V;
@@ -28,8 +29,9 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingStoreDisplayActivity extends PreferenceActivity  {
     public static final String TAG = "BlessingStoreDisplay";
-    public static final String CERTIFICATE_CHAIN_VOM = "CERTIFICATE_CHAIN_VOM";
-    public static final String BLESSING_PATTERN = "BLESSING_PATTERN";
+
+    private static final String SIGNING_BLESSINGS_TITLE = "Identity Blessings";
+    private static final String AUTHORIZATION_BLESSINGS_TITLE = "Authorization Blessings";
 
     private static final String SIGNING_BLESSINGS_TITLE = "Identity Blessings";
     private static final String AUTHORIZATION_BLESSINGS_TITLE = "Authorization Blessings";
@@ -53,14 +55,15 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
         nonSigningCat.setTitle(AUTHORIZATION_BLESSINGS_TITLE);
         prefScreen.addPreference(nonSigningCat);
 
-
         for (Map.Entry<BlessingPattern, Blessings> entry: blessingStore.peerBlessings().entrySet()) {
             Blessings blessings = entry.getValue();
             for (List<VCertificate> certChain: blessings.getCertificateChains()) {
                 String name = "";
-                for (VCertificate certificate: certChain) {
-                    name += certificate.getExtension() + "/";
+                int size = certChain.size();
+                for (int i = 0; i < (size - 1); i++) {
+                    name += certChain.get(i).getExtension() + "/";
                 }
+                name += certChain.get(size - 1).getExtension();
 
                 String certChainVom = null;
                 try {
@@ -82,8 +85,9 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
                         "io.v.android.apps.account_manager.BlessingDisplayActivity");
                 intent.setAction(
                         "io.v.android.apps.account_manager.DISPLAY_BLESSING");
-                intent.putExtra(CERTIFICATE_CHAIN_VOM, certChainVom);
-                intent.putExtra(BLESSING_PATTERN, entry.getKey().getValue());
+                intent.putExtra(BlessingDisplayActivity.EXTRA_CERTIFICATE_CHAIN_VOM, certChainVom);
+                intent.putExtra(BlessingDisplayActivity.EXTRA_BLESSING_PATTERN,
+                        entry.getKey().getValue());
                 currentPreference.setIntent(intent);
 
                 List<List<VCertificate>> b = new ArrayList<List<VCertificate>>();
@@ -92,9 +96,21 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
                     nonSigningCat.addPreference(currentPreference);
                 } else {
                     signingCat.addPreference(currentPreference);
-
                 }
+
             }
+        }
+        if (signingCat.getPreferenceCount() <= 0) {
+            Preference nonePref = new Preference(this);
+            nonePref.setTitle("No Identity Blessings");
+            nonePref.setEnabled(false);
+            signingCat.addPreference(nonePref);
+        }
+        if (nonSigningCat.getPreferenceCount() <= 0) {
+            Preference nonePref = new Preference(this);
+            nonePref.setTitle("No Authorization Blessings");
+            nonePref.setEnabled(false);
+            nonSigningCat.addPreference(nonePref);
         }
         setPreferenceScreen(prefScreen);
     }

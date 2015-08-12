@@ -75,10 +75,10 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
      *      LOG_REMOTE_BLESSINGS contains the actual blessing data indexed as follows:
      *          The number of blessings given to a principal with public key - pk - is listed in
      *              LOG_REMOTE_PRINCIPALS.  Let us say m blessings were given out.
-     *          Only MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL blessing events are maintained, so the
+     *          Only MAX_BLESSINGS_FOR_PRINCIPAL blessing events are maintained, so the
      *              string serializations of stored blessing events are keyed by
-     *              pk_(m - MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL) ... pk_(m-1), if m is greater than
-     *              MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL, and pk_0 ... pk_(m-1) otherwise.
+     *              pk_(m - MAX_BLESSINGS_FOR_PRINCIPAL) ... pk_(m-1), if m is greater than
+     *              MAX_BLESSINGS_FOR_PRINCIPAL, and pk_0 ... pk_(m-1) otherwise.
      *
      * Rationale for the scheme:
      *      A seemingly simpler implementation would have maintained a map of the form:
@@ -94,7 +94,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     public static final String NUM_PRINCIPALS_KEY  = "numRemotePrincipals";
     public static final String PRINCIPAL_KEY       = "principal";
     public static final String PRINCIPAL_NAMES_KEY = "principalName";
-    public static final int MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL = 50;
+    public static final int MAX_BLESSINGS_FOR_PRINCIPAL = 50;
 
     private static final int BLESSING_CHOOSING_REQUEST = 1;
 
@@ -429,7 +429,8 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     private void log(String blessingsVom, List<Caveat> caveats, String extension)
             throws Exception{
         BlessingEvent newBlessingEvent =
-                new BlessingEvent(mBlesseeNames, blessingsVom, DateTime.now(), caveats, extension);
+                new BlessingEvent(mBlesseeNames, blessingsVom, DateTime.now(), caveats, extension,
+                        mBlesseePublicKey);
         String pubKey = encodePubKeyToString(mBlesseePublicKey);
 
         SharedPreferences blessingsLog = getSharedPreferences(LOG_BLESSINGS, MODE_PRIVATE);
@@ -448,8 +449,8 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         }
 
         // Delete stale blessing entry, if there are too many entries for the principal.
-        String keyToDelete = pubKey + "_" + (numEvents - MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL);
-        if (numEvents > MAX_BLESSINGS_FOR_REMOTE_PRINCIPAL && blessingsLog.contains(keyToDelete)) {
+        String keyToDelete = pubKey + "_" + (numEvents - MAX_BLESSINGS_FOR_PRINCIPAL);
+        if (numEvents > MAX_BLESSINGS_FOR_PRINCIPAL && blessingsLog.contains(keyToDelete)) {
             blessingsLogEditor.remove(keyToDelete);
             blessingsLogEditor.apply();
         }

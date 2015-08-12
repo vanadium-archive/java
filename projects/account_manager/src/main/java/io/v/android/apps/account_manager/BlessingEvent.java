@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
 import io.v.v23.vom.VomUtil;
@@ -24,14 +25,16 @@ class BlessingEvent implements Serializable {
     DateTime mTimeStamp;
     List<Caveat> mCaveats;
     String   mExtension;
+    ECPublicKey mPublicKey;
 
     BlessingEvent(String[] blesseeNames, String blessingsVom, DateTime timeStamp,
-                  List<Caveat> caveats, String extension) {
+                  List<Caveat> caveats, String extension, ECPublicKey publicKey) {
         mBlesseeNames = blesseeNames;
         mBlessingsVom = blessingsVom;
         mTimeStamp = timeStamp;
         mCaveats = caveats;
         mExtension = extension;
+        mPublicKey = publicKey;
     }
 
     /**
@@ -69,6 +72,13 @@ class BlessingEvent implements Serializable {
      */
     public String getNameExtension() {
         return mExtension;
+    }
+
+    /**
+     * Returns the public key of the blessee.
+     */
+    public ECPublicKey getPublicKey() {
+        return mPublicKey;
     }
 
     /**
