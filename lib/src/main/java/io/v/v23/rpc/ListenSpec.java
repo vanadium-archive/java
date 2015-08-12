@@ -40,6 +40,11 @@ public class ListenSpec {
          * Returns the network address.
          */
         public String getAddress() { return this.address; }
+
+        @Override
+        public String toString() {
+            return this.protocol + ":" + this.address;
+        }
     }
 
     private final Address[] addrs;  // non-null
@@ -74,23 +79,24 @@ public class ListenSpec {
     }
 
     /**
-     * Returns a new copy of this {@link ListenSpec} with the {@link AddressChooser} replaced with the given address
-     * chooser.
+     * Returns a new copy of this {@link ListenSpec} with the {@link AddressChooser} replaced with
+     * the given address chooser.
      */
     public ListenSpec withAddressChooser(AddressChooser newChooser) {
         return new ListenSpec(getAddresses(), proxy, newChooser);
     }
 
     /**
-     * Returns a new copy of this {@link ListenSpec} whose {@link #getProxy} method will return the given proxy.
+     * Returns a new copy of this {@link ListenSpec} whose {@link #getProxy} method will return the
+     * given proxy.
      */
     public ListenSpec withProxy(String newProxy) {
         return new ListenSpec(getAddresses(), newProxy, chooser);
     }
 
     /**
-     * Returns a new copy of this {@link ListenSpec} whose {@link #getAddresses} method will return an array
-     * containing only the given address.
+     * Returns a new copy of this {@link ListenSpec} whose {@link #getAddresses} method will return
+     * an array containing only the given address.
      */
     public ListenSpec withAddress(Address address) {
         return new ListenSpec(new Address[]{address}, proxy, chooser);
