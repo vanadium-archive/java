@@ -43,23 +43,10 @@ public static getOS() {
 
 def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
 def v23Bin = VanadiumEnvironment.getVanadiumEnvironment().v23Bin.getAbsolutePath()
-
-task buildVdlTool(type: Exec) {
-    commandLine v23Bin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
-}
-
-def vdlPath = [ [v23Root, 'release', 'go', 'src'].join(File.separator),
-                [v23Root, 'roadmap', 'go', 'src'].join(File.separator) ].join(':')
-
+def vdlPath = [v23Root, 'release', 'go', 'src'].join(File.separator)
 def vdlBin = [v23Root, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 
-task generateVdl(type: Exec, dependsOn: buildVdlTool) {
-    environment VDLPATH: vdlPath
-    commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
-}
-
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
-tasks.'compileJava'.dependsOn(generateVdl)
 
 class VanadiumEnvironment {
     File v23Root;
@@ -96,6 +83,17 @@ class VanadiumEnvironment {
         return result
     }
 }
+
+task buildVdlTool(type: Exec) {
+    commandLine v23Bin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
+}
+
+task generateVdl(type: Exec, dependsOn: buildVdlTool) {
+    environment VDLPATH: vdlPath
+    commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
+}
+
+tasks.'compileJava'.dependsOn(generateVdl)
 
 task checkVanadiumEnvironment {
     VanadiumEnvironment.getVanadiumEnvironment()
