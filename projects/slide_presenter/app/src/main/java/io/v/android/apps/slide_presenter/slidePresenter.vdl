@@ -1,0 +1,18 @@
+package slidepresenter
+
+
+// SlidePresenter allows clients to sync slide number state across devices 
+// for use in a multi-device slide presentation application.  
+type SlidePresenter interface {
+
+
+  // Receives a new slide number.
+  GetSlideNum() (slideNum int32 | error)
+
+  // Sends a message to update the slide number.
+  SetSlideNum(slideNum int32) error
+
+  // Creates a stream on which the new slide number will be sent each time
+  // it is updated (via SetSlideNum()).
+  StreamingGetSlideNum() stream<_, int32> error
+}

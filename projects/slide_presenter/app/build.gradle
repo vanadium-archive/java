@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.v.vdl'
 
 android {
-
     compileSdkVersion 22
     buildToolsVersion "23.0.0 rc3"
     defaultConfig {
@@ -26,6 +26,17 @@ android {
     }
 }
 
+buildscript {
+    repositories {
+        maven {
+            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
+        }
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+    }
+}
+
 android.sourceSets.androidTest.java.srcDirs += 'src/test/java'
 
 dependencies {
@@ -37,4 +48,9 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile 'com.android.support.test:rules:0.3'
+}
+
+vdl {
+    // This is where the VDL tool will look for VDL definitions.
+    inputPaths += 'src/main/java'
 }
