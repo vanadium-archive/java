@@ -9,7 +9,6 @@ import org.joda.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import io.v.v23.InputChannel;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
@@ -174,10 +173,16 @@ public interface Namespace {
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    InputChannel<GlobReply> glob(VContext context, String pattern) throws VException;
+    Iterable<GlobReply> glob(VContext context, String pattern) throws VException;
 
     /**
-     * Returns all names matching the provided pattern.
+     * Returns the iterator over all names matching the provided pattern.
+     * <p>
+     * You should be aware that the iterator:
+     * <p><ul>
+     *     <li>can be created <strong>only</strong> once</li>
+     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
+     * </ul>
      * <p>
      * A particular implementation of this interface chooses which options to support, but at the
      * minimum it must handle the following pre-defined options:
@@ -188,10 +193,10 @@ public interface Namespace {
      * @param context a client context
      * @param pattern a pattern that should be matched
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return an input channel of {@link GlobReply} objects matching the provided pattern
+     * @return        an iterator over {@link GlobReply} objects matching the provided pattern
      * @throws VException if an error is encountered
      */
-    InputChannel<GlobReply> glob(VContext context, String pattern, Options options)
+    Iterable<GlobReply> glob(VContext context, String pattern, Options options)
             throws VException;
 
     /**

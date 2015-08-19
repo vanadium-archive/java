@@ -9,7 +9,6 @@ import org.joda.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import io.v.v23.InputChannel;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
@@ -25,7 +24,7 @@ import io.v.v23.verror.VException;
 public class NamespaceImpl implements Namespace {
     private final long nativePtr;
 
-    private static native InputChannel<GlobReply> nativeGlob(
+    private static native Iterable<GlobReply> nativeGlob(
             long nativePtr, VContext context, String pattern, Options options) throws VException;
 
     private static native void nativeMount(long nativePtr, VContext context, String name,
@@ -129,12 +128,12 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public InputChannel<GlobReply> glob(VContext context, String pattern) throws VException {
+    public Iterable<GlobReply> glob(VContext context, String pattern) throws VException {
         return glob(context, pattern, null);
     }
 
     @Override
-    public InputChannel<GlobReply> glob(VContext context, String pattern, Options options)
+    public Iterable<GlobReply> glob(VContext context, String pattern, Options options)
             throws VException {
         return nativeGlob(nativePtr, context, pattern, options);
     }

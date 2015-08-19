@@ -4,7 +4,6 @@
 
 package io.v.v23.rpc;
 
-import io.v.v23.InputChannel;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.security.Authorizer;
 import io.v.v23.verror.VException;
@@ -106,18 +105,24 @@ public interface Server {
     ServerStatus getStatus();
 
     /**
-     * Returns a channel over which {@link NetworkChange}s will be sent. The server will
-     * not block sending data over this channel and hence change events may be lost if the
-     * implementation doesn't ensure there is sufficient buffering in the channel.
+     * Returns an iterator over server's network changes.  The returned iterator blocks
+     * if there aren't any immediate changes.  Some change events may be lost if the reader is
+     * too slow in its iterations.
+     * <p>
+     * You should be aware that the iterator:
+     * <p><ul>
+     *     <li>can be created <strong>only</strong> once</li>
+     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
+     * </ul>
      */
-    InputChannel<NetworkChange> watchNetwork();
+    Iterable<NetworkChange> watchNetwork();
 
     /**
-     * Unregisters a channel previously registered using {@link #watchNetwork}.
+     * Unregisters an iterator previously returned via {@link #watchNetwork}.
      *
-     * @param channel a channel previously registered using {@link #watchNetwork}
+     * @param it an iterator previously returned via {@link #watchNetwork}
      */
-    void unwatchNetwork(InputChannel<NetworkChange> channel);
+    void unwatchNetwork(Iterable<NetworkChange> it);
 
     /**
      * Gracefully stops all services on this server.  New calls are rejected, but any in-flight

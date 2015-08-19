@@ -6,7 +6,6 @@ package io.v.x.jni.test.fortune;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import io.v.v23.InputChannel;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
@@ -143,7 +142,7 @@ public class FortuneTest extends TestCase {
 
         // TODO(spetrovic): Figure out how to force network change in android and test that the
         // changes get announced on this channel.
-        InputChannel<NetworkChange> channel = s.watchNetwork();
+        Iterable<NetworkChange> channel = s.watchNetwork();
         s.unwatchNetwork(channel);
     }
 

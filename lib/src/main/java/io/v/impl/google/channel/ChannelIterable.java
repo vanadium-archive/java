@@ -6,42 +6,47 @@ package io.v.impl.google.channel;
 
 import com.google.common.collect.AbstractIterator;
 
-import io.v.v23.InputChannel;
-import io.v.v23.verror.VException;
-
 import java.io.EOFException;
 import java.util.Iterator;
 
 /**
- * An implementation of {@link InputChannel} that calls to native code for most
- * of its functionalities.
+ * An implementation of {@link Iterable} that reads data from an underlying Go channel.
  */
-public class InputChannelImpl<T> implements InputChannel<T> {
+public class ChannelIterable<T> implements Iterable<T> {
     private final long nativePtr;
     private final long sourceNativePtr;
 
-    private native boolean nativeAvailable(long nativePtr);
-    private native Object nativeReadValue(long nativePtr) throws EOFException, VException;
+    private native Object nativeReadValue(long nativePtr) throws EOFException;
     private native void nativeFinalize(long nativePtr, long sourceNativePtr);
 
-    private InputChannelImpl(long nativePtr, long sourceNativePtr) {
+    private ChannelIterable(long nativePtr, long sourceNativePtr) {
         this.nativePtr = nativePtr;
         this.sourceNativePtr = sourceNativePtr;
     }
 
     @Override
-    public boolean available() {
-        return nativeAvailable(this.nativePtr);
+    public Iterator<T> iterator() {
+        return new AbstractIterator<T>() {
+            @Override
+            protected T computeNext() {
+                try {
+                    return readValue();
+                } catch (EOFException e) {
+                    return endOfData();
+                }
+            }
+        };
     }
 
-    @SuppressWarnings("unchecked")
-    public T readValue() throws EOFException, VException {
+    private T readValue() throws EOFException {
         return (T) nativeReadValue(this.nativePtr);
     }
+
     @Override
     protected void finalize() {
         nativeFinalize(this.nativePtr, this.sourceNativePtr);
     }
+
     /**
      * Returns the native pointer to the Go channel of Java objects.
      *
@@ -55,20 +60,4 @@ public class InputChannelImpl<T> implements InputChannel<T> {
      * @return the native pointer to the Go channel that feeds the above Go channel of Java object
      */
     public long getSourceNativePtr() { return this.sourceNativePtr; }
-
-    @Override
-    public Iterator<T> iterator() {
-        return new AbstractIterator<T>() {
-            @Override
-            protected T computeNext() {
-                try {
-                    return readValue();
-                } catch (EOFException e) {
-                    return endOfData();
-                } catch (VException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-    }
 }

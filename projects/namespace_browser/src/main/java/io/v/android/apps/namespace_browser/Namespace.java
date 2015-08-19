@@ -10,7 +10,6 @@ import org.joda.time.Duration;
 
 import java.util.List;
 
-import io.v.v23.InputChannel;
 import io.v.v23.android.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
@@ -30,7 +29,7 @@ public class Namespace {
     public static List<GlobReply> glob(String root, VContext ctx) throws VException {
         io.v.v23.namespace.Namespace n = V.getNamespace(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        InputChannel<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*");
+        Iterable<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*");
         return ImmutableList.copyOf(chan);
     }
 }
