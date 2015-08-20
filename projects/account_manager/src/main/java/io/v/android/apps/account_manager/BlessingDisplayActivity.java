@@ -16,7 +16,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import java.util.List;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.security.Caveat;
 import io.v.v23.security.VCertificate;
 import io.v.v23.verror.VException;

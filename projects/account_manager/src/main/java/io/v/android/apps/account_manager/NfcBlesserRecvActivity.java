@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import java.security.interfaces.ECPublicKey;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;

@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 
 public class MainActivity extends Activity {
 

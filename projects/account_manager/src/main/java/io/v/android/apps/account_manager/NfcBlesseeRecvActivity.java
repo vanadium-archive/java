@@ -12,7 +12,7 @@ import android.nfc.NfcAdapter;
 import android.os.Parcelable;
 import android.widget.Toast;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 
-package io.v.v23.android;
+package io.v.android.v23;
 
 import java.io.BufferedReader;
 import java.io.FileDescriptor;
@@ -26,6 +26,7 @@ import android.util.Log;
  * panic messages to logcat.
  */
 final class RedirectStderr {
+    private static final String TAG = "RedirectStderr";
     /**
      * Start redirecting android's stderr
      */
@@ -48,12 +49,11 @@ final class RedirectStderr {
             final Application app = (Application) method.invoke(null,
                     (Object[]) null);
             if (app == null) {
-                Log.e("RedirectStderrGetApplication",
-                        "Application context was null");
+                Log.e(TAG, "Application context was null");
             }
             return app;
         } catch (final Exception e) {
-            Log.e("RedirectStderrGetApplication", e.toString());
+            Log.e(TAG, e.toString());
         }
         return null;
     }
@@ -89,9 +89,8 @@ final class RedirectStderr {
             Log.e("RedirectStderrOpenLog", e.toString());
             return;
         } catch (NoSuchFieldException e) {
-            Log.e("RedirectStderrDescriptor",
-                    "Failed to get descriptor field. It is highly likely that you are using a different version of java. Report this bug. "
-                            + e);
+            Log.e(TAG, "Failed to get descriptor field. It is highly likely that you are using a " +
+                    "different version of java. Report this bug. " + e);
             return;
         } catch (IllegalAccessException e) {
             Log.e("RedirectStderrGetField", e.toString());

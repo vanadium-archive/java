@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;

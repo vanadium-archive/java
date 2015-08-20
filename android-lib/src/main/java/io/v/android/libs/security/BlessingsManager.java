@@ -4,27 +4,19 @@
 
 package io.v.android.libs.security;
 
-import com.google.common.collect.ImmutableList;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.VCertificate;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.security.interfaces.ECPublicKey;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Manages {@link Blessings} for a given Android application, persisting them in its

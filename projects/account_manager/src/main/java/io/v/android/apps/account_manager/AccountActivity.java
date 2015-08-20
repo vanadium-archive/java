@@ -38,7 +38,7 @@ import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingStore;
@@ -91,7 +91,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             getIdentity();
         } else if (requestCode == REQUEST_CODE_USER_APPROVAL) {
             if (resultCode != RESULT_OK) {
-                replyWithError("User didn't give approve proposed permissions.");
+                replyWithError("User didn't give proposed permissions.");
                 return;
             }
             getIdentity();

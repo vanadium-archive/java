@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.EOFException;
 
 import io.v.android.libs.security.BlessingsManager;
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;

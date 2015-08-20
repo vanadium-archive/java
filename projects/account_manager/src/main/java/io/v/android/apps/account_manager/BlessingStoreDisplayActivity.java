@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import io.v.v23.android.V;
+import io.v.android.v23.V;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Blessings;
@@ -29,9 +29,6 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingStoreDisplayActivity extends PreferenceActivity  {
     public static final String TAG = "BlessingStoreDisplay";
-
-    private static final String SIGNING_BLESSINGS_TITLE = "Identity Blessings";
-    private static final String AUTHORIZATION_BLESSINGS_TITLE = "Authorization Blessings";
 
     private static final String SIGNING_BLESSINGS_TITLE = "Identity Blessings";
     private static final String AUTHORIZATION_BLESSINGS_TITLE = "Authorization Blessings";
