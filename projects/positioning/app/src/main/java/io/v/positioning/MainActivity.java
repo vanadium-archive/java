@@ -6,7 +6,6 @@ package io.v.positioning;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -24,7 +23,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 
 import io.v.positioning.gae.ServletPostAsyncTask;
-
+import io.v.positioning.ble.BleActivity;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -38,11 +37,6 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // Check whether BLE is supported on the device
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-        }
         buildGoogleApiClient();
     }
 
@@ -52,6 +46,10 @@ public class MainActivity extends Activity implements
 
     public void onUltrasound(View view) {
         startActivity(new Intent(this, UltrasoundActivity.class));
+    }
+
+    public void onBle(View view) {
+        startActivity(new Intent(this, BleActivity.class));
     }
 
     public void onRecordMyLocation(View view) {
@@ -64,9 +62,7 @@ public class MainActivity extends Activity implements
                 data.put("longitude", mLongitude);
                 data.put("deviceTime", System.currentTimeMillis());
                 new ServletPostAsyncTask("gps", data).execute(this);
-            } catch (JSONException e) {
-                Log.e(TAG, "Failed to record the location." + e);
-            } catch (MalformedURLException e) {
+            } catch (JSONException | MalformedURLException e) {
                 Log.e(TAG, "Failed to record the location." + e);
             }
         } else {

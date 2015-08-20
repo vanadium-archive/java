@@ -10,7 +10,7 @@
     <string name="ble_not_supported">BLE is not supported on this device.</string>
     <!-- Finding Devices with Bluetooth -->
     <string name="positioning_with_bluetooth">Positioning with Bluetooth</string>
-    <string name="finding_devices">Finding devices...</string>
+    <string name="finding_devices">Finding devices…</string>
     <string name="no_devices_found">No devices found</string>
     <string name="discovery_finished">Discovery finished</string>
     <string name="recorded_devices">Recorded Devices</string>
@@ -21,4 +21,11 @@
     <string name="send_ultrasound">Send ultrasound</string>
     <string name="start_receiving_ultrasound">Start receiving ultrasound</string>
     <string name="stop_receiving_ultrasound">Stop receiving ultrasound</string>
+    <!-- Advertising and Connecting-->
+    <string name="start_advertising">Start Advertising</string>
+    <string name="start_scanning">Start Scanning </string>
+    <string name="stop_scanning">Stop Scanning </string>
+    <string name="no_advertising_support">Advertising not supported</string>
+    <string name="ble">Bluetooth low energy</string>
+    <string name="title_activity_ble">BleActivity</string>
 </resources>

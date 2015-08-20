@@ -42,7 +42,7 @@ public class UltrasoundActivity extends Activity {
         Log.d(TAG, "ultrasound played at " + timeSoundPlayed);
     }
 
-    public void onStartReceivingUltrasound(View view) {
+    public void onToggleReceivingUltrasound(View view) {
         if (!mReceiving) {
             mReceiving = true;
             mUltrasoundDetector = new UltrasoundDetectorAsyncTask();

@@ -36,6 +36,10 @@
             android:name=".UltrasoundActivity"
             android:label="@string/title_activity_ultrasound" >
         </activity>
+        <activity
+            android:name=".ble.BleActivity"
+            android:label="@string/title_activity_ble" >
+        </activity>
     </application>
 
 </manifest>
