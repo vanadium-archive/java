@@ -162,21 +162,15 @@ public class CryptoUtil {
         if (purpose == null) {
             throw new VException("Empty purpose.");
         }
+        if (key == null) {
+            throw new VException("PublicKey of signer not provided.");
+        }
         // TODO(ashankar): Remove this if once https://github.com/vanadium/issues/issues/619 is resolved.
         String purposeStr = purpose.toString();
-        byte[] keyBytes = null;
-        if (!purposeStr.equals(Constants.SIGNATURE_FOR_BLESSING_CERTIFICATES_V_0) &&
-               !purposeStr.equals(Constants.SIGNATURE_FOR_DISCHARGE_V_0) &&
-               !purposeStr.equals(Constants.SIGNATURE_FOR_MESSAGE_SIGNING_V_0)) {
-            if (key == null) {
-                    throw new VException("PublicKey of signer not provided.");
-            }
-            keyBytes = hash(vHashAlgorithm, key.getEncoded());
-        }
+        byte[] keyBytes = hash(vHashAlgorithm, key.getEncoded());
         message = hash(vHashAlgorithm, message);
         purpose = hash(vHashAlgorithm, purpose);
-        byte[] ret = join(join(keyBytes, message), purpose);
-        return ret;
+        return join(join(keyBytes, message), purpose);
     }
 
     private static byte[] join(byte[] a, byte[] b) {
