@@ -21,7 +21,7 @@ public class NfcBlesseeSendActivity extends PreferenceActivity
     private static final String READY_MESSAGE  = "BEAM TO REQUEST BLESSINGS!";
     private static final String FAILED_MESSAGE = "PLEASE TRY AGAIN!";
 
-    String mBlessingsVom = null;
+    byte[] mBlessingsVom = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,8 @@ public class NfcBlesseeSendActivity extends PreferenceActivity
         }
         nfcAdapter.setNdefPushMessageCallback(this, this);
 
-        mBlessingsVom = getIntent().getStringExtra(BlesseeRequestActivity.BLESSINGS_VOM);
-        if (mBlessingsVom == null || mBlessingsVom.isEmpty()) {
+        mBlessingsVom = getIntent().getByteArrayExtra(BlesseeRequestActivity.BLESSINGS_VOM);
+        if (mBlessingsVom == null || mBlessingsVom.length == 0) {
             displayFailureMessage();
         } else {
             displayReadyMessage();
@@ -47,7 +47,7 @@ public class NfcBlesseeSendActivity extends PreferenceActivity
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        NdefRecord[] records = {NdefRecord.createMime(MIME_REQUEST, mBlessingsVom.getBytes())};
+        NdefRecord[] records = {NdefRecord.createMime(MIME_REQUEST, mBlessingsVom)};
         NdefMessage message = new NdefMessage(records);
         return message;
     }

@@ -49,9 +49,9 @@ public class NfcBlesseeRecvActivity extends Activity {
             Toast.makeText(this, "Did not receive blessing(s).", Toast.LENGTH_LONG).show();
             return;
         }
-        String blessingsVom = new String(records[0].getPayload());
+        byte[] blessingsVom = records[0].getPayload();
         try{
-            Blessings blessings = (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
+            Blessings blessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
             // TODO(sjayanti): Should get pattern from user.
             // TODO(sjayanti): Should eventually validate received blessings in some way.
             Intent i = new Intent();

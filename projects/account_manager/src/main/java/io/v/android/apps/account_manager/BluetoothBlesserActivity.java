@@ -167,8 +167,8 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
                     handleError(msg);
                     return;
                 }
-                String blessingsVom = data.getStringExtra(Constants.REPLY);
-                if (blessingsVom == null || blessingsVom.isEmpty()) {
+                byte[] blessingsVom = data.getByteArrayExtra(Constants.REPLY);
+                if (blessingsVom == null || blessingsVom.length == 0) {
                     String msg = "Received empty blessings";
                     handleError(msg);
                     return;
@@ -212,7 +212,7 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
         setUserDialog("Receiving Request...");
         new ReceiveBluetoothMessage(mSocket) {
             @Override
-            protected void onSuccess(String blessingsVom) {
+            protected void onSuccess(byte[] blessingsVom) {
                 dismissUserDialog();
                 bless(blessingsVom);
             }
@@ -225,10 +225,10 @@ public class BluetoothBlesserActivity extends PreferenceActivity {
         }.execute();
     }
 
-    private void bless(String blessingsVom) {
+    private void bless(byte[] blessingsVom) {
         Blessings remoteBlessings = null;
         try {
-            remoteBlessings = (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
+            remoteBlessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
         } catch (Exception e) {
             handleError("Couldn't get blessee credentials: " + e.getMessage());
             return;

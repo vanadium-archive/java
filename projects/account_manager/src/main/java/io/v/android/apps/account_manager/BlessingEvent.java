@@ -21,13 +21,13 @@ import io.v.v23.security.Caveat;
 /** A ({@link io.v.v23.security.Blessings}, timestamp) blessing event. */
 class BlessingEvent implements Serializable {
     String[] mBlesseeNames;
-    String   mBlessingsVom;
+    byte[] mBlessingsVom;
     DateTime mTimeStamp;
     List<Caveat> mCaveats;
     String   mExtension;
     ECPublicKey mPublicKey;
 
-    BlessingEvent(String[] blesseeNames, String blessingsVom, DateTime timeStamp,
+    BlessingEvent(String[] blesseeNames, byte[] blessingsVom, DateTime timeStamp,
                   List<Caveat> caveats, String extension, ECPublicKey publicKey) {
         mBlesseeNames = blesseeNames;
         mBlessingsVom = blessingsVom;
@@ -55,7 +55,7 @@ class BlessingEvent implements Serializable {
      * Returns the VOM encoded {@link io.v.v23.security.Blessings} of the
      * certificate chain that was extended in this blessing event.
      */
-    public String getBlessingsVom() {
+    public byte[] getBlessingsVom() {
         return mBlessingsVom;
     }
 

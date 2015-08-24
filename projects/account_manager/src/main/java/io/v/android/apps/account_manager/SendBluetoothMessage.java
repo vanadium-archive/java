@@ -17,12 +17,12 @@ import java.io.OutputStream;
 public abstract class SendBluetoothMessage extends AsyncTask<Void, Void, Void> {
     public static final byte END_OF_MESSAGE = '\n';
 
-    private final String mMessage;
+    private final byte[] mMessage;
     private final BluetoothSocket mSocket;
     private final OutputStream mOutStream;
     private String mError = null;
 
-    SendBluetoothMessage(String message, BluetoothSocket socket) {
+    SendBluetoothMessage(byte[] message, BluetoothSocket socket) {
         mMessage = message;
         mSocket = socket;
         OutputStream outStream = null;
@@ -47,7 +47,7 @@ public abstract class SendBluetoothMessage extends AsyncTask<Void, Void, Void> {
         }
         try {
             Looper.prepare();
-            mOutStream.write(mMessage.getBytes());
+            mOutStream.write(mMessage);
             mOutStream.write(END_OF_MESSAGE);
         } catch (IOException e) {
             mError = e.getMessage();

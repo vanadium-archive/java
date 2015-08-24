@@ -36,12 +36,10 @@ public class CertificateDisplayActivity extends PreferenceActivity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String certificateVom =
-                getIntent().getExtras().getString(EXTRA_CERTIFICATE_VOM);
+        byte[] certificateVom = getIntent().getByteArrayExtra(EXTRA_CERTIFICATE_VOM);
         VCertificate certificate = null;
         try {
-            certificate = (VCertificate)
-                    VomUtil.decodeFromString(certificateVom, VCertificate.class);
+            certificate = (VCertificate) VomUtil.decode(certificateVom, VCertificate.class);
         } catch (Exception e) {
             handleError("Couldn't display certificate: " + e);
             return;

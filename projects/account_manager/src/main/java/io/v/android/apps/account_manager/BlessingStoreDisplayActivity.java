@@ -62,14 +62,15 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
                 }
                 name += certChain.get(size - 1).getExtension();
 
-                String certChainVom = null;
+                byte[] certChainVom = null;
                 try {
-                    certChainVom = VomUtil.encodeToString(certChain,
+                    certChainVom = VomUtil.encode(certChain,
                             new TypeToken<List<VCertificate>>(){}.getType());
                 } catch(Exception e) {
                     String msg = "Couldn't serialize certificate chain: " + e;
                     android.util.Log.e(TAG, msg);
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                    return;
                 }
 
                 Preference currentPreference = new Preference(this);

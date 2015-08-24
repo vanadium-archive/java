@@ -55,9 +55,9 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
                         blessingsFromEvent(BlessingEvent.decode(encoded));
                 for (List<VCertificate> certChain: certChains) {
                     String name = certificateChainName(certChain);
-                    String certChainVom = null;
+                    byte[] certChainVom = null;
                     try {
-                        certChainVom = VomUtil.encodeToString(certChain,
+                        certChainVom = VomUtil.encode(certChain,
                                 new TypeToken<List<VCertificate>>(){}.getType());
                     } catch(VException e) {
                         String msg = "Couldn't serialize certificate chain: " + e;
@@ -89,9 +89,8 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
 
     private List<List<VCertificate>> blessingsFromEvent(BlessingEvent event) throws VException {
         // Get the blessings that were extended.
-        String blessingsVom = event.getBlessingsVom();
-        Blessings blessings = (Blessings) VomUtil.decodeFromString(blessingsVom,
-                Blessings.class);
+        byte[] blessingsVom = event.getBlessingsVom();
+        Blessings blessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
         List<List<VCertificate>> certChains = blessings.getCertificateChains();
 
         // Recreate the certificate that the blessings were extended with.

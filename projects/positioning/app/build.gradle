@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
         }
@@ -10,7 +10,7 @@ buildscript {
     }
 }
 repositories {
-    jcenter()
+    mavenCentral()
     maven {
         url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
     }

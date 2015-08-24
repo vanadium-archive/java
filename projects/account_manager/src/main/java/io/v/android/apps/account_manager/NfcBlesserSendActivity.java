@@ -21,7 +21,7 @@ public class NfcBlesserSendActivity extends PreferenceActivity
     private static final String READY_MESSAGE  = "BEAM TO GRANT BLESSINGS!";
     private static final String FAILED_MESSAGE = "PLEASE TRY AGAIN!";
 
-    String mBlessingsVom = null;
+    byte[] mBlessingsVom = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,8 +38,8 @@ public class NfcBlesserSendActivity extends PreferenceActivity
         nfcAdapter.setNdefPushMessageCallback(this, this);
 
         // Get blessings to transmit.
-        mBlessingsVom = getIntent().getStringExtra(NfcBlesserRecvActivity.BLESSINGS_VOM);
-        if (mBlessingsVom == null || mBlessingsVom.isEmpty()) {
+        mBlessingsVom = getIntent().getByteArrayExtra(NfcBlesserRecvActivity.BLESSINGS_VOM);
+        if (mBlessingsVom == null || mBlessingsVom.length == 0) {
             displayFailureMessage();
         } else {
             displayReadyMessage();
@@ -48,11 +48,11 @@ public class NfcBlesserSendActivity extends PreferenceActivity
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        if (mBlessingsVom == null || mBlessingsVom.getBytes().length == 0) {
+        if (mBlessingsVom == null || mBlessingsVom.length == 0) {
             Toast.makeText(this, "Please try again!", Toast.LENGTH_LONG).show();
             return null;
         }
-        NdefRecord[] records = {NdefRecord.createMime(MIME_STRING, mBlessingsVom.getBytes())};
+        NdefRecord[] records = {NdefRecord.createMime(MIME_STRING, mBlessingsVom)};
         return new NdefMessage(records);
     }
 

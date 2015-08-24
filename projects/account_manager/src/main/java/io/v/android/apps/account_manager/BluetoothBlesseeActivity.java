@@ -37,7 +37,7 @@ public class BluetoothBlesseeActivity extends PreferenceActivity {
 
     private static final int ENABLE_BLUETOOTH_REQUEST = 1;
 
-    String mBlessingsVom = "";
+    byte[] mBlessingsVom = null;
     BluetoothAdapter mBluetoothAdapter = null;
     BluetoothSocket mSocket = null;
     BluetoothDevice mBlesser = null;
@@ -104,11 +104,11 @@ public class BluetoothBlesseeActivity extends PreferenceActivity {
                     setUserDialog("Getting Blessings...");
                     new ReceiveBluetoothMessage(mSocket) {
                         @Override
-                        protected void onSuccess(String blessingsVom) {
+                        protected void onSuccess(byte[] blessingsVom) {
                             dismissUserDialog();
                             try{
                                 Blessings blessings = (Blessings)
-                                        VomUtil.decodeFromString(blessingsVom, Blessings.class);
+                                        VomUtil.decode(blessingsVom, Blessings.class);
                                 Toast.makeText(BluetoothBlesseeActivity.this, "Blessings Received!",
                                         Toast.LENGTH_SHORT).show();
                                 Intent i = new Intent();
@@ -143,8 +143,8 @@ public class BluetoothBlesseeActivity extends PreferenceActivity {
         mPreferenceScreen = this.getPreferenceManager().createPreferenceScreen(this);
         mPreferenceScreen.bind(new ListView(this));
         mNeighboringDevices = new HashSet<BluetoothDevice>();
-        mBlessingsVom = getIntent().getStringExtra(BlesseeRequestActivity.BLESSINGS_VOM);
-        if (mBlessingsVom == null || mBlessingsVom.isEmpty()) {
+        mBlessingsVom = getIntent().getByteArrayExtra(BlesseeRequestActivity.BLESSINGS_VOM);
+        if (mBlessingsVom == null || mBlessingsVom.length == 0) {
             handleError("Empty blessings.");
             return;
         }
@@ -195,10 +195,6 @@ public class BluetoothBlesseeActivity extends PreferenceActivity {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 60);
         startActivity(intent);
-
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(BluetoothDevice.ACTION_FOUND);
-//        registerReceiver(mReceiver, filter);
 
         mBluetoothAdapter.startDiscovery();
     }

@@ -13,7 +13,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <!--  Needed for Security -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Needed for RPC -->
+    <!-- Needed for Blessings -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 
     <application
         android:allowBackup="true"
@@ -31,6 +33,12 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
+        </activity>
+        <activity
+            android:name="io.v.android.x.ref.services.blessing.BlessingActivity" >
+            <intent-filter>
+                <action android:name="io.v.android.x.ref.services.blessing.BLESSING" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>

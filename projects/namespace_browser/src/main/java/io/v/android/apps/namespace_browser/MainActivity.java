@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +30,8 @@ import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
+import io.v.android.v23.services.blessing.BlessingCreationException;
+import io.v.android.v23.services.blessing.BlessingService;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
@@ -36,6 +39,7 @@ import io.v.v23.naming.MountedServer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
@@ -179,12 +183,17 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case BLESSING_REQUEST:
                 try {
-                    Blessings blessings = BlessingsManager.processBlessingsReply(resultCode, data);
+                    byte[] blessingVom = BlessingService.extractBlessingReply(resultCode, data);
+                    Blessings blessings = (Blessings) VomUtil.decode(blessingVom, Blessings.class);
                     BlessingsManager.addBlessings(this, blessings);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     getBlessings();
+                } catch (BlessingCreationException e) {
+                    String msg = "Couldn't retrieve blessing from blessing service: " + e.getMessage();
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                    android.util.Log.e(TAG, msg);
                 } catch (VException e) {
-                    String msg = "Couldn't derive blessing: " + e.getMessage();
+                    String msg = "Couldn't decode and store blessing: " + e.getMessage();
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     android.util.Log.e(TAG, msg);
                 }
@@ -193,7 +202,7 @@ public class MainActivity extends Activity {
     }
 
     private void refreshBlessings() {
-        Intent intent = BlessingsManager.newRefreshBlessingsIntent(this);
+        Intent intent = BlessingService.newBlessingIntent(this);
         startActivityForResult(intent, BLESSING_REQUEST);
     }
 

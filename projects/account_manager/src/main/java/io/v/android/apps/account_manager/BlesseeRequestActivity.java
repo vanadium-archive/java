@@ -53,8 +53,8 @@ public class BlesseeRequestActivity extends PreferenceActivity {
                     }
                     return;
                 }
-                String blessingsVom = data.getStringExtra(Constants.REPLY);
-                if (blessingsVom == null || blessingsVom.isEmpty()) {
+                byte[] blessingsVom = data.getByteArrayExtra(Constants.REPLY);
+                if (blessingsVom == null || blessingsVom.length == 0) {
                     handleError("No blessings selected.");
                     return;
                 }
@@ -69,7 +69,7 @@ public class BlesseeRequestActivity extends PreferenceActivity {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
-    private void display(String blessingsVom) {
+    private void display(byte[] blessingsVom) {
         PreferenceScreen preferenceScreen = this.getPreferenceManager().createPreferenceScreen(this);
         PreferenceCategory channelCategory = new PreferenceCategory(this);
         channelCategory.setTitle(CHANNEL_TITLE);

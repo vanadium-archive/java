@@ -56,6 +56,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     public static final String BLESSEE_NAMES      = "BLESSEE_NAMES";
     public static final String BLESSEE_EXTENSION  = "BLESSEE_EXTENSION";
     public static final String BLESSEE_EXTENSION_MUTABLE = "BLESSEE_EXTENSION_MUTABLE";
+    public static final String BLESS_WITH = "BLESS_WITH";
 
     /* The logging scheme for remote blessings is as follows. **************************************
      *      The SharedPreferences file LOG_REMOTE_PRINCIPALS stores the public keys of blessed
@@ -105,7 +106,6 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     String mExtension = "";
     boolean mExtensionMutable = true;
     ProgressDialog mDialog = null;
-    String mBlessingsVom = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,10 +136,14 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
             mExtension = "";
         }
         mExtensionMutable = intent.getBooleanExtra(BLESSEE_EXTENSION_MUTABLE, true);
-
-        // Choose blessings to extend.
-        startActivityForResult(
-                new Intent(this, BlessingChooserActivity.class), BLESSING_CHOOSING_REQUEST);
+        byte[] blessWithVom = intent.getByteArrayExtra(BLESS_WITH);
+        if (blessWithVom != null && blessWithVom.length > 0) {
+            handleSelectedBlessings(blessWithVom);
+        } else {
+            // No blessings provided: let the user pick which one to use.
+            Intent i = new Intent(this, BlessingChooserActivity.class);
+            startActivityForResult(i, BLESSING_CHOOSING_REQUEST);
+        }
     }
 
     private void addCaveatView() {
@@ -171,8 +175,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
                 return;
             } else {
                 try {
-                    log(VomUtil.encodeToString(mWithBlessings, Blessings.class), caveats,
-                            extension);
+                    log(VomUtil.encode(mWithBlessings, Blessings.class), caveats, extension);
                 } catch (Exception e) {
                     String msg = "Couldn't log blessing event: " + e.getMessage();
                     android.util.Log.e(TAG, msg);
@@ -315,23 +318,29 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
                             data.getStringExtra(Constants.ERROR));
                     return;
                 }
-                String blessingsVom = data.getStringExtra(Constants.REPLY);
-                if (blessingsVom == null || blessingsVom.isEmpty()) {
-                    replyWithError("No blessings selected.");
-                    return;
-                }
-                try {
-                    mWithBlessings =
-                            (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
-                } catch (Exception e) {
-                    replyWithError("Couldn't deserialize blessings");
-                }
-                if (mWithBlessings == null || mWithBlessings.isEmpty()) {
-                    replyWithError("No blessings selected");
-                }
-                display();
+                handleSelectedBlessings(data.getByteArrayExtra(Constants.REPLY));
                 break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void handleSelectedBlessings(byte[] blessingsVom) {
+        if (blessingsVom == null || blessingsVom.length <= 0) {
+            replyWithError("No blessings selected.");
+            return;
+        }
+        try {
+            mWithBlessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
+        } catch (VException e) {
+            replyWithError("Couldn't deserialize blessings.");
+            return;
+        }
+        if (mWithBlessings == null || mWithBlessings.isEmpty()) {
+            replyWithError("Empty blessings provided.");
+            return;
+        }
+        display();
     }
 
     private void display() {
@@ -378,7 +387,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
     /**
      * Extends a set of Vanadium {@link Blessings} for the invoking activity.
      */
-    private class BlesserAsyncTask extends AsyncTask<Void, Void, String> {
+    private class BlesserAsyncTask extends AsyncTask<Void, Void, byte[]> {
         String mExtension = "";
         List<Caveat> mCaveats = null;
 
@@ -388,7 +397,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         }
 
         @Override
-        protected String doInBackground(Void... arg) {
+        protected byte[] doInBackground(Void... arg) {
             try {
                 VPrincipal principal = V.getPrincipal(mBaseContext);
                 Blessings blessings =
@@ -403,7 +412,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
                     replyWithError("Got empty certificate chains.");
                     return null;
                 }
-                return VomUtil.encodeToString(blessings, Blessings.class);
+                return VomUtil.encode(blessings, Blessings.class);
             } catch (VException e) {
                 replyWithError("Couldn't bless: " + e.getMessage());
                 return null;
@@ -411,23 +420,21 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         }
 
         @Override
-        protected void onPostExecute(String blessingsVom) {
+        protected void onPostExecute(byte[] blessingsVom) {
             super.onPostExecute(blessingsVom);
-            if (blessingsVom == null || blessingsVom.isEmpty()) {
+            if (blessingsVom == null || blessingsVom.length == 0) {
                 replyWithError("Couldn't bless : got empty derived blessings");
                 return;
             }
 
-            mBlessingsVom = blessingsVom;
             if (mDialog != null) {
                 mDialog.dismiss();
             }
-            replyWithSuccess(mBlessingsVom);
+            replyWithSuccess(blessingsVom);
         }
     }
 
-    private void log(String blessingsVom, List<Caveat> caveats, String extension)
-            throws Exception{
+    private void log(byte[] blessingsVom, List<Caveat> caveats, String extension) throws Exception {
         BlessingEvent newBlessingEvent =
                 new BlessingEvent(mBlesseeNames, blessingsVom, DateTime.now(), caveats, extension,
                         mBlesseePublicKey);
@@ -482,7 +489,7 @@ public class BlessActivity extends Activity implements AdapterView.OnItemSelecte
         finish();
     }
 
-    private void replyWithSuccess(String blessingsVom) {
+    private void replyWithSuccess(byte[] blessingsVom) {
         Intent intent = new Intent();
         intent.putExtra(Constants.REPLY, blessingsVom);
         setResult(RESULT_OK, intent);

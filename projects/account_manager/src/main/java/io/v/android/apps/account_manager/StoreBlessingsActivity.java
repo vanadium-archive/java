@@ -44,11 +44,7 @@ public class StoreBlessingsActivity extends Activity {
     private void addToBlessingStore(Blessings blessings, VContext context) throws VException {
         VPrincipal principal = V.getPrincipal(context);
         BlessingStore blessingStore = principal.blessingStore();
-
-        Blessings oldBlessings = blessingStore.forPeer("...");
-        Blessings newBlessings =
-                VSecurity.unionOfBlessings(new Blessings[]{oldBlessings, blessings});
-        blessingStore.set(newBlessings, new BlessingPattern("..."));
+        blessingStore.set(blessings, new BlessingPattern(blessings.toString()));
     }
 
     private void handleError(String error) {

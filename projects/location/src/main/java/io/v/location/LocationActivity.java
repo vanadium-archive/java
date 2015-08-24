@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
+import io.v.android.v23.services.blessing.BlessingCreationException;
+import io.v.android.v23.services.blessing.BlessingService;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
@@ -80,7 +82,7 @@ public class LocationActivity extends Activity {
 
     private void fetchBlessings(boolean startService) {
         mStartService = startService;
-        Intent intent = BlessingsManager.newRefreshBlessingsIntent(this);
+        Intent intent = BlessingService.newBlessingIntent(this);
         startActivityForResult(intent, BLESSING_REQUEST);
     }
 
@@ -89,14 +91,19 @@ public class LocationActivity extends Activity {
         switch (requestCode) {
             case BLESSING_REQUEST:
                 try {
-                    Blessings blessings = BlessingsManager.processBlessingsReply(resultCode, data);
+                    byte[] blessingsVom = BlessingService.extractBlessingReply(resultCode, data);
+                    Blessings blessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
                     BlessingsManager.addBlessings(this, blessings);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     if (mStartService) {
                         startLocationService(blessings);
                     }
+                } catch (BlessingCreationException e) {
+                    String msg = "Couldn't create blessing: " + e.getMessage();
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                    android.util.Log.e(TAG, msg);
                 } catch (VException e) {
-                    String msg = "Couldn't derive blessing: " + e.getMessage();
+                    String msg = "Couldn't store blessing: " + e.getMessage();
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     android.util.Log.e(TAG, msg);
                 }

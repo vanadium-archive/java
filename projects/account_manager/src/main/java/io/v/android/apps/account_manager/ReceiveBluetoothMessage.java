@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Looper;
 
+import com.google.common.primitives.Bytes;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Receives a string message over the input stream of the given bluetooth socket.
  */
-public abstract class ReceiveBluetoothMessage extends AsyncTask<Void, Void, String> {
+public abstract class ReceiveBluetoothMessage extends AsyncTask<Void, Void, byte[]> {
     private final BluetoothSocket mSocket;
     private final InputStream mInStream;
     private String mError = null;
@@ -38,28 +40,23 @@ public abstract class ReceiveBluetoothMessage extends AsyncTask<Void, Void, Stri
     }
 
     @Override
-    protected String doInBackground(Void... args) {
+    protected byte[] doInBackground(Void... args) {
         if (mError != null) {
             return null;
         }
         Looper.prepare();
-        ArrayList<Byte> tempBytes = new ArrayList<Byte>();
+        ArrayList<Byte> message = new ArrayList<Byte>();
         byte lastByte;
         try {
             while (true) {
                 lastByte = (byte) mInStream.read();
                 if (lastByte != SendBluetoothMessage.END_OF_MESSAGE) {
-                    tempBytes.add(lastByte);
+                    message.add(lastByte);
                 } else {
                     break;
                 }
             }
-
-            byte[] messageBytes = new byte[tempBytes.size()];
-            for (int i = 0; i < tempBytes.size(); i++) {
-                messageBytes[i] = tempBytes.get(i);
-            }
-            return new String(messageBytes);
+            return Bytes.toArray(message);
         } catch (IOException e) {
             mError = e.getMessage();
             return null;
@@ -67,7 +64,7 @@ public abstract class ReceiveBluetoothMessage extends AsyncTask<Void, Void, Stri
     }
 
     @Override
-    protected void onPostExecute(String message) {
+    protected void onPostExecute(byte[] message) {
         if (mError == null) {
             onSuccess(message);
         } else {
@@ -76,7 +73,7 @@ public abstract class ReceiveBluetoothMessage extends AsyncTask<Void, Void, Stri
     }
 
     // Called when a message is successfully retrieved.
-    protected abstract void onSuccess(String message);
+    protected abstract void onSuccess(byte[] message);
 
     // Called when a message could not be retrieved.
     protected abstract void onFailure(String error);

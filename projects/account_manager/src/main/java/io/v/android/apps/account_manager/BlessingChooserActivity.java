@@ -34,13 +34,13 @@ import io.v.v23.vom.VomUtil;
  */
 public class BlessingChooserActivity extends Activity {
     public static final String TAG = "BlessingChooserActivity";
+    private static final int REQUEST_CODE_CREATE_ACCOUNT = 1000;
+
     public static final String CANCELED_REQUEST = "User Canceled Blessing Selection";
 
     public static final String EXTRA_BLESSING_SET = "EXTRA_BLESSING_SET";
     public static final int ALL_BLESSINGS = 1;
     public static final int SIGNING_BLESSINGS = 2;
-
-    private static final int CREATE_BLESSING_REQUEST = 1;
 
     BlessingStore mBlessingStore = null;
     HashMap<Integer, Blessings> mBlessings = null;
@@ -94,7 +94,7 @@ public class BlessingChooserActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case CREATE_BLESSING_REQUEST:
+            case REQUEST_CODE_CREATE_ACCOUNT:
                 if (resultCode != RESULT_OK && !hasBlessings()) {
                     // No blessing to display.  To avoid putting the user into a potentially
                     // infinite blessing creation loop, we reply with an error here.
@@ -148,7 +148,7 @@ public class BlessingChooserActivity extends Activity {
 
     // Starts the blessing creation activity.
     private void createBlessings() {
-        startActivityForResult(new Intent(this, AccountActivity.class), CREATE_BLESSING_REQUEST);
+        startActivityForResult(new Intent(this, AccountActivity.class), REQUEST_CODE_CREATE_ACCOUNT);
     }
 
     private boolean hasBlessings() {
@@ -191,7 +191,7 @@ public class BlessingChooserActivity extends Activity {
         Intent intent = new Intent();
         try {
             Blessings union = VSecurity.unionOfBlessings(blessings);
-            intent.putExtra(Constants.REPLY, VomUtil.encodeToString(union, Blessings.class));
+            intent.putExtra(Constants.REPLY, VomUtil.encode(union, Blessings.class));
             setResult(RESULT_OK, intent);
             finish();
         } catch (Exception e) {

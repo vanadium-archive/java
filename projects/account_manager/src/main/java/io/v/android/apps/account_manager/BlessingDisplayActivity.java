@@ -41,19 +41,17 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
         super.onCreate(savedInstanceState);
         V.init(this);
 
-        Bundle extras = getIntent().getExtras();
+        Intent intent = getIntent();
 
-        String certChainVom =
-                extras.getString(EXTRA_CERTIFICATE_CHAIN_VOM);
-        String pattern =
-                extras.getString(EXTRA_BLESSING_PATTERN);
+        byte[] certChainVom = intent.getByteArrayExtra(EXTRA_CERTIFICATE_CHAIN_VOM);
+        String pattern = intent.getStringExtra(EXTRA_BLESSING_PATTERN);
         if (pattern == null) {
             pattern = "Pattern not found";
         }
 
         List<VCertificate> certChain = null;
         try {
-            certChain = (List<VCertificate>) VomUtil.decodeFromString(certChainVom,
+            certChain = (List<VCertificate>) VomUtil.decode(certChainVom,
                     new TypeToken<List<VCertificate>>(){}.getType());
         } catch (Exception e) {
             handleError("Couldn't display blessings: " + e);
@@ -85,20 +83,20 @@ public class BlessingDisplayActivity extends PreferenceActivity  {
             currentPreference.setSummary(certificate.getExtension());
             currentPreference.setEnabled(true);
 
-            String certificateVom = null;
+            byte[] certificateVom = null;
             try {
-                certificateVom = VomUtil.encodeToString(certificate, VCertificate.class);
+                certificateVom = VomUtil.encode(certificate, VCertificate.class);
             } catch (Exception e) {
                 handleError("Couldn't serialize certificate: " + e);
             }
 
-            Intent intent = new Intent();
-            intent.setPackage("io.v.android.apps.account_manager");
-            intent.setClassName("io.v.android.apps.account_manager",
+            Intent certIntent = new Intent();
+            certIntent.setPackage("io.v.android.apps.account_manager");
+            certIntent.setClassName("io.v.android.apps.account_manager",
                     "io.v.android.apps.account_manager.CertificateDisplayActivity");
-            intent.setAction("io.v.android.apps.account_manager.DISPLAY_CERTIFICATE");
-            intent.putExtra(CertificateDisplayActivity.EXTRA_CERTIFICATE_VOM, certificateVom);
-            currentPreference.setIntent(intent);
+            certIntent.setAction("io.v.android.apps.account_manager.DISPLAY_CERTIFICATE");
+            certIntent.putExtra(CertificateDisplayActivity.EXTRA_CERTIFICATE_VOM, certificateVom);
+            currentPreference.setIntent(certIntent);
 
             certificatesCategory.addPreference(currentPreference);
 

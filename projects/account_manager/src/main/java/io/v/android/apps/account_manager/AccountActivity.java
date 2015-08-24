@@ -17,7 +17,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -57,26 +56,40 @@ import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 // TODO: Change to BlessingCreationActivity.
 public class AccountActivity extends AccountAuthenticatorActivity {
     public static final String TAG = "AccountActivity";
+
     private static final int REQUEST_CODE_PICK_ACCOUNTS = 1000;
     private static final int REQUEST_CODE_USER_APPROVAL = 1001;
 
     private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
 
-    private static final String PREF_VANADIUM_IDENTITY_SERVICE = "pref_identity_service_name";
-    private static final String DEFAULT_IDENTITY_SERVICE_NAME = "identity/dev.v.io/u/google";
+    public static final String GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
 
-    VContext mBaseContext = null;
-    String mAccountName = "", mAccountType = "";
+    private VContext mBaseContext = null;
+    private String mAccountName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
         mBaseContext = V.init(this);
-        Intent intent = AccountManager.newChooseAccountIntent(
-                null, null, new String[]{"com.google"}, true, null, null, null, null);
-        startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNTS);
+
+        Intent intent = getIntent();
+        if (intent == null) {
+            replyWithError("Intent not found.");
+            return;
+        }
+        // See if the caller wants to use a specific Google account to create the Vanadium account.
+        // If null or empty string is passed, the user will be prompted to choose the Google
+        // account to use.
+        mAccountName = intent.getStringExtra(GOOGLE_ACCOUNT);
+        if (mAccountName != null && !mAccountName.isEmpty()) {
+            getIdentity();
+            return;
+        }
+        Intent chooseIntent = AccountManager.newChooseAccountIntent(
+                null, null, new String[]{"com.google"}, false, null, null, null, null);
+        startActivityForResult(chooseIntent, REQUEST_CODE_PICK_ACCOUNTS);
     }
 
     @Override
@@ -87,7 +100,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 return;
             }
             mAccountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            mAccountType = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
             getIdentity();
         } else if (requestCode == REQUEST_CODE_USER_APPROVAL) {
             if (resultCode != RESULT_OK) {
@@ -98,26 +110,20 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
     private void getIdentity() {
         if (mAccountName == null || mAccountName.isEmpty()) {
             replyWithError("Empty account name.");
             return;
         }
-        if (mAccountType == null || mAccountType.isEmpty()) {
-            replyWithError("Empty account type.");
-            return;
-        }
-        Account[] accounts = AccountManager.get(this).getAccounts();
+        Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
         Account account = null;
         for (int i = 0; i < accounts.length; i++) {
-            if (accounts[i].name.equals(mAccountName) && accounts[i].type.equals(mAccountType)) {
+            if (accounts[i].name.equals(mAccountName)) {
                 account = accounts[i];
             }
         }
         if (account == null) {
-            replyWithError(String.format("Couldn't find account with name: %s and type: %s.",
-                    mAccountName, mAccountType));
+            replyWithError("Couldn't find Google account with name: " + mAccountName);
             return;
         }
         AccountManager.get(this).getAuthToken(
@@ -134,7 +140,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                     }
                 }));
     }
-
     class OnTokenAcquired implements AccountManagerCallback<Bundle> {
         @Override
         public void run(AccountManagerFuture<Bundle> result) {
@@ -160,26 +165,20 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             }
         }
     }
-
     private class BlessingFetcher extends AsyncTask<String, Void, Blessings> {
         ProgressDialog progressDialog = new ProgressDialog(AccountActivity.this);
         String errorMsg = null;
-
         @Override
         protected void onPreExecute() {
             progressDialog.setMessage("Fetching Vanadium Identity...");
             progressDialog.show();
         }
-
         @Override
         protected Blessings doInBackground(String... tokens) {
             if (tokens.length != 1) {
                 errorMsg = "Empty OAuth token.";
                 return null;
             }
-            String identityServiceName = PreferenceManager.getDefaultSharedPreferences(
-                    AccountActivity.this).getString(
-                    PREF_VANADIUM_IDENTITY_SERVICE, DEFAULT_IDENTITY_SERVICE_NAME);
             try {
                 URL url = new URL("https://dev.v.io/auth/blessing-root");
                 JSONObject object = new JSONObject(CharStreams.toString(
@@ -196,9 +195,8 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                             .add(ecPublicKey, new BlessingPattern(name));
                 }
                 OAuthBlesserClient blesser =
-                        OAuthBlesserClientFactory.getOAuthBlesserClient(identityServiceName);
+                        OAuthBlesserClientFactory.getOAuthBlesserClient("identity/dev.v.io/u/google");
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-
                 List<Caveat> caveats = new ArrayList<>();
                 caveats.add(VSecurity.newExpiryCaveat(DateTime.now().plusDays(1)));
                 OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
@@ -228,7 +226,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 return null;
             }
         }
-
         @Override
         protected void onPostExecute(Blessings blessing) {
             progressDialog.dismiss();
@@ -239,7 +236,6 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             replyWithSuccess(blessing);
         }
     }
-
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error creating account: " + error);
         setResult(RESULT_CANCELED);
@@ -247,22 +243,16 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         finish();
     }
-
     private void replyWithSuccess(Blessings blessing) {
         enforceAccountExists();
         // Store the obtained blessing from identity server.
         try {
             VPrincipal principal = V.getPrincipal(mBaseContext);
             BlessingStore blessingStore = principal.blessingStore();
-
-            Blessings oldBlessings = blessingStore.forPeer("...");
-            Blessings newBlessings =
-                    VSecurity.unionOfBlessings(new Blessings[]{oldBlessings, blessing});
-            blessingStore.set(newBlessings, new BlessingPattern("..."));
+            blessingStore.set(blessing, new BlessingPattern(blessing.toString()));
         } catch (VException e) {
             replyWithError("Couldn't store obtained blessing: " + e.getMessage());
         }
-
         setResult(RESULT_OK);
         Toast.makeText(this, "Success.", Toast.LENGTH_SHORT).show();
         finish();

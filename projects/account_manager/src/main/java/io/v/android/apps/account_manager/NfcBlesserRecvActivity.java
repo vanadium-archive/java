@@ -83,8 +83,8 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
         }
 
         try {
-            String blessingsVom = new String(records[0].getPayload());
-            mRemoteBlessings = (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
+            byte[] blessingsVom = records[0].getPayload();
+            mRemoteBlessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
             mRemotePublicKey = mRemoteBlessings.publicKey();
         } catch (VException e) {
             android.util.Log.e(TAG, "Didn't Receive blessings from remote end: " + e);
@@ -136,14 +136,13 @@ public class NfcBlesserRecvActivity extends PreferenceActivity {
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     return;
                 }
-                String blessingsVom = data.getStringExtra(Constants.REPLY);
-                if (blessingsVom == null || blessingsVom.isEmpty()) {
+                byte[] blessingsVom = data.getByteArrayExtra(Constants.REPLY);
+                if (blessingsVom == null || blessingsVom.length == 0) {
                     String msg = "Received empty blessings";
                     android.util.Log.e(TAG, msg);
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     return;
                 }
-
                 Intent intent = new Intent();
                 intent.setPackage("io.v.android.apps.account_manager");
                 intent.setClassName("io.v.android.apps.account_manager",
