@@ -3,7 +3,7 @@ apply plugin: 'io.v.vdl'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.0 rc3"
+    buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId "io.v.android.apps.slide_presenter"
         minSdkVersion 19

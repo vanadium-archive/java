@@ -31,6 +31,7 @@ import io.v.v23.security.VPrincipal;
 import io.v.v23.vdl.TypedClientStream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 import io.v.x.jni.test.fortune.ComplexErrorParam;
 
 public class SlidePresenterActivity extends Activity {
