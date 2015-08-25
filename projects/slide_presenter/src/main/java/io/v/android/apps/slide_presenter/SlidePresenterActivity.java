@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -53,7 +52,7 @@ public class SlidePresenterActivity extends Activity {
 
     VContext mBaseContext;
     SlidePresenterClient mClient;
-    private GestureDetectorCompat mDetector;
+    private GestureDetector mDetector;
     boolean mStartService = false;
     private final int[] slides = new int[]{R.drawable.slide1, R.drawable.slide2, R.drawable.slide3,
             R.drawable.slide4, R.drawable.slide5, R.drawable.slide6, R.drawable.slide7};
@@ -63,7 +62,7 @@ public class SlidePresenterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDetector = new GestureDetectorCompat(this, new SlideGestureListener());
+        mDetector = new GestureDetector(this, new SlideGestureListener());
         // Initialize the Vanadium runtime and load its native shared library
         // implementation. This is required before we can do anything involving
         // Vanadium.
