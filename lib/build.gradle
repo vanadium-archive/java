@@ -125,23 +125,23 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
     commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
-            '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni'
+            '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni/main'
 }
 
 // Copy the shared library to its ultimate destination.
 if (isLinux()) {
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from v23Root + '/release/go/pkg/linux_amd64_shared/v.io/x'
+        from v23Root + '/release/go/pkg/linux_amd64_shared/v.io/x/jni'
         into 'build/libs'
-        include 'jni.a'
-        rename 'jni.a', 'libv23.so'
+        include 'main.a'
+        rename 'main.a', 'libv23.so'
     }
 } else {  // darwin
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from v23Root + '/release/go/pkg/darwin_amd64/v.io/x'
+        from v23Root + '/release/go/pkg/darwin_amd64/v.io/x/jni'
         into 'build/libs'
-        include 'jni.a'
-        rename 'jni.a', 'libv23.dylib'
+        include 'main.a'
+        rename 'main.a', 'libv23.dylib'
     }
 }
 
