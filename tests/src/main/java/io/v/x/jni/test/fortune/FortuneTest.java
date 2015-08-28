@@ -40,13 +40,12 @@ public class FortuneTest extends TestCase {
 
     private Server s;
     private VContext ctx;
-    private ListenSpec listenSpec;
 
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
-        s = V.newServer(ctx);
-        listenSpec = V.getListenSpec(ctx).withAddress(new ListenSpec.Address("tcp", "127.0.0.1:0"));
+        ListenSpec.Address addr = new ListenSpec.Address("tcp", "127.0.0.1:0");
+        ctx = V.setListenSpec(ctx, V.getListenSpec(ctx).withAddress(addr));
     }
 
     @Override
@@ -57,13 +56,18 @@ public class FortuneTest extends TestCase {
         V.shutdown();
     }
 
-    public void testFortune() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
-        FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+    private String name() {
+        if (s == null) {
+            return "";
+        }
+        return "/" + s.getStatus().getEndpoints()[0];
+    }
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+    public void testFortune() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        s = V.newServer(ctx, "", server, null);
+
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.get(ctxT);
@@ -79,12 +83,10 @@ public class FortuneTest extends TestCase {
     }
 
     public void testStreaming() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         TypedClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
@@ -102,12 +104,10 @@ public class FortuneTest extends TestCase {
     }
 
     public void testMultiple() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
@@ -118,12 +118,10 @@ public class FortuneTest extends TestCase {
     }
 
     public void testComplexError() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.getComplexError(ctxT);
@@ -136,9 +134,8 @@ public class FortuneTest extends TestCase {
     }
 
     public void testWatchNetwork() throws Exception {
-        s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
         // TODO(spetrovic): Figure out how to force network change in android and test that the
         // changes get announced on this channel.
@@ -147,12 +144,10 @@ public class FortuneTest extends TestCase {
     }
 
     public void testContext() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             client.testServerCall(ctxT);
@@ -162,14 +157,12 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGetSignature() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
         Client c = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        ClientCall call = c.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
+        ClientCall call = c.startCall(ctxT, name(), "__Signature", new Object[0], new Type[0]);
         Object[] results = call.finish(new Type[] { new TypeToken<Interface[]>() {}.getType() });
         assertThat(results.length == 1).isTrue();
         Interface[] signature = (Interface[]) results[0];
@@ -178,32 +171,27 @@ public class FortuneTest extends TestCase {
     }
 
     public void testGlob() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         FortuneServer server = new FortuneServerImpl();
-        s.serve("", server, null);
+        s = V.newServer(ctx, "", server, null);
 
-        String name = "/" + endpoints[0];
         List<GlobReply> globResult
-                = ImmutableList.copyOf(V.getNamespace(ctx).glob(ctx, name + "/*"));
+                = ImmutableList.copyOf(V.getNamespace(ctx).glob(ctx, name() + "/*"));
         assertThat(globResult).hasSize(2);
         assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
         assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())
-                .isEqualTo(name + "/helloworld");
+                .isEqualTo(name() + "/helloworld");
         assertThat(globResult.get(1)).isInstanceOf(GlobReply.Error.class);
     }
 
     public void testCustomInvoker() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
-        s.serve("", new TestInvoker(), null);
+        s = V.newServer(ctx, "", new TestInvoker(), null);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
     }
 
     public void testCustomDispatcherReturningAServer() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         final FortuneServer server = new FortuneServerImpl();
         Dispatcher dispatcher = new Dispatcher() {
             @Override
@@ -211,10 +199,9 @@ public class FortuneTest extends TestCase {
                 return new ServiceObjectWithAuthorizer(server, null);
             }
         };
-        s.serveDispatcher("", dispatcher);
+        s = V.newServer(ctx, "", dispatcher);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
@@ -222,17 +209,15 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomDispatcherReturningAnInvoker() throws Exception {
-        Endpoint[] endpoints = s.listen(listenSpec);
         Dispatcher dispatcher = new Dispatcher() {
             @Override
             public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
                 return new ServiceObjectWithAuthorizer(new TestInvoker(), null);
             }
         };
-        s.serveDispatcher("", dispatcher);
+        s = V.newServer(ctx, "", dispatcher);
 
-        String name = "/" + endpoints[0];
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
     }

@@ -10,8 +10,13 @@ import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
+import io.v.v23.rpc.Dispatcher;
+import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.ReflectInvoker;
 import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServiceObjectWithAuthorizer;
+import io.v.v23.security.Authorizer;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.verror.VException;
 
@@ -26,7 +31,8 @@ public class VRuntimeImpl implements VRuntime {
             throws VException;
     private static native Client nativeGetClient(VContext ctx)
             throws VException;
-    private static native Server nativeNewServer(VContext ctx) throws VException;
+    private static native Server nativeNewServer(VContext ctx, String name, Dispatcher dispatcher) 
+            throws VException;
     private static native VContext nativeSetPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
@@ -34,6 +40,7 @@ public class VRuntimeImpl implements VRuntime {
             throws VException;
     private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
+    private static native VContext nativeSetListenSpec(VContext ctx, ListenSpec spec) throws VException;
 
     /**
      * Returns a new runtime instance.
@@ -66,9 +73,19 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public Server newServer(VContext ctx, Options opts) throws VException {
-        return nativeNewServer(ctx);
+    public Server newServer(VContext ctx, String name, Dispatcher disp, Options opts) throws VException {
+        return nativeNewServer(ctx, name, disp);
     }
+
+    @Override
+    public Server newServer(VContext ctx, String name, Object object, Authorizer authorizer, Options opts) throws VException {
+        if (object == null) {
+            throw new VException("newServer called with a null object");
+        }
+        Invoker invoker = object instanceof Invoker ? (Invoker) object : new ReflectInvoker(object);
+        return nativeNewServer(ctx, name, new DefaultDispatcher(invoker, authorizer));
+    }
+
     @Override
     public VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException {
         return nativeSetPrincipal(ctx, principal);
@@ -102,11 +119,29 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
+    public VContext setListenSpec(VContext ctx, ListenSpec spec) throws VException {
+        return nativeSetListenSpec(ctx, spec);
+    }
+    @Override
     public VContext getContext() {
         return this.ctx;
     }
     @Override
     public void shutdown() {
         nativeShutdown(ctx);
+    }
+
+    private static class DefaultDispatcher implements Dispatcher {
+        private final Invoker invoker;
+        private final Authorizer auth;
+
+        DefaultDispatcher(Invoker invoker, Authorizer auth) {
+            this.invoker = invoker;
+            this.auth = auth;
+        }
+        @Override
+        public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
+            return new ServiceObjectWithAuthorizer(this.invoker, this.auth);
+        }
     }
 }
