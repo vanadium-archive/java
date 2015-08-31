@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -488,9 +489,10 @@ public class BinaryEncoder {
                 fieldValue = ((VdlStruct) value).getField(field.getName());
             } else {
                 try {
-                    Method method = value.getClass().getMethod("get" + field.getName());
-                    method.setAccessible(true);
-                    fieldValue = method.invoke(value);
+                    Field f = value.getClass().getDeclaredField(
+                            BinaryUtil.firstCharToLower(field.getName()));
+                    f.setAccessible(true);
+                    fieldValue = f.get(value);
                 } catch (Exception e) {
                     throw new IOException("Unsupported VDL struct value (type " + value.getClass()
                             + ", value " + value + ")", e);
