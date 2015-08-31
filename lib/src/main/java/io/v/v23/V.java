@@ -45,7 +45,7 @@ import io.v.v23.verror.VException;
  * </pre></blockquote><p>
  */
 public class V {
-    private static native void nativeInit();
+    private static native void nativeInit() throws VException;
     private static native void nativeShutdown(VContext context);
 
     private static volatile VContext context = null;
@@ -80,7 +80,11 @@ public class V {
                 throw new RuntimeException("Could not load v23 native library", new VLoaderException(errors));
             }
         }
-        nativeInit();
+        try {
+            nativeInit();
+        } catch (VException e) {
+            throw new RuntimeException("Could not initialize v23 native library", e);
+        }
 
         // Register caveat validators.
         try {

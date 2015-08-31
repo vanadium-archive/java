@@ -195,4 +195,11 @@ final class BinaryUtil {
         }
         return value.getBytes(UTF8_CHARSET);
     }
+
+    /**
+     * Lower-cases the first character in a string.
+     */
+    public static String firstCharToLower(String str) {
+        return Character.toLowerCase(str.charAt(0)) + str.substring(1);
+    }
 }

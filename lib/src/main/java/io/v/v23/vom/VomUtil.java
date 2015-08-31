@@ -34,7 +34,9 @@ public class VomUtil {
         try {
             encoder.encodeValue(type, value);
         } catch (IOException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         }
         return out.toByteArray();
     }
@@ -53,7 +55,9 @@ public class VomUtil {
         try {
             encoder.encodeValue(type, value);
         } catch (IOException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         }
         return out.toByteArray();
     }
@@ -84,7 +88,9 @@ public class VomUtil {
         try {
             encoder.encodeValue(value);
         } catch (IOException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         }
         return out.toByteArray();
     }
@@ -103,9 +109,13 @@ public class VomUtil {
         try {
             return decoder.decodeValue(type);
         } catch (IOException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         } catch (ConversionException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         }
     }
 
@@ -122,9 +132,13 @@ public class VomUtil {
         try {
             return decoder.decodeValue();
         } catch (IOException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         } catch (ConversionException e) {
-            throw new VException(e.getMessage());
+            VException ve = new VException(e.getMessage());
+            ve.initCause(e);
+            throw ve;
         }
     }
 
@@ -139,6 +153,32 @@ public class VomUtil {
     public static Object decodeFromString(String hex, Type type) throws VException {
         byte[] data = hexStringToBytes(hex);
         return decode(data, type);
+    }
+
+    /**
+     * Returns a {@link VdlValue} corresponding to the given Java object of the provided type.
+     *
+     * @param obj            a java object
+     * @param type           type of the provided object
+     * @return               {@link VdlValue} corresponding to the given Java object
+     * @throws VException    if the {@link VdlValue} couldn't be computed.
+     */
+    public static VdlValue valueOf(Object obj, Type type) throws VException {
+        byte[] data = VomUtil.encode(obj, type);
+        return (VdlValue) VomUtil.decode(data, VdlValue.class);
+    }
+
+    /**
+     * Returns a {@link VdlValue} corresponding to the given Java object of the provided type.
+     *
+     * @param obj            a java object
+     * @param type           type of the provided object
+     * @return               {@link VdlValue} corresponding to the given Java object
+     * @throws VException    if the {@link VdlValue} couldn't be computed.
+     */
+    public static VdlValue valueOf(Object obj, VdlType type) throws VException {
+        byte[] data = VomUtil.encode(obj, type);
+        return (VdlValue) VomUtil.decode(data, VdlValue.class);
     }
 
     /**

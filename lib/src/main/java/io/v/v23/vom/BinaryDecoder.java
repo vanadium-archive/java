@@ -369,10 +369,10 @@ public class BinaryDecoder {
                 return;
             }
             try {
-                Method method = data.getClass().getDeclaredMethod("set" + key,
-                        ReflectUtil.getRawClass(elemType));
-                method.setAccessible(true);
-                method.invoke(data, elem);
+                Field f = data.getClass().getDeclaredField(
+                        BinaryUtil.firstCharToLower((String) key));
+                f.setAccessible(true);
+                f.set(data, elem);
             } catch (Exception e) {
                 throw new ConversionException("Can't set field " + key + " to " + elem + " of "
                         + target.getTargetType(), e);
