@@ -158,4 +158,39 @@ public class BinaryDecoderTest extends TestCase {
         assertDecodeEncode(new DateTime(2015, 2, 18, 20, 34, 35, 997, DateTimeZone.UTC));
         assertDecodeEncode(new Duration(239017));
     }
+
+    public void testDecodeEncodeJavaObject() throws Exception {
+        assertDecodeEncode(new JavaObject(
+                5, "boo", ImmutableList.of(new JavaObject(7, "foo", null))));
+    }
+
+    private static class JavaObject  {
+        private int i;
+        private final String s;
+        private List<JavaObject> j;
+
+        public JavaObject() {
+            this.i = 0;
+            this.s = "";
+            this.j = null;
+        }
+
+        public JavaObject(int i, String s, List<JavaObject> j) {
+            this.i = i;
+            this.s = s;
+            this.j = j;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            JavaObject that = (JavaObject) o;
+
+            if (i != that.i) return false;
+            if (s != null ? !s.equals(that.s) : that.s != null) return false;
+            return !(j != null ? !j.equals(that.j) : that.j != null);
+        }
+    }
 }

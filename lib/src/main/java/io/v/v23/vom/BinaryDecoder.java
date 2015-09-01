@@ -342,6 +342,12 @@ public class BinaryDecoder {
             return VdlValue.class;
         } else {
             String fieldName = (String) key;
+            try {
+                Field field = targetClass.getDeclaredField(BinaryUtil.firstCharToLower(fieldName));
+                return field.getGenericType();
+            } catch (NoSuchFieldException e) {
+                // OK, we'll try to look at annotations.
+            }
             for (Field field : targetClass.getDeclaredFields()) {
                 GeneratedFromVdl annotation = field.getAnnotation(GeneratedFromVdl.class);
                 if (annotation != null && annotation.name().equals(fieldName)) {

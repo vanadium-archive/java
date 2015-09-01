@@ -159,7 +159,7 @@ final class ReflectUtil {
      * Creates an instance of VDL struct. The target class should be inherited from
      * {@code AbstractVdlStruct}.
      */
-    static AbstractVdlStruct createStruct(ConversionTarget target) throws ConversionException {
+    static Object createStruct(ConversionTarget target) throws ConversionException {
         Class<?> targetClass = target.getTargetClass();
         if (targetClass == VdlStruct.class) {
             return new VdlStruct(target.getVdlType());
@@ -167,7 +167,7 @@ final class ReflectUtil {
         try {
             Constructor<?> ctor = targetClass.getConstructor();
             ctor.setAccessible(true);
-            return (AbstractVdlStruct) ctor.newInstance();
+            return ctor.newInstance();
         } catch (Exception e) {
             throw new ConversionException(target.getVdlType(), targetClass, e);
         }
