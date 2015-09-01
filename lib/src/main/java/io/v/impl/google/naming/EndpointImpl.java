@@ -25,10 +25,13 @@ class EndpointImpl implements Endpoint {
 
     private final String protocol;
     private final String address;
+    private final List<String> routes;
     private final RoutingId routingId;
     private final List<String> blessingNames;
     private final boolean isMountTable;
     private final boolean isLeaf;
+
+    // TODO(suharshs): Remove endpoint 5 when the transition to endpoint 6 is complete.
 
     static Endpoint fromString(String s) {
         Matcher matcher = hostPortPattern.matcher(s);
@@ -40,7 +43,7 @@ class EndpointImpl implements Endpoint {
                 blessings.add(matcher.group(1));
             }
 
-            return new EndpointImpl("", hostPort.toString(), RoutingId.NULL_ROUTING_ID,
+            return new EndpointImpl("", hostPort.toString(), ImmutableList.<String>of(), RoutingId.NULL_ROUTING_ID,
                     blessings, true, false);
         }
 
@@ -56,6 +59,8 @@ class EndpointImpl implements Endpoint {
         switch (version) {
             case 5:
                 return fromV5String(parts);
+            case 6:
+                return fromV6String(parts);
             default:
                 return null;
         }
@@ -100,13 +105,57 @@ class EndpointImpl implements Endpoint {
             blessings = Splitter.on(',').splitToList(
                     Joiner.on("@").join(parts.subList(5, parts.size())));
         }
-        return new EndpointImpl(protocol, address, routingId, blessings, isMountTable, isLeaf);
+        return new EndpointImpl(protocol, address, ImmutableList.<String>of(), routingId, blessings, isMountTable, isLeaf);
     }
 
-    EndpointImpl(String protocol, String address, RoutingId routingId,
+    private static Endpoint fromV6String(List<String> parts) {
+        if (parts.size() < 6) {
+            throw new IllegalArgumentException(
+                    "Invalid format for endpoint, expecting 6 '@'-separated components");
+        }
+
+        String protocol = parts.get(1);
+        String address = unescapeAddress(parts.get(2));
+        if (address.isEmpty()) {
+            address = ":0";
+        }
+        List<String> routes = unescapeRoutes(Splitter.on(',').splitToList(parts.get(3)));
+        RoutingId routingId = RoutingId.fromString(parts.get(4));
+        String mountTableFlag = parts.get(5);
+        boolean isMountTable;
+        boolean isLeaf;
+        if ("".equals(mountTableFlag)) {
+            isMountTable = true;
+            isLeaf = false;
+        } else if ("l".equals(mountTableFlag)) {
+            isMountTable = false;
+            isLeaf = true;
+        } else if ("m".equals(mountTableFlag)) {
+            isMountTable = true;
+            isLeaf = false;
+        } else if ("s".equals(mountTableFlag)) {
+            isMountTable = false;
+            isLeaf = false;
+        } else {
+            throw new IllegalArgumentException("Invalid mounttable flag " + mountTableFlag +
+                    ", should be one of 'l', 'm' or 's'");
+        }
+
+        List<String> blessings;
+        if ("".equals(parts.get(6))) {
+            blessings = ImmutableList.of();
+        } else {
+            blessings = Splitter.on(',').splitToList(
+                    Joiner.on("@").join(parts.subList(5, parts.size())));
+        }
+        return new EndpointImpl(protocol, address, routes, routingId, blessings, isMountTable, isLeaf);
+    }
+
+    EndpointImpl(String protocol, String address, List<String> routes, RoutingId routingId,
                  List<String> blessingNames, boolean isMountTable, boolean isLeaf) {
         this.protocol = protocol;
         this.address = address;
+        this.routes = ImmutableList.copyOf(routes);
         this.routingId = routingId;
         this.blessingNames = ImmutableList.copyOf(blessingNames);
         this.isMountTable = isMountTable;
@@ -121,6 +170,11 @@ class EndpointImpl implements Endpoint {
     @Override
     public RoutingId routingId() {
         return routingId;
+    }
+
+    @Override
+    public List<String> routes() {
+        return routes;
     }
 
     @Override
@@ -143,16 +197,42 @@ class EndpointImpl implements Endpoint {
         return blessingNames;
     }
 
+    private List<String> escapedRoutes() {
+        int len = routes.size();
+        List<String> escaped = new ArrayList<>(len);
+        for (int i = 0; i < len; i++) {
+            escaped.add(escapeString(routes.get(i)));
+        }
+        return escaped;
+    }
+
+    private static List<String> unescapeRoutes(List<String> s) {
+        int len = s.size();
+        List<String> unescaped = new ArrayList<>(len);
+        for (int i = 0; i < len; i++) {
+            unescaped.add(unescapeString(s.get(i)));
+        }
+        return unescaped;
+    }
+
     private String escapedAddress() {
+        return escapeString(address);
+    }
+
+    private static String unescapeAddress(String address) {
+        return unescapeString(address);
+    }
+
+    private static String escapeString(String s) {
         CharMatcher matcher = CharMatcher.anyOf("%@");
-        int count = matcher.countIn(address);
+        int count = matcher.countIn(s);
         if (count == 0) {
-            return address;
+            return s;
         }
 
-        char[] escaped = new char[address.length() + 2 * count];
-        for (int i = 0; i < address.length(); ) {
-            char x = address.charAt(i);
+        char[] escaped = new char[s.length() + 2 * count];
+        for (int i = 0; i < s.length(); ) {
+            char x = s.charAt(i);
             if (x == '%') {
                 escaped[i++] = '%';
                 escaped[i++] = '2';
@@ -176,18 +256,18 @@ class EndpointImpl implements Endpoint {
         return result;
     }
 
-    private static String unescapeAddress(String address) {
-        if (address.contains("%")) {
-            return address;
+    private static String unescapeString(String s) {
+        if (s.contains("%")) {
+            return s;
         }
 
-        int addressLength = address.length();
+        int slen = s.length();
         StringBuilder unescaped = new StringBuilder();
-        for (int i = 0; i < addressLength; ) {
-            char x = address.charAt(i);
+        for (int i = 0; i < slen; ) {
+            char x = s.charAt(i);
             if (x == '%') {
-                char newChar = (char) ((digit(address.charAt(i + 1)) << 4) |
-                        (digit(address.charAt(i + 2))));
+                char newChar = (char) ((digit(s.charAt(i + 1)) << 4) |
+                        (digit(s.charAt(i + 2))));
                 unescaped.append(newChar);
                 i += 3;
             } else {
@@ -207,8 +287,9 @@ class EndpointImpl implements Endpoint {
             mt = 'm';
         }
         String blessings = Joiner.on(',').join(blessingNames);
-        return String.format("@5@%s@%s@%s@%s@%s@@", protocol, escapedAddress(), routingId, mt,
-                blessings);
+        String routeString = Joiner.on(',').join(escapedRoutes());
+        return String.format("@6@%s@%s@%s@%s@%s@%s@@", protocol, escapedAddress(),
+            routeString, routingId, mt, blessings);
     }
 
     @Override
@@ -234,6 +315,9 @@ class EndpointImpl implements Endpoint {
         if (!address.equals(endpoint.address)) {
             return false;
         }
+        if (!routes.equals(endpoint.routes)) {
+            return false;
+        }
         if (!routingId.equals(endpoint.routingId)) {
             return false;
         }
@@ -242,6 +326,6 @@ class EndpointImpl implements Endpoint {
 
     @Override
     public int hashCode() {
-        return Objects.hash(protocol, address, routingId, blessingNames, isMountTable, isLeaf);
+        return Objects.hash(protocol, address, routes, routingId, blessingNames, isMountTable, isLeaf);
     }
 }

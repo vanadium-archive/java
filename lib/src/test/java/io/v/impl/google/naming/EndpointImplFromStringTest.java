@@ -28,12 +28,13 @@ public class EndpointImplFromStringTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {new EndpointImpl("", "batman.com:1234", RoutingId.NULL_ROUTING_ID,
-                        ImmutableList.<String>of(), true, false), "batman.com:1234"},
-                {new EndpointImpl("", "batman.com:1234",
+                {new EndpointImpl("", "batman.com:1234", ImmutableList.<String>of(),
+                        RoutingId.NULL_ROUTING_ID, ImmutableList.<String>of(), true, false),
+                        "batman.com:1234"},
+                {new EndpointImpl("", "batman.com:1234", Arrays.asList("foo", "bar"),
                         RoutingId.fixedRoutingId(0xdabbad00L), ImmutableList.<String>of(),
                         true, false),
-                        "@5@@batman.com:1234@000000000000000000000000dabbad00@m@@@"},
+                        "@6@@batman.com:1234@foo,bar@000000000000000000000000dabbad00@m@@@"},
         });
     }
 

@@ -39,6 +39,11 @@ public interface Endpoint {
     RoutingId routingId();
 
     /**
+     * Returns the Routes associated with this endpoint.
+     */
+    List<String> routes();
+
+    /**
      * Returns the {@link NetworkAddress} associated with this endpoint.
      */
     NetworkAddress address();
