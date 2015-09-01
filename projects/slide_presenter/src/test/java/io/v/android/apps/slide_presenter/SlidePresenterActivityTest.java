@@ -45,4 +45,3 @@ public class SlidePresenterActivityTest
         Assert.assertEquals(0, mSlidePresenterActivityTest.getSlideNum());
     }
 }
-

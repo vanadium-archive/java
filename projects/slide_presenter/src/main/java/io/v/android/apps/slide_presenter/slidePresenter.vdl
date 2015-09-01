@@ -1,8 +1,8 @@
 package slidepresenter
 
 
-// SlidePresenter allows clients to sync slide number state across devices 
-// for use in a multi-device slide presentation application.  
+// SlidePresenter allows clients to sync slide number state across devices
+// for use in a multi-device slide presentation application.
 type SlidePresenter interface {
 
 

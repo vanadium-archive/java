@@ -6,17 +6,15 @@ package io.v.android.apps.slide_presenter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.common.collect.ImmutableList;
 
 import java.io.EOFException;
 
@@ -28,52 +26,54 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.vdl.TypedClientStream;
-import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-import io.v.x.jni.test.fortune.ComplexErrorParam;
 
 public class SlidePresenterActivity extends Activity {
 
-    static final String BLESSINGS_KEY = "Blessings";
     private static final int BLESSING_REQUEST = 1;
-    private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
-            "StrVal",
-            11,
-            ImmutableList.<VdlUint32>of(new VdlUint32(22), new VdlUint32(33)));
     private static final String SERVER_NAME = "users/spetrovic@gmail.com/slidepresenter";
     private static final String TAG = "SlidePresenter";
 
-    /**
-     * Specifies how far you need to swipe (up or down) before it
-     * will be consider a completed gesture when you lift your finger
-     */
-    private static final float SWIPE_THRESHOLD_RATIO = 0.35f;
-
     VContext mBaseContext;
     SlidePresenterClient mClient;
-    private GestureDetector mDetector;
-    boolean mStartService = false;
-    private final int[] slides = new int[]{R.drawable.slide1, R.drawable.slide2, R.drawable.slide3,
-            R.drawable.slide4, R.drawable.slide5, R.drawable.slide6, R.drawable.slide7};
+    private final int[] slideDrawables = new int[]{R.drawable.slide1, R.drawable.slide2,
+            R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
+            R.drawable.slide7};
     private int slideNum = 0;
+    private Slide[] slides = new Slide[slideDrawables.length];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mDetector = new GestureDetector(this, new SlideGestureListener());
+
+        setContentView(R.layout.activity_slidepresenter);
         // Initialize the Vanadium runtime and load its native shared library
         // implementation. This is required before we can do anything involving
         // Vanadium.
 
         mBaseContext = V.init(this);
 
-        // Display slides each as an individual image
-        final ImageView mImageView = (ImageView) findViewById(R.id.imageView);
-        mImageView.setImageResource(slides[slideNum]);
-        mImageView.invalidate();
+        for (int i = 0; i < slideDrawables.length; i++) {
+            slides[i] = new Slide(slideDrawables[i], "Notes for slide " + (i + 1));
+        }
+
+        setSlideNum(0);
         getBlessings();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            findViewById(R.id.textView).setVisibility(View.INVISIBLE);
+            ((ImageView) findViewById(R.id.imageView)).setScaleType(ImageView.ScaleType.FIT_XY);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            findViewById(R.id.textView).setVisibility(View.VISIBLE);
+            ((ImageView) findViewById(R.id.imageView)).setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }
     }
 
     @Override
@@ -86,8 +86,7 @@ public class SlidePresenterActivity extends Activity {
                     BlessingsManager.addBlessings(this, blessings);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     getBlessings();
-                }
-                catch (BlessingCreationException e) {
+                } catch (BlessingCreationException e) {
                     String msg = "Couldn't create blessing: " + e.getMessage();
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     android.util.Log.e(TAG, msg);
@@ -142,13 +141,6 @@ public class SlidePresenterActivity extends Activity {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -177,8 +169,37 @@ public class SlidePresenterActivity extends Activity {
         } else if (slideNum >= slides.length) {
             slideNum = slides.length - 1;
         }
-        ImageView mImageView = (ImageView) findViewById(R.id.imageView);
-        mImageView.setImageResource(slides[slideNum]);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ImageView) findViewById(R.id.imageView))
+                        .setImageResource(slides[slideNum].getSlideDrawableId());
+
+                ((ImageView) findViewById(R.id.currSlide))
+                        .setImageResource(slides[slideNum].getSlideDrawableId());
+
+                if (slideNum > 0) {
+                    ((ImageView) findViewById(R.id.prevSlide))
+                            .setImageResource(slides[slideNum - 1]
+                                    .getSlideDrawableId());
+                } else {
+                    ((ImageView) findViewById(R.id.prevSlide)).setImageResource(0);
+                }
+
+                if (slideNum < slides.length - 1) {
+                    ((ImageView) findViewById(R.id.nextSlide))
+                            .setImageResource(slides[slideNum + 1]
+                                    .getSlideDrawableId());
+                } else {
+                    ((ImageView) findViewById(R.id.nextSlide)).setImageResource(0);
+                }
+
+                ((TextView) findViewById(R.id.textView))
+                        .setText(slides[slideNum].getSlideNotes());
+            }
+        });
+
     }
 
     public void sendSlideNumtoServer(int _slideNum) {
@@ -189,6 +210,16 @@ public class SlidePresenterActivity extends Activity {
         }
     }
 
+    public void nextSlide(View v) {
+        setSlideNum(slideNum + 1);
+        sendSlideNumtoServer(slideNum);
+    }
+
+    public void prevSlide(View v) {
+        setSlideNum(slideNum - 1);
+        sendSlideNumtoServer(slideNum);
+    }
+
     public int getSlideNum() {
         return slideNum;
     }
@@ -197,43 +228,12 @@ public class SlidePresenterActivity extends Activity {
         return slides.length;
     }
 
-    private class SlideGestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final String DEBUG_TAG = "Gestures";
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onDown: " + event.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onFling(
-                MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-
-            int width = findViewById(R.id.imageView).getWidth();
-
-            // Confirm that this is a horizontal (while device is in landscape mode) swipe, then
-            // determine if it is a left or right swipe*/
-            if (Math.abs(event1.getX() - event2.getX()) / width > SWIPE_THRESHOLD_RATIO) {
-                if (event1.getX() > event2.getX()) {
-                    setSlideNum(slideNum + 1);
-                } else {
-                    setSlideNum(slideNum - 1);
-                }
-                sendSlideNumtoServer(slideNum);
-                ((ImageView) findViewById(R.id.imageView)).invalidate();
-            }
-            return true;
-        }
-    }
-
     private class SlidePresenterAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
             TypedClientStream<Void, Integer, Void> stream = null;
             try {
-                int slideNum = mClient.getSlideNum(mBaseContext);
                 stream = mClient.streamingGetSlideNum(mBaseContext);
             } catch (VException e) {
                 android.util.Log.e(TAG, "Couldn't create receive stream: " + e.getMessage());
@@ -242,15 +242,11 @@ public class SlidePresenterActivity extends Activity {
 
             while (true) {
                 try {
-                    final int streamNum = (Integer) stream.recv();
-                    SlidePresenterActivity.this.runOnUiThread(new Runnable() {
-                        public void run() {
-                            if (slideNum != streamNum) {
-                                setSlideNum(streamNum);
-                                ((ImageView) findViewById(R.id.imageView)).invalidate();
-                            }
-                        }
-                    });
+                    final int streamNum;
+                    streamNum = stream.recv();
+                    if (slideNum != streamNum) {
+                        setSlideNum(streamNum);
+                    }
                 } catch (EOFException e) {
                     android.util.Log.e(TAG, "Sender closed stream!");
                     break;
@@ -259,6 +255,41 @@ public class SlidePresenterActivity extends Activity {
                 }
             }
             return null;
+        }
+    }
+
+    private class Slide {
+        int slideDrawableId;
+        String slideNotes;
+
+        public Slide() {
+            slideDrawableId = 0;
+            slideNotes = "";
+        }
+
+        public Slide(int _slideDrawableId) {
+            slideDrawableId = _slideDrawableId;
+        }
+
+        public Slide(int _slideDrawableId, String _slideNotes) {
+            slideDrawableId = _slideDrawableId;
+            slideNotes = _slideNotes;
+        }
+
+        public void setSlideDrawableId(int _slideDrawableID) {
+            slideDrawableId = _slideDrawableID;
+        }
+
+        public int getSlideDrawableId() {
+            return slideDrawableId;
+        }
+
+        public void setSlideNotes(String _slideNotes) {
+            slideNotes = _slideNotes;
+        }
+
+        public String getSlideNotes() {
+            return slideNotes;
         }
     }
 }
