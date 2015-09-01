@@ -197,6 +197,13 @@ final class BinaryUtil {
     }
 
     /**
+     * Upper-cases the first character of a given string.
+     */
+    public static String firstCharToUpper(String str) {
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    /**
      * Lower-cases the first character in a string.
      */
     public static String firstCharToLower(String str) {

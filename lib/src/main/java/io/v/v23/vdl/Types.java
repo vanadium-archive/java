@@ -7,10 +7,7 @@ package io.v.v23.vdl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -543,7 +540,16 @@ public final class Types {
                 pendingTypes.put(klass, pending);
                 return pending;
             }
-
+            if (klass.isAssignableFrom(List.class)) {
+                throw new IllegalArgumentException("Unable to create a VDL type from List.class." +
+                        "  Consider creating a type using a TypeToken.");
+            } else if (klass.isAssignableFrom(Set.class)) {
+                throw new IllegalArgumentException("Unable to create a VDL type from Set.class." +
+                        "  Consider creating a type using a TypeToken.");
+            } else if (klass.isAssignableFrom(Map.class)) {
+                throw new IllegalArgumentException("Unable to create a VDL type from Map.class." +
+                        "  Consider creating a type using a TypeToken.");
+            }
             pending = builder.newPending();
             pendingTypes.put(klass, pending);
             Class<?> superClass = klass.getSuperclass();
@@ -558,14 +564,17 @@ public final class Types {
                 populateUnion(pending, klass);
             } else if (superClass == VdlArray.class) {
                 populateArray(pending, klass);
-            } else if (superClass != null) {
+            } else if (superClass != null && superClass != Object.class) {
                 pending.assignBase(lookupOrBuildPending(klass.getGenericSuperclass()));
             } else {
-                throw new IllegalArgumentException("Unable to create VDL Type for " + klass);
+                // Attempt to decode as a struct.
+                populateStruct(pending, klass);
             }
             GeneratedFromVdl annotation = klass.getAnnotation(GeneratedFromVdl.class);
             if (annotation != null) {
                 pending.setName(annotation.name());
+            } else if (klass.getCanonicalName() != null){
+                pending.setName(klass.getCanonicalName());
             }
             return pending;
         }
@@ -587,10 +596,30 @@ public final class Types {
         private void populateStruct(PendingType pending, Class<?> klass) {
             pending.setKind(Kind.STRUCT);
             TreeMap<Integer, PendingVdlField> fields = new TreeMap<Integer, PendingVdlField>();
+            // See if the struct has any annotations.  If not, we assume user has provided
+            // a raw class and we try to guess what the annotations would be.
+            boolean hasFieldAnnotations = false;
             for (Field field : klass.getDeclaredFields()) {
                 GeneratedFromVdl annotation = field.getAnnotation(GeneratedFromVdl.class);
                 if (annotation != null) {
+                    hasFieldAnnotations = true;
+                    break;
+                }
+            }
+            int fieldIndex = 0;
+            for (Field field : klass.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {  // skip static fields
+                    continue;
+                }
+                if (Character.isUpperCase(field.getName().charAt(0))) {
+                    throw new IllegalArgumentException("Java field names must be lower-cased");
+                }
+                GeneratedFromVdl annotation = field.getAnnotation(GeneratedFromVdl.class);
+                if (annotation != null) {
                     fields.put(annotation.index(), new PendingVdlField(annotation.name(),
+                            lookupOrBuildPending(field.getGenericType())));
+                } else if (!hasFieldAnnotations) {
+                    fields.put(++fieldIndex, new PendingVdlField(firstCharToUpper(field.getName()),
                             lookupOrBuildPending(field.getGenericType())));
                 }
             }
@@ -635,6 +664,10 @@ public final class Types {
                 throw new IllegalArgumentException(
                         "Unable to create VDL Type for type " + klass, e);
             }
+        }
+
+        private static String firstCharToUpper(String str) {
+            return Character.toUpperCase(str.charAt(0)) + str.substring(1);
         }
 
         private static final class PendingVdlField {

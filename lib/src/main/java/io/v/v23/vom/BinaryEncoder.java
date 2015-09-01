@@ -233,7 +233,7 @@ public class BinaryEncoder {
             case STRING:
                 return writeVdlString(out, value);
             case STRUCT:
-                return writeVdlStruct(out, value);
+                return writeVdlStruct(out, value, type);
             case UINT16:
             case UINT32:
             case UINT64:
@@ -478,9 +478,8 @@ public class BinaryEncoder {
     /**
      * Writes a VDL struct to output stream and returns true iff the value is non-zero.
      */
-    private boolean writeVdlStruct(EncodingStream out, Object value) throws IOException {
-        expectClass(Kind.STRUCT, value, AbstractVdlStruct.class);
-        List<VdlField> fields = ((AbstractVdlStruct) value).vdlType().getFields();
+    private boolean writeVdlStruct(EncodingStream out, Object value, VdlType type) throws IOException {
+        List<VdlField> fields = type.getFields();
         boolean hasNonZeroField = false;
         for (int i = 0; i < fields.size(); i++) {
             VdlField field = fields.get(i);
