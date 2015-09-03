@@ -97,7 +97,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(app.exists(ctx)).isTrue();
         assertThat(Arrays.asList(service.listApps(ctx))).containsExactly(app.name());
         assertThat(app.listDatabases(ctx)).isEmpty();
-        app.delete(ctx);
+        app.destroy(ctx);
         assertThat(app.exists(ctx)).isFalse();
         assertThat(service.listApps(ctx)).isEmpty();
     }
@@ -115,7 +115,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(db.exists(ctx)).isTrue();
         assertThat(Arrays.asList(app.listDatabases(ctx))).containsExactly(db.name());
         assertThat(db.listTables(ctx)).isEmpty();
-        db.delete(ctx);
+        db.destroy(ctx);
         assertThat(db.exists(ctx)).isFalse();
         assertThat(app.listDatabases(ctx)).isEmpty();
     }

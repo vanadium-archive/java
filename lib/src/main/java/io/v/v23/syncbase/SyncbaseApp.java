@@ -68,10 +68,10 @@ public interface SyncbaseApp extends AccessController {
     void create(VContext ctx, Permissions perms) throws VException;
 
     /**
-     * Deletes the app.
+     * Destroys the app.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the app couldn't be deleted
+     * @throws VException if the app couldn't be destroyed
      */
-    void delete(VContext ctx) throws VException;
+    void destroy(VContext ctx) throws VException;
 }

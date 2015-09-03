@@ -111,8 +111,8 @@ class DatabaseImpl implements Database, BatchDatabase {
         this.client.create(ctx, metadataOpt, perms);
     }
     @Override
-    public void delete(VContext ctx) throws VException {
-        this.client.delete(ctx, getSchemaVersion());
+    public void destroy(VContext ctx) throws VException {
+        this.client.destroy(ctx, getSchemaVersion());
     }
     @Override
     public void createTable(VContext ctx, String relativeName, Permissions perms)

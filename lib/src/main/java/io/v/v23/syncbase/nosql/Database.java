@@ -36,12 +36,12 @@ public interface Database extends DatabaseCore, AccessController {
     void create(VContext ctx, Permissions perms) throws VException;
 
     /**
-     * Deletes this database.
+     * Destroys this database.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the database couldn't be deleted
+     * @throws VException if the database couldn't be destroyed
      */
-    void delete(VContext ctx) throws VException;
+    void destroy(VContext ctx) throws VException;
 
     /**
      * Creates the table with the given name.

@@ -55,8 +55,8 @@ class SyncbaseAppImpl implements SyncbaseApp {
         this.client.create(ctx, perms);
     }
     @Override
-    public void delete(VContext ctx) throws VException {
-        this.client.delete(ctx);
+    public void destroy(VContext ctx) throws VException {
+        this.client.destroy(ctx);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
