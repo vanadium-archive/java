@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.rpc.ListenSpec;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncGroupSpec;
@@ -62,7 +63,9 @@ public class SyncbaseTest extends TestCase {
         String tmpDir = Files.createTempDir().getAbsolutePath();
         server = Syncbase.startServer(new SyncbaseServerParams()
                 .withPermissions(allowAll)
-                .withStorageRootDir(tmpDir));
+                .withStorageRootDir(tmpDir)
+                .withListenSpec(V.getListenSpec(ctx).withAddress(
+                        new ListenSpec.Address("tcp", "localhost:0"))));
         String[] endpoints = server.getStatus().getEndpoints();
         assertThat(endpoints).isNotEmpty();
         serverName = "/" + endpoints[0];
