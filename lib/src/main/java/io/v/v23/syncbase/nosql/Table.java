@@ -26,6 +26,26 @@ public interface Table {
     String fullName();
 
     /**
+     * Creates this table.
+     * Create must not be called from within a batch.
+     *
+     * @param  ctx        Vanadium context
+     * @param  perms      table permissions; if {@code null}, {@link Database}'s
+     *                    permissions are used
+     * @throws VException if the table couldn't be created
+     */
+    void create(VContext ctx, Permissions perms) throws VException;
+
+    /**
+     * Destroys this table, permanently removing all of its data.
+     * Destroy must not be called from within a batch.
+     *
+     * @param  ctx        Vanadium context
+     * @throws VException if the table couldn't be deleted
+     */
+    void destroy(VContext ctx) throws VException;
+
+    /**
      * Returns {@code true} iff this table exists and the caller has sufficient permissions
      * to access it.
      *

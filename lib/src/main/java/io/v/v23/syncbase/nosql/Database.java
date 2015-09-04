@@ -44,26 +44,6 @@ public interface Database extends DatabaseCore, AccessController {
     void destroy(VContext ctx) throws VException;
 
     /**
-     * Creates the table with the given name.
-     *
-     * @param  ctx           Vanadium context
-     * @param  relativeName  relative name of the table; must not contain {@code /}
-     * @param  perms         table permissions; if {@code null}, {@link Database}'s
-     *                       permissions are used
-     * @throws VException    if the table couldn't be created
-     */
-    void createTable(VContext ctx, String relativeName, Permissions perms) throws VException;
-
-    /**
-     * Deletes the table with the given name.
-     *
-     * @param  ctx           Vanadium context
-     * @param  relativeName  relative name of the table; must not contain {@code /}
-     * @throws VException    if the table couldn't be deleted
-     */
-    void deleteTable(VContext ctx, String relativeName) throws VException;
-
-    /**
      * Creates a new "batch", i.e., a handle to a set of reads and writes to the database that
      * should be considered an atomic unit.  Instead of calling this function directly, clients are
      * encouraged to use the {@link NoSql#runInBatch NoSql.runInBatch()} helper function, which

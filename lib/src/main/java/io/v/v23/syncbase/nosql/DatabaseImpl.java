@@ -114,20 +114,6 @@ class DatabaseImpl implements Database, BatchDatabase {
     public void destroy(VContext ctx) throws VException {
         this.client.destroy(ctx, getSchemaVersion());
     }
-    @Override
-    public void createTable(VContext ctx, String relativeName, Permissions perms)
-            throws VException {
-        String tableFullName = NamingUtil.join(this.fullName, relativeName);
-        TableClient table = TableClientFactory.getTableClient(tableFullName);
-        table.create(ctx, getSchemaVersion(), perms);
-    }
-    @Override
-    public void deleteTable(VContext ctx, String relativeName) throws VException {
-        String tableFullName = NamingUtil.join(this.fullName, relativeName);
-        TableClient table = TableClientFactory.getTableClient(tableFullName);
-        table.delete(ctx, getSchemaVersion());
-    }
-    @Override
     public BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException {
         String relativeName = this.client.beginBatch(ctx, getSchemaVersion(), opts);
         return new DatabaseImpl(this.parentFullName, relativeName, this.schema);

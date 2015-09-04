@@ -41,6 +41,14 @@ class TableImpl implements Table {
         return this.fullName;
     }
     @Override
+    public void create(VContext ctx, Permissions perms) throws VException {
+        this.client.create(ctx, this.schemaVersion, perms);
+    }
+    @Override
+    public void destroy(VContext ctx) throws VException {
+        this.client.destroy(ctx, this.schemaVersion);
+    }
+    @Override
     public boolean exists(VContext ctx) throws VException {
         return this.client.exists(ctx, this.schemaVersion);
     }

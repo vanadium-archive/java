@@ -130,7 +130,7 @@ public class SyncbaseTest extends TestCase {
                 NamingUtil.join(serverName, APP_NAME, DB_NAME, TABLE_NAME));
         assertThat(table.exists(ctx)).isFalse();
         assertThat(db.listTables(ctx)).isEmpty();
-        db.createTable(ctx, TABLE_NAME, allowAll);
+        table.create(ctx, allowAll);
         assertThat(table.exists(ctx)).isTrue();
         assertThat(Arrays.asList(db.listTables(ctx))).containsExactly(TABLE_NAME);
 
@@ -153,7 +153,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(table.getRow("row1").exists(ctx)).isFalse();
         assertThat(table.getRow("row2").exists(ctx)).isFalse();
 
-        db.deleteTable(ctx, TABLE_NAME);
+        table.destroy(ctx);
         assertThat(table.exists(ctx)).isFalse();
         assertThat(db.listTables(ctx)).isEmpty();
     }
@@ -289,8 +289,9 @@ public class SyncbaseTest extends TestCase {
     }
 
     private Table createTable(Database db) throws Exception {
-        db.createTable(ctx, TABLE_NAME, allowAll);
-        return db.getTable(TABLE_NAME);
+        Table table = db.getTable(TABLE_NAME);
+        table.create(ctx, allowAll);
+        return table;
     }
 
     private static class Foo implements Serializable {
