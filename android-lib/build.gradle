@@ -101,7 +101,7 @@ class VanadiumEnvironment {
         def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
         if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
             throw new InvalidUserDataException(
-                    thirdPartyGoBin + " does not exist or is not an executable file. "
+                    thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
                     + "You probably didn't install the android profile. Try running\n\n"
                     + "v23 profile install android\n\nand then try building again.")
         }
@@ -110,7 +110,7 @@ class VanadiumEnvironment {
                 ['third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator))
         if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
             throw new InvalidUserDataException(
-                    syncbaseOutputDir + " does not exist or is not a directory. "
+                    syncbaseOutputDir.toString() + " does not exist or is not a directory. "
                     + "You probably didn't install the android syncbase profile. Try running\n\n"
                     + "GOOS=android GOARCH=arm v23 profile install syncbase"
                     + "\n\nand then try building again"
