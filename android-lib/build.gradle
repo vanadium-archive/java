@@ -33,14 +33,10 @@ android {
 
 repositories {
     mavenCentral()
-
-    maven {
-        url "https://maven.v.io/"
-    }
 }
 
 dependencies {
-    compile 'io.v:vanadium:0.1-SNAPSHOT'
+    compile project(':lib')
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
     // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
