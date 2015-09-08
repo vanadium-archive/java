@@ -16,18 +16,18 @@ import android.widget.Toast;
 
 import com.google.common.collect.Lists;
 
+import java.util.Arrays;
 import java.util.List;
 
 import io.v.android.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.naming.Endpoint;
+import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
-import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -71,9 +71,6 @@ public class LocationService extends Service {
             p.blessingStore().setDefaultBlessings(blessings);
             p.blessingStore().set(blessings, new BlessingPattern("..."));
             p.addToRoots(blessings);
-            Server s = V.newServer(mBaseContext);
-            Endpoint[] endpoints = s.listen(V.getListenSpec(mBaseContext).withProxy("proxy"));
-            Log.i(TAG, "Listening on endpoint: " + endpoints[0]);
             String mountPoint;
             String prefix = mountNameFromBlessings(blessings);
             if ("".equals(prefix)) {
@@ -83,9 +80,13 @@ public class LocationService extends Service {
                 mountPoint = "users/" + prefix + "/location";
                 Log.i(TAG, "Mounting server at " + mountPoint);
             }
-            VeyronLocationService server = new VeyronLocationService(
+            VeyronLocationService locationService = new VeyronLocationService(
                     (LocationManager) getSystemService(Context.LOCATION_SERVICE));
-            s.serve(mountPoint, server, VSecurity.newAllowEveryoneAuthorizer());
+            ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
+            Server server = V.newServer(V.setListenSpec(mBaseContext, spec), mountPoint,
+                    locationService, null);
+            Log.i(TAG, "Listening on endpoints: " + Arrays.toString(
+                    server.getStatus().getEndpoints()));
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
         } catch (VException e) {
             String msg = "Couldn't start LocationService: " + e.getMessage();
