@@ -138,7 +138,7 @@ public class SyncbaseTest extends TestCase {
         table.put(ctx, "row1", "value1", String.class);
         assertThat(table.getRow("row1").exists(ctx)).isTrue();
         assertThat(table.get(ctx, "row1", String.class)).isEqualTo("value1");
-        table.delete(ctx, new RowRange("row1"));
+        table.delete(ctx, "row1");
         assertThat(table.getRow("row1").exists(ctx)).isFalse();
         table.put(ctx, "row1", "value1", String.class);
         table.put(ctx, "row2", "value2", String.class);
@@ -149,7 +149,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(table.scan(ctx, new RowRange("row1", "row3"))).containsExactly(
                 new KeyValue("row1", VomUtil.encode("value1", String.class)),
                 new KeyValue("row2", VomUtil.encode("value2", String.class)));
-        table.delete(ctx, new RowRange("row1", "row3"));
+        table.deleteRange(ctx, new RowRange("row1", "row3"));
         assertThat(table.getRow("row1").exists(ctx)).isFalse();
         assertThat(table.getRow("row2").exists(ctx)).isFalse();
 

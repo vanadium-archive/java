@@ -65,8 +65,12 @@ class TableImpl implements Table {
         getRow(key).put(ctx, value, type);
     }
     @Override
-    public void delete(VContext ctx, RowRange range) throws VException {
-        this.client.deleteRowRange(ctx, this.schemaVersion,
+    public void delete(VContext ctx, String key) throws VException {
+        getRow(key).delete(ctx);
+    }
+    @Override
+    public void deleteRange(VContext ctx, RowRange range) throws VException {
+        this.client.deleteRange(ctx, this.schemaVersion,
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override

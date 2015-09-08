@@ -86,6 +86,15 @@ public interface Table {
     void put(VContext ctx, String key, Object value, Type type) throws VException;
 
     /**
+     * Deletes the value for the given primary key.
+     *
+     * @param  ctx        Vanadium context
+     * @param  key        primary key for the row to be deleted
+     * @throws VException if the row couldn't be deleted
+     */
+    void delete(VContext ctx, String key) throws VException;
+
+    /**
      * Deletes all rows in the given half-open range {@code [start, limit)}. If {@code limit} is
      * {@code ""}, all rows with keys &ge; {@code start} are deleted.
      *
@@ -93,7 +102,7 @@ public interface Table {
      * @param  range      range of rows to be deleted
      * @throws VException if the rows couldn't be deleted
      */
-    void delete(VContext ctx, RowRange range) throws VException;
+    void deleteRange(VContext ctx, RowRange range) throws VException;
 
     /**
      * Returns all rows in the given half-open range {@code [start, limit)}. If {@code limit}
