@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
+            url 'https://maven.v.io/'
         }
     }
     dependencies {
@@ -16,7 +16,7 @@ apply plugin: 'wrapper'
 repositories {
     mavenCentral()
     maven {
-        url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
+        url 'https://maven.v.io/'
     }
 }
 android {
