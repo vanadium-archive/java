@@ -6,6 +6,7 @@ package io.v.v23.syncbase.nosql;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
+import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.verror.VException;
 
@@ -77,6 +78,34 @@ public interface Database extends DatabaseCore, AccessController {
      * @throws VException if the batch couldn't be created
      */
     BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException;
+
+    /**
+     * Allows a client to watch for updates to the database. For each watch request, the client will
+     * receive a reliable stream of watch events without re-ordering.
+     * <p>
+     * See {@link io.v.v23.services.watch.GlobWatcherClient} for a detailed explanation of the
+     * watch behavior.
+     * <p>
+     * In order to not miss any changes, clients should obtain a {@link ResumeMarker} from a
+     * fixed snapshot of the database, and then listen to changes that occurred only after this
+     * snapshot.  In other words, a client should:
+     * <p><ol>
+     * <li>begin a read-only batch,</li>
+     * <li>read all information your app needs,</li>
+     * <li>read the ResumeMarker,</li>
+     * <li>abort the batch,</li>
+     * <li>start watching for changes to the data using the {@link ResumeMarker}.</li>
+     * </ol><p>
+     *
+     * @param ctx                 vanadium context
+     * @param tableRelativeName   relative name of the table to watch
+     * @param rowPrefix           prefix of the rows to watch
+     * @param resumeMarker        {@link ResumeMarker} from which the changes will be monitored
+     * @return                    a stream of changes
+     * @throws VException         if there was an error setting up this watch request
+     */
+    Stream<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
+                              ResumeMarker resumeMarker) throws VException;
 
     /**
      * Returns a handle to a database {@link SyncGroup} with the given full (i.e., object) name.

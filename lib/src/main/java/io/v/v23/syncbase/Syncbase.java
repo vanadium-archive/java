@@ -4,7 +4,9 @@
 
 package io.v.v23.syncbase;
 
+import com.google.common.base.CharMatcher;
 import io.v.impl.google.services.syncbase.syncbased.SyncbaseServer;
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 
 /**
@@ -25,14 +27,22 @@ public class Syncbase {
      * <p>
      * This is a non-blocking call.
      *
+     * @param ctx                            vanadium context
      * @param params                         syncbase starting parameters
      * @throws SyncbaseServerStartException  if there was an error starting the syncbase service
      * @return                               vanadium server
      */
-    public static Server startServer(SyncbaseServerParams params)
+    public static Server startServer(VContext ctx, SyncbaseServerParams params)
             throws SyncbaseServerStartException {
         // TODO(spetrovic): allow clients to pass in their own Server implementations.
-        return SyncbaseServer.start(params);
+        return SyncbaseServer.start(ctx, params);
+    }
+
+    /**
+     * Returns {@code true} iff the provided string is a valid syncbase name.
+     */
+    public static boolean isValidName(String name) {
+        return !name.isEmpty() && CharMatcher.JAVA_LETTER_OR_DIGIT.matchesAllOf(name);
     }
 
     private Syncbase() {}

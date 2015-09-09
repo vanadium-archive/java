@@ -7,9 +7,14 @@ package io.v.v23.syncbase.nosql;
 import java.io.EOFException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import io.v.impl.google.naming.NamingUtil;
@@ -17,8 +22,13 @@ import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
 import io.v.v23.services.syncbase.nosql.SchemaMetadata;
+import io.v.v23.services.syncbase.nosql.StoreChange;
 import io.v.v23.services.syncbase.nosql.TableClient;
 import io.v.v23.services.syncbase.nosql.TableClientFactory;
+import io.v.v23.services.watch.Change;
+import io.v.v23.services.watch.GlobRequest;
+import io.v.v23.services.watch.ResumeMarker;
+import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
@@ -28,6 +38,7 @@ import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
 import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 class DatabaseImpl implements Database, BatchDatabase {
     private final String parentFullName;
@@ -119,6 +130,18 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new DatabaseImpl(this.parentFullName, relativeName, this.schema);
     }
     @Override
+    public Stream<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
+                                     ResumeMarker resumeMarker) throws VException {
+        CancelableVContext ctxC = ctx.withCancel();
+        TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctxC,
+                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
+        return new WatchChangeStreamImpl(ctxC, stream);
+    }
+    @Override
+    public ResumeMarker getResumeMarker(VContext ctx) throws VException {
+        return this.client.getResumeMarker(ctx);
+    }
+    @Override
     public SyncGroup getSyncGroup(String name) {
         return new SyncGroupImpl(this.fullName, name);
     }
@@ -191,5 +214,149 @@ class DatabaseImpl implements Database, BatchDatabase {
             return -1;
         }
         return this.schema.getMetadata().getVersion();
+    }
+
+    private static class ResultStreamImpl implements ResultStream {
+        private final CancelableVContext ctxC;
+        private final TypedClientStream<Void, List<VdlAny>, Void> stream;
+        private final List<String> columnNames;
+        private volatile boolean isCanceled;
+        private volatile boolean isCreated;
+
+        private ResultStreamImpl(CancelableVContext ctxC, TypedClientStream<Void,
+                List<VdlAny>, Void> stream, List<String> columnNames) {
+            this.ctxC = ctxC;
+            this.stream = stream;
+            this.columnNames = columnNames;
+            this.isCanceled = this.isCreated = false;
+        }
+        // Implements Stream<List<VdlAny>>.
+        @Override
+        public synchronized Iterator<List<VdlAny>> iterator() {
+            if (isCreated) {
+                throw new RuntimeException("Can only create one ResultStream iterator.");
+            }
+            isCreated = true;
+            return new AbstractIterator<List<VdlAny>>() {
+                @Override
+                protected List<VdlAny> computeNext() {
+                    synchronized (ResultStreamImpl.this) {
+                        if (isCanceled) {  // client canceled the stream
+                            return endOfData();
+                        }
+                        try {
+                            return stream.recv();
+                        } catch (EOFException e) {  // legitimate end of stream
+                            return endOfData();
+                        } catch (VException e) {
+                            if (isCanceled) {
+                                return endOfData();
+                            }
+                            throw new RuntimeException("Error retrieving next stream element.", e);
+                        }
+                    }
+                }
+            };
+        }
+        @Override
+        public synchronized void cancel() throws VException {
+            this.isCanceled = true;
+            this.ctxC.cancel();
+        }
+        // Implements ResultStream.
+        @Override
+        public List<String> columnNames() {
+            return this.columnNames;
+        }
+    }
+
+    private static class WatchChangeStreamImpl implements Stream<WatchChange> {
+        private final CancelableVContext ctxC;
+        private final TypedClientStream<Void, Change, Void> stream;
+        private volatile boolean isCanceled;
+        private volatile boolean isCreated;
+
+
+        private WatchChangeStreamImpl(CancelableVContext ctxC,
+                                      TypedClientStream<Void, Change, Void> stream) {
+            this.ctxC = ctxC;
+            this.stream = stream;
+            this.isCanceled = this.isCreated = false;
+        }
+        // Implements Stream<WatchChange>.
+        @Override
+        public synchronized Iterator<WatchChange> iterator() {
+            if (isCreated) {
+                throw new RuntimeException("Can only create one ResultStream iterator.");
+            }
+            isCreated = true;
+            return new AbstractIterator<WatchChange>() {
+                @Override
+                protected WatchChange computeNext() {
+                    synchronized (WatchChangeStreamImpl.this) {
+                        if (isCanceled) {  // client canceled the stream
+                            return endOfData();
+                        }
+                        try {
+                            return convert(stream.recv());
+                        } catch (EOFException e) {  // legitimate end of stream
+                            return endOfData();
+                        } catch (VException e) {
+                            if (isCanceled) {
+                                return endOfData();
+                            }
+                            throw new RuntimeException("Error retrieving next stream element.", e);
+                        }
+                    }
+                }
+            };
+        }
+        @Override
+        public synchronized void cancel() throws VException {
+            isCanceled = true;
+            ctxC.cancel();
+        }
+
+        private WatchChange convert(Change watchChange) throws VException {
+            Object value = watchChange.getValue().getElem();
+            if (!(value instanceof StoreChange)) {
+                throw new VException("Expected watch data to contain StoreChange, instead got: "
+                        + value);
+            }
+            StoreChange storeChange = (StoreChange) value;
+            ChangeType changeType;
+            switch (watchChange.getState()) {
+                case io.v.v23.services.watch.Constants.EXISTS:
+                    changeType = ChangeType.PUT_CHANGE;
+                    break;
+                case io.v.v23.services.watch.Constants.DOES_NOT_EXIST:
+                    changeType = ChangeType.DELETE_CHANGE;
+                    break;
+                default:
+                    throw new VException(
+                            "Unsupported watch change state: " + watchChange.getState());
+            }
+            List<String> parts = splitInTwo(watchChange.getName(), "/");
+            String tableName = parts.get(0);
+            if (!Syncbase.isValidName(tableName)) {
+                throw new VException("Invalid table name: \"" + tableName + "\"" + " in change: " +
+                        watchChange);
+            }
+            String rowName = parts.get(1);
+            // Empty row name is OK.
+            if (!Syncbase.isValidName(rowName)) {
+                throw new VException("Invalid row name: \"" + rowName + "\"" + " in change: " +
+                        watchChange);
+            }
+            return new WatchChange(tableName, rowName, changeType, storeChange.getValue(),
+                    watchChange.getResumeMarker(), storeChange.getFromSync(),
+                    watchChange.getContinued());
+        }
+
+        private static List<String> splitInTwo(String str, String separator) {
+            Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
+            return ImmutableList.of(
+                    iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
+        }
     }
 }

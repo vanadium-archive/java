@@ -4,7 +4,11 @@
 package io.v.v23.syncbase.nosql;
 
 import io.v.v23.context.VContext;
+import io.v.v23.services.watch.ResumeMarker;
+import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.VException;
+
+import java.util.List;
 
 /**
  * Base interface for {@link Database} and {@link BatchDatabase}, allowing clients to pass the
@@ -52,4 +56,12 @@ public interface DatabaseCore {
      * @throws VException if there was an error executing the query
      */
     ResultStream exec(VContext ctx, String query) throws VException;
+
+    /**
+     * Returns the {@link ResumeMarker} that points to the current state of the database.
+     *
+     * @throws VException if there was an error obtaining the {@link ResumeMarker}
+     */
+    ResumeMarker getResumeMarker(VContext ctx) throws VException;
+
 }

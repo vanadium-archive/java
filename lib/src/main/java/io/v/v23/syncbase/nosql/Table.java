@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.verror.VException;
 
@@ -118,7 +119,7 @@ public interface Table {
      *                     provided rows
      * @throws VException  if the scan stream couldn't be created
      */
-    ScanStream scan(VContext ctx, RowRange range) throws VException;
+    Stream<KeyValue> scan(VContext ctx, RowRange range) throws VException;
 
     /**
      * Returns an array of {@link PrefixPermissions} (i.e., {@code (prefix, perms)} pairs) for

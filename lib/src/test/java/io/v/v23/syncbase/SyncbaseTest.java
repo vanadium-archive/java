@@ -13,11 +13,13 @@ import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncGroupSpec;
 import io.v.v23.syncbase.nosql.BatchDatabase;
+import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.PrefixRange;
 import io.v.v23.syncbase.nosql.ResultStream;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
+import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.SyncGroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.V;
@@ -27,6 +29,7 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -34,6 +37,7 @@ import junit.framework.TestCase;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -61,7 +65,7 @@ public class SyncbaseTest extends TestCase {
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
         String tmpDir = Files.createTempDir().getAbsolutePath();
-        server = Syncbase.startServer(new SyncbaseServerParams()
+        server = Syncbase.startServer(ctx, new SyncbaseServerParams()
                 .withPermissions(allowAll)
                 .withStorageRootDir(tmpDir)
                 .withListenSpec(V.getListenSpec(ctx).withAddress(
@@ -205,6 +209,40 @@ public class SyncbaseTest extends TestCase {
                     ImmutableList.of(new VdlAny(String.class, "foo"), new VdlAny(Foo.class, foo))
             );
         }
+    }
+
+    public void testDatabaseWatch() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        Table table = createTable(db);
+        Foo foo = new Foo(4, "f");
+        Bar bar = new Bar(0.5f, "b");
+        Baz baz = new Baz("John Doe", true);
+
+        Stream<WatchChange> watchStream = db.watch(ctx, TABLE_NAME, "b", db.getResumeMarker(ctx));
+        table.put(ctx, "foo", foo, Foo.class);
+        table.put(ctx, "bar", bar, Bar.class);
+        table.put(ctx, "baz", baz, Baz.class);
+        table.getRow("baz").delete(ctx);
+
+        ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
+                new WatchChange(TABLE_NAME, "bar", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(bar, Bar.class), null, false, false),
+                new WatchChange(TABLE_NAME, "baz", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(baz, Baz.class), null, false, false),
+                new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
+                        new byte[0], null, false, false ));
+        Iterator<WatchChange> iterator = watchStream.iterator();
+        for (WatchChange expected : expectedChanges) {
+            assertThat(iterator.hasNext());
+            WatchChange actual = iterator.next();
+            assertThat(actual.getTableName()).isEqualTo(expected.getTableName());
+            assertThat(actual.getRowName()).isEqualTo(expected.getRowName());
+            assertThat(actual.getChangeType()).isEqualTo(expected.getChangeType());
+            assertThat(actual.getVomValue()).isEqualTo(expected.getVomValue());
+            assertThat(actual.isFromSync()).isEqualTo(expected.isFromSync());
+            assertThat(actual.isContinued()).isEqualTo(expected.isContinued());
+        }
+        watchStream.cancel();
     }
 
     public void testBatch() throws Exception {
