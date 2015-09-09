@@ -41,7 +41,7 @@ public class RowRangeMultiRowTest {
     }
 
     public RowRangeMultiRowTest(String start, String limit, String row, boolean expectedIsWithin) {
-        this.range = new RowRange(start, limit);
+        this.range = RowRange.range(start, limit);
         this.row = row;
         this.expectedIsWithin = expectedIsWithin;
     }

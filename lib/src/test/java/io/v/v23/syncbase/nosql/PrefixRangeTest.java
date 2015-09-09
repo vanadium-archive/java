@@ -39,7 +39,7 @@ public class PrefixRangeTest {
     }
 
     public PrefixRangeTest(String prefix, String row, boolean expectedIsWithin) {
-        this.range = new PrefixRange(prefix);
+        this.range = RowRange.prefix(prefix);
         this.row = row;
         this.expectedIsWithin = expectedIsWithin;
     }

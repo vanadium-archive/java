@@ -150,10 +150,10 @@ public class SyncbaseTest extends TestCase {
         assertThat(table.getRow("row2").exists(ctx)).isTrue();
         assertThat(table.get(ctx, "row1", String.class)).isEqualTo("value1");
         assertThat(table.get(ctx, "row2", String.class)).isEqualTo("value2");
-        assertThat(table.scan(ctx, new RowRange("row1", "row3"))).containsExactly(
+        assertThat(table.scan(ctx, RowRange.range("row1", "row3"))).containsExactly(
                 new KeyValue("row1", VomUtil.encode("value1", String.class)),
                 new KeyValue("row2", VomUtil.encode("value2", String.class)));
-        table.deleteRange(ctx, new RowRange("row1", "row3"));
+        table.deleteRange(ctx, RowRange.range("row1", "row3"));
         assertThat(table.getRow("row1").exists(ctx)).isFalse();
         assertThat(table.getRow("row2").exists(ctx)).isFalse();
 
@@ -248,7 +248,7 @@ public class SyncbaseTest extends TestCase {
     public void testBatch() throws Exception {
         Database db = createDatabase(createApp(createService()));
         Table table = createTable(db);
-        assertThat(table.scan(ctx, new PrefixRange(""))).isEmpty();
+        assertThat(table.scan(ctx, RowRange.prefix(""))).isEmpty();
 
         BatchDatabase batchFoo = db.beginBatch(ctx, null);
         Table batchFooTable = batchFoo.getTable(TABLE_NAME);

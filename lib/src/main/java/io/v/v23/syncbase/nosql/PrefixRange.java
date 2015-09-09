@@ -14,8 +14,10 @@ public class PrefixRange extends RowRange {
 
     /**
      * Creates a new prefix range that includes all rows with the given prefix.
+     * Package-private constructor for PrefixRange class. Static method
+     * {@link RowRange#prefix} can be used to create instances.
      */
-    public PrefixRange(String prefix) {
+    PrefixRange(String prefix) {
         super(Util.prefixRangeStart(prefix), Util.prefixRangeLimit(prefix));
         this.prefix = prefix;
     }
