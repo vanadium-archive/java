@@ -27,20 +27,20 @@ import io.v.v23.verror.VException;
 public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeInit(int numCpus) throws VException;
     private static native void nativeShutdown(VContext context);
-    private static native VContext nativeSetNewClient(VContext ctx, Options opts)
+    private static native VContext nativeWithNewClient(VContext ctx, Options opts)
             throws VException;
-    private static native Client nativeGetClient(VContext ctx)
-            throws VException;
-    private static native Server nativeNewServer(VContext ctx, String name, Dispatcher dispatcher) 
-            throws VException;
-    private static native VContext nativeSetPrincipal(VContext ctx, VPrincipal principal)
+    private static native Client nativeGetClient(VContext ctx) throws VException;
+    private static native VContext nativeWithNewServer(VContext ctx, String name,
+                                                       Dispatcher dispatcher) throws VException;
+    private static native Server nativeGetServer(VContext ctx) throws VException;
+    private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
-    private static native VContext nativeSetNewNamespace(VContext ctx, String... roots)
+    private static native VContext nativeWithNewNamespace(VContext ctx, String... roots)
             throws VException;
     private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
+    private static native VContext nativeWithListenSpec(VContext ctx, ListenSpec spec) throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
-    private static native VContext nativeSetListenSpec(VContext ctx, ListenSpec spec) throws VException;
 
     /**
      * Returns a new runtime instance.
@@ -61,8 +61,8 @@ public class VRuntimeImpl implements VRuntime {
         this.ctx = ctx;
     }
     @Override
-    public VContext setNewClient(VContext ctx, Options opts) throws VException {
-        return nativeSetNewClient(ctx, opts);
+    public VContext withNewClient(VContext ctx, Options opts) throws VException {
+        return nativeWithNewClient(ctx, opts);
     }
     @Override
     public Client getClient(VContext ctx) {
@@ -73,22 +73,30 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public Server newServer(VContext ctx, String name, Dispatcher disp, Options opts) throws VException {
-        return nativeNewServer(ctx, name, disp);
+    public VContext withNewServer(VContext ctx, String name, Dispatcher disp, Options opts)
+            throws VException {
+        return nativeWithNewServer(ctx, name, disp);
     }
-
     @Override
-    public Server newServer(VContext ctx, String name, Object object, Authorizer authorizer, Options opts) throws VException {
+    public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
+                                  Options opts) throws VException {
         if (object == null) {
             throw new VException("newServer called with a null object");
         }
         Invoker invoker = object instanceof Invoker ? (Invoker) object : new ReflectInvoker(object);
-        return nativeNewServer(ctx, name, new DefaultDispatcher(invoker, authorizer));
+        return nativeWithNewServer(ctx, name, new DefaultDispatcher(invoker, authorizer));
     }
-
     @Override
-    public VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException {
-        return nativeSetPrincipal(ctx, principal);
+    public Server getServer(VContext ctx) {
+        try {
+            return nativeGetServer(ctx);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get server", e);
+        }
+    }
+    @Override
+    public VContext withPrincipal(VContext ctx, VPrincipal principal) throws VException {
+        return nativeWithPrincipal(ctx, principal);
     }
     @Override
     public VPrincipal getPrincipal(VContext ctx) {
@@ -99,8 +107,8 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public VContext setNewNamespace(VContext ctx, String... roots) throws VException {
-        return nativeSetNewNamespace(ctx, roots);
+    public VContext withNewNamespace(VContext ctx, String... roots) throws VException {
+        return nativeWithNewNamespace(ctx, roots);
     }
     @Override
     public Namespace getNamespace(VContext ctx) {
@@ -111,16 +119,16 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
+    public VContext withListenSpec(VContext ctx, ListenSpec spec) throws VException {
+        return nativeWithListenSpec(ctx, spec);
+    }
+    @Override
     public ListenSpec getListenSpec(VContext ctx) {
         try {
             return nativeGetListenSpec(ctx);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get listen spec: ", e);
         }
-    }
-    @Override
-    public VContext setListenSpec(VContext ctx, ListenSpec spec) throws VException {
-        return nativeSetListenSpec(ctx, spec);
     }
     @Override
     public VContext getContext() {

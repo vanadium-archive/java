@@ -38,18 +38,18 @@ import static com.google.common.truth.Truth.assertThat;
 public class FortuneTest extends TestCase {
     private static final String TEST_INVOKER_FORTUNE = "Test invoker fortune";
 
-    private Server s;
     private VContext ctx;
 
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
         ListenSpec.Address addr = new ListenSpec.Address("tcp", "127.0.0.1:0");
-        ctx = V.setListenSpec(ctx, V.getListenSpec(ctx).withAddress(addr));
+        ctx = V.withListenSpec(ctx, V.getListenSpec(ctx).withAddress(addr));
     }
 
     @Override
     protected void tearDown() throws Exception {
+        Server s = V.getServer(ctx);
         if (s != null) {
             s.stop();
         }
@@ -57,6 +57,7 @@ public class FortuneTest extends TestCase {
     }
 
     private String name() {
+        Server s = V.getServer(ctx);
         if (s == null) {
             return "";
         }
@@ -65,7 +66,7 @@ public class FortuneTest extends TestCase {
 
     public void testFortune() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -84,7 +85,7 @@ public class FortuneTest extends TestCase {
 
     public void testStreaming() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
@@ -105,7 +106,7 @@ public class FortuneTest extends TestCase {
 
     public void testMultiple() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -119,7 +120,7 @@ public class FortuneTest extends TestCase {
 
     public void testComplexError() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -135,17 +136,18 @@ public class FortuneTest extends TestCase {
 
     public void testWatchNetwork() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         // TODO(spetrovic): Figure out how to force network change in android and test that the
         // changes get announced on this channel.
+        Server s = V.getServer(ctx);
         Iterable<NetworkChange> channel = s.watchNetwork();
         s.unwatchNetwork(channel);
     }
 
     public void testContext() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -156,9 +158,16 @@ public class FortuneTest extends TestCase {
         }
     }
 
+    public void testGetServer() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        Server s = V.getServer(ctx);
+        assertThat(s).isNotNull();
+    }
+
     public void testGetSignature() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         Client c = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -172,7 +181,7 @@ public class FortuneTest extends TestCase {
 
     public void testGlob() throws Exception {
         FortuneServer server = new FortuneServerImpl();
-        s = V.newServer(ctx, "", server, null);
+        ctx = V.withNewServer(ctx, "", server, null);
 
         List<GlobReply> globResult
                 = ImmutableList.copyOf(V.getNamespace(ctx).glob(ctx, name() + "/*"));
@@ -184,7 +193,7 @@ public class FortuneTest extends TestCase {
     }
 
     public void testCustomInvoker() throws Exception {
-        s = V.newServer(ctx, "", new TestInvoker(), null);
+        ctx = V.withNewServer(ctx, "", new TestInvoker(), null);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -199,7 +208,7 @@ public class FortuneTest extends TestCase {
                 return new ServiceObjectWithAuthorizer(server, null);
             }
         };
-        s = V.newServer(ctx, "", dispatcher);
+        ctx = V.withNewServer(ctx, "", dispatcher);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
@@ -215,7 +224,7 @@ public class FortuneTest extends TestCase {
                 return new ServiceObjectWithAuthorizer(new TestInvoker(), null);
             }
         };
-        s = V.newServer(ctx, "", dispatcher);
+        ctx = V.withNewServer(ctx, "", dispatcher);
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s

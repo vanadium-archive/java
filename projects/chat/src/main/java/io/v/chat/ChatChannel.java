@@ -84,12 +84,10 @@ public class ChatChannel {
             }
         };
 
-        server = V.newServer(ctx);
-        server.listen(V.getListenSpec(ctx));
-
         String mountPath = getLockedPath(ctx);
         if (mountPath != null) {
-            server.serve(mountPath, chatServer, VSecurity.newAllowEveryoneAuthorizer());
+            ctx = V.withNewServer(ctx, mountPath, chatServer,
+                    VSecurity.newAllowEveryoneAuthorizer());
         } else {
             throw new VException("Could not find an appropriate path name for the chat server");
         }

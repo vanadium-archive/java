@@ -83,8 +83,9 @@ public class LocationService extends Service {
             VeyronLocationService locationService = new VeyronLocationService(
                     (LocationManager) getSystemService(Context.LOCATION_SERVICE));
             ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
-            Server server = V.newServer(V.setListenSpec(mBaseContext, spec), mountPoint,
-                    locationService, null);
+            VContext ctx = V.withNewServer(
+                    V.withListenSpec(mBaseContext, spec), mountPoint, locationService, null);
+            Server server = V.getServer(ctx);
             Log.i(TAG, "Listening on endpoints: " + Arrays.toString(
                     server.getStatus().getEndpoints()));
             Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();

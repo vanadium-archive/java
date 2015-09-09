@@ -65,7 +65,7 @@ public class V extends io.v.v23.V {
             RedirectStderr.Start();
             // Attach principal and listen spec to the context.
             try {
-                context = V.setPrincipal(context, createPrincipal(androidCtx));
+                context = V.withPrincipal(context, createPrincipal(androidCtx));
             } catch (VException e) {
                 throw new RuntimeException("Couldn't setup Vanadium Runtime options", e);
             }

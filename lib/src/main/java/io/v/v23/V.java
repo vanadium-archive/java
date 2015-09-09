@@ -38,7 +38,7 @@ import io.v.v23.verror.VException;
  * <p><blockquote><pre>
  *     VContext ctx = V.init(opts);
  *     ...
- *     Server s = V.newServer(ctx);
+ *     ctx = V.withNewServer(ctx, "server", obj, null);
  *     ...
  *     Client c = V.getClient(ctx);
  *     ...
@@ -182,18 +182,21 @@ public class V {
     }
 
     /**
-     * Creates a new client instance and attaches it to a new context.
+     * Creates a new client instance and attaches it to a new context (which is derived from the
+     * provided context).
      *
      * @param  ctx             current context
      * @return                 child context to which the new client is attached
      * @throws VException      if a new client cannot be created
      */
-    public static VContext setNewClient(VContext ctx) throws VException {
-        return setNewClient(ctx, null);
+    public static VContext withNewClient(VContext ctx) throws VException {
+        return withNewClient(ctx, null);
     }
 
     /**
-     * Creates a new client instance with the provided options and attaches it to a new context.
+     * Creates a new client instance with the provided options and attaches it to a new context
+     * (which is derived from the provided context).
+     * <p></p>
      * A particular runtime implementation chooses which options to support, but at the minimum must
      * handle the following options:
      * <p><ul>
@@ -205,70 +208,67 @@ public class V {
      * @return                 child context to which the new client is attached
      * @throws VException      if a new client cannot be created
      */
-    public static VContext setNewClient(VContext ctx, Options opts) throws VException {
+    public static VContext withNewClient(VContext ctx, Options opts) throws VException {
         if (opts == null) opts = new Options();
-        return getRuntime().setNewClient(ctx, opts);
+        return getRuntime().withNewClient(ctx, opts);
     }
 
     /**
-     * Returns the client attached to the given context.
-     *
-     * @param  ctx current context
-     * @return     the client attached to the given context
+     * Returns the client attached to the given context, or {@code null} if no client is attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * client will never be {@code null}.
      */
     public static Client getClient(VContext ctx) {
         return getRuntime().getClient(ctx);
     }
 
     /**
-     * Creates a new Server instance to serve a service object.
+     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a service object and attaches
+     * it to a new context (which is derived from the provided context).
      *
-     * The server will listen for network connections as specified by
-     * the {@link ListenSpec} attached to the context. Depending on
-     * your runtime, 'roaming' support may be enabled. In this mode
-     * the server will adapt to changes in the network configuration
-     * and re-publish the current set of endpoints to the mount table
-     * accordingly.
+     * The server will listen for network connections as specified by the {@link ListenSpec}
+     * attached to the context. Depending on your runtime, 'roaming' support may be enabled.
+     * In this mode the server will adapt to changes in the network configuration
+     * and re-publish the current set of endpoints to the mount table accordingly.
      * <p>
-     * This call associates object with name by publishing the address
-     * of this server with the mount table under the supplied name and
-     * using the given authorizer to authorize access to it.  RPCs
-     * invoked on the supplied name will be delivered to methods
-     * implemented by the supplied object.
-     * <p> 
-     * Reflection is used to match requests to the object's method
-     * set.  As a special-case, if the object implements the 
-     * {@link Invoker} interface, the invoker is used to invoke methods
-     * directly, without reflection.
+     * This call associates object with name by publishing the address of this server with the
+     * mount table under the supplied name and using the given authorizer to authorize access to it.
+     * RPCs invoked on the supplied name will be delivered to methods implemented by the supplied
+     * object.
      * <p>
-     * If name is an empty string, no attempt will made to publish
-     * that name to a mount table.
+     * Reflection is used to match requests to the object's method set.  As a special-case, if the
+     * object implements the {@link io.v.v23.rpc.Invoker} interface, the invoker is used to invoke
+     * methods directly, without reflection.
      * <p>
-     * If the passed-in authorizer is {@code null}, the default
-     * authorizer will be used.  (The default authorizer uses the
-     * blessing chain derivation to determine if the client is
+     * If name is an empty string, no attempt will made to publish that name to a mount table.
+     * <p>
+     * If the passed-in authorizer is {@code null}, the default authorizer will be used.
+     * (The default authorizer uses the blessing chain derivation to determine if the client is
      * authorized to access the object's methods.)
      *
      * @param  ctx             current context
      * @param  name            name under which the supplied object should be published,
      *                         or the empty string if the object should not be published
      * @param  object          object to be published under the given name
-     * @param  auth            authorizer that will control access to objects methods
-     * @return                 the new server instance
+     * @param  authorizer      authorizer that will control access to objects methods
+     * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
      */
-    public static Server newServer(VContext ctx, String name, Object object, Authorizer authorizer) throws VException {
-        return newServer(ctx, name, object, authorizer, null);
+    public static VContext withNewServer(VContext ctx, String name, Object object,
+                                         Authorizer authorizer) throws VException {
+        return withNewServer(ctx, name, object, authorizer, null);
     }
 
     /**
-     * Creates a new Server instance to serve a service object.
+     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a service object and attaches
+     * it to a new context (which is derived from the provided context).
      *
-     * Same as {@link #newServer(VContext,String,Object,Authorizer}
+     * Same as {@link #withNewServer(VContext, String, Object, Authorizer)}
      * but accepts implementation-specific server-creation options.
      * <p>
-     * A particular runtime implementation chooses which options to support,
-     * but at the minimum it must handle the following options:
+     * A particular runtime implementation chooses which options to support, but at the minimum it
+     * must handle the following options:
      * <p><ul>
      *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
      * </ul>
@@ -277,57 +277,56 @@ public class V {
      * @param  name            name under which the supplied object should be published,
      *                         or the empty string if the object should not be published
      * @param  object          object to be published under the given name
-     * @param  auth            authorizer that will control access to objects methods
+     * @param  authorizer            authorizer that will control access to objects methods
      * @param  opts            server options
-     * @return                 the new server instance
+     * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
      */
-    public static Server newServer(VContext ctx, String name, Object object, Authorizer authorizer, Options opts) throws VException {
+    public static VContext withNewServer(VContext ctx, String name, Object object,
+                                         Authorizer authorizer, Options opts) throws VException {
         if (opts == null) {
             opts = new Options();
         }
-        return getRuntime().newServer(ctx, name, object, authorizer, opts);
+        return getRuntime().withNewServer(ctx, name, object, authorizer, opts);
     }
 
     /**
-     * Creates a new Server instance to serve a dispatcher.
+     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a dispatcher and attaches
+     * it to a new context (which is derived from the provided context).
      *
-     * The server will listen for network connections as specified by
-     * the {@link ListenSpec} attached to the context. Depending on
-     * your runtime, 'roaming' support may be enabled. In this mode
-     * the server will adapt to changes in the network configuration
-     * and re-publish the current set of endpoints to the mount table
-     * accordingly.
+     * The server will listen for network connections as specified by the {@link ListenSpec}
+     * attached to the context. Depending on your runtime, 'roaming' support may be enabled.
+     * In this mode the server will adapt to changes in the network configuration
+     * and re-publish the current set of endpoints to the mount table accordingly.
      * <p>
-     * Associates dispatcher with the portion of the mount table's
-     * name space for which {@code name} is a prefix, by publishing
-     * the address of this dispatcher with the mount table under the
-     * supplied name.
-     * <p> 
-     * RPCs invoked on the supplied name will be delivered to the
-     * supplied {@link Dispatcher}'s {@link Dispatcher#lookup lookup}
-     * method which will in turn return the object and
+     * Associates dispatcher with the portion of the mount table's name space for which
+     * {@code name} is a prefix, by publishing the address of this dispatcher with the mount
+     * table under the supplied name.
+     * <p>
+     * RPCs invoked on the supplied name will be delivered to the supplied {@link Dispatcher}'s
+     * {@link Dispatcher#lookup lookup} method which will in turn return the object and
      * {@link Authorizer} used to serve the actual RPC call.
      * <p>
-     * If name is an empty string, no attempt will made to publish
-     * that name to a mount table.
+     * If name is an empty string, no attempt will made to publish that name to a mount table.
      *
      * @param  ctx             current context
      * @param  name            name under which the supplied object should be published,
      *                         or the empty string if the object should not be published
-     * @param  disp            dispatcher to be published under the given name
-     * @return                 the new server instance
+     * @param  dispatcher      dispatcher to be published under the given name
+     * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
      */
-    public static Server newServer(VContext ctx, String name, Dispatcher disp) throws VException {
-        return newServer(ctx, name, disp, (Options)null);
+    public static VContext withNewServer(VContext ctx, String name,
+                                         Dispatcher dispatcher) throws VException {
+        return withNewServer(ctx, name, dispatcher, (Options) null);
     }
 
     /**
-     * Creates a new Server instance to serve a dispatcher.
+     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a dispatcher and attaches
+     * it to a new context (which is derived from the provided context).
      *
-     * Same as {@link #newServer(VContext,String,Dispatcher} but
-     * accepts implementation-specific server-creation options.
+     * Same as {@link #withNewServer(VContext,String,Dispatcher)} but accepts
+     * implementation-specific server-creation options.
      * <p>
      * A particular runtime implementation chooses which options to support,
      * but at the minimum it must handle the following options:
@@ -338,81 +337,95 @@ public class V {
      * @param  ctx             current context
      * @param  name            name under which the supplied object should be published,
      *                         or the empty string if the object should not be published
-     * @param  disp            dispatcher to be published under the given name
+     * @param  dispatcher      dispatcher to be published under the given name
      * @param  opts            server options
-     * @return                 the new server instance
+     * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
      */
-    public static Server newServer(VContext ctx, String name, Dispatcher disp, Options opts) throws VException {
+    public static VContext withNewServer(VContext ctx, String name, Dispatcher dispatcher,
+                                         Options opts) throws VException {
         if (opts == null) {
             opts = new Options();
         }
-        return getRuntime().newServer(ctx, name, disp, opts);
+        return getRuntime().withNewServer(ctx, name, dispatcher, opts);
     }
 
     /**
-     * Attaches the given principal to a new context (that is derived from the given context).
+     * Returns the server attached to the given context, or {@code null} if no server is attached.
+     */
+    public static Server getServer(VContext ctx) {
+        return getRuntime().getServer(ctx);
+    }
+
+    /**
+     * Attaches the given principal to a new context (which is derived from the given context).
      *
      * @param  ctx             current context
      * @param  principal       principal to be attached
      * @return                 child context to which the principal is attached
      * @throws VException      if the principal couldn't be attached
      */
-    public static VContext setPrincipal(VContext ctx, VPrincipal principal) throws VException {
-        return getRuntime().setPrincipal(ctx, principal);
+    public static VContext withPrincipal(VContext ctx, VPrincipal principal) throws VException {
+        return getRuntime().withPrincipal(ctx, principal);
     }
 
     /**
-     * Returns the principal attached to the given context.
-     *
-     * @param  ctx current context
-     * @return     the principal attached to the given context
+     * Returns the principal attached to the given context or {@code null} if no principal is
+     * attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * principal will never be {@code null}.
+
      */
     public static VPrincipal getPrincipal(VContext ctx) {
         return getRuntime().getPrincipal(ctx);
     }
 
     /**
-     * Creates a new namespace instance and attaches it to a new context.
+     * Creates a new namespace instance and attaches it to a new context (which is derived from the
+     * given context).
      *
      * @param  ctx             current context
      * @param  roots           roots of the namespace
      * @return                 child context to which the principal is attached
      * @throws VException      if the namespace couldn't be created
      */
-    public static VContext setNewNamespace(VContext ctx, String... roots) throws VException {
-        return getRuntime().setNewNamespace(ctx, roots);
+    public static VContext withNewNamespace(VContext ctx, String... roots) throws VException {
+        return getRuntime().withNewNamespace(ctx, roots);
     }
 
     /**
-     * Returns the namespace attached to the given context.
-     *
-     * @param  ctx current context
-     * @return     the namespace attached to the given context.
+     * Returns the namespace attached to the given context, or {@code null} if no namespace is
+     * attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * namespace will never be {@code null}.
      */
     public static Namespace getNamespace(VContext ctx) {
         return getRuntime().getNamespace(ctx);
     }
 
     /**
-     * Returns the {@code ListenSpec} attached to the given context.
-     *
-     * @param  ctx current context
-     * @return     the {@code ListenSpec} attached to the given context
-     */
-    public static ListenSpec getListenSpec(VContext ctx) {
-        return getRuntime().getListenSpec(ctx);
-    }
-
-    /**
-     * Attaches the given {@code ListenSpec} to a new context.
+     * Attaches the given {@code ListenSpec} to a new context (which is derived from the given
+     * context).
      *
      * @param ctx        current context
      * @param spec       the {@code ListenSpec} to attach
      * @return           child context to which the {@code ListenSpec} is attached.
      */
-    public static VContext setListenSpec(VContext ctx, ListenSpec spec) throws VException {
-        return getRuntime().setListenSpec(ctx, spec);
+    public static VContext withListenSpec(VContext ctx, ListenSpec spec) throws VException {
+        return getRuntime().withListenSpec(ctx, spec);
+    }
+
+    /**
+     * Returns the {@code ListenSpec} attached to the given context, or {@code null} if no spec
+     * is attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * spec will never be {@code null}.
+     */
+    public static ListenSpec getListenSpec(VContext ctx) {
+        return getRuntime().getListenSpec(ctx);
     }
 
     private static VRuntime getRuntime() {
