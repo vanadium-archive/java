@@ -22,8 +22,10 @@ import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 
-import io.v.positioning.gae.ServletPostAsyncTask;
 import io.v.positioning.ble.BleActivity;
+import io.v.positioning.gae.ServletPostAsyncTask;
+import io.v.positioning.tofprotocol.TofProtocolActivity;
+
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -50,6 +52,10 @@ public class MainActivity extends Activity implements
 
     public void onBle(View view) {
         startActivity(new Intent(this, BleActivity.class));
+    }
+
+    public void onTofProtocol(View view) {
+        startActivity(new Intent(this, TofProtocolActivity.class));
     }
 
     public void onRecordMyLocation(View view) {

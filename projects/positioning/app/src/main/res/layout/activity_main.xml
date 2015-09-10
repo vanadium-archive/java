@@ -37,4 +37,11 @@
         android:onClick="onBle"
         android:text="@string/ble" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:onClick="onTofProtocol"
+        android:text="@string/tof_protocol" />
+
 </LinearLayout>

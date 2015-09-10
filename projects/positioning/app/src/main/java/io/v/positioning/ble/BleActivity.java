@@ -30,6 +30,7 @@ public class BleActivity extends Activity {
     private static final String TAG = BleActivity.class.getSimpleName();
     private static final int TIMEOUT = 1000; // advertise for 1sec
     private final static int REQUEST_ENABLE_BT = 1;
+    
     private boolean mScanning = false;
     private boolean mAdvertising = false;
     private BleScanner mBleScanner = null;
@@ -58,7 +59,7 @@ public class BleActivity extends Activity {
             return;
         }
         mBleAdvertiser = new BleAdvertiser(mBluetoothAdapter);
-        mBleScanner = new BleScanner(mBluetoothAdapter);
+        mBleScanner = new BleScanner(mBluetoothAdapter, new Random().nextInt());
     }
 
     @Override
@@ -91,7 +92,11 @@ public class BleActivity extends Activity {
         if (!mAdvertising) {
             mAdvertising = true;
             // send BLE packet with random values for now
-            mBleAdvertiser.startAdvertising(new BleData(new Random().nextInt(), new Random().nextInt(), System.nanoTime()), TIMEOUT);
+            try {
+                mBleAdvertiser.startAdvertising(new BleData(new Random().nextInt(), new Random().nextInt(), System.nanoTime()), TIMEOUT);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Advertiser interrupted. " + e);
+            }
             ((Button) view.findViewById(R.id.ble_advertising)).setText(R.string.stop_advertising);
             Log.d(TAG, "started advertising");
         } else {
@@ -101,5 +106,4 @@ public class BleActivity extends Activity {
             Log.d(TAG, "stopped advertising");
         }
     }
-
 }
