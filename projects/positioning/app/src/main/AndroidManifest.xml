@@ -40,6 +40,10 @@
             android:name=".ble.BleActivity"
             android:label="@string/title_activity_ble" >
         </activity>
+        <activity
+            android:name=".tofprotocol.TofProtocolActivity"
+            android:label="@string/title_activity_tof_protocol" >
+        </activity>
     </application>
 
 </manifest>

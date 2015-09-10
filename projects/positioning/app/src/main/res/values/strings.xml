@@ -28,4 +28,15 @@
     <string name="no_advertising_support">Advertising not supported</string>
     <string name="ble">Bluetooth low energy</string>
     <string name="title_activity_ble">BleActivity</string>
+    <string name="title_activity_tof_protocol">TofProtocolActivity</string>
+    <!-- ToF protocol -->>
+    <string name="tof_protocol">Tof Protocol</string>
+    <string name="start_tof_initiator">Send initial message</string>
+    <string name="stop_tof_initiator">Interrupt initiated protocol</string>
+    <string name="start_tof_responder">Start listening for messages</string>
+    <string name="stop_tof_responder">Stop listening for messages</string>
+    <string name="responder_not_alive">Responder is not alive. Turn it on.</string>
+    <string name="busy_try_again">Busy, try again!</string>
+    <string name="responder_stopped">Responder stopped.</string>
+
 </resources>

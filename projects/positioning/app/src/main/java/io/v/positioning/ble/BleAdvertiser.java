@@ -12,6 +12,8 @@ import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 /**
  * Wrapper class around the BluetoothLeAdvertiser {@link android.bluetooth.le.BluetoothLeAdvertiser}
  * used to advertise BLE packets defined in the BleData class {@link BleData}
@@ -19,27 +21,32 @@ import android.util.Log;
 public class BleAdvertiser {
     public static final String UUID = "00002a5d-0000-1000-8000-00805f9b34fb";
     private static final String TAG = BleAdvertiser.class.getSimpleName();
-    private BluetoothLeAdvertiser mBleAdvertiser = null;
+    private final BluetoothLeAdvertiser mBleAdvertiser;
     private BleData mData = null;
     private long mTimeDataSent = 0;
     private int mTimeout = 0;
+    // Blocking queue is used to synchronize between the advertisement requests and their callbacks
+    // Queue element is the time when successful advertisement was sent (initialized in the callback)
+    ArrayBlockingQueue<Long> advertisementSentWaiter;
 
-    BleAdvertiser(BluetoothAdapter bluetoothAdapter) {
+    public BleAdvertiser(BluetoothAdapter bluetoothAdapter) {
         mBleAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
+        if (mBleAdvertiser == null) {
+            throw new IllegalStateException("BLE advertiser null");
+        }
+        advertisementSentWaiter = new ArrayBlockingQueue<Long>(1);
     }
 
-    public long startAdvertising(BleData data, int timeout) {
+    public long startAdvertising(BleData data, int timeout) throws InterruptedException {
         this.mData = data;
         this.mTimeout = timeout;
         AdvertiseData ad = getAdvertiseData();
-        Log.d(TAG, ad.toString());
-        if (mBleAdvertiser != null) {
-            mTimeDataSent = System.nanoTime();
-            mBleAdvertiser.startAdvertising(getAdvertiseSettings(), ad,
-                    getAdvertiseData(), mAdvertiseCallback);
-            Log.d(TAG, "Started advertising");
-        }
-        return mTimeDataSent;
+        long mTimeDataSent = System.nanoTime();
+        mBleAdvertiser.startAdvertising(getAdvertiseSettings(), ad,
+                getAdvertiseData(), mAdvertiseCallback);
+        Log.d(TAG, "Data advertised: " + mData.toString() + " at time: " + mTimeDataSent);
+        // waiting for the notification from on a successful callback ...
+        return advertisementSentWaiter.take();
     }
 
     private AdvertiseSettings getAdvertiseSettings() {
@@ -69,7 +76,12 @@ public class BleAdvertiser {
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            super.onStartSuccess(settingsInEffect);
+            try {
+                // ... notify the waiter that an advertisement was successfully sent
+                advertisementSentWaiter.put(System.nanoTime());
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Advertiser is interrupted. " + e);
+            }
             Log.d(TAG, "Advertisement sent");
         }
 

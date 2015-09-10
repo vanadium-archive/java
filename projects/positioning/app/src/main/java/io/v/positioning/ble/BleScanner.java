@@ -15,6 +15,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 
 /**
@@ -23,14 +24,19 @@ import java.util.List;
  */
 public class BleScanner {
     private static final String TAG = BleScanner.class.getSimpleName();
-    private BluetoothLeScanner mBluetoothLeScanner = null;
-    private List<ScanFilter> mFilters;
-    private long mTimeDataReceived = 0;
-    private BleData mData = null;
 
-    BleScanner(BluetoothAdapter bluetoothAdapter) {
+    private final int mDeviceId;
+    private final BluetoothLeScanner mBluetoothLeScanner;
+    private List<ScanFilter> mFilters;
+    private long mTimeDataReceived;
+    // Queue is used to synchronize on Scanning requests and successful scan callbacks.
+    ArrayBlockingQueue<BleData> bleDataQueue;
+
+    public BleScanner(BluetoothAdapter bluetoothAdapter, int deviceId) {
+        mDeviceId = deviceId;
         mBluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         mFilters = new ArrayList<>();
+        bleDataQueue = new ArrayBlockingQueue<BleData>(1);
     }
 
     // Start and stop scanning and a callback that has to be shared for identification
@@ -45,6 +51,7 @@ public class BleScanner {
 
     public void stopScan() {
         if (mBluetoothLeScanner != null) {
+            mBluetoothLeScanner.flushPendingScanResults(mScanCallback);
             mBluetoothLeScanner.stopScan(mScanCallback);
         }
     }
@@ -54,12 +61,19 @@ public class BleScanner {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            Log.d(TAG, "Scanned record: " + result.toString());
-            mTimeDataReceived = result.getTimestampNanos();
+            mTimeDataReceived = System.nanoTime();
             byte[] serviceData = result.getScanRecord().getServiceData(ParcelUuid.fromString(BleAdvertiser.UUID));
             if (serviceData != null) {
-                mData = new BleData(serviceData);
-                Log.d(TAG, "Data scanned: " + mData.toString());
+                BleData data = new BleData(serviceData);
+                if (data.getDeviceId() != mDeviceId) {
+                    try {
+                        bleDataQueue.put(data);
+                    } catch (InterruptedException e) {
+                        Log.d(TAG, "Interrupted queue's waiting" + e);
+                    }
+                    return;
+                }
+                Log.d(TAG, "Data scanned: " + data.toString() + " scanning time: " + mTimeDataReceived);
             } else {
                 Log.e(TAG, "Service data is null.");
             }
@@ -75,7 +89,7 @@ public class BleScanner {
         return mTimeDataReceived;
     }
 
-    public BleData getReceivedData() {
-        return mData;
+    public BleData getReceivedData() throws InterruptedException {
+        return bleDataQueue.take();
     }
 }
