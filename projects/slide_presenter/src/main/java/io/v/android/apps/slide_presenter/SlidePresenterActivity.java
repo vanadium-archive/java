@@ -6,12 +6,12 @@ package io.v.android.apps.slide_presenter;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,45 +34,46 @@ public class SlidePresenterActivity extends Activity {
     private static final int BLESSING_REQUEST = 1;
     private static final String SERVER_NAME = "users/spetrovic@gmail.com/slidepresenter";
     private static final String TAG = "SlidePresenter";
-
     VContext mBaseContext;
     SlidePresenterClient mClient;
-    private final int[] slideDrawables = new int[]{R.drawable.slide1, R.drawable.slide2,
-            R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
-            R.drawable.slide7};
-    private int slideNum = 0;
+    private final int[] slideDrawables = new int[]{R.drawable.slide1, R.drawable.slide2, R.drawable.slide3,
+            R.drawable.slide4, R.drawable.slide5, R.drawable.slide6, R.drawable.slide7};
+    private int slideNum = 0, localSlideNum = 0;
     private Slide[] slides = new Slide[slideDrawables.length];
+    private boolean synced = true;
+
+    private enum Role {
+        Lecturer, Moderator, Audience
+    }
+
+    private Role role = Role.Audience;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_slidepresenter);
+        if (role == Role.Lecturer) {
+            setContentView(R.layout.activity_slidelecturer);
+        } else if (role == Role.Audience) {
+            setContentView(R.layout.activity_slideaudience);
+        }
+
         // Initialize the Vanadium runtime and load its native shared library
         // implementation. This is required before we can do anything involving
         // Vanadium.
-
         mBaseContext = V.init(this);
 
         for (int i = 0; i < slideDrawables.length; i++) {
+            slides[i] = new Slide(slideDrawables[i]);
             slides[i] = new Slide(slideDrawables[i], "Notes for slide " + (i + 1));
         }
 
         setSlideNum(0);
         getBlessings();
-    }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            findViewById(R.id.textView).setVisibility(View.INVISIBLE);
-            ((ImageView) findViewById(R.id.imageView)).setScaleType(ImageView.ScaleType.FIT_XY);
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            findViewById(R.id.textView).setVisibility(View.VISIBLE);
-            ((ImageView) findViewById(R.id.imageView)).setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (role == Role.Audience) {
+            findViewById(R.id.prevButton).setVisibility(View.INVISIBLE);
+            findViewById(R.id.nextButton).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -163,40 +164,41 @@ public class SlidePresenterActivity extends Activity {
     }
 
     public void setSlideNum(int _slideNum) {
-        slideNum = _slideNum;
-        if (slideNum < 0) {
-            slideNum = 0;
-        } else if (slideNum >= slides.length) {
-            slideNum = slides.length - 1;
-        }
+        final int thisSlide = _slideNum < 0 ? 0
+                            : _slideNum >= slides.length ? slides.length - 1
+                            : _slideNum;
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((ImageView) findViewById(R.id.imageView))
-                        .setImageResource(slides[slideNum].getSlideDrawableId());
+                ((ImageView) findViewById(R.id.slideView))
+                        .setImageResource(slides[thisSlide].getSlideDrawableId());
 
                 ((ImageView) findViewById(R.id.currSlide))
-                        .setImageResource(slides[slideNum].getSlideDrawableId());
+                        .setImageResource(slides[thisSlide].getSlideDrawableId());
 
-                if (slideNum > 0) {
+                if (thisSlide > 0) {
                     ((ImageView) findViewById(R.id.prevSlide))
-                            .setImageResource(slides[slideNum - 1]
-                                    .getSlideDrawableId());
+                            .setImageResource(slides[thisSlide - 1].getSlideDrawableId());
                 } else {
                     ((ImageView) findViewById(R.id.prevSlide)).setImageResource(0);
                 }
 
-                if (slideNum < slides.length - 1) {
+                if (thisSlide < slides.length - 1) {
                     ((ImageView) findViewById(R.id.nextSlide))
-                            .setImageResource(slides[slideNum + 1]
-                                    .getSlideDrawableId());
+                            .setImageResource(slides[thisSlide + 1].getSlideDrawableId());
                 } else {
                     ((ImageView) findViewById(R.id.nextSlide)).setImageResource(0);
                 }
 
-                ((TextView) findViewById(R.id.textView))
-                        .setText(slides[slideNum].getSlideNotes());
+                if (role == Role.Lecturer || role == Role.Moderator) {
+                    slideNum = thisSlide;
+                    ((TextView) findViewById(R.id.textView)).setText(slides[slideNum].getSlideNotes());
+                } else {
+                    localSlideNum = thisSlide;
+                }
+
+                findViewById(R.id.slideView).invalidate();
             }
         });
 
@@ -211,13 +213,36 @@ public class SlidePresenterActivity extends Activity {
     }
 
     public void nextSlide(View v) {
-        setSlideNum(slideNum + 1);
-        sendSlideNumtoServer(slideNum);
+        if (role == Role.Lecturer || role == Role.Moderator) {
+            setSlideNum(slideNum + 1);
+            sendSlideNumtoServer(slideNum);
+        } else if (role == Role.Audience) {
+            setSlideNum(localSlideNum + 1);
+        }
+
     }
 
     public void prevSlide(View v) {
-        setSlideNum(slideNum - 1);
-        sendSlideNumtoServer(slideNum);
+        if (role == Role.Lecturer || role == Role.Moderator) {
+            setSlideNum(slideNum - 1);
+            sendSlideNumtoServer(slideNum);
+        } else if (role == Role.Audience) {
+            setSlideNum(localSlideNum - 1);
+        }
+    }
+
+    public void syncClick(View v) {
+        synced = !synced;
+
+        if (synced) {
+            findViewById(R.id.prevButton).setVisibility(View.INVISIBLE);
+            findViewById(R.id.nextButton).setVisibility(View.INVISIBLE);
+            ((Button) findViewById(R.id.syncButton)).setText("Unsync");
+        } else {
+            findViewById(R.id.prevButton).setVisibility(View.VISIBLE);
+            findViewById(R.id.nextButton).setVisibility(View.VISIBLE);
+            ((Button) findViewById(R.id.syncButton)).setText("Sync");
+        }
     }
 
     public int getSlideNum() {
@@ -244,7 +269,7 @@ public class SlidePresenterActivity extends Activity {
                 try {
                     final int streamNum;
                     streamNum = stream.recv();
-                    if (slideNum != streamNum) {
+                    if (slideNum != streamNum && synced) {
                         setSlideNum(streamNum);
                     }
                 } catch (EOFException e) {
@@ -276,16 +301,8 @@ public class SlidePresenterActivity extends Activity {
             slideNotes = _slideNotes;
         }
 
-        public void setSlideDrawableId(int _slideDrawableID) {
-            slideDrawableId = _slideDrawableID;
-        }
-
         public int getSlideDrawableId() {
             return slideDrawableId;
-        }
-
-        public void setSlideNotes(String _slideNotes) {
-            slideNotes = _slideNotes;
         }
 
         public String getSlideNotes() {
@@ -293,3 +310,4 @@ public class SlidePresenterActivity extends Activity {
         }
     }
 }
+
