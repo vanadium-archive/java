@@ -28,7 +28,8 @@ public interface Table {
 
     /**
      * Creates this table.
-     * Create must not be called from within a batch.
+     * <p>
+     * Must not be called from within a batch.
      *
      * @param  ctx        Vanadium context
      * @param  perms      table permissions; if {@code null}, {@link Database}'s

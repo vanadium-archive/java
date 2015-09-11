@@ -4,6 +4,7 @@
 
 package io.v.impl.google.naming;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +69,7 @@ public class NamingUtil {
     private static List<String> splitInTwo(String str, String separator) {
        Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
        return ImmutableList.of(
-            iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
+               iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
     }
 
     /**
@@ -101,6 +102,15 @@ public class NamingUtil {
         Iterator<String> iter = Arrays.asList(names).iterator();
         for (int i = 0; i < names.length && names[i].isEmpty(); ++i, iter.next());
         return clean(Joiner.on("/").join(iter));
+    }
+
+    /**
+     * Splits the given name into fragments using {@code '/'} as the separator.
+     * <p>
+     * The returned list is cleaned of empty strings.
+     */
+    public static List<String> split(String name) {
+        return Splitter.on("/").omitEmptyStrings().splitToList(name);
     }
 
     /**
