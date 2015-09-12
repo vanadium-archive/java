@@ -56,6 +56,23 @@ public class BleScanner {
         }
     }
 
+
+    public void startScanNonBlocking() {
+        ParcelUuid uuidPositioning = ParcelUuid.fromString(BleAdvertiser.UUID);
+        ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(uuidPositioning).build();
+        mFilters.add(scanFilter);
+        ScanSettings mSettings = new ScanSettings.Builder().setReportDelay(0)
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+        mBluetoothLeScanner.startScan(mFilters, mSettings, mScanCallbackNonBlocking);
+    }
+
+    public void stopScanNonBlocking() {
+        if (mBluetoothLeScanner != null) {
+            mBluetoothLeScanner.flushPendingScanResults(mScanCallbackNonBlocking);
+            mBluetoothLeScanner.stopScan(mScanCallbackNonBlocking);
+        }
+    }
+
     private ScanCallback mScanCallback = new ScanCallback() {
 
         @Override
@@ -73,6 +90,28 @@ public class BleScanner {
                     }
                     return;
                 }
+                Log.d(TAG, "Data scanned: " + data.toString() + " scanning time: " + mTimeDataReceived);
+            } else {
+                Log.e(TAG, "Service data is null.");
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.e(TAG, "Scan failed with error code: " + errorCode);
+        }
+    };
+
+    private ScanCallback mScanCallbackNonBlocking = new ScanCallback() {
+
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.d(TAG, "scanning result ...");
+            super.onScanResult(callbackType, result);
+            mTimeDataReceived = System.nanoTime();
+            byte[] serviceData = result.getScanRecord().getServiceData(ParcelUuid.fromString(BleAdvertiser.UUID));
+            if (serviceData != null) {
+                BleData data = new BleData(serviceData);
                 Log.d(TAG, "Data scanned: " + data.toString() + " scanning time: " + mTimeDataReceived);
             } else {
                 Log.e(TAG, "Service data is null.");

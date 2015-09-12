@@ -53,11 +53,9 @@ public class DistanceRequestInitiator extends AsyncTask<Context, Void, Double> {
         long mTimeDiffFromB = 0;
         // Setting high priority to the thread to speed up the advertisement.
         android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        try {
-            actualBleTimeSent = bleAdvertiser.startAdvertising(new BleData(mDeviceId, mRoundNumber, mTimeBleSent),
-                    TofProtocolActivity.ADVERTISE_TIMEOUT);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Advertisement is interrupted. " + e);
+        actualBleTimeSent = bleAdvertiser.startAdvertising(new BleData(mDeviceId, mRoundNumber, mTimeBleSent),
+                TofProtocolActivity.ADVERTISE_TIMEOUT);
+        if(actualBleTimeSent == 0) {
             return null;
         }
         bleScanner.startScan();

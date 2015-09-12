@@ -28,9 +28,9 @@ import io.v.positioning.R;
  */
 public class BleActivity extends Activity {
     private static final String TAG = BleActivity.class.getSimpleName();
-    private static final int TIMEOUT = 1000; // advertise for 1sec
+    public static final int TIMEOUT = 100; // advertisement time
     private final static int REQUEST_ENABLE_BT = 1;
-    
+
     private boolean mScanning = false;
     private boolean mAdvertising = false;
     private BleScanner mBleScanner = null;
@@ -77,12 +77,12 @@ public class BleActivity extends Activity {
     public void onToggleBleScanning(View view) {
         if (!mScanning) {
             mScanning = true;
-            mBleScanner.startScan();
+            mBleScanner.startScanNonBlocking();
             ((Button) view.findViewById(R.id.ble_scanning)).setText(R.string.stop_scanning);
             Log.d(TAG, "started scanning");
         } else {
             mScanning = false;
-            mBleScanner.stopScan();
+            mBleScanner.stopScanNonBlocking();
             ((Button) view.findViewById(R.id.ble_scanning)).setText(R.string.start_scanning);
             Log.d(TAG, "stopped scanning");
         }
@@ -91,19 +91,28 @@ public class BleActivity extends Activity {
     public void onToggleBleAdvertising(View view) {
         if (!mAdvertising) {
             mAdvertising = true;
-            // send BLE packet with random values for now
-            try {
-                mBleAdvertiser.startAdvertising(new BleData(new Random().nextInt(), new Random().nextInt(), System.nanoTime()), TIMEOUT);
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Advertiser interrupted. " + e);
-            }
+            mBleAdvertiser.sendAdvertisingNonBlocking(new BleData(
+                    new Random().nextInt(), new Random().nextInt(), System.nanoTime()), TIMEOUT);
             ((Button) view.findViewById(R.id.ble_advertising)).setText(R.string.stop_advertising);
             Log.d(TAG, "started advertising");
         } else {
             mAdvertising = false;
-            mBleAdvertiser.stopAdvertising();
+            mBleAdvertiser.stopAdvertisingNonBlocking();
             ((Button) view.findViewById(R.id.ble_advertising)).setText(R.string.start_advertising);
             Log.d(TAG, "stopped advertising");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mBleScanner != null) {
+            mBleScanner.stopScan();
+            mBleScanner.stopScanNonBlocking();
+        }
+        if(mBleAdvertiser != null) {
+            mBleAdvertiser.stopAdvertising();
+            mBleAdvertiser.stopAdvertisingNonBlocking();
         }
     }
 }

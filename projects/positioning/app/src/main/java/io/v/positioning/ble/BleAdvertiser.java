@@ -27,17 +27,19 @@ public class BleAdvertiser {
     private int mTimeout = 0;
     // Blocking queue is used to synchronize between the advertisement requests and their callbacks
     // Queue element is the time when successful advertisement was sent (initialized in the callback)
-    ArrayBlockingQueue<Long> advertisementSentWaiter;
+    private ArrayBlockingQueue<Long> advertisementSentWaiter = new ArrayBlockingQueue<Long>(1);;
 
     public BleAdvertiser(BluetoothAdapter bluetoothAdapter) {
         mBleAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBleAdvertiser == null) {
             throw new IllegalStateException("BLE advertiser null");
         }
-        advertisementSentWaiter = new ArrayBlockingQueue<Long>(1);
     }
 
-    public long startAdvertising(BleData data, int timeout) throws InterruptedException {
+    /**
+     * @return time advertisement was successfully sent or 0 on failure
+     * */
+    public long startAdvertising(BleData data, int timeout) {
         this.mData = data;
         this.mTimeout = timeout;
         AdvertiseData ad = getAdvertiseData();
@@ -46,7 +48,28 @@ public class BleAdvertiser {
                 getAdvertiseData(), mAdvertiseCallback);
         Log.d(TAG, "Data advertised: " + mData.toString() + " at time: " + mTimeDataSent);
         // waiting for the notification from on a successful callback ...
-        return advertisementSentWaiter.take();
+        try{
+            return advertisementSentWaiter.take();
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Advertisement timed out.");
+            return 0;
+        }
+    }
+
+    public void sendAdvertisingNonBlocking(BleData data, int timeout) {
+        this.mData = data;
+        this.mTimeout = timeout;
+        AdvertiseData ad = getAdvertiseData();
+        long mTimeDataSent = System.nanoTime();
+        mBleAdvertiser.startAdvertising(getAdvertiseSettings(), ad,
+                getAdvertiseData(), mAdvertiseCallbackNonBlocking);
+        Log.d(TAG, "Data advertised: " + mData.toString() + " at time: " + mTimeDataSent);
+    }
+
+    public void stopAdvertisingNonBlocking() {
+        if (mBleAdvertiser != null) {
+            mBleAdvertiser.stopAdvertising(mAdvertiseCallbackNonBlocking);
+        }
     }
 
     private AdvertiseSettings getAdvertiseSettings() {
@@ -76,12 +99,25 @@ public class BleAdvertiser {
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+            Log.d(TAG, "Advertisement sent successfully.");
             try {
                 // ... notify the waiter that an advertisement was successfully sent
                 advertisementSentWaiter.put(System.nanoTime());
             } catch (InterruptedException e) {
                 Log.e(TAG, "Advertiser is interrupted. " + e);
             }
+            Log.d(TAG, "Advertisement sent");
+        }
+
+        @Override
+        public void onStartFailure(int errorCode) {
+            Log.d(TAG, "Advertisement failed with code: " + errorCode);
+        }
+    };
+
+    private AdvertiseCallback mAdvertiseCallbackNonBlocking = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             Log.d(TAG, "Advertisement sent");
         }
 

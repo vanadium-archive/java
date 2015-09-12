@@ -56,5 +56,4 @@ public class BleData {
     public long getTime() {
         return time;
     }
-
 }

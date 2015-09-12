@@ -60,7 +60,12 @@ public class DistanceRequestReceiver extends AsyncTask<Context, Void, Void> {
                 ultrasoundRecorder.run();
                 mTimeUltrasoundRecorded = ultrasoundRecorder.reportTime();
                 // compute the delay and advertise it for phone A to compute the distance
-                bleAdvertiser.startAdvertising(bleToUsTimeDifference(), TofProtocolActivity.ADVERTISE_TIMEOUT);
+                long timeDataAdvertised = bleAdvertiser.startAdvertising(bleToUsTimeDifference(),
+                        TofProtocolActivity.ADVERTISE_TIMEOUT);
+                if(timeDataAdvertised == 0) {
+                    Log.e(TAG, "Advertised timed out failing to send data. Wait for new requests.");
+                    break;
+                }
             } catch (InterruptedException e) {
                 keepAlive = false;
                 break;
