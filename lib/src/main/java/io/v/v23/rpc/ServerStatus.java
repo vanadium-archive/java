@@ -4,6 +4,10 @@
 
 package io.v.v23.rpc;
 
+import com.google.common.collect.Lists;
+import io.v.impl.google.naming.EndpointImpl;
+import io.v.v23.naming.Endpoint;
+
 import java.util.Arrays;
 
 /**
@@ -63,8 +67,12 @@ public class ServerStatus {
      * Returns the set of endpoints currently registered with the mount table for the names
      * published using this server but excluding those used for serving proxied requests.
      */
-    public String[] getEndpoints() {
-        return Arrays.copyOf(this.endpoints, this.endpoints.length);
+    public Endpoint[] getEndpoints() {
+        Endpoint[] result = new Endpoint[endpoints.length];
+        for (int i = 0; i < endpoints.length; i++) {
+            result[i] = EndpointImpl.fromString(endpoints[i]);
+        }
+        return result;
     }
 
     /**

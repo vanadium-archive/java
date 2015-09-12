@@ -20,7 +20,7 @@ import io.v.v23.naming.Endpoint;
 import io.v.v23.naming.RoutingId;
 import io.v.v23.rpc.NetworkAddress;
 
-class EndpointImpl implements Endpoint {
+public class EndpointImpl implements Endpoint {
     private static final Pattern hostPortPattern = Pattern.compile("^(?:\\((.*)\\)@)?([^@]+)$");
 
     private final String protocol;
@@ -33,7 +33,7 @@ class EndpointImpl implements Endpoint {
 
     // TODO(suharshs): Remove endpoint 5 when the transition to endpoint 6 is complete.
 
-    static Endpoint fromString(String s) {
+    public static Endpoint fromString(String s) {
         Matcher matcher = hostPortPattern.matcher(s);
         if (matcher.matches()) {
             List<String> blessings = new ArrayList<>(1);
@@ -146,7 +146,7 @@ class EndpointImpl implements Endpoint {
             blessings = ImmutableList.of();
         } else {
             blessings = Splitter.on(',').splitToList(
-                    Joiner.on("@").join(parts.subList(5, parts.size())));
+                    Joiner.on("@").join(parts.subList(6, parts.size())));
         }
         return new EndpointImpl(protocol, address, routes, routingId, blessings, isMountTable, isLeaf);
     }
