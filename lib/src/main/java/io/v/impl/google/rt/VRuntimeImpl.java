@@ -32,15 +32,21 @@ public class VRuntimeImpl implements VRuntime {
     private static native Client nativeGetClient(VContext ctx) throws VException;
     private static native VContext nativeWithNewServer(VContext ctx, String name,
                                                        Dispatcher dispatcher) throws VException;
-    private static native Server nativeGetServer(VContext ctx) throws VException;
     private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
     private static native VContext nativeWithNewNamespace(VContext ctx, String... roots)
             throws VException;
     private static native Namespace nativeGetNamespace(VContext ctx) throws VException;
-    private static native VContext nativeWithListenSpec(VContext ctx, ListenSpec spec) throws VException;
+    private static native VContext nativeWithListenSpec(VContext ctx, ListenSpec spec)
+            throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
+
+    // Attaches a server to the given context.  Used by this class and other classes
+    // that natively create a server.
+    private static VContext withServer(VContext ctx, Server server) {
+        return ctx.withValue(new ServerKey(), server);
+    }
 
     /**
      * Returns a new runtime instance.
@@ -84,15 +90,12 @@ public class VRuntimeImpl implements VRuntime {
             throw new VException("newServer called with a null object");
         }
         Invoker invoker = object instanceof Invoker ? (Invoker) object : new ReflectInvoker(object);
-        return nativeWithNewServer(ctx, name, new DefaultDispatcher(invoker, authorizer));
+        return withNewServer(ctx, name, new DefaultDispatcher(invoker, authorizer), opts);
     }
     @Override
     public Server getServer(VContext ctx) {
-        try {
-            return nativeGetServer(ctx);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't get server", e);
-        }
+        Server server = (Server) ctx.value(new ServerKey());
+        return server;
     }
     @Override
     public VContext withPrincipal(VContext ctx, VPrincipal principal) throws VException {
@@ -150,6 +153,13 @@ public class VRuntimeImpl implements VRuntime {
         @Override
         public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
             return new ServiceObjectWithAuthorizer(this.invoker, this.auth);
+        }
+    }
+
+    private static class ServerKey {
+        @Override
+        public int hashCode() {
+            return 0;
         }
     }
 }

@@ -224,7 +224,7 @@ public class V {
     }
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a service object and attaches
+     * Creates a new {@link Server} instance to serve a service object and attaches
      * it to a new context (which is derived from the provided context).
      *
      * The server will listen for network connections as specified by the {@link ListenSpec}
@@ -261,7 +261,7 @@ public class V {
     }
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a service object and attaches
+     * Creates a new {@link Server} instance to serve a service object and attaches
      * it to a new context (which is derived from the provided context).
      *
      * Same as {@link #withNewServer(VContext, String, Object, Authorizer)}
@@ -291,7 +291,7 @@ public class V {
     }
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a dispatcher and attaches
+     * Creates a new {@link Server} instance to serve a dispatcher and attaches
      * it to a new context (which is derived from the provided context).
      *
      * The server will listen for network connections as specified by the {@link ListenSpec}
@@ -322,7 +322,7 @@ public class V {
     }
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a dispatcher and attaches
+     * Creates a new {@link Server} instance to serve a dispatcher and attaches
      * it to a new context (which is derived from the provided context).
      *
      * Same as {@link #withNewServer(VContext,String,Dispatcher)} but accepts
@@ -358,7 +358,7 @@ public class V {
     }
 
     /**
-     * Attaches the given principal to a new context (which is derived from the given context).
+     * Attaches the given principal to a new context (which is derived from the provided context).
      *
      * @param  ctx             current context
      * @param  principal       principal to be attached

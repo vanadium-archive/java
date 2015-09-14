@@ -5,7 +5,6 @@
 package io.v.impl.google.services.syncbase.syncbased;
 
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Server;
 import io.v.v23.syncbase.SyncbaseServerParams;
 import io.v.v23.syncbase.SyncbaseServerStartException;
 import io.v.v23.verror.VException;
@@ -14,23 +13,25 @@ import io.v.v23.verror.VException;
  * An implementation of a syncbase server.
  */
 public class SyncbaseServer {
-    private static native Server nativeStart(VContext ctx, SyncbaseServerParams params)
-            throws VException;
+    private static native VContext nativeWithNewServer(
+            VContext ctx, SyncbaseServerParams params) throws VException;
 
     /**
-     * Starts the syncbase server with the given parameters.
+     * Creates a new the syncbase server and attaches it to a new context (which is derived
+     * from the provided context).
      * <p>
-     * This is a non-blocking call.
+     * The newly created {@link io.v.v23.rpc.Server} instance can be obtained from the context via
+     * {@link io.v.v23.V#getServer}.
      *
-     * @param ctx                            vanadium context
-     * @param params                         syncbase starting parameters
+     * @param  ctx                           vanadium context
+     * @param  params                        syncbase starting parameters
      * @throws SyncbaseServerStartException  if there was an error starting the syncbase service
-     * @return                               vanadium server
+     * @return                               a child context to which the new server is attached
      */
-    public static Server start(VContext ctx, SyncbaseServerParams params)
+    public static VContext withNewServer(VContext ctx, SyncbaseServerParams params)
             throws SyncbaseServerStartException {
         try {
-            return nativeStart(ctx, params);
+            return nativeWithNewServer(ctx, params);
         } catch (VException e) {
             throw new SyncbaseServerStartException(e.getMessage());
         }

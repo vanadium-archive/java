@@ -15,9 +15,6 @@ public interface Server {
     /**
      * Adds the specified name to the mount table for the object or {@link Dispatcher} served by
      * this server.
-     * <p>
-     * This method may be called multiple times but only after {@link #serve serve} or
-     * {@link #serveDispatcher serveDispatcher} has been called.
      *
      * @param  name            name to be added to the mount table
      * @throws VException      if the name couldn't be added to the mount table
@@ -26,9 +23,6 @@ public interface Server {
 
     /**
      * Removes the specified name from the mount table.
-     * <p>
-     * This method may be called multiple times but only after {@link #serve serve} or
-     * {@link #serveDispatcher serveDispatcher} has been called.
      *
      * @param name name to be removed from the mount table
      */

@@ -116,8 +116,7 @@ public interface Table {
      *
      * @param  ctx         Vanadium context
      * @param  range       range of rows to be read
-     * @return             a {@link ScanStream} used for iterating over the snapshot of the
-     *                     provided rows
+     * @return             a stream used for iterating over the snapshot of the provided rows
      * @throws VException  if the scan stream couldn't be created
      */
     Stream<KeyValue> scan(VContext ctx, RowRange range) throws VException;
