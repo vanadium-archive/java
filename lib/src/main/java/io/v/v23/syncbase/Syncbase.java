@@ -7,7 +7,6 @@ package io.v.v23.syncbase;
 import com.google.common.base.CharMatcher;
 import io.v.impl.google.services.syncbase.syncbased.SyncbaseServer;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Server;
 
 /**
  * Various syncbase utility methods.
@@ -23,19 +22,20 @@ public class Syncbase {
     }
 
     /**
-     * Starts the syncbase server with the given parameters.
+     * Creates a new the syncbase server and attaches it to a new context (which is derived
+     * from the provided context).
      * <p>
-     * This is a non-blocking call.
+     * The newly created {@link io.v.v23.rpc.Server} instance can be obtained from the context via
+     * {@link io.v.v23.V#getServer}.
      *
-     * @param ctx                            vanadium context
-     * @param params                         syncbase starting parameters
+     * @param  ctx                           vanadium context
+     * @param  params                        syncbase starting parameters
      * @throws SyncbaseServerStartException  if there was an error starting the syncbase service
-     * @return                               vanadium server
+     * @return                               a child context to which the new server is attached
      */
-    public static Server startServer(VContext ctx, SyncbaseServerParams params)
+    public static VContext withNewServer(VContext ctx, SyncbaseServerParams params)
             throws SyncbaseServerStartException {
-        // TODO(spetrovic): allow clients to pass in their own Server implementations.
-        return SyncbaseServer.start(ctx, params);
+        return SyncbaseServer.withNewServer(ctx, params);
     }
 
     /**

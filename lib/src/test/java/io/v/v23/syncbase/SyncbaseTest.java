@@ -16,7 +16,6 @@ import io.v.v23.services.syncbase.nosql.SyncGroupSpec;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.syncbase.nosql.PrefixRange;
 import io.v.v23.syncbase.nosql.ResultStream;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
@@ -53,12 +52,13 @@ public class SyncbaseTest extends TestCase {
 
     private VContext ctx;
     private Permissions allowAll;
-    private Server server;
     private String serverName;
 
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
+        ctx = V.withListenSpec(ctx, V.getListenSpec(ctx).withAddress(
+                new ListenSpec.Address("tcp", "localhost:0")));
         AccessList acl = new AccessList(
                 ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
         allowAll = new Permissions(ImmutableMap.of(
@@ -66,18 +66,19 @@ public class SyncbaseTest extends TestCase {
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
         String tmpDir = Files.createTempDir().getAbsolutePath();
-        server = Syncbase.startServer(ctx, new SyncbaseServerParams()
+        ctx = Syncbase.withNewServer(ctx, new SyncbaseServerParams()
                 .withPermissions(allowAll)
-                .withStorageRootDir(tmpDir)
-                .withListenSpec(V.getListenSpec(ctx).withAddress(
-                        new ListenSpec.Address("tcp", "localhost:0"))));
+                .withStorageRootDir(tmpDir));
+        Server server = V.getServer(ctx);
+        assertThat(server).isNotNull();
         Endpoint[] endpoints = server.getStatus().getEndpoints();
         assertThat(endpoints).isNotEmpty();
-        serverName = "/" + endpoints[0];
+        serverName = "/" + endpoints[0].name();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        Server server = V.getServer(ctx);
         if (server != null) {
             server.stop();
         }

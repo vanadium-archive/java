@@ -78,7 +78,6 @@ public class SlidePresenterActivity extends Activity {
 
     private VContext mBaseContext = null;
     private Permissions mPermissions = null;
-    private Server mSyncbaseServer = null;
     private Row mSlideNumRow = null;
     private SyncGroup mSyncGroup = null;
     private Stream<WatchChange> mChangeStream = null;
@@ -100,6 +99,12 @@ public class SlidePresenterActivity extends Activity {
             setContentView(R.layout.activity_slideaudience);
         }
         mBaseContext = V.init(this);
+        try {
+            mBaseContext = V.withListenSpec(
+                    mBaseContext, V.getListenSpec(mBaseContext).withProxy("proxy"));
+        } catch (VException e) {
+            handleError("Couldn't setup vanadium proxy: " + e.getMessage());
+        }
         AccessList acl = new AccessList(
                 ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
         mPermissions = new Permissions(ImmutableMap.of(
@@ -126,9 +131,10 @@ public class SlidePresenterActivity extends Activity {
                 Log.e(TAG, "Couldn't cancel change stream: " + e.getMessage());
             }
         }
-        if (mSyncbaseServer != null) {
+        Server syncbaseServer = V.getServer(mBaseContext);
+        if (syncbaseServer != null) {
             try {
-                mSyncbaseServer.stop();
+                syncbaseServer.stop();
             } catch (VException e) {
                 Log.e(TAG, "Couldn't stop syncbase server: " + e.getMessage());
             }
@@ -213,9 +219,6 @@ public class SlidePresenterActivity extends Activity {
         // existing directory messes up the sync.
         deleteFileRecursively(storageDir);
         storageDir.mkdirs();
-        for (File f : storageDir.listFiles()) {
-            Log.e(TAG, "File: " + f.getName());
-        }
 
         String email = emailFromBlessings(blessings);
         if (email.isEmpty()) {
@@ -223,16 +226,16 @@ public class SlidePresenterActivity extends Activity {
             return;
         }
         try {
-            mSyncbaseServer = Syncbase.startServer(mBaseContext, new SyncbaseServerParams()
+            mBaseContext = Syncbase.withNewServer(mBaseContext, new SyncbaseServerParams()
                     .withPermissions(mPermissions)
-                    .withStorageRootDir(storageDir.getAbsolutePath())
-                    .withListenSpec(V.getListenSpec(mBaseContext).withProxy("proxy")));
+                    .withStorageRootDir(storageDir.getAbsolutePath()));
         } catch (SyncbaseServerStartException e) {
             handleError("Couldn't start syncbase server");
             return;
         }
         try {
-            String serverName = "/" + mSyncbaseServer.getStatus().getEndpoints()[0];
+            Server syncbaseServer = V.getServer(mBaseContext);
+            String serverName = "/" + syncbaseServer.getStatus().getEndpoints()[0];
             SyncbaseService service = Syncbase.newService(serverName);
             SyncbaseApp app = service.getApp(SYNCBASE_APP_NAME);
             if (!app.exists(mBaseContext)) {

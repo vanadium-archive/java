@@ -48,7 +48,7 @@ public interface VRuntime {
     Client getClient(VContext ctx);
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a service object and attaches
+     * Creates a new {@link Server} instance to serve a service object and attaches
      * it to a new context (which is derived from the provided context).
      *
      * The server will listen for network connections as specified by the {@link ListenSpec}
@@ -90,7 +90,7 @@ public interface VRuntime {
                      Options opts) throws VException;
 
     /**
-     * Creates a new {@link io.v.v23.rpc.Server} instance to serve a dispatcher and attaches
+     * Creates a new {@link Server} instance to serve a dispatcher and attaches
      * it to a new context (which is derived from the provided context).
      *
      * The server will listen for network connections as specified by the {@link ListenSpec}

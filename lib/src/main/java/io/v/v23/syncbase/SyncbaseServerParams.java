@@ -4,7 +4,6 @@
 
 package io.v.v23.syncbase;
 
-import io.v.v23.rpc.ListenSpec;
 import io.v.v23.security.access.Permissions;
 
 /**
@@ -12,20 +11,18 @@ import io.v.v23.security.access.Permissions;
  * parameter creation:
  * <p><blockquote><pre>
  *     SyncbaseServerParams params = new SyncbaseServerParams()
- *           .withListenSpec(V.getListenSpec(ctx))
  *           .withName("test")
  *           .withStorageEngine(SyncbaseStorageEngine.LEVELDB);
- *     Syncbase.startServer(params);
+ *     Syncbase.startServer(ctx, params);
  * </pre></blockquote><p>
  * {@link SyncbaseServerParams} form a tree where derived params are children of the params from
  * which they were derived.  Children inherit all the properties of their parent except for the
- * property being replaced (the listenSpec/name/storageEngine in the example above).
+ * property being replaced (the name/storageEngine in the example above).
  */
 public class SyncbaseServerParams {
     private SyncbaseServerParams parent = null;
 
     private Permissions permissions;
-    private ListenSpec listenSpec;
     private String name;
     private String storageRootDir;
     private SyncbaseStorageEngine storageEngine;
@@ -46,15 +43,6 @@ public class SyncbaseServerParams {
     public SyncbaseServerParams withPermissions(Permissions permissions) {
         SyncbaseServerParams ret = new SyncbaseServerParams(this);
         ret.permissions = permissions;
-        return ret;
-    }
-
-    /**
-     * Returns a child of the current params with the given {@link ListenSpec}.
-     */
-    public SyncbaseServerParams withListenSpec(ListenSpec spec) {
-        SyncbaseServerParams ret = new SyncbaseServerParams(this);
-        ret.listenSpec = spec;
         return ret;
     }
 
@@ -91,16 +79,6 @@ public class SyncbaseServerParams {
     public Permissions getPermissions() {
         if (this.permissions != null) return this.permissions;
         if (this.parent != null) return this.parent.getPermissions();
-        return null;
-    }
-
-    /**
-     * Returns a {@ListenSpec} that the service will listen on.
-     */
-
-    public ListenSpec getListenSpec() {
-        if (this.listenSpec != null) return this.listenSpec;
-        if (this.parent != null) return this.parent.getListenSpec();
         return null;
     }
 

@@ -13,8 +13,7 @@ public enum ServerState {
      */
     SERVER_INIT,
     /**
-     * Server is active: {@link Server#listen listen}, {@link Server#serve serve},
-     * {@link Server#addName addName}, or {@link Server#removeName removeName} have been called.
+     * Server is active.
      */
     SERVER_ACTIVE,
     /**
