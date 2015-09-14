@@ -343,7 +343,6 @@ class DatabaseImpl implements Database, BatchDatabase {
                         watchChange);
             }
             String rowName = parts.get(1);
-            // Empty row name is OK.
             if (!Syncbase.isValidName(rowName)) {
                 throw new VException("Invalid row name: \"" + rowName + "\"" + " in change: " +
                         watchChange);
