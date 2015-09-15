@@ -120,7 +120,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
         existingPath = ""
     }
 
-    environment 'V23_PROFILE': 'java'
+    environment 'JIRI_PROFILE': 'java'
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
     commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',

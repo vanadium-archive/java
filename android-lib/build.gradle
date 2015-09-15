@@ -136,7 +136,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
         existingPath = ""
     }
 
-    environment 'V23_PROFILE': 'android'
+    environment 'JIRI_PROFILE': 'android'
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
     commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
