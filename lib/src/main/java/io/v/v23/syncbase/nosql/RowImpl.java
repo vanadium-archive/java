@@ -10,6 +10,7 @@ import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.RowClient;
 import io.v.v23.services.syncbase.nosql.RowClientFactory;
+import io.v.v23.syncbase.util.Util;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -20,7 +21,7 @@ class RowImpl implements Row {
     private final RowClient client;
 
     RowImpl(String parentFullName, String key, int schemaVersion) {
-        this.fullName = NamingUtil.join(parentFullName, key);
+        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, key);
         this.key = key;
         this.schemaVersion = schemaVersion;
         this.client = RowClientFactory.getRowClient(this.fullName);

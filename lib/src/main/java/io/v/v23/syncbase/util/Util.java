@@ -22,6 +22,9 @@ import io.v.v23.verror.VException;
  * Various NoSQL utility methods.
  */
 public class Util {
+    public static final String NAME_SEP = "$";
+    public static final String NAME_SEP_WITH_SLASHES = "/$/";
+
     /**
      * Returns the start of the row range for the given prefix.
      */
@@ -52,49 +55,6 @@ public class Util {
     }
 
     /**
-     * Performs {@link Namespace#glob Namespace.glob("name/*")} and returns a
-     * sorted list of results.
-     *
-     * @param  ctx        Vanadium context
-     * @param  globName   name used for globbing
-     * @return            a sorted list of results of
-     *                    {@link Namespace#glob Namespace.glob("name/*")}
-     * @throws VException if a glob error occurred
-     */
-    public static String[] list(VContext ctx, String globName) throws VException {
-        Namespace n = V.getNamespace(ctx);
-        ArrayList<String> names = new ArrayList<String>();
-        try {
-            for (GlobReply reply : n.glob(ctx, NamingUtil.join(globName, "*"))) {
-                if (reply instanceof GlobReply.Entry) {
-                    String fullName = ((GlobReply.Entry) reply).getElem().getName();
-                    // NOTE(nlacasse): The names that come back from Glob are all
-                    // rooted.  We only want the last part of the name, so we must chop
-                    // off everything before the final '/'.  Since endpoints can
-                    // themselves contain slashes, we have to remove the endpoint from
-                    // the name first.
-                    String name = NamingUtil.splitAddressName(fullName).get(1);
-                    int idx = name.lastIndexOf('/');
-                    if (idx != -1) {
-                        name = name.substring(idx + 1, name.length());
-                    }
-                    names.add(name);
-                } else if (reply instanceof GlobReply.Error) {
-                    throw ((GlobReply.Error) reply).getElem().getError();
-                } else if (reply == null) {
-                    throw new VException("null glob() reply");
-                } else {
-                    throw new VException("Unrecognized glob() reply type: " + reply.getClass());
-                }
-            }
-        } catch (RuntimeException e) {  // error during iteration
-            throw (VException) e.getCause();
-        }
-        Collections.sort(names, Collator.getInstance());
-        return names.toArray(new String[names.size()]);
-    }
-
-    /**
      * Returns the UTF-8 encoding of the provided string.
      */
     public static byte[] getBytes(String s) {
@@ -109,6 +69,30 @@ public class Util {
      */
     public static String getString(byte[] bytes) {
         return new String(bytes, Charsets.UTF_8);
+    }
+
+    /**
+     * Returns {@code true} iff the the given Syncbase component name (i.e. app,
+     * database, table, or row name) is valid. Component names:
+     * <p><ul>
+     * <li>must be valid UTF-8;</li>
+     * <li>must not contain {@code "\0"} or {@code "@@"};</li>
+     * <li>must not have any slash-separated parts equal to {@code ""} or {@code "$"}; and</li>
+     * <li>must not have any slash-separated parts that start with {@code "__"}.</li>
+     * </ul><p>
+     */
+    public static boolean isValidName(String name) {
+        // TODO(sadovsky): Check that name is valid UTF-8.
+        if (name.contains("\0") || name.contains("@@")) {
+            return false;
+        }
+        String[] parts = name.split("/");
+        for (String v : parts) {
+            if (v.isEmpty() || v.equals(NAME_SEP) || v.startsWith("__")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private Util() {}

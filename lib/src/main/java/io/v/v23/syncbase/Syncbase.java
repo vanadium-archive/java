@@ -38,12 +38,5 @@ public class Syncbase {
         return SyncbaseServer.withNewServer(ctx, params);
     }
 
-    /**
-     * Returns {@code true} iff the provided string is a valid syncbase name.
-     */
-    public static boolean isValidName(String name) {
-        return !name.isEmpty() && CharMatcher.JAVA_LETTER_OR_DIGIT.matchesAllOf(name);
-    }
-
     private Syncbase() {}
 }

@@ -29,7 +29,7 @@ class TableImpl implements Table {
     private final TableClient client;
 
     TableImpl(String parentFullName, String relativeName, int schemaVersion) {
-        this.fullName = NamingUtil.join(parentFullName, relativeName);
+        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, relativeName);
         this.name = relativeName;
         this.schemaVersion = schemaVersion;
         this.client = TableClientFactory.getTableClient(this.fullName);
@@ -147,4 +147,3 @@ class TableImpl implements Table {
         }
     }
 }
-

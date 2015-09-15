@@ -49,7 +49,7 @@ class DatabaseImpl implements Database, BatchDatabase {
 
     DatabaseImpl(String parentFullName, String relativeName, Schema schema) {
         this.parentFullName = parentFullName;
-        this.fullName = NamingUtil.join(parentFullName, relativeName);
+        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, relativeName);
         this.name = relativeName;
         this.schema = schema;
         this.client = DatabaseClientFactory.getDatabaseClient(this.fullName);
@@ -70,7 +70,8 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public String[] listTables(VContext ctx) throws VException {
-        return Util.list(ctx, this.fullName);
+        List<String> x = this.client.listTables(ctx);
+        return x.toArray(new String[x.size()]);
     }
     @Override
     public ResultStream exec(VContext ctx, String query) throws VException {
@@ -134,7 +135,7 @@ class DatabaseImpl implements Database, BatchDatabase {
                                      ResumeMarker resumeMarker) throws VException {
         CancelableVContext ctxC = ctx.withCancel();
         TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctxC,
-                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
+                new GlobRequest(NamingUtil.join(tableRelativeName, Util.NAME_SEP, rowPrefix + "*"), resumeMarker));
         return new WatchChangeStreamImpl(ctxC, stream);
     }
     @Override
@@ -336,14 +337,14 @@ class DatabaseImpl implements Database, BatchDatabase {
                     throw new VException(
                             "Unsupported watch change state: " + watchChange.getState());
             }
-            List<String> parts = splitInTwo(watchChange.getName(), "/");
+            List<String> parts = splitInTwo(watchChange.getName(), Util.NAME_SEP_WITH_SLASHES);
             String tableName = parts.get(0);
-            if (!Syncbase.isValidName(tableName)) {
+            if (!Util.isValidName(tableName)) {
                 throw new VException("Invalid table name: \"" + tableName + "\"" + " in change: " +
                         watchChange);
             }
             String rowName = parts.get(1);
-            if (!Syncbase.isValidName(rowName)) {
+            if (!Util.isValidName(rowName)) {
                 throw new VException("Invalid row name: \"" + rowName + "\"" + " in change: " +
                         watchChange);
             }
