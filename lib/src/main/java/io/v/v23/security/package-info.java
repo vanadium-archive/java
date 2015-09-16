@@ -5,8 +5,8 @@
 /**
  * Package security defines types and utilities associated with security.
  * <p><ul>
- *   <li>Concept: <a href="https://v.io/concepts/security.html">https://v.io/concepts/security.html</a></li>
- *   <li>Tutorial: <a href="https://v.io/tutorials/security/overview.html">https://v.io/tutorials/security/overview.html</a></li>
+ *   <li>Concept: <a href="https://github.com/vanadium/docs/blob/master/concepts/security.md">https://github.com/vanadium/docs/blob/master/concepts/security.md</a></li>
+ *   <li>Tutorial: (forthcoming)</li>
  * </ul><p>
  * The primitives and APIs defined in this package enable bi-directional,
  * end-to-end authentication between communicating parties; authorization based

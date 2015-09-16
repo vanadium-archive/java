@@ -15,7 +15,7 @@ import java.util.Map;
  * <p>
  * Multiple goroutines may invoke methods on a {@link VPrincipal} simultaneously.
  * <p>
- * See also: <a href="https://v.io/glossary.html#principal">https://v.io/glossary.html#principal</a>.
+ * See also: <a href="https://github.com/vanadium/docs/blob/master/glossary.md#principal">https://github.com/vanadium/docs/blob/master/glossary.md#principal</a>.
  */
 public interface VPrincipal {
     /**

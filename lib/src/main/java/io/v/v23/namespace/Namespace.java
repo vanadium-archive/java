@@ -38,10 +38,10 @@ public interface Namespace {
      * </ul>
      *
      * @param context a client context
-     * @param name a Vanadium name, see also <a href="https://v.io/glossary.html#object-name">the
+     * @param name a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the
      *             Name entry</a> in the glossary
      * @param server an object address, see also
-     *               <a href="https://v.io/concepts/naming.html#object-names">the Object names</a>
+     *               <a href="https://github.com/vanadium/docs/blob/master/concepts/naming.md#object-names">the Object names</a>
      *               section of the Naming Concepts document
      * @param ttl the duration for which the mount should live
      * @param options options to pass to the implementation as described above, or {@code null}
@@ -67,10 +67,10 @@ public interface Namespace {
      * </ul>
      *
      * @param context a client context
-     * @param name a Vanadium name, see also <a href="https://v.io/glossary.html#object-name">the
+     * @param name a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the
      *             Name entry</a> in the glossary
      * @param server an object address, see also
-     *               <a href="https://v.io/concepts/naming.html#object-names">the Object names</a>
+     *               <a href="https://github.com/vanadium/docs/blob/master/concepts/naming.md#object-names">the Object names</a>
      *               section of the Naming Concepts document
      * @param options options to pass to the implementation as described above, or {@code null}
      * @throws VException if the server object address could not be unmounted
@@ -96,7 +96,7 @@ public interface Namespace {
      *
      * @param context a client context
      * @param name the Vanadium name to delete, see also
-     *             <a href="https://v.io/glossary.html#object-name">the Name entry</a> in the
+     *             <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the Name entry</a> in the
      *             glossary
      * @param deleteSubtree whether the entire tree rooted at {@code name} should be deleted
      * @param options options to pass to the implementation as described above, or {@code null}
@@ -122,7 +122,7 @@ public interface Namespace {
      *
      * @param context a client context
      * @param name the Vanadium name to resolve, see also
-     *             <a href="https://v.io/glossary.html#object-name">the Name entry</a> in the
+     *             <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the Name entry</a> in the
      *             glossary
      * @param options options to pass to the implementation as described above, or {@code null}
      * @return the {@link MountEntry} to which the name resolves, or {@code null} if it does not
@@ -148,7 +148,7 @@ public interface Namespace {
      *
      * @param context a client context
      * @param name the Vanadium name to resolve, see also
-     *             <a href="https://v.io/glossary.html#object-name">the Name entry</a> in the
+     *             <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the Name entry</a> in the
      *             glossary
      * @param options options to pass to the implementation as described above, or {@code null}
      * @return the {@link MountEntry} of the mounttable server directly responsible for
@@ -163,7 +163,7 @@ public interface Namespace {
      * {@code true}.
      *
      * @param context a client context
-     * @param name a Vanadium name, see also <a href="https://v.io/glossary.html#object-name">the
+     * @param name a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the
      *             Name entry</a> in the glossary
      * @return {@code true} if resolution information was for the name was flushed
      */
@@ -209,7 +209,7 @@ public interface Namespace {
      *
      * @param roots the roots that will be used to turn relative paths into absolute paths, or
      *              {@code null} to clear the currently configured set of roots. Each entry should
-     *              be a Vanadium name, see also <a href="https://v.io/glossary.html#object-name">
+     *              be a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">
      *              the Name entry</a> in the glossary
      */
     void setRoots(List<String> roots) throws VException;

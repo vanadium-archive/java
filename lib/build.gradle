@@ -58,7 +58,7 @@ class VanadiumEnvironment {
         if (!System.getenv().containsKey('V23_ROOT')) {
             throw new InvalidUserDataException("V23_ROOT is not set. "
                     + "Please follow the Vanadium installation instructions at "
-                    + "https://v.io/installation/index.html")
+                    + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
         result.v23Root = new File(System.getenv()['V23_ROOT'])
@@ -67,7 +67,7 @@ class VanadiumEnvironment {
             throw new InvalidUserDataException(
                     result.v23Bin.toString() + " does not exist or is not an executable file. "
                     + "Please follow the Vanadium installation instructions at "
-                    + "https://v.io/installation/index.html")
+                    + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
         result.thirdPartyGoBinDir = new File(result.v23Root,
