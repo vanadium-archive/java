@@ -257,7 +257,7 @@ public class SlidePresenterActivity extends Activity {
                     SYNCBASE_SLIDE_NUM_ROW_NAME, db.getResumeMarker(mBaseContext));
             new SlideChangeAsyncTask(mChangeStream).execute();
             String sgName = NamingUtil.join(SYNCBASE_MOUNTTABLE,
-                    "users", email, "slidePresenterSync", "desktop", "$sync", SYNCGROUP_NAME);
+                    "users", email, "slidePresenterSync", "desktop", "@@sync", SYNCGROUP_NAME);
             mSyncGroup = db.getSyncGroup(sgName);
             mSyncGroup.join(mBaseContext, new SyncGroupMemberInfo((byte) 0));
         } catch (VException e) {
