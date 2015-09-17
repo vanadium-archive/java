@@ -30,6 +30,7 @@ import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.android.v23.services.blessing.BlessingService;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -42,8 +43,6 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
-import io.v.v23.syncbase.SyncbaseServerParams;
-import io.v.v23.syncbase.SyncbaseServerStartException;
 import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
@@ -88,7 +87,7 @@ public class SlidePresenterActivity extends Activity {
         Lecturer, Moderator, Audience
     }
 
-    private Role role = Role.Audience;
+    private Role role = Role.Lecturer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,10 +225,10 @@ public class SlidePresenterActivity extends Activity {
             return;
         }
         try {
-            mBaseContext = Syncbase.withNewServer(mBaseContext, new SyncbaseServerParams()
+            mBaseContext = SyncbaseServer.withNewServer(mBaseContext, new SyncbaseServer.Params()
                     .withPermissions(mPermissions)
                     .withStorageRootDir(storageDir.getAbsolutePath()));
-        } catch (SyncbaseServerStartException e) {
+        } catch (SyncbaseServer.StartException e) {
             handleError("Couldn't start syncbase server");
             return;
         }
@@ -250,14 +249,11 @@ public class SlidePresenterActivity extends Activity {
                 table.create(mBaseContext, mPermissions);
             }
             mSlideNumRow = table.getRow(SYNCBASE_SLIDE_NUM_ROW_NAME);
-            if (!mSlideNumRow.exists(mBaseContext)) {
-                mSlideNumRow.put(mBaseContext, 0, Integer.class);
-            }
             mChangeStream = db.watch(mBaseContext, SYNCBASE_TABLE_NAME,
                     SYNCBASE_SLIDE_NUM_ROW_NAME, db.getResumeMarker(mBaseContext));
             new SlideChangeAsyncTask(mChangeStream).execute();
             String sgName = NamingUtil.join(SYNCBASE_MOUNTTABLE,
-                    "users", email, "slidePresenterSync", "desktop", "@@sync", SYNCGROUP_NAME);
+                    "users", email, "slidePresenter", "desktop", "@@sync", SYNCGROUP_NAME);
             mSyncGroup = db.getSyncGroup(sgName);
             mSyncGroup.join(mBaseContext, new SyncGroupMemberInfo((byte) 0));
         } catch (VException e) {

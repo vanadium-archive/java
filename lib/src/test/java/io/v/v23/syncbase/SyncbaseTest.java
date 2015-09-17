@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.services.syncbase.nosql.KeyValue;
@@ -53,7 +54,7 @@ public class SyncbaseTest extends TestCase {
 
     private VContext ctx;
     private Permissions allowAll;
-    private String serverName;
+    private Endpoint serverEndpoint;
 
     @Override
     protected void setUp() throws Exception {
@@ -67,14 +68,14 @@ public class SyncbaseTest extends TestCase {
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
         String tmpDir = Files.createTempDir().getAbsolutePath();
-        ctx = Syncbase.withNewServer(ctx, new SyncbaseServerParams()
+        ctx = SyncbaseServer.withNewServer(ctx, new SyncbaseServer.Params()
                 .withPermissions(allowAll)
                 .withStorageRootDir(tmpDir));
         Server server = V.getServer(ctx);
         assertThat(server).isNotNull();
         Endpoint[] endpoints = server.getStatus().getEndpoints();
         assertThat(endpoints).isNotEmpty();
-        serverName = "/" + endpoints[0].name();
+        serverEndpoint = endpoints[0];
     }
 
     @Override
@@ -88,7 +89,7 @@ public class SyncbaseTest extends TestCase {
 
     public void testService() throws Exception {
         SyncbaseService service = createService();
-        assertThat(service.fullName()).isEqualTo(serverName);
+        assertThat(service.fullName()).isEqualTo(serverEndpoint.name());
         assertThat(service.listApps(ctx)).isEmpty();
     }
 
@@ -97,7 +98,7 @@ public class SyncbaseTest extends TestCase {
         SyncbaseApp app = service.getApp(APP_NAME);
         assertThat(app).isNotNull();
         assertThat(app.name()).isEqualTo(APP_NAME);
-        assertThat(app.fullName()).is(NamingUtil.join(serverName, APP_NAME));
+        assertThat(app.fullName()).is(NamingUtil.join(serverEndpoint.name(), APP_NAME));
         assertThat(app.exists(ctx)).isFalse();
         assertThat(service.listApps(ctx)).isEmpty();
         app.create(ctx, allowAll);
@@ -115,7 +116,8 @@ public class SyncbaseTest extends TestCase {
         Database db = app.getNoSqlDatabase("db", null);
         assertThat(db).isNotNull();
         assertThat(db.name()).isEqualTo(DB_NAME);
-        assertThat(db.fullName()).isEqualTo(NamingUtil.join(serverName, APP_NAME, Util.NAME_SEP, DB_NAME));
+        assertThat(db.fullName()).isEqualTo(
+                NamingUtil.join(serverEndpoint.name(), APP_NAME, Util.NAME_SEP, DB_NAME));
         assertThat(db.exists(ctx)).isFalse();
         assertThat(app.listDatabases(ctx)).isEmpty();
         db.create(ctx, allowAll);
@@ -133,8 +135,8 @@ public class SyncbaseTest extends TestCase {
         Table table = db.getTable(TABLE_NAME);
         assertThat(table).isNotNull();
         assertThat(table.name()).isEqualTo(TABLE_NAME);
-        assertThat(table.fullName()).isEqualTo(
-                NamingUtil.join(serverName, APP_NAME, Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME));
+        assertThat(table.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(),
+                APP_NAME, Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME));
         assertThat(table.exists(ctx)).isFalse();
         assertThat(db.listTables(ctx)).isEmpty();
         table.create(ctx, allowAll);
@@ -170,8 +172,8 @@ public class SyncbaseTest extends TestCase {
         Row row = table.getRow(ROW_NAME);
         assertThat(row).isNotNull();
         assertThat(row.key()).isEqualTo(ROW_NAME);
-        assertThat(row.fullName()).isEqualTo(
-                NamingUtil.join(serverName, APP_NAME, Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME, Util.NAME_SEP, ROW_NAME));
+        assertThat(row.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(), APP_NAME,
+                Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME, Util.NAME_SEP, ROW_NAME));
         assertThat(row.exists(ctx)).isFalse();
         row.put(ctx, "value", String.class);
         assertThat(row.exists(ctx)).isTrue();
@@ -314,7 +316,7 @@ public class SyncbaseTest extends TestCase {
     // TODO(spetrovic): Test Database.upgradeIfOutdated().
 
     private SyncbaseService createService() throws Exception {
-        return Syncbase.newService(serverName);
+        return Syncbase.newService(serverEndpoint.name());
     }
 
     private SyncbaseApp createApp(SyncbaseService service) throws Exception {
