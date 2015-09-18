@@ -1,33 +1,29 @@
 // Copyright 2015 The Vanadium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-//
 
-package io.v.impl.google.services.mounttable;
+package io.v.impl.google.services.groups;
 
 import io.v.v23.context.VContext;
-import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.VException;
 
-import java.util.Map;
-
 /**
- * An implementation of a mounttable server.
+ * An implementation of a group server.
  */
-public class MountTableServer {
+public class GroupServer {
     private static native VContext nativeWithNewServer(VContext ctx, Params params)
             throws VException;
 
     /**
-     * Creates a new mounttable server and attaches it to a new context (which is derived
+     * Creates a new groups server and attaches it to a new context (which is derived
      * from the provided context).
      * <p>
      * The newly created {@link io.v.v23.rpc.Server} instance can be obtained from the context via
      * {@link io.v.v23.V#getServer}.
      *
      * @param  ctx                           vanadium context
-     * @param  params                        mounttable starting parameters
-     * @throws StartException                if there was an error starting the mounttable service
+     * @param  params                        group server starting parameters
+     * @throws StartException                if there was an error starting the group service
      * @return                               a child context to which the new server is attached
      */
     public static VContext withNewServer(VContext ctx, Params params) throws StartException {
@@ -39,13 +35,13 @@ public class MountTableServer {
     }
 
     /**
-     * Parameters used when starting a mounttable service.  Here is an example of a simple
+     * Parameters used when starting a group service.  Here is an example of a simple
      * parameter creation:
      * <p><blockquote><pre>
-     *     MountTableServer.Params params = new MountTableServer.Params()
+     *     GroupServer.Params params = new GroupServer.Params()
      *           .withName("test")
-     *           .withStatsPrefix("test");
-     *     ctx = MountTableServer.withNewServer(ctx, params);
+     *           .withStorageEngine(GroupServer.StorageEngine.LEVELDB);
+     *     ctx = GroupServer.withNewServer(ctx, params);
      * </pre></blockquote><p>
      *
      * {@link Params} form a tree where derived params are children of the params from
@@ -56,9 +52,8 @@ public class MountTableServer {
         private Params parent = null;
 
         private String name;
-        private String rootDir;
-        private Map<String, Permissions> perms;
-        private String statsPrefix;
+        private String storageRootDir;
+        private StorageEngine storageEngine;
 
         /**
          * Creates a new (and empty) {@link Params} object.
@@ -84,26 +79,16 @@ public class MountTableServer {
          */
         public Params withStorageRootDir(String rootDir) {
             Params ret = new Params(this);
-            ret.rootDir = rootDir;
+            ret.storageRootDir = rootDir;
             return ret;
         }
 
         /**
-         * Returns a child of the current params with the given map from paths in the mounttable
-         * to permissions.
+         * Returns a child of the current params with the given storage engine.
          */
-        public Params withPermissions(Map<String, Permissions> perms) {
+        public Params withStorageEngine(StorageEngine engine) {
             Params ret = new Params(this);
-            ret.perms = perms;
-            return ret;
-        }
-
-        /**
-         * Returns a child of the current params with the given stats name prefix.
-         */
-        public Params withStatsPrefix(String statsPrefix) {
-            Params ret = new Params(this);
-            ret.statsPrefix = statsPrefix;
+            ret.storageEngine = engine;
             return ret;
         }
 
@@ -117,35 +102,47 @@ public class MountTableServer {
         }
 
         /**
-         * Returns a directory used for persisting the mounttable.
+         * Returns a directory used for persisting the groups.
          */
         public String getStorageRootDir() {
-            if (this.rootDir != null) return this.rootDir;
+            if (this.storageRootDir != null) return this.storageRootDir;
             if (this.parent != null) return this.parent.getStorageRootDir();
             return null;
         }
 
         /**
-         * Returns a map from paths in the mounttable to the {@link Permissions} for that path.
+         * Returns a storage engine for the service.
          */
-        public Map<String, Permissions> getPermissions() {
-            if (this.perms != null) return this.perms;
-            if (this.parent != null) return this.parent.getPermissions();
-            return null;
-        }
-
-        /**
-         * Returns a stats name prefix.
-         */
-        public String getStatsPrefix() {
-            if (this.statsPrefix != null) return this.statsPrefix;
-            if (this.parent != null) return this.parent.getStatsPrefix();
+        public StorageEngine getStorageEngine() {
+            if (this.storageEngine != null) return this.storageEngine;
+            if (this.parent != null) return this.parent.getStorageEngine();
             return null;
         }
     }
 
     /**
-     * Exception thrown if the mounttable server couldn't be started.
+     * Storage engine used for storing the groups data.
+     */
+    public enum StorageEngine {
+        LEVELDB   ("leveldb"),
+        MEMSTORE  ("memstore");
+
+        private final String value;
+
+        StorageEngine(String value) {
+            this.value = value;
+        }
+
+        /**
+         * Returns the {@link String} value corresponding to this {@link StorageEngine}.
+         */
+        public String getValue() {
+            return this.value;
+        }
+    }
+
+    /**
+     * Exception thrown if the group server couldn't be started.
      */
     public static class StartException extends Exception {
         public StartException(String msg) {

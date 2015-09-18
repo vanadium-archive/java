@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * To define a new error identifier, for example {@code "someNewError"}, client code is
  * expected to declare a variable like this:
  * <p><blockquote><pre>
- * IDAction someNewError = VException.register(
+ * VException.IDAction someNewError = VException.register(
  *         "my/package/name.someNewError",
  *         VException.ActionCode.NO_RETRY,
  *         "{1} {2} English text for new error");

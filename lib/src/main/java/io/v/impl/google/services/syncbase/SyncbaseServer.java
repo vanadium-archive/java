@@ -152,7 +152,7 @@ public class SyncbaseServer {
     /**
      * Storage engine used for storing the syncbase data.
      */
-    public static enum StorageEngine {
+    public enum StorageEngine {
         LEVELDB   ("leveldb"),
         MEMSTORE  ("memstore");
 

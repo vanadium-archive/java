@@ -6,16 +6,12 @@ package io.v.v23.security.access;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.Authorizer;
-import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
-import io.v.v23.security.VSecurity;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlType;
-import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 
 /**
  * An authorizer that subscribes to an authorization policy where access is granted if
@@ -84,71 +80,38 @@ import java.util.Arrays;
  * in the ACLs for both the {@code ReadAccess} and {@code WriteAccess} tags.
  */
 public class PermissionsAuthorizer implements Authorizer {
-    private final Permissions acls;  // non-null
-    private final VdlType tagType;  // non-null
+    private static native PermissionsAuthorizer nativeCreate(Permissions perms, VdlType type)
+            throws VException;
 
     /**
      * Creates a new {@link PermissionsAuthorizer} authorizer.
      *
-     * @param  acls       ACLs containing authorization rules
+     * @param  perms      ACLs containing authorization rules
      * @param  tagType    type of the method tags this authorizer checks
      * @return            a newly created authorizer
      * @throws VException if the authorizer couldn't be created
      */
-    public static PermissionsAuthorizer create(Permissions acls, Type tagType) throws VException {
+    public static PermissionsAuthorizer create(Permissions perms, Type tagType) throws VException {
         try {
             VdlType type = Types.getVdlTypeFromReflect(tagType);
-            return new PermissionsAuthorizer(acls != null ? acls : new Permissions(), type);
+            return nativeCreate(perms, type);
         } catch (IllegalArgumentException e) {
             throw new VException(String.format(
-                "Tag type %s does not have a corresponding VdlType: %s", tagType, e.getMessage()));
+                    "Tag type %s does not have a corresponding VdlType: %s",
+                    tagType, e.getMessage()));
         }
     }
 
-    private PermissionsAuthorizer(Permissions acls, VdlType tagType) {
-        this.acls = acls;
-        this.tagType = tagType;
+    private final long nativePtr;
+
+    private native void nativeAuthorize(long nativePtr, VContext ctx, Call call) throws VException;
+
+    private PermissionsAuthorizer(long nativePtr) {
+        this.nativePtr = nativePtr;
     }
 
     @Override
     public void authorize(VContext ctx, Call call) throws VException {
-        Blessings local = call.localBlessings();
-        Blessings remote = call.remoteBlessings();
-        // Self-RPCs are always authorized.
-        if (local != null && local.publicKey() != null &&
-                remote != null && remote.publicKey() != null &&
-                Arrays.equals(local.publicKey().getEncoded(), remote.publicKey().getEncoded())) {
-            return;
-        }
-        String[] blessings =
-                remote != null ? VSecurity.getRemoteBlessingNames(ctx, call) : new String[0];
-        VdlValue[] tags = call.methodTags();
-        if (tags == null) {
-            tags = new VdlValue[0];
-        }
-        if (tags.length == 0) {
-            throw new VException(String.format("PermissionsAuthorizer.Authorize called with an " +
-                    "object (%s, method %s) that has no method tags; this is likely " +
-                    "unintentional", call.suffix(), call.method()));
-        }
-        boolean grant = false;
-        for (VdlValue tag : tags) {
-            if (tag == null || tag.vdlType() != this.tagType) {
-                continue;
-            }
-            AccessList acl = this.acls.get(tag.toString());
-            if (acl == null || !acl.includes(blessings)) {
-                errorACLMatch(blessings);
-            }
-            grant = true;
-        }
-        if (!grant) {
-            errorACLMatch(blessings);
-        }
-    }
-
-    private void errorACLMatch(String[] blessings) throws VException {
-        throw new VException(String.format("Blessings %s don't match ACL",
-            Arrays.asList(blessings).toString()));
+        nativeAuthorize(nativePtr, ctx, call);
     }
 }

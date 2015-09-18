@@ -2,29 +2,30 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.v23.security.access;
+package io.v.v23.services.groups;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-
+import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.naming.Endpoint;
+import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingRoots;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
 import io.v.v23.security.CallParams;
-import io.v.v23.security.Constants;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
 import io.v.v23.security.VSigner;
-import io.v.v23.security.access.internal.MyObjectServerWrapper;
-import io.v.v23.security.access.internal.MyTag;
+import io.v.impl.google.services.groups.GroupServer;
+import io.v.v23.security.access.*;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 import org.junit.Test;
@@ -36,8 +37,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
-
 
 /**
  * Tests the implementation of {@code PermissionsAuthorizer}.
@@ -45,36 +46,60 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class PermissionsAuthorizerTest {
     private static final VContext CONTEXT;
-    private static final PermissionsAuthorizer AUTHORIZER;
-    private static final VPrincipal CLIENT_PRINCIPAL;
-    private static final VPrincipal SERVER_PRINCIPAL;
     private static final Blessings SERVER_BLESSINGS;
+    private static final VPrincipal SERVER_PRINCIPAL;
+    private static final VPrincipal CLIENT_PRINCIPAL;
+    private static final PermissionsAuthorizer AUTHORIZER;
+
+    private static final Server GROUP_SERVER;
 
     static {
-        CONTEXT = V.init();
-        Permissions perms = new Permissions(ImmutableMap.of(
-                "R", new AccessList(
-                        ImmutableList.of(Constants.ALL_PRINCIPALS),
-                        null),
-                "W", new AccessList(
-                        ImmutableList.of(
-                                new BlessingPattern("ali/family"),
-                                new BlessingPattern("bob"),
-                                new BlessingPattern("che/$")),
-                        ImmutableList.of(
-                                "bob/acquaintances")),
-                "X", new AccessList(
-                        ImmutableList.of(
-                                new BlessingPattern("ali/family/boss/$"),
-                                new BlessingPattern("superman/$")),
-                        null)
-        ));
         try {
-            AUTHORIZER = PermissionsAuthorizer.create(perms, MyTag.class);
+            CONTEXT = V.withListenSpec(V.init(), V.getListenSpec(V.init()).withAddress(
+                    new ListenSpec.Address("tcp", "localhost:0")));
+            AccessList acl = new AccessList(
+                    ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
+            Permissions allowAll = new Permissions(ImmutableMap.of(
+                    io.v.v23.security.access.Constants.READ.getValue(), acl,
+                    io.v.v23.security.access.Constants.WRITE.getValue(), acl,
+                    io.v.v23.security.access.Constants.ADMIN.getValue(), acl));
             CLIENT_PRINCIPAL = newPrincipal();
             SERVER_PRINCIPAL = newPrincipal();
             SERVER_BLESSINGS = SERVER_PRINCIPAL.blessSelf("server");
+
+            // Start group server.
+            GROUP_SERVER = V.getServer(
+                    GroupServer.withNewServer(CONTEXT, new GroupServer.Params()
+                            .withStorageEngine(GroupServer.StorageEngine.MEMSTORE)));
+            assertThat(GROUP_SERVER).isNotNull();
+            assertThat(GROUP_SERVER.getStatus().getEndpoints()).isNotEmpty();
+            Endpoint groupServerEndpoint = GROUP_SERVER.getStatus().getEndpoints()[0];
+            String groupNameReaders = NamingUtil.join(groupServerEndpoint.name(), "readers");
+            String groupNameWriters = NamingUtil.join(groupServerEndpoint.name(), "writers");
+
+            // Populate the group server.
+            {
+                GroupClient client = GroupClientFactory.getGroupClient(groupNameReaders);
+                client.create(CONTEXT, allowAll, ImmutableList.of(
+                        new BlessingPatternChunk("root/alice"),
+                        new BlessingPatternChunk("root/bob")));
+            }
+            {
+                GroupClient client = GroupClientFactory.getGroupClient(groupNameWriters);
+                client.create(CONTEXT, allowAll, ImmutableList.of(
+                        new BlessingPatternChunk("root/alice")));
+            }
+
+            AUTHORIZER = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
+                    "Read", new AccessList(
+                            ImmutableList.of(new BlessingPattern("<grp:" + groupNameReaders + ">")),
+                            null),
+                    "Write", new AccessList(
+                            ImmutableList.of(new BlessingPattern("<grp:" + groupNameWriters + ">")),
+                            null))), Access.typicalTagType());
         } catch (VException e) {
+            throw new RuntimeException(e);
+        } catch (GroupServer.StartException e) {
             throw new RuntimeException(e);
         }
     }
@@ -82,11 +107,6 @@ public class PermissionsAuthorizerTest {
     private static VPrincipal newPrincipal() throws VException {
         VSigner signer = VSecurity.newInMemorySigner();
         return VSecurity.newPrincipal(signer, null, new TrustAllRoots());
-    }
-
-    private static VdlValue[] getMethodTags(String method) throws VException {
-        MyObjectServerWrapper s = new MyObjectServerWrapper(null);
-        return s.getMethodTags(method);
     }
 
     private final String methodName;
@@ -97,31 +117,22 @@ public class PermissionsAuthorizerTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"get", ImmutableList.of(), true},
-                {"get", ImmutableList.of("ali"), true},
-                {"get", ImmutableList.of("bob/friend", "che/enemy"), true},
-                {"put", ImmutableList.of("ali/family/mom"), true},
-                {"put", ImmutableList.of("bob/friends"), true},
-                // granted because of "che"
-                {"put", ImmutableList.of("bob/acquantainces/carol", "che"), true},
-                {"resolve", ImmutableList.of("superman"), true},
-                {"resolve", ImmutableList.of("ali/family/boss"), true},
-
-                {"put", ImmutableList.of("ali", "bob/acquaintances", "bob/acquaintances/dave",
-                        "che/friend", "dave"), false},
-                {"resolve", ImmutableList.of("ali", "ali/friend", "ali/family", "ali/family/friend",
-                        "alice/family/boss/friend", "superman/friend"), false},
-                // Since there are no tags on the noTags method, it has an
-                // empty ACL.  No client will have access.
-                {"noTags", ImmutableList.of(
-                        "ali", "ali/family/boss", "bob", "che", "superman"), false}
+                {"get", io.v.v23.security.access.Constants.READ,
+                        ImmutableList.of("root/alice"), true},
+                {"get", io.v.v23.security.access.Constants.WRITE,
+                        ImmutableList.of("root/alice"), true},
+                {"get", io.v.v23.security.access.Constants.READ,
+                        ImmutableList.of("root/bob"), true},
+                {"put", io.v.v23.security.access.Constants.WRITE,
+                        ImmutableList.of("root/bob"), false}
         });
     }
 
-    public PermissionsAuthorizerTest(String methodName, List<String> clientBlessingNames,
+    public PermissionsAuthorizerTest(String methodName, VdlValue methodTag,
+                                     List<String> clientBlessingNames,
                                      boolean isAccepted) throws VException {
         this.methodName = methodName;
-        this.methodTags = new MyObjectServerWrapper(null).getMethodTags(methodName);
+        this.methodTags = new VdlValue[]{ methodTag };
         this.clientBlessings = VSecurity.unionOfBlessings(Lists.transform(
                 clientBlessingNames, new Function<String, Blessings>() {
                     @Override
@@ -137,7 +148,7 @@ public class PermissionsAuthorizerTest {
     }
 
     @Test
-    public void testAuthorize() {
+    public void testAuthorize() throws VException {
         Call call = VSecurity.newCall(new CallParams()
                 .withLocalPrincipal(SERVER_PRINCIPAL)
                 .withLocalBlessings(SERVER_BLESSINGS)
@@ -152,8 +163,7 @@ public class PermissionsAuthorizerTest {
             }
         } catch (VException e) {
             if (shouldAccept) {
-                fail(String.format(
-                        "Access denied for method %s to %s", methodName, clientBlessings));
+                throw e;
             }
         }
     }
