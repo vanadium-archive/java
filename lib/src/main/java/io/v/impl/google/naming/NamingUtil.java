@@ -4,6 +4,7 @@
 
 package io.v.impl.google.naming;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -167,8 +168,133 @@ public class NamingUtil {
      * <p>
      * {@code /} on its own is considered rooted.
      */
-    static boolean isRooted(String name) {
+    public static boolean isRooted(String name) {
         return name.startsWith("/");
+    }
+
+
+    /**
+     * Returns a string representable as a name element by escaping {@code /}.
+     *
+     * @param name Name to encode.
+     * @return Encoded name.
+     */
+    public static String encodeAsNameElement(String name) {
+        return escape(name, new char[]{'/'});
+    }
+
+    /**
+     * Decodes an encoded name element.
+     * <p>
+     * Note that this is more than the inverse of {@link NamingUtil#encodeAsNameElement} since it
+     * can handle more hex encodings than {@code /} and {@code %}.
+     * This is intentional since we'll most likely want to add other letters to the set to be encoded.
+     *
+     * @param name Name to decode.
+     * @return Decoded name.
+     * @throws IllegalArgumentException if the {@code name} is trucated or malformed.
+     */
+    public static String decodeFromNameElement(String name) {
+        return unescape(name);
+    }
+
+    private static final String hexDigits = "0123456789ABCDEF";
+
+    /**
+     * Encodes a string replacing the characters in {@code special} and {@code %} with a {@code %<hex>} escape.
+     *
+     * @param text Text to escape.
+     * @param special Collection of special characters to escape in {@code text}.
+     * @return Encoded text.
+     */
+    public static String escape(String text, char[] special) {
+        /*
+         * Note that this function is a modified version of Android's URLEncoder in
+         * Android SDK java/net/URLEncoder.java (https://goo.gl/61z5ZV).
+         * The biggest difference is that, unlike URLEncoder, our code only encodes characters
+         * in {@code special} rather than all non-ASCII characters.
+         * We also do not convert space to +.
+         */
+        String specialStr = new String(special) + '%';
+
+        // Avoid copying the string if it does not have any of the special characters.
+        boolean hasSpecial = false;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (specialStr.indexOf(ch) >= 0) {
+                hasSpecial = true;
+                break;
+            }
+        }
+
+        if (!hasSpecial) {
+            return text;
+        }
+
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (specialStr.indexOf(ch) < 0) {
+                buf.append(ch);
+            } else {
+                byte[] bytes = new String(new char[] { ch }).getBytes();
+                for (int j = 0; j < bytes.length; j++) {
+                    buf.append('%');
+                    buf.append(hexDigits.charAt((bytes[j] & 0xf0) >> 4));
+                    buf.append(hexDigits.charAt(bytes[j] & 0xf));
+                }
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Decodes {@code}%<hex>} encodings in a string into the relevant character.
+     *
+     * @param text
+     * @return Decoded text.
+     * @throws IllegalArgumentException if the {@code text} is trucated or malformed.
+     */
+    public static String unescape(String text) {
+        /*
+         * Note that this function is a slightly modified version of Android's URLDecoder in
+         * Android SDK java/net/URLDecoder.java (https://goo.gl/TFrx7E).
+         * The biggest difference is that, unlike URLDecoder, our code does not convert + to space.
+         * We also avoid string copying if text does not encoded to start with.
+         */
+
+        // Avoid string copying if text is not encoded to start with.
+        if (text.indexOf('%') < 0){
+            return text;
+        }
+
+        StringBuffer result = new StringBuffer(text.length());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (int i = 0; i < text.length();) {
+            char c = text.charAt(i);
+            if (c == '%') {
+                out.reset();
+                do {
+                    if (i + 2 >= text.length()) {
+                        throw new IllegalArgumentException("Truncated or malformed encoded string");
+                    }
+                    int d1 = Character.digit(text.charAt(i + 1), 16);
+                    int d2 = Character.digit(text.charAt(i + 2), 16);
+                    if (d1 == -1 || d2 == -1) {
+                        throw new IllegalArgumentException("Truncated or malformed encoded string");
+                    }
+                    out.write((byte) ((d1 << 4) + d2));
+                    i += 3;
+                } while (i < text.length() && text.charAt(i) == '%');
+                result.append(out.toString());
+                continue;
+            } else {
+                result.append(c);
+            }
+            i++;
+        }
+        return result.toString();
+
     }
 
     private NamingUtil() {}
