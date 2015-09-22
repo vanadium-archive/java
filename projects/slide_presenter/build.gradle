@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url 'http://maven.v.io'
+            url 'https://maven.v.io'
         }
     }
     dependencies {
@@ -29,7 +29,7 @@ apply plugin: 'wrapper'
 repositories {
     mavenCentral()
     maven {
-        url 'http://maven.v.io/'
+        url 'https://maven.v.io/'
     }
 }
 
