@@ -56,6 +56,14 @@ class TableImpl implements Table {
         return this.client.exists(ctx, this.schemaVersion);
     }
     @Override
+    public Permissions getPermissions(VContext ctx) throws VException {
+        return this.client.getPermissions(ctx, this.schemaVersion);
+    }
+    @Override
+    public void setPermissions(VContext ctx, Permissions perms) throws VException {
+        this.client.setPermissions(ctx, this.schemaVersion, perms);
+    }
+    @Override
     public Row getRow(String key) {
         return new RowImpl(this.fullName, key, this.schemaVersion);
     }
@@ -84,19 +92,19 @@ class TableImpl implements Table {
         return new ScanStreamImpl(ctxC, stream);
     }
     @Override
-    public PrefixPermissions[] getPermissions(VContext ctx, String key) throws VException {
-        List<PrefixPermissions> perms = this.client.getPermissions(ctx, this.schemaVersion, key);
+    public PrefixPermissions[] getPrefixPermissions(VContext ctx, String key) throws VException {
+        List<PrefixPermissions> perms = this.client.getPrefixPermissions(
+                ctx, this.schemaVersion, key);
         return perms.toArray(new PrefixPermissions[perms.size()]);
     }
     @Override
-    public void setPermissions(VContext ctx, PrefixRange prefix, Permissions perms)
+    public void setPrefixPermissions(VContext ctx, PrefixRange prefix, Permissions perms)
             throws VException {
-        this.client.setPermissions(ctx, this.schemaVersion, prefix.getPrefix(), perms);
+        this.client.setPrefixPermissions(ctx, this.schemaVersion, prefix.getPrefix(), perms);
     }
-
     @Override
-    public void deletePermissions(VContext ctx, PrefixRange prefix) throws VException {
-        this.client.deletePermissions(ctx, this.schemaVersion, prefix.getPrefix());
+    public void deletePrefixPermissions(VContext ctx, PrefixRange prefix) throws VException {
+        this.client.deletePrefixPermissions(ctx, this.schemaVersion, prefix.getPrefix());
     }
 
     private static class ScanStreamImpl implements Stream<KeyValue> {

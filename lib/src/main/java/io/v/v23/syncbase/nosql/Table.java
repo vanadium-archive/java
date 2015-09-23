@@ -57,6 +57,24 @@ public interface Table {
     boolean exists(VContext ctx) throws VException;
 
     /**
+     * Returns the current permissions for the table.
+     *
+     * @param  ctx        Vanadium context
+     * @return            table permissions
+     * @throws VException if the table permissions couldn't be retrieved
+     */
+    Permissions getPermissions(VContext ctx) throws VException;
+
+    /**
+     * Replaces the current permissions for the table.
+     *
+     * @param  ctx        Vanadium context
+     * @param  perms      new permissions for the table
+     * @throws VException if the table permissions couldn't be updated
+     */
+    void setPermissions(VContext ctx, Permissions perms) throws VException;
+
+    /**
      * Returns the row with the given primary key.
      *
      * @param  key primary key of the row
@@ -137,15 +155,15 @@ public interface Table {
      * @return            an array of prefix permissions for the given row
      * @throws VException if the prefix permissions couldn't be retrieved
      */
-    PrefixPermissions[] getPermissions(VContext ctx, String key) throws VException;
+    PrefixPermissions[] getPrefixPermissions(VContext ctx, String key) throws VException;
 
     /**
      * Sets the permissions for all current and future rows with the given prefix. If the prefix
      * overlaps with an existing prefix, the longest prefix that matches a row applies.
      * For example:
      * <p><blockquote><pre>
-     *     setPermissions(ctx, NoSql.prefix("a/b"), perms1);
-     *     setPermissions(ctx, NoSql.prefix("a/b/c"), perms2);
+     *     setPrefixPermissions(ctx, NoSql.prefix("a/b"), perms1);
+     *     setPrefixPermissions(ctx, NoSql.prefix("a/b/c"), perms2);
      * </pre></blockquote><p>
      * The permissions for row {@code "a/b/1"} are {@code perms1}, and the permissions for row
      * {@code "a/b/c/1"} are {@code perms2}.
@@ -155,16 +173,16 @@ public interface Table {
      * @param  perms      permissions to apply
      * @throws VException if the permissions couldn't be applied
      */
-    void setPermissions(VContext ctx, PrefixRange prefix, Permissions perms) throws VException;
+    void setPrefixPermissions(VContext ctx, PrefixRange prefix, Permissions perms) throws VException;
 
     /**
      * Deletes permissions for the specified prefix.  Any rows covered by this prefix will use the
      * next longest prefix's permissions.  (See the array returned by
-     * {@link #getPermissions getPermissions()}).
+     * {@link #getPrefixPermissions getPrefixPermissions()}).
      *
      * @param  ctx        Vanadium context
      * @param  prefix     prefix for which the permissions are to be deleted
      * @throws VException if the permissions couldn't be deleted
      */
-    void deletePermissions(VContext ctx, PrefixRange prefix) throws VException;
+    void deletePrefixPermissions(VContext ctx, PrefixRange prefix) throws VException;
 }
