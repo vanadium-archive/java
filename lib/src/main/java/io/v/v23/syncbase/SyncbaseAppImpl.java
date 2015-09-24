@@ -4,7 +4,6 @@
 
 package io.v.v23.syncbase;
 
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -26,7 +25,7 @@ class SyncbaseAppImpl implements SyncbaseApp {
     private final AppClient client;
 
     SyncbaseAppImpl(String parentFullName, String relativeName) {
-        this.fullName = NamingUtil.join(parentFullName, relativeName);
+        this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName));
         this.name = relativeName;
         this.client = AppClientFactory.getAppClient(this.fullName);
     }
@@ -49,8 +48,7 @@ class SyncbaseAppImpl implements SyncbaseApp {
     }
     @Override
     public String[] listDatabases(VContext ctx) throws VException {
-        List<String> x = this.client.listDatabases(ctx);
-        return x.toArray(new String[x.size()]);
+        return Util.listChildren(ctx, this.fullName);
     }
     @Override
     public void create(VContext ctx, Permissions perms) throws VException {

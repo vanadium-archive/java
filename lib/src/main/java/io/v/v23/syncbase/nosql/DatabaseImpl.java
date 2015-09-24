@@ -47,9 +47,13 @@ class DatabaseImpl implements Database, BatchDatabase {
     private final Schema schema;
     private final DatabaseClient client;
 
-    DatabaseImpl(String parentFullName, String relativeName, Schema schema) {
+    DatabaseImpl(String parentFullName, String relativeName, String batchSuffix, Schema schema) {
         this.parentFullName = parentFullName;
-        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, relativeName);
+        // Escape relativeName so that any forward slashes get dropped, thus
+        // ensuring that the server will interpret fullName as referring to a
+        // database object. Note that the server will still reject this name if
+        // util.ValidDatabaseName returns false.
+        this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName) + batchSuffix);
         this.name = relativeName;
         this.schema = schema;
         this.client = DatabaseClientFactory.getDatabaseClient(this.fullName);
@@ -70,8 +74,7 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public String[] listTables(VContext ctx) throws VException {
-        List<String> x = this.client.listTables(ctx);
-        return x.toArray(new String[x.size()]);
+        return Util.listChildren(ctx, this.fullName);
     }
     @Override
     public ResultStream exec(VContext ctx, String query) throws VException {
@@ -127,15 +130,15 @@ class DatabaseImpl implements Database, BatchDatabase {
         this.client.destroy(ctx, getSchemaVersion());
     }
     public BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException {
-        String relativeName = this.client.beginBatch(ctx, getSchemaVersion(), opts);
-        return new DatabaseImpl(this.parentFullName, relativeName, this.schema);
+        String batchSuffix = this.client.beginBatch(ctx, getSchemaVersion(), opts);
+        return new DatabaseImpl(this.parentFullName, this.name, batchSuffix, this.schema);
     }
     @Override
     public Stream<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
                                      ResumeMarker resumeMarker) throws VException {
         CancelableVContext ctxC = ctx.withCancel();
         TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctxC,
-                new GlobRequest(NamingUtil.join(tableRelativeName, Util.NAME_SEP, rowPrefix + "*"), resumeMarker));
+                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
         return new WatchChangeStreamImpl(ctxC, stream);
     }
     @Override
@@ -337,17 +340,9 @@ class DatabaseImpl implements Database, BatchDatabase {
                     throw new VException(
                             "Unsupported watch change state: " + watchChange.getState());
             }
-            List<String> parts = splitInTwo(watchChange.getName(), Util.NAME_SEP_WITH_SLASHES);
+            List<String> parts = splitInTwo(watchChange.getName(), "/");
             String tableName = parts.get(0);
-            if (!Util.isValidName(tableName)) {
-                throw new VException("Invalid table name: \"" + tableName + "\"" + " in change: " +
-                        watchChange);
-            }
             String rowName = parts.get(1);
-            if (!Util.isValidName(rowName)) {
-                throw new VException("Invalid row name: \"" + rowName + "\"" + " in change: " +
-                        watchChange);
-            }
             return new WatchChange(tableName, rowName, changeType, storeChange.getValue(),
                     watchChange.getResumeMarker(), storeChange.getFromSync(),
                     watchChange.getContinued());

@@ -4,7 +4,6 @@
 
 package io.v.v23.syncbase;
 
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -35,8 +34,7 @@ class SyncbaseServiceImpl implements SyncbaseService {
     }
     @Override
     public String[] listApps(VContext ctx) throws VException {
-        List<String> x = this.client.listApps(ctx);
-        return x.toArray(new String[x.size()]);
+        return Util.listChildren(ctx, this.fullName);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {

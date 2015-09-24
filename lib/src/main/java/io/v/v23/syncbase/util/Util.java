@@ -22,8 +22,31 @@ import io.v.v23.verror.VException;
  * Various NoSQL utility methods.
  */
 public class Util {
-    public static final String NAME_SEP = "$";
-    public static final String NAME_SEP_WITH_SLASHES = "/$/";
+    /**
+     * Escapes a component name for use in a Syncbase object name. In
+     * particular, it replaces bytes {@code "%"} and {@code "/"} with the
+     * {@code "%"} character followed by the byte's two-digit hex code. Clients
+     * using the client library need not escape names themselves; the client
+     * library does so on their behalf.
+     *
+     * @param s String to escape.
+     * @return Escaped string.
+     */
+    public static String escape(String s) {
+      return NamingUtil.escape(s, new char[]{'/'});
+    }
+
+    /**
+     * Applies the inverse of escape. Throws exception if the given string is
+     * not a valid escaped string.
+     *
+     * @param s String to unescape.
+     * @return Unescaped string.
+     * @throws IllegalArgumentException if {@code s} is truncated or malformed.
+     */
+    public static String unescape(String s) {
+      return NamingUtil.unescape(s);
+    }
 
     /**
      * Returns the start of the row range for the given prefix.
@@ -55,6 +78,48 @@ public class Util {
     }
 
     /**
+     * Returns the relative names of all children of parentFullName.
+     *
+     * @param  ctx            Vanadium context
+     * @param  parentFullName Object name of parent component
+     * @throws VException     if a glob error occurred
+     */
+    public static String[] listChildren(VContext ctx, String globName) throws VException {
+        Namespace n = V.getNamespace(ctx);
+        ArrayList<String> names = new ArrayList<String>();
+        try {
+            for (GlobReply reply : n.glob(ctx, NamingUtil.join(globName, "*"))) {
+                if (reply instanceof GlobReply.Entry) {
+                    String fullName = ((GlobReply.Entry) reply).getElem().getName();
+                    int idx = fullName.lastIndexOf('/');
+                    if (idx == -1) {
+                      throw new VException("Unexpected glob() reply name: " + fullName);
+                    }
+                    String escName = fullName.substring(idx + 1, fullName.length());
+                    // Component names within object names are always escaped.
+                    // See comment in server/nosql/dispatcher.go for
+                    // explanation. If unescape throws an exception, there's a
+                    // bug in the Syncbase server. Glob should return names with
+                    // escaped components.
+                    names.add(unescape(escName));
+                } else if (reply instanceof GlobReply.Error) {
+                    // TODO(sadovsky): Surface these errors somehow. (We don't
+                    // want to throw an exception, since some names may simply
+                    // be hidden to this client.)
+                } else if (reply == null) {
+                    throw new VException("null glob() reply");
+                } else {
+                    throw new VException("Unrecognized glob() reply type: " + reply.getClass());
+                }
+            }
+        } catch (RuntimeException e) {  // error during iteration
+            throw (VException) e.getCause();
+        }
+        Collections.sort(names, Collator.getInstance());
+        return names.toArray(new String[names.size()]);
+    }
+
+    /**
      * Returns the UTF-8 encoding of the provided string.
      */
     public static byte[] getBytes(String s) {
@@ -69,30 +134,6 @@ public class Util {
      */
     public static String getString(byte[] bytes) {
         return new String(bytes, Charsets.UTF_8);
-    }
-
-    /**
-     * Returns {@code true} iff the the given Syncbase component name (i.e. app,
-     * database, table, or row name) is valid. Component names:
-     * <p><ul>
-     * <li>must be valid UTF-8;</li>
-     * <li>must not contain {@code "\0"} or {@code "@@"};</li>
-     * <li>must not have any slash-separated parts equal to {@code ""} or {@code "$"}; and</li>
-     * <li>must not have any slash-separated parts that start with {@code "__"}.</li>
-     * </ul><p>
-     */
-    public static boolean isValidName(String name) {
-        // TODO(sadovsky): Check that name is valid UTF-8.
-        if (name.contains("\0") || name.contains("@@")) {
-            return false;
-        }
-        String[] parts = name.split("/");
-        for (String v : parts) {
-            if (v.isEmpty() || v.equals(NAME_SEP) || v.startsWith("__")) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private Util() {}

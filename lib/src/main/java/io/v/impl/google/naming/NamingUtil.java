@@ -192,7 +192,7 @@ public class NamingUtil {
      *
      * @param name Name to decode.
      * @return Decoded name.
-     * @throws IllegalArgumentException if the {@code name} is trucated or malformed.
+     * @throws IllegalArgumentException if {@code name} is truncated or malformed.
      */
     public static String decodeFromNameElement(String name) {
         return unescape(name);

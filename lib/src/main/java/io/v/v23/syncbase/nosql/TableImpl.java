@@ -29,7 +29,11 @@ class TableImpl implements Table {
     private final TableClient client;
 
     TableImpl(String parentFullName, String relativeName, int schemaVersion) {
-        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, relativeName);
+        // Escape relativeName so that any forward slashes get dropped, thus
+        // ensuring that the server will interpret fullName as referring to a
+        // table object. Note that the server will still reject this name if
+        // util.ValidTableName returns false.
+        this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName));
         this.name = relativeName;
         this.schemaVersion = schemaVersion;
         this.client = TableClientFactory.getTableClient(this.fullName);

@@ -21,7 +21,9 @@ class RowImpl implements Row {
     private final RowClient client;
 
     RowImpl(String parentFullName, String key, int schemaVersion) {
-        this.fullName = NamingUtil.join(parentFullName, Util.NAME_SEP, key);
+        // Note, we immediately unescape row keys on the server side. See
+        // comment in server/nosql/dispatcher.go for explanation.
+        this.fullName = NamingUtil.join(parentFullName, Util.escape(key));
         this.key = key;
         this.schemaVersion = schemaVersion;
         this.client = RowClientFactory.getRowClient(this.fullName);

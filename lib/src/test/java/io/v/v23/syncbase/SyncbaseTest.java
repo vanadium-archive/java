@@ -117,7 +117,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(db).isNotNull();
         assertThat(db.name()).isEqualTo(DB_NAME);
         assertThat(db.fullName()).isEqualTo(
-                NamingUtil.join(serverEndpoint.name(), APP_NAME, Util.NAME_SEP, DB_NAME));
+                NamingUtil.join(serverEndpoint.name(), APP_NAME, DB_NAME));
         assertThat(db.exists(ctx)).isFalse();
         assertThat(app.listDatabases(ctx)).isEmpty();
         db.create(ctx, allowAll);
@@ -136,7 +136,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(table).isNotNull();
         assertThat(table.name()).isEqualTo(TABLE_NAME);
         assertThat(table.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(),
-                APP_NAME, Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME));
+                APP_NAME, DB_NAME, TABLE_NAME));
         assertThat(table.exists(ctx)).isFalse();
         assertThat(db.listTables(ctx)).isEmpty();
         table.create(ctx, allowAll);
@@ -173,7 +173,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(row).isNotNull();
         assertThat(row.key()).isEqualTo(ROW_NAME);
         assertThat(row.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(), APP_NAME,
-                Util.NAME_SEP, DB_NAME, Util.NAME_SEP, TABLE_NAME, Util.NAME_SEP, ROW_NAME));
+                DB_NAME, TABLE_NAME, ROW_NAME));
         assertThat(row.exists(ctx)).isFalse();
         row.put(ctx, "value", String.class);
         assertThat(row.exists(ctx)).isTrue();

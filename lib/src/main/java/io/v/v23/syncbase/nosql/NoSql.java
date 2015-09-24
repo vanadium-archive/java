@@ -14,7 +14,7 @@ import io.v.v23.verror.VException;
  */
 public class NoSql {
     public static Database newDatabase(String parentFullName, String relativeName, Schema schema) {
-        return new DatabaseImpl(parentFullName, relativeName, schema);
+        return new DatabaseImpl(parentFullName, relativeName, "", schema);
     }
 
     /**
