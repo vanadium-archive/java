@@ -55,13 +55,13 @@ class VanadiumEnvironment {
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
 
-        if (!System.getenv().containsKey('V23_ROOT')) {
-            throw new InvalidUserDataException("V23_ROOT is not set. "
+        if (!System.getenv().containsKey('JIRI_ROOT')) {
+            throw new InvalidUserDataException("JIRI_ROOT is not set. "
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
-        result.v23Root = new File(System.getenv()['V23_ROOT'])
+        result.v23Root = new File(System.getenv()['JIRI_ROOT'])
         result.v23Bin = new File(result.v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
         if (!result.v23Bin.exists() || !result.v23Bin.isFile() || !result.v23Bin.canExecute()) {
             throw new InvalidUserDataException(
