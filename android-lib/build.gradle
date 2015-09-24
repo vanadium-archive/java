@@ -67,11 +67,11 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
-def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
+def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 
 class VanadiumEnvironment {
-    File v23Root;
-    File v23Bin;
+    File jiriRoot;
+    File jiriBin;
     File thirdPartyGoBinDir;
 
     public static getVanadiumEnvironment() {
@@ -83,32 +83,32 @@ class VanadiumEnvironment {
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
-        result.v23Root = new File(System.getenv()['JIRI_ROOT'])
-        result.v23Bin = new File(result.v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
-        if (!result.v23Bin.exists() || !result.v23Bin.isFile() || !result.v23Bin.canExecute()) {
+        result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
+        result.jiriBin = new File(result.jiriRoot, ['devtools', 'bin', 'jiri'].join(File.separator))
+        if (!result.jiriBin.exists() || !result.jiriBin.isFile() || !result.jiriBin.canExecute()) {
             throw new InvalidUserDataException(
-                    result.v23Bin.toString() + " does not exist or is not an executable file. "
+                    result.jiriBin.toString() + " does not exist or is not an executable file. "
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
-        result.thirdPartyGoBinDir = new File(result.v23Root,
+        result.thirdPartyGoBinDir = new File(result.jiriRoot,
                 ['third_party', 'android', 'go', 'bin'].join(File.separator))
         def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
         if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
             throw new InvalidUserDataException(
                     thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
                     + "You probably didn't install the android profile. Try running\n\n"
-                    + "v23 profile install android\n\nand then try building again.")
+                    + "jiri profile install android\n\nand then try building again.")
         }
 
-        def syncbaseOutputDir = new File(result.v23Root,
+        def syncbaseOutputDir = new File(result.jiriRoot,
                 ['third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator))
         if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
             throw new InvalidUserDataException(
                     syncbaseOutputDir.toString() + " does not exist or is not a directory. "
                     + "You probably didn't install the android syncbase profile. Try running\n\n"
-                    + "GOOS=android GOARCH=arm v23 profile install syncbase"
+                    + "GOOS=android GOARCH=arm jiri profile install syncbase"
                     + "\n\nand then try building again"
             )
         }
@@ -139,13 +139,13 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     environment 'JIRI_PROFILE': 'android'
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
-    commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
+    commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
             '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni/main'
 }
 
 // Copy the shared library to its ultimate destination.
 task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-    from v23Root + '/release/go/pkg/android_arm/v.io/x/jni'
+    from jiriRoot + '/release/go/pkg/android_arm/v.io/x/jni'
     into 'src/main/jniLibs/armeabi-v7a'
     include 'main.a'
     rename 'main.a', 'libv23.so'
