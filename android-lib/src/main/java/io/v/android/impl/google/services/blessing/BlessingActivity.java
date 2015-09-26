@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.x.ref.services.blessing;
+package io.v.android.impl.google.services.blessing;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -20,40 +20,18 @@ import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-
-import org.apache.http.NameValuePair;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 import io.v.android.v23.services.blessing.BlessingService;
 import io.v.android.v23.V;
-import io.v.v23.context.VContext;
-import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.Blessings;
 import io.v.v23.security.Caveat;
-import io.v.v23.security.CryptoUtil;
-import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-import io.v.x.ref.services.identity.OAuthBlesserClient;
-import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 
 /**
  * Mints a new Vanadium blessing given the email address and the public key.

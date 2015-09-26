@@ -8,7 +8,6 @@ import android.content.Context;
 
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
-import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Constants;
@@ -19,7 +18,6 @@ import io.v.v23.verror.VException;
 
 import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
-import java.util.Map;
 
 /**
  * The local android environment allowing clients and servers to communicate with one another.
