@@ -47,10 +47,10 @@ import static com.google.common.truth.Truth.assertThat;
  * Client-server syncbase tests.
  */
 public class SyncbaseTest extends TestCase {
-    private static final String APP_NAME = "app";
+    private static final String APP_NAME = "app/a#%b";  // symbols are okay
     private static final String DB_NAME = "db";
     private static final String TABLE_NAME = "table";
-    private static final String ROW_NAME = "row";
+    private static final String ROW_NAME = "row/a#%b";  // symbols are okay
 
     private VContext ctx;
     private Permissions allowAll;
@@ -98,7 +98,8 @@ public class SyncbaseTest extends TestCase {
         SyncbaseApp app = service.getApp(APP_NAME);
         assertThat(app).isNotNull();
         assertThat(app.name()).isEqualTo(APP_NAME);
-        assertThat(app.fullName()).is(NamingUtil.join(serverEndpoint.name(), APP_NAME));
+        assertThat(app.fullName()).isEqualTo(
+            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME)));
         assertThat(app.exists(ctx)).isFalse();
         assertThat(service.listApps(ctx)).isEmpty();
         app.create(ctx, allowAll);
@@ -117,7 +118,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(db).isNotNull();
         assertThat(db.name()).isEqualTo(DB_NAME);
         assertThat(db.fullName()).isEqualTo(
-                NamingUtil.join(serverEndpoint.name(), APP_NAME, DB_NAME));
+            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME));
         assertThat(db.exists(ctx)).isFalse();
         assertThat(app.listDatabases(ctx)).isEmpty();
         db.create(ctx, allowAll);
@@ -135,8 +136,8 @@ public class SyncbaseTest extends TestCase {
         Table table = db.getTable(TABLE_NAME);
         assertThat(table).isNotNull();
         assertThat(table.name()).isEqualTo(TABLE_NAME);
-        assertThat(table.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(),
-                APP_NAME, DB_NAME, TABLE_NAME));
+        assertThat(table.fullName()).isEqualTo(
+            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME));
         assertThat(table.exists(ctx)).isFalse();
         assertThat(db.listTables(ctx)).isEmpty();
         table.create(ctx, allowAll);
@@ -172,8 +173,9 @@ public class SyncbaseTest extends TestCase {
         Row row = table.getRow(ROW_NAME);
         assertThat(row).isNotNull();
         assertThat(row.key()).isEqualTo(ROW_NAME);
-        assertThat(row.fullName()).isEqualTo(NamingUtil.join(serverEndpoint.name(), APP_NAME,
-                DB_NAME, TABLE_NAME, ROW_NAME));
+        assertThat(row.fullName()).isEqualTo(
+            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME,
+                            Util.escape(ROW_NAME)));
         assertThat(row.exists(ctx)).isFalse();
         row.put(ctx, "value", String.class);
         assertThat(row.exists(ctx)).isTrue();

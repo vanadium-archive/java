@@ -33,7 +33,7 @@ public class Util {
      * @return Escaped string.
      */
     public static String escape(String s) {
-      return NamingUtil.escape(s, new char[]{'/'});
+      return NamingUtil.encodeAsNameElement(s);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Util {
      * @throws IllegalArgumentException if {@code s} is truncated or malformed.
      */
     public static String unescape(String s) {
-      return NamingUtil.unescape(s);
+      return NamingUtil.decodeFromNameElement(s);
     }
 
     /**

@@ -74,7 +74,10 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public String[] listTables(VContext ctx) throws VException {
-        return Util.listChildren(ctx, this.fullName);
+        // See comment in v.io/v23/services/syncbase/nosql/service.vdl for why
+        // we can't implement listTables using Glob (via Util.listChildren).
+        List<String> x = this.client.listTables(ctx);
+        return x.toArray(new String[x.size()]);
     }
     @Override
     public ResultStream exec(VContext ctx, String query) throws VException {
