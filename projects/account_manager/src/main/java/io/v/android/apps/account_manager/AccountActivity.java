@@ -21,6 +21,7 @@ import android.util.Base64;
 import android.widget.Toast;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
 
 import org.joda.time.DateTime;
@@ -197,10 +198,9 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 OAuthBlesserClient blesser =
                         OAuthBlesserClientFactory.getOAuthBlesserClient("identity/dev.v.io/u/google");
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-                List<Caveat> caveats = new ArrayList<>();
-                caveats.add(VSecurity.newExpiryCaveat(DateTime.now().plusDays(1)));
                 OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
-                        blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0], caveats);
+                        blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0],
+                                ImmutableList.<Caveat>of(VSecurity.newUnconstrainedUseCaveat()));
                 Blessings blessing = reply.blessing;
                 if (blessing == null || blessing.getCertificateChains() == null ||
                         blessing.getCertificateChains().size() <= 0) {
