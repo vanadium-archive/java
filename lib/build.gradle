@@ -40,16 +40,16 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
-def v23Root = VanadiumEnvironment.getVanadiumEnvironment().v23Root.getAbsolutePath()
-def v23Bin = VanadiumEnvironment.getVanadiumEnvironment().v23Bin.getAbsolutePath()
-def vdlPath = [v23Root, 'release', 'go', 'src'].join(File.separator)
-def vdlBin = [v23Root, 'release', 'go', 'bin', 'vdl'].join(File.separator)
+def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
+def vdlPath = [jiriRoot, 'release', 'go', 'src'].join(File.separator)
+def vdlBin = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
 
 class VanadiumEnvironment {
-    File v23Root;
-    File v23Bin;
+    File jiriRoot;
+    File jiriBin;
     File thirdPartyGoBinDir;
 
     public static getVanadiumEnvironment() {
@@ -61,30 +61,30 @@ class VanadiumEnvironment {
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
-        result.v23Root = new File(System.getenv()['JIRI_ROOT'])
-        result.v23Bin = new File(result.v23Root, ['devtools', 'bin', 'v23'].join(File.separator))
-        if (!result.v23Bin.exists() || !result.v23Bin.isFile() || !result.v23Bin.canExecute()) {
+        result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
+        result.jiriBin = new File(result.jiriRoot, ['devtools', 'bin', 'jiri'].join(File.separator))
+        if (!result.jiriBin.exists() || !result.jiriBin.isFile() || !result.jiriBin.canExecute()) {
             throw new InvalidUserDataException(
-                    result.v23Bin.toString() + " does not exist or is not an executable file. "
+                    result.jiriBin.toString() + " does not exist or is not an executable file. "
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
 
-        result.thirdPartyGoBinDir = new File(result.v23Root,
+        result.thirdPartyGoBinDir = new File(result.jiriRoot,
                 ['third_party', 'java', 'go', 'bin'].join(File.separator))
         def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
         if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
             throw new InvalidUserDataException(
                     thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
                     + "You probably didn't install the java profile. Try running\n\n"
-                    + "v23 profile install java\n\nand then try building again.")
+                    + "jiri profile install java\n\nand then try building again.")
         }
         return result
     }
 }
 
 task buildVdlTool(type: Exec) {
-    commandLine v23Bin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
+    commandLine jiriBin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
 }
 
 task generateVdl(type: Exec, dependsOn: buildVdlTool) {
@@ -101,7 +101,7 @@ task checkVanadiumEnvironment {
         throw new InvalidUserDataException("The JAVA_HOME environment variable is not set. "
                 + "Please set it to the root of a JDK installation directory.  If JDK isn't "
                 + "installed, you probably didn't install the java profile: try running\n\n"
-                + "v23 profile install java\n\nand then try building again.")
+                + "jiri profile install java\n\nand then try building again.")
     }
     if (!isAmd64()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
@@ -123,21 +123,21 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     environment 'JIRI_PROFILE': 'java'
     environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
 
-    commandLine env.v23Bin.getAbsolutePath(), 'go', 'install',
+    commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
             '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni/main'
 }
 
 // Copy the shared library to its ultimate destination.
 if (isLinux()) {
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from v23Root + '/release/go/pkg/linux_amd64_shared/v.io/x/jni'
+        from jiriRoot + '/release/go/pkg/linux_amd64_shared/v.io/x/jni'
         into 'build/libs'
         include 'main.a'
         rename 'main.a', 'libv23.so'
     }
 } else {  // darwin
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from v23Root + '/release/go/pkg/darwin_amd64/v.io/x/jni'
+        from jiriRoot + '/release/go/pkg/darwin_amd64/v.io/x/jni'
         into 'build/libs'
         include 'main.a'
         rename 'main.a', 'libv23.dylib'
