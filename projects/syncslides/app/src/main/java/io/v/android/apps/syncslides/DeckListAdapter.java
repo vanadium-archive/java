@@ -12,33 +12,32 @@ import android.widget.ImageView;
 import android.widget.Toolbar;
 
 /**
- * Provides a list of presentations to be shown in the RecyclerView of the
- * PresentationChooserFragment.
+ * Provides a list of decks to be shown in the RecyclerView of the
+ * DeckChooserFragment.
  */
-public class PresentationListAdapter
-        extends RecyclerView.Adapter<PresentationListAdapter.ViewHolder> {
+public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHolder> {
     // TODO(kash): Replace this static data with syncbase.
     private static final int[] THUMBS = {
-            R.drawable.thumb_presentation1,
-            R.drawable.thumb_presentation2,
-            R.drawable.thumb_presentation3
+            R.drawable.thumb_deck1,
+            R.drawable.thumb_deck2,
+            R.drawable.thumb_deck3
     };
-    private static final String[] TITLES = {"Presentation 1", "Presentation 2", "Presentation 3"};
+    private static final String[] TITLES = {"deck 1", "deck 2", "deck 3"};
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.presentation_card, parent, false);
-        // TODO(kash): Add a menu that allows the user to delete a presentation.
+                .inflate(R.layout.deck_card, parent, false);
+        // TODO(kash): Add a menu that allows the user to delete a deck.
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int i) {
         holder.mToolbar.setTitle(TITLES[i]);
-        // TODO(kash): We need to say when the user last viewed the presentation or show
-        // that the presentation is active.  Either use the subtitle for this or create
+        // TODO(kash): We need to say when the user last viewed the deck or show
+        // that the deck is active.  Either use the subtitle for this or create
         // a custom view for both the title and subtitle.
         holder.mThumb.setImageResource(THUMBS[i]);
     }
@@ -54,8 +53,8 @@ public class PresentationListAdapter
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mThumb = (ImageView) itemView.findViewById(R.id.presentation_thumb);
-            mToolbar = (Toolbar) itemView.findViewById(R.id.presentation_card_toolbar);
+            mThumb = (ImageView) itemView.findViewById(R.id.deck_thumb);
+            mToolbar = (Toolbar) itemView.findViewById(R.id.deck_card_toolbar);
         }
     }
 }

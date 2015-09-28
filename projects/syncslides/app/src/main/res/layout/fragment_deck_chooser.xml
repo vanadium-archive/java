@@ -8,13 +8,13 @@
     android:background="#eee9e9">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/presentation_grid"
+        android:id="@+id/deck_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/new_presentation_fab"
+        android:id="@+id/new_deck_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"

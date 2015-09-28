@@ -11,19 +11,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.support.v4.widget.DrawerLayout;
 
-public class PresentationChooserActivity extends AppCompatActivity
+public class DeckChooserActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-    private static final String TAG = "PresentationChooser";
+    private static final String TAG = "DeckChooser";
     /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+     * Fragment managing the behaviors, interactions and deck of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_presentation_chooser);
+        setContentView(R.layout.activity_deck_chooser);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -38,7 +38,7 @@ public class PresentationChooserActivity extends AppCompatActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PresentationChooserFragment.newInstance(position + 1))
+                .replace(R.id.container, DeckChooserFragment.newInstance(position + 1))
                 .commit();
     }
 
@@ -62,7 +62,7 @@ public class PresentationChooserActivity extends AppCompatActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.presentation_chooser, menu);
+            getMenuInflater().inflate(R.menu.deck_chooser, menu);
             return true;
         }
         return super.onCreateOptionsMenu(menu);
