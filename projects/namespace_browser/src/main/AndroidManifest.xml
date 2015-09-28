@@ -35,7 +35,7 @@
             android:label="@string/title_activity_settings">
         </activity>
         <activity
-            android:name="io.v.android.x.ref.services.blessing.BlessingActivity" >
+            android:name="io.v.android.impl.google.services.blessing.BlessingActivity" >
             <intent-filter>
                 <action android:name="io.v.android.x.ref.services.blessing.BLESSING" />
             </intent-filter>

@@ -4,6 +4,8 @@
 
 package io.v.v23.rpc;
 
+import io.v.v23.verror.VException;
+
 import java.util.Arrays;
 
 /**
@@ -58,16 +60,19 @@ public class ListenSpec {
      * @param  addrs   {@link Address}es that the server should listen on
      * @param  proxy   proxy that the server should use to proxy the connection
      * @param  chooser {@link AddressChooser} used for selecting addresses to publish with the
-     *                 mount table from a candidate set of addresses
+     *                 mount table from a candidate set of addresses;  if {@code null}, a default
+     *                 {@link AddressChooser} that chooses all the addresses will be used.
      */
     public ListenSpec(Address[] addrs, String proxy, AddressChooser chooser) {
         this.addrs = addrs == null ? new Address[0] : Arrays.copyOf(addrs, addrs.length);
         this.proxy = proxy == null ? "" : proxy;
-        if (chooser == null) {
-            throw new IllegalArgumentException(
-                    "Cannot instantiate ListenSpec with a null AddressChooser");
-        }
-        this.chooser = chooser;
+        this.chooser = chooser != null ? chooser : new AddressChooser() {
+            @Override
+            public NetworkAddress[] choose(String protocol, NetworkAddress[] candidates)
+                    throws VException {
+                return candidates;
+            }
+        };
     }
 
     /**

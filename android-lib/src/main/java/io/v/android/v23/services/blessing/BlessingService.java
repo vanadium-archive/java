@@ -13,12 +13,12 @@ import android.content.pm.PackageManager;
 import java.security.interfaces.ECPublicKey;
 
 import io.v.android.v23.V;
-import io.v.android.x.ref.services.blessing.BlessingActivity;
+import io.v.android.impl.google.services.blessing.BlessingActivity;
 import io.v.v23.context.VContext;
 
 /**
  * Provides client methods for talking to the android
- * {@link io.v.android.x.ref.services.blessing.BlessingActivity BlessingService}.
+ * {@link io.v.android.impl.google.services.blessing.BlessingActivity BlessingService}.
  */
 public class BlessingService {
     public static final String EXTRA_ERROR = "ERROR";
