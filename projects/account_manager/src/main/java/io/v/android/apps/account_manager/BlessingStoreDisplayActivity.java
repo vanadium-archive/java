@@ -13,6 +13,7 @@ import android.preference.PreferenceScreen;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
+import io.v.v23.security.WireBlessings;
 import io.v.v23.vom.VomUtil;
 
 /**
@@ -92,14 +94,12 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
                         entry.getKey().getValue());
                 currentPreference.setIntent(intent);
 
-                List<List<VCertificate>> b = new ArrayList<List<VCertificate>>();
-                b.add(certChain);
-                if (Blessings.create(b).signingBlessings().isEmpty()) {
+                Blessings b = Blessings.create(new WireBlessings(ImmutableList.of(certChain)));
+                if (b.signingBlessings().isEmpty()) {
                     nonSigningCat.addPreference(currentPreference);
                 } else {
                     signingCat.addPreference(currentPreference);
                 }
-
             }
         }
         if (signingCat.getPreferenceCount() <= 0) {

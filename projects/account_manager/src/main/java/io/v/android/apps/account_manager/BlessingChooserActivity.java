@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
+import io.v.v23.security.WireBlessings;
 import io.v.v23.vom.VomUtil;
 
 /**
@@ -127,9 +130,7 @@ public class BlessingChooserActivity extends Activity {
                 }
 
                 for (List<VCertificate> certChain: chains) {
-                    List<List<VCertificate>> certChains = new ArrayList<List<VCertificate>>();
-                    certChains.add(certChain);
-                    Blessings blessing = Blessings.create(certChains);
+                    Blessings blessing = Blessings.create(new WireBlessings(ImmutableList.of(certChain)));
                     mBlessings.put(blessingsView.getChildCount(), blessing);
 
                     LinearLayout blessingView =
