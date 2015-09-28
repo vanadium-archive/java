@@ -25,7 +25,7 @@ public class CaveatTest extends TestCase {
     public void testMethodCaveat() throws VException {
         VContext context = V.init();
         VPrincipal p1 = VSecurity.newPrincipal();
-        Blessings alice = p1.blessSelf("alice", VSecurity.newMethodCaveat("succeed"));
+        Blessings alice = p1.blessSelf("alice", VSecurity.newMethodCaveat("Succeed"));
         p1.addToRoots(alice);
         {
             Call call = VSecurity.newCall(
@@ -35,7 +35,7 @@ public class CaveatTest extends TestCase {
         }
         {
             Call call = VSecurity.newCall(
-                    new CallParams().withLocalPrincipal(p1).withMethod("fail"));
+                    new CallParams().withLocalPrincipal(p1).withMethod("Fail"));
             String[] result = VSecurity.getRemoteBlessingNames(context, call);
             assertThat(result != null).isTrue();
             assertThat(Arrays.asList(result)).containsExactly();
