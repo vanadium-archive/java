@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    android:id="@+id/presentation_card"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/presentation_card_width"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/presentation_card_margin"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- A thumbnail of the presentation title slide. -->
+        <ImageView
+            android:id="@+id/presentation_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"/>
+
+        <!-- Display the title of the presentation and a menu to configure it. -->
+        <Toolbar
+            android:id="@+id/presentation_card_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"></Toolbar>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

@@ -4,17 +4,11 @@
 
 package io.v.android.apps.syncslides;
 
-import android.app.Activity;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 public class PresentationChooserActivity extends AppCompatActivity
@@ -72,64 +66,6 @@ public class PresentationChooserActivity extends AppCompatActivity
             return true;
         }
         return super.onCreateOptionsMenu(menu);
-    }
-
-    /**
-     * This fragment contains the list of presentations as well as the FAB to create a new
-     * presentation.
-     */
-    public static class PresentationChooserFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PresentationChooserFragment newInstance(int sectionNumber) {
-            PresentationChooserFragment fragment = new PresentationChooserFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PresentationChooserFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_presentation_chooser, container,
-                    false);
-            FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
-                    R.id.new_presentation_fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    newPresentation();
-                }
-            });
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((PresentationChooserActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-
-        /**
-         * Import a presentation so it shows up in the list of all presentations.
-         */
-        private void newPresentation() {
-            // TODO(afergan): Hook up new presentation screen here.
-            Log.i(TAG, "newPresentation");
-        }
     }
 
 }
