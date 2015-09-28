@@ -12,19 +12,21 @@ import com.google.common.collect.ImmutableList;
 import static com.google.common.truth.Truth.assertThat;
 
 import io.v.v23.V;
-import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Tests the default Blessings implementation.
  */
 public class BlessingsTest extends TestCase {
-    public void testPublicKey() throws VException {
+    public void testPublicKey() throws Exception {
         V.init();
         VPrincipal p1 = VSecurity.newPrincipal();
         VPrincipal p2 = VSecurity.newPrincipal();
@@ -41,7 +43,7 @@ public class BlessingsTest extends TestCase {
         }
     }
 
-    public void testVomEncodeDecode() throws VException {
+    public void testVomEncodeDecode() throws Exception {
         V.init();
         VPrincipal p = VSecurity.newPrincipal();
         Blessings alice = p.blessSelf("alice");
@@ -52,7 +54,28 @@ public class BlessingsTest extends TestCase {
         }
     }
 
-    public void testSigningBlessings() throws VException {
+    public void testSerialization() throws Exception {
+        V.init();
+        VPrincipal p = VSecurity.newPrincipal();
+        Blessings blessings = p.blessSelf("alice");
+
+        // Write
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(data);
+        out.writeObject(blessings);
+        out.close();
+
+        // Read
+        final ObjectInputStream in =
+                new ObjectInputStream(new ByteArrayInputStream(data.toByteArray()));
+
+        // Verify
+        final Object copy = in.readObject();
+        assertThat(copy).isEqualTo(blessings);
+        assertThat(copy.hashCode()).isEqualTo(copy.hashCode());
+    }
+
+    public void testSigningBlessings() throws Exception {
         V.init();
         VPrincipal p = VSecurity.newPrincipal();
         ECPublicKey pk = p.publicKey();
@@ -71,5 +94,4 @@ public class BlessingsTest extends TestCase {
 
         assertThat(union.signingBlessings().getCertificateChains().size()).isEqualTo(1);
     }
-
 }

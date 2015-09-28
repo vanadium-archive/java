@@ -6,6 +6,9 @@ package io.v.v23.security;
 
 import com.google.common.base.Joiner;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
@@ -27,35 +30,36 @@ import io.v.v23.verror.VException;
  * <p>
  * See also: <a href="https://github.com/vanadium/docs/blob/master/glossary.md#blessing">https://github.com/vanadium/docs/blob/master/glossary.md#blessing</a>.
  */
-public class Blessings implements Serializable {
+public final class Blessings implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static native Blessings nativeCreate(WireBlessings wire) throws VException;
+    private static native long nativeCreate(WireBlessings wire) throws VException;
     private static native Blessings nativeCreateUnion(Blessings[] blessings) throws VException;
 
     public static Blessings create(WireBlessings wire) {
         try {
-            return nativeCreate(wire);
+            return new Blessings(nativeCreate(wire), wire);
         } catch (VException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Couldn't create blessings from WireBlessings", e);
         }
-    }
-
-    public static Blessings create(List<List<VCertificate>> certChains) {
-        return create(new WireBlessings(certChains));
     }
 
     static Blessings createUnion(Blessings... blessings) throws VException {
         return nativeCreateUnion(blessings);
     }
 
-    private final long nativePtr;
-    private final WireBlessings wire;  // non-null
+    private long nativePtr;
+    private volatile WireBlessings wire;  // can be null
 
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
     private native Blessings nativeSigningBlessings(long nativePtr) throws VException;
+    private native WireBlessings nativeWireFormat(long nativePtr) throws VException;
+
     private native void nativeFinalize(long nativePtr);
-    // TODO(sjayanti): a method to get all the non-signing blessings in a given blessings object.
+
+    private Blessings(long nativePtr) {
+        this.nativePtr = nativePtr;
+    }
 
     private Blessings(long nativePtr, WireBlessings wire) {
         this.nativePtr = nativePtr;
@@ -68,7 +72,7 @@ public class Blessings implements Serializable {
      */
     public ECPublicKey publicKey() {
         try {
-            return nativePublicKey(this.nativePtr);
+            return nativePublicKey(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
         }
@@ -80,8 +84,8 @@ public class Blessings implements Serializable {
      * The return value may be {@code null} if the blessings are empty.
      */
     public Blessings signingBlessings() {
-      try {
-          return nativeSigningBlessings(this.nativePtr);
+        try {
+            return nativeSigningBlessings(nativePtr);
       } catch (VException e) {
           throw new RuntimeException("Couldn't get signing blessings", e);
       }
@@ -91,14 +95,55 @@ public class Blessings implements Serializable {
      * Returns the blessings in the wire format.
      */
     public WireBlessings wireFormat() {
-        return this.wire;
+        // Check the cache first as nativeWireFormat() is an expensive operation.
+        synchronized (this) {
+            if (wire != null) {
+                return wire;
+            }
+        }
+        WireBlessings ret = null;
+        try {
+            ret = nativeWireFormat(nativePtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get wire blessings representation.", e);
+        }
+        synchronized (this) {
+            if (wire == null) {
+                wire = ret;
+            }
+        }
+        return ret;
     }
 
     /**
      * Returns {@code true} iff the blessings are empty.
      */
     public boolean isEmpty() {
-        return this.wire.getCertificateChains().isEmpty();
+        return wireFormat().getCertificateChains().isEmpty();
+    }
+
+    /**
+     * Returns the certificate chains stored inside the blessings.
+     */
+    public List<List<VCertificate>> getCertificateChains() {
+        return wireFormat().getCertificateChains();
+    }
+
+    long nativePtr() {
+        return nativePtr;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeObject(wireFormat());
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        wire = (WireBlessings) in.readObject();
+        try {
+            nativePtr = nativeCreate(wire);
+        } catch (VException e) {
+            throw new IOException("Couldn't create native blessings.", e);
+        }
     }
 
     @Override
@@ -107,17 +152,20 @@ public class Blessings implements Serializable {
         if (obj == null) return false;
         if (!(obj instanceof Blessings)) return false;
         Blessings other = (Blessings) obj;
-        return this.wireFormat().equals(other.wireFormat());
+        return wireFormat().equals(other.wireFormat());
     }
+
     @Override
     public int hashCode() {
-        return this.wire.hashCode();
+        return wireFormat().hashCode();
     }
+
     @Override
     public String toString() {
-        List<String> chains = new ArrayList<>(getCertificateChains().size());
+        List<String> chains = new ArrayList<String>(getCertificateChains().size());
         for (List<VCertificate> certificateChain : getCertificateChains()) {
-            List<String> certificateNames = new ArrayList<>(certificateChain.size());
+            List<String> certificateNames =
+                    new ArrayList<String>(certificateChain.size());
             for (VCertificate certificate : certificateChain) {
                 certificateNames.add(certificate.getExtension());
             }
@@ -127,10 +175,6 @@ public class Blessings implements Serializable {
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
-    }
-
-    public List<List<VCertificate>> getCertificateChains() {
-        return wire.getCertificateChains();
+        nativeFinalize(nativePtr);
     }
 }
