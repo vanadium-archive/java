@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--TODO(afergan): set the aspect ratio of the image to be 16:9-->
+<android.support.v7.widget.CardView
+    android:id="@+id/deck_card"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="@dimen/slide_card_height"
+    android:layout_gravity="top"
+    android:layout_margin="@dimen/slide_card_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <!-- The actual slide image to be shown-->
+        <ImageView
+            android:id="@+id/slide_card_image"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:scaleType="centerInside"/>
+
+        <!-- Presenter or audience notes to be shown alongside the slide-->
+        <TextView
+            android:id="@+id/slide_card_notes"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

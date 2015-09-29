@@ -45,10 +45,8 @@ public class DeckChooserFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_deck_chooser, container,
-                false);
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
-                R.id.new_deck_fab);
+        View rootView = inflater.inflate(R.layout.fragment_deck_chooser, container, false);
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.new_deck_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
