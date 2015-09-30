@@ -68,11 +68,11 @@ class VPrincipalImpl implements VPrincipal {
     @Override
     public Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
         Caveat... additionalCaveats) throws VException {
-        return nativeBless(this.nativePtr, key, with, extension, caveat, additionalCaveats);
+        return nativeBless(nativePtr, key, with, extension, caveat, additionalCaveats);
     }
     @Override
     public Blessings blessSelf(String name, Caveat... caveats) throws VException {
-        return nativeBlessSelf(this.nativePtr, name, caveats);
+        return nativeBlessSelf(nativePtr, name, caveats);
     }
     @Override
     public VSignature sign(byte[] message) throws VException {
@@ -80,7 +80,7 @@ class VPrincipalImpl implements VPrincipal {
             byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
             return this.signer.sign(purpose, message);
         }
-        return nativeSign(this.nativePtr, message);
+        return nativeSign(nativePtr, message);
     }
     @Override
     public ECPublicKey publicKey() {
@@ -88,7 +88,7 @@ class VPrincipalImpl implements VPrincipal {
             return this.signer.publicKey();
         }
         try {
-            return nativePublicKey(this.nativePtr);
+            return nativePublicKey(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
         }
@@ -96,7 +96,7 @@ class VPrincipalImpl implements VPrincipal {
     @Override
     public Blessings[] blessingsByName(BlessingPattern name) {
         try {
-            return nativeBlessingsByName(this.nativePtr, name);
+            return nativeBlessingsByName(nativePtr, name);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get blessings for name", e);
         }
@@ -104,7 +104,7 @@ class VPrincipalImpl implements VPrincipal {
     @Override
     public Map<String, Caveat[]> blessingsInfo(Blessings blessings) {
         try {
-            return nativeBlessingsInfo(this.nativePtr, blessings);
+            return nativeBlessingsInfo(nativePtr, blessings);
         } catch (VException e) {
             throw new RuntimeException(
                     "Couldn't get human-readable strings for blessings", e);
@@ -116,7 +116,7 @@ class VPrincipalImpl implements VPrincipal {
             return this.store;
         }
         try {
-            return nativeBlessingStore(this.nativePtr);
+            return nativeBlessingStore(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get Blessing Store", e);
         }
@@ -127,28 +127,29 @@ class VPrincipalImpl implements VPrincipal {
             return this.roots;
         }
         try {
-            return nativeRoots(this.nativePtr);
+            return nativeRoots(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get Blessing Store", e);
         }
     }
     @Override
     public void addToRoots(Blessings blessings) throws VException {
-        nativeAddToRoots(this.nativePtr, blessings);
+        nativeAddToRoots(nativePtr, blessings);
     }
+    private long nativePtr() { return nativePtr; }
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((VPrincipalImpl) other).nativePtr;
+        return nativePtr == ((VPrincipalImpl) other).nativePtr;
     }
     @Override
     public int hashCode() {
-        return Long.valueOf(this.nativePtr).hashCode();
+        return Long.valueOf(nativePtr).hashCode();
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(nativePtr);
     }
 }
