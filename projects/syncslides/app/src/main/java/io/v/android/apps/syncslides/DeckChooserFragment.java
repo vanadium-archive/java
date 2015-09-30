@@ -61,7 +61,8 @@ public class DeckChooserFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new DeckListAdapter();
+        DB db = DB.Singleton.get(getActivity().getApplicationContext());
+        mAdapter = new DeckListAdapter(db);
         mRecyclerView.setAdapter(mAdapter);
         return rootView;
     }
@@ -71,6 +72,12 @@ public class DeckChooserFragment extends Fragment {
         super.onAttach(activity);
         ((DeckChooserActivity) activity).onSectionAttached(
                 getArguments().getInt(ARG_SECTION_NUMBER));
+    }
+
+    @Override
+    public void onPause() {
+        mAdapter.stop();
+        super.onPause();
     }
 
     /**
