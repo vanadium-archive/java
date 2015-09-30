@@ -7,9 +7,11 @@ package io.v.android.apps.syncslides;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 /**
@@ -30,7 +32,6 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.deck_card, parent, false);
-        // TODO(kash): Add a menu that allows the user to delete a deck.
         return new ViewHolder(v);
     }
 
@@ -65,6 +66,20 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             super(itemView);
             mThumb = (ImageView) itemView.findViewById(R.id.deck_thumb);
             mToolbar = (Toolbar) itemView.findViewById(R.id.deck_card_toolbar);
+            mToolbar.inflateMenu(R.menu.deck_card);
+            mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.action_delete_deck:
+                            // TODO(kash): Actually delete the deck.
+                            Toast.makeText(mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
+                                    .show();
+                            return true;
+                    }
+                    return false;
+                }
+            });
         }
     }
 }

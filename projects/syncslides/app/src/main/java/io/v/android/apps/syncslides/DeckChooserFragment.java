@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 /**
  * This fragment contains the list of decks as well as the FAB to create a new
@@ -57,9 +58,24 @@ public class DeckChooserFragment extends Fragment {
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.deck_grid);
         mRecyclerView.setHasFixedSize(true);
 
-        // TODO(kash): Dynamically set the span based on the screen width.
+        // Statically set the span count (i.e. number of columns) for now...  See below.
         mLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        // Dynamically set the span based on the screen width.  Cribbed from
+        // http://stackoverflow.com/questions/26666143/recyclerview-gridlayoutmanager-how-to-auto-detect-span-count
+        mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        mRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        int viewWidth = mRecyclerView.getMeasuredWidth();
+                        float cardViewWidth = getActivity().getResources().getDimension(
+                                R.dimen.deck_card_width);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        mLayoutManager.setSpanCount(newSpanCount);
+                        mLayoutManager.requestLayout();
+                    }
+                });
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         mAdapter = new DeckListAdapter(db);
