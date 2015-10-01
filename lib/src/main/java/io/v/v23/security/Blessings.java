@@ -129,7 +129,7 @@ public final class Blessings implements Serializable {
         return wireFormat().getCertificateChains();
     }
 
-    long nativePtr() {
+    private long nativePtr() {
         return nativePtr;
     }
 

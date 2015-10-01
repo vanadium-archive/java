@@ -34,19 +34,19 @@ class CallImpl implements Call {
     @Override
     public DateTime timestamp() {
         try {
-            return nativeTimestamp(this.nativePtr);
+            return nativeTimestamp(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get timestamp", e);
         }
     }
     @Override
     public String method() {
-        return nativeMethod(this.nativePtr);
+        return nativeMethod(nativePtr);
     }
     @Override
     public VdlValue[] methodTags() {
         try {
-            VdlValue[] tags = nativeMethodTags(this.nativePtr);
+            VdlValue[] tags = nativeMethodTags(nativePtr);
             return tags != null ? tags : new VdlValue[0];
         } catch (VException e) {
             throw new RuntimeException("Couldn't get method tags", e);
@@ -54,7 +54,7 @@ class CallImpl implements Call {
     }
     @Override
     public String suffix() {
-        return nativeSuffix(this.nativePtr);
+        return nativeSuffix(nativePtr);
     }
     @Override
     public Map<String, Discharge> localDischarges() {
@@ -66,16 +66,16 @@ class CallImpl implements Call {
     }
     @Override
     public String localEndpoint() {
-        return nativeLocalEndpoint(this.nativePtr);
+        return nativeLocalEndpoint(nativePtr);
     }
     @Override
     public String remoteEndpoint() {
-        return nativeRemoteEndpoint(this.nativePtr);
+        return nativeRemoteEndpoint(nativePtr);
     }
     @Override
     public VPrincipal localPrincipal() {
         try {
-            return nativeLocalPrincipal(this.nativePtr);
+            return nativeLocalPrincipal(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get local principal", e);
         }
@@ -83,7 +83,7 @@ class CallImpl implements Call {
     @Override
     public Blessings localBlessings() {
         try {
-            return nativeLocalBlessings(this.nativePtr);
+            return nativeLocalBlessings(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get local blessings", e);
         }
@@ -91,7 +91,7 @@ class CallImpl implements Call {
     @Override
     public Blessings remoteBlessings() {
         try {
-            return nativeRemoteBlessings(this.nativePtr);
+            return nativeRemoteBlessings(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get remote blessings", e);
         }
@@ -99,6 +99,10 @@ class CallImpl implements Call {
     // Implements java.lang.Object.
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(nativePtr);
+    }
+
+    private long nativePtr() {
+        return nativePtr;
     }
 }

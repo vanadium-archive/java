@@ -27,28 +27,30 @@ class BlessingRootsImpl implements BlessingRoots {
 
     @Override
     public void add(ECPublicKey root, BlessingPattern pattern) throws VException {
-        nativeAdd(this.nativePtr, root, pattern);
+        nativeAdd(nativePtr, root, pattern);
     }
     @Override
     public void recognized(ECPublicKey root, String blessing) throws VException {
-        nativeRecognized(this.nativePtr, root, blessing);
+        nativeRecognized(nativePtr, root, blessing);
     }
     @Override
     public String debugString() {
-        return nativeDebugString(this.nativePtr);
+        return nativeDebugString(nativePtr);
     }
 
     @Override
     public Multimap<BlessingPattern, ECPublicKey> dump() throws VException {
         return nativeDump(nativePtr);
     }
-
+    private long nativePtr() {
+        return nativePtr;
+    }
     @Override
     public String toString() {
-        return nativeToString(this.nativePtr);
+        return nativeToString(nativePtr);
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(nativePtr);
     }
 }

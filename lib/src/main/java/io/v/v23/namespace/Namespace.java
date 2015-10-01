@@ -81,8 +81,7 @@ public interface Namespace {
      * A shortcut for {@link #delete(VContext, String, boolean, Options)} with a {@code null}
      * options parameter.
      */
-    void delete(VContext context, String name, boolean deleteSubtree)
-            throws VException;
+    void delete(VContext context, String name, boolean deleteSubtree) throws VException;
 
     /**
      * Deletes the name from a mount table. If the name has any children in its mount table, it (and
