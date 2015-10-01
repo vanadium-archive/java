@@ -67,12 +67,15 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
+public static newStyleProfiles() {
+    return new File(System.getenv()['JIRI_ROOT'], '.jiri_xprofiles').exists()
+}
+
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 
 class VanadiumEnvironment {
     File jiriRoot;
     File jiriBin;
-    File thirdPartyGoBinDir;
 
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
@@ -90,16 +93,6 @@ class VanadiumEnvironment {
                     result.jiriBin.toString() + " does not exist or is not an executable file. "
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
-        }
-
-        result.thirdPartyGoBinDir = new File(result.jiriRoot,
-                ['third_party', 'android', 'go', 'bin'].join(File.separator))
-        def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
-        if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
-            throw new InvalidUserDataException(
-                    thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
-                    + "You probably didn't install the android profile. Try running\n\n"
-                    + "jiri profile install android\n\nand then try building again.")
         }
 
         def syncbaseOutputDir = new File(result.jiriRoot,
@@ -136,11 +129,13 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
         existingPath = ""
     }
 
-    environment 'JIRI_PROFILE': 'android'
-    environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
-
-    commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
+    if (newStyleProfiles()) {
+        commandLine env.jiriBin.getAbsolutePath(), 'go', '--profiles=android', '--target=android', 'install', '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni/main'
+    } else {
+        environment 'JIRI_PROFILE': 'android'
+        commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
             '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni/main'
+    }
 }
 
 // Copy the shared library to its ultimate destination.
