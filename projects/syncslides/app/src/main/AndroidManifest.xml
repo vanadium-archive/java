@@ -20,7 +20,7 @@
         presentation activity.-->
         <activity
             android:name=".PresentationActivity"
-            android:label="@string/app_name" >
+            android:label="SyncSlides Presentation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

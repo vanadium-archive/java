@@ -14,4 +14,7 @@
     <string name="action_delete_deck">Delete</string>
 
     <string name="slide_list_title">Pitch deck</string>
+    <string name="notes_hint">Notes (only you see these)</string>
+    <string name="next_hint">Next</string>
+    <string name="prev_hint">Previous</string>
 </resources>

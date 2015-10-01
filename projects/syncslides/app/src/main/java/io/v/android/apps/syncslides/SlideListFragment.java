@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class SlideListFragment extends Fragment {
-
     private static final String DECK_ID = "deck_id";
     private static final String SLIDE_LIST_TITLE = "Pitch deck";
     private RecyclerView mRecyclerView;
@@ -46,7 +45,7 @@ public class SlideListFragment extends Fragment {
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         // TODO(afergan): Use the real deckId.
-        mAdapter = new SlideListAdapter(db, "dummy_deckId");
+        mAdapter = new SlideListAdapter(mRecyclerView, db, "dummy_deckId");
         mRecyclerView.setAdapter(mAdapter);
         getActivity().setTitle(SLIDE_LIST_TITLE);
         return rootView;

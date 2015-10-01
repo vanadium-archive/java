@@ -15,4 +15,10 @@
     <dimen name="card_toolbar_height">48dp</dimen>
     <dimen name="slide_card_margin">5dp</dimen>
     <dimen name="slide_card_height">150dp</dimen>
+
+    <dimen name="nav_bar_height">40dp</dimen>
+    <dimen name="nav_button_size">24dp</dimen>
+    <dimen name="nav_button_margin">10dp</dimen>
+    <dimen name="nav_hint_margin">5dp</dimen>
+    <dimen name="nav_hint_padding">10dp</dimen>
 </resources>

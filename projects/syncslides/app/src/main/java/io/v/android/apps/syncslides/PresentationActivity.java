@@ -20,4 +20,13 @@ public class PresentationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Swap out the current fragment for a NavigateFragment.
+     * @param slideNum the slide to show
+     */
+    public void jumpToSlide(int slideNum) {
+        // TODO(kash): Actually navigate to the right slide.  Need vcl/16118 for that.
+        NavigateFragment fragment = new NavigateFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
+    }
 }
