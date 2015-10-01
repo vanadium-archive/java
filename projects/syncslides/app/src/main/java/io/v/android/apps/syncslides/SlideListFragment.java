@@ -14,11 +14,22 @@ import android.view.ViewGroup;
 
 public class SlideListFragment extends Fragment {
 
+    private static final String DECK_ID = "deck_id";
     private static final String SLIDE_LIST_TITLE = "Pitch deck";
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private SlideListAdapter mAdapter;
 
+    /**
+     * Returns a new instance of this fragment for the given deck.
+     */
+    public static SlideListFragment newInstance(String deckId) {
+        SlideListFragment fragment = new SlideListFragment();
+        Bundle args = new Bundle();
+        args.putString(DECK_ID, deckId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,7 +44,9 @@ public class SlideListFragment extends Fragment {
                 LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new SlideListAdapter();
+        DB db = DB.Singleton.get(getActivity().getApplicationContext());
+        // TODO(afergan): Use the real deckId.
+        mAdapter = new SlideListAdapter(db, "dummy_deckId");
         mRecyclerView.setAdapter(mAdapter);
         getActivity().setTitle(SLIDE_LIST_TITLE);
         return rootView;

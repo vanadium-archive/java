@@ -18,6 +18,11 @@ import java.util.List;
  * A fake implementation of DB for manual testing purposes.
  */
 public class FakeDB implements DB {
+    private static final int[] SLIDEDRAWABLES = new int[]{R.drawable.slide1, R.drawable.slide2,
+            R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
+            R.drawable.slide7};
+    private final String[] SLIDENOTES = {"slide 1 notes", "slide 2 notes", "slide 3 notes",
+            "slide 4 notes", "slide 5 notes", "slide 6 notes", "slide 7 notes"};
     private static final String TAG = "FakeDB";
     private static final int[] THUMBS = {
             R.drawable.thumb_deck1,
@@ -27,21 +32,29 @@ public class FakeDB implements DB {
     private static final String[] TITLES = {"deck 1", "deck 2", "deck 3"};
 
     private final Bitmap[] mThumbs;
+    private final Bitmap[] mSlideImages;
 
     public FakeDB(Context context) {
         mThumbs = new Bitmap[THUMBS.length];
         for (int i = 0; i < THUMBS.length; i++) {
             mThumbs[i] = BitmapFactory.decodeResource(context.getResources(), THUMBS[i]);
         }
+        mSlideImages = new Bitmap[SLIDEDRAWABLES.length];
+        for (int i = 0; i < SLIDEDRAWABLES.length; i++) {
+            mSlideImages[i] =
+                    BitmapFactory.decodeResource(context.getResources(), SLIDEDRAWABLES[i]);
+        }
     }
 
     private static class FakeDeck implements Deck {
         private final String mTitle;
         private final Bitmap mThumb;
+        private final String mDeckId;
 
-        FakeDeck(Bitmap thumb, String title) {
+        FakeDeck(Bitmap thumb, String title, String deckId) {
             mThumb = thumb;
             mTitle = title;
+            mDeckId = deckId;
         }
 
         @Override
@@ -52,6 +65,32 @@ public class FakeDB implements DB {
         @Override
         public String getTitle() {
             return mTitle;
+        }
+
+        @Override
+        public String getId() {
+            return mDeckId;
+        }
+
+    }
+
+    private static class FakeSlide implements Slide {
+        private final String mSlideNotes;
+        private final Bitmap mSlideImage;
+
+        FakeSlide(Bitmap slideImage, String slideNotes) {
+            mSlideImage = slideImage;
+            mSlideNotes = slideNotes;
+        }
+
+        @Override
+        public Bitmap getImage() {
+            return mSlideImage;
+        }
+
+        @Override
+        public String getNotes() {
+            return mSlideNotes;
         }
     }
 
@@ -82,7 +121,7 @@ public class FakeDB implements DB {
 
         @Override
         public Deck getDeck(int i) {
-            return new FakeDeck(mGrowingThumbs.get(i), mGrowingTitles.get(i));
+            return new FakeDeck(mGrowingThumbs.get(i), mGrowingTitles.get(i), String.valueOf(i));
         }
 
         @Override
@@ -136,9 +175,36 @@ public class FakeDB implements DB {
         }
     }
 
+    private static class FakeSlideList implements SlideList {
+        private final Bitmap[] mSlideImages;
+        private final String[] mSlideNotes;
+
+        private FakeSlideList (Bitmap[] slideImages, String[] slideNotes) {
+            mSlideImages = slideImages;
+            mSlideNotes = slideNotes;
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return mSlideImages.length;
+        }
+
+        @Override
+        public Slide getSlide(int i) {
+            return new FakeSlide(mSlideImages[i], mSlideNotes[i]);
+        }
+    }
+
 
     @Override
     public DeckList getDecks() {
         return new FakeDeckList(mThumbs, TITLES);
+    }
+
+    @Override
+    public SlideList getSlides(String deckId) {
+        // Always return the same set of slides no matter which deck was requested.
+        return new FakeSlideList(mSlideImages, SLIDENOTES);
     }
 }

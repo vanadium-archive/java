@@ -41,12 +41,30 @@ public interface DB {
          * Returns the title of the deck.
          */
         String getTitle();
+
+        /**
+         * Returns the deck id.
+         */
+        String getId();
+    }
+
+    interface Slide {
+        /**
+         * Returns a Bitmap of the slide image.
+         */
+        Bitmap getImage();
+
+        /**
+         * Returns the slide notes.
+         */
+        String getNotes();
     }
 
     /**
      * Provides a list of Decks via an API that fits well with RecyclerView.Adapter.
      */
     interface DeckList {
+
         /**
          * Returns the number of items in the list.
          */
@@ -69,6 +87,22 @@ public interface DB {
     }
 
     /**
+     * Provides a list of Slides via an API that fits well with RecyclerView.Adapter.
+     */
+    interface SlideList {
+        /**
+         * Returns the number of items in the list.
+         */
+        int getItemCount();
+
+        /**
+         * Returns the ith item in the list.
+         */
+        Slide getSlide(int i);
+
+    }
+
+    /**
      * Callbacks for when the dataset changes dynamically.
      */
     interface Listener {
@@ -82,4 +116,10 @@ public interface DB {
      * @return a list of decks
      */
     DeckList getDecks();
+
+    /**
+     * Given a deck ID, gets the list of slides visible to the user.
+     * @return a list of slides
+     */
+    SlideList getSlides(String deckId);
 }
