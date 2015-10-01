@@ -27,7 +27,7 @@ public class PresentationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_presentation);
         if (savedInstanceState == null) {
             SlideListFragment slideList = new SlideListFragment();
-            getFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
         }
     }
 
