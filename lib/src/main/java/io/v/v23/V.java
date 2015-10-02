@@ -52,6 +52,14 @@ public class V {
     private static volatile VRuntime runtime = null;
     private static volatile boolean initOnceDone = false;
 
+    private static boolean isDarwin() {
+        return System.getProperty("os.name").toLowerCase().contains("os x");
+    }
+
+    private static boolean isLinux() {
+        return System.getProperty("os.name").toLowerCase().contains("linux");
+    }
+
     private static synchronized void initOnce() {
         if (initOnceDone) {
             return;
@@ -64,8 +72,19 @@ public class V {
             // Thrown if the library does not exist. In this case, try to find it in our classpath.
             errors.add(new RuntimeException("loadLibrary attempt failed", ule));
             try {
-                URL resource = Resources.getResource("libv23.so");
-                File file = File.createTempFile("libv23-", ".so");
+                URL resource = null;
+                File file = null;
+                if (isLinux()) {
+                    resource = Resources.getResource("libv23.so");
+                    file = File.createTempFile("libv23-", ".so");
+                } else if (isDarwin()) {
+                    resource = Resources.getResource("libv23.dylib");
+                    file = File.createTempFile("libv23-", ".dylib");
+                } else {
+                    String os = System.getProperty("os.name");
+                    errors.add(new RuntimeException("unsupported OS: " + os));
+                    throw new RuntimeException("Unsupported OS: " + os, new VLoaderException(errors));
+                }
                 file.deleteOnExit();
                 ByteStreams.copy(resource.openStream(), new FileOutputStream(file));
                 System.load(file.getAbsolutePath());
