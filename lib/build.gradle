@@ -40,17 +40,20 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
+public static newStyleProfiles() {
+    return new File(System.getenv()['JIRI_ROOT'], '.jiri_xprofiles').exists()
+}
+
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 def vdlPath = [jiriRoot, 'release', 'go', 'src'].join(File.separator)
-def vdlBin = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
+def vdlBin = [jiriRoot, 'devtools', 'bin', 'vdl'].join(File.separator)
 
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
 
 class VanadiumEnvironment {
     File jiriRoot;
     File jiriBin;
-    File thirdPartyGoBinDir;
 
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
@@ -69,25 +72,11 @@ class VanadiumEnvironment {
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
-
-        result.thirdPartyGoBinDir = new File(result.jiriRoot,
-                ['third_party', 'java', 'go', 'bin'].join(File.separator))
-        def thirdPartyGoBin = new File(result.thirdPartyGoBinDir, 'go')
-        if (!thirdPartyGoBin.exists() || !thirdPartyGoBin.isFile() || !thirdPartyGoBin.canExecute()) {
-            throw new InvalidUserDataException(
-                    thirdPartyGoBin.toString() + " does not exist or is not an executable file. "
-                    + "You probably didn't install the java profile. Try running\n\n"
-                    + "jiri profile install java\n\nand then try building again.")
-        }
         return result
     }
 }
 
-task buildVdlTool(type: Exec) {
-    commandLine jiriBin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
-}
-
-task generateVdl(type: Exec, dependsOn: buildVdlTool) {
+task generateVdl(type: Exec) {
     environment VDLPATH: vdlPath
     commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
 }
@@ -113,6 +102,7 @@ task checkVanadiumEnvironment {
     }
 }
 
+
 task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     def env = VanadiumEnvironment.getVanadiumEnvironment()
     def existingPath = System.getenv('PATH')
@@ -120,11 +110,15 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
         existingPath = ""
     }
 
-    environment 'JIRI_PROFILE': 'java'
-    environment 'PATH': [env.thirdPartyGoBinDir.getAbsolutePath(), existingPath].join(File.pathSeparator)
-
-    commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
+    if (newStyleProfiles()) {
+        commandLine env.jiriBin.getAbsolutePath(), 'go', '--profiles=java',
+        'install', '-buildmode=c-shared', '-v', '-tags', 'java',
+        'v.io/x/jni/main'
+    } else {
+        environment 'JIRI_PROFILE': 'java'
+        commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
             '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni/main'
+    }
 }
 
 // Copy the shared library to its ultimate destination.
