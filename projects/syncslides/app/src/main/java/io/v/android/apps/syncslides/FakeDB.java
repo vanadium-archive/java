@@ -98,30 +98,20 @@ public class FakeDB implements DB {
         private final Bitmap[] mThumbs;
         private final String[] mTitles;
         private Listener mListener;
-        private int mItemToAdd;
-        private List<Bitmap> mGrowingThumbs;
-        private List<String> mGrowingTitles;
-        private AsyncTask<Void, Void, Void> mTask;
-        private boolean mDiscarded;
 
         private FakeDeckList(Bitmap[] thumbs, String[] titles) {
             mThumbs = thumbs;
             mTitles = titles;
-            mItemToAdd = 0;
-            mGrowingThumbs = new ArrayList<>(Arrays.asList(mThumbs));
-            mGrowingTitles = new ArrayList<>(Arrays.asList(mTitles));
-            mTask = newAsyncTask();
-            mTask.execute();
         }
 
         @Override
         public int getItemCount() {
-            return mGrowingThumbs.size();
+            return mThumbs.length;
         }
 
         @Override
         public Deck getDeck(int i) {
-            return new FakeDeck(mGrowingThumbs.get(i), mGrowingTitles.get(i), String.valueOf(i));
+            return new FakeDeck(mThumbs[i], mTitles[i], String.valueOf(i));
         }
 
         @Override
@@ -132,46 +122,7 @@ public class FakeDB implements DB {
 
         @Override
         public void discard() {
-            mDiscarded = true;
-            mTask.cancel(true);
-        }
-
-        /**
-         * Creates a new AsyncTask that sleeps for a short time and then adds a new
-         * deck to the list.
-         */
-        private AsyncTask<Void, Void, Void> newAsyncTask() {
-            return new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        Log.v(TAG, "sleeping " + FakeDeckList.this);
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        // Nothing to do.
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void result) {
-                    if (!mDiscarded) {
-                        Log.v(TAG, "growing  " + FakeDeckList.this);
-                        mGrowingThumbs.add(mThumbs[mItemToAdd]);
-                        mGrowingTitles.add(mTitles[mItemToAdd]);
-                        mItemToAdd = (mItemToAdd + 1) % mThumbs.length;
-                        if (mListener != null) {
-                            mListener.notifyItemInserted(mGrowingThumbs.size() - 1);
-                        }
-                        if (mItemToAdd < 50) {
-                            mTask = newAsyncTask();
-                            mTask.execute();
-                        }
-                    } else {
-                        Log.v(TAG, "discarded " + FakeDeckList.this);
-                    }
-                }
-            };
+            // Nothing to do.
         }
     }
 
@@ -182,7 +133,6 @@ public class FakeDB implements DB {
         private FakeSlideList (Bitmap[] slideImages, String[] slideNotes) {
             mSlideImages = slideImages;
             mSlideNotes = slideNotes;
-
         }
 
         @Override
