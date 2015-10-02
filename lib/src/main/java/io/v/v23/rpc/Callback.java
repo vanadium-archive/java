@@ -7,13 +7,12 @@ package io.v.v23.rpc;
 import io.v.v23.verror.VException;
 
 /**
- * Instance of this interface are called when an asynchronous RPC succeeds or fails.
+ * Instances of this interface are called when an asynchronous RPC succeeds or fails.
  */
 public interface Callback<T> {
     /**
      * This method will be called when an asynchronous RPC succeeds. Implementations
-     * should not perform expensive operations on this thread, as the caller may
-     * be the network thread.
+     * should not perform expensive operations on this thread.
      *
      * @param result the result of the RPC
      */
@@ -21,10 +20,9 @@ public interface Callback<T> {
 
     /**
      * This method will be called when an asynchronous RPC fails. Implementations
-     * should not perform expensive operations on this thread, as the caller may
-     * be the network thread.
+     * should not perform expensive operations on this thread.
      *
-     * @param result the {@link VException} that caused the RPC to fail
+     * @param error the {@link VException} that caused the RPC to fail
      */
     void onFailure(VException error);
 }

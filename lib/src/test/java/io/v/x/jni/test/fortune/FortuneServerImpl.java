@@ -5,7 +5,6 @@
 package io.v.x.jni.test.fortune;
 
 import com.google.common.collect.ImmutableList;
-
 import io.v.v23.OutputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobError;
@@ -19,6 +18,7 @@ import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;
+import java.util.concurrent.CountDownLatch;
 
 public class FortuneServerImpl implements FortuneServer, Globber {
     private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
@@ -28,11 +28,31 @@ public class FortuneServerImpl implements FortuneServer, Globber {
 
     public static final VException COMPLEX_ERROR = new VException(
             Errors.ERR_COMPLEX, "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
+    private final CountDownLatch latch;
 
     private String lastAddedFortune;
 
+    public FortuneServerImpl() {
+        this(null);
+    }
+
+    /**
+     * If not {@code null}, the {@link FortuneServerImpl#get} method will block until the
+     * latch is counted down. This allows for testing asynchronous RPCs.
+     */
+    public FortuneServerImpl(CountDownLatch latch) {
+        this.latch = latch;
+    }
+
     @Override
     public String get(VContext context, ServerCall call) throws VException {
+        if (latch != null) {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new VException(e.getMessage());
+            }
+        }
         if (lastAddedFortune == null) {
             throw new VException(Errors.ERR_NO_FORTUNES, context);
         }

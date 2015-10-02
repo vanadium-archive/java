@@ -34,4 +34,12 @@ public interface ClientCall extends Stream {
      * @throws VException      if there was an error executing the call
      */
     Object[] finish(Type[] types) throws VException;
+
+    /**
+     * Finishes the RPC call in the background and calls the given callback (must be non-null).
+     *
+     * @param  types           types for all the output arguments
+     * @param  callback        the callback to call when the {@code ClientCall} is finished
+     */
+    void finish(Type[] types, Callback<Object[]> callback);
 }

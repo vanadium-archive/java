@@ -8,9 +8,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
+import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
-import io.v.v23.naming.Endpoint;
 import io.v.v23.naming.GlobReply;
+import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Dispatcher;
@@ -30,8 +31,13 @@ import junit.framework.TestCase;
 import org.joda.time.Duration;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -83,6 +89,68 @@ public class FortuneTest extends TestCase {
         assertEquals(firstMessage, client.get(ctxT));
     }
 
+    public void testAsyncFortune() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        final AtomicReference<String> result = new AtomicReference<>();
+        final CountDownLatch latch = new CountDownLatch(1);
+        VContext ctxT = ctx.withTimeout(new Duration(2000000)); // 20s
+        client.add(ctxT, "Hello world");
+        client.get(ctxT, new Callback<String>() {
+            @Override
+            public void onSuccess(String fortune) {
+                result.set(fortune);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                throw new RuntimeException(error);
+            }
+        });
+        assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(result.get()).isNotEmpty();
+    }
+
+    public void testAsyncFortuneWithCancel() throws Exception {
+        CountDownLatch callLatch = new CountDownLatch(1);
+        FortuneServer server = new FortuneServerImpl(callLatch);
+        ctx = V.withNewServer(ctx, "", server, null);
+        CancelableVContext cancelCtx = ctx.withCancel();
+
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        final AtomicReference<String> result = new AtomicReference<>();
+        final AtomicReference<VException> errorResult = new AtomicReference<>();
+        final CountDownLatch latch = new CountDownLatch(1);
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        client.add(ctxT, "Hello world");
+        client.get(cancelCtx, new Callback<String>() {
+            @Override
+            public void onSuccess(String fortune) {
+                result.set(fortune);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                errorResult.set(error);
+                latch.countDown();
+            }
+        });
+        // Cancel the RPC.
+        cancelCtx.cancel();
+        // Allow the server RPC impl to finish.
+        callLatch.countDown();
+        // The call should have failed, it was canceled before it completed.
+        assertThat(result.get()).isNull();
+        assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(errorResult.get()).isNotNull();
+        assertThat(errorResult.get().getAction()).isEqualTo(io.v.v23.verror.Errors.CANCELED
+                .getAction());
+    }
+
     public void testStreaming() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
@@ -102,6 +170,47 @@ public class FortuneTest extends TestCase {
         }
         int total = stream.finish();
         assertEquals(5, total);
+    }
+
+    public void testAsyncStreaming() throws Throwable {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        final String msg = "The only fortune";
+        client.add(ctxT, msg);
+
+        final AtomicReference<Throwable> errorResult = new AtomicReference<>();
+        final CountDownLatch latch = new CountDownLatch(1);
+        client.streamingGet(ctxT, new Callback<TypedClientStream<Boolean,
+                String, Integer>>() {
+            @Override
+            public void onSuccess(TypedClientStream<Boolean, String, Integer> stream) {
+                try {
+                    for (int i = 0; i < 5; i++) {
+                        stream.send(true);
+                        assertEquals(msg, stream.recv());
+                    }
+                    int total = stream.finish();
+                    assertEquals(5, total);
+                } catch (VException | IOException | AssertionError error) {
+                    errorResult.set(error);
+                } finally {
+                    latch.countDown();
+                }
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                errorResult.set(error);
+                latch.countDown();
+            }
+        });
+        assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+        if (errorResult.get() != null) {
+            throw errorResult.get();
+        }
     }
 
     public void testMultiple() throws Exception {

@@ -55,6 +55,48 @@ public interface Client {
             Options opts) throws VException;
 
     /**
+     * Starts an asynchronous call of the method on the server instance identified by name with the
+     * given input args (of any arity). The callback's {@link Callback#onSuccess} method is called
+     * when the asynchronous call has been started on the remote side, or its {@link
+     * Callback#onFailure} method is called if the call could not be started.
+     *
+     * @param  context         client context
+     * @param  name            name of the server
+     * @param  method          name of the server's method to be invoked
+     * @param  args            arguments to the server method.
+     * @param  argTypes        types of the provided arguments
+     * @param  callback        the non-{@code null} callback to call when the call has been started
+     * @throws VException      if the call cannot be started
+     */
+    void startCall(VContext context, String name, String method, Object[] args, Type[] argTypes,
+                   Callback<ClientCall> callback) throws VException;
+
+    /**
+     * Starts an asynchronous call of the method on the server instance identified by name with the
+     * given input args (of any arity) and provided options. The callback's {@link
+     * Callback#onSuccess} method is called when the asynchronous call has been started on the
+     * remote side, or its {@link Callback#onFailure} method is called if the call could not be
+     * started.
+     * <p>
+     * A particular implementation of this interface chooses which options to support,
+     * but at the minimum it must handle the following pre-defined options:
+     * <ul>
+     *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
+     * </ul>
+     *
+     * @param  context         client context
+     * @param  name            name of the server
+     * @param  method          name of the server's method to be invoked
+     * @param  args            arguments to the server method.
+     * @param  argTypes        types of the provided arguments
+     * @param  opts            call options
+     * @param  callback        the non-{@code null} callback to call when the call has been started
+     * @throws VException      if the call cannot be started
+     */
+    void startCall(VContext context, String name, String method, Object[] args, Type[] argTypes,
+                         Options opts, Callback<ClientCall> callback) throws VException;
+
+    /**
      * Discards the state associated with this client.  In-flight calls may be terminated with
      * an error.
      */
