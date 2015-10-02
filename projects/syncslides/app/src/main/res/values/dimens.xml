@@ -16,9 +16,11 @@
     <dimen name="slide_card_margin">5dp</dimen>
     <dimen name="slide_card_height">150dp</dimen>
 
-    <dimen name="nav_bar_height">40dp</dimen>
-    <dimen name="nav_button_size">24dp</dimen>
-    <dimen name="nav_button_margin">10dp</dimen>
+    <dimen name="nav_bar_height">60dp</dimen>
+    <dimen name="nav_button_size">36dp</dimen>
+    <dimen name="nav_button_margin">15dp</dimen>
     <dimen name="nav_hint_margin">5dp</dimen>
+    <!-- The nav hint's padding and corner radius need to be the same to get a circular edge. -->
     <dimen name="nav_hint_padding">10dp</dimen>
+    <dimen name="nav_hint_corner_radius">10dp</dimen>
 </resources>
