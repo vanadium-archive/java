@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.context.VContextImpl;
 
 /**
  * Tests for the various Language utility methods.
@@ -19,7 +18,7 @@ public class LanguageTest extends TestCase {
     }
 
     public void testLanguageFromContext() {
-        VContext dcWithoutLang = VContextImpl.create();
+        VContext dcWithoutLang = VContext.create();
         VContext dcWithEN = Language.contextWithLanguage(dcWithoutLang, "en");
         VContext dcWithFR = Language.contextWithLanguage(dcWithEN, "fr");
         assertTrue(Language.languageFromContext(dcWithoutLang).isEmpty());

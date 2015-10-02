@@ -4,7 +4,6 @@
 
 package io.v.impl.google.rt;
 
-import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
@@ -25,7 +24,7 @@ import io.v.v23.verror.VException;
  * code for most of its functionalities.
  */
 public class VRuntimeImpl implements VRuntime {
-    private static native VContext nativeInit(int numCpus) throws VException;
+    private static native VContext nativeInit() throws VException;
     private static native void nativeShutdown(VContext context);
     private static native VContext nativeWithNewClient(VContext ctx, Options opts)
             throws VException;
@@ -52,13 +51,7 @@ public class VRuntimeImpl implements VRuntime {
      * Returns a new runtime instance.
      */
     public static VRuntimeImpl create(Options opts) throws VException {
-        int numCpus = opts.has(OptionDefs.RUNTIME_NUM_CPUS)
-                ? opts.get(OptionDefs.RUNTIME_NUM_CPUS, Integer.class)
-                : 1;
-        if (numCpus < 1) {
-            numCpus = 1;
-        }
-        return new VRuntimeImpl(nativeInit(numCpus));
+        return new VRuntimeImpl(nativeInit());
     }
 
     private final VContext ctx;  // non-null

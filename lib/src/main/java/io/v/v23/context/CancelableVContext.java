@@ -4,22 +4,38 @@
 
 package io.v.v23.context;
 
+import io.v.v23.verror.VException;
+
 /**
  * An extension of {@link VContext} interface that allows the user to explicitly cancel the context.
  */
-public abstract class CancelableVContext implements VContext {
+public class CancelableVContext extends VContext {
+    private long nativeCancelPtr;
+
+    private native void nativeCancel(long nativeCancelPtr) throws VException;
+    private native void nativeFinalize(long nativeCancelPtr);
+
+    private CancelableVContext(long nativePtr, long nativeCancelPtr) {
+        super(nativePtr);
+        this.nativeCancelPtr = nativeCancelPtr;
+    }
+
     /**
-     * Cancels the contex.  After this method is invoked, the counter returned by
+     * Cancels the context.  After this method is invoked, the counter returned by
      * {@link VContext#done done} method of the new context (and all contexts further derived
      * from it) will be set to zero.
      */
-    public abstract void cancel();
+    public void cancel() {
+        try {
+            nativeCancel(nativeCancelPtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't cancel context", e);
+        }
+    }
 
-    /**
-     * Restricts all implementations of {@link CancelableVContext} (and therefore {@link VContext})
-     * to the local package.
-     */
-    abstract void implementationsOnlyInThisPackage();
-
-    protected CancelableVContext() {}
+    @Override
+    protected void finalize() {
+        super.finalize();
+        nativeFinalize(nativeCancelPtr);
+    }
 }

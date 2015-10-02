@@ -4,13 +4,14 @@
 
 package io.v.v23.context;
 
+import io.v.v23.verror.VException;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
- * The interface for carrying deadlines, cancellation, as well as other arbitrary values.
+ * The mechanism for carrying deadlines, cancellation, as well as other arbitrary values.
  * <p>
  * Application code receives contexts in two main ways:
  * <p><ol>
@@ -74,12 +75,55 @@ import java.util.concurrent.CountDownLatch;
  * same type).  Keys are tested for equality by comparing their value pairs
  * {@code (getClass(), hashCode())}.
  */
-public interface VContext {
+public class VContext {
+    private static native VContext nativeCreate() throws VException;
+
+    /** Creates a new context with no data attached.
+     * <p>
+     * This function is meant for use in tests only - the preferred way of obtaining a fully
+     * initialized context is through the Vanadium runtime.
+     *
+     * @return a new root context with no data attached
+     */
+    public static VContext create() {
+        try {
+            return nativeCreate();
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create new context", e);
+        }
+    }
+
+    private long nativePtr;
+    // Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.
+    private volatile CountDownLatch doneLatch = null;
+
+    private native DateTime nativeDeadline(long nativePtr) throws VException;
+    private native CountDownLatch nativeDone(long nativePtr) throws VException;
+    private native Object nativeValue(long nativePtr, Object key) throws VException;
+    private native CancelableVContext nativeWithCancel(long nativePtr) throws VException;
+    private native CancelableVContext nativeWithDeadline(long nativePtr, DateTime deadline)
+            throws VException;
+    private native CancelableVContext nativeWithTimeout(long nativePtr, Duration timeout)
+            throws VException;
+    private native VContext nativeWithValue(long nativePtr, Object key, Object value)
+            throws VException;
+    private native void nativeFinalize(long nativePtr);
+
+    protected VContext(long nativePtr) {
+        this.nativePtr = nativePtr;
+    }
+
     /**
      * Returns the time at which this context will be automatically canceled, or {@code null}
      * if this context doesn't have a deadline.
      */
-    DateTime deadline();
+    public DateTime deadline() {
+        try {
+            return nativeDeadline(nativePtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get deadline", e);
+        }
+    }
 
     /**
      * Returns a counter that will reach the count of zero when this context is canceled (either
@@ -92,7 +136,20 @@ public interface VContext {
      * @return a counter that reaches the count of zero when this context is canceled or exceeds
      *         its deadline, or {@code null} if the counter can never be canceled.
      */
-    CountDownLatch done();
+    public CountDownLatch done() {
+        // NOTE(spetrovic): We may have to lock needlessly if nativeDone() returns a null
+        // CountDownLatch, but that's OK for now.
+        if (doneLatch != null) return doneLatch;
+        synchronized (this) {
+            if (doneLatch != null) return doneLatch;
+            try {
+                doneLatch = nativeDone(nativePtr);
+                return doneLatch;
+            } catch (VException e) {
+                throw new RuntimeException("Couldn't invoke done", e);
+            }
+        }
+    }
 
     /**
      * Returns data inside the context associated with the provided key.  See {@link #withValue}
@@ -101,7 +158,13 @@ public interface VContext {
      * @param  key a key value is associated with.
      * @return     value associated with the key.
      */
-    Object value(Object key);
+    public Object value(Object key) {
+        try {
+            return nativeValue(nativePtr, key);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get value: ", e);
+        }
+    }
 
     /**
      * Returns a child of the current context that can be canceled.  After
@@ -116,7 +179,13 @@ public interface VContext {
      *
      * @return a child of the current context that can be canceled.
      */
-    CancelableVContext withCancel();
+    public CancelableVContext withCancel() {
+        try {
+            return nativeWithCancel(nativePtr);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create cancelable context", e);
+        }
+    }
 
     /**
      * Returns a child of the current context that is automatically canceled after the provided
@@ -132,7 +201,13 @@ public interface VContext {
      * @return          a child of the current context that is automatically canceled after the
      *                  provided deadline is reached.
      */
-    CancelableVContext withDeadline(DateTime deadline);
+    public CancelableVContext withDeadline(DateTime deadline) {
+        try {
+            return nativeWithDeadline(nativePtr, deadline);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create context with deadline", e);
+        }
+    }
 
     /**
      * Returns a child of the current context that is automatically canceled after the provided
@@ -148,7 +223,13 @@ public interface VContext {
      * @return         a child of the current context that is automatically canceled after the
      *                 provided duration of time.
      */
-    CancelableVContext withTimeout(Duration timeout);
+    public CancelableVContext withTimeout(Duration timeout) {
+        try {
+            return nativeWithTimeout(nativePtr, timeout);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create context with timeout", e);
+        }
+    }
 
     /**
      * Returns a child of the current context that additionally contains the given key and its
@@ -167,5 +248,20 @@ public interface VContext {
      * @return       a child of the current context that additionally contains the given key and its
      *               associated value
      */
-    VContext withValue(Object key, Object value);
+    public VContext withValue(Object key, Object value) {
+        try {
+            return nativeWithValue(nativePtr, key, value);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create context with data:", e);
+        }
+    }
+
+    protected long nativePtr() {
+        return nativePtr;
+    }
+
+    @Override
+    protected void finalize() {
+        nativeFinalize(nativePtr);
+    }
 }
