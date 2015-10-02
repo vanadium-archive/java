@@ -47,7 +47,7 @@ public static newStyleProfiles() {
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 def vdlPath = [jiriRoot, 'release', 'go', 'src'].join(File.separator)
-def vdlBin = [jiriRoot, 'devtools', 'bin', 'vdl'].join(File.separator)
+def vdlBin = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
 
@@ -76,7 +76,11 @@ class VanadiumEnvironment {
     }
 }
 
-task generateVdl(type: Exec) {
+task buildVdlTool(type: Exec) {
+    commandLine jiriBin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
+}
+
+task generateVdl(type: Exec, dependsOn: buildVdlTool) {
     environment VDLPATH: vdlPath
     commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
 }
