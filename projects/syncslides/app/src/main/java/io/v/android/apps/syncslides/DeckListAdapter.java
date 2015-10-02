@@ -4,8 +4,9 @@
 
 package io.v.android.apps.syncslides;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,10 +63,19 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         public final ImageView mThumb;
         public final Toolbar mToolbar;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             mThumb = (ImageView) itemView.findViewById(R.id.deck_thumb);
             mToolbar = (Toolbar) itemView.findViewById(R.id.deck_card_toolbar);
+            mThumb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Context context = v.getContext();
+                    // Intent for the activity to open when user selects the thumbnail.
+                    Intent presentationIntent = new Intent(context, PresentationActivity.class);
+                    context.startActivity(presentationIntent);
+                }
+            });
             mToolbar.inflateMenu(R.menu.deck_card);
             mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
