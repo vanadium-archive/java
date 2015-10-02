@@ -13,7 +13,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.context.VContextImpl;
 import io.v.v23.verror.VException;
 
 import java.util.Arrays;

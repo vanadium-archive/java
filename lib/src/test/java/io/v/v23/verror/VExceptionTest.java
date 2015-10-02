@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.context.VContextImpl;
 import io.v.v23.i18n.Catalog;
 import io.v.v23.i18n.Language;
 
@@ -57,7 +56,7 @@ public class VExceptionTest extends TestCase {
             "C", VException.ActionCode.NO_RETRY, "");
 
         {
-            VContext ctx = VContextImpl.create();
+            VContext ctx = VContext.create();
             ctx = Language.contextWithLanguage(ctx, EN);
             ctx = VException.contextWithComponentName(ctx, "VExceptionTest");
             VException.setDefaultContext(ctx);
@@ -79,7 +78,7 @@ public class VExceptionTest extends TestCase {
         cat.set(FR, Errors.NO_EXIST.getID(), "{1} {2} pas trouvé {_}");
         cat.set(DE, Errors.NO_EXIST.getID(), "");
 
-        VContext ctx = VContextImpl.create();
+        VContext ctx = VContext.create();
         ctx = Language.contextWithLanguage(ctx, FR);
         ctx = VException.contextWithComponentName(ctx, "FooServer");
 
