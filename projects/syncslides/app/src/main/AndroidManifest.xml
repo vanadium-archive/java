@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.v.android.apps.syncslides" >
+<manifest package="io.v.android.apps.syncslides"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -16,17 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- TODO(afergan): Remove this once we have a way to select a deck and transition to the
-        presentation activity.-->
-        <activity
-            android:name=".PresentationActivity"
-            android:label="SyncSlides Presentation" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".PresentationActivity"/>
     </application>
 
 </manifest>

@@ -16,11 +16,22 @@ import android.view.ViewGroup;
  * to make transitions between them seamless.
  */
 public class NavigateFragment extends Fragment {
-    // TODO(kash): Make this fragment immersive.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ((PresentationActivity)getActivity()).setUiImmersive(true);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((PresentationActivity)getActivity()).setUiImmersive(false);
     }
 }

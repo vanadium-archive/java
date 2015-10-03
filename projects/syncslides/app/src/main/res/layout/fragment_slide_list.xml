@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- We want to enter immersive mode whenever the NavigationFragment starts
+and exit immersive mode when it stops (e.g. user goes back to slide list).
+However, this doesn't just work.  Going back to the slide list causes
+the slide list's toolbar to be shifted down.  Between the toolbar and the
+status bar, there is a gray strip that is the same height as the status
+bar.  We work around this mis-render by having the content
+of the slide list go behind the toolbar.  We then need to pad the content
+of the slide list to be below the toolbar. -->
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="@dimen/toolbar_and_statusbar_height"
     android:background="@color/snow_2"
     android:label="@string/slide_list_title"
     tools:context=".PresentationActivity">
