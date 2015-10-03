@@ -4,6 +4,7 @@
 
 package io.v.impl.google.namespace;
 
+import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
 import java.util.List;
@@ -27,23 +28,48 @@ public class NamespaceImpl implements Namespace {
     private static native Iterable<GlobReply> nativeGlob(
             long nativePtr, VContext context, String pattern, Options options) throws VException;
 
+    private static native void nativeGlobAsync(long nativePtr, VContext context, String pattern,
+                                               Options options, Callback<Iterable<GlobReply>>
+                                                       callback) throws VException;
+
     private static native void nativeMount(long nativePtr, VContext context, String name,
                                            String server, Duration ttl, Options options)
             throws VException;
 
+    private static native void nativeMountAsync(long nativePtr, VContext context, String name,
+                                                String server, Duration ttl, Options options,
+                                                Callback<Void> callback) throws VException;
+
     private static native void nativeUnmount(long nativePtr, VContext context, String name,
                                              String server, Options options) throws VException;
+
+    private static native void nativeUnmountAsync(long nativePtr, VContext context, String name,
+                                                  String server, Options options, Callback<Void>
+                                                          callback) throws VException;
 
     private static native void nativeDelete(long nativePtr, VContext context, String name,
                                             boolean deleteSubtree, Options options)
             throws VException;
 
+    private static native void nativeDeleteAsync(long nativePtr, VContext context, String name,
+                                                 boolean deleteSubtree, Options options,
+                                                 Callback<Void> callback) throws VException;
+
     private static native MountEntry nativeResolveToMountTable(long nativePtr, VContext context,
                                                                String name, Options options)
             throws VException;
 
+    private static native void nativeResolveToMountTableAsync(long nativePtr, VContext context,
+                                                              String name, Options options,
+                                                              Callback<MountEntry> callback)
+            throws VException;
+
     private static native MountEntry nativeResolve(long nativePtr, VContext context, String name,
                                                    Options options) throws VException;
+
+    private static native void nativeResolveAsync(long nativePtr, VContext context, String name,
+                                                  Options options, Callback<MountEntry> callback)
+            throws VException;
 
     private static native boolean nativeFlushCacheEntry(long nativePtr, VContext context,
                                                         String name);
@@ -54,11 +80,18 @@ public class NamespaceImpl implements Namespace {
                                                     Permissions permissions, String version,
                                                     Options options) throws VException;
 
+    private static native void nativeSetPermissionsAsync(long nativePtr, VContext context, String
+            name, Permissions permissions, String version, Options options, Callback<Void>
+            callback) throws VException;
+
     private static native Map<String, Permissions> nativeGetPermissions(long nativePtr,
                                                                         VContext context,
                                                                         String name,
                                                                         Options options)
             throws VException;
+
+    private static native void nativeGetPermissionsAsync(long nativePtr, VContext context, String
+            name, Options options, Callback<Map<String, Permissions>> callback) throws VException;
 
     private native void nativeFinalize(long nativePtr);
 
@@ -69,7 +102,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public void mount(VContext context, String name, String server, Duration ttl)
             throws VException {
-        mount(context, name, server, ttl, null);
+        mount(context, name, server, ttl, (Options) null);
     }
 
     @Override
@@ -79,20 +112,43 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void mount(VContext context, String name, String server, Duration ttl, Callback<Void>
+            callback) throws VException {
+        mount(context, name, server, ttl, null, callback);
+    }
+
+    @Override
+    public void mount(VContext context, String name, String server, Duration ttl, Options
+            options, Callback<Void> callback) throws VException {
+        nativeMountAsync(nativePtr, context, name, server, ttl, options, callback);
+    }
+
+    @Override
     public void unmount(VContext context, String name, String server) throws VException {
-        unmount(context, name, server, null);
+        unmount(context, name, server, (Options) null);
     }
 
     @Override
     public void unmount(VContext context, String name, String server, Options options)
             throws VException {
         nativeUnmount(nativePtr, context, name, server, options);
+    }
 
+    @Override
+    public void unmount(VContext context, String name, String server, Callback<Void> callback)
+            throws VException {
+        unmount(context, name, server, null, callback);
+    }
+
+    @Override
+    public void unmount(VContext context, String name, String server, Options options,
+                        Callback<Void> callback) throws VException {
+        nativeUnmountAsync(nativePtr, context, name, server, options, callback);
     }
 
     @Override
     public void delete(VContext context, String name, boolean deleteSubtree) throws VException {
-        delete(context, name, deleteSubtree, null);
+        delete(context, name, deleteSubtree, (Options) null);
     }
 
     @Override
@@ -102,8 +158,20 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void delete(VContext context, String name, boolean deleteSubtree, Callback<Void>
+            callback) throws VException {
+        delete(context, name, deleteSubtree, null, callback);
+    }
+
+    @Override
+    public void delete(VContext context, String name, boolean deleteSubtree, Options options,
+                       Callback<Void> callback) throws VException {
+        nativeDeleteAsync(nativePtr, context, name, deleteSubtree, options, callback);
+    }
+
+    @Override
     public MountEntry resolve(VContext context, String name) throws VException {
-        return resolve(context, name, null);
+        return resolve(context, name, (Options) null);
     }
 
     @Override
@@ -112,8 +180,20 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void resolve(VContext context, String name, Callback<MountEntry> callback) throws
+            VException {
+        resolve(context, name, null, callback);
+    }
+
+    @Override
+    public void resolve(VContext context, String name, Options options, Callback<MountEntry>
+            callback) throws VException {
+        nativeResolveAsync(nativePtr, context, name, options, callback);
+    }
+
+    @Override
     public MountEntry resolveToMountTable(VContext context, String name) throws VException {
-        return resolveToMountTable(context, name, null);
+        return resolveToMountTable(context, name, (Options) null);
     }
 
     @Override
@@ -123,13 +203,26 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void resolveToMountTable(VContext context, String name, Callback<MountEntry> callback)
+            throws VException {
+        resolveToMountTable(context, name, null, callback);
+    }
+
+    @Override
+    public void resolveToMountTable(VContext context, String name, Options options,
+                                    Callback<MountEntry> callback)
+            throws VException {
+        nativeResolveToMountTableAsync(nativePtr, context, name, options, callback);
+    }
+
+    @Override
     public boolean flushCacheEntry(VContext context, String name) {
         return nativeFlushCacheEntry(nativePtr, context, name);
     }
 
     @Override
     public Iterable<GlobReply> glob(VContext context, String pattern) throws VException {
-        return glob(context, pattern, null);
+        return glob(context, pattern, (Options) null);
     }
 
     @Override
@@ -139,6 +232,19 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void glob(VContext context, String pattern, Callback<Iterable<GlobReply>> callback)
+            throws VException {
+        glob(context, pattern, null, callback);
+    }
+
+    @Override
+    public void glob(VContext context, String pattern, Options options,
+                     Callback<Iterable<GlobReply>> callback) throws VException {
+        nativeGlobAsync(nativePtr, context, pattern, options, callback);
+    }
+
+
+    @Override
     public void setRoots(List<String> roots) throws VException {
         nativeSetRoots(nativePtr, roots);
     }
@@ -146,7 +252,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public void setPermissions(VContext context, String name, Permissions permissions,
                                String version) throws VException {
-        setPermissions(context, name, permissions, version, null);
+        setPermissions(context, name, permissions, version, (Options) null);
     }
 
     @Override
@@ -156,15 +262,41 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public void setPermissions(VContext context, String name, Permissions permissions,
+                               String version, Callback<Void> callback) throws VException {
+        setPermissions(context, name, permissions, version, null, callback);
+    }
+
+    @Override
+    public void setPermissions(VContext context, String name, Permissions permissions, String
+            version, Options options, Callback<Void> callback) throws VException {
+        nativeSetPermissionsAsync(nativePtr, context, name, permissions, version, options,
+                callback);
+    }
+
+    @Override
     public Map<String, Permissions> getPermissions(VContext context, String name)
             throws VException {
-        return getPermissions(context, name, null);
+        return getPermissions(context, name, (Options) null);
     }
 
     @Override
     public Map<String, Permissions> getPermissions(VContext context, String name, Options options)
             throws VException {
         return nativeGetPermissions(nativePtr, context, name, options);
+    }
+
+    @Override
+    public void getPermissions(VContext context, String name, Callback<Map<String, Permissions>>
+            callback) throws VException {
+        getPermissions(context, name, null, callback);
+    }
+
+    @Override
+    public void getPermissions(VContext context, String name, Options options,
+                               Callback<Map<String, Permissions>> callback)
+            throws VException {
+        nativeGetPermissionsAsync(nativePtr, context, name, options, callback);
     }
 
     @Override

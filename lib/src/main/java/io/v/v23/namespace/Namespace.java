@@ -4,6 +4,7 @@
 
 package io.v.v23.namespace;
 
+import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
 import java.util.List;
@@ -51,6 +52,22 @@ public interface Namespace {
             throws VException;
 
     /**
+     * A shortcut for {@link #mount(VContext, String, String, Duration, Options, Callback)} with
+     * a {@code null} options parameter.
+     */
+    void mount(VContext context, String name, String server, Duration ttl, Callback<Void> callback)
+            throws VException;
+
+    /**
+     * Asynchronous version of {@link #mount(VContext, String, String, Duration, Options)} that
+     * takes in a callback whose {@code onSuccess} method will be called when the operation
+     * completes successfully, and whose {@code onFailure} will be called if an error is
+     * encountered.
+     */
+    void mount(VContext context, String name, String server, Duration ttl, Options options,
+               Callback<Void> callback) throws VException;
+
+    /**
      * A shortcut for {@link #unmount(VContext, String, String, Options)} with a {@code null}
      * options parameter.
      */
@@ -76,6 +93,21 @@ public interface Namespace {
      * @throws VException if the server object address could not be unmounted
      */
     void unmount(VContext context, String name, String server, Options options) throws VException;
+
+    /**
+     * A shortcut for {@link #unmount(VContext, String, String, Options, Callback)} with a {@code
+     * null} options parameter.
+     */
+    void unmount(VContext context, String name, String server, Callback<Void> callback) throws
+            VException;
+
+    /**
+     * Asynchronous version of {@link #unmount(VContext, String, String, Options)} that takes
+     * in a callback whose {@code onSuccess} method will be called when the operation completes
+     * successfully, and whose {@code onFailure} will be called if an error is encountered.
+     */
+    void unmount(VContext context, String name, String server, Options options, Callback<Void>
+            callback) throws VException;
 
     /**
      * A shortcut for {@link #delete(VContext, String, boolean, Options)} with a {@code null}
@@ -105,6 +137,21 @@ public interface Namespace {
             throws VException;
 
     /**
+     * A shortcut for {@link #delete(VContext, String, boolean, Options, Callback)} with a {@code
+     * null} options parameter.
+     */
+    void delete(VContext context, String name, boolean deleteSubtree, Callback<Void> callback)
+            throws VException;
+
+    /**
+     * Asynchronous version of {@link #delete(VContext, String, boolean, Options)} that takes
+     * in a callback whose {@code onSuccess} method will be called when the operation completes
+     * successfully, and whose {@code onFailure} will be called if an error is encountered.
+     */
+    void delete(VContext context, String name, boolean deleteSubtree, Options options,
+                Callback<Void> callback) throws VException;
+
+    /**
      * A shortcut for {@link #resolve(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
@@ -129,6 +176,20 @@ public interface Namespace {
      * @throws VException if an error occurred during name resolution
      */
     MountEntry resolve(VContext context, String name, Options options) throws VException;
+
+    /**
+     * A shortcut for {@link #resolve(VContext, String, Options, Callback)} with a {@code null}
+     * options parameter.
+     */
+    void resolve(VContext context, String name, Callback<MountEntry> callback) throws VException;
+
+    /**
+     * Asynchronous version of {@link #resolve(VContext, String, Options)} that takes in a
+     * callback whose {@code onSuccess} method will be called when the operation completes
+     * successfully, and whose {@code onFailure} will be called if an error is encountered.
+     */
+    void resolve(VContext context, String name, Options options, Callback<MountEntry> callback)
+            throws VException;
 
     /**
      * A shortcut for {@link #resolve(VContext, String, Options)} with a {@code null} options
@@ -158,6 +219,21 @@ public interface Namespace {
             throws VException;
 
     /**
+     * A shortcut for {@link #resolve(VContext, String, Options, Callback)} with a {@code null}
+     * options parameter.
+     */
+    void resolveToMountTable(VContext context, String name, Callback<MountEntry> callback) throws
+            VException;
+
+    /**
+     * Asynchronous version of {@link #resolveToMountTable(VContext, String, Options)} that takes
+     * in a callback whose {@code onSuccess} method will be called when the operation completes
+     * successfully, and whose {@code onFailure} will be called if an error is encountered.
+     */
+    void resolveToMountTable(VContext context, String name, Options options, Callback<MountEntry>
+            callback) throws VException;
+
+    /**
      * Flushes resolution information cached for the given name. If anything was flushed it returns
      * {@code true}.
      *
@@ -175,7 +251,9 @@ public interface Namespace {
     Iterable<GlobReply> glob(VContext context, String pattern) throws VException;
 
     /**
-     * Returns the iterator over all names matching the provided pattern.
+     * Returns the iterator over all names matching the provided pattern. Note that due to the
+     * inherently asynchronous nature of Vanadium's glob API, you should assume that calls to
+     * the returned iterator's {@code next} method may block.
      * <p>
      * You should be aware that the iterator:
      * <p><ul>
@@ -197,6 +275,42 @@ public interface Namespace {
      */
     Iterable<GlobReply> glob(VContext context, String pattern, Options options)
             throws VException;
+
+    /**
+     * A shortcut for {@link #glob(VContext, String, Options, Callback)} with a {@code null} options
+     * parameter.
+     */
+    void glob(VContext context, String pattern, Callback<Iterable<GlobReply>> callback)
+            throws VException;
+
+    /**
+     * Asynchronously returns the iterator over all names matching the provided pattern. This
+     * function returns immediately and the given non-{@code null} callback is called when the
+     * operation completes (either successfully or with a failure). Generally, the callback will
+     * be called when at least one entry can be read from the iterator. Subsequent calls to
+     * {@code next} may block. You should not use the iterator on threads that should not block.
+     * <p>
+     * You should be aware that the iterator:
+     * <p><ul>
+     *     <li>can be created <strong>only</strong> once</li>
+     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
+     * </ul>
+     * <p>
+     * A particular implementation of this interface chooses which options to support, but at the
+     * minimum it must handle the following pre-defined options:
+     * <ul>
+     *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
+     * </ul>
+     *
+     * @param context a client context
+     * @param pattern a pattern that should be matched
+     * @param options options to pass to the implementation as described above, or {@code null}
+     * @param callback a callback whose {@code onSuccess} method will be passed the {@link Iterable}
+     *                 over {@link GlobReply} objects matching the provided pattern
+     * @throws VException if an error is encountered
+     */
+    void glob(VContext context, String pattern, Options options, Callback<Iterable<GlobReply>>
+            callback) throws VException;
 
     /**
      * Sets the roots that the local namespace is relative to.
@@ -246,6 +360,22 @@ public interface Namespace {
                         Options options) throws VException;
 
     /**
+     * A shortcut for {@link #setPermissions(VContext, String, Permissions, String, Options,
+     * Callback)} with a {@code null} options parameter.
+     */
+    void setPermissions(VContext context, String name, Permissions permissions, String version,
+                        Callback<Void> callback) throws VException;
+
+    /**
+     * Asynchronous version of {@link #setPermissions(VContext, String, Permissions, String,
+     * Options)} that takes in a callback whose {@code onSuccess} method will be called when the
+     * operation completes successfully, and whose {@code onFailure} will be called if an error is
+     * encountered.
+     */
+    void setPermissions(VContext context, String name, Permissions permissions, String version,
+                        Options options, Callback<Void> callback) throws VException;
+
+    /**
      * A shortcut for {@link #getPermissions(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
@@ -271,4 +401,19 @@ public interface Namespace {
      */
     Map<String, Permissions> getPermissions(VContext context, String name, Options options)
             throws VException;
+
+    /**
+     * A shortcut for {@link #getPermissions(VContext, String, Options, Callback)} with a
+     * {@code null} options parameter.
+     */
+    void getPermissions(VContext context, String name, Callback<Map<String, Permissions>>
+            callback) throws VException;
+
+    /**
+     * Asynchronous version of {@link #getPermissions(VContext, String, Options)} that takes in a
+     * callback whose {@code onSuccess} method will be called when the operation completes
+     * successfully, and whose {@code onFailure} will be called if an error is encountered.
+     */
+    void getPermissions(VContext context, String name, Options options, Callback<Map<String,
+            Permissions>> callback) throws VException;
 }
