@@ -33,26 +33,29 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
+                <!-- The icons below are 24dp scaled to 36dp.  For whatever reason, the
+                  36 dp icons look too fat. -->
                 <ImageView
                     android:id="@+id/arrow_back"
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
+                    android:layout_marginLeft="@dimen/nav_button_margin"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_arrow_back"/>
+                    android:src="@drawable/ic_arrow_back_white_24dp"/>
 
                 <ImageView
                     android:id="@+id/slide_list"
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_layers_white"/>
+                    android:src="@drawable/ic_layers_white_24dp"/>
 
                 <ImageView
                     android:id="@+id/questions"
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_live_help_white"/>
+                    android:src="@drawable/ic_live_help_white_24dp"/>
 
                 <!-- This button shows up only some of the time.  NavigateFragment makes it visible
                      dynamically. -->
@@ -61,8 +64,8 @@
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_arrow_forward_white"
-                    android:visibility="invisible"/>
+                    android:src="@drawable/ic_arrow_forward_white_24dp"
+                    android:visibility="visible"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -74,8 +77,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:clickable="true"
-            android:src="@drawable/ic_arrow_forward_white"
-            android:visibility="invisible"
+            android:src="@drawable/ic_arrow_forward_white_36dp"
+            android:visibility="visible"
             app:backgroundTint="@color/action_orange"
             app:layout_anchor="@id/slide_current_medium"
             app:layout_anchorGravity="bottom|right|end"/>
@@ -112,17 +115,18 @@
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
                 android:src="@drawable/slide1"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/nav_hint_margin"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/nav_hint_margin"
+                android:background="@drawable/nav_hint"
                 android:paddingLeft="@dimen/nav_hint_padding"
                 android:paddingRight="@dimen/nav_hint_padding"
-                android:textColor="@color/nav_hint_text"
-                android:background="@drawable/nav_hint"
-                android:text="@string/prev_hint"/>
+                android:text="@string/prev_hint"
+                android:textColor="@color/nav_hint_text"/>
 
         </RelativeLayout>
 
@@ -138,17 +142,18 @@
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
                 android:src="@drawable/slide3"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/nav_hint_margin"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/nav_hint_margin"
+                android:background="@drawable/nav_hint"
                 android:paddingLeft="@dimen/nav_hint_padding"
                 android:paddingRight="@dimen/nav_hint_padding"
-                android:textColor="@color/nav_hint_text"
-                android:background="@drawable/nav_hint"
-                android:text="@string/next_hint"/>
+                android:text="@string/next_hint"
+                android:textColor="@color/nav_hint_text"/>
 
         </RelativeLayout>
 
