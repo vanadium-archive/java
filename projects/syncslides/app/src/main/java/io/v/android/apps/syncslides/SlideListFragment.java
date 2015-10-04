@@ -5,6 +5,7 @@
 package io.v.android.apps.syncslides;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,16 @@ public class SlideListFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_slide_list, container, false);
 
+        //Clicking on the fab leads to the first slide
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
+                R.id.play_presentation_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PresentationActivity activity = (PresentationActivity) v.getContext();
+                activity.jumpToSlide(0);
+            }
+        });
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.slide_list);
         mRecyclerView.setHasFixedSize(true);
 
