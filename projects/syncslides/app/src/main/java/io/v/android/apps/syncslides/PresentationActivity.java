@@ -49,8 +49,8 @@ public class PresentationActivity extends AppCompatActivity {
      */
 
     public void jumpToSlide(int slideNum) {
-        // TODO(kash): Actually navigate to the right slide.  Need vcl/16118 for that.
-        NavigateFragment fragment = new NavigateFragment();
+        NavigateFragment fragment = NavigateFragment.newInstance(
+                "dummy deck id", slideNum, NavigateFragment.Role.AUDIENCE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)

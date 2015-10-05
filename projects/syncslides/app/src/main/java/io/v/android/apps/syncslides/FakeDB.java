@@ -8,6 +8,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -31,10 +33,12 @@ public class FakeDB implements DB {
     };
     private static final String[] TITLES = {"deck 1", "deck 2", "deck 3"};
 
+    private final Handler mHandler;
     private final Bitmap[] mThumbs;
     private final Bitmap[] mSlideImages;
 
     public FakeDB(Context context) {
+        mHandler = new Handler(Looper.getMainLooper());
         mThumbs = new Bitmap[THUMBS.length];
         for (int i = 0; i < THUMBS.length; i++) {
             mThumbs[i] = BitmapFactory.decodeResource(context.getResources(), THUMBS[i]);
@@ -156,5 +160,20 @@ public class FakeDB implements DB {
     public SlideList getSlides(String deckId) {
         // Always return the same set of slides no matter which deck was requested.
         return new FakeSlideList(mSlideImages, SLIDENOTES);
+    }
+
+    @Override
+    public void getSlides(String deckId, final SlidesCallback callback) {
+        final Slide[] slides = new Slide[mSlideImages.length];
+        for (int i = 0; i < mSlideImages.length; i++) {
+            slides[i] = new FakeSlide(mSlideImages[i], SLIDENOTES[i]);
+        }
+        // Run the callback asynchronously on the UI thread.
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.done(slides);
+            }
+        });
     }
 }

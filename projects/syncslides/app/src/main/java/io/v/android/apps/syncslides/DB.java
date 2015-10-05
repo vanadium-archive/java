@@ -122,4 +122,19 @@ public interface DB {
      * @return a list of slides
      */
     SlideList getSlides(String deckId);
+
+    interface SlidesCallback {
+        /**
+         * This callback is run on the UI thread once the list of slides is loaded from the DB.
+         * @param slides the loaded slide data
+         */
+        void done(Slide[] slides);
+    }
+
+    /**
+     * Asynchronously fetch the slides for the given deck.
+     * @param deckId the deck to fetch
+     * @param callback runs on the UI thread when the slide data is loaded
+     */
+    void getSlides(String deckId, SlidesCallback callback);
 }

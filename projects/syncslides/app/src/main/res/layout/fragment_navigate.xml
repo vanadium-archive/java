@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:id="@+id/navigate_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,8 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/slide2"/>
+                android:scaleType="fitCenter" />
 
             <!-- A bar containing icons to navigate the presentation. -->
             <LinearLayout
@@ -41,21 +40,21 @@
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginLeft="@dimen/nav_button_margin"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_arrow_back_white_24dp"/>
+                    android:src="@drawable/ic_arrow_back_white_24dp" />
 
                 <ImageView
                     android:id="@+id/slide_list"
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_layers_white_24dp"/>
+                    android:src="@drawable/ic_layers_white_24dp" />
 
                 <ImageView
                     android:id="@+id/questions"
                     android:layout_width="@dimen/nav_button_size"
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_live_help_white_24dp"/>
+                    android:src="@drawable/ic_live_help_white_24dp" />
 
                 <!-- This button shows up only some of the time.  NavigateFragment makes it visible
                      dynamically. -->
@@ -65,7 +64,7 @@
                     android:layout_height="@dimen/nav_button_size"
                     android:layout_marginRight="@dimen/nav_button_margin"
                     android:src="@drawable/ic_arrow_forward_white_24dp"
-                    android:visibility="visible"/>
+                    android:visibility="visible" />
             </LinearLayout>
         </LinearLayout>
 
@@ -81,7 +80,7 @@
             android:visibility="visible"
             app:backgroundTint="@color/action_orange"
             app:layout_anchor="@id/slide_current_medium"
-            app:layout_anchorGravity="bottom|right|end"/>
+            app:layout_anchorGravity="bottom|right|end" />
 
     </android.support.design.widget.CoordinatorLayout>
 
@@ -93,7 +92,7 @@
         android:layout_weight="1"
         android:gravity="left"
         android:hint="@string/notes_hint"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 
     <!-- Display the next and previous slide thumbnails. -->
     <LinearLayout
@@ -109,12 +108,12 @@
             android:layout_weight="1">
 
             <ImageView
+                android:id="@+id/prev_thumb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/slide1"/>
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -126,7 +125,7 @@
                 android:paddingLeft="@dimen/nav_hint_padding"
                 android:paddingRight="@dimen/nav_hint_padding"
                 android:text="@string/prev_hint"
-                android:textColor="@color/nav_hint_text"/>
+                android:textColor="@color/nav_hint_text" />
 
         </RelativeLayout>
 
@@ -136,12 +135,12 @@
             android:layout_weight="1">
 
             <ImageView
+                android:id="@+id/next_thumb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:src="@drawable/slide3"/>
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -153,7 +152,7 @@
                 android:paddingLeft="@dimen/nav_hint_padding"
                 android:paddingRight="@dimen/nav_hint_padding"
                 android:text="@string/next_hint"
-                android:textColor="@color/nav_hint_text"/>
+                android:textColor="@color/nav_hint_text" />
 
         </RelativeLayout>
 
