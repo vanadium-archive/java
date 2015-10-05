@@ -77,9 +77,6 @@ public class DeckChooserFragment extends Fragment {
                     }
                 });
 
-        DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        mAdapter = new DeckListAdapter(db);
-        mRecyclerView.setAdapter(mAdapter);
         return rootView;
     }
 
@@ -91,9 +88,18 @@ public class DeckChooserFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
+    public void onStart() {
+        super.onStart();
+        DB db = DB.Singleton.get(getActivity().getApplicationContext());
+        mAdapter = new DeckListAdapter(db);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mAdapter.stop();
-        super.onPause();
+        mAdapter = null;
     }
 
     /**
