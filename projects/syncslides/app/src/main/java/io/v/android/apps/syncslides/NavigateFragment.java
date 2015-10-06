@@ -4,12 +4,17 @@
 
 package io.v.android.apps.syncslides;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -34,6 +39,7 @@ public class NavigateFragment extends Fragment {
     private EditText mNotes;
     private DB.Slide[] mSlides;
     private Role mRole;
+    private boolean mEditing;
 
     public enum Role {
         PRESENTER, AUDIENCE
@@ -47,6 +53,12 @@ public class NavigateFragment extends Fragment {
         args.putSerializable(ROLE_KEY, role);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -101,7 +113,24 @@ public class NavigateFragment extends Fragment {
                 fullscreenSlide();
             }
         });
+
         mNotes = (EditText) rootView.findViewById(R.id.notes);
+        mNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                mEditing = hasFocus;
+                getActivity().invalidateOptionsMenu();
+            }
+        });
+        // The parent of mNotes needs to be focusable in order to clear focus
+        // from mNotes when done editing.  We set the attributes in code rather
+        // than in XML because it is too easy to add an extra level of layout
+        // in XML and forget to add these attributes.
+        ViewGroup parent = (ViewGroup) mNotes.getParent();
+        parent.setFocusable(true);
+        parent.setClickable(true);
+        parent.setFocusableInTouchMode(true);
+
         View slideListIcon = rootView.findViewById(R.id.slide_list);
         slideListIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +170,33 @@ public class NavigateFragment extends Fragment {
         outState.putInt(SLIDE_NUM_KEY, mSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (mEditing) {
+            inflater.inflate(R.menu.edit_notes, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_save:
+                Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
+                mNotes.clearFocus();
+                InputMethodManager inputManager =
+                        (InputMethodManager) getContext().
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(
+                        getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+                ((PresentationActivity) getActivity()).setUiImmersive(true);
+                return true;
+        }
+        return false;
+    }
+
 
     private void fullscreenSlide() {
         // TODO(afergan): Transition to the fullscreen fragment.
@@ -193,6 +249,8 @@ public class NavigateFragment extends Fragment {
         }
         if (!mSlides[mSlideNum].getNotes().equals("")) {
             mNotes.setText(mSlides[mSlideNum].getNotes());
+        } else {
+            mNotes.getText().clear();
         }
     }
 }

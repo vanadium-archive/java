@@ -23,8 +23,8 @@ public class FakeDB implements DB {
     private static final int[] SLIDEDRAWABLES = new int[]{R.drawable.slide1, R.drawable.slide2,
             R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
             R.drawable.slide7};
-    private final String[] SLIDENOTES = {"slide 1 notes", "slide 2 notes", "slide 3 notes",
-            "slide 4 notes", "slide 5 notes", "slide 6 notes", "slide 7 notes"};
+    private final String[] SLIDENOTES = {"slide 1 notes", "slide 2 notes", "",
+            "slide 4 notes", "", "slide 6 notes", "slide 7 notes"};
     private static final String TAG = "FakeDB";
     private static final int[] THUMBS = {
             R.drawable.thumb_deck1,

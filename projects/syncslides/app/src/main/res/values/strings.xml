@@ -12,9 +12,11 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_delete_deck">Delete</string>
+    <string name="action_save">Save</string>
 
     <string name="slide_list_title">Pitch deck</string>
     <string name="notes_hint">Notes (only you see these)</string>
     <string name="next_hint">Next</string>
     <string name="prev_hint">Previous</string>
+
 </resources>

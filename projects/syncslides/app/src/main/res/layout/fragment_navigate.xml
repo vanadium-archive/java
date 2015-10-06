@@ -92,7 +92,9 @@
         android:layout_weight="1"
         android:gravity="left"
         android:hint="@string/notes_hint"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:scrollbars="vertical"
+        android:inputType="textMultiLine|textAutoComplete|textCapSentences"/>
 
     <!-- Display the next and previous slide thumbnails. -->
     <LinearLayout
