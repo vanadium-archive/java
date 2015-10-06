@@ -5,6 +5,8 @@
 package io.v.android.apps.syncslides;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -281,20 +283,43 @@ public class NavigateFragment extends Fragment {
             return;
         }
         if (mSlideNum > 0) {
-            mPrevThumb.setImageBitmap(mSlides[mSlideNum - 1].getImage());
+            setThumbBitmap(mPrevThumb, mSlides[mSlideNum - 1].getImage());
         } else {
-            mPrevThumb.setImageDrawable(null);
+            setThumbNull(mPrevThumb);
         }
         mCurrentSlide.setImageBitmap(mSlides[mSlideNum].getImage());
         if (mSlideNum == mSlides.length - 1) {
-            mNextThumb.setImageDrawable(null);
+            setThumbNull(mNextThumb);
         } else {
-            mNextThumb.setImageBitmap(mSlides[mSlideNum + 1].getImage());
+            setThumbBitmap(mNextThumb, mSlides[mSlideNum + 1].getImage());
         }
         if (!mSlides[mSlideNum].getNotes().equals("")) {
             mNotes.setText(mSlides[mSlideNum].getNotes());
         } else {
             mNotes.getText().clear();
+        }
+    }
+
+    private void setThumbBitmap(ImageView thumb, Bitmap bitmap) {
+        thumb.setImageBitmap(bitmap);
+        // In landscape, the height is dependent on the image size.  However, if the
+        // image was null, the height is hardcoded to 9/16 of the width in setThumbNull.
+        // This resets it to the actual image size.
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ViewGroup.LayoutParams thumbParams = thumb.getLayoutParams();
+            thumbParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+    }
+
+    private void setThumbNull(ImageView thumb) {
+        thumb.setImageDrawable(null);
+        // In landscape, the height is dependent on the image size.  Because we don't have an
+        // image, assume all of the images are 16:9.  The width is fixed, so we can calculate
+        // the expected height.
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ViewGroup grandparent = (ViewGroup) thumb.getParent().getParent();
+            ViewGroup.LayoutParams thumbParams = thumb.getLayoutParams();
+            thumbParams.height = (int) ((9 / 16.0) * grandparent.getMeasuredWidth());
         }
     }
 }

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/navigate_fragment"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/notes_and_thumbs"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Editable notes for the current slide. -->
+        <EditText
+            android:id="@+id/notes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:hint="@string/notes_hint"
+            android:textSize="18sp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/next_thumb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/slide3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/nav_hint_margin"
+                android:background="@drawable/nav_hint"
+                android:paddingLeft="@dimen/nav_hint_padding"
+                android:paddingRight="@dimen/nav_hint_padding"
+                android:text="@string/next_hint"
+                android:textColor="@color/nav_hint_text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/prev_thumb_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/prev_thumb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/slide1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/nav_hint_margin"
+                android:background="@drawable/nav_hint"
+                android:paddingLeft="@dimen/nav_hint_padding"
+                android:paddingRight="@dimen/nav_hint_padding"
+                android:text="@string/prev_hint"
+                android:textColor="@color/nav_hint_text"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/main_slide"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:background="@color/matte_black">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- A medium version of the slide image. -->
+            <ImageView
+                android:id="@+id/slide_current_medium"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_margin="12dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/slide2"/>
+
+            <!-- A bar containing icons to navigate the presentation. -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/nav_bar_height"
+                android:background="@color/toolbar_gray"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- The icons below are 24dp scaled to 36dp.  For whatever reason, the
+                  36 dp icons look too fat. -->
+                <ImageView
+                    android:id="@+id/arrow_back"
+                    android:layout_width="@dimen/nav_button_size"
+                    android:layout_height="@dimen/nav_button_size"
+                    android:layout_marginLeft="@dimen/nav_button_margin"
+                    android:layout_marginRight="@dimen/nav_button_margin"
+                    android:src="@drawable/ic_arrow_back_white_24dp"/>
+
+                <ImageView
+                    android:id="@+id/slide_list"
+                    android:layout_width="@dimen/nav_button_size"
+                    android:layout_height="@dimen/nav_button_size"
+                    android:layout_marginRight="@dimen/nav_button_margin"
+                    android:src="@drawable/ic_layers_white_24dp"/>
+
+                <RelativeLayout
+                    android:id="@+id/questions_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/questions"
+                        android:layout_width="@dimen/nav_button_size"
+                        android:layout_height="@dimen/nav_button_size"
+                        android:layout_marginRight="@dimen/nav_button_margin"
+                        android:src="@drawable/ic_live_help_white_24dp" />
+
+                    <TextView
+                        android:id="@+id/questions_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/questions"
+                        android:layout_alignTop="@id/questions"
+                        android:gravity="center"
+                        android:textSize="@dimen/nav_question_num_size"
+                        android:background="@drawable/orange_circle"
+                        android:textColor="@color/nav_question_num_text"/>
+                </RelativeLayout>
+
+                <!-- This button shows up only some of the time.  NavigateFragment makes it visible
+                     dynamically. -->
+                <ImageView
+                    android:id="@+id/arrow_forward"
+                    android:layout_width="@dimen/nav_button_size"
+                    android:layout_height="@dimen/nav_button_size"
+                    android:layout_marginRight="@dimen/nav_button_margin"
+                    android:src="@drawable/ic_arrow_forward_white_24dp"
+                    android:visibility="visible"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- This button shows up only some of the time.  NavigateFragment makes it visible
+             dynamically. -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/primary_navigation_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_arrow_forward_white_36dp"
+            android:visibility="visible"
+            app:backgroundTint="@color/action_orange"
+            app:layout_anchor="@id/slide_current_medium"
+            app:layout_anchorGravity="bottom|right|end"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</LinearLayout>
