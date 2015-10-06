@@ -6,9 +6,6 @@ package io.v.android.apps.syncslides;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-
-import java.util.List;
 
 /**
  * Provides high-level methods for getting and setting the state of SyncSlides.
@@ -100,6 +97,32 @@ public interface DB {
          */
         Slide getSlide(int i);
 
+    }
+
+    /**
+     * Add user to presenter's question queue.
+     * @param identity the user's identity name
+     */
+    void askQuestion(String identity);
+
+    /**
+     * Fetch the list of identities asking questions for the given deck.
+     *
+     * @param deckId   the deck to fetch
+     * @param callback runs on the UI thread when the slide data is loaded
+     */
+    void getQuestionerList(String deckId, QuestionerListener callback);
+
+    /** Listener for changes in the Q&A queue.
+     *
+     */
+    interface QuestionerListener {
+        /**
+         * This callback is run on the UI thread to detect changes in the number of questions asked.
+         *
+         * @param questionerList the list of identities in the questions queue
+         */
+        void onChange(String[] questionerList);
     }
 
     /**

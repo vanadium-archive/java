@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -36,9 +37,12 @@ public class NavigateFragment extends Fragment {
     private ImageView mPrevThumb;
     private ImageView mNextThumb;
     private ImageView mCurrentSlide;
+    private ImageView mQuestions;
+    private TextView mQuestionsNum;
     private EditText mNotes;
     private DB.Slide[] mSlides;
     private Role mRole;
+    private String[] mQuestionerList;
     private boolean mEditing;
 
     public enum Role {
@@ -75,7 +79,7 @@ public class NavigateFragment extends Fragment {
         mSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
 
-        View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
 
         View.OnClickListener previousSlideListener = new View.OnClickListener() {
             @Override
@@ -106,6 +110,13 @@ public class NavigateFragment extends Fragment {
         }
         mNextThumb = (ImageView) rootView.findViewById(R.id.next_thumb);
         mNextThumb.setOnClickListener(nextSlideListener);
+        mQuestions = (ImageView) rootView.findViewById(R.id.questions);
+        mQuestions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                questionButton();
+            }
+        });
         mCurrentSlide = (ImageView) rootView.findViewById(R.id.slide_current_medium);
         mCurrentSlide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +149,10 @@ public class NavigateFragment extends Fragment {
                 getFragmentManager().popBackStack();
             }
         });
+        mQuestionsNum = (TextView) rootView.findViewById(R.id.questions_num);
+        if (mRole == Role.AUDIENCE) {
+            mQuestionsNum.setVisibility(View.INVISIBLE);
+        }
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.SlidesCallback() {
@@ -147,7 +162,20 @@ public class NavigateFragment extends Fragment {
                 updateView();
             }
         });
-
+        if (mRole == Role.PRESENTER) {
+            db.getQuestionerList(mDeckId, new DB.QuestionerListener() {
+                @Override
+                public void onChange(String[] questionerList) {
+                    mQuestionerList = questionerList;
+                    if (mQuestionerList.length > 0) {
+                        mQuestionsNum.setVisibility(View.VISIBLE);
+                        mQuestionsNum.setText(String.valueOf(mQuestionerList.length));
+                    } else {
+                        mQuestionsNum.setVisibility(View.INVISIBLE);
+                    }
+                }
+            });
+        }
         return rootView;
     }
 
@@ -228,6 +256,22 @@ public class NavigateFragment extends Fragment {
         if (mSlideNum > 0) {
             mSlideNum--;
             updateView();
+        }
+    }
+
+    /**
+     * When the user presses the icon, add the user's identity to the presenter's question queue.
+     * If presenter presses the button, get a list of users who are asking questions.
+     */
+    private void questionButton() {
+        DB db = DB.Singleton.get(getActivity().getApplicationContext());
+        if (mRole == Role.AUDIENCE) {
+            db.askQuestion("Audience member #1");
+            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                    "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
+            toast.show();
+        } else {
+            //TODO (afergan): Pop up Q&A queue for presenter.
         }
     }
 

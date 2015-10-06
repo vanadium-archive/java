@@ -7,14 +7,8 @@ package io.v.android.apps.syncslides;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A fake implementation of DB for manual testing purposes.
@@ -134,7 +128,7 @@ public class FakeDB implements DB {
         private final Bitmap[] mSlideImages;
         private final String[] mSlideNotes;
 
-        private FakeSlideList (Bitmap[] slideImages, String[] slideNotes) {
+        private FakeSlideList(Bitmap[] slideImages, String[] slideNotes) {
             mSlideImages = slideImages;
             mSlideNotes = slideNotes;
         }
@@ -150,6 +144,24 @@ public class FakeDB implements DB {
         }
     }
 
+
+    @Override
+    public void askQuestion(String identity) {
+        //TODO (afergan): send identity to syncbase
+    }
+
+    @Override
+    public void getQuestionerList(String deckId, final QuestionerListener callback) {
+        final String[] questionerList = new String[]{
+                "Audience member #1", "Audience member #2", "Audience member #3"};
+        // Run the callback asynchronously on the UI thread.
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onChange(questionerList);
+            }
+        });
+    }
 
     @Override
     public DeckList getDecks() {

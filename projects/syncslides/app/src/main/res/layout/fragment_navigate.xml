@@ -49,12 +49,30 @@
                     android:layout_marginRight="@dimen/nav_button_margin"
                     android:src="@drawable/ic_layers_white_24dp" />
 
-                <ImageView
-                    android:id="@+id/questions"
-                    android:layout_width="@dimen/nav_button_size"
-                    android:layout_height="@dimen/nav_button_size"
-                    android:layout_marginRight="@dimen/nav_button_margin"
-                    android:src="@drawable/ic_live_help_white_24dp" />
+                <RelativeLayout
+                    android:id="@+id/questions_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/questions"
+                        android:layout_width="@dimen/nav_button_size"
+                        android:layout_height="@dimen/nav_button_size"
+                        android:layout_marginRight="@dimen/nav_button_margin"
+                        android:src="@drawable/ic_live_help_white_24dp" />
+
+                    <TextView
+                        android:id="@+id/questions_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/questions"
+                        android:layout_alignTop="@id/questions"
+                        android:gravity="center"
+                        android:textSize="@dimen/nav_question_num_size"
+                        android:background="@drawable/orange_circle"
+                        android:textColor="@color/nav_question_num_text"/>
+                </RelativeLayout>
+
 
                 <!-- This button shows up only some of the time.  NavigateFragment makes it visible
                      dynamically. -->

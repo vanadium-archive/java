@@ -24,4 +24,7 @@
     <!-- The nav hint's padding and corner radius need to be the same to get a circular edge. -->
     <dimen name="nav_hint_padding">10dp</dimen>
     <dimen name="nav_hint_corner_radius">10dp</dimen>
+    <dimen name="nav_question_num_size">15dp</dimen>
+    <dimen name="nav_question_num_circle_size">18dp</dimen>
+    <dimen name="nav_question_num_text_size">12sp</dimen>
 </resources>
