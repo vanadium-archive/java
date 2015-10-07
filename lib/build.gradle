@@ -32,6 +32,10 @@ public static isAmd64() {
     return getArch().contains("x86_64") || getArch().contains("amd64")
 }
 
+public static isArm() {
+    return getArch().contains("arm")
+}
+
 public static getArch() {
     return System.properties['os.arch'].toLowerCase()
 }
@@ -96,9 +100,9 @@ task checkVanadiumEnvironment {
                 + "installed, you probably didn't install the java profile: try running\n\n"
                 + "jiri profile install java\n\nand then try building again.")
     }
-    if (!isAmd64()) {
+    if (!isAmd64() && !isArm()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
-                + "architectures, not: " + getArch())
+                + "and arm architectures, not: " + getArch())
     }
     if (!isLinux() && !isDarwin()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on "
@@ -108,34 +112,40 @@ task checkVanadiumEnvironment {
 
 
 task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
-    def env = VanadiumEnvironment.getVanadiumEnvironment()
     def existingPath = System.getenv('PATH')
     if (existingPath == null) {
         existingPath = ""
     }
 
+    // NOTE(spetrovic): we add the '-installsuffix=shared' flag because the build doesn't work
+    // without it on linux/arm.  (There is some conflict with "regular", i.e., non-shared builds).
     if (newStyleProfiles()) {
-        commandLine env.jiriBin.getAbsolutePath(), 'go', '--profiles=java',
-        'install', '-buildmode=c-shared', '-v', '-tags', 'java',
-        'v.io/x/jni/main'
+        commandLine jiriBin, 'go', '--profiles=java', 'install', '-buildmode=c-shared', '-v',
+                '-tags', 'java', '-installsuffix=shared', 'v.io/x/jni/main'
     } else {
         environment 'JIRI_PROFILE': 'java'
-        commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
-            '-buildmode=c-shared', '-v', '-tags', 'java', 'v.io/x/jni/main'
+        commandLine jiriBin, 'go', 'install', '-buildmode=c-shared', '-v', '-tags', 'java',
+                '-installsuffix=shared', 'v.io/x/jni/main'
     }
 }
 
 // Copy the shared library to its ultimate destination.
 if (isLinux()) {
+    def installDir = ''
+    if (isAmd64()) {
+        installDir = '/release/go/pkg/linux_amd64_shared_shared/v.io/x/jni'
+    } else {  // arm
+        installDir = '/release/go/pkg/linux_arm_shared/v.io/x/jni'
+    }
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from jiriRoot + '/release/go/pkg/linux_amd64_shared/v.io/x/jni'
+        from jiriRoot + installDir
         into 'build/libs'
         include 'main.a'
         rename 'main.a', 'libv23.so'
     }
 } else {  // darwin
     task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-        from jiriRoot + '/release/go/pkg/darwin_amd64/v.io/x/jni'
+        from jiriRoot + '/release/go/pkg/darwin_amd64_shared/v.io/x/jni'
         into 'build/libs'
         include 'main.a'
         rename 'main.a', 'libv23.dylib'
@@ -181,7 +191,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task natives(type: Jar, dependsOn: buildVanadiumLib) {
-    from 'build/libs/libv23.so'
+    if (isLinux()) {
+        from 'build/libs/libv23.so'
+    } else {
+        from 'build/libs/libv23.dylib'
+    }
 }
 
 publishing {

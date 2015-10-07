@@ -129,18 +129,24 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
         existingPath = ""
     }
 
+    // NOTE(spetrovic): we add the '-installsuffix=shared' flag as a safe measure, because the build
+    // without it doesn't work on linux/arm.  (It does work on android/arm, but we are playing it
+    // safe here.)
     if (newStyleProfiles()) {
-        commandLine env.jiriBin.getAbsolutePath(), 'go', '--profiles=android', '--target=android', 'install', '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni/main'
+        commandLine env.jiriBin.getAbsolutePath(), 'go', '--target=android', 'install',
+                '-buildmode=c-shared', '-v', '-tags', 'android',
+                '-installsuffix=shared', 'v.io/x/jni/main'
     } else {
         environment 'JIRI_PROFILE': 'android'
         commandLine env.jiriBin.getAbsolutePath(), 'go', 'install',
-            '-buildmode=c-shared', '-v', '-tags', 'android', 'v.io/x/jni/main'
+            '-buildmode=c-shared', '-v', '-tags', 'android',
+                '-installsuffix=shared', 'v.io/x/jni/main'
     }
 }
 
 // Copy the shared library to its ultimate destination.
 task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-    from jiriRoot + '/release/go/pkg/android_arm/v.io/x/jni'
+    from jiriRoot + '/release/go/pkg/android_arm_shared/v.io/x/jni'
     into 'src/main/jniLibs/armeabi-v7a'
     include 'main.a'
     rename 'main.a', 'libv23.so'
