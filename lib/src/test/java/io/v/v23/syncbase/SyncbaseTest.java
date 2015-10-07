@@ -13,6 +13,7 @@ import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
+import io.v.v23.services.syncbase.nosql.SyncGroupPrefix;
 import io.v.v23.services.syncbase.nosql.SyncGroupSpec;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
@@ -291,7 +292,8 @@ public class SyncbaseTest extends TestCase {
 
         // "A" creates the group.
         SyncGroupSpec spec = new SyncGroupSpec("test", allowAll,
-                ImmutableList.of(TABLE_NAME + "/"), ImmutableList.<String>of(), false);
+            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+            ImmutableList.<String>of(), false);
         SyncGroupMemberInfo memberInfo = new SyncGroupMemberInfo((byte) 1);
         SyncGroup group = db.getSyncGroup(groupName);
         {
@@ -304,13 +306,15 @@ public class SyncbaseTest extends TestCase {
         // TODO(spetrovic): test leave() and destroy().
 
         SyncGroupSpec specRMW = new SyncGroupSpec("testRMW", allowAll,
-                ImmutableList.of(TABLE_NAME + "/"), ImmutableList.<String>of(), false);
+            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+            ImmutableList.<String>of(), false);
         assertThat(group.getSpec(ctx).keySet()).isNotEmpty();
         String version = group.getSpec(ctx).keySet().iterator().next();
         group.setSpec(ctx, specRMW, version);
         assertThat(group.getSpec(ctx).values()).containsExactly(specRMW);
         SyncGroupSpec specOverwrite = new SyncGroupSpec("testOverwrite", allowAll,
-                ImmutableList.of(TABLE_NAME + "/"), ImmutableList.<String>of(), false);
+            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+            ImmutableList.<String>of(), false);
         group.setSpec(ctx, specOverwrite, "");
         assertThat(group.getSpec(ctx).values()).containsExactly(specOverwrite);
     }
