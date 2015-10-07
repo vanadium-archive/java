@@ -123,7 +123,9 @@ public class NavigateFragment extends Fragment {
         mCurrentSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fullscreenSlide();
+                if (mRole == Role.AUDIENCE) {
+                    fullscreenSlide();
+                }
             }
         });
 
@@ -229,8 +231,13 @@ public class NavigateFragment extends Fragment {
 
 
     private void fullscreenSlide() {
-        // TODO(afergan): Transition to the fullscreen fragment.
-        Toast.makeText(getContext(), "Going fullscreen", Toast.LENGTH_SHORT).show();
+        FullscreenSlideFragment fullscreenSlideFragment =
+                FullscreenSlideFragment.newInstance(mDeckId, mSlideNum);
+        getFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment, fullscreenSlideFragment)
+                .addToBackStack("")
+                .commit();
     }
 
     /**
