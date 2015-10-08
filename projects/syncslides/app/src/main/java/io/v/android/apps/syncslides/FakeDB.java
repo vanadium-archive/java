@@ -4,7 +4,9 @@
 
 package io.v.android.apps.syncslides;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -144,6 +146,17 @@ public class FakeDB implements DB {
         }
     }
 
+
+    @Override
+    public void init(Activity activity) {
+        // Nothing to do.
+    }
+
+    @Override
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Nothing to do.
+        return false;
+    }
 
     @Override
     public void askQuestion(String identity) {

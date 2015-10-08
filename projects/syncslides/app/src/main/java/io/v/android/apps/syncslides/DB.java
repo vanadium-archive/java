@@ -4,7 +4,9 @@
 
 package io.v.android.apps.syncslides;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 /**
@@ -20,13 +22,32 @@ public interface DB {
                 synchronized (Singleton.class) {
                     result = instance;
                     if (result == null) {
+                        // Switch between FakeDB and SyncbaseDB by commenting out one.
                         instance = result = new FakeDB(context);
+                        //instance = result = new SyncbaseDB(context);
                     }
                 }
             }
             return result;
         }
     }
+
+    /**
+     * Perform initialization steps.  This method must be called early in the lifetime
+     * of the activity.  As part of the initialization, it might send an intent to
+     * another activity.
+     *
+     * @param activity implements onActivityResult() to call into DB.onActivityResult.
+     */
+    void init(Activity activity);
+
+    /**
+     * If init() sent an intent to another Activity, the result must be forwarded
+     * from our app's activity to this method.
+     *
+     * @return true if the requestCode matches an intent sent by this implementation.
+     */
+    boolean onActivityResult(int requestCode, int resultCode, Intent data);
 
     interface Deck {
         /**
@@ -101,6 +122,7 @@ public interface DB {
 
     /**
      * Add user to presenter's question queue.
+     *
      * @param identity the user's identity name
      */
     void askQuestion(String identity);
@@ -136,12 +158,14 @@ public interface DB {
 
     /**
      * Gets the list of decks visible to the user.
+     *
      * @return a list of decks
      */
     DeckList getDecks();
 
     /**
      * Given a deck ID, gets the list of slides visible to the user.
+     *
      * @return a list of slides
      */
     SlideList getSlides(String deckId);
@@ -149,6 +173,7 @@ public interface DB {
     interface SlidesCallback {
         /**
          * This callback is run on the UI thread once the list of slides is loaded from the DB.
+         *
          * @param slides the loaded slide data
          */
         void done(Slide[] slides);
@@ -156,6 +181,7 @@ public interface DB {
 
     /**
      * Asynchronously fetch the slides for the given deck.
+     *
      * @param deckId the deck to fetch
      * @param callback runs on the UI thread when the slide data is loaded
      */
