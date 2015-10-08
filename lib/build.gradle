@@ -45,7 +45,7 @@ public static getOS() {
 }
 
 public static newStyleProfiles() {
-    return new File(System.getenv()['JIRI_ROOT'], '.jiri_xprofiles').exists()
+    return new File(System.getenv()['JIRI_ROOT'], '.jiri_v23_profiles').exists()
 }
 
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
@@ -98,7 +98,7 @@ task checkVanadiumEnvironment {
         throw new InvalidUserDataException("The JAVA_HOME environment variable is not set. "
                 + "Please set it to the root of a JDK installation directory.  If JDK isn't "
                 + "installed, you probably didn't install the java profile: try running\n\n"
-                + "jiri profile install java\n\nand then try building again.")
+                + "jiri v23-profile install java\n\nand then try building again.")
     }
     if (!isAmd64() && !isArm()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
