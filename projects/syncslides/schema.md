@@ -18,7 +18,7 @@
    Fullsize Blobref
  }
 
- // Note contains private-to-the user notes for a specific slide.
+ // Note contains private-to-the-user notes for a specific slide.
  struct Note {
    Text string
  }
@@ -31,6 +31,7 @@
    Driver ?Person  // ? means optional.
  }
 
+ // Person represents either an audience member or the presenter.
  struct Person {
    FirstName string
    LastName string
@@ -52,6 +53,8 @@
  struct Question {
    // The person who asked the question.
    Questioner Person
+   // Time when the question was asked in milliseconds since the epoch.
+   Time int64
    // Track whether this question has been answered.
    Answered bool
  }
@@ -66,10 +69,10 @@
  key (see example below).  The other tables refer to the slides by these hardcoded
  names, so those references would break if we allowed deck mutations.
  ```
- <deckId>          --> Deck
- <deckId>/slide1   --> Slide
- <deckId>/slide2   --> Slide
- <deckId>/slide3   --> Slide
+ <deckId>            --> Deck
+ <deckId>/slides/1   --> Slide
+ <deckId>/slides/2   --> Slide
+ <deckId>/slides/3   --> Slide
  ...
  ```
 
@@ -83,8 +86,8 @@
  TODO(kash): Can we replace this with vdl.Time?  Does it work in Java?
  ```
  <deckId>/LastViewed  --> int64
- <deckId>/slide1      --> Note
- <deckId>/slide5      --> Note
+ <deckId>/slides/1    --> Note
+ <deckId>/slides/5    --> Note
  ```
 
  ## Table `Presentations`
