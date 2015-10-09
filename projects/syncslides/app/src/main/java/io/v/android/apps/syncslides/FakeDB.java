@@ -18,9 +18,17 @@ import android.os.Looper;
 public class FakeDB implements DB {
     private static final int[] SLIDEDRAWABLES = new int[]{R.drawable.slide1, R.drawable.slide2,
             R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
-            R.drawable.slide7};
-    private final String[] SLIDENOTES = {"slide 1 notes", "slide 2 notes", "",
-            "slide 4 notes", "", "slide 6 notes", "slide 7 notes"};
+            R.drawable.slide7, R.drawable.slide8, R.drawable.slide9, R.drawable.slide10,
+            R.drawable.slide11};
+    private final String[] SLIDENOTES = {
+            "This is the teaser slide. It should be memorable and descriptive of what your " +
+                    "company is trying to do", "",
+            "The bigger the pain, the better",
+            "How do you solve this problem? How is it better or different from existing solutions?",
+            "Demo the product", "", "[REDACTED]",
+            "They may have tractor traction, but we still have the competitive advantage",
+            "I'm not a businessman. I'm a business, man", "There is no 'i' on this slide",
+            "Sqrt(all evil)"};
     private static final String TAG = "FakeDB";
     private static final int[] THUMBS = {
             R.drawable.thumb_deck1,
