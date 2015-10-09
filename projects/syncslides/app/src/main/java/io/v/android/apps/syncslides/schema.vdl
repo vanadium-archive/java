@@ -1,0 +1,60 @@
+// Copyright 2015 The Vanadium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package syncslides
+
+// Deck is the metadata for a set of slides.
+type Deck struct {
+    Title string
+    Thumbnail []byte
+}
+
+// Slide contains the image content for the slide.
+type Slide struct {
+    // A low-res version of the image stored as PNG.
+    Thumbnail []byte
+    // A high-res version of the image stored as PNG.
+    //Fullsize Blobref
+}
+
+// Note contains private-to-the-user notes for a specific slide.
+type Note struct {
+    Text string
+}
+
+// Presentation represents a live display of a Deck.
+type Presentation struct {
+    // If the presenter has handed control of the presentation to an audience member,
+    // driver will be present.  When the presenter takes back control, this
+    // will switch back to the empty string.
+    Driver ?Person  // ? means optional.
+}
+
+// Person represents either an audience member or the presenter.
+type Person struct{
+    FirstName string
+    LastName string
+}
+
+// CurrentSlide contains state for the live presentation.  It is separate from the
+// Presentation so that the presenter can temporarily delegate control of the
+// CurrentSlide without giving up control of the entire presentation.
+type CurrentSlide struct {
+    // The number of the slide that the presenter is talking about.
+    Num int32
+    // In the future, we could add markup/doodles here.  That markup would be transient
+    // if stored here.  Maybe better to put it in a separate row...
+}
+
+// Question represents a member of the audience asking a question of the presenter.
+// TODO(kash): Add support for the user to type in their question.  Right now, they
+// need to ask their question verbally.
+type Question struct {
+    // The person who asked the question.
+    Questioner Person
+    // Time when the question was asked in milliseconds since the epoch.
+    Time int64
+    // Track whether this question has been answered.
+    Answered bool
+}
