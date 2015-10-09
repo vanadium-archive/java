@@ -4,6 +4,7 @@
 
 package io.v.android.apps.syncslides;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
@@ -19,10 +20,15 @@ public class DeckChooserActivity extends AppCompatActivity
      * Fragment managing the behaviors, interactions and deck of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
+    private DB mDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Do this initialization early on in case it needs to start the AccountManager.
+        mDB = DB.Singleton.get(getApplicationContext());
+        mDB.init(this);
+
         setContentView(R.layout.activity_deck_chooser);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -66,6 +72,15 @@ public class DeckChooserActivity extends AppCompatActivity
             return true;
         }
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mDB.onActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        // Any other activity results would be handled here.
     }
 
 }
