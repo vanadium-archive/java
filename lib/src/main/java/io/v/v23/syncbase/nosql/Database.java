@@ -108,19 +108,19 @@ public interface Database extends DatabaseCore, AccessController {
                               ResumeMarker resumeMarker) throws VException;
 
     /**
-     * Returns a handle to a database {@link SyncGroup} with the given full (i.e., object) name.
+     * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.
      *
      * @param  name name of the synchronization group
      */
-    SyncGroup getSyncGroup(String name);
+    Syncgroup getSyncgroup(String name);
 
     /**
-     * Returns the global names of all {@link SyncGroup}s attached to this database.
+     * Returns the global names of all {@link Syncgroup}s attached to this database.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the sync group names couldn't be retrieved
+     * @throws VException if the syncgroup names couldn't be retrieved
      */
-    String[] listSyncGroupNames(VContext ctx) throws VException;
+    String[] listSyncgroupNames(VContext ctx) throws VException;
 
     /**
      * Compares the current schema version of the database with the schema version provided while

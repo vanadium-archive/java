@@ -40,7 +40,7 @@ import io.v.v23.security.VPrincipal;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
+import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
@@ -48,7 +48,7 @@ import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.Stream;
-import io.v.v23.syncbase.nosql.SyncGroup;
+import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.verror.VException;
@@ -78,7 +78,7 @@ public class SlidePresenterActivity extends Activity {
     private VContext mBaseContext = null;
     private Permissions mPermissions = null;
     private Row mSlideNumRow = null;
-    private SyncGroup mSyncGroup = null;
+    private Syncgroup mSyncgroup = null;
     private Stream<WatchChange> mChangeStream = null;
     private volatile int mSlideNum = 0;
     private volatile boolean mSynced = true;
@@ -116,9 +116,9 @@ public class SlidePresenterActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mSyncGroup != null) {
+        if (mSyncgroup != null) {
             try {
-                mSyncGroup.leave(mBaseContext);
+                mSyncgroup.leave(mBaseContext);
             } catch (VException e) {
                 Log.e(TAG, "Couldn't leave syncgroup: " + e.getMessage());
             }
@@ -254,8 +254,8 @@ public class SlidePresenterActivity extends Activity {
             new SlideChangeAsyncTask(mChangeStream).execute();
             String sgName = NamingUtil.join(SYNCBASE_MOUNTTABLE,
                     "users", email, "slidePresenter", "desktop", "%%sync", SYNCGROUP_NAME);
-            mSyncGroup = db.getSyncGroup(sgName);
-            mSyncGroup.join(mBaseContext, new SyncGroupMemberInfo((byte) 0));
+            mSyncgroup = db.getSyncgroup(sgName);
+            mSyncgroup.join(mBaseContext, new SyncgroupMemberInfo((byte) 0));
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
             return;

@@ -12,9 +12,9 @@ import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.services.syncbase.nosql.KeyValue;
-import io.v.v23.services.syncbase.nosql.SyncGroupMemberInfo;
-import io.v.v23.services.syncbase.nosql.SyncGroupPrefix;
-import io.v.v23.services.syncbase.nosql.SyncGroupSpec;
+import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
+import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
+import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
@@ -22,7 +22,7 @@ import io.v.v23.syncbase.nosql.ResultStream;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Stream;
-import io.v.v23.syncbase.nosql.SyncGroup;
+import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.V;
@@ -286,34 +286,34 @@ public class SyncbaseTest extends TestCase {
         }
     }
 
-    public void testSyncGroup() throws Exception {
+    public void testSyncgroup() throws Exception {
         Database db = createDatabase(createApp(createService()));
         String groupName = "test";
 
         // "A" creates the group.
-        SyncGroupSpec spec = new SyncGroupSpec("test", allowAll,
-            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+        SyncgroupSpec spec = new SyncgroupSpec("test", allowAll,
+            ImmutableList.of(new SyncgroupPrefix(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
-        SyncGroupMemberInfo memberInfo = new SyncGroupMemberInfo((byte) 1);
-        SyncGroup group = db.getSyncGroup(groupName);
+        SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo((byte) 1);
+        Syncgroup group = db.getSyncgroup(groupName);
         {
             group.create(ctx, spec, memberInfo);
-            assertThat(Arrays.asList(db.listSyncGroupNames(ctx))).containsExactly(groupName);
+            assertThat(Arrays.asList(db.listSyncgroupNames(ctx))).containsExactly(groupName);
             assertThat(group.getSpec(ctx).values()).containsExactly(spec);
             assertThat(group.getMembers(ctx).values()).containsExactly(memberInfo);
             assertThat(group.join(ctx, memberInfo)).isEqualTo(spec);
         }
         // TODO(spetrovic): test leave() and destroy().
 
-        SyncGroupSpec specRMW = new SyncGroupSpec("testRMW", allowAll,
-            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+        SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", allowAll,
+            ImmutableList.of(new SyncgroupPrefix(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
         assertThat(group.getSpec(ctx).keySet()).isNotEmpty();
         String version = group.getSpec(ctx).keySet().iterator().next();
         group.setSpec(ctx, specRMW, version);
         assertThat(group.getSpec(ctx).values()).containsExactly(specRMW);
-        SyncGroupSpec specOverwrite = new SyncGroupSpec("testOverwrite", allowAll,
-            ImmutableList.of(new SyncGroupPrefix(TABLE_NAME, "")),
+        SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", allowAll,
+            ImmutableList.of(new SyncgroupPrefix(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
         group.setSpec(ctx, specOverwrite, "");
         assertThat(group.getSpec(ctx).values()).containsExactly(specOverwrite);

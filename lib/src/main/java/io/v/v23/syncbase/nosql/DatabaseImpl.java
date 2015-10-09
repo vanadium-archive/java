@@ -149,12 +149,12 @@ class DatabaseImpl implements Database, BatchDatabase {
         return this.client.getResumeMarker(ctx);
     }
     @Override
-    public SyncGroup getSyncGroup(String name) {
-        return new SyncGroupImpl(this.fullName, name);
+    public Syncgroup getSyncgroup(String name) {
+        return new SyncgroupImpl(this.fullName, name);
     }
     @Override
-    public String[] listSyncGroupNames(VContext ctx) throws VException {
-        List<String> names = this.client.getSyncGroupNames(ctx);
+    public String[] listSyncgroupNames(VContext ctx) throws VException {
+        List<String> names = this.client.getSyncgroupNames(ctx);
         return names.toArray(new String[names.size()]);
     }
     @Override
