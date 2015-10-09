@@ -9,13 +9,13 @@ of the slide list go behind the toolbar.  We then need to pad the content
 of the slide list to be below the toolbar. -->
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/toolbar_and_statusbar_height"
     android:background="@color/snow_2"
     android:label="@string/slide_list_title"
+    android:paddingTop="@dimen/toolbar_and_statusbar_height"
     tools:context=".PresentationActivity">
 
     <android.support.v7.widget.RecyclerView
