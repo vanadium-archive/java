@@ -31,7 +31,7 @@ class VdlPlugin implements Plugin<Project> {
         def prepareTask = project.task('prepareVdl') {
             doLast {
                 generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"))
-                generateTask.commandLine('build/vdltool/vdl-' + getOsName(), 'generate', '--builtin_vdlroot', '--lang=java', "--java-out-dir=${project.vdl.outputPath}", 'all')
+                generateTask.commandLine('build/vdltool/vdl-' + getOsName(), '--builtin_vdlroot', 'generate', '--lang=java', "--java-out-dir=${project.vdl.outputPath}", 'all')
             }
         }
         def removeVdlRootTask = project.task('removeVdlRoot', type: Delete) {
