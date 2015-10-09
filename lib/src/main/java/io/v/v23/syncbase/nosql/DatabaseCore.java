@@ -64,4 +64,15 @@ public interface DatabaseCore {
      */
     ResumeMarker getResumeMarker(VContext ctx) throws VException;
 
+    /**
+     * An interface for iterating through rows resulting from a
+     * {@link DatabaseCore#exec DatabaseCore.exec()}.
+     */
+    interface ResultStream extends Stream<List<VdlAny>> {
+        /**
+         * Returns an array of column names that matched the query.  The size of the {@link VdlAny}
+         * list returned in every iteration will match the size of this array.
+         */
+        List<String> columnNames();
+    }
 }

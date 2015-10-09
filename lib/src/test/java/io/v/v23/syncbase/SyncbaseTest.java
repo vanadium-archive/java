@@ -6,19 +6,25 @@ package io.v.v23.syncbase;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
+import io.v.v23.context.CancelableVContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
+import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
+import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.syncbase.nosql.BatchDatabase;
+import io.v.v23.syncbase.nosql.BlobReader;
+import io.v.v23.syncbase.nosql.BlobWriter;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.syncbase.nosql.ResultStream;
+import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Stream;
@@ -38,6 +44,9 @@ import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 import junit.framework.TestCase;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -119,7 +128,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(db).isNotNull();
         assertThat(db.name()).isEqualTo(DB_NAME);
         assertThat(db.fullName()).isEqualTo(
-            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME));
+                NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME));
         assertThat(db.exists(ctx)).isFalse();
         assertThat(app.listDatabases(ctx)).isEmpty();
         db.create(ctx, allowAll);
@@ -175,8 +184,8 @@ public class SyncbaseTest extends TestCase {
         assertThat(row).isNotNull();
         assertThat(row.key()).isEqualTo(ROW_NAME);
         assertThat(row.fullName()).isEqualTo(
-            NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME,
-                            Util.escape(ROW_NAME)));
+                NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME,
+                        Util.escape(ROW_NAME)));
         assertThat(row.exists(ctx)).isFalse();
         row.put(ctx, "value", String.class);
         assertThat(row.exists(ctx)).isTrue();
@@ -202,14 +211,14 @@ public class SyncbaseTest extends TestCase {
         table.put(ctx, "baz", baz, Baz.class);
 
         {
-            ResultStream stream = db.exec(ctx,
+            DatabaseCore.ResultStream stream = db.exec(ctx,
                     "select k, v.Name from " + TABLE_NAME + " where Type(v) like \"%Baz\"");
             assertThat(stream.columnNames()).containsExactly("k", "v.Name");
             assertThat(stream).containsExactly(ImmutableList.of(
                     new VdlAny(String.class, "baz"), new VdlAny(String.class, baz.name)));
         }
         {
-            ResultStream stream = db.exec(ctx, "select k, v from " + TABLE_NAME);
+            DatabaseCore.ResultStream stream = db.exec(ctx, "select k, v from " + TABLE_NAME);
             assertThat(stream.columnNames()).containsExactly("k", "v");
             assertThat(stream).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "bar"), new VdlAny(Bar.class, bar)),
@@ -320,6 +329,203 @@ public class SyncbaseTest extends TestCase {
     }
 
     // TODO(spetrovic): Test Database.upgradeIfOutdated().
+
+    public void testBlobSmall() throws Exception {
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        OutputStream out = writer.stream(ctx);
+        out.write(data);
+        out.close();
+        assertThat(writer.size(ctx)).isEqualTo(data.length);
+        writer.commit(ctx);
+        BlobRef ref = writer.getRef();
+
+        BlobReader reader = db.readBlob(ctx, ref);
+        byte[] actual = new byte[data.length];
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        assertThat(actual).isEqualTo(data);
+    }
+
+    public void testBlobLarge() throws Exception {
+        byte[] data = new byte[1 << 17];
+        for (int i = 0; i < data.length; ++i) {
+            data[i] = (byte)(i & 0xFF);
+        }
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        OutputStream out = writer.stream(ctx);
+        out.write(data);
+        out.close();
+        assertThat(writer.size(ctx)).isEqualTo(data.length);
+        writer.commit(ctx);
+        BlobRef ref = writer.getRef();
+
+        BlobReader reader = db.readBlob(ctx, ref);
+        byte[] actual = new byte[data.length];
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        assertThat(actual).isEqualTo(data);
+    }
+
+    public void testBlobWriteResume() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobRef ref = writer.getRef();
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        {
+            // Write, part 1.
+            OutputStream out = writer.stream(ctx);
+            out.write(data, 0, data.length / 2);
+            out.close();
+            assertThat(writer.size(ctx)).isEqualTo(data.length / 2);
+        }
+        {
+            // Write, part 2.
+            writer = db.writeBlob(ctx, ref);
+            assertThat(writer.size(ctx)).isEqualTo(5);
+            OutputStream out = writer.stream(ctx);
+            out.write(data, data.length / 2, data.length / 2);
+            out.close();
+            assertThat(writer.size(ctx)).isEqualTo(data.length);
+            writer.commit(ctx);
+        }
+        // Read.
+        BlobReader reader = db.readBlob(ctx, ref);
+        byte[] actual = new byte[data.length];
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        assertThat(actual).isEqualTo(data);
+    }
+
+    public void testBlobWriteCommitted() throws Exception {
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobRef ref = writer.getRef();
+        OutputStream out = writer.stream(ctx);
+        out.write(data);
+        out.close();
+        assertThat(writer.size(ctx)).isEqualTo(data.length);
+        writer.commit(ctx);
+
+        try {
+            out = writer.stream(ctx);
+            out.write(data);
+            out.close();
+            fail("write of a committed blob should fail");
+        } catch (Exception e) {
+            // OK
+        }
+        try {
+            writer.commit(ctx);
+            fail("commit of a committed blob should fail");
+        } catch (VException e) {
+            // OK
+        }
+
+        BlobReader reader = db.readBlob(ctx, ref);
+        byte[] actual = new byte[data.length];
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        assertThat(actual).isEqualTo(data);
+    }
+
+    public void testBlobWriteCancelable() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        CancelableVContext ctxC = ctx.withCancel();
+        BlobWriter writer = db.writeBlob(ctxC, null);
+        BlobRef ref = writer.getRef();
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+        // Write 1st chunk.
+        OutputStream out = writer.stream(ctxC);
+        out.write(data, 0, data.length / 2);
+        ctxC.cancel();
+        // Write 2nd chunk.
+        try {
+            out.write(data, data.length / 2, data.length / 2);
+            out.close();
+            fail("write on a canceled stream should fail");
+        } catch (IOException e) {
+            // OK
+        }
+    }
+
+    public void testBlobReadUncommitted() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobRef ref = writer.getRef();
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
+        OutputStream out = writer.stream(ctx);
+        out.write(data, 0, data.length);
+        out.close();
+
+        BlobReader reader = db.readBlob(ctx, ref);
+        try {
+            byte[] actual = new byte[data.length];
+            ByteStreams.readFully(reader.stream(ctx, 0), actual);
+            fail("read of an uncommitted blob should fail");
+        } catch (VException e) {
+            // OK
+        } catch (IOException e) {
+            // OK
+        }
+        try {
+            Iterator<BlobFetchStatus> iter = reader.prefetch(ctx, 0).iterator();
+            iter.next();
+            fail("prefetch of an uncommitted blob should fail");
+        } catch (VException e) {
+            // OK
+        } catch (RuntimeException e) {
+            // OK
+        }
+    }
+
+    public void testBlobReadPrefetch() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobRef ref = writer.getRef();
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
+        OutputStream out = writer.stream(ctx);
+        out.write(data, 0, data.length);
+        out.close();
+        writer.commit(ctx);
+
+        // Prefetch
+        BlobReader reader = db.readBlob(ctx, ref);
+        for (BlobFetchStatus status : reader.prefetch(ctx, 0)) {}
+        // Read
+        byte[] actual = new byte[data.length];
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        assertThat(actual).isEqualTo(data);
+    }
+
+    public void testBlobReadClosedStream() throws Exception {
+        byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        Database db = createDatabase(createApp(createService()));
+        BlobWriter writer = db.writeBlob(ctx, null);
+        OutputStream out = writer.stream(ctx);
+        out.write(data);
+        out.close();
+        assertThat(writer.size(ctx)).isEqualTo(data.length);
+        writer.commit(ctx);
+        BlobRef ref = writer.getRef();
+
+        BlobReader reader = db.readBlob(ctx, ref);
+        byte[] actual = new byte[data.length / 2];
+        InputStream in = reader.stream(ctx, 0);
+        // Read 1st chunk.
+        ByteStreams.readFully(in, actual);
+        assertThat(actual).isEqualTo(new byte[]{1, 2, 3, 4, 5});
+        // Close the input stream.
+        in.close();
+        // Read 2nd chunk.
+        try {
+            ByteStreams.readFully(in, actual);
+            fail("read of a closed stream should fail");
+        } catch (IOException e) {
+            // OK
+        }
+    }
+
 
     private SyncbaseService createService() throws Exception {
         return Syncbase.newService(serverEndpoint.name());

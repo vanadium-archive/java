@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
@@ -19,16 +18,14 @@ import com.google.common.collect.ImmutableMap;
 
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
+import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
 import io.v.v23.services.syncbase.nosql.SchemaMetadata;
 import io.v.v23.services.syncbase.nosql.StoreChange;
-import io.v.v23.services.syncbase.nosql.TableClient;
-import io.v.v23.services.syncbase.nosql.TableClientFactory;
 import io.v.v23.services.watch.Change;
 import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
-import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
@@ -38,7 +35,6 @@ import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.VomUtil;
 
 class DatabaseImpl implements Database, BatchDatabase {
     private final String parentFullName;
@@ -158,6 +154,21 @@ class DatabaseImpl implements Database, BatchDatabase {
         return names.toArray(new String[names.size()]);
     }
     @Override
+    public BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException {
+        if (ref == null) {
+            ref = client.createBlob(ctx);
+        }
+        return new BlobWriterImpl(client, ref);
+    }
+    @Override
+    public BlobReader readBlob(VContext ctx, BlobRef ref) throws VException {
+        if (ref == null) {
+            throw new VException("Must pass a non-null blob ref.");
+        }
+        return new BlobReaderImpl(client, ref);
+    }
+
+    @Override
     public boolean upgradeIfOutdated(VContext ctx) throws VException {
         if (this.schema == null) {
             throw new VException(io.v.v23.flow.Errors.BAD_STATE, ctx,
@@ -223,54 +234,14 @@ class DatabaseImpl implements Database, BatchDatabase {
         return this.schema.getMetadata().getVersion();
     }
 
-    private static class ResultStreamImpl implements ResultStream {
-        private final CancelableVContext ctxC;
-        private final TypedClientStream<Void, List<VdlAny>, Void> stream;
+    private static class ResultStreamImpl extends StreamImpl<List<VdlAny>> implements ResultStream {
         private final List<String> columnNames;
-        private volatile boolean isCanceled;
-        private volatile boolean isCreated;
 
         private ResultStreamImpl(CancelableVContext ctxC, TypedClientStream<Void,
                 List<VdlAny>, Void> stream, List<String> columnNames) {
-            this.ctxC = ctxC;
-            this.stream = stream;
+            super(ctxC, stream);
             this.columnNames = columnNames;
-            this.isCanceled = this.isCreated = false;
         }
-        // Implements Stream<List<VdlAny>>.
-        @Override
-        public synchronized Iterator<List<VdlAny>> iterator() {
-            if (isCreated) {
-                throw new RuntimeException("Can only create one ResultStream iterator.");
-            }
-            isCreated = true;
-            return new AbstractIterator<List<VdlAny>>() {
-                @Override
-                protected List<VdlAny> computeNext() {
-                    synchronized (ResultStreamImpl.this) {
-                        if (isCanceled) {  // client canceled the stream
-                            return endOfData();
-                        }
-                        try {
-                            return stream.recv();
-                        } catch (EOFException e) {  // legitimate end of stream
-                            return endOfData();
-                        } catch (VException e) {
-                            if (isCanceled) {
-                                return endOfData();
-                            }
-                            throw new RuntimeException("Error retrieving next stream element.", e);
-                        }
-                    }
-                }
-            };
-        }
-        @Override
-        public synchronized void cancel() throws VException {
-            this.isCanceled = true;
-            this.ctxC.cancel();
-        }
-        // Implements ResultStream.
         @Override
         public List<String> columnNames() {
             return this.columnNames;

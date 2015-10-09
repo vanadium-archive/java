@@ -6,6 +6,7 @@ package io.v.v23.syncbase.nosql;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
+import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.verror.VException;
@@ -121,6 +122,41 @@ public interface Database extends DatabaseCore, AccessController {
      * @throws VException if the syncgroup names couldn't be retrieved
      */
     String[] listSyncgroupNames(VContext ctx) throws VException;
+
+    /**
+     * Opens a blob for writing.
+     * <p>
+     * If invoked with a {@code null} blob reference, a brand new (empty) blob is created.
+     * <p>
+     * If the blob reference is non-{@code null}, any new writes to the blob are appended to
+     * the existing blob data.
+     * <p>
+     * It is illegal to invoke this method with a reference to an already-committed blob.  If such
+     * a reference is passed-in, no new writes are applied to the blob;  however, this method may
+     * still return a valid {@link BlobWriter} and some of the writes on that writer may
+     * {@strong appear} to succeed, though it is not so (see comments on
+     * {@link BlobWriter#writeStream}.
+     *
+     * @param ctx         vanadium context
+     * @param ref         blob reference
+     * @return            a writer used for writing to the blob
+     * @throws VException if the blob couldn't be opened for writing
+     */
+    BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException;
+
+    /**
+     * Opens a blob for reading.
+     * <p>
+     * It is illegal to invoke this method with a reference to an un-committed blob.  If such a
+     * reference is passed-in, no reads of the blob will succeed, though this method itself
+     * may not fail (i.e., it may return a {@link BlobReader} object).
+     *
+     * @param ctx         vanadium context
+     * @param ref         blob reference
+     * @return            a reader used for reading from the blob
+     * @throws VException if the blob couldn't be opened for reading
+     */
+    BlobReader readBlob(VContext ctx, BlobRef ref) throws VException;
 
     /**
      * Compares the current schema version of the database with the schema version provided while
