@@ -160,7 +160,7 @@ public class FakeDB implements DB {
 
     @Override
     public void askQuestion(String identity) {
-        //TODO (afergan): send identity to syncbase
+        //TODO(afergan): send identity to syncbase
     }
 
     @Override

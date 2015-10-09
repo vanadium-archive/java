@@ -5,11 +5,16 @@
 package io.v.android.apps.syncslides;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +39,7 @@ public class NavigateFragment extends Fragment {
     private static final String DECK_ID_KEY = "deck_id_key";
     private static final String SLIDE_NUM_KEY = "slide_num_key";
     private static final String ROLE_KEY = "role_key";
+    private static final int DIALOG_REQUEST_CODE = 23;
 
     private String mDeckId;
     private int mSlideNum;
@@ -46,6 +53,7 @@ public class NavigateFragment extends Fragment {
     private Role mRole;
     private String[] mQuestionerList;
     private boolean mEditing;
+    private int mQuestionerPosition;
 
     public enum Role {
         PRESENTER, AUDIENCE
@@ -280,7 +288,9 @@ public class NavigateFragment extends Fragment {
                     "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
             toast.show();
         } else {
-            //TODO (afergan): Pop up Q&A queue for presenter.
+            DialogFragment dialog = QuestionDialogFragment.newInstance(mQuestionerList);
+            dialog.setTargetFragment(this, DIALOG_REQUEST_CODE);
+            dialog.show(getFragmentManager(), "QuestionerDialogFragment");
         }
     }
 
@@ -305,6 +315,48 @@ public class NavigateFragment extends Fragment {
         } else {
             mNotes.getText().clear();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == DIALOG_REQUEST_CODE) {
+            // TODO(afergan): Using the position is insufficient if the list of questioners changes
+            // while the dialog is showing.
+            mQuestionerPosition = data.getIntExtra(
+                    QuestionDialogFragment.QUESTION_BUNDLE_KEY, 0);
+            handoffControl();
+        }
+    }
+
+    /**
+     * Handoff control of the presentation to a questioner. A snackbar displays the status while
+     * the audience member is in control, and control ends when the presenter presses the action
+     * text.
+     */
+    private void handoffControl() {
+        //TODO(afergan): Change slide presenter to the audience member at mQuestionerPosition.
+        View.OnClickListener snackbarClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO(afergan): End handoff, presenter regains control of presentation.
+            }
+        };
+
+        ((PresentationActivity) getActivity()).setUiImmersive(true);
+        Snackbar snack = Snackbar.make(getView(), getResources().getString(
+                        R.string.handoff_message) + " " + mQuestionerList[mQuestionerPosition],
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getResources().getString(R.string.end_handoff),
+                        snackbarClickListener)
+                .setActionTextColor(ContextCompat.getColor(getContext(), R.color.action_orange));
+
+        // Needed to set the location of the snackbar (default is bottom center, which hides buttons
+        // in landscape mode).
+        View view = snack.getView();
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+        params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+        view.setLayoutParams(params);
+        snack.show();
     }
 
     private void setThumbBitmap(ImageView thumb, Bitmap bitmap) {
