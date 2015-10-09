@@ -68,7 +68,7 @@ public static getOS() {
 }
 
 public static newStyleProfiles() {
-    return new File(System.getenv()['JIRI_ROOT'], '.jiri_xprofiles').exists()
+    return new File(System.getenv()['JIRI_ROOT'], '.jiri_v23_profiles').exists()
 }
 
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
@@ -94,23 +94,11 @@ class VanadiumEnvironment {
                     + "Please follow the Vanadium installation instructions at "
                     + "https://github.com/vanadium/docs/blob/master/installation.md")
         }
-
-        def syncbaseOutputDir = new File(result.jiriRoot,
-                ['third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator))
-        if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
-            throw new InvalidUserDataException(
-                    syncbaseOutputDir.toString() + " does not exist or is not a directory. "
-                    + "You probably didn't install the android syncbase profile. Try running\n\n"
-                    + "GOOS=android GOARCH=arm jiri profile install syncbase"
-                    + "\n\nand then try building again"
-            )
-        }
-
         return result
     }
 }
 
-task checkVanadiumEnvironment {
+task checkVanadiumEnvironment() {
     VanadiumEnvironment.getVanadiumEnvironment()
     if (!isAmd64()) {
         throw new InvalidUserDataException("Android Vanadium builds only enabled on amd64 "
@@ -122,7 +110,29 @@ task checkVanadiumEnvironment {
     }
 }
 
-task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
+task checkVanadiumSyncbaseEnvironment(type: Exec, dependsOn: checkVanadiumEnvironment) {
+    def env = VanadiumEnvironment.getVanadiumEnvironment()
+    if (newStyleProfiles()) {
+        commandLine env.jiriBin.getAbsolutePath(), 'v23-profile', 'env',
+            '-profile=syncbase', '--target=arm-android', 'V23_TARGET_INSTALLATION_DIR='
+    } else {
+        commandLine "echo", ['third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator)
+    }
+    standardOutput = new ByteArrayOutputStream()
+    doLast {
+        def syncbaseOutputDir = new File(standardOutput.toString().trim())
+        if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
+            throw new InvalidUserDataException(
+                syncbaseOutputDir.toString() + " does not exist or is not a directory. "
+                + "You probably didn't install the android base profile. Try    running\n\n"
+                + "jiri v23-profile install --target=android=arm-android base"
+                + "\n\nand then try building again"
+            )
+        }
+    }
+}
+
+task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumSyncbaseEnvironment) {
     def env = VanadiumEnvironment.getVanadiumEnvironment()
     def existingPath = System.getenv('PATH')
     if (existingPath == null) {
