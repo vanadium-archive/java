@@ -5,9 +5,13 @@
 package io.v.android.apps.syncslides;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 /**
  * This fragment contains the list of decks as well as the FAB to create a new
@@ -27,6 +32,7 @@ public class DeckChooserFragment extends Fragment {
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "ChooserFragment";
+    private static final int REQUEST_CODE_IMPORT_DECK = 1000;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private DeckListAdapter mAdapter;
@@ -51,7 +57,7 @@ public class DeckChooserFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                newDeck();
+                onImportDeck();
             }
         });
 
@@ -81,6 +87,24 @@ public class DeckChooserFragment extends Fragment {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_IMPORT_DECK:
+                if (resultCode != Activity.RESULT_OK) {
+                    String errorStr = data != null && data.hasExtra(DocumentsContract.EXTRA_ERROR)
+                            ? data.getStringExtra(DocumentsContract.EXTRA_ERROR)
+                            : "";
+                    Toast.makeText(getActivity(), "Error selecting deck to import " + errorStr,
+                            Toast.LENGTH_LONG).show();
+                    break;
+                }
+                DocumentFile pickedDir = DocumentFile.fromTreeUri(getContext(), data.getData());
+                Log.i(TAG, "Picked folder: " + pickedDir.getUri());
+                break;
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         ((DeckChooserActivity) activity).onSectionAttached(
@@ -105,9 +129,10 @@ public class DeckChooserFragment extends Fragment {
     /**
      * Import a deck so it shows up in the list of all decks.
      */
-    private void newDeck() {
-        // TODO(afergan): Hook up new deck screen here.
-        Log.i(TAG, "newDeck");
+    private void onImportDeck() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, REQUEST_CODE_IMPORT_DECK);
     }
-
 }
