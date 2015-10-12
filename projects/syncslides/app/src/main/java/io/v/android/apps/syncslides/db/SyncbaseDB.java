@@ -356,6 +356,11 @@ public class SyncbaseDB implements DB {
         public String getId() {
             return mKey;
         }
+
+        @Override
+        public Status getStatus() {
+            return Status.IDLE;
+        }
     }
 
     @Override

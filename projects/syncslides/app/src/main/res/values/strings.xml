@@ -21,5 +21,6 @@
     <string name="question_message">Answer questions</string>
     <string name="handoff_message">You handed off to</string>
     <string name="end_handoff">RESUME</string>
+    <string name="presentation_live">LIVE!</string>
 
 </resources>

@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
  * A deck, aka a presentation.
  */
 public interface Deck {
+    enum Status { LIVE, IDLE }
+
     /**
      * Returns a Bitmap suitable as a thumbnail of the deck (e.g. the title
      * slide).
@@ -25,4 +27,9 @@ public interface Deck {
      * Returns the deck id.
      */
     String getId();
+
+    /**
+     * Status.
+     */
+    Status getStatus();
 }

@@ -94,6 +94,10 @@ public class FakeDB implements DB {
             return mDeckId;
         }
 
+        @Override
+        public Status getStatus() {
+            return Status.IDLE;
+        }
     }
 
     private static class FakeSlide implements Slide {
@@ -132,7 +136,7 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public io.v.android.apps.syncslides.model.Deck get(int i) {
+        public Deck get(int i) {
             return new FakeDeck(mThumbs[i], mTitles[i], String.valueOf(i));
         }
 
@@ -163,7 +167,7 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public io.v.android.apps.syncslides.model.Slide get(int i) {
+        public Slide get(int i) {
             return new FakeSlide(mSlideImages[i], mSlideNotes[i]);
         }
 
@@ -209,19 +213,19 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public DBList<io.v.android.apps.syncslides.model.Deck> getDecks() {
+    public DBList<Deck> getDecks() {
         return new FakeDeckList(mThumbs, TITLES);
     }
 
     @Override
-    public DBList<io.v.android.apps.syncslides.model.Slide> getSlides(String deckId) {
+    public DBList<Slide> getSlides(String deckId) {
         // Always return the same set of slides no matter which deck was requested.
         return new FakeSlideList(mSlideImages, SLIDENOTES);
     }
 
     @Override
     public void getSlides(String deckId, final SlidesCallback callback) {
-        final io.v.android.apps.syncslides.model.Slide[] slides = new io.v.android.apps.syncslides.model.Slide[mSlideImages.length];
+        final Slide[] slides = new Slide[mSlideImages.length];
         for (int i = 0; i < mSlideImages.length; i++) {
             slides[i] = new FakeSlide(mSlideImages[i], SLIDENOTES[i]);
         }
