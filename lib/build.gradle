@@ -44,6 +44,16 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
+def String getOsName() {
+    if (isLinux()) {
+        return "linux";
+    } else if (isDarwin()) {
+        return "macosx";
+    } else {
+        throw new IllegalStateException("Unsupported operating system " + System.properties.'os.name')
+    }
+}
+
 public static newStyleProfiles() {
     return new File(System.getenv()['JIRI_ROOT'], '.jiri_v23_profiles').exists()
 }
@@ -198,10 +208,29 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 task natives(type: Jar, dependsOn: buildVanadiumLib) {
     if (isLinux()) {
         from 'build/libs/libv23.so'
-    } else {
+    } else if (isDarwin()) {
         from 'build/libs/libv23.dylib'
+    } else {
+        throw new InvalidUserDataException("unsupported operating system: " + getOS())
     }
 }
+
+def pomDependencyText = '''
+<dependencies>
+    <dependency>
+        <groupId>io.v</groupId>
+        <artifactId>vanadium-natives-linux</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.v</groupId>
+        <artifactId>vanadium-natives-macosx</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+'''
+
+def pomDependencies = new XmlParser().parseText(pomDependencyText)
 
 publishing {
     publications {
@@ -220,11 +249,22 @@ publishing {
                 classifier "javadoc"
             }
 
-            artifact natives {
-                classifier "natives"
+            pom.withXml {
+                for (Node node : pomDependencies.children()) {
+                    asNode().dependencies[0].append(node)
+                }
             }
         }
+
+        mavenNatives(MavenPublication) {
+            groupId 'io.v'
+            artifactId 'vanadium-natives-' + getOsName()
+            version '0.1-SNAPSHOT'
+
+            artifact natives
+        }
     }
+
     repositories {
         maven {
             credentials {
