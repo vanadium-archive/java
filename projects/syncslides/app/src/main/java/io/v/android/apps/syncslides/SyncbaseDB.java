@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,6 +26,7 @@ import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.android.v23.services.blessing.BlessingService;
+import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
@@ -39,8 +39,10 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
+import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.ResultStream;
+import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.VException;
@@ -57,6 +59,7 @@ public class SyncbaseDB implements DB {
     private static final String SYNCBASE_APP = "syncslides";
     private static final String SYNCBASE_DB = "syncslides";
     private static final String DECKS_TABLE = "Decks";
+    private static final String NOTES_TABLE = "Notes";
 
     // If SyncbaseDB needs to start the AccountManager to get blessings, it will not
     // finish its initialization, but the fragment that is trying to initialize
@@ -67,8 +70,9 @@ public class SyncbaseDB implements DB {
     private Permissions mPermissions;
     private Context mContext;
     private VContext mVContext;
-    private Table mDecks;
     private Database mDB;
+    private Table mDecks;
+    private Table mNotes;
 
     SyncbaseDB(Context context) {
         mContext = context;
@@ -183,18 +187,11 @@ public class SyncbaseDB implements DB {
             if (!mDecks.exists(mVContext)) {
                 mDecks.create(mVContext, mPermissions);
             }
-            mDecks.put(mVContext, "deck1",
-                    new io.v.android.apps.syncslides.Deck(
-                            "deck 1", getThumbnailBytes(R.drawable.thumb_deck1)),
-                    io.v.android.apps.syncslides.Deck.class);
-            mDecks.put(mVContext, "deck2",
-                    new io.v.android.apps.syncslides.Deck(
-                            "deck 2", getThumbnailBytes(R.drawable.thumb_deck2)),
-                    io.v.android.apps.syncslides.Deck.class);
-            mDecks.put(mVContext, "deck3",
-                    new io.v.android.apps.syncslides.Deck(
-                            "deck 3", getThumbnailBytes(R.drawable.thumb_deck3)),
-                    io.v.android.apps.syncslides.Deck.class);
+            mNotes = mDB.getTable(NOTES_TABLE);
+            if (!mNotes.exists(mVContext)) {
+                mNotes.create(mVContext, mPermissions);
+            }
+            importDecks();
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
             return;
@@ -205,7 +202,7 @@ public class SyncbaseDB implements DB {
     private byte[] getThumbnailBytes(int resourceId) {
         Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
         return stream.toByteArray();
     }
 
@@ -220,25 +217,34 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public DeckList getDecks() {
+    public DBList<Deck> getDecks() {
         if (!mInitialized) {
-            return new NoopDeckList();
+            return new NoopList<Deck>();
         }
-        return new SyncbaseDeckList(mVContext, mDB);
+        return new DeckList(mVContext, mDB);
     }
 
-    private static class NoopDeckList implements DeckList {
+    private static class NoopList<E> implements DBList<E> {
         @Override
-        public int getItemCount() {return 0;}
+        public int getItemCount() {
+            return 0;
+        }
+
         @Override
-        public Deck getDeck(int i) {return null;}
+        public E get(int i) {
+            return null;
+        }
+
         @Override
-        public void setListener(Listener listener) {}
+        public void setListener(Listener listener) {
+        }
+
         @Override
-        public void discard() {}
+        public void discard() {
+        }
     }
 
-    private static class SyncbaseDeckList implements DeckList {
+    private static class DeckList implements DBList {
 
         private final VContext mVContext;
         private final Database mDB;
@@ -247,7 +253,7 @@ public class SyncbaseDB implements DB {
         private List<SyncbaseDeck> mDecks;
         private Listener mListener;
 
-        public SyncbaseDeckList(VContext vContext, Database db) {
+        public DeckList(VContext vContext, Database db) {
             mVContext = vContext;
             mDB = db;
             mHandler = new Handler(Looper.getMainLooper());
@@ -261,12 +267,13 @@ public class SyncbaseDB implements DB {
         }
 
         private void fetchData() {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            // TODO(kash): Uncomment this once we've figured out why performance is so bad.
+            //Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
             try {
                 final List<SyncbaseDeck> decks = Lists.newArrayList();
                 ResultStream stream = mDB.exec(mVContext,
-                        "SELECT k, v FROM Decks");// WHERE Type(v) like \"%Deck\"");
+                        "SELECT k, v FROM Decks WHERE Type(v) like \"%Deck\"");
                 // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                 // a new VContext so it can be cancelled.
                 for (List<VdlAny> row : stream) {
@@ -274,6 +281,7 @@ public class SyncbaseDB implements DB {
                         throw new VException("Wrong number of columns: " + row.size());
                     }
                     String key = (String) row.get(0).getElem();
+                    Log.i(TAG, "Fetched deck " + key);
                     io.v.android.apps.syncslides.Deck deck =
                             (io.v.android.apps.syncslides.Deck) row.get(1).getElem();
                     decks.add(new SyncbaseDeck(key, deck.getTitle(), deck.getThumbnail()));
@@ -303,7 +311,7 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public Deck getDeck(int i) {
+        public Deck get(int i) {
             if (mDecks != null) {
                 return mDecks.get(i);
             }
@@ -351,9 +359,120 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public SlideList getSlides(String deckId) {
-        return null;
+    public DBList<Slide> getSlides(String deckId) {
+        if (!mInitialized) {
+            return new NoopList<>();
+        }
+        return new SlideList(mVContext, mDB, deckId);
     }
+
+    private static class SlideList implements DBList {
+
+        private final VContext mVContext;
+        private final Database mDB;
+        private final Handler mHandler;
+        private final Thread mThread;
+        private final String mDeckId;
+        private List<SyncbaseSlide> mSlides;
+        private Listener mListener;
+
+        public SlideList(VContext vContext, Database db, String deckId) {
+            Log.i(TAG, "Fetching slides for " + deckId);
+            mVContext = vContext;
+            mDB = db;
+            mDeckId = deckId;
+            mSlides = Lists.newArrayList();
+            mHandler = new Handler(Looper.getMainLooper());
+            mThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    fetchData();
+                }
+            });
+            mThread.start();
+        }
+
+        private void fetchData() {
+            // TODO(kash): Uncomment this once we've figured out why performance is so bad.
+            //Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+            try {
+                BatchDatabase batch = mDB.beginBatch(mVContext, null);
+                Table table = batch.getTable(NOTES_TABLE);
+
+                String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%Slide\" " +
+                        "AND k LIKE \"" + NamingUtil.join(mDeckId, "slides") + "%\"";
+                ResultStream stream = batch.exec(mVContext, query);
+                // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
+                // a new VContext so it can be cancelled.
+                for (List<VdlAny> row : stream) {
+                    if (row.size() != 2) {
+                        throw new VException("Wrong number of columns: " + row.size());
+                    }
+                    String key = (String) row.get(0).getElem();
+                    Log.i(TAG, "Fetched slide " + key);
+                    io.v.android.apps.syncslides.Slide slide =
+                            (io.v.android.apps.syncslides.Slide) row.get(1).getElem();
+                    Note note = (Note) table.get(mVContext, key, Note.class);
+                    final SyncbaseSlide newSlide = new SyncbaseSlide(
+                            key, slide.getThumbnail(), note.getText());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSlides.add(newSlide);
+                            mListener.notifyItemInserted(mSlides.size() - 1);
+                        }
+                    });
+                }
+            } catch (VException e) {
+                Log.e(TAG, e.toString());
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return mSlides.size();
+        }
+
+        @Override
+        public Slide get(int i) {
+            return mSlides.get(i);
+        }
+
+        @Override
+        public void setListener(Listener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        public void discard() {
+            mThread.interrupt();
+            mHandler.removeCallbacksAndMessages(null);
+        }
+    }
+
+    private static class SyncbaseSlide implements Slide {
+
+
+        private final Bitmap mThumbnail;
+        private final String mNotes;
+
+        public SyncbaseSlide(String key, byte[] thumbnail, String notes) {
+            mThumbnail = BitmapFactory.decodeByteArray(thumbnail, 0, thumbnail.length);
+            mNotes = notes;
+        }
+
+        @Override
+        public Bitmap getImage() {
+            return mThumbnail;
+        }
+
+        @Override
+        public String getNotes() {
+            return mNotes;
+        }
+    }
+
 
     @Override
     public void getSlides(String deckId, SlidesCallback callback) {
@@ -363,6 +482,72 @@ public class SyncbaseDB implements DB {
     private void handleError(String msg) {
         Log.e(TAG, msg);
         Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
+    }
+
+    private void importDecks() {
+        importDeck("deckId1", "Car Business", R.drawable.thumb_deck1);
+        importDeck("deckId2", "Baku Discovery", R.drawable.thumb_deck2);
+        importDeck("deckId3", "Vanadium", R.drawable.thumb_deck3);
+    }
+
+    private static final int[] SLIDEDRAWABLES = new int[]{
+            R.drawable.slide1_thumb,
+            R.drawable.slide2_thumb,
+            R.drawable.slide3_thumb,
+            R.drawable.slide4_thumb,
+            R.drawable.slide5_thumb,
+            R.drawable.slide6_thumb,
+            R.drawable.slide7_thumb,
+            R.drawable.slide8_thumb,
+            R.drawable.slide9_thumb,
+            R.drawable.slide10_thumb,
+            R.drawable.slide11_thumb
+    };
+    private final String[] SLIDENOTES = {
+            "This is the teaser slide. It should be memorable and descriptive of what your " +
+                    "company is trying to do", "",
+            "The bigger the pain, the better",
+            "How do you solve this problem? How is it better or different from existing solutions?",
+            "Demo the product", "", "[REDACTED]",
+            "They may have tractor traction, but we still have the competitive advantage",
+            "I'm not a businessman. I'm a business, man", "There is no 'i' on this slide",
+            "Sqrt(all evil)"};
+
+    private void importDeck(String prefix, String title, int resourceId) {
+        Log.i(TAG, String.format("importing %s, %s, %d", prefix, title, resourceId));
+        try {
+            mDecks.deleteRange(mVContext, RowRange.prefix(prefix));
+            if (!mDecks.getRow(prefix).exists(mVContext)) {
+                mDecks.put(
+                        mVContext,
+                        prefix,
+                        new io.v.android.apps.syncslides.Deck(
+                                title, getThumbnailBytes(resourceId)),
+                        io.v.android.apps.syncslides.Deck.class);
+            }
+            for (int i = 0; i < SLIDENOTES.length; i++) {
+                String key = NamingUtil.join(prefix, "slides", String.format("%04d", i));
+                Log.i(TAG, "Adding slide " + key);
+                if (!mDecks.getRow(key).exists(mVContext)) {
+                    Log.i(TAG, "Putting bytes: " + getThumbnailBytes(SLIDEDRAWABLES[i]).length);
+                    mDecks.put(
+                            mVContext,
+                            key,
+                            new io.v.android.apps.syncslides.Slide(
+                                    getThumbnailBytes(SLIDEDRAWABLES[i])),
+                            io.v.android.apps.syncslides.Slide.class);
+                }
+                Log.i(TAG, "Adding notes");
+                mNotes.put(mVContext, key, new Note(SLIDENOTES[i]), Note.class);
+                mNotes.put(
+                        mVContext,
+                        NamingUtil.join(prefix, "LastViewed"),
+                        System.currentTimeMillis(),
+                        Long.class);
+            }
+        } catch (VException e) {
+            handleError(e.toString());
+        }
     }
 
 }

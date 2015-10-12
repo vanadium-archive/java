@@ -79,9 +79,9 @@ public interface DB {
     }
 
     /**
-     * Provides a list of Decks via an API that fits well with RecyclerView.Adapter.
+     * Provides a list of elements via an API that fits well with RecyclerView.Adapter.
      */
-    interface DeckList {
+    interface DBList<E> {
 
         /**
          * Returns the number of items in the list.
@@ -91,7 +91,7 @@ public interface DB {
         /**
          * Returns the ith item in the list.
          */
-        Deck getDeck(int i);
+        E get(int i);
 
         /**
          * Sets the listener for changes to the list.  There can only be one listener.
@@ -102,22 +102,6 @@ public interface DB {
          * Indicates that the list is no longer needed and should stop notifying its listener.
          */
         void discard();
-    }
-
-    /**
-     * Provides a list of Slides via an API that fits well with RecyclerView.Adapter.
-     */
-    interface SlideList {
-        /**
-         * Returns the number of items in the list.
-         */
-        int getItemCount();
-
-        /**
-         * Returns the ith item in the list.
-         */
-        Slide getSlide(int i);
-
     }
 
     /**
@@ -161,14 +145,14 @@ public interface DB {
      *
      * @return a list of decks
      */
-    DeckList getDecks();
+    DBList<Deck> getDecks();
 
     /**
      * Given a deck ID, gets the list of slides visible to the user.
      *
      * @return a list of slides
      */
-    SlideList getSlides(String deckId);
+    DBList<Slide> getSlides(String deckId);
 
     interface SlidesCallback {
         /**

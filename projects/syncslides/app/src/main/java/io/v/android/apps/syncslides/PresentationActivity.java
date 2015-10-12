@@ -7,16 +7,26 @@ package io.v.android.apps.syncslides;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 public class PresentationActivity extends AppCompatActivity {
+
+    public static final String DECK_ID_KEY = "deck_id";
+
+    private String mDeckId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_presentation);
+
+        Bundle bundle = getIntent().getExtras();
+        mDeckId = bundle.getString(DECK_ID_KEY);
+
         if (savedInstanceState == null) {
-            SlideListFragment slideList = new SlideListFragment();
+            SlideListFragment slideList = SlideListFragment.newInstance(mDeckId);
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
         }
     }
@@ -50,7 +60,7 @@ public class PresentationActivity extends AppCompatActivity {
 
     public void jumpToSlide(int slideNum) {
         NavigateFragment fragment = NavigateFragment.newInstance(
-                "dummy deck id", slideNum, NavigateFragment.Role.AUDIENCE);
+                mDeckId, slideNum, NavigateFragment.Role.AUDIENCE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)

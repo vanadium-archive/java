@@ -15,12 +15,13 @@ import android.widget.TextView;
 public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.ViewHolder>
         implements DB.Listener {
     private static final String TAG = "SlideListAdapter";
-    private final DB.SlideList mSlides;
+    private DB.DBList<DB.Slide> mSlides;
     private final RecyclerView mRecyclerView;
 
     public SlideListAdapter(RecyclerView recyclerView, DB db, String deckId) {
         mRecyclerView = recyclerView;
         mSlides = db.getSlides(deckId);
+        mSlides.setListener(this);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
             @Override
             public void onClick(View v) {
                 int position = mRecyclerView.getChildAdapterPosition(v);
-                PresentationActivity activity = (PresentationActivity)v.getContext();
+                PresentationActivity activity = (PresentationActivity) v.getContext();
                 activity.jumpToSlide(position);
             }
         });
@@ -40,7 +41,7 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int i) {
-        DB.Slide slide = mSlides.getSlide(i);
+        DB.Slide slide = mSlides.get(i);
         holder.mNotes.setText(slide.getNotes());
         holder.mImage.setImageBitmap(slide.getImage());
     }
@@ -48,6 +49,14 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
     @Override
     public int getItemCount() {
         return mSlides.getItemCount();
+    }
+
+    /**
+     * Stops any background monitoring of the underlying data.
+     */
+    public void stop() {
+        mSlides.discard();
+        mSlides = null;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

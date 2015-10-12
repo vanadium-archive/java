@@ -16,10 +16,19 @@ import android.os.Looper;
  * A fake implementation of DB for manual testing purposes.
  */
 public class FakeDB implements DB {
-    private static final int[] SLIDEDRAWABLES = new int[]{R.drawable.slide1, R.drawable.slide2,
-            R.drawable.slide3, R.drawable.slide4, R.drawable.slide5, R.drawable.slide6,
-            R.drawable.slide7, R.drawable.slide8, R.drawable.slide9, R.drawable.slide10,
-            R.drawable.slide11};
+    private static final int[] SLIDEDRAWABLES = new int[]{
+            R.drawable.slide1_thumb,
+            R.drawable.slide2_thumb,
+            R.drawable.slide3_thumb,
+            R.drawable.slide4_thumb,
+            R.drawable.slide5_thumb,
+            R.drawable.slide6_thumb,
+            R.drawable.slide7_thumb,
+            R.drawable.slide8_thumb,
+            R.drawable.slide9_thumb,
+            R.drawable.slide10_thumb,
+            R.drawable.slide11_thumb
+    };
     private final String[] SLIDENOTES = {
             "This is the teaser slide. It should be memorable and descriptive of what your " +
                     "company is trying to do", "",
@@ -102,7 +111,7 @@ public class FakeDB implements DB {
         }
     }
 
-    private static class FakeDeckList implements DeckList {
+    private static class FakeDeckList implements DBList {
         private final Bitmap[] mThumbs;
         private final String[] mTitles;
         private Listener mListener;
@@ -118,7 +127,7 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public Deck getDeck(int i) {
+        public Deck get(int i) {
             return new FakeDeck(mThumbs[i], mTitles[i], String.valueOf(i));
         }
 
@@ -134,7 +143,7 @@ public class FakeDB implements DB {
         }
     }
 
-    private static class FakeSlideList implements SlideList {
+    private static class FakeSlideList implements DBList {
         private final Bitmap[] mSlideImages;
         private final String[] mSlideNotes;
 
@@ -149,8 +158,18 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public Slide getSlide(int i) {
+        public Slide get(int i) {
             return new FakeSlide(mSlideImages[i], mSlideNotes[i]);
+        }
+
+        @Override
+        public void setListener(Listener listener) {
+
+        }
+
+        @Override
+        public void discard() {
+
         }
     }
 
@@ -185,12 +204,12 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public DeckList getDecks() {
+    public DBList<Deck> getDecks() {
         return new FakeDeckList(mThumbs, TITLES);
     }
 
     @Override
-    public SlideList getSlides(String deckId) {
+    public DBList<Slide> getSlides(String deckId) {
         // Always return the same set of slides no matter which deck was requested.
         return new FakeSlideList(mSlideImages, SLIDENOTES);
     }

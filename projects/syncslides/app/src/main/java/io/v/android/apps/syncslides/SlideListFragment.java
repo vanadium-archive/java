@@ -14,8 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class SlideListFragment extends Fragment {
-    private static final String DECK_ID = "deck_id";
+    private static final String DECK_ID_KEY = "deck_id";
     private static final String SLIDE_LIST_TITLE = "Pitch deck";
+
+    private String mDeckId;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private SlideListAdapter mAdapter;
@@ -26,7 +28,7 @@ public class SlideListFragment extends Fragment {
     public static SlideListFragment newInstance(String deckId) {
         SlideListFragment fragment = new SlideListFragment();
         Bundle args = new Bundle();
-        args.putString(DECK_ID, deckId);
+        args.putString(DECK_ID_KEY, deckId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -38,6 +40,9 @@ public class SlideListFragment extends Fragment {
         ((PresentationActivity)getActivity()).setUiImmersive(false);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_slide_list, container, false);
+
+        Bundle arguments = getArguments();
+        mDeckId = arguments.getString(DECK_ID_KEY);
 
         //Clicking on the fab leads to the first slide
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
@@ -56,11 +61,22 @@ public class SlideListFragment extends Fragment {
                 LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        // TODO(afergan): Use the real deckId.
-        mAdapter = new SlideListAdapter(mRecyclerView, db, "dummy_deckId");
-        mRecyclerView.setAdapter(mAdapter);
         getActivity().setTitle(SLIDE_LIST_TITLE);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        DB db = DB.Singleton.get(getActivity().getApplicationContext());
+        mAdapter = new SlideListAdapter(mRecyclerView, db, mDeckId);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stop();
+        mAdapter = null;
     }
 }

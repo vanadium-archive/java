@@ -6,6 +6,7 @@ package io.v.android.apps.syncslides;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,7 +23,7 @@ import android.widget.Toolbar;
 public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHolder>
         implements DB.Listener {
     private static final String TAG = "DeckListAdapter";
-    private DB.DeckList mDecks;
+    private DB.DBList<DB.Deck> mDecks;
 
     public DeckListAdapter(DB db) {
         mDecks = db.getDecks();
@@ -37,13 +38,36 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int i) {
-        DB.Deck deck = mDecks.getDeck(i);
+    public void onBindViewHolder(final ViewHolder holder, int i) {
+        final DB.Deck deck = mDecks.get(i);
         holder.mToolbar.setTitle(deck.getTitle());
         // TODO(kash): We need to say when the user last viewed the deck or show
         // that the deck is active.  Either use the subtitle for this or create
         // a custom view for both the title and subtitle.
         holder.mThumb.setImageBitmap(deck.getThumb());
+        holder.mThumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Context context = v.getContext();
+                // Intent for the activity to open when user selects the thumbnail.
+                Intent intent = new Intent(context, PresentationActivity.class);
+                intent.putExtra(PresentationActivity.DECK_ID_KEY, deck.getId());
+                context.startActivity(intent);
+            }
+        });
+        holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_delete_deck:
+                        // TODO(kash): Actually delete the deck.
+                        Toast.makeText(holder.mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
+                                .show();
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -67,29 +91,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             super(itemView);
             mThumb = (ImageView) itemView.findViewById(R.id.deck_thumb);
             mToolbar = (Toolbar) itemView.findViewById(R.id.deck_card_toolbar);
-            mThumb.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final Context context = v.getContext();
-                    // Intent for the activity to open when user selects the thumbnail.
-                    Intent presentationIntent = new Intent(context, PresentationActivity.class);
-                    context.startActivity(presentationIntent);
-                }
-            });
             mToolbar.inflateMenu(R.menu.deck_card);
-            mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.action_delete_deck:
-                            // TODO(kash): Actually delete the deck.
-                            Toast.makeText(mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
-                                    .show();
-                            return true;
-                    }
-                    return false;
-                }
-            });
         }
     }
 }
