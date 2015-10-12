@@ -6,7 +6,6 @@ package io.v.android.apps.syncslides;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.support.design.widget.FloatingActionButton;

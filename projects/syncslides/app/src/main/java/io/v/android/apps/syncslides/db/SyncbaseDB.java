@@ -42,7 +42,7 @@ import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.syncbase.nosql.ResultStream;
+import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.vdl.VdlAny;
@@ -273,7 +273,7 @@ public class SyncbaseDB implements DB {
 
             try {
                 final List<SyncbaseDeck> decks = Lists.newArrayList();
-                ResultStream stream = mDB.exec(mVContext,
+                DatabaseCore.ResultStream stream = mDB.exec(mVContext,
                         "SELECT k, v FROM Decks WHERE Type(v) like \"%Deck\"");
                 // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                 // a new VContext so it can be cancelled.
@@ -402,7 +402,7 @@ public class SyncbaseDB implements DB {
 
                 String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%Slide\" " +
                         "AND k LIKE \"" + NamingUtil.join(mDeckId, "slides") + "%\"";
-                ResultStream stream = batch.exec(mVContext, query);
+                DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
                 // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                 // a new VContext so it can be cancelled.
                 for (List<VdlAny> row : stream) {
