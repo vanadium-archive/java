@@ -116,7 +116,7 @@ task checkVanadiumSyncbaseEnvironment(type: Exec, dependsOn: checkVanadiumEnviro
         commandLine env.jiriBin.getAbsolutePath(), 'v23-profile', 'env',
             '-profile=syncbase', '--target=arm-android', 'V23_TARGET_INSTALLATION_DIR='
     } else {
-        commandLine "echo", ['third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator)
+        commandLine "echo", [jiriRoot, 'third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator)
     }
     standardOutput = new ByteArrayOutputStream()
     doLast {
