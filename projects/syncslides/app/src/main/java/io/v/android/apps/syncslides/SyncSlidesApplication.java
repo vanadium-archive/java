@@ -6,6 +6,9 @@ package io.v.android.apps.syncslides;
 
 import android.app.Application;
 
+import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.db.FakeDB;
+
 /**
  * Subclass the main application object so that we can store global state.
  * http://www.devahead.com/blog/2011/06/extending-the-android-application-class-and-dealing-with-singleton/

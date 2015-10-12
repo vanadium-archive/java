@@ -11,11 +11,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Slide;
+
 
 public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.ViewHolder>
-        implements DB.Listener {
+        implements Listener {
     private static final String TAG = "SlideListAdapter";
-    private DB.DBList<DB.Slide> mSlides;
+    private DB.DBList<Slide> mSlides;
     private final RecyclerView mRecyclerView;
 
     public SlideListAdapter(RecyclerView recyclerView, DB db, String deckId) {
@@ -41,7 +45,7 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int i) {
-        DB.Slide slide = mSlides.get(i);
+        Slide slide = mSlides.get(i);
         holder.mNotes.setText(slide.getNotes());
         holder.mImage.setImageBitmap(slide.getImage());
     }

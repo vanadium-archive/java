@@ -6,7 +6,6 @@ package io.v.android.apps.syncslides;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -16,14 +15,18 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.Listener;
+
 /**
  * Provides a list of decks to be shown in the RecyclerView of the
  * DeckChooserFragment.
  */
 public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHolder>
-        implements DB.Listener {
+        implements Listener {
     private static final String TAG = "DeckListAdapter";
-    private DB.DBList<DB.Deck> mDecks;
+    private DB.DBList<Deck> mDecks;
 
     public DeckListAdapter(DB db) {
         mDecks = db.getDecks();
@@ -39,7 +42,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int i) {
-        final DB.Deck deck = mDecks.get(i);
+        final Deck deck = mDecks.get(i);
         holder.mToolbar.setTitle(deck.getTitle());
         // TODO(kash): We need to say when the user last viewed the deck or show
         // that the deck is active.  Either use the subtitle for this or create

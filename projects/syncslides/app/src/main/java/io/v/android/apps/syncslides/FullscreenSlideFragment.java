@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Slide;
+
 public class FullscreenSlideFragment extends Fragment {
 
     private static final String DECK_ID = "deck_id";
@@ -18,7 +21,7 @@ public class FullscreenSlideFragment extends Fragment {
 
     private String mDeckId;
     private int mSlideNum;
-    private DB.Slide[] mSlides;
+    private Slide[] mSlides;
     private ImageView mFullScreenImage;
 
     public static FullscreenSlideFragment newInstance(String deckId, int slideNum) {
@@ -40,7 +43,7 @@ public class FullscreenSlideFragment extends Fragment {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.SlidesCallback() {
             @Override
-            public void done(DB.Slide[] slides) {
+            public void done(Slide[] slides) {
                 mSlides = slides;
                 if (mSlideNum >= 0 && mSlideNum < mSlides.length) {
                     mFullScreenImage.setImageBitmap(mSlides[mSlideNum].getImage());

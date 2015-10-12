@@ -2,12 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.apps.syncslides;
+package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+
+import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Slide;
 
 /**
  * Provides high-level methods for getting and setting the state of SyncSlides.
@@ -48,35 +51,6 @@ public interface DB {
      * @return true if the requestCode matches an intent sent by this implementation.
      */
     boolean onActivityResult(int requestCode, int resultCode, Intent data);
-
-    interface Deck {
-        /**
-         * Returns a Bitmap suitable as a thumbnail of the deck (e.g. the title slide).
-         */
-        Bitmap getThumb();
-
-        /**
-         * Returns the title of the deck.
-         */
-        String getTitle();
-
-        /**
-         * Returns the deck id.
-         */
-        String getId();
-    }
-
-    interface Slide {
-        /**
-         * Returns a Bitmap of the slide image.
-         */
-        Bitmap getImage();
-
-        /**
-         * Returns the slide notes.
-         */
-        String getNotes();
-    }
 
     /**
      * Provides a list of elements via an API that fits well with RecyclerView.Adapter.
@@ -129,15 +103,6 @@ public interface DB {
          * @param questionerList the list of identities in the questions queue
          */
         void onChange(String[] questionerList);
-    }
-
-    /**
-     * Callbacks for when the dataset changes dynamically.
-     */
-    interface Listener {
-        void notifyItemChanged(int position);
-        void notifyItemInserted(int position);
-        void notifyItemRemoved(int position);
     }
 
     /**

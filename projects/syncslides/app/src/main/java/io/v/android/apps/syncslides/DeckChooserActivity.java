@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.support.v4.widget.DrawerLayout;
 
+import io.v.android.apps.syncslides.db.DB;
+
 public class DeckChooserActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 

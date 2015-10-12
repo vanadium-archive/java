@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.v.android.apps.syncslides.db.DB;
+
 public class SlideListFragment extends Fragment {
     private static final String DECK_ID_KEY = "deck_id";
     private static final String SLIDE_LIST_TITLE = "Pitch deck";

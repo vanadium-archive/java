@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.apps.syncslides;
+package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -22,6 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 
+import io.v.android.apps.syncslides.R;
+import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
@@ -217,9 +218,9 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public DBList<Deck> getDecks() {
+    public DBList<io.v.android.apps.syncslides.model.Deck> getDecks() {
         if (!mInitialized) {
-            return new NoopList<Deck>();
+            return new NoopList<io.v.android.apps.syncslides.model.Deck>();
         }
         return new DeckList(mVContext, mDB);
     }
@@ -282,8 +283,7 @@ public class SyncbaseDB implements DB {
                     }
                     String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched deck " + key);
-                    io.v.android.apps.syncslides.Deck deck =
-                            (io.v.android.apps.syncslides.Deck) row.get(1).getElem();
+                    Deck deck = (Deck) row.get(1).getElem();
                     decks.add(new SyncbaseDeck(key, deck.getTitle(), deck.getThumbnail()));
                 }
                 mHandler.post(new Runnable() {
@@ -311,7 +311,7 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public Deck get(int i) {
+        public io.v.android.apps.syncslides.model.Deck get(int i) {
             if (mDecks != null) {
                 return mDecks.get(i);
             }
@@ -330,7 +330,7 @@ public class SyncbaseDB implements DB {
         }
     }
 
-    private static class SyncbaseDeck implements Deck {
+    private static class SyncbaseDeck implements io.v.android.apps.syncslides.model.Deck {
 
         private final String mKey;
         private final String mTitle;
@@ -359,7 +359,7 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public DBList<Slide> getSlides(String deckId) {
+    public DBList<io.v.android.apps.syncslides.model.Slide> getSlides(String deckId) {
         if (!mInitialized) {
             return new NoopList<>();
         }
@@ -411,8 +411,7 @@ public class SyncbaseDB implements DB {
                     }
                     String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched slide " + key);
-                    io.v.android.apps.syncslides.Slide slide =
-                            (io.v.android.apps.syncslides.Slide) row.get(1).getElem();
+                    Slide slide = (Slide) row.get(1).getElem();
                     Note note = (Note) table.get(mVContext, key, Note.class);
                     final SyncbaseSlide newSlide = new SyncbaseSlide(
                             key, slide.getThumbnail(), note.getText());
@@ -435,7 +434,7 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public Slide get(int i) {
+        public io.v.android.apps.syncslides.model.Slide get(int i) {
             return mSlides.get(i);
         }
 
@@ -451,7 +450,7 @@ public class SyncbaseDB implements DB {
         }
     }
 
-    private static class SyncbaseSlide implements Slide {
+    private static class SyncbaseSlide implements io.v.android.apps.syncslides.model.Slide {
 
 
         private final Bitmap mThumbnail;
@@ -521,9 +520,8 @@ public class SyncbaseDB implements DB {
                 mDecks.put(
                         mVContext,
                         prefix,
-                        new io.v.android.apps.syncslides.Deck(
-                                title, getThumbnailBytes(resourceId)),
-                        io.v.android.apps.syncslides.Deck.class);
+                        new Deck(title, getThumbnailBytes(resourceId)),
+                        Deck.class);
             }
             for (int i = 0; i < SLIDENOTES.length; i++) {
                 String key = NamingUtil.join(prefix, "slides", String.format("%04d", i));
@@ -533,9 +531,8 @@ public class SyncbaseDB implements DB {
                     mDecks.put(
                             mVContext,
                             key,
-                            new io.v.android.apps.syncslides.Slide(
-                                    getThumbnailBytes(SLIDEDRAWABLES[i])),
-                            io.v.android.apps.syncslides.Slide.class);
+                            new Slide(getThumbnailBytes(SLIDEDRAWABLES[i])),
+                            Slide.class);
                 }
                 Log.i(TAG, "Adding notes");
                 mNotes.put(mVContext, key, new Note(SLIDENOTES[i]), Note.class);

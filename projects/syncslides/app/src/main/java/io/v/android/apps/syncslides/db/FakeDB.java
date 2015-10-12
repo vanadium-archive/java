@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.apps.syncslides;
+package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+
+import io.v.android.apps.syncslides.R;
+import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Slide;
 
 /**
  * A fake implementation of DB for manual testing purposes.
@@ -127,7 +132,7 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public Deck get(int i) {
+        public io.v.android.apps.syncslides.model.Deck get(int i) {
             return new FakeDeck(mThumbs[i], mTitles[i], String.valueOf(i));
         }
 
@@ -158,7 +163,7 @@ public class FakeDB implements DB {
         }
 
         @Override
-        public Slide get(int i) {
+        public io.v.android.apps.syncslides.model.Slide get(int i) {
             return new FakeSlide(mSlideImages[i], mSlideNotes[i]);
         }
 
@@ -204,19 +209,19 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public DBList<Deck> getDecks() {
+    public DBList<io.v.android.apps.syncslides.model.Deck> getDecks() {
         return new FakeDeckList(mThumbs, TITLES);
     }
 
     @Override
-    public DBList<Slide> getSlides(String deckId) {
+    public DBList<io.v.android.apps.syncslides.model.Slide> getSlides(String deckId) {
         // Always return the same set of slides no matter which deck was requested.
         return new FakeSlideList(mSlideImages, SLIDENOTES);
     }
 
     @Override
     public void getSlides(String deckId, final SlidesCallback callback) {
-        final Slide[] slides = new Slide[mSlideImages.length];
+        final io.v.android.apps.syncslides.model.Slide[] slides = new io.v.android.apps.syncslides.model.Slide[mSlideImages.length];
         for (int i = 0; i < mSlideImages.length; i++) {
             slides[i] = new FakeSlide(mSlideImages[i], SLIDENOTES[i]);
         }

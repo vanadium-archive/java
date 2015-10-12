@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import io.v.android.apps.syncslides.db.DB;
+
 /**
  * This fragment contains the list of decks as well as the FAB to create a new
  * deck.

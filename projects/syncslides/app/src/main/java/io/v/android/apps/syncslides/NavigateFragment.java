@@ -28,6 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Slide;
+
 /**
  * Provides both the presenter and audience views for navigating through a presentation.
  * Instantiated by the PresentationActivity along with other views/fragments of the presentation
@@ -49,7 +52,7 @@ public class NavigateFragment extends Fragment {
     private ImageView mQuestions;
     private TextView mQuestionsNum;
     private EditText mNotes;
-    private DB.Slide[] mSlides;
+    private Slide[] mSlides;
     private Role mRole;
     private String[] mQuestionerList;
     private boolean mEditing;
@@ -169,7 +172,7 @@ public class NavigateFragment extends Fragment {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.SlidesCallback() {
             @Override
-            public void done(DB.Slide[] slides) {
+            public void done(Slide[] slides) {
                 mSlides = slides;
                 updateView();
             }
