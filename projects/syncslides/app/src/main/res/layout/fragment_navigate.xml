@@ -127,11 +127,10 @@
             android:layout_margin="@dimen/fab_margin"
             android:clickable="true"
             android:src="@drawable/ic_sync_white_36dp"
-            android:visibility="visible"
+            android:visibility="invisible"
             app:backgroundTint="@color/action_orange"
             app:layout_anchor="@id/slide_current_medium"
             app:layout_anchorGravity="bottom|right|end" />
-
     </android.support.design.widget.CoordinatorLayout>
 
     <!-- Editable notes for the current slide. -->

@@ -53,7 +53,7 @@ public class SlideListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 PresentationActivity activity = (PresentationActivity) v.getContext();
-                activity.jumpToSlide(0);
+                activity.jumpToSlideSynced(0);
             }
         });
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.slide_list);
