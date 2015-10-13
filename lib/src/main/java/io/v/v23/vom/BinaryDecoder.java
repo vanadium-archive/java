@@ -273,8 +273,12 @@ public class BinaryDecoder {
         }
 
         Class<?> targetClass = target.getTargetClass();
-        if (!List.class.isAssignableFrom(targetClass) && !targetClass.isArray()) {
-            return ConvertUtil.convertFromBytes(BinaryUtil.decodeBytes(in, len), target);
+        if (!List.class.isAssignableFrom(targetClass)) {
+            if (BinaryUtil.isBytes(actualType) && targetClass.equals(byte[].class)) {
+                return BinaryUtil.decodeBytes(in, len);
+            } else if (!targetClass.isArray()) {
+                return ConvertUtil.convertFromBytes(BinaryUtil.decodeBytes(in, len), target);
+            }
         }
 
         Type elementType = ReflectUtil.getElementType(target.getTargetType(), 0);
