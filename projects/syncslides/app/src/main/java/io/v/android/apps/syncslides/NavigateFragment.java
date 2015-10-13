@@ -42,7 +42,9 @@ public class NavigateFragment extends Fragment {
     private static final String DECK_ID_KEY = "deck_id_key";
     private static final String SLIDE_NUM_KEY = "slide_num_key";
     private static final String ROLE_KEY = "role_key";
+    private static final String SYNCED_KEY = "synced_key";
     private static final int DIALOG_REQUEST_CODE = 23;
+
 
     private String mDeckId;
     private int mSlideNum;
@@ -50,6 +52,7 @@ public class NavigateFragment extends Fragment {
     private ImageView mNextThumb;
     private ImageView mCurrentSlide;
     private ImageView mQuestions;
+    private View mFabSync;
     private TextView mQuestionsNum;
     private EditText mNotes;
     private Slide[] mSlides;
@@ -57,17 +60,20 @@ public class NavigateFragment extends Fragment {
     private String[] mQuestionerList;
     private boolean mEditing;
     private int mQuestionerPosition;
+    private boolean mSynced;
 
     public enum Role {
         PRESENTER, AUDIENCE
     }
 
-    public static NavigateFragment newInstance(String deckId, int slideNum, Role role) {
+    public static NavigateFragment newInstance(
+            String deckId, int slideNum, Role role, boolean synced) {
         NavigateFragment fragment = new NavigateFragment();
         Bundle args = new Bundle();
         args.putString(DECK_ID_KEY, deckId);
         args.putInt(SLIDE_NUM_KEY, slideNum);
         args.putSerializable(ROLE_KEY, role);
+        args.putBoolean(SYNCED_KEY, synced);
         fragment.setArguments(args);
         return fragment;
     }
@@ -91,9 +97,24 @@ public class NavigateFragment extends Fragment {
         mDeckId = args.getString(DECK_ID_KEY);
         mSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
+        mSynced = args.getBoolean(SYNCED_KEY);
 
         final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
+        mFabSync = rootView.findViewById(R.id.audience_sync_fab);
+        if (mSynced || mRole == Role.PRESENTER) {
+            mFabSync.setVisibility(View.INVISIBLE);
+        } else {
+            mFabSync.setVisibility(View.VISIBLE);
+        }
 
+        mFabSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO(afergan): Set slide num to the presenter's current slide.
+                mSynced = true;
+                mFabSync.setVisibility(View.INVISIBLE);
+            }
+        });
         View.OnClickListener previousSlideListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,6 +167,7 @@ public class NavigateFragment extends Fragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 mEditing = hasFocus;
                 getActivity().invalidateOptionsMenu();
+                unsync();
             }
         });
         // The parent of mNotes needs to be focusable in order to clear focus
@@ -251,6 +273,12 @@ public class NavigateFragment extends Fragment {
                 .commit();
     }
 
+    private void unsync() {
+        if (mRole == Role.AUDIENCE && mSynced) {
+            mSynced = false;
+            mFabSync.setVisibility(View.VISIBLE);
+        }
+    }
     /**
      * Advances to the next slide, if there is one, and updates the UI.
      */
@@ -262,6 +290,7 @@ public class NavigateFragment extends Fragment {
         if (mSlideNum < mSlides.length - 1) {
             mSlideNum++;
             updateView();
+            unsync();
         }
     }
 
@@ -276,6 +305,7 @@ public class NavigateFragment extends Fragment {
         if (mSlideNum > 0) {
             mSlideNum--;
             updateView();
+            unsync();
         }
     }
 

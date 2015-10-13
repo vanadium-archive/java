@@ -7,9 +7,7 @@ package io.v.android.apps.syncslides;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 public class PresentationActivity extends AppCompatActivity {
 
@@ -53,14 +51,26 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Swap out the current fragment for a NavigateFragment.
-     *
+     * Swap out the current fragment for a NavigateFragment. The presenter and audience members
+     * who join live presentations will be synced.
      * @param slideNum the slide to show
      */
+    public void jumpToSlideSynced(int slideNum) {
+        jumpToSlide(slideNum, true);
+    }
 
-    public void jumpToSlide(int slideNum) {
+    /**
+     * Swap out the current fragment for a NavigateFragment. Audience members who click on a slide
+     * from the slide list will start unsynced.
+     * @param slideNum the slide to show
+     */
+    public void jumpToSlideUnsynced(int slideNum) {
+        jumpToSlide(slideNum, false);
+    }
+
+    private void jumpToSlide(int slideNum, boolean synced) {
         NavigateFragment fragment = NavigateFragment.newInstance(
-                mDeckId, slideNum, NavigateFragment.Role.AUDIENCE);
+                mDeckId, slideNum, NavigateFragment.Role.AUDIENCE, synced);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
