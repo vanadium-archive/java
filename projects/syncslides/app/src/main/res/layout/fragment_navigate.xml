@@ -16,13 +16,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- A medium version of the slide image. -->
-            <ImageView
-                android:id="@+id/slide_current_medium"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
+                android:layout_height="wrap_content">
+
+                <!-- A medium version of the slide image. -->
+                <ImageView
+                    android:id="@+id/slide_current_medium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"/>
+
+                <TextView
+                    android:id="@+id/slide_num_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/slide_current_medium"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="@dimen/nav_hint_margin"
+                    android:background="@drawable/nav_hint"
+                    android:paddingLeft="@dimen/nav_hint_padding"
+                    android:paddingRight="@dimen/nav_hint_padding"
+                    android:textColor="@color/nav_hint_text"/>
+
+            </RelativeLayout>
 
             <!-- A bar containing icons to navigate the presentation. -->
             <LinearLayout
@@ -95,6 +113,20 @@
             android:layout_margin="@dimen/fab_margin"
             android:clickable="true"
             android:src="@drawable/ic_arrow_forward_white_36dp"
+            android:visibility="visible"
+            app:backgroundTint="@color/action_orange"
+            app:layout_anchor="@id/slide_current_medium"
+            app:layout_anchorGravity="bottom|right|end" />
+
+        <!-- This button shows up only some of the time.  NavigateFragment makes it visible
+             dynamically. -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/audience_sync_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"
+            android:src="@drawable/ic_sync_white_36dp"
             android:visibility="visible"
             app:backgroundTint="@color/action_orange"
             app:layout_anchor="@id/slide_current_medium"

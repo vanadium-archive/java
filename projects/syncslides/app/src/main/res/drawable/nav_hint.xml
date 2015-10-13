@@ -4,7 +4,6 @@
     android:shape="rectangle">
 
     <corners android:radius="@dimen/nav_hint_corner_radius"/>
-    <!-- TODO(kash): This isn't working right in the preview.  Need to test with phone.  -->
     <solid android:color="@color/nav_hint_background"/>
 </shape>
 

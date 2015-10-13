@@ -318,6 +318,8 @@ public class NavigateFragment extends Fragment {
         } else {
             mNotes.getText().clear();
         }
+        ((TextView) getView().findViewById(R.id.slide_num_text))
+                .setText(String.valueOf(mSlideNum + 1) + " of " + String.valueOf(mSlides.length));
     }
 
     @Override
