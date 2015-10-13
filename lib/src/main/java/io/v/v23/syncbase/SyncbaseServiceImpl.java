@@ -4,10 +4,13 @@
 
 package io.v.v23.syncbase;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.v.v23.rpc.Callback;
+import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.ServiceClient;
 import io.v.v23.services.syncbase.ServiceClientFactory;
 import io.v.v23.syncbase.util.Util;
@@ -33,16 +36,39 @@ class SyncbaseServiceImpl implements SyncbaseService {
         return new SyncbaseAppImpl(this.fullName, relativeName);
     }
     @Override
-    public String[] listApps(VContext ctx) throws VException {
+    public List<String> listApps(VContext ctx) throws VException {
         return Util.listChildren(ctx, this.fullName);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
         this.client.setPermissions(ctx, perms, version);
     }
+
+    @Override
+    public void setPermissions(VContext ctx, Permissions perms, String version,
+                               Callback<Void> callback) throws VException {
+        client.setPermissions(ctx, perms, version, callback);
+    }
+
     @Override
     public Map<String, Permissions> getPermissions(VContext ctx) throws VException {
         ServiceClient.GetPermissionsOut perms = this.client.getPermissions(ctx);
         return ImmutableMap.of(perms.version, perms.perms);
+    }
+
+    @Override
+    public void getPermissions(VContext ctx, final Callback<Map<String, Permissions>> callback)
+            throws VException {
+        client.getPermissions(ctx, new Callback<ObjectClient.GetPermissionsOut>() {
+            @Override
+            public void onSuccess(ObjectClient.GetPermissionsOut result) {
+                callback.onSuccess(ImmutableMap.of(result.version, result.perms));
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                callback.onFailure(error);
+            }
+        });
     }
 }
