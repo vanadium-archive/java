@@ -16,6 +16,7 @@ import org.joda.time.Duration;
 
 import io.v.v23.V;
 import io.v.v23.vdl.Types;
+import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -42,22 +43,26 @@ public class BinaryDecoderTest extends TestCase {
 
     public void testDecode() throws Exception {
         for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
-            byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
-            Object value;
-            if (test.getValue().getElem().getClass().isArray()) {
-                value = TestUtil.decode(bytes, test.getValue().getElem().getClass());
-            } else {
-                value = TestUtil.decode(bytes);
-            }
-            TestUtil.assertEqual(test.getValue().getElem(), value);
+          byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
+          Serializable targetVal = test.getValue();
+          if (test.getValue().getElem() != null) {
+            targetVal = test.getValue().getElem();
+          }
+          Object value;
+          if (test.getValue().getElem() != null && test.getValue().getElem().getClass().isArray()) {
+              value = TestUtil.decode(bytes, test.getValue().getElem().getClass());
+          } else {
+              value = TestUtil.decode(bytes);
+          }
+          TestUtil.assertEqual(String.format("decode(%s) -> %s == %s", test.getName(), targetVal, value), targetVal, value);
         }
     }
 
     public void testDecodeEncode() throws Exception {
         for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
-            byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
-            VdlValue value = (VdlValue) TestUtil.decode(bytes, VdlValue.class);
-            assertEquals(test.getHex(), TestUtil.encode(value.vdlType(), value));
+          byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
+          VdlValue value = (VdlValue) TestUtil.decode(bytes, VdlValue.class);
+          assertEquals(String.format("encode(%s) == %s", test.getName(), test.getHex()), test.getHex(), TestUtil.encode(value.vdlType(), value));
         }
 
         VdlType testsType = Types.getVdlTypeFromReflect(

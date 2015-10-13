@@ -353,7 +353,7 @@ public final class Types {
             return type;
         }
         if (!Strings.isNullOrEmpty(vdlType.getName())) {  // named type
-            throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+            throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - named type is unregistered");
         }
 
         Type key, elem;
@@ -362,7 +362,7 @@ public final class Types {
             case ENUM:
             case STRUCT:
             case UNION:
-                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - illegal unnamed union");
             case ANY:
                 return VdlAny.class;
             case BOOL:
@@ -384,30 +384,33 @@ public final class Types {
             case INT64:
                 return Long.class;
             case LIST:
+                if (vdlType.getElem().getKind() == Kind.BYTE) {
+                  return byte[].class;
+                }
                 elem = getReflectTypeForVdl(vdlType.getElem());
                 if (elem != null) {
                     return new ParameterizedTypeImpl(VdlList.class, elem);
                 }
-                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - unknown list elem type");
             case MAP:
                 key = getReflectTypeForVdl(vdlType.getKey());
                 elem = getReflectTypeForVdl(vdlType.getElem());
                 if (key != null && elem != null) {
                     return new ParameterizedTypeImpl(VdlMap.class, key, elem);
                 }
-                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - unknown map key or elem type");
             case OPTIONAL:
                 elem = getReflectTypeForVdl(vdlType.getElem());
                 if (elem != null) {
                     return new ParameterizedTypeImpl(VdlOptional.class, elem);
                 }
-                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - unkown optional elem type");
             case SET:
                 key = getReflectTypeForVdl(vdlType.getKey());
                 if (key != null) {
                     return new ParameterizedTypeImpl(VdlSet.class, key);
                 }
-                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType);
+                throw new IllegalArgumentException("Can't build java type for VDL type " + vdlType + " - unknown set key type");
             case STRING:
                 return String.class;
             case TYPEOBJECT:

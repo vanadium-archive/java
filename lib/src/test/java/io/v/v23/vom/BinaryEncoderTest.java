@@ -64,7 +64,11 @@ public class BinaryEncoderTest extends TestCase {
     public void testEncode() throws Exception {
         for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
             VdlAny value = test.getValue();
-            assertEquals(test.getHex(), TestUtil.encode(value.getElemType(), value.getElem()));
+            if (value.getElemType() == null) {
+              assertEquals(test.getHex(), TestUtil.encode(VdlAny.VDL_TYPE, null));
+            } else {
+              assertEquals(test.getHex(), TestUtil.encode(value.getElemType(), value.getElem()));
+            }
         }
 
         VdlType testsType = Types.getVdlTypeFromReflect(

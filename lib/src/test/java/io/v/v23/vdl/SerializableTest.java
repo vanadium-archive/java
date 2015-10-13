@@ -34,8 +34,8 @@ public class SerializableTest extends junit.framework.TestCase {
 
             // Verify
             Object copy = in.readObject();
-            assertEquals(value, copy);
-            assertEquals(value.hashCode(), copy.hashCode());
+            assertEquals(String.format("serialization of %s", test.getName()), value, copy);
+            assertEquals(String.format("original and deserialized %s", test.getName()), value.hashCode(), copy.hashCode());
         }
     }
 }

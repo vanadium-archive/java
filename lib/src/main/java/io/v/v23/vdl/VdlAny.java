@@ -6,58 +6,118 @@ package io.v.v23.vdl;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * VdlAny is a representation of a VDL any.
- */
+* VdlAny is a representation of a VDL any.
+*/
 public final class VdlAny extends VdlValue {
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final Serializable elem;
-    private final VdlType elemType;
+  /**
+  * Vdl type for {@link VdlAny}.
+  */
+  public static final io.v.v23.vdl.VdlType VDL_TYPE = io.v.v23.vdl.Types.ANY;
 
-    public VdlAny(VdlType vdlType, Serializable value) {
-        super(Types.ANY);
-        elem = value;
-        elemType = vdlType;
+  private final Serializable elem;
+  private final VdlType elemType;
+
+  public VdlAny(VdlType vdlType, Serializable value) {
+    super(Types.ANY);
+    elem = value;
+    elemType = vdlType;
+  }
+
+  public VdlAny(Type type, Serializable value) {
+    this(Types.getVdlTypeFromReflect(type), value);
+  }
+
+  public VdlAny(VdlValue value) {
+    this(value.vdlType(), value);
+  }
+
+  public VdlAny() {
+    this((VdlType) null, null);
+  }
+
+  public Serializable getElem() {
+    return elem;
+  }
+
+  public VdlType getElemType() {
+    return elemType;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (this.getClass() != obj.getClass()) return false;
+    VdlAny other = (VdlAny) obj;
+
+    if (elem == null) {
+      return other.elem == null;
+    }
+    if (other.elem == null) {
+      return false;
+    }
+    if (elemType != other.elemType) {
+      return false;
     }
 
-    public VdlAny(Type type, Serializable value) {
-        this(Types.getVdlTypeFromReflect(type), value);
+    if (elem.getClass().isArray() != other.elem.getClass().isArray()) {
+      return false;
     }
+    if (elem.getClass().isArray()) {
+      if (Array.getLength(elem) != Array.getLength(other.elem)) {
+        return false;
+      }
+      for (int i = 0; i < Array.getLength(elem); i++) {
+        Object obj1 = Array.get(elem, i);
+        Object obj2 = Array.get(other.elem, i);
+        if (!Objects.equals(obj1, obj2)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return elem == null ? other.elem == null : elem.equals(other.elem);
+  }
 
-    public VdlAny(VdlValue value) {
-        this(value.vdlType(), value);
+  @Override
+  public int hashCode() {
+    if (elem != null && elem.getClass().isArray()) {
+      Object[] arr = new Object[Array.getLength(elem)];
+      for (int i = 0; i < Array.getLength(elem); i++) {
+        arr[i] = Array.get(elem, i);
+      }
+      return Objects.hash(elemType, Arrays.hashCode(arr));
+    } else {
+      return Objects.hash(elemType, elem);
     }
+  }
 
-    public VdlAny() {
-        this((VdlType) null, null);
+  @Override
+  public String toString() {
+    if (elem == null) {
+      return "any(null)";
     }
-
-    public Serializable getElem() {
-        return elem;
+    String typeString = elemType.toString();
+    if (elem.getClass().isArray()) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(typeString);
+      sb.append("{");
+      for (int i = 0; i < Array.getLength(elem); i++) {
+        if (i > 0) {
+          sb.append(",");
+        }
+        sb.append(Array.get(elem, i).toString());
+      }
+      sb.append("}");
+      return sb.toString();
     }
-
-    public VdlType getElemType() {
-        return elemType;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        VdlAny other = (VdlAny) obj;
-        return elem == null ? other.elem == null : elem.equals(other.elem);
-    }
-
-    @Override
-    public int hashCode() {
-        return elem == null ? 0 : elem.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return elem == null ? null : elem.toString();
-    }
+    return typeString+elem.toString();
+  }
 }

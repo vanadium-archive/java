@@ -66,7 +66,7 @@ public class ConversionTest extends TestCase {
                         } else {
                             targetType = Types.getReflectTypeForVdl(value.getElemType());
                         }
-                        TestUtil.assertEqual(value.getElem(), convert(otherValue, targetType));
+                        TestUtil.assertEqual(String.format("convert %s -> %s == %s", otherValue, targetType, value.getElem()), value.getElem(), convert(otherValue, targetType));
                     }
                     // Element of one convert group can't be converted to primary type of
                     // previous groups.

@@ -252,12 +252,13 @@ public class BinaryEncoder {
         expectClass(Kind.ANY, value, VdlAny.class);
         VdlAny anyValue = (VdlAny) value;
         Object elem = anyValue.getElem();
+
         if (elem != null) {
             BinaryUtil.encodeUint(out, getType(anyValue.getElemType()).getValue());
             writeValue(out, elem, anyValue.getElemType());
             return true;
         } else {
-            BinaryUtil.encodeUint(out, Constants.WIRE_CTRL_NIL);
+            writeVdlByte(out, Constants.WIRE_CTRL_NIL);
             return false;
         }
     }

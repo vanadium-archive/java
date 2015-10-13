@@ -63,28 +63,36 @@ public class TestUtil {
         return TestUtil.bytesToHexString(out.toByteArray());
     }
 
-    static void assertEqual(Object expected, Object actual) {
+    static void assertEqual(String message, Object expected, Object actual) {
+	if (expected == null) {
+	    TestCase.assertNull(message, actual);
+	    return;
+	}
+	if (actual == null) {
+	    TestCase.assertNull(message, expected);
+	    return;
+	}
         if (expected.getClass().isArray()) {
             Class<?> component = expected.getClass().getComponentType();
             if (component == Boolean.TYPE) {
-                TestCase.assertTrue(Arrays.equals((boolean[]) expected, (boolean[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((boolean[]) expected, (boolean[]) actual));
             } else if (component == Byte.TYPE) {
-                TestCase.assertTrue(Arrays.equals((byte[]) expected, (byte[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((byte[]) expected, (byte[]) actual));
             } else if (component == Short.TYPE) {
-                TestCase.assertTrue(Arrays.equals((short[]) expected, (short[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((short[]) expected, (short[]) actual));
             } else if (component == Integer.TYPE) {
-                TestCase.assertTrue(Arrays.equals((int[]) expected, (int[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((int[]) expected, (int[]) actual));
             } else if (component == Long.TYPE) {
-                TestCase.assertTrue(Arrays.equals((long[]) expected, (long[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((long[]) expected, (long[]) actual));
             } else if (component == Float.TYPE) {
-                TestCase.assertTrue(Arrays.equals((float[]) expected, (float[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((float[]) expected, (float[]) actual));
             } else if (component == Double.TYPE) {
-                TestCase.assertTrue(Arrays.equals((double[]) expected, (double[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((double[]) expected, (double[]) actual));
             } else {
-                TestCase.assertTrue(Arrays.equals((Object[]) expected, (Object[]) actual));
+                TestCase.assertTrue(message, Arrays.equals((Object[]) expected, (Object[]) actual));
             }
         } else {
-            TestCase.assertEquals(expected, actual);
+            TestCase.assertEquals(message, expected, actual);
         }
     }
 }
