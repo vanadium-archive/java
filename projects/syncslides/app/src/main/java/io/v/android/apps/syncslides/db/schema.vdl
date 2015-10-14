@@ -5,13 +5,13 @@
 package db
 
 // Deck is the metadata for a set of slides.
-type Deck struct {
+type VDeck struct {
     Title string
     Thumbnail []byte
 }
 
 // Slide contains the image content for the slide.
-type Slide struct {
+type VSlide struct {
     // A low-res version of the image stored as PNG.
     Thumbnail []byte
     // A high-res version of the image stored as PNG.
@@ -19,20 +19,20 @@ type Slide struct {
 }
 
 // Note contains private-to-the-user notes for a specific slide.
-type Note struct {
+type VNote struct {
     Text string
 }
 
 // Presentation represents a live display of a Deck.
-type Presentation struct {
+type VPresentation struct {
     // If the presenter has handed control of the presentation to an audience member,
     // driver will be present.  When the presenter takes back control, this
     // will switch back to the empty string.
-    Driver ?Person  // ? means optional.
+    Driver ?VPerson  // ? means optional.
 }
 
 // Person represents either an audience member or the presenter.
-type Person struct{
+type VPerson struct{
     FirstName string
     LastName string
 }
@@ -40,7 +40,7 @@ type Person struct{
 // CurrentSlide contains state for the live presentation.  It is separate from the
 // Presentation so that the presenter can temporarily delegate control of the
 // CurrentSlide without giving up control of the entire presentation.
-type CurrentSlide struct {
+type VCurrentSlide struct {
     // The number of the slide that the presenter is talking about.
     Num int32
     // In the future, we could add markup/doodles here.  That markup would be transient
@@ -50,9 +50,9 @@ type CurrentSlide struct {
 // Question represents a member of the audience asking a question of the presenter.
 // TODO(kash): Add support for the user to type in their question.  Right now, they
 // need to ask their question verbally.
-type Question struct {
+type VQuestion struct {
     // The person who asked the question.
-    Questioner Person
+    Questioner VPerson
     // Time when the question was asked in milliseconds since the epoch.
     Time int64
     // Track whether this question has been answered.

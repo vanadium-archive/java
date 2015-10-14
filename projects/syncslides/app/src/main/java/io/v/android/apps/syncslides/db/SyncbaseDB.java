@@ -27,7 +27,12 @@ import java.util.List;
 import java.util.UUID;
 
 import io.v.android.apps.syncslides.R;
+import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.NoopList;
+import io.v.android.apps.syncslides.model.Slide;
+import io.v.android.apps.syncslides.model.SlideImpl;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
@@ -237,31 +242,11 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public DBList<io.v.android.apps.syncslides.model.Deck> getDecks() {
+    public DBList<Deck> getDecks() {
         if (!mInitialized) {
             return new NoopList<>();
         }
         return new DeckList(mVContext, mDB);
-    }
-
-    private static class NoopList<E> implements DBList<E> {
-        @Override
-        public int getItemCount() {
-            return 0;
-        }
-
-        @Override
-        public E get(int i) {
-            return null;
-        }
-
-        @Override
-        public void setListener(Listener listener) {
-        }
-
-        @Override
-        public void discard() {
-        }
     }
 
     private static class DeckList implements DBList {
@@ -270,7 +255,7 @@ public class SyncbaseDB implements DB {
         private final Database mDB;
         private final Handler mHandler;
         private final Thread mThread;
-        private List<SyncbaseDeck> mDecks;
+        private List<Deck> mDecks;
         private Listener mListener;
 
         public DeckList(VContext vContext, Database db) {
@@ -291,9 +276,9 @@ public class SyncbaseDB implements DB {
             //Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
             try {
-                final List<SyncbaseDeck> decks = Lists.newArrayList();
+                final List<Deck> decks = Lists.newArrayList();
                 DatabaseCore.ResultStream stream = mDB.exec(mVContext,
-                        "SELECT k, v FROM Decks WHERE Type(v) like \"%Deck\"");
+                        "SELECT k, v FROM Decks WHERE Type(v) like \"%VDeck\"");
                 // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                 // a new VContext so it can be cancelled.
                 for (List<VdlAny> row : stream) {
@@ -302,8 +287,13 @@ public class SyncbaseDB implements DB {
                     }
                     String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched deck " + key);
-                    Deck deck = (Deck) row.get(1).getElem();
-                    decks.add(new SyncbaseDeck(key, deck.getTitle(), deck.getThumbnail()));
+                    VDeck deck = (VDeck) row.get(1).getElem();
+                    decks.add(new DeckImpl(
+                            deck.getTitle(),
+                            BitmapFactory.decodeByteArray(
+                                    deck.getThumbnail(), 0, deck.getThumbnail().length),
+                            key,
+                            Deck.Status.IDLE));
                 }
                 mHandler.post(new Runnable() {
                     @Override
@@ -330,7 +320,7 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public io.v.android.apps.syncslides.model.Deck get(int i) {
+        public Deck get(int i) {
             if (mDecks != null) {
                 return mDecks.get(i);
             }
@@ -349,41 +339,8 @@ public class SyncbaseDB implements DB {
         }
     }
 
-    private static class SyncbaseDeck implements io.v.android.apps.syncslides.model.Deck {
-
-        private final String mKey;
-        private final String mTitle;
-        private final Bitmap mThumbnail;
-
-        public SyncbaseDeck(String key, String title, byte[] thumbnail) {
-            mKey = key;
-            mTitle = title;
-            mThumbnail = BitmapFactory.decodeByteArray(thumbnail, 0, thumbnail.length);
-        }
-
-        @Override
-        public Bitmap getThumb() {
-            return mThumbnail;
-        }
-
-        @Override
-        public String getTitle() {
-            return mTitle;
-        }
-
-        @Override
-        public String getId() {
-            return mKey;
-        }
-
-        @Override
-        public Status getStatus() {
-            return Status.IDLE;
-        }
-    }
-
     @Override
-    public DBList<io.v.android.apps.syncslides.model.Slide> getSlides(String deckId) {
+    public DBList<Slide> getSlides(String deckId) {
         if (!mInitialized) {
             return new NoopList<>();
         }
@@ -391,8 +348,7 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void getSlides(final String deckId,
-                          final Callback<io.v.android.apps.syncslides.model.Slide[]> callback) {
+    public void getSlides(final String deckId, final Callback<Slide[]> callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -403,26 +359,26 @@ public class SyncbaseDB implements DB {
                     BatchDatabase batch = mDB.beginBatch(mVContext, null);
                     Table table = batch.getTable(NOTES_TABLE);
 
-                    String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%Slide\" " +
+                    String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%VSlide\" " +
                             "AND k LIKE \"" + NamingUtil.join(deckId, "slides") + "%\"";
                     DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
                     // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                     // a new VContext so it can be cancelled.
-                    final List<SyncbaseSlide> slides = Lists.newArrayList();
+                    final List<Slide> slides = Lists.newArrayList();
                     for (List<VdlAny> row : stream) {
                         if (row.size() != 2) {
                             throw new VException("Wrong number of columns: " + row.size());
                         }
                         String key = (String) row.get(0).getElem();
                         Log.i(TAG, "Fetched slide " + key);
-                        Slide slide = (Slide) row.get(1).getElem();
-                        Note note = (Note) table.get(mVContext, key, Note.class);
-                        slides.add(new SyncbaseSlide(
-                                key, slide.getThumbnail(), note.getText()));
+                        VSlide slide = (VSlide) row.get(1).getElem();
+                        VNote note = (VNote) table.get(mVContext, key, VNote.class);
+                        slides.add(new SlideImpl(
+                                BitmapFactory.decodeByteArray(
+                                        slide.getThumbnail(), 0, slide.getThumbnail().length),
+                                note.getText()));
                     }
-                    final io.v.android.apps.syncslides.model.Slide[] ret =
-                            slides.toArray(
-                                    new io.v.android.apps.syncslides.model.Slide[slides.size()]);
+                    final Slide[] ret = slides.toArray(new Slide[slides.size()]);
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
@@ -449,11 +405,11 @@ public class SyncbaseDB implements DB {
                 String prefix = NamingUtil.join(deckId, presentationId);
                 try {
                     // Add rows to Presentations table.
-                    Presentation presentation = new Presentation();  // Empty for now.
-                    mPresentations.put(mVContext, prefix, presentation, Presentation.class);
-                    CurrentSlide current = new CurrentSlide(0);
+                    VPresentation presentation = new VPresentation();  // Empty for now.
+                    mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
+                    VCurrentSlide current = new VCurrentSlide(0);
                     mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
-                            current, CurrentSlide.class);
+                            current, VCurrentSlide.class);
 
                     // Create the syncgroup.
                     final String syncgroupName = NamingUtil.join(mPresentations.fullName(), prefix);
@@ -510,7 +466,7 @@ public class SyncbaseDB implements DB {
         private final Handler mHandler;
         private final Thread mThread;
         private final String mDeckId;
-        private List<SyncbaseSlide> mSlides;
+        private List<Slide> mSlides;
         private Listener mListener;
 
         public SlideList(VContext vContext, Database db, String deckId) {
@@ -537,7 +493,7 @@ public class SyncbaseDB implements DB {
                 BatchDatabase batch = mDB.beginBatch(mVContext, null);
                 Table table = batch.getTable(NOTES_TABLE);
 
-                String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%Slide\" " +
+                String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%VSlide\" " +
                         "AND k LIKE \"" + NamingUtil.join(mDeckId, "slides") + "%\"";
                 DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
                 // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
@@ -548,10 +504,12 @@ public class SyncbaseDB implements DB {
                     }
                     String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched slide " + key);
-                    Slide slide = (Slide) row.get(1).getElem();
-                    Note note = (Note) table.get(mVContext, key, Note.class);
-                    final SyncbaseSlide newSlide = new SyncbaseSlide(
-                            key, slide.getThumbnail(), note.getText());
+                    VSlide slide = (VSlide) row.get(1).getElem();
+                    VNote note = (VNote) table.get(mVContext, key, VNote.class);
+                    final SlideImpl newSlide = new SlideImpl(
+                            BitmapFactory.decodeByteArray(
+                                    slide.getThumbnail(), 0, slide.getThumbnail().length),
+                            note.getText());
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -571,7 +529,7 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public io.v.android.apps.syncslides.model.Slide get(int i) {
+        public Slide get(int i) {
             return mSlides.get(i);
         }
 
@@ -584,28 +542,6 @@ public class SyncbaseDB implements DB {
         public void discard() {
             mThread.interrupt();
             mHandler.removeCallbacksAndMessages(null);
-        }
-    }
-
-    private static class SyncbaseSlide implements io.v.android.apps.syncslides.model.Slide {
-
-
-        private final Bitmap mThumbnail;
-        private final String mNotes;
-
-        public SyncbaseSlide(String key, byte[] thumbnail, String notes) {
-            mThumbnail = BitmapFactory.decodeByteArray(thumbnail, 0, thumbnail.length);
-            mNotes = notes;
-        }
-
-        @Override
-        public Bitmap getImage() {
-            return mThumbnail;
-        }
-
-        @Override
-        public String getNotes() {
-            return mNotes;
         }
     }
 
@@ -651,8 +587,8 @@ public class SyncbaseDB implements DB {
                 mDecks.put(
                         mVContext,
                         prefix,
-                        new Deck(title, getThumbnailBytes(resourceId)),
-                        Deck.class);
+                        new VDeck(title, getThumbnailBytes(resourceId)),
+                        VDeck.class);
             }
             for (int i = 0; i < SLIDENOTES.length; i++) {
                 String key = NamingUtil.join(prefix, "slides", String.format("%04d", i));
@@ -662,11 +598,11 @@ public class SyncbaseDB implements DB {
                     mDecks.put(
                             mVContext,
                             key,
-                            new Slide(getThumbnailBytes(SLIDEDRAWABLES[i])),
-                            Slide.class);
+                            new VSlide(getThumbnailBytes(SLIDEDRAWABLES[i])),
+                            VSlide.class);
                 }
                 Log.i(TAG, "Adding notes");
-                mNotes.put(mVContext, key, new Note(SLIDENOTES[i]), Note.class);
+                mNotes.put(mVContext, key, new VNote(SLIDENOTES[i]), VNote.class);
                 mNotes.put(
                         mVContext,
                         NamingUtil.join(prefix, "LastViewed"),
