@@ -6,7 +6,10 @@ package io.v.android.apps.syncslides;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +19,7 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import io.v.android.apps.syncslides.db.DB;
-import io.v.android.apps.syncslides.discovery.Discovery;
+import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 
@@ -28,46 +31,44 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         implements Listener {
     private static final String TAG = "DeckListAdapter";
     private DB.DBList<Deck> mDecks;
-    private Discovery.DList mLivePresList;
+    private DB.DBList<Deck> mLiveDecks;
 
-    public DeckListAdapter(DB db, Discovery discovery) {
-        mLivePresList = discovery.getLivePresentations();
-        mDecks = db.getDecks();
-
-        mLivePresList.setListener(new Listener() {
-            @Override
-            public void notifyItemChanged(int position) {
-                DeckListAdapter.this.notifyItemChanged(position);
-            }
-
-            @Override
-            public void notifyItemInserted(int position) {
-                DeckListAdapter.this.notifyItemInserted(position);
-            }
-
-            @Override
-            public void notifyItemRemoved(int position) {
-                DeckListAdapter.this.notifyItemRemoved(position);
-            }
-        });
-
+    public void start(DiscoveryManager discoveryManager, DB.DBList<Deck> decks) {
+        if (mDecks != null) {
+            throw new IllegalStateException("Wrong lifecycle.");
+        }
+        Log.d(TAG, "Starting.");
+        mLiveDecks = discoveryManager;
+        mLiveDecks.setListener(this);
+        discoveryManager.start();
+        mDecks = decks;
         mDecks.setListener(new Listener() {
             @Override
             public void notifyItemChanged(int position) {
-                DeckListAdapter.this.notifyItemChanged(mLivePresList.getItemCount() + position);
+                DeckListAdapter.this.notifyItemChanged(mLiveDecks.getItemCount() + position);
             }
 
             @Override
             public void notifyItemInserted(int position) {
-                DeckListAdapter.this.notifyItemInserted(mLivePresList.getItemCount() + position);
+                DeckListAdapter.this.notifyItemInserted(mLiveDecks.getItemCount() + position);
             }
 
             @Override
             public void notifyItemRemoved(int position) {
-                DeckListAdapter.this.notifyItemRemoved(mLivePresList.getItemCount() + position);
+                DeckListAdapter.this.notifyItemRemoved(mLiveDecks.getItemCount() + position);
             }
         });
+    }
 
+    /**
+     * Stops any background monitoring of the underlying data.
+     */
+    public void stop() {
+        Log.d(TAG, "Stopping.");
+        mLiveDecks.discard();
+        mLiveDecks = null;
+        mDecks.discard();
+        mDecks = null;
     }
 
     @Override
@@ -81,14 +82,18 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int i) {
         final Deck deck;
         final Role role;
+        final boolean isLive;
+
         // If the position is less than the number of live presentation decks, get deck card from
         // there (and don't allow the user to delete the deck). If not, get the card from the DB.
-        if (i < mLivePresList.getItemCount()) {
-            deck = mLivePresList.get(i);
+        if (i < mLiveDecks.getItemCount()) {
+            isLive = true;
+            deck = mLiveDecks.get(i);
             holder.mToolbar.getMenu().clear();
             role = Role.AUDIENCE;
         } else {
-            deck = mDecks.get(i - mLivePresList.getItemCount());
+            isLive = false;
+            deck = mDecks.get(i - mLiveDecks.getItemCount());
             holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -107,11 +112,18 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         }
 
         holder.mToolbar.setTitle(deck.getTitle());
-        // TODO(afergan): Display "LIVE NOW" subtitle in toolbar for live presentations.
-        // TODO(kash): We need to say when the user last viewed the deck or show
-        // that the deck is active.  Either use the subtitle for this or create
-        // a custom view for both the title and subtitle.
-        holder.mThumb.setImageBitmap(deck.getThumb());
+        // TODO(kash): We need to say when the user last viewed the deck.
+        Bitmap thumb = deck.getThumb();
+        if (thumb == null) {
+            thumb = makeDefaultThumb(holder.mToolbar.getContext());
+        }
+        holder.mThumb.setImageBitmap(thumb);
+        if (isLive) {
+            // TODO(afergan): Display "LIVE NOW" subtitle in toolbar for live presentations.
+            holder.mToolbar.setTitle(" " + deck.getTitle());
+            holder.mToolbar.setLogo(R.drawable.orange_circle);
+        }
+
         holder.mThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,17 +139,13 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mLivePresList.getItemCount() + mDecks.getItemCount();
+        return mLiveDecks.getItemCount() + mDecks.getItemCount();
     }
 
-    /**
-     * Stops any background monitoring of the underlying data.
-     */
-    public void stop() {
-        mDecks.discard();
-        mDecks = null;
+    private Bitmap makeDefaultThumb(Context c) {
+        return BitmapFactory.decodeResource(
+                c.getResources(), R.drawable.thumb_deck3);
     }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView mThumb;
         public final Toolbar mToolbar;

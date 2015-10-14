@@ -21,7 +21,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
-import io.v.android.apps.syncslides.discovery.Discovery;
+import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 
 /**
  * This fragment contains the list of decks as well as the FAB to create a new
@@ -29,19 +29,17 @@ import io.v.android.apps.syncslides.discovery.Discovery;
  */
 public class DeckChooserFragment extends Fragment {
     /**
-     * The fragment argument representing the section number for this
-     * fragment.
+     * The fragment argument representing the section number for this fragment.
      */
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String TAG = "ChooserFragment";
+    private static final String TAG = "DeckChooserFragment";
     private static final int REQUEST_CODE_IMPORT_DECK = 1000;
     private RecyclerView mRecyclerView;
     private GridLayoutManager mLayoutManager;
     private DeckListAdapter mAdapter;
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Returns a new instance of this fragment for the given section number.
      */
     public static DeckChooserFragment newInstance(int sectionNumber) {
         DeckChooserFragment fragment = new DeckChooserFragment();
@@ -116,15 +114,21 @@ public class DeckChooserFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        Discovery discovery = Discovery.Singleton.get(getActivity().getApplicationContext());
-        mAdapter = new DeckListAdapter(db, discovery);
+        Log.i(TAG, "Starting");
+        mAdapter = new DeckListAdapter();
+        mAdapter.start(
+                DiscoveryManager.Singleton.get(
+                        getActivity().getApplicationContext()),
+                DB.Singleton.get(
+                        getActivity().getApplicationContext()).getDecks()
+        );
         mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.i(TAG, "Stopping");
         mAdapter.stop();
         mAdapter = null;
     }

@@ -23,13 +23,13 @@ public class ParticipantScannerFake implements ParticipantScanner {
         HashSet<Participant> participants = new HashSet<>();
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
-                    new ParticipantService(
+                    new ParticipantPeer(
                             "Alice", new DeckImpl("Kale - Just eat it.")));
         }
         // Bob has less to say than Alice.
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
-                    new ParticipantService(
+                    new ParticipantPeer(
                             "Bob", new DeckImpl("Java - Object deluge.")));
         }
         return participants;

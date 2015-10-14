@@ -10,6 +10,10 @@ import org.joda.time.Duration;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Repeatedly runs a task in a thread distinct from that which calls start().
@@ -18,30 +22,33 @@ class PeriodicTasker {
     private static final String TAG = "PeriodicTasker";
 
     private static final Duration DELAY_BEFORE_FIRST_TASK =
-            Duration.standardSeconds(5);
+            Duration.standardSeconds(2);
 
     private static final Duration WAIT_BETWEEN_TASKS =
-            Duration.standardSeconds(5);
+            Duration.standardSeconds(2);
 
-    private Timer mTimer = null;
+    private ScheduledExecutorService mTimer = null;
 
-    void start(TimerTask task) {
+    void start(Runnable task) {
         if (mTimer != null) {
             throw new IllegalStateException("Must stop existing task first.");
         }
         Log.d(TAG, "Starting");
-        mTimer = new Timer();
+        mTimer = Executors.newSingleThreadScheduledExecutor();
         mTimer.scheduleAtFixedRate(
                 task,
                 DELAY_BEFORE_FIRST_TASK.getMillis(),
-                WAIT_BETWEEN_TASKS.getMillis());
+                WAIT_BETWEEN_TASKS.getMillis(),
+                TimeUnit.MILLISECONDS);
     }
 
     void stop() {
-        Log.d(TAG, "Stopping");
-        if (mTimer != null) {
-            // Currently running task will continue to completion.
-            mTimer.cancel();
+        if (mTimer == null) {
+            Log.d(TAG, "Nothing to stop.");
+            return;
         }
+        Log.d(TAG, "Stopping");
+        mTimer.shutdownNow();
+        mTimer = null;
     }
 }

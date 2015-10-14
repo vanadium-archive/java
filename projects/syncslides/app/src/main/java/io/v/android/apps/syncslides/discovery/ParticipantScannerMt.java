@@ -35,7 +35,7 @@ public class ParticipantScannerMt implements ParticipantScanner {
         Set<String> endPoints = mV23Manager.scan(ROOT_NAME + "/*");
         Set<Participant> result = new HashSet<>();
         for (String endPoint : endPoints) {
-            result.add(new ParticipantService(endPoint));
+            result.add(new ParticipantPeer(endPoint));
         }
         return result;
     }

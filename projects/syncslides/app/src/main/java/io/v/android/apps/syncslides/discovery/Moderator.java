@@ -8,7 +8,6 @@ import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TimerTask;
 
 import io.v.android.apps.syncslides.model.Participant;
 
@@ -21,7 +20,7 @@ import io.v.android.apps.syncslides.model.Participant;
  *
  * Not safe for more than one thread to enter run() at a time.
  */
-class Moderator extends TimerTask {
+class Moderator implements Runnable {
 
     private static final String TAG = "Moderator";
 
@@ -34,22 +33,19 @@ class Moderator extends TimerTask {
     // Participants that were not seen in the most recent scan, but we there in
     // the scan just before that.
     private final Set<Participant> mGraduated = new HashSet<>();
-
-    // Notify this guy when task done; make it a list if more needed.
-    private final Observer mObserver;
-
     // Does the actual scan.
     private final ParticipantScanner mScanner;
-
+    // Notify this guy when task done; make it a list if more needed.
+    private Observer mObserver;
     // Counts runs for debugging.
     private int mCounter = 0;
 
-    // Used in generating fake data.
-    private int mFakeCounter = 0;
-
-    public Moderator(Observer observer, ParticipantScanner scanner) {
-        mObserver = observer;
+    public Moderator(ParticipantScanner scanner) {
         mScanner = scanner;
+    }
+
+    public void setObserver(Observer observer) {
+        this.mObserver = observer;
     }
 
     public Set<Participant> getGraduated() {
@@ -62,6 +58,9 @@ class Moderator extends TimerTask {
 
     @Override
     public void run() {
+        if (mObserver == null) {
+            throw new IllegalStateException("Must have an observer.");
+        }
         Log.d(TAG, "Run #" + mCounter);
         try {
             mCounter++;

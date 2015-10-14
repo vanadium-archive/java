@@ -15,17 +15,11 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.Arrays;
-
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
-import io.v.android.v23.V;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.ListenSpec;
-import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.verror.VException;
 
 /**
  * Someone taking part in a presentation.
@@ -42,10 +36,13 @@ import io.v.v23.verror.VException;
  * and run it as a server, using the (public) userName as part of the mount
  * name.
  */
-public class ParticipantService extends Service implements Participant {
-    private static final String TAG = "ParticipantService";
+public class ParticipantPeer extends Service implements Participant {
+    private static final String TAG = "ParticipantPeer";
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormat.forPattern("hh_mm_ss_SSSS");
+    // Needed to allow this instance of ParticipantPeer to actually
+    // function as a service rather than as just a data bucket.
+    private final V23Manager mV23Manager;
     // V23 EndPoint of the V23 service representing the participant.
     private String mEndpointStr;
     // When did we last grab data from the endPoint?  Meaningful only in
@@ -58,27 +55,24 @@ public class ParticipantService extends Service implements Participant {
     private String mUserName;
     // Deck the user is presenting.  Can only present one at a time.
     private Deck mDeck;
-    // Needed to allow this instance of ParticipantService to actually
-    // function as a service rather than as just a data bucket.
-    private final V23Manager mV23Manager;
 
-    public ParticipantService(String userName, Deck deck, String endPoint) {
+    public ParticipantPeer(String userName, Deck deck, String endPoint) {
         mUserName = userName;
         mDeck = deck;
         mEndpointStr = endPoint;
         mV23Manager = null;
     }
 
-    public ParticipantService(String endPoint) {
+    public ParticipantPeer(String endPoint) {
         this(Unknown.USER_NAME, DeckImpl.DUMMY, endPoint);
     }
 
-    public ParticipantService(String userName, Deck deck) {
+    public ParticipantPeer(String userName, Deck deck) {
         this(userName, deck, Unknown.END_POINT);
     }
 
     public static Participant fromBundle(Bundle b) {
-        return new ParticipantService(
+        return new ParticipantPeer(
                 b.getString(B.USER_NAME),
                 new DeckImpl(
                         b.getString(B.TITLE),
@@ -132,7 +126,7 @@ public class ParticipantService extends Service implements Participant {
         if (!(obj instanceof Participant)) {
             return false;
         }
-        return mEndpointStr.equals(((ParticipantService) obj).mEndpointStr);
+        return mEndpointStr.equals(((ParticipantPeer) obj).mEndpointStr);
     }
 
     @Override
@@ -189,7 +183,6 @@ public class ParticipantService extends Service implements Participant {
     /**
      * Implementation of VDL Participant service.
      */
-
     private class ServerImpl implements ParticipantServer {
         private final Participant mParticipant;
 

@@ -30,25 +30,55 @@ import io.v.v23.verror.VException;
 /**
  * Does vanadium stuff - MT scanning, service creation, unmounting, etc.
  *
- * Trying to keep it syncslides independent.  See how long that lasts.
+ * This class is a singleton, since all vanadium activity must involve a
+ * Vanadium context recovered from a static call to V.init, ultimately
+ * (ideally) bookended by a static call to V.shutdown.   In an app.Service,
+ * one could call these in onCreate and onDestroy respectively.
  */
 public class V23Manager {
     private static final String TAG = "V23Manager";
 
     private static final Duration MT_TIMEOUT =
             Duration.standardSeconds(5);
+
+    public static class Singleton {
+        private static volatile V23Manager instance;
+        public static V23Manager get(Context context) {
+            V23Manager result = instance;
+            if (instance == null) {
+                synchronized (Singleton.class) {
+                    result = instance;
+                    if (result == null) {
+                        instance = result = new V23Manager(context);
+                    }
+                }
+            }
+            if (!result.getAndroidCtx().equals(context)) {
+                throw new IllegalArgumentException("Cannot reset context.");
+            }
+            return result;
+        }
+    }
     // Generates a name to use in the MT.
     private final NameGenerator mNameGenerator = new NameGeneratorByDate();
+
+    public Context getAndroidCtx() {
+        return mAndroidCtx;
+    }
+
     private final Context mAndroidCtx;
     private VContext mBaseContext = null;
     private VContext mMTContext = null;
     private Namespace mNamespace = null;
+
     // Can only have one of these at the moment.  Could add more...
     private Server mLiveServer = null;
 
-    public V23Manager(Context androidCtx) {
+    // Singleton.
+    private V23Manager(Context androidCtx) {
         mAndroidCtx = androidCtx;
     }
+
     /**
      * Placeholder for possibly scraping a website for the NS Root.
      *
@@ -62,8 +92,7 @@ public class V23Manager {
 
     public void init() {
         if (mBaseContext != null) {
-            // TODO(jregan):  Does re-init do harm in V23 Java?
-            return;
+            throw new IllegalStateException("Cannot reinitialize V23");
         }
         mBaseContext = V.init(mAndroidCtx);
         mMTContext = mBaseContext.withTimeout(MT_TIMEOUT);
@@ -74,6 +103,12 @@ public class V23Manager {
             // TODO(jregan): Handle total v23 failure higher up the stack.
             throw new IllegalStateException(e);
         }
+    }
+
+    public void shutdown() {
+        Log.i(TAG, "Shutdown");
+        V.shutdown();
+        mBaseContext = null;
     }
 
     public Set<String> scan(String pattern) {
