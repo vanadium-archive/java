@@ -4,22 +4,15 @@
 
 package io.v.v23.syncbase.nosql;
 
-import java.io.EOFException;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Iterators;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.VIterable;
+import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
+import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -31,8 +24,6 @@ import io.v.v23.services.watch.Change;
 import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.Util;
-import io.v.v23.context.VContext;
-import io.v.v23.security.access.Permissions;
 import io.v.v23.vdl.TypedClientStream;
 import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.vdl.Types;
@@ -41,6 +32,13 @@ import io.v.v23.vdl.VdlOptional;
 import io.v.v23.verror.BadStateException;
 import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
+
+import java.io.EOFException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 class DatabaseImpl implements Database, BatchDatabase {
     private final String parentFullName;
@@ -146,6 +144,10 @@ class DatabaseImpl implements Database, BatchDatabase {
         return this.client.exists(ctx, getSchemaVersion());
     }
     @Override
+    public void exists(VContext ctx, Callback<Boolean> callback) throws VException {
+        client.exists(ctx, getSchemaVersion(), callback);
+    }
+    @Override
     public void create(VContext ctx, Permissions perms) throws VException {
         VdlOptional metadataOpt = this.schema != null
                 ? VdlOptional.of(this.schema.getMetadata())
@@ -153,33 +155,76 @@ class DatabaseImpl implements Database, BatchDatabase {
         this.client.create(ctx, metadataOpt, perms);
     }
     @Override
+    public void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException {
+        VdlOptional metadataOpt = this.schema != null
+                ? VdlOptional.of(this.schema.getMetadata())
+                : new VdlOptional<SchemaMetadata>(Types.optionalOf(SchemaMetadata.VDL_TYPE));
+        client.create(ctx, metadataOpt, perms, callback);
+    }
+    @Override
     public void destroy(VContext ctx) throws VException {
         this.client.destroy(ctx, getSchemaVersion());
+    }
+    @Override
+    public void destroy(VContext ctx, Callback<Void> callback) throws VException {
+        client.destroy(ctx, getSchemaVersion(), callback);
     }
     public BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException {
         String batchSuffix = this.client.beginBatch(ctx, getSchemaVersion(), opts);
         return new DatabaseImpl(this.parentFullName, this.name, batchSuffix, this.schema);
     }
+    public void beginBatch(VContext ctx, BatchOptions opts, final Callback<BatchDatabase> callback) throws VException {
+        client.beginBatch(ctx, getSchemaVersion(), opts, new Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                callback.onSuccess(new DatabaseImpl(parentFullName, name, result, schema));
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                callback.onFailure(error);
+            }
+        });
+    }
     @Override
     public VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
                                         ResumeMarker resumeMarker) throws VException {
-        TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctx,
-                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
-        return new TypedStreamIterable(stream) {
+        final TypedClientStream<Void, WatchChange, Void> stream = transformStream(this.client.watchGlob(ctx,
+                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker)),
+                new VFunction<Change, WatchChange>() {
             @Override
-            public synchronized Iterator iterator() {
-                return Iterators.transform(super.iterator(), new Function<Change, WatchChange>() {
+            public WatchChange apply(Change input) throws VException {
+                return convertToWatchChange(input);
+            }
+        });
+        return new TypedStreamIterable<WatchChange>(stream);
+    }
+
+    @Override
+    public void watch(VContext ctx, String tableRelativeName, String rowPrefix,
+                      ResumeMarker resumeMarker, final Callback<VIterable<WatchChange>> callback)
+            throws VException {
+        final CancelableVContext ctxC = ctx.withCancel();
+        Callback<TypedClientStream<Void, Change, Void>> watchCallback =
+                new Callback<TypedClientStream<Void, Change, Void>>() {
+            @Override
+            public void onSuccess(TypedClientStream<Void, Change, Void> result) {
+                callback.onSuccess(
+                        new TypedStreamIterable<>(transformStream(result, new VFunction<Change, WatchChange>() {
                     @Override
-                    public WatchChange apply(Change change) {
-                        try {
-                            return convertToWatchChange(change);
-                        } catch (VException e) {
-                            throw new RuntimeException(e);
-                        }
+                    public WatchChange apply(Change input) throws VException {
+                        return convertToWatchChange(input);
                     }
-                });
+                })));
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                callback.onFailure(error);
             }
         };
+        client.watchGlob(ctxC, new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix +
+                "*"), resumeMarker), watchCallback);
     }
     @Override
     public ResumeMarker getResumeMarker(VContext ctx) throws VException {
@@ -190,9 +235,13 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new SyncgroupImpl(this.fullName, name);
     }
     @Override
-    public String[] listSyncgroupNames(VContext ctx) throws VException {
-        List<String> names = this.client.getSyncgroupNames(ctx);
-        return names.toArray(new String[names.size()]);
+    public List<String> listSyncgroupNames(VContext ctx) throws VException {
+        return client.getSyncgroupNames(ctx);
+    }
+    @Override
+    public void listSyncgroupNames(VContext ctx, Callback<List<String>> callback)
+            throws VException {
+        client.getSyncgroupNames(ctx, callback);
     }
     @Override
     public BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException {
@@ -202,13 +251,36 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new BlobWriterImpl(client, ref);
     }
     @Override
+    public void writeBlob(VContext ctx, BlobRef ref, final Callback<BlobWriter> callback)
+            throws VException {
+        if (ref != null) {
+            callback.onSuccess(new BlobWriterImpl(client, ref));
+        } else {
+            client.createBlob(ctx, new Callback<BlobRef>() {
+                @Override
+                public void onSuccess(BlobRef result) {
+                    callback.onSuccess(new BlobWriterImpl(client, result));
+                }
+
+                @Override
+                public void onFailure(VException error) {
+                    callback.onFailure(error);
+                }
+            });
+        }
+    }
+    @Override
     public BlobReader readBlob(VContext ctx, BlobRef ref) throws VException {
         if (ref == null) {
             throw new VException("Must pass a non-null blob ref.");
         }
         return new BlobReaderImpl(client, ref);
     }
-
+    @Override
+    public void readBlob(VContext ctx, BlobRef ref, Callback<BlobReader> callback)
+            throws VException {
+        callback.onSuccess(readBlob(ctx, ref));
+    }
     @Override
     public boolean upgradeIfOutdated(VContext ctx) throws VException {
         if (this.schema == null) {
@@ -249,14 +321,39 @@ class DatabaseImpl implements Database, BatchDatabase {
         return true;
     }
 
+    @Override
+    public void upgradeIfOutdated(final VContext ctx, final Callback<Boolean> callback)
+            throws VException {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    callback.onSuccess(upgradeIfOutdated(ctx));
+                } catch (VException error) {
+                    callback.onFailure(error);
+                }
+            }
+        });
+        thread.setName("DB update thread");
+        thread.start();
+    }
+
     // Implements BatchDatabase.
     @Override
     public void commit(VContext ctx) throws VException {
         this.client.commit(ctx, getSchemaVersion());
     }
     @Override
+    public void commit(VContext ctx, Callback<Void> callback) throws VException {
+        client.commit(ctx, getSchemaVersion(), callback);
+    }
+    @Override
     public void abort(VContext ctx) throws VException {
         this.client.abort(ctx, getSchemaVersion());
+    }
+    @Override
+    public void abort(VContext ctx, Callback<Void> callback) throws VException {
+        client.abort(ctx, getSchemaVersion(), callback);
     }
 
     private int getSchemaVersion() {
@@ -312,5 +409,30 @@ class DatabaseImpl implements Database, BatchDatabase {
         Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
         return ImmutableList.of(
                 iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
+    }
+
+    private interface VFunction<T, U> {
+        U apply(T input) throws VException;
+    }
+
+    private static <SendT, RecvT, NewRecvT, FinishT> TypedClientStream<SendT, NewRecvT, FinishT>
+            transformStream(final TypedClientStream<SendT, RecvT, FinishT> inputStream,
+                            final VFunction<RecvT, NewRecvT> transformFunction) {
+        return new TypedClientStream<SendT, NewRecvT, FinishT>() {
+            @Override
+            public FinishT finish() throws VException {
+                return inputStream.finish();
+            }
+
+            @Override
+            public void send(SendT item) throws VException {
+                inputStream.send(item);
+            }
+
+            @Override
+            public NewRecvT recv() throws EOFException, VException {
+                return transformFunction.apply(inputStream.recv());
+            }
+        };
     }
 }

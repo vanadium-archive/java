@@ -5,12 +5,15 @@ package io.v.v23.syncbase.nosql;
 
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.verror.VException;
+
+import java.util.List;
 
 /**
  * A database interface, which is logically a collection of {@link Table}s.
@@ -28,6 +31,13 @@ public interface Database extends DatabaseCore, AccessController {
     boolean exists(VContext ctx) throws VException;
 
     /**
+     * Asynchronous version of {@link #exists(VContext)}.
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void exists(VContext ctx, Callback<Boolean> callback) throws VException;
+
+    /**
      * Creates this database.
      *
      * @param  ctx        Vanadium context
@@ -39,12 +49,26 @@ public interface Database extends DatabaseCore, AccessController {
     void create(VContext ctx, Permissions perms) throws VException;
 
     /**
+     * Asynchronous version of {@link #create(VContext, Permissions)}.
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException;
+
+    /**
      * Destroys this database.
      *
      * @param  ctx        Vanadium context
      * @throws VException if the database couldn't be destroyed
      */
     void destroy(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #destroy(VContext)}.
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void destroy(VContext ctx, Callback<Void> callback) throws VException;
 
     /**
      * Creates a new "batch", i.e., a handle to a set of reads and writes to the database that
@@ -82,6 +106,14 @@ public interface Database extends DatabaseCore, AccessController {
     BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException;
 
     /**
+     * Asynchronous version of {@link #beginBatch(VContext, BatchOptions)}.
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void beginBatch(VContext ctx, BatchOptions opts, Callback<BatchDatabase> callback)
+            throws VException;
+
+    /**
      * Allows a client to watch for updates to the database. For each watch request, the client will
      * receive a reliable iterator of watch events without re-ordering.
      * <p>
@@ -111,6 +143,18 @@ public interface Database extends DatabaseCore, AccessController {
     VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
                                  ResumeMarker resumeMarker) throws VException;
 
+
+    /**
+     * Asynchronous version of {@link #watch(VContext, String, String, ResumeMarker)}. The callback
+     * is called once the stream is established, not necessarily when there is any
+     * {@link WatchChange} instance available for reading.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void watch(VContext ctx, String tableRelativeName, String rowPrefix,
+               ResumeMarker resumeMarker, Callback<VIterable<WatchChange>> callback) throws VException;
+
     /**
      * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.
      *
@@ -124,7 +168,15 @@ public interface Database extends DatabaseCore, AccessController {
      * @param  ctx        Vanadium context
      * @throws VException if the syncgroup names couldn't be retrieved
      */
-    String[] listSyncgroupNames(VContext ctx) throws VException;
+    List<String> listSyncgroupNames(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #listSyncgroupNames(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void listSyncgroupNames(VContext ctx, Callback<List<String>> callback) throws VException;
 
     /**
      * Opens a blob for writing.
@@ -135,7 +187,7 @@ public interface Database extends DatabaseCore, AccessController {
      * the existing blob data.
      * <p>
      * It is illegal to invoke this method with a reference to an already-committed blob.  If such
-     * a reference is passed-in, no new writes are applied to the blob;  however, this method may
+     * a reference is passed in, no new writes are applied to the blob;  however, this method may
      * still return a valid {@link BlobWriter} and some of the writes on that writer may
      * <strong>appear</strong> to succeed, though it is not so (see comments on
      * {@link BlobWriter#stream}.
@@ -146,6 +198,14 @@ public interface Database extends DatabaseCore, AccessController {
      * @throws VException if the blob couldn't be opened for writing
      */
     BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException;
+
+    /**
+     * Asynchronous version of {@link #writeBlob(VContext, BlobRef)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void writeBlob(VContext ctx, BlobRef ref, Callback<BlobWriter> callback) throws VException;
 
     /**
      * Opens a blob for reading.
@@ -160,6 +220,15 @@ public interface Database extends DatabaseCore, AccessController {
      * @throws VException if the blob couldn't be opened for reading
      */
     BlobReader readBlob(VContext ctx, BlobRef ref) throws VException;
+
+
+    /**
+     * Asynchronous version of {@link #readBlob(VContext, BlobRef)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void readBlob(VContext ctx, BlobRef ref, Callback<BlobReader> callback) throws VException;
 
     /**
      * Compares the current schema version of the database with the schema version provided while
@@ -177,4 +246,12 @@ public interface Database extends DatabaseCore, AccessController {
      * @throws VException if there was an error upgrading the schema
      */
     boolean upgradeIfOutdated(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #upgradeIfOutdated(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void upgradeIfOutdated(VContext ctx, Callback<Boolean> callback) throws VException;
 }

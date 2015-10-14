@@ -326,7 +326,7 @@ public class SyncbaseTest extends TestCase {
         Syncgroup group = db.getSyncgroup(groupName);
         {
             group.create(ctx, spec, memberInfo);
-            assertThat(Arrays.asList(db.listSyncgroupNames(ctx))).containsExactly(groupName);
+            assertThat(db.listSyncgroupNames(ctx)).containsExactly(groupName);
             assertThat(group.getSpec(ctx).values()).containsExactly(spec);
             assertThat(group.getMembers(ctx).values()).containsExactly(memberInfo);
             assertThat(group.join(ctx, memberInfo)).isEqualTo(spec);
