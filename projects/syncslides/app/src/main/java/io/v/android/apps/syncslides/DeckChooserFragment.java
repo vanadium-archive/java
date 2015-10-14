@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.discovery.Discovery;
 
 /**
  * This fragment contains the list of decks as well as the FAB to create a new
@@ -116,7 +117,8 @@ public class DeckChooserFragment extends Fragment {
     public void onStart() {
         super.onStart();
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        mAdapter = new DeckListAdapter(db);
+        Discovery discovery = Discovery.Singleton.get(getActivity().getApplicationContext());
+        mAdapter = new DeckListAdapter(db, discovery);
         mRecyclerView.setAdapter(mAdapter);
     }
 

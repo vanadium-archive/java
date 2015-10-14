@@ -16,6 +16,7 @@ import android.widget.Toast;
 import android.widget.Toolbar;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.discovery.Discovery;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 
@@ -27,10 +28,46 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         implements Listener {
     private static final String TAG = "DeckListAdapter";
     private DB.DBList<Deck> mDecks;
+    private Discovery.DList mLivePresList;
 
-    public DeckListAdapter(DB db) {
+    public DeckListAdapter(DB db, Discovery discovery) {
+        mLivePresList = discovery.getLivePresentations();
         mDecks = db.getDecks();
-        mDecks.setListener(this);
+
+        mLivePresList.setListener(new Listener() {
+            @Override
+            public void notifyItemChanged(int position) {
+                DeckListAdapter.this.notifyItemChanged(position);
+            }
+
+            @Override
+            public void notifyItemInserted(int position) {
+                DeckListAdapter.this.notifyItemInserted(position);
+            }
+
+            @Override
+            public void notifyItemRemoved(int position) {
+                DeckListAdapter.this.notifyItemRemoved(position);
+            }
+        });
+
+        mDecks.setListener(new Listener() {
+            @Override
+            public void notifyItemChanged(int position) {
+                DeckListAdapter.this.notifyItemChanged(mLivePresList.getItemCount() + position);
+            }
+
+            @Override
+            public void notifyItemInserted(int position) {
+                DeckListAdapter.this.notifyItemInserted(mLivePresList.getItemCount() + position);
+            }
+
+            @Override
+            public void notifyItemRemoved(int position) {
+                DeckListAdapter.this.notifyItemRemoved(mLivePresList.getItemCount() + position);
+            }
+        });
+
     }
 
     @Override
@@ -42,8 +79,33 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int i) {
-        final Deck deck = mDecks.get(i);
+        final Deck deck;
+
+        // If the position is less than the number of live presentation decks, get deck card from
+        // there (and don't allow the user to delete the deck). If not, get the card from the DB.
+        if (i < mLivePresList.getItemCount()) {
+            deck = mLivePresList.get(i);
+            holder.mToolbar.getMenu().clear();
+        } else {
+            deck = mDecks.get(i - mLivePresList.getItemCount());
+            holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.action_delete_deck:
+                            // TODO(kash): Actually delete the deck.
+                            Toast.makeText(
+                                    holder.mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
+                                    .show();
+                            return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
         holder.mToolbar.setTitle(deck.getTitle());
+        // TODO(afergan): Display "LIVE NOW" subtitle in toolbar for live presentations.
         // TODO(kash): We need to say when the user last viewed the deck or show
         // that the deck is active.  Either use the subtitle for this or create
         // a custom view for both the title and subtitle.
@@ -56,26 +118,14 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 Intent intent = new Intent(context, PresentationActivity.class);
                 intent.putExtra(PresentationActivity.DECK_ID_KEY, deck.getId());
                 context.startActivity(intent);
-            }
-        });
-        holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_delete_deck:
-                        // TODO(kash): Actually delete the deck.
-                        Toast.makeText(holder.mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
-                                .show();
-                        return true;
-                }
-                return false;
+                // TODO(afergan, jregan): Different logic flows for DB vs. live presentations.
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mDecks.getItemCount();
+        return mLivePresList.getItemCount() + mDecks.getItemCount();
     }
 
     /**
