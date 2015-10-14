@@ -16,19 +16,21 @@ import io.v.android.apps.syncslides.model.Slide;
 
 public class FullscreenSlideFragment extends Fragment {
 
-    private static final String DECK_ID = "deck_id";
-    private static final String SLIDE_NUM = "slide_num";
+    private static final String DECK_ID_KEY = "deck_id";
+    private static final String SLIDE_NUM_KEY = "slide_num";
+    private static final String ROLE_KEY = "role";
 
     private String mDeckId;
     private int mSlideNum;
     private Slide[] mSlides;
     private ImageView mFullScreenImage;
 
-    public static FullscreenSlideFragment newInstance(String deckId, int slideNum) {
+    public static FullscreenSlideFragment newInstance(String deckId, int slideNum, Role role) {
         FullscreenSlideFragment fragment = new FullscreenSlideFragment();
         Bundle args = new Bundle();
-        args.putString(DECK_ID, deckId);
-        args.putInt(SLIDE_NUM, slideNum);
+        args.putString(DECK_ID_KEY, deckId);
+        args.putInt(SLIDE_NUM_KEY, slideNum);
+        args.putSerializable(ROLE_KEY, role);
         fragment.setArguments(args);
         return fragment;
     }
@@ -37,8 +39,9 @@ public class FullscreenSlideFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Bundle args = getArguments();
-        mDeckId = args.getString(DECK_ID);
-        mSlideNum = args.getInt(SLIDE_NUM);
+        mDeckId = args.getString(DECK_ID_KEY);
+        mSlideNum = args.getInt(SLIDE_NUM_KEY);
+        // TODO(kash): If role == AUDIENCE, watch for slide number changes.
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.Callback<Slide[]>() {

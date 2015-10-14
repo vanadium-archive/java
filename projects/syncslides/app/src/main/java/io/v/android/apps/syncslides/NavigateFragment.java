@@ -45,7 +45,6 @@ public class NavigateFragment extends Fragment {
     private static final String SYNCED_KEY = "synced_key";
     private static final int DIALOG_REQUEST_CODE = 23;
 
-
     private String mDeckId;
     private int mSlideNum;
     private ImageView mPrevThumb;
@@ -61,10 +60,6 @@ public class NavigateFragment extends Fragment {
     private boolean mEditing;
     private int mQuestionerPosition;
     private boolean mSynced;
-
-    public enum Role {
-        PRESENTER, AUDIENCE
-    }
 
     public static NavigateFragment newInstance(
             String deckId, int slideNum, Role role, boolean synced) {
@@ -101,7 +96,7 @@ public class NavigateFragment extends Fragment {
 
         final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
         mFabSync = rootView.findViewById(R.id.audience_sync_fab);
-        if (mSynced || mRole == Role.PRESENTER) {
+        if (mSynced || mRole != Role.AUDIENCE) {
             mFabSync.setVisibility(View.INVISIBLE);
         } else {
             mFabSync.setVisibility(View.VISIBLE);
@@ -145,6 +140,7 @@ public class NavigateFragment extends Fragment {
         mNextThumb = (ImageView) rootView.findViewById(R.id.next_thumb);
         mNextThumb.setOnClickListener(nextSlideListener);
         mQuestions = (ImageView) rootView.findViewById(R.id.questions);
+        // TODO(kash): Hide the mQuestions button if mRole == BROWSER.
         mQuestions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,8 +151,8 @@ public class NavigateFragment extends Fragment {
         mCurrentSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mRole == Role.AUDIENCE) {
-                    fullscreenSlide();
+                if (mRole == Role.AUDIENCE || mRole == Role.BROWSER) {
+                    ((PresentationActivity) getActivity()).fullscreenSlide(mSlideNum);
                 }
             }
         });
@@ -187,9 +183,9 @@ public class NavigateFragment extends Fragment {
             }
         });
         mQuestionsNum = (TextView) rootView.findViewById(R.id.questions_num);
-        if (mRole == Role.AUDIENCE) {
-            mQuestionsNum.setVisibility(View.INVISIBLE);
-        }
+        // Start off invisible for everyone.  If there are questions, this
+        // will be set to visible in the db.getQuestionerList() callback.
+        mQuestionsNum.setVisibility(View.INVISIBLE);
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.Callback<Slide[]>() {
@@ -234,6 +230,7 @@ public class NavigateFragment extends Fragment {
         outState.putString(DECK_ID_KEY, mDeckId);
         outState.putInt(SLIDE_NUM_KEY, mSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
+        outState.putBoolean(SYNCED_KEY, mSynced);
     }
 
     @Override
@@ -262,23 +259,13 @@ public class NavigateFragment extends Fragment {
         return false;
     }
 
-
-    private void fullscreenSlide() {
-        FullscreenSlideFragment fullscreenSlideFragment =
-                FullscreenSlideFragment.newInstance(mDeckId, mSlideNum);
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment, fullscreenSlideFragment)
-                .addToBackStack("")
-                .commit();
-    }
-
     private void unsync() {
         if (mRole == Role.AUDIENCE && mSynced) {
             mSynced = false;
             mFabSync.setVisibility(View.VISIBLE);
         }
     }
+
     /**
      * Advances to the next slide, if there is one, and updates the UI.
      */
@@ -315,15 +302,20 @@ public class NavigateFragment extends Fragment {
      */
     private void questionButton() {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        if (mRole == Role.AUDIENCE) {
-            db.askQuestion("Audience member #1");
-            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                    "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
-            toast.show();
-        } else {
-            DialogFragment dialog = QuestionDialogFragment.newInstance(mQuestionerList);
-            dialog.setTargetFragment(this, DIALOG_REQUEST_CODE);
-            dialog.show(getFragmentManager(), "QuestionerDialogFragment");
+        switch (mRole) {
+            case AUDIENCE:
+                db.askQuestion("Audience member #1");
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                        "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
+                toast.show();
+                break;
+            case PRESENTER:
+                DialogFragment dialog = QuestionDialogFragment.newInstance(mQuestionerList);
+                dialog.setTargetFragment(this, DIALOG_REQUEST_CODE);
+                dialog.show(getFragmentManager(), "QuestionerDialogFragment");
+                break;
+            case BROWSER:
+                // Do nothing.
         }
     }
 

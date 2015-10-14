@@ -12,26 +12,36 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
 
 public class SlideListFragment extends Fragment {
     private static final String DECK_ID_KEY = "deck_id";
+    private static final String ROLE_KEY = "role";
     private static final String SLIDE_LIST_TITLE = "Pitch deck";
+    private static final String TAG = "SlideList";
 
+    /**
+     * onCreate's savedInstanceState is always null when this fragment is restored from
+     * the back stack. http://stackoverflow.com/a/11353470  Therefore, we need to keep
+     * track of whether this fragment has already been initialized -- we don't want to
+     * overwrite any changes.
+     */
+    private boolean mInitialized = false;
     private String mDeckId;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private SlideListAdapter mAdapter;
+    private Role mRole;
 
     /**
      * Returns a new instance of this fragment for the given deck.
      */
-    public static SlideListFragment newInstance(String deckId) {
+    public static SlideListFragment newInstance(String deckId, Role role) {
         SlideListFragment fragment = new SlideListFragment();
         Bundle args = new Bundle();
         args.putString(DECK_ID_KEY, deckId);
+        args.putSerializable(ROLE_KEY, role);
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,23 +50,37 @@ public class SlideListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // See comment at the top of fragment_slide_list.xml.
-        ((PresentationActivity)getActivity()).setUiImmersive(false);
+        ((PresentationActivity) getActivity()).setUiImmersive(false);
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_slide_list, container, false);
 
-        Bundle arguments = getArguments();
-        mDeckId = arguments.getString(DECK_ID_KEY);
+        if (!mInitialized) {
+            mInitialized = true;
 
-        // Clicking on the fab leads to the first slide
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
+            Bundle bundle = savedInstanceState;
+            if (bundle == null) {
+                bundle = getArguments();
+            }
+            mDeckId = bundle.getString(DECK_ID_KEY);
+            mRole = (Role) bundle.get(ROLE_KEY);
+        }
+
+        // Clicking on the fab starts the presentation.
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
                 R.id.play_presentation_fab);
+        if (mRole == Role.BROWSER) {
+            fab.setVisibility(View.VISIBLE);
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mRole = Role.PRESENTER;
+                fab.setVisibility(View.INVISIBLE);
                 PresentationActivity activity = (PresentationActivity) v.getContext();
                 activity.startPresentation();
             }
         });
+
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.slide_list);
         mRecyclerView.setHasFixedSize(true);
 
@@ -81,5 +105,12 @@ public class SlideListFragment extends Fragment {
         super.onStop();
         mAdapter.stop();
         mAdapter = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(DECK_ID_KEY, mDeckId);
+        outState.putSerializable(ROLE_KEY, mRole);
     }
 }

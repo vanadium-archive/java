@@ -80,12 +80,13 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, int i) {
         final Deck deck;
-
+        final Role role;
         // If the position is less than the number of live presentation decks, get deck card from
         // there (and don't allow the user to delete the deck). If not, get the card from the DB.
         if (i < mLivePresList.getItemCount()) {
             deck = mLivePresList.get(i);
             holder.mToolbar.getMenu().clear();
+            role = Role.AUDIENCE;
         } else {
             deck = mDecks.get(i - mLivePresList.getItemCount());
             holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -102,6 +103,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                     return false;
                 }
             });
+            role = Role.BROWSER;
         }
 
         holder.mToolbar.setTitle(deck.getTitle());
@@ -117,8 +119,8 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 // Intent for the activity to open when user selects the thumbnail.
                 Intent intent = new Intent(context, PresentationActivity.class);
                 intent.putExtra(PresentationActivity.DECK_ID_KEY, deck.getId());
+                intent.putExtra(PresentationActivity.ROLE_KEY, role);
                 context.startActivity(intent);
-                // TODO(afergan, jregan): Different logic flows for DB vs. live presentations.
             }
         });
     }
