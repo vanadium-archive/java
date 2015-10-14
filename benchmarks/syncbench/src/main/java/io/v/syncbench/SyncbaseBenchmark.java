@@ -94,14 +94,9 @@ public class SyncbaseBenchmark {
         for (int i = 0; i < reps; i++) {
             DatabaseCore.ResultStream stream = database.exec(baseContext, "select v from someTable");
             for (List<VdlAny> result : stream) {
-                VdlList<Byte> fetchedBytes = (VdlList<Byte>) result.get(0).getElem();
-                if (fetchedBytes.size() != imageBytes.length) {
-                    throw new IllegalStateException("size mismatch");
-                }
-                for (int j = 0; j < imageBytes.length; j++) {
-                    if (imageBytes[j] != fetchedBytes.get(j)) {
-                        throw new IllegalStateException("data mismatch");
-                    }
+                byte[] fetchedBytes = (byte[]) result.get(0).getElem();
+                if (!Arrays.equals(fetchedBytes, imageBytes)) {
+                    throw new IllegalStateException("fetched bytes do not match");
                 }
             }
         }
