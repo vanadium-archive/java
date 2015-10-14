@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import io.v.android.apps.syncslides.db.DB;
+
 public class PresentationActivity extends AppCompatActivity {
 
     public static final String DECK_ID_KEY = "deck_id";
@@ -18,6 +20,9 @@ public class PresentationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Do this initialization early on in case it needs to start the AccountManager.
+        DB.Singleton.get(getApplicationContext()).init(this);
+
         setContentView(R.layout.activity_presentation);
 
         Bundle bundle = getIntent().getExtras();
