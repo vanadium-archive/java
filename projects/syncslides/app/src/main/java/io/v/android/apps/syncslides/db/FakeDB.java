@@ -11,6 +11,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.model.Deck;
@@ -54,6 +59,8 @@ public class FakeDB implements DB {
     private final Handler mHandler;
     private final Bitmap[] mThumbs;
     private final Bitmap[] mSlideImages;
+    private List<CurrentSlideListener> mCurrentSlideListeners;
+    private Thread mCurrentSlideWatcher;
 
     public FakeDB(Context context) {
         mHandler = new Handler(Looper.getMainLooper());
@@ -66,6 +73,14 @@ public class FakeDB implements DB {
             mSlideImages[i] =
                     BitmapFactory.decodeResource(context.getResources(), SLIDEDRAWABLES[i]);
         }
+        mCurrentSlideListeners = Lists.newArrayList();
+        mCurrentSlideWatcher = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                watchCurrentSlide();
+            }
+        });
+        mCurrentSlideWatcher.start();
     }
 
     private static class FakeDeck implements Deck {
@@ -224,13 +239,26 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void createPresentation(String deckId, final Callback<StartPresentationResult> callback) {
+    public void createPresentation(String deckId, final Callback<CreatePresentationResult> callback) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                callback.done(new StartPresentationResult("fakePresentationId", "sgname"));
+                callback.done(new CreatePresentationResult("fakePresentationId", "sgname"));
             }
         });
+    }
+
+    @Override
+    public void addCurrentSlideListener(CurrentSlideListener listener) {
+        mCurrentSlideListeners.add(listener);
+        // TODO(kash): It would be better to fire off a notification of the current
+        // slide right away.  That requires storing the current slide in some
+        // place that is accessible to the UI thread.  Too much work for now.
+    }
+
+    @Override
+    public void removeCurrentSlideListener(CurrentSlideListener listener) {
+        mCurrentSlideListeners.remove(listener);
     }
 
     @Override
@@ -246,5 +274,26 @@ public class FakeDB implements DB {
                 callback.done(slides);
             }
         });
+    }
+
+    private void watchCurrentSlide() {
+        try {
+            int currentSlide = 0;
+            while (!Thread.currentThread().isInterrupted()) {
+                Thread.sleep(5000);
+                currentSlide = (currentSlide + 1) % mSlideImages.length;
+                final int finalCurrentSlide = currentSlide;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (CurrentSlideListener listener : mCurrentSlideListeners) {
+                            listener.onChange(finalCurrentSlide);
+                        }
+                    }
+                });
+            }
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Current Slide Watcher interrupted " + e);
+        }
     }
 }

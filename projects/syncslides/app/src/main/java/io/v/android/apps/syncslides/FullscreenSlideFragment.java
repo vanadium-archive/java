@@ -22,8 +22,15 @@ public class FullscreenSlideFragment extends Fragment {
 
     private String mDeckId;
     private int mSlideNum;
+    /**
+     * While mSlides is loading, we can't validate any slide numbers coming from DB.
+     * We hold them here until mSlides finishes loading.
+     */
+    private int mLoadingSlideNum;
+    private Role mRole;
     private Slide[] mSlides;
     private ImageView mFullScreenImage;
+    private DB.CurrentSlideListener mCurrentSlideListener;
 
     public static FullscreenSlideFragment newInstance(String deckId, int slideNum, Role role) {
         FullscreenSlideFragment fragment = new FullscreenSlideFragment();
@@ -38,20 +45,26 @@ public class FullscreenSlideFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle args = getArguments();
+        Bundle args = savedInstanceState;
+        if (args == null) {
+            args = getArguments();
+        }
         mDeckId = args.getString(DECK_ID_KEY);
         mSlideNum = args.getInt(SLIDE_NUM_KEY);
-        // TODO(kash): If role == AUDIENCE, watch for slide number changes.
+        mLoadingSlideNum = -1;
+        mRole = (Role) args.get(ROLE_KEY);
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         db.getSlides(mDeckId, new DB.Callback<Slide[]>() {
             @Override
             public void done(Slide[] slides) {
                 mSlides = slides;
-                if (mSlideNum >= 0 && mSlideNum < mSlides.length) {
-                    mFullScreenImage.setImageBitmap(mSlides[mSlideNum].getImage());
+                // The CurrentSlideListener could have been notified while we were waiting for
+                // the slides to load.
+                if (mLoadingSlideNum != -1) {
+                    currentSlideChanged(mLoadingSlideNum);
                 } else {
-                    getFragmentManager().popBackStack();
+                    currentSlideChanged(mSlideNum);
                 }
             }
         });
@@ -69,5 +82,52 @@ public class FullscreenSlideFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mRole == Role.AUDIENCE) {
+            mCurrentSlideListener = new DB.CurrentSlideListener() {
+                @Override
+                public void onChange(int slideNum) {
+                    FullscreenSlideFragment.this.currentSlideChanged(slideNum);
+                }
+            };
+            DB.Singleton.get(getActivity().getApplicationContext())
+                    .addCurrentSlideListener(mCurrentSlideListener);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mRole == Role.AUDIENCE) {
+            DB.Singleton.get(getActivity().getApplicationContext())
+                    .removeCurrentSlideListener(mCurrentSlideListener);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(DECK_ID_KEY, mDeckId);
+        outState.putInt(SLIDE_NUM_KEY, mSlideNum);
+        outState.putSerializable(ROLE_KEY, mRole);
+    }
+
+    private void currentSlideChanged(int slideNum) {
+        if (mSlides == null) {
+            // We can't validate that slideNum is within the bounds of mSlides.  Hold it off
+            // to the side until mSlides finishes loading.
+            mLoadingSlideNum = slideNum;
+            return;
+        }
+        if (slideNum < 0 || slideNum > mSlides.length) {
+            getFragmentManager().popBackStack();
+            return;
+        }
+        mSlideNum = slideNum;
+        mFullScreenImage.setImageBitmap(mSlides[mSlideNum].getImage());
     }
 }

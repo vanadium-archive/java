@@ -136,7 +136,7 @@ public interface DB {
      */
     void getSlides(String deckId, Callback<Slide[]> callback);
 
-    class StartPresentationResult {
+    class CreatePresentationResult {
         /**
          * A unique ID for the presentation.  All methods that deal with live presentation
          * data (e.g. the current slide) use this ID.
@@ -148,7 +148,7 @@ public interface DB {
          */
         public String syncgroupName;
 
-        StartPresentationResult(String presentationId, String syncgroupName) {
+        CreatePresentationResult(String presentationId, String syncgroupName) {
             this.presentationId = presentationId;
             this.syncgroupName = syncgroupName;
         }
@@ -160,5 +160,24 @@ public interface DB {
      * @param deckId the deck to use in the presentation
      * @param callback called when the presentation is created
      */
-    void createPresentation(String deckId, Callback<StartPresentationResult> callback);
+    void createPresentation(String deckId, Callback<CreatePresentationResult> callback);
+
+    interface CurrentSlideListener {
+        /**
+         * Called whenever the current slide of a live presentation changes.
+         *
+         * @param slideNum the new slide number
+         */
+        void onChange(int slideNum);
+    }
+
+    /**
+     * Add a listener for changes to the current slide of a live presentation.
+     */
+    void addCurrentSlideListener(CurrentSlideListener listener);
+
+    /**
+     * Remove a listener that was previously passed to addCurrentSlideListener().
+     */
+    void removeCurrentSlideListener(CurrentSlideListener listener);
 }

@@ -211,7 +211,7 @@ public class SyncbaseDB implements DB {
             if (!mPresentations.exists(mVContext)) {
                 mPresentations.create(mVContext, mPermissions);
             }
-            importDecks();
+            //importDecks();
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
             return;
@@ -391,14 +391,57 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void getSlides(String deckId,
-                          Callback<io.v.android.apps.syncslides.model.Slide[]> callback) {
+    public void getSlides(final String deckId,
+                          final Callback<io.v.android.apps.syncslides.model.Slide[]> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // We could probably share this block of code with SlideList.fetchData(),
+                // but they are just different enough to make that annoying.  Not sure
+                // that we'd really save anything in the end.
+                try {
+                    BatchDatabase batch = mDB.beginBatch(mVContext, null);
+                    Table table = batch.getTable(NOTES_TABLE);
 
+                    String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%Slide\" " +
+                            "AND k LIKE \"" + NamingUtil.join(deckId, "slides") + "%\"";
+                    DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
+                    // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
+                    // a new VContext so it can be cancelled.
+                    final List<SyncbaseSlide> slides = Lists.newArrayList();
+                    for (List<VdlAny> row : stream) {
+                        if (row.size() != 2) {
+                            throw new VException("Wrong number of columns: " + row.size());
+                        }
+                        String key = (String) row.get(0).getElem();
+                        Log.i(TAG, "Fetched slide " + key);
+                        Slide slide = (Slide) row.get(1).getElem();
+                        Note note = (Note) table.get(mVContext, key, Note.class);
+                        slides.add(new SyncbaseSlide(
+                                key, slide.getThumbnail(), note.getText()));
+                    }
+                    final io.v.android.apps.syncslides.model.Slide[] ret =
+                            slides.toArray(
+                                    new io.v.android.apps.syncslides.model.Slide[slides.size()]);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.done(ret);
+                        }
+                    });
+
+                } catch (VException e) {
+                    Log.e(TAG, e.toString());
+                }
+
+            }
+        }).start();
     }
 
     @Override
     public void createPresentation(final String deckId,
-                                   final Callback<StartPresentationResult> callback) {
+                                   final Callback<CreatePresentationResult> callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -439,7 +482,7 @@ public class SyncbaseDB implements DB {
                         @Override
                         public void run() {
                             callback.done(
-                                    new StartPresentationResult(presentationId, syncgroupName));
+                                    new CreatePresentationResult(presentationId, syncgroupName));
                         }
                     });
                 } catch (VException e) {
@@ -448,6 +491,15 @@ public class SyncbaseDB implements DB {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void addCurrentSlideListener(CurrentSlideListener listener) {
+
+    }
+
+    @Override
+    public void removeCurrentSlideListener(CurrentSlideListener listener) {
 
     }
 

@@ -13,8 +13,6 @@ import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
 
-import io.v.android.apps.syncslides.db.DB;
-
 public class PresentationActivity extends AppCompatActivity {
 
     private static final String TAG = "PresentationActivity";
@@ -133,9 +131,9 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void startPresentation() {
         DB db = DB.Singleton.get(getApplicationContext());
-        db.createPresentation(mDeckId, new DB.Callback<DB.StartPresentationResult>() {
+        db.createPresentation(mDeckId, new DB.Callback<DB.CreatePresentationResult>() {
             @Override
-            public void done(DB.StartPresentationResult startPresentationResult) {
+            public void done(DB.CreatePresentationResult startPresentationResult) {
                 Log.i(TAG, "Started presentation");
                 Toast.makeText(getApplicationContext(), "Started presentation",
                         Toast.LENGTH_SHORT).show();

@@ -46,7 +46,20 @@ public class NavigateFragment extends Fragment {
     private static final int DIALOG_REQUEST_CODE = 23;
 
     private String mDeckId;
-    private int mSlideNum;
+    /**
+     * The slide number for the live presentation, if any.
+     */
+    private int mCurrentSlideNum;
+    /**
+     * While mSlides is loading, we can't validate any slide numbers coming from DB.
+     * We hold them here until mSlides finishes loading.
+     */
+    private int mLoadingCurrentSlide;
+    /**
+     * The slide number that the user is viewing.  This will be different from mCurrentSlideNum
+     * if mRole == AUDIENCE and the user went forwards or backwards in the deck.
+     */
+    private int mUserSlideNum;
     private ImageView mPrevThumb;
     private ImageView mNextThumb;
     private ImageView mCurrentSlide;
@@ -60,6 +73,7 @@ public class NavigateFragment extends Fragment {
     private boolean mEditing;
     private int mQuestionerPosition;
     private boolean mSynced;
+    private DB.CurrentSlideListener mCurrentSlideListener;
 
     public static NavigateFragment newInstance(
             String deckId, int slideNum, Role role, boolean synced) {
@@ -84,13 +98,14 @@ public class NavigateFragment extends Fragment {
                              Bundle savedInstanceState) {
         Bundle args;
         if (savedInstanceState != null) {
-            Log.i(TAG, "restoring from savedInstanceState");
             args = savedInstanceState;
         } else {
             args = getArguments();
         }
         mDeckId = args.getString(DECK_ID_KEY);
-        mSlideNum = args.getInt(SLIDE_NUM_KEY);
+        mCurrentSlideNum = 0;
+        mLoadingCurrentSlide = -1;
+        mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
         mSynced = args.getBoolean(SYNCED_KEY);
 
@@ -105,8 +120,7 @@ public class NavigateFragment extends Fragment {
         mFabSync.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO(afergan): Set slide num to the presenter's current slide.
-                mSynced = true;
+                sync();
                 mFabSync.setVisibility(View.INVISIBLE);
             }
         });
@@ -152,7 +166,7 @@ public class NavigateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mRole == Role.AUDIENCE || mRole == Role.BROWSER) {
-                    ((PresentationActivity) getActivity()).fullscreenSlide(mSlideNum);
+                    ((PresentationActivity) getActivity()).fullscreenSlide(mUserSlideNum);
                 }
             }
         });
@@ -192,7 +206,13 @@ public class NavigateFragment extends Fragment {
             @Override
             public void done(Slide[] slides) {
                 mSlides = slides;
-                updateView();
+                // The CurrentSlideListener could have been notified while we were waiting for
+                // the slides to load.
+                if (mLoadingCurrentSlide != -1) {
+                    currentSlideChanged(mLoadingCurrentSlide);
+                } else {
+                    updateView();
+                }
             }
         });
         if (mRole == Role.PRESENTER) {
@@ -209,6 +229,7 @@ public class NavigateFragment extends Fragment {
                 }
             });
         }
+
         return rootView;
     }
 
@@ -216,19 +237,33 @@ public class NavigateFragment extends Fragment {
     public void onStart() {
         super.onStart();
         ((PresentationActivity) getActivity()).setUiImmersive(true);
+        if (mRole == Role.AUDIENCE) {
+            mCurrentSlideListener = new DB.CurrentSlideListener() {
+                @Override
+                public void onChange(int slideNum) {
+                    NavigateFragment.this.currentSlideChanged(slideNum);
+                }
+            };
+            DB.Singleton.get(getActivity().getApplicationContext())
+                    .addCurrentSlideListener(mCurrentSlideListener);
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         ((PresentationActivity) getActivity()).setUiImmersive(false);
+        if (mRole == Role.AUDIENCE) {
+            DB.Singleton.get(getActivity().getApplicationContext())
+                    .removeCurrentSlideListener(mCurrentSlideListener);
+        }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(DECK_ID_KEY, mDeckId);
-        outState.putInt(SLIDE_NUM_KEY, mSlideNum);
+        outState.putInt(SLIDE_NUM_KEY, mUserSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
         outState.putBoolean(SYNCED_KEY, mSynced);
     }
@@ -266,6 +301,12 @@ public class NavigateFragment extends Fragment {
         }
     }
 
+    private void sync() {
+        mSynced = true;
+        mUserSlideNum = mCurrentSlideNum;
+        updateView();
+    }
+
     /**
      * Advances to the next slide, if there is one, and updates the UI.
      */
@@ -274,8 +315,8 @@ public class NavigateFragment extends Fragment {
             // Wait until the slides have loaded before letting the user move around.
             return;
         }
-        if (mSlideNum < mSlides.length - 1) {
-            mSlideNum++;
+        if (mUserSlideNum < mSlides.length - 1) {
+            mUserSlideNum++;
             updateView();
             unsync();
         }
@@ -289,10 +330,27 @@ public class NavigateFragment extends Fragment {
             // Wait until the slides have loaded before letting the user move around.
             return;
         }
-        if (mSlideNum > 0) {
-            mSlideNum--;
+        if (mUserSlideNum > 0) {
+            mUserSlideNum--;
             updateView();
             unsync();
+        }
+    }
+
+    private void currentSlideChanged(int slideNum) {
+        if (mSlides == null) {
+            // We can't validate that slideNum is within the bounds of mSlides.  Hold it off
+            // to the side until mSlides finishes loading.
+            mLoadingCurrentSlide = slideNum;
+            return;
+        }
+        if (slideNum < 0 || slideNum >= mSlides.length) {
+            return;
+        }
+        mCurrentSlideNum = slideNum;
+        if (mSynced) {
+            mUserSlideNum = slideNum;
+            updateView();
         }
     }
 
@@ -324,24 +382,24 @@ public class NavigateFragment extends Fragment {
             // We can't do anything until the slides have loaded.
             return;
         }
-        if (mSlideNum > 0) {
-            setThumbBitmap(mPrevThumb, mSlides[mSlideNum - 1].getImage());
+        if (mUserSlideNum > 0) {
+            setThumbBitmap(mPrevThumb, mSlides[mUserSlideNum - 1].getImage());
         } else {
             setThumbNull(mPrevThumb);
         }
-        mCurrentSlide.setImageBitmap(mSlides[mSlideNum].getImage());
-        if (mSlideNum == mSlides.length - 1) {
+        mCurrentSlide.setImageBitmap(mSlides[mUserSlideNum].getImage());
+        if (mUserSlideNum == mSlides.length - 1) {
             setThumbNull(mNextThumb);
         } else {
-            setThumbBitmap(mNextThumb, mSlides[mSlideNum + 1].getImage());
+            setThumbBitmap(mNextThumb, mSlides[mUserSlideNum + 1].getImage());
         }
-        if (!mSlides[mSlideNum].getNotes().equals("")) {
-            mNotes.setText(mSlides[mSlideNum].getNotes());
+        if (!mSlides[mUserSlideNum].getNotes().equals("")) {
+            mNotes.setText(mSlides[mUserSlideNum].getNotes());
         } else {
             mNotes.getText().clear();
         }
         ((TextView) getView().findViewById(R.id.slide_num_text))
-                .setText(String.valueOf(mSlideNum + 1) + " of " + String.valueOf(mSlides.length));
+                .setText(String.valueOf(mUserSlideNum + 1) + " of " + String.valueOf(mSlides.length));
     }
 
     @Override
