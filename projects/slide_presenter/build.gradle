@@ -49,7 +49,6 @@ android {
 }
 
 dependencies {
-    compile 'io.v:vanadium:0.1-SNAPSHOT'
     compile 'io.v:vanadium-android:0.1-SNAPSHOT'
 }
 
