@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
 
+import io.v.android.apps.syncslides.db.DB;
+
 public class PresentationActivity extends AppCompatActivity {
 
     private static final String TAG = "PresentationActivity";
@@ -23,6 +25,9 @@ public class PresentationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Do this initialization early on in case it needs to start the AccountManager.
+        DB.Singleton.get(getApplicationContext()).init(this);
+
         setContentView(R.layout.activity_presentation);
 
         Bundle bundle = getIntent().getExtras();
