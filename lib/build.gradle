@@ -219,6 +219,11 @@ def pomDependencyText = '''
 <dependencies>
     <dependency>
         <groupId>io.v</groupId>
+        <artifactId>vanadium-without-natives</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>io.v</groupId>
         <artifactId>vanadium-natives-linux</artifactId>
         <version>0.1-SNAPSHOT</version>
     </dependency>
@@ -234,9 +239,9 @@ def pomDependencies = new XmlParser().parseText(pomDependencyText)
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        mavenNoNatives(MavenPublication) {
             groupId 'io.v'
-            artifactId 'vanadium'
+            artifactId 'vanadium-without-natives'
             version '0.1-SNAPSHOT'
 
             from components.java
@@ -248,6 +253,17 @@ publishing {
             artifact javadocJar {
                 classifier "javadoc"
             }
+        }
+
+        mavenJava(MavenPublication) {
+            groupId 'io.v'
+            artifactId 'vanadium'
+            version '0.1-SNAPSHOT'
+
+            from components.java
+
+            // No archives in this one, it's a meta package only.
+            artifacts.clear()
 
             pom.withXml {
                 for (Node node : pomDependencies.children()) {

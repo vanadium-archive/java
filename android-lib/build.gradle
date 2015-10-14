@@ -172,6 +172,18 @@ task sourceJar(type: Jar) {
     classifier "source"
 }
 
+def pomDependencyText = '''
+<dependencies>
+    <dependency>
+        <groupId>io.v</groupId>
+        <artifactId>vanadium-without-natives</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+'''
+
+def pomDependencies = new XmlParser().parseText(pomDependencyText)
+
 publishing {
     publications {
         androidLibrary(MavenPublication) {
@@ -180,6 +192,10 @@ publishing {
             version '0.1-SNAPSHOT'
             artifact(sourceJar)
             artifact("$buildDir/outputs/aar/android-lib-release.aar")
+
+            pom.withXml {
+                asNode().append(pomDependencies)
+            }
         }
     }
     repositories {
