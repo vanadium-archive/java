@@ -46,14 +46,14 @@ public class SlideListFragment extends Fragment {
         Bundle arguments = getArguments();
         mDeckId = arguments.getString(DECK_ID_KEY);
 
-        //Clicking on the fab leads to the first slide
+        // Clicking on the fab leads to the first slide
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(
                 R.id.play_presentation_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PresentationActivity activity = (PresentationActivity) v.getContext();
-                activity.jumpToSlideSynced(0);
+                activity.startPresentation();
             }
         });
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.slide_list);

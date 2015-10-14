@@ -224,7 +224,17 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void getSlides(String deckId, final SlidesCallback callback) {
+    public void createPresentation(String deckId, final Callback<StartPresentationResult> callback) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.done(new StartPresentationResult("fakePresentationId", "sgname"));
+            }
+        });
+    }
+
+    @Override
+    public void getSlides(String deckId, final Callback<Slide[]> callback) {
         final Slide[] slides = new Slide[mSlideImages.length];
         for (int i = 0; i < mSlideImages.length; i++) {
             slides[i] = new FakeSlide(mSlideImages[i], SLIDENOTES[i]);

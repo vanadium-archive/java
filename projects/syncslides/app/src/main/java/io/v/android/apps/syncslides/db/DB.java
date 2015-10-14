@@ -119,13 +119,13 @@ public interface DB {
      */
     DBList<Slide> getSlides(String deckId);
 
-    interface SlidesCallback {
+    interface Callback<Result> {
         /**
-         * This callback is run on the UI thread once the list of slides is loaded from the DB.
+         * This callback is run on the UI thread once the method is done.
          *
-         * @param slides the loaded slide data
+         * @param result the loaded data
          */
-        void done(Slide[] slides);
+        void done(Result result);
     }
 
     /**
@@ -134,5 +134,31 @@ public interface DB {
      * @param deckId the deck to fetch
      * @param callback runs on the UI thread when the slide data is loaded
      */
-    void getSlides(String deckId, SlidesCallback callback);
+    void getSlides(String deckId, Callback<Slide[]> callback);
+
+    class StartPresentationResult {
+        /**
+         * A unique ID for the presentation.  All methods that deal with live presentation
+         * data (e.g. the current slide) use this ID.
+         */
+        public String presentationId;
+        /**
+         * This is the name of the syncgroup that was created for this presentation instance.
+         * Audience members must join this syncgroup.
+         */
+        public String syncgroupName;
+
+        StartPresentationResult(String presentationId, String syncgroupName) {
+            this.presentationId = presentationId;
+            this.syncgroupName = syncgroupName;
+        }
+    }
+
+    /**
+     * Creates a new presentation by creating a syncgroup.
+     *
+     * @param deckId the deck to use in the presentation
+     * @param callback called when the presentation is created
+     */
+    void createPresentation(String deckId, Callback<StartPresentationResult> callback);
 }

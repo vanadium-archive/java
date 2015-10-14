@@ -13,13 +13,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import org.joda.time.Duration;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.model.Listener;
@@ -29,6 +34,7 @@ import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.android.v23.services.blessing.BlessingService;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
+import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -37,6 +43,9 @@ import io.v.v23.security.VPrincipal;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
+import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
+import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
@@ -44,6 +53,7 @@ import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.RowRange;
+import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.VException;
@@ -61,6 +71,10 @@ public class SyncbaseDB implements DB {
     private static final String SYNCBASE_DB = "syncslides";
     private static final String DECKS_TABLE = "Decks";
     private static final String NOTES_TABLE = "Notes";
+    private static final String PRESENTATIONS_TABLE = "Presentations";
+    private static final String CURRENT_SLIDE = "CurrentSlide";
+    private static final String SYNCGROUP_PRESENTATION_DESCRIPTION = "Live Presentation";
+    private static final String PI_MILK_CRATE = "192.168.86.254:8101";
 
     // If SyncbaseDB needs to start the AccountManager to get blessings, it will not
     // finish its initialization, but the fragment that is trying to initialize
@@ -74,6 +88,7 @@ public class SyncbaseDB implements DB {
     private Database mDB;
     private Table mDecks;
     private Table mNotes;
+    private Table mPresentations;
 
     SyncbaseDB(Context context) {
         mContext = context;
@@ -192,6 +207,10 @@ public class SyncbaseDB implements DB {
             if (!mNotes.exists(mVContext)) {
                 mNotes.create(mVContext, mPermissions);
             }
+            mPresentations = mDB.getTable(PRESENTATIONS_TABLE);
+            if (!mPresentations.exists(mVContext)) {
+                mPresentations.create(mVContext, mPermissions);
+            }
             importDecks();
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
@@ -220,7 +239,7 @@ public class SyncbaseDB implements DB {
     @Override
     public DBList<io.v.android.apps.syncslides.model.Deck> getDecks() {
         if (!mInitialized) {
-            return new NoopList<io.v.android.apps.syncslides.model.Deck>();
+            return new NoopList<>();
         }
         return new DeckList(mVContext, mDB);
     }
@@ -371,6 +390,67 @@ public class SyncbaseDB implements DB {
         return new SlideList(mVContext, mDB, deckId);
     }
 
+    @Override
+    public void getSlides(String deckId,
+                          Callback<io.v.android.apps.syncslides.model.Slide[]> callback) {
+
+    }
+
+    @Override
+    public void createPresentation(final String deckId,
+                                   final Callback<StartPresentationResult> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final String presentationId = UUID.randomUUID().toString();
+                String prefix = NamingUtil.join(deckId, presentationId);
+                try {
+                    // Add rows to Presentations table.
+                    Presentation presentation = new Presentation();  // Empty for now.
+                    mPresentations.put(mVContext, prefix, presentation, Presentation.class);
+                    CurrentSlide current = new CurrentSlide(0);
+                    mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
+                            current, CurrentSlide.class);
+
+                    // Create the syncgroup.
+                    final String syncgroupName = NamingUtil.join(mPresentations.fullName(), prefix);
+                    Log.i(TAG, "Creating syncgroup " + syncgroupName);
+                    Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
+                    CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
+                    syncgroup.create(
+                            context,
+                            new SyncgroupSpec(SYNCGROUP_PRESENTATION_DESCRIPTION,
+                                    // TODO(kash): Use real permissions.
+                                    mPermissions,
+                                    Arrays.asList(
+                                            new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
+                                            new SyncgroupPrefix(DECKS_TABLE, deckId)),
+                                    Arrays.asList(PI_MILK_CRATE),
+                                    false
+                            ),
+                            new SyncgroupMemberInfo((byte) 10));
+                    Log.i(TAG, "Finished creating syncgroup");
+                    // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
+                    // here or somewhere else.  We're not going to demo sync across a user's
+                    // devices right away, so we'll figure this out later.
+
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.done(
+                                    new StartPresentationResult(presentationId, syncgroupName));
+                        }
+                    });
+                } catch (VException e) {
+                    // TODO(kash): Change Callback to take an error parameter.
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+
+    }
+
     private static class SlideList implements DBList {
 
         private final VContext mVContext;
@@ -475,12 +555,6 @@ public class SyncbaseDB implements DB {
         public String getNotes() {
             return mNotes;
         }
-    }
-
-
-    @Override
-    public void getSlides(String deckId, SlidesCallback callback) {
-
     }
 
     private void handleError(String msg) {

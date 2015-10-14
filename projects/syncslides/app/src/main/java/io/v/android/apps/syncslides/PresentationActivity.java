@@ -7,10 +7,15 @@ package io.v.android.apps.syncslides;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
+import io.v.android.apps.syncslides.db.DB;
 
 public class PresentationActivity extends AppCompatActivity {
 
+    private static final String TAG = "PresentationActivity";
     public static final String DECK_ID_KEY = "deck_id";
 
     private String mDeckId;
@@ -27,6 +32,12 @@ public class PresentationActivity extends AppCompatActivity {
             SlideListFragment slideList = SlideListFragment.newInstance(mDeckId);
             getSupportFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // TODO(jregan): Stop advertising the live presentation if necessary.
     }
 
     /**
@@ -76,5 +87,22 @@ public class PresentationActivity extends AppCompatActivity {
                 .replace(R.id.fragment, fragment)
                 .addToBackStack("")
                 .commit();
+    }
+
+    /**
+     * Starts a live presentation.  The presentation will be advertised to other
+     * devices as long as this activity is alive.
+     */
+    public void startPresentation() {
+        DB db = DB.Singleton.get(getApplicationContext());
+        db.createPresentation(mDeckId, new DB.Callback<DB.StartPresentationResult>() {
+            @Override
+            public void done(DB.StartPresentationResult startPresentationResult) {
+                Log.i(TAG, "Started presentation");
+                Toast.makeText(getApplicationContext(), "Started presentation",
+                        Toast.LENGTH_SHORT).show();
+                // TODO(jregan): Advertise this presentation.
+            }
+        });
     }
 }

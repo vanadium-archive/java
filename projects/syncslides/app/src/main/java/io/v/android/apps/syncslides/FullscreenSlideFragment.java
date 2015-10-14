@@ -41,7 +41,7 @@ public class FullscreenSlideFragment extends Fragment {
         mSlideNum = args.getInt(SLIDE_NUM);
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        db.getSlides(mDeckId, new DB.SlidesCallback() {
+        db.getSlides(mDeckId, new DB.Callback<Slide[]>() {
             @Override
             public void done(Slide[] slides) {
                 mSlides = slides;
