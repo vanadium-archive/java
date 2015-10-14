@@ -77,8 +77,7 @@ public class ParticipantPeer extends Service implements Participant {
                 new DeckImpl(
                         b.getString(B.TITLE),
                         (Bitmap) b.getParcelable(B.THUMB),
-                        b.getString(B.ID),
-                        Deck.Status.IDLE),
+                        b.getString(B.ID)),
                 b.getString(B.END_POINT));
     }
 

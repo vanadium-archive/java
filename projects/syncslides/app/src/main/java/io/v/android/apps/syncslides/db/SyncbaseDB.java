@@ -292,8 +292,7 @@ public class SyncbaseDB implements DB {
                             deck.getTitle(),
                             BitmapFactory.decodeByteArray(
                                     deck.getThumbnail(), 0, deck.getThumbnail().length),
-                            key,
-                            Deck.Status.IDLE));
+                            key));
                 }
                 mHandler.post(new Runnable() {
                     @Override

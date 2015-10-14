@@ -12,26 +12,20 @@ import android.graphics.Bitmap;
 public class DeckImpl implements Deck {
     // For demos, debugging.
     public static final Deck DUMMY = new DeckImpl(
-            Unknown.TITLE, Unknown.THUMB, Unknown.ID, Deck.Status.IDLE);
+            Unknown.TITLE, Unknown.THUMB, Unknown.ID);
 
     private final String mTitle;
     private final Bitmap mThumb;
     private final String mDeckId;
-    private final Status mStatus;
 
-    public DeckImpl(String title, Bitmap thumb, String deckId, Status status) {
+    public DeckImpl(String title, Bitmap thumb, String deckId) {
         mTitle = title;
         mThumb = thumb;
         mDeckId = deckId;
-        mStatus = status;
-    }
-
-    public DeckImpl(String title, Bitmap thumb, String deckId) {
-        this(title, thumb, deckId, Status.IDLE);
     }
 
     public DeckImpl(String title, Bitmap thumb) {
-        this(title, thumb, Unknown.ID, Status.IDLE);
+        this(title, thumb, Unknown.ID);
     }
 
     public DeckImpl(String title) {
@@ -51,11 +45,6 @@ public class DeckImpl implements Deck {
     @Override
     public String getId() {
         return mDeckId;
-    }
-
-    @Override
-    public Status getStatus() {
-        return mStatus;
     }
 
     private static class Unknown {

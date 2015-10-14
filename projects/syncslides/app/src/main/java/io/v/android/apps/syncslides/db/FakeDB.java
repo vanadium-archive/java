@@ -108,11 +108,6 @@ public class FakeDB implements DB {
         public String getId() {
             return mDeckId;
         }
-
-        @Override
-        public Status getStatus() {
-            return Status.IDLE;
-        }
     }
 
     private static class FakeSlide implements Slide {
