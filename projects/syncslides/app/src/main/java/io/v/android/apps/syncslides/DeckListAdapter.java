@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -82,18 +83,23 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int i) {
         final Deck deck;
         final Role role;
-        final boolean isLive;
 
         // If the position is less than the number of live presentation decks, get deck card from
         // there (and don't allow the user to delete the deck). If not, get the card from the DB.
         if (i < mLiveDecks.getItemCount()) {
-            isLive = true;
             deck = mLiveDecks.get(i);
+            holder.mToolbarLiveNow
+                    .setText(holder.itemView.getResources().getString(R.string.presentation_live));
+            holder.mToolbarLiveNow.setVisibility(View.VISIBLE);
+            holder.mToolbarLastOpened.setVisibility(View.GONE);
             holder.mToolbar.getMenu().clear();
             role = Role.AUDIENCE;
         } else {
-            isLive = false;
             deck = mDecks.get(i - mLiveDecks.getItemCount());
+            // TODO(afergan): Set actual date here.
+            holder.mToolbarLastOpened.setText("Opened on Oct 26, 2015");
+            holder.mToolbarLastOpened.setVisibility(View.VISIBLE);
+            holder.mToolbarLiveNow.setVisibility(View.GONE);
             holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -111,18 +117,13 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             role = Role.BROWSER;
         }
 
-        holder.mToolbar.setTitle(deck.getTitle());
+        holder.mToolbarTitle.setText(deck.getTitle());
         // TODO(kash): We need to say when the user last viewed the deck.
         Bitmap thumb = deck.getThumb();
         if (thumb == null) {
             thumb = makeDefaultThumb(holder.mToolbar.getContext());
         }
         holder.mThumb.setImageBitmap(thumb);
-        if (isLive) {
-            // TODO(afergan): Display "LIVE NOW" subtitle in toolbar for live presentations.
-            holder.mToolbar.setTitle(" " + deck.getTitle());
-            holder.mToolbar.setLogo(R.drawable.orange_circle);
-        }
 
         holder.mThumb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,14 +147,22 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         return BitmapFactory.decodeResource(
                 c.getResources(), R.drawable.thumb_deck3);
     }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView mThumb;
         public final Toolbar mToolbar;
+        public final TextView mToolbarTitle;
+        public final TextView mToolbarLiveNow;
+        public final TextView mToolbarLastOpened;
 
         public ViewHolder(final View itemView) {
             super(itemView);
             mThumb = (ImageView) itemView.findViewById(R.id.deck_thumb);
             mToolbar = (Toolbar) itemView.findViewById(R.id.deck_card_toolbar);
+            mToolbarTitle = (TextView) itemView.findViewById(R.id.deck_card_toolbar_title);
+            mToolbarLiveNow = (TextView) itemView.findViewById(R.id.deck_card_toolbar_live_now);
+            mToolbarLastOpened =
+                    (TextView) itemView.findViewById(R.id.deck_card_toolbar_last_opened);
             mToolbar.inflateMenu(R.menu.deck_card);
         }
     }

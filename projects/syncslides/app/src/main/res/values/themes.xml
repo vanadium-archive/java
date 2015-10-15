@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    </style>
+
+    <style name="ThemeToolbar" parent="AppTheme">
+        <!-- Navigation icon color -->
+        <item name="colorControlNormal">@color/action_orange</item>
+    </style>
+
+
+</resources>

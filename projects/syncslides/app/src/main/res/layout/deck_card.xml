@@ -23,7 +23,39 @@
         <Toolbar
             android:id="@+id/deck_card_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/card_toolbar_height"/>
+            android:layout_height="@dimen/card_toolbar_height"
+            android:contentInsetStart="@dimen/toolbar_inset"
+            android:theme="@style/ThemeToolbar">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/deck_card_toolbar_title"
+                    style="@style/DeckTitleFont"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/deck_card_toolbar_live_now"
+                    style="@style/DeckLiveNowFont"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/toolbar_text_top_margin"
+                    android:paddingEnd="@dimen/toolbar_text_live_now_padding"
+                    android:paddingStart="@dimen/toolbar_text_live_now_padding"/>
+
+                <TextView
+                    android:id="@+id/deck_card_toolbar_last_opened"
+                    style="@style/DeckLastOpenedFont"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/toolbar_text_top_margin"/>
+
+            </LinearLayout>
+        </Toolbar>
 
     </LinearLayout>
 
