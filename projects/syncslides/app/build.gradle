@@ -67,7 +67,7 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:recyclerview-v7:23.0.1'
     compile 'com.android.support:cardview-v7:23.0.1'
-    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
+    compile project(':android-lib')
 }
 
 vdl {
