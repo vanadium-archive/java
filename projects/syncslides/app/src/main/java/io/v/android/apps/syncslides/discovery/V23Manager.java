@@ -31,52 +31,25 @@ import io.v.v23.verror.VException;
  * Does vanadium stuff - MT scanning, service creation, unmounting, etc.
  *
  * This class is a singleton, since all vanadium activity must involve a
- * Vanadium context recovered from a static call to V.init, ultimately
- * (ideally) bookended by a static call to V.shutdown.   In an app.Service,
- * one could call these in onCreate and onDestroy respectively.
+ * Vanadium context recovered from a static call to V.init, ultimately (ideally)
+ * bookended by a static call to V.shutdown.   In an app.Service, one could call
+ * these in onCreate and onDestroy respectively.
  */
 public class V23Manager {
     private static final String TAG = "V23Manager";
 
     private static final Duration MT_TIMEOUT =
             Duration.standardSeconds(5);
-
-    public static class Singleton {
-        private static volatile V23Manager instance;
-        public static V23Manager get(Context context) {
-            V23Manager result = instance;
-            if (instance == null) {
-                synchronized (Singleton.class) {
-                    result = instance;
-                    if (result == null) {
-                        instance = result = new V23Manager(context);
-                    }
-                }
-            }
-            if (!result.getAndroidCtx().equals(context)) {
-                throw new IllegalArgumentException("Cannot reset context.");
-            }
-            return result;
-        }
-    }
     // Generates a name to use in the MT.
     private final NameGenerator mNameGenerator = new NameGeneratorByDate();
-
-    public Context getAndroidCtx() {
-        return mAndroidCtx;
-    }
-
-    private final Context mAndroidCtx;
+    private Context mAndroidCtx;
     private VContext mBaseContext = null;
     private VContext mMTContext = null;
     private Namespace mNamespace = null;
-
     // Can only have one of these at the moment.  Could add more...
     private Server mLiveServer = null;
-
     // Singleton.
-    private V23Manager(Context androidCtx) {
-        mAndroidCtx = androidCtx;
+    private V23Manager() {
     }
 
     /**
@@ -90,10 +63,21 @@ public class V23Manager {
         return result;
     }
 
-    public void init() {
-        if (mBaseContext != null) {
-            throw new IllegalStateException("Cannot reinitialize V23");
+    public Context getAndroidCtx() {
+        return mAndroidCtx;
+    }
+
+    public void init(Context androidCtx) {
+        Log.d(TAG, "init");
+        if (mAndroidCtx != null) {
+            if (mAndroidCtx == androidCtx) {
+                Log.d(TAG, "Already initialized.");
+                return;
+            } else {
+                shutdown(Behavior.STRICT);
+            }
         }
+        mAndroidCtx = androidCtx;
         mBaseContext = V.init(mAndroidCtx);
         mMTContext = mBaseContext.withTimeout(MT_TIMEOUT);
         mNamespace = V.getNamespace(mMTContext);
@@ -105,10 +89,18 @@ public class V23Manager {
         }
     }
 
-    public void shutdown() {
-        Log.i(TAG, "Shutdown");
+    public void shutdown(Behavior behavior) {
+        Log.d(TAG, "Shutdown");
+        if (mAndroidCtx == null) {
+            if (behavior == Behavior.STRICT) {
+                throw new IllegalStateException(
+                        "Shutdown called on uninitialized manager.");
+            }
+            Log.d(TAG, "Was never initialized.");
+            return;
+        }
         V.shutdown();
-        mBaseContext = null;
+        mAndroidCtx = null;
     }
 
     public Set<String> scan(String pattern) {
@@ -141,7 +133,7 @@ public class V23Manager {
                     mountName, server, null);
             mLiveServer = V.getServer(ctx);
             Endpoint[] endpoints = mLiveServer.getStatus().getEndpoints();
-            Log.i(TAG, "Listening on endpoints: " + Arrays.toString(endpoints));
+            Log.d(TAG, "Listening on endpoints: " + Arrays.toString(endpoints));
             return endpoints[0].name();
         } catch (VException e) {
             // TODO(jregan): Handle total v23 failure higher up the stack.
@@ -149,7 +141,7 @@ public class V23Manager {
         }
     }
 
-    public void unmount() {
+    public void unMount() {
         if (mLiveServer == null) {
             throw new IllegalStateException("No v32 service");
         }
@@ -162,6 +154,25 @@ public class V23Manager {
             throw new IllegalStateException(e);
         }
         mLiveServer = null;
+    }
+
+    public enum Behavior {PERMISSIVE, STRICT}
+
+    public static class Singleton {
+        private static volatile V23Manager instance;
+
+        public static V23Manager get() {
+            V23Manager result = instance;
+            if (instance == null) {
+                synchronized (Singleton.class) {
+                    result = instance;
+                    if (result == null) {
+                        instance = result = new V23Manager();
+                    }
+                }
+            }
+            return result;
+        }
     }
 
     /**

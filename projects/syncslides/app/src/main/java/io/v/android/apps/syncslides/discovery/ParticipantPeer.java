@@ -162,7 +162,7 @@ public class ParticipantPeer extends Service implements Participant {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mV23Manager.unmount();
+        mV23Manager.unMount();
         Log.d(TAG, "###### onDestroy");
     }
 

@@ -116,12 +116,7 @@ public class DeckChooserFragment extends Fragment {
         super.onStart();
         Log.i(TAG, "Starting");
         mAdapter = new DeckListAdapter();
-        mAdapter.start(
-                DiscoveryManager.Singleton.get(
-                        getActivity().getApplicationContext()),
-                DB.Singleton.get(
-                        getActivity().getApplicationContext()).getDecks()
-        );
+        mAdapter.start(getActivity().getApplicationContext());
         mRecyclerView.setAdapter(mAdapter);
     }
 

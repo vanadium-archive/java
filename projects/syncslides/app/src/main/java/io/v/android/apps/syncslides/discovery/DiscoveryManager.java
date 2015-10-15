@@ -24,7 +24,7 @@ import io.v.android.apps.syncslides.model.Participant;
 public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     private static final String TAG = "DiscoveryManager";
     // If true, require a live MT to scan.  If false, fake the scan.
-    private static final boolean PRODUCTION_MODE = false;
+    public static final boolean PRODUCTION_MODE = false;
     // Search result indicator.
     public static final int NOT_FOUND = -1;
     // Manages creation, mounting and unmounting of V23 services.
@@ -43,25 +43,40 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
         mModerator = moderator;
     }
 
-    public void start() {
+    public DiscoveryManager start(Context context) {
         if (mListener == null) {
             throw new IllegalStateException("Must have a listener.");
         }
-        Log.i(TAG, "Starting");
-        if (mV23Manager != null) {
-            mV23Manager.init();
+        Log.d(TAG, "Starting");
+        if (PRODUCTION_MODE) {
+            if (mV23Manager == null) {
+                throw new IllegalStateException("Must have V23.");
+            }
+            mV23Manager.init(context);
         }
         // The observer is the guy who implements onTaskDone, and wants
         // to be notified when a scan is complete.
         mModerator.setObserver(this);
         mTasker.start(mModerator);
+        return this;
     }
 
     public void stop() {
-        Log.i(TAG, "Stopping");
+        Log.d(TAG, "Stopping discovery");
         mTasker.stop();
-        if (mV23Manager != null) {
-            mV23Manager.shutdown();
+    }
+
+    /**
+     * Stops discovery and underlying V23 services.
+     */
+    public void stopEverything() {
+        Log.d(TAG, "Stopping everything.");
+        stop();
+        if (PRODUCTION_MODE) {
+            if (mV23Manager == null) {
+                throw new IllegalStateException("Must have V23.");
+            }
+            mV23Manager.shutdown(V23Manager.Behavior.STRICT);
         }
     }
 
@@ -97,7 +112,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
 
     @Override
     public void discard() {
-        Log.i(TAG, "Discarding.");
+        Log.d(TAG, "Discarding.");
         stop();
         mListener = null;
     }
@@ -105,31 +120,29 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     public static class Singleton {
         private static volatile DiscoveryManager instance;
 
-        public static DiscoveryManager get(Context context) {
+        public static DiscoveryManager get() {
             DiscoveryManager result = instance;
             if (instance == null) {
                 synchronized (Singleton.class) {
                     result = instance;
                     if (result == null) {
-                        instance = result = makeInstance(context);
+                        instance = result = makeInstance();
                     }
                 }
             }
             return result;
         }
 
-        private static DiscoveryManager makeInstance(Context context) {
-            Log.i(TAG, "Creating singleton.");
-            V23Manager manager;
-            ParticipantScanner scanner;
+        private static DiscoveryManager makeInstance() {
+            Log.d(TAG, "Creating singleton.");
             if (PRODUCTION_MODE) {
-                manager = V23Manager.Singleton.get(context);
-                scanner = new ParticipantScannerMt(manager);
-            } else {
-                manager = null;
-                scanner = new ParticipantScannerFake();
+                V23Manager manager = V23Manager.Singleton.get();
+                return new DiscoveryManager(
+                        manager,
+                        new Moderator(new ParticipantScannerMt(manager)));
             }
-            return new DiscoveryManager(manager, new Moderator(scanner));
+            return new DiscoveryManager(
+                    null, new Moderator(new ParticipantScannerFake()));
         }
     }
 }
