@@ -15,11 +15,10 @@ import io.v.android.apps.syncslides.db.DB;
 
 public class PresentationActivity extends AppCompatActivity {
 
-    private static final String TAG = "PresentationActivity";
     public static final String DECK_ID_KEY = "deck_id";
     public static final String ROLE_KEY = "role";
     public static final String TITLE_KEY = "title";
-
+    private static final String TAG = "PresentationActivity";
     private String mDeckId;
     private String mTitle;
     /**
@@ -49,19 +48,17 @@ public class PresentationActivity extends AppCompatActivity {
         }
 
         getSupportActionBar().setTitle(mTitle);
-        SlideListFragment slideList = SlideListFragment.newInstance(mDeckId, mRole);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
 
         // If this is an audience member, we want them to jump straight to the fullscreen view.
         if (mRole == Role.AUDIENCE) {
-            // TODO(kash): The back button will take the AUDIENCE member
-            //    FullscreenSlide --> Navigate --> SlideList --> DeckChooser
-            // It would be better if it went
-            //    FullscreenSlide --> Navigate --> DeckChooser
-            // I tried to get this to work, but it was too much trouble.  We need to
-            // inspect the back stack to get it right.
-            jumpToSlideSynced(0);
-            fullscreenSlide(0);
+            NavigateFragment fragment = NavigateFragment.newInstanceSynced(mDeckId, 0, mRole);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment, fragment)
+                    .commit();
+            showFullscreenSlide(0);
+        } else {
+            showSlideList();
         }
     }
 
@@ -83,6 +80,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void setUiImmersive(boolean immersive) {
         if (immersive) {
+            getSupportActionBar().hide();
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -91,6 +89,7 @@ public class PresentationActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         } else {
+            getSupportActionBar().show();
             // See the comment at the top of fragment_slide_list.xml for why we don't simply
             // use View.SYSTEM_UI_FLAG_VISIBLE.
             getWindow().getDecorView().setSystemUiVisibility(
@@ -106,7 +105,12 @@ public class PresentationActivity extends AppCompatActivity {
      * @param slideNum the slide to show
      */
     public void jumpToSlideSynced(int slideNum) {
-        jumpToSlide(slideNum, true);
+        NavigateFragment fragment = NavigateFragment.newInstanceSynced(
+                mDeckId, slideNum, mRole);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment, fragment)
+                .commit();
     }
 
     /**
@@ -116,16 +120,11 @@ public class PresentationActivity extends AppCompatActivity {
      * @param slideNum the slide to show
      */
     public void jumpToSlideUnsynced(int slideNum) {
-        jumpToSlide(slideNum, false);
-    }
-
-    private void jumpToSlide(int slideNum, boolean synced) {
-        NavigateFragment fragment = NavigateFragment.newInstance(
-                mDeckId, slideNum, mRole, synced);
+        NavigateFragment fragment = NavigateFragment.newInstanceUnsynced(
+                mDeckId, slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
-                .addToBackStack("")
                 .commit();
     }
 
@@ -153,13 +152,18 @@ public class PresentationActivity extends AppCompatActivity {
      *
      * @param slideNum the number of the slide to show full screen
      */
-    public void fullscreenSlide(int slideNum) {
+    public void showFullscreenSlide(int slideNum) {
         FullscreenSlideFragment fullscreenSlideFragment =
                 FullscreenSlideFragment.newInstance(mDeckId, slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment, fullscreenSlideFragment)
+                .replace(R.id.fragment, fullscreenSlideFragment)
                 .addToBackStack("")
                 .commit();
+    }
+
+    public void showSlideList() {
+        SlideListFragment slideList = SlideListFragment.newInstance(mDeckId, mRole);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, slideList).commit();
     }
 }

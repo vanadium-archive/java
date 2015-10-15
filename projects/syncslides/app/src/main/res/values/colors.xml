@@ -5,6 +5,7 @@
     <color name="matte_black">#424242</color>
     <color name="toolbar_gray">#78909C</color>
     <color name="action_orange">#FF6E00</color>
+    <color name="blue_grey_50">#ECEFF1</color>
     <!-- When specifying a color with 8 characters instead of the usual 6, the first two
       indicate the alpha value.  In this case, we get a slightly transparent black. -->
     <color name="nav_hint_background">#66000000</color>

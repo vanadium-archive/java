@@ -13,7 +13,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -76,8 +75,17 @@ public class NavigateFragment extends Fragment {
     private int mQuestionerPosition;
     private boolean mSynced;
     private DB.CurrentSlideListener mCurrentSlideListener;
+    private TextView mSlideNumText;
 
-    public static NavigateFragment newInstance(
+    public static NavigateFragment newInstanceSynced(String deckId, int slideNum, Role role) {
+        return newInstance(deckId, slideNum, role, true);
+    }
+
+    public static NavigateFragment newInstanceUnsynced(String deckId, int slideNum, Role role) {
+        return newInstance(deckId, slideNum, role, false);
+    }
+
+    private static NavigateFragment newInstance(
             String deckId, int slideNum, Role role, boolean synced) {
         NavigateFragment fragment = new NavigateFragment();
         Bundle args = new Bundle();
@@ -168,10 +176,11 @@ public class NavigateFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mRole == Role.AUDIENCE || mRole == Role.BROWSER) {
-                    ((PresentationActivity) getActivity()).fullscreenSlide(mUserSlideNum);
+                    ((PresentationActivity) getActivity()).showFullscreenSlide(mUserSlideNum);
                 }
             }
         });
+        mSlideNumText = (TextView) rootView.findViewById(R.id.slide_num_text);
 
         mNotes = (EditText) rootView.findViewById(R.id.notes);
         mNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -195,7 +204,7 @@ public class NavigateFragment extends Fragment {
         slideListIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().popBackStack();
+                ((PresentationActivity)getActivity()).showSlideList();
             }
         });
         mQuestionsNum = (TextView) rootView.findViewById(R.id.questions_num);
@@ -400,9 +409,8 @@ public class NavigateFragment extends Fragment {
         } else {
             mNotes.getText().clear();
         }
-        ((TextView) getView().findViewById(R.id.slide_num_text))
-                .setText(String.valueOf(mUserSlideNum + 1) + " of " +
-                        String.valueOf(mSlides.size()));
+        mSlideNumText.setText(
+                String.valueOf(mUserSlideNum + 1) + " of " + String.valueOf(mSlides.size()));
     }
 
     @Override
