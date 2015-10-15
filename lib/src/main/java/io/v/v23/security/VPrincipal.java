@@ -99,21 +99,4 @@ public interface VPrincipal {
      * match specific patterns.  Never returns {@code null}.
      */
     BlessingRoots roots();
-
-    /**
-     * Marks the root principals of all blessing chains represented by {@code blessings} as an
-     * authority on blessing chains beginning at that root.
-     * <p>
-     * For example, if {@code blessings} represents the blessing chains
-     * {@code ["alice/friend/spouse", "charlie/family/daughter"]} then {@code addToRoots(blessing)}
-     * will mark the root public key of the chain {@code "alice/friend/bob"} as the as authority on
-     * all blessings that match the pattern {@code "alice/..."}, and root public key of the chain
-     * {@code "charlie/family/daughter"} as an authority on all blessings that match the pattern
-     * {@code "charlie/..."}.
-     *
-     * @param  blessings       blessings to be used as authorities on blessing chains beginning at
-     *                         those roots
-     * @throws VException      if there was an error assigning the said authorities
-     */
-    void addToRoots(Blessings blessings) throws VException;
 }

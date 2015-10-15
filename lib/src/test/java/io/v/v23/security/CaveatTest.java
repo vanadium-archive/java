@@ -5,7 +5,6 @@
 package io.v.v23.security;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 
 import junit.framework.TestCase;
 
@@ -26,7 +25,7 @@ public class CaveatTest extends TestCase {
         VContext context = V.init();
         VPrincipal p1 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice", VSecurity.newMethodCaveat("Succeed"));
-        p1.addToRoots(alice);
+        VSecurity.addToRoots(p1, alice);
         {
             Call call = VSecurity.newCall(
                     new CallParams().withLocalPrincipal(p1).withRemoteBlessings(alice).withMethod("succeed"));
@@ -47,7 +46,7 @@ public class CaveatTest extends TestCase {
         VPrincipal p1 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf(
             "alice", VSecurity.newExpiryCaveat(DateTime.now().plusHours(1)));
-        p1.addToRoots(alice);
+        VSecurity.addToRoots(p1, alice);
         {
             Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)
@@ -74,7 +73,7 @@ public class CaveatTest extends TestCase {
         VPrincipal p1 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice",
                 VSecurity.newCaveat(io.v.x.jni.test.security.Constants.TEST_CAVEAT, "succeed"));
-        p1.addToRoots(alice);
+        VSecurity.addToRoots(p1, alice);
         {
             Call call = VSecurity.newCall(new CallParams()
                     .withLocalPrincipal(p1)

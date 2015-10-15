@@ -38,6 +38,7 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -227,7 +228,7 @@ public class MainActivity extends Activity {
             // Update local state with the new blessings.
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
-            p.addToRoots(blessings);
+            VSecurity.addToRoots(p, blessings);
         } catch (VException e) {
             String msg = String.format(
                     "Couldn't set local blessing %s: %s", blessings, e.getMessage());

@@ -71,7 +71,7 @@
  * will be able to recognize her delegates as well:
  * <p><blockquote><pre>
  *  // (in process B)
- *  p2.addToRoots(call.remoteBlessings());
+ *  VSecurity.addToRoots(p2, call.remoteBlessings());
  *  String[] names = VSecurity.getRemoteBlessingNames(ctx, call);
  *  System.out.println(Arrays.toString(names));  // Will print {@code "alice"}
  * </pre></blockquote><p>

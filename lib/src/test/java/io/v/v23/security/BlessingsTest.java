@@ -32,7 +32,7 @@ public class BlessingsTest extends TestCase {
         VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
         assertTrue(Arrays.equals(p1.publicKey().getEncoded(), alice.publicKey().getEncoded()));
-        p2.addToRoots(alice);
+        VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                 alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());

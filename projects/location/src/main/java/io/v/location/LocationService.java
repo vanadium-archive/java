@@ -27,7 +27,7 @@ import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
-import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -70,7 +70,7 @@ public class LocationService extends Service {
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.blessingStore().set(blessings, new BlessingPattern("..."));
-            p.addToRoots(blessings);
+            VSecurity.addToRoots(p, blessings);
             String mountPoint;
             String prefix = mountNameFromBlessings(blessings);
             if ("".equals(prefix)) {
