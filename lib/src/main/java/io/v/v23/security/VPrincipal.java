@@ -71,16 +71,6 @@ public interface VPrincipal {
     ECPublicKey publicKey();
 
     /**
-     * Returns blessings granted to this principal from recognized authorities
-     * (i.e., blessing roots) whose human-readable strings match a given name pattern.
-     * This method does not check the validity of the caveats in the returned blessings.
-     *
-     * @param  name a pattern against which blessings are matched
-     * @return      blessings whose human-readable strings match a given name pattern
-     */
-    Blessings[] blessingsByName(BlessingPattern name);
-
-    /**
      * Returns human-readable strings for the provided blessings, along with the caveats associated
      * with them.  The provided blessings must belong to this principal and must have been granted
      * to it from recognized authorities (i.e., blessing roots).
