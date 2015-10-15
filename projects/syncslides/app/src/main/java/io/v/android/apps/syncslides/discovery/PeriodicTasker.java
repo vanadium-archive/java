@@ -22,10 +22,10 @@ class PeriodicTasker {
     private static final String TAG = "PeriodicTasker";
 
     private static final Duration DELAY_BEFORE_FIRST_TASK =
-            Duration.standardSeconds(2);
+            Duration.standardSeconds(30);
 
     private static final Duration WAIT_BETWEEN_TASKS =
-            Duration.standardSeconds(2);
+            Duration.standardSeconds(30);
 
     private ScheduledExecutorService mTimer = null;
 
