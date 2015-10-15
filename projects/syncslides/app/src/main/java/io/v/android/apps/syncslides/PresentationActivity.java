@@ -18,8 +18,10 @@ public class PresentationActivity extends AppCompatActivity {
     private static final String TAG = "PresentationActivity";
     public static final String DECK_ID_KEY = "deck_id";
     public static final String ROLE_KEY = "role";
+    public static final String TITLE_KEY = "title";
 
     private String mDeckId;
+    private String mTitle;
     /**
      * The current role of the user.  This value can change during the lifetime
      * of the activity.
@@ -40,11 +42,13 @@ public class PresentationActivity extends AppCompatActivity {
         }
         mDeckId = bundle.getString(DECK_ID_KEY);
         mRole = (Role) bundle.get(ROLE_KEY);
+        mTitle = bundle.getString(TITLE_KEY);
 
         if (savedInstanceState != null) {
             return;
         }
 
+        getSupportActionBar().setTitle(mTitle);
         SlideListFragment slideList = SlideListFragment.newInstance(mDeckId, mRole);
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, slideList).commit();
 

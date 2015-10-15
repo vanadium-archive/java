@@ -133,6 +133,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 Intent intent = new Intent(context, PresentationActivity.class);
                 intent.putExtra(PresentationActivity.DECK_ID_KEY, deck.getId());
                 intent.putExtra(PresentationActivity.ROLE_KEY, role);
+                intent.putExtra(PresentationActivity.TITLE_KEY, deck.getTitle());
                 context.startActivity(intent);
             }
         });
