@@ -27,7 +27,7 @@ public interface DB {
                     if (result == null) {
                         // Switch between FakeDB and SyncbaseDB by commenting out one.
                         instance = result = new FakeDB(context);
-                        //instance = result = new SyncbaseDB(context);
+                       // instance = result = new SyncbaseDB(context);
                     }
                 }
             }
