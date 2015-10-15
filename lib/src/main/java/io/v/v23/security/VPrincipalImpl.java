@@ -51,8 +51,6 @@ class VPrincipalImpl implements VPrincipal {
             throws VException;
     private native BlessingStore nativeBlessingStore(long nativePtr) throws VException;
     private native BlessingRoots nativeRoots(long nativePtr) throws VException;
-    private native void nativeAddToRoots(long nativePtr, Blessings blessings)
-            throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private VPrincipalImpl(
@@ -121,10 +119,6 @@ class VPrincipalImpl implements VPrincipal {
         } catch (VException e) {
             throw new RuntimeException("Couldn't get Blessing Store", e);
         }
-    }
-    @Override
-    public void addToRoots(Blessings blessings) throws VException {
-        nativeAddToRoots(nativePtr, blessings);
     }
     private long nativePtr() { return nativePtr; }
     @Override

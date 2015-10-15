@@ -17,7 +17,6 @@ import io.v.v23.verror.VException;
 
 import java.util.Arrays;
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +28,7 @@ public class VSecurityTest extends TestCase {
         VPrincipal p1 = VSecurity.newPrincipal();
         VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
-        p2.addToRoots(alice);
+        VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                 alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
@@ -47,7 +46,7 @@ public class VSecurityTest extends TestCase {
         VPrincipal p1 = VSecurity.newPrincipal();
         VPrincipal p2 = VSecurity.newPrincipal();
         Blessings alice = p1.blessSelf("alice");
-        p2.addToRoots(alice);
+        VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                 alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
@@ -90,7 +89,7 @@ public class VSecurityTest extends TestCase {
         Blessings failing = p.bless(pk, b2, "failing", failingCaveats.get(0),
             failingCaveats.subList(1, failingCaveats.size()).toArray(new Caveat[0]));
         Blessings union = VSecurity.unionOfBlessings(new Blessings[]{passing, failing});
-        p.addToRoots(passing);
+        VSecurity.addToRoots(p, passing);
 
         String[] signingBlessingNames = VSecurity.getSigningBlessingNames(context, p, union);
         assertThat(Arrays.asList(signingBlessingNames)).containsExactly("alice/passing");

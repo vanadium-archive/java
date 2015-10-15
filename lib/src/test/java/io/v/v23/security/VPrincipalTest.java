@@ -25,7 +25,7 @@ public class VPrincipalTest extends TestCase {
         final VPrincipal p1 = VSecurity.newPrincipal();
         final VPrincipal p2 = VSecurity.newPrincipal();
         final Blessings alice = p1.blessSelf("alice");
-        p2.addToRoots(alice);
+        VSecurity.addToRoots(p2, alice);
 
         final Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
                 alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());

@@ -35,6 +35,9 @@ public class VSecurity {
             throws VException;
     private static native String[] nativeGetSigningBlessingNames(VContext context,
             VPrincipal principal, Blessings blessings) throws VException;
+    private static native void nativeAddToRoots(VPrincipal principal, Blessings blessings)
+            throws VException;
+
 
     /**
      * Creates a new instance of {@link VSigner} using the provided public/private key pair.
@@ -95,7 +98,7 @@ public class VSecurity {
      * Creates a principal using the provided signer, blessing store, and blessing roots.  If the
      * provided store is {@code null}, the principal will use a store whose every opration will
      * fail.  If the provided roots are {@code null}, the principal will not trust any public keys
-     * and all subsequent {@link VPrincipal#addToRoots} operations will fail.
+     * and all subsequent {@link VSecurity#addToRoots} operations with that principal will fail.
      *
      * @param  signer signer to be used by the principal
      * @param  store  blessing store to be used by the principal
@@ -357,6 +360,26 @@ public class VSecurity {
             throw new VException(
                 "Invalid signing data [ " + Arrays.toString(message) + " ]: " + e.getMessage());
         }
+    }
+
+    /**
+     * Marks the root principals of all blessing chains represented by {@code blessings} as an
+     * authority on blessing chains beginning at that root.
+     * <p>
+     * For example, if {@code blessings} represents the blessing chains
+     * {@code ["alice/friend/spouse", "charlie/family/daughter"]} then {@code addToRoots(blessing)}
+     * will mark the root public key of the chain {@code "alice/friend/bob"} as the as authority on
+     * all blessings that match the pattern {@code "alice/..."}, and root public key of the chain
+     * {@code "charlie/family/daughter"} as an authority on all blessings that match the pattern
+     * {@code "charlie/..."}.
+     *
+     * @param  principal       the principal whose {@link BlessingRoots} object should be edited
+     * @param  blessings       blessings to be used as authorities on blessing chains beginning at
+     *                         those roots
+     * @throws VException      if there was an error assigning the said authorities
+     */
+    public static void addToRoots(VPrincipal principal, Blessings blessings) throws VException {
+        nativeAddToRoots(principal, blessings);
     }
 
     private VSecurity() {}

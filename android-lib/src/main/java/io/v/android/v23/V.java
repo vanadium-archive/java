@@ -102,7 +102,7 @@ public class V extends io.v.v23.V {
             Blessings self = principal.blessSelf(ctx.getPackageName());
             store.setDefaultBlessings(self);
             store.set(self, Constants.ALL_PRINCIPALS);
-            principal.addToRoots(self);
+            VSecurity.addToRoots(principal, self);
         }
         return principal;
     }

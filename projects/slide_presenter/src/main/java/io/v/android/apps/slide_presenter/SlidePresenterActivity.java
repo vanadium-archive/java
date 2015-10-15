@@ -37,6 +37,7 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
@@ -202,7 +203,7 @@ public class SlidePresenterActivity extends Activity {
             VPrincipal p = V.getPrincipal(mBaseContext);
             p.blessingStore().setDefaultBlessings(blessings);
             p.blessingStore().set(blessings, new BlessingPattern("..."));
-            p.addToRoots(blessings);
+            VSecurity.addToRoots(p, blessings);
         } catch (VException e) {
             handleError(String.format(
                     "Couldn't set local blessing %s: %s", blessings, e.getMessage()));
