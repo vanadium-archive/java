@@ -34,15 +34,16 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     private DB.DBList<Deck> mDecks;
     private DB.DBList<Deck> mLiveDecks;
 
-    public void start(DiscoveryManager discoveryManager, DB.DBList<Deck> decks) {
+    public void start(Context context) {
         if (mDecks != null) {
             throw new IllegalStateException("Wrong lifecycle.");
         }
         Log.d(TAG, "Starting.");
-        mLiveDecks = discoveryManager;
-        mLiveDecks.setListener(this);
-        discoveryManager.start();
-        mDecks = decks;
+        DiscoveryManager dm = DiscoveryManager.Singleton.get();
+        dm.setListener(this);
+        dm.start(context);
+        mLiveDecks = dm;
+        mDecks = DB.Singleton.get(context).getDecks();
         mDecks.setListener(new Listener() {
             @Override
             public void notifyItemChanged(int position) {
