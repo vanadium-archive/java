@@ -28,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.model.Slide;
 
@@ -67,7 +69,7 @@ public class NavigateFragment extends Fragment {
     private View mFabSync;
     private TextView mQuestionsNum;
     private EditText mNotes;
-    private Slide[] mSlides;
+    private List<Slide> mSlides;
     private Role mRole;
     private String[] mQuestionerList;
     private boolean mEditing;
@@ -202,9 +204,9 @@ public class NavigateFragment extends Fragment {
         mQuestionsNum.setVisibility(View.INVISIBLE);
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        db.getSlides(mDeckId, new DB.Callback<Slide[]>() {
+        db.getSlides(mDeckId, new DB.Callback<List<Slide>>() {
             @Override
-            public void done(Slide[] slides) {
+            public void done(List<Slide> slides) {
                 mSlides = slides;
                 // The CurrentSlideListener could have been notified while we were waiting for
                 // the slides to load.
@@ -315,7 +317,7 @@ public class NavigateFragment extends Fragment {
             // Wait until the slides have loaded before letting the user move around.
             return;
         }
-        if (mUserSlideNum < mSlides.length - 1) {
+        if (mUserSlideNum < mSlides.size() - 1) {
             mUserSlideNum++;
             updateView();
             unsync();
@@ -344,7 +346,7 @@ public class NavigateFragment extends Fragment {
             mLoadingCurrentSlide = slideNum;
             return;
         }
-        if (slideNum < 0 || slideNum >= mSlides.length) {
+        if (slideNum < 0 || slideNum >= mSlides.size()) {
             return;
         }
         mCurrentSlideNum = slideNum;
@@ -383,23 +385,24 @@ public class NavigateFragment extends Fragment {
             return;
         }
         if (mUserSlideNum > 0) {
-            setThumbBitmap(mPrevThumb, mSlides[mUserSlideNum - 1].getImage());
+            setThumbBitmap(mPrevThumb, mSlides.get(mUserSlideNum - 1).getImage());
         } else {
             setThumbNull(mPrevThumb);
         }
-        mCurrentSlide.setImageBitmap(mSlides[mUserSlideNum].getImage());
-        if (mUserSlideNum == mSlides.length - 1) {
+        mCurrentSlide.setImageBitmap(mSlides.get(mUserSlideNum).getImage());
+        if (mUserSlideNum == mSlides.size() - 1) {
             setThumbNull(mNextThumb);
         } else {
-            setThumbBitmap(mNextThumb, mSlides[mUserSlideNum + 1].getImage());
+            setThumbBitmap(mNextThumb, mSlides.get(mUserSlideNum + 1).getImage());
         }
-        if (!mSlides[mUserSlideNum].getNotes().equals("")) {
-            mNotes.setText(mSlides[mUserSlideNum].getNotes());
+        if (!mSlides.get(mUserSlideNum).getNotes().equals("")) {
+            mNotes.setText(mSlides.get(mUserSlideNum).getNotes());
         } else {
             mNotes.getText().clear();
         }
         ((TextView) getView().findViewById(R.id.slide_num_text))
-                .setText(String.valueOf(mUserSlideNum + 1) + " of " + String.valueOf(mSlides.length));
+                .setText(String.valueOf(mUserSlideNum + 1) + " of " +
+                        String.valueOf(mSlides.size()));
     }
 
     @Override

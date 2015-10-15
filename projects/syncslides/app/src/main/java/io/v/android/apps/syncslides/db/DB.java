@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.List;
+
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Slide;
@@ -27,7 +29,7 @@ public interface DB {
                     if (result == null) {
                         // Switch between FakeDB and SyncbaseDB by commenting out one.
                         instance = result = new FakeDB(context);
-                       // instance = result = new SyncbaseDB(context);
+                        //instance = result = new SyncbaseDB(context);
                     }
                 }
             }
@@ -134,7 +136,39 @@ public interface DB {
      * @param deckId the deck to fetch
      * @param callback runs on the UI thread when the slide data is loaded
      */
-    void getSlides(String deckId, Callback<Slide[]> callback);
+    void getSlides(String deckId, Callback<List<Slide>> callback);
+
+    /**
+     * Imports the slide deck along with its slides.
+     *
+     * @param deck   deck to import
+     * @param slides slides belonging to the above deck
+     */
+    void importDeck(Deck deck, Slide[] slides);
+
+    /**
+     * Asynchronously imports the slide deck along with its slides.
+     *
+     * @param deck     deck to import
+     * @param slides   slides belonging to the above deck
+     * @param callback runs on the UI thread when the deck has been imported
+     */
+    void importDeck(Deck deck, Slide[] slides, Callback<Void> callback);
+
+    /**
+     * Asynchronously deletes the deck and all of its slides.
+     *
+     * @param deckId  id of the deck to delete
+     */
+    void deleteDeck(String deckId);
+
+    /**
+     * Asynchronously deletes the deck and all of its slides.
+     *
+     * @param deckId    id of the deck to delete
+     * @param callback  runs on the UI thread when the deck has been deleted
+     */
+    void deleteDeck(String deckId, Callback<Void> callback);
 
     class CreatePresentationResult {
         /**

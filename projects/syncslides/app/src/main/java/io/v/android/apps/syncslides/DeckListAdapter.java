@@ -1,9 +1,7 @@
 // Copyright 2015 The Vanadium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-
 package io.v.android.apps.syncslides;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,14 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toolbar;
-
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
-
 /**
  * Provides a list of decks to be shown in the RecyclerView of the
  * DeckChooserFragment.
@@ -33,6 +28,11 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     private static final String TAG = "DeckListAdapter";
     private DB.DBList<Deck> mDecks;
     private DB.DBList<Deck> mLiveDecks;
+    private DB mDB;
+
+    public DeckListAdapter(DB db) {
+        mDB = db;
+    }
 
     public void start(Context context) {
         if (mDecks != null) {
@@ -49,19 +49,16 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             public void notifyItemChanged(int position) {
                 DeckListAdapter.this.notifyItemChanged(mLiveDecks.getItemCount() + position);
             }
-
             @Override
             public void notifyItemInserted(int position) {
                 DeckListAdapter.this.notifyItemInserted(mLiveDecks.getItemCount() + position);
             }
-
             @Override
             public void notifyItemRemoved(int position) {
                 DeckListAdapter.this.notifyItemRemoved(mLiveDecks.getItemCount() + position);
             }
         });
     }
-
     /**
      * Stops any background monitoring of the underlying data.
      */
@@ -72,19 +69,16 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         mDecks.discard();
         mDecks = null;
     }
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.deck_card, parent, false);
         return new ViewHolder(v);
     }
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, int i) {
         final Deck deck;
         final Role role;
-
         // If the position is less than the number of live presentation decks, get deck card from
         // there (and don't allow the user to delete the deck). If not, get the card from the DB.
         if (i < mLiveDecks.getItemCount()) {
@@ -106,10 +100,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.action_delete_deck:
-                            // TODO(kash): Actually delete the deck.
-                            Toast.makeText(
-                                    holder.mToolbar.getContext(), "Delete", Toast.LENGTH_SHORT)
-                                    .show();
+                            mDB.deleteDeck(deck.getId());
                             return true;
                     }
                     return false;
@@ -117,7 +108,6 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             });
             role = Role.BROWSER;
         }
-
         holder.mToolbarTitle.setText(deck.getTitle());
         // TODO(kash): We need to say when the user last viewed the deck.
         Bitmap thumb = deck.getThumb();
@@ -125,7 +115,6 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             thumb = makeDefaultThumb(holder.mToolbar.getContext());
         }
         holder.mThumb.setImageBitmap(thumb);
-
         holder.mThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +128,6 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return mLiveDecks.getItemCount() + mDecks.getItemCount();

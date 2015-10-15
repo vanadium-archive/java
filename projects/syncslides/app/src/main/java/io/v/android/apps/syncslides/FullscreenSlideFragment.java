@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.List;
+
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.model.Slide;
 
@@ -28,7 +30,7 @@ public class FullscreenSlideFragment extends Fragment {
      */
     private int mLoadingSlideNum;
     private Role mRole;
-    private Slide[] mSlides;
+    private List<Slide> mSlides;
     private ImageView mFullScreenImage;
     private DB.CurrentSlideListener mCurrentSlideListener;
 
@@ -55,9 +57,9 @@ public class FullscreenSlideFragment extends Fragment {
         mRole = (Role) args.get(ROLE_KEY);
 
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        db.getSlides(mDeckId, new DB.Callback<Slide[]>() {
+        db.getSlides(mDeckId, new DB.Callback<List<Slide>>() {
             @Override
-            public void done(Slide[] slides) {
+            public void done(List<Slide> slides) {
                 mSlides = slides;
                 // The CurrentSlideListener could have been notified while we were waiting for
                 // the slides to load.
@@ -123,11 +125,11 @@ public class FullscreenSlideFragment extends Fragment {
             mLoadingSlideNum = slideNum;
             return;
         }
-        if (slideNum < 0 || slideNum > mSlides.length) {
+        if (slideNum < 0 || slideNum > mSlides.size()) {
             getFragmentManager().popBackStack();
             return;
         }
         mSlideNum = slideNum;
-        mFullScreenImage.setImageBitmap(mSlides[mSlideNum].getImage());
+        mFullScreenImage.setImageBitmap(mSlides.get(mSlideNum).getImage());
     }
 }
