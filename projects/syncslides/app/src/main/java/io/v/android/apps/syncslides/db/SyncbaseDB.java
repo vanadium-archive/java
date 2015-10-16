@@ -722,7 +722,7 @@ public class SyncbaseDB implements DB {
 
         private String notesForSlide(Table notesTable, String key) {
             try {
-                return ((Note) notesTable.get(mVContext, key, Note.class)).getText();
+                return ((VNote) notesTable.get(mVContext, key, VNote.class)).getText();
             } catch (VException e) {
                 return "";
             }
@@ -831,7 +831,7 @@ public class SyncbaseDB implements DB {
                     VSlide.class);
         }
         Log.i(TAG, "Adding note: " + note);
-        mNotes.put(mVContext, key, new Note(note), Note.class);
+        mNotes.put(mVContext, key, new VNote(note), VNote.class);
         mNotes.put(
                 mVContext,
                 NamingUtil.join(prefix, "LastViewed"),
