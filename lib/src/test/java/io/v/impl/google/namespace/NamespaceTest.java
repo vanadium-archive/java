@@ -9,7 +9,19 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
+
+import junit.framework.TestCase;
+
+import org.joda.time.Duration;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import io.v.impl.google.services.mounttable.MountTableServer;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
@@ -27,16 +39,7 @@ import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectServer;
-import io.v.v23.verror.Errors;
 import io.v.v23.verror.VException;
-import junit.framework.TestCase;
-import org.joda.time.Duration;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -115,45 +118,21 @@ public class NamespaceTest extends TestCase {
     public void testMountAndUnmountAsync() throws Exception {
         Namespace n = V.getNamespace(ctx);
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1), new
-                    Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    // Expected
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
+            FutureCallback<Void> callback = new FutureCallback<>();
+            n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1),
+                    callback);
+            assertThat(
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS))
+                    .isNull();
         }
 
         assertThat(globNames(n.glob(ctx, "test/*"))).containsExactly("test/test");
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.unmount(ctx, "test/test", "", new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    // Expected
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
+            final FutureCallback<Void> callback = new FutureCallback<>();
+            n.unmount(ctx, "test/test", "", callback);
+            assertThat(
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS))
+                    .isNull();
         }
 
         assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
@@ -185,45 +164,23 @@ public class NamespaceTest extends TestCase {
         assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
                 "test/test/test", "test/test/test2");
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.delete(ctx, "test/test", false, new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    // Expected
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNotNull();
+            final FutureCallback<Void> callback = new FutureCallback<>();
+            n.delete(ctx, "test/test", false, callback);
+            try {
+                Uninterruptibles.getUninterruptibly(callback.getFuture());
+                fail("expected an ExecutionException whose cause is a VException");
+            } catch (ExecutionException e) {
+                assertThat(e.getCause()).isInstanceOf(VException.class);
+            }
         }
 
         assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
                 "test/test/test", "test/test/test2");
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.delete(ctx, "test/test", true, new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    // Expected
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
+            final FutureCallback<Void> callback = new FutureCallback<>();
+            n.delete(ctx, "test/test", true, callback);
+            assertThat(Uninterruptibles.getUninterruptibly(
+                    callback.getFuture(), 1, TimeUnit.SECONDS)).isNull();
         }
         assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
     }
@@ -232,26 +189,11 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<Iterable<GlobReply>> globResult = new AtomicReference<>();
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.glob(ctx, "test/*", new Callback<Iterable<GlobReply>>() {
-                @Override
-                public void onSuccess(Iterable<GlobReply> result) {
-                    // Expected
-                    globResult.set(result);
-                    latch.countDown();
-                }
+            final FutureCallback<Iterable<GlobReply>> callback = new FutureCallback<>();
+            n.glob(ctx, "test/*", callback);
 
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
-            List<GlobReply> reply = ImmutableList.copyOf(globResult.get());
+            List<GlobReply> reply = ImmutableList.copyOf(
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS));
             assertThat(reply).hasSize(1);
             assertThat(reply.get(0).getElem()).isInstanceOf(MountEntry.class);
             assertThat(((MountEntry) (reply.get(0).getElem())).getName()).isEqualTo("test/test");
@@ -274,30 +216,15 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<MountEntry> entry = new AtomicReference<>();
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.resolve(ctx, "test/test", new Callback<MountEntry>() {
-                @Override
-                public void onSuccess(MountEntry result) {
-                    // Expected
-                    entry.set(result);
-                    latch.countDown();
-                }
+            FutureCallback<MountEntry> callback = new FutureCallback<>();
+            n.resolve(ctx, "test/test", callback);
 
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
-            assertThat(entry.get()).isNotNull();
-            assertThat(entry.get().getServers()).isNotNull();
-            assertThat(entry.get().getServers()).hasSize(1);
-            assertThat(entry.get().getServers().get(0).getServer()).isEqualTo(dummyServerEndpoint
+            MountEntry entry =
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
+            assertThat(entry).isNotNull();
+            assertThat(entry.getServers()).isNotNull();
+            assertThat(entry.getServers()).hasSize(1);
+            assertThat(entry.getServers().get(0).getServer()).isEqualTo(dummyServerEndpoint
                     .name());
         }
     }
@@ -316,28 +243,14 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<MountEntry> entry = new AtomicReference<>();
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.resolveToMountTable(ctx, "test/test", new Callback<MountEntry>() {
-                @Override
-                public void onSuccess(MountEntry result) {
-                    // Expected
-                    entry.set(result);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(entry.get()).isNotNull();
-            assertThat(entry.get().getServers()).isNotNull();
-            assertThat(entry.get().getServers()).hasSize(1);
-            assertThat(entry.get().getServers().get(0).getServer()).isEqualTo(mountTableEndpoint
+            FutureCallback<MountEntry> callback = new FutureCallback<>();
+            n.resolveToMountTable(ctx, "test/test", callback);
+            MountEntry entry =
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
+            assertThat(entry).isNotNull();
+            assertThat(entry.getServers()).isNotNull();
+            assertThat(entry.getServers()).hasSize(1);
+            assertThat(entry.getServers().get(0).getServer()).isEqualTo(mountTableEndpoint
                     .name());
         }
     }
@@ -348,50 +261,22 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
+            final FutureCallback<Void> callback = new FutureCallback<>();
             n.setPermissions(ctx, "test/test", new Permissions(ImmutableMap.of("1", acl)), "1",
-                    new Callback<Void>() {
-                @Override
-                public void onSuccess(Void result) {
-                    // Expected
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
+                    callback);
+            assertThat(Uninterruptibles.getUninterruptibly(callback.getFuture(), 1,
+                    TimeUnit.SECONDS)).isNull();
         }
 
         {
-            final CountDownLatch latch = new CountDownLatch(1);
-            final AtomicReference<Map<String, Permissions>> permissions = new AtomicReference<>();
-            final AtomicReference<VException> exceptionResult = new AtomicReference<>();
-            n.getPermissions(ctx, "test/test", new Callback<Map<String, Permissions>>() {
-                @Override
-                public void onSuccess(Map<String, Permissions> result) {
-                    // Expected
-                    permissions.set(result);
-                    latch.countDown();
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    exceptionResult.set(error);
-                    latch.countDown();
-                }
-            });
-            Uninterruptibles.awaitUninterruptibly(latch, 1, TimeUnit.SECONDS);
-            assertThat(exceptionResult.get()).isNull();
-            assertThat(permissions.get()).isNotNull();
-            assertThat(permissions.get()).hasSize(1);
+            final FutureCallback<Map<String, Permissions>> callback = new FutureCallback<>();
+            n.getPermissions(ctx, "test/test", callback);
+            Map<String, Permissions> permissions =
+                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
+            assertThat(permissions).isNotNull();
+            assertThat(permissions).hasSize(1);
             // TODO(sjr): figure out what is actually in this map
-            assertThat(permissions.get()).containsKey("2");
+            assertThat(permissions).containsKey("2");
         }
 
     }
@@ -404,6 +289,24 @@ public class NamespaceTest extends TestCase {
         @Override
         public GetPermissionsOut getPermissions(VContext ctx, ServerCall call) throws VException {
             throw new VException("Unimplemented!");
+        }
+    }
+
+    private static class FutureCallback<T> implements Callback<T> {
+        private final SettableFuture<T> future = SettableFuture.create();
+
+        public Future<T> getFuture() {
+            return future;
+        }
+
+        @Override
+        public void onSuccess(T result) {
+            future.set(result);
+        }
+
+        @Override
+        public void onFailure(VException error) {
+            future.setException(error);
         }
     }
 }
