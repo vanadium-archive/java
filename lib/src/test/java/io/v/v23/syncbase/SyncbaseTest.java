@@ -262,6 +262,22 @@ public class SyncbaseTest extends TestCase {
         watchStream.cancel();
     }
 
+    public void testDatabaseWatchWithCancel() throws Exception {
+        final CancelableVContext cancelCtx = ctx.withCancel();
+        Database db = createDatabase(createApp(createService()));
+        createTable(db);
+
+        Stream<WatchChange> watchStream = db.watch(
+                cancelCtx, TABLE_NAME, "b", db.getResumeMarker(ctx));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                cancelCtx.cancel();
+            }
+        }).start();
+        assertThat(watchStream).isEmpty();
+    }
+
     public void testBatch() throws Exception {
         Database db = createDatabase(createApp(createService()));
         Table table = createTable(db);

@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.verror.Errors;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;
@@ -43,7 +44,7 @@ class StreamImpl<T> implements Stream<T> {
                     } catch (EOFException e) {  // legitimate end of stream
                         return endOfData();
                     } catch (VException e) {
-                        if (isCanceled) {
+                        if (isCanceled || Errors.CANCELED.getID().equals(e.getID())) {
                             return endOfData();
                         }
                         throw new RuntimeException("Error retrieving next stream element.", e);
