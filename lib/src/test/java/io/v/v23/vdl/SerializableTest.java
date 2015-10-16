@@ -4,8 +4,8 @@
 
 package io.v.v23.vdl;
 
-import io.v.v23.vom.testdata.Constants;
-import io.v.v23.vom.testdata.TestCase;
+import io.v.v23.vom.testdata.data80.Constants;
+import io.v.v23.vom.testdata.types.TestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

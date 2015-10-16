@@ -21,7 +21,7 @@ import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.testdata.Constants;
+import io.v.v23.vom.testdata.data80.Constants;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -42,7 +42,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecode() throws Exception {
-        for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
+        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
           byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
           Serializable targetVal = test.getValue();
           if (test.getValue().getElem() != null) {
@@ -59,7 +59,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeEncode() throws Exception {
-        for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
+        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
           byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
           VdlValue value = (VdlValue) TestUtil.decode(bytes, VdlValue.class);
           assertEquals(String.format("encode(%s) == %s", test.getName(), test.getHex()), test.getHex(), TestUtil.encode(value.vdlType(), value));

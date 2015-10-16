@@ -17,8 +17,8 @@ import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlTypeObject;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.vom.testdata.Constants;
-import io.v.v23.vom.testdata.ConvertGroup;
+import io.v.v23.vom.testdata.data80.Constants;
+import io.v.v23.vom.testdata.types.ConvertGroup;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
