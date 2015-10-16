@@ -25,6 +25,7 @@ import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerState;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
 /**
@@ -48,6 +49,7 @@ public class V23Manager {
     private Namespace mNamespace = null;
     // Can only have one of these at the moment.  Could add more...
     private Server mLiveServer = null;
+
     // Singleton.
     private V23Manager() {
     }
@@ -59,7 +61,7 @@ public class V23Manager {
      */
     private static List<String> determineNamespaceRoot() {
         List<String> result = new ArrayList<>();
-        result.add("/" + FixedMt.JR_LAPTOP_AT_HOME);
+        result.add("/" + FixedMt.PI_MILK_CRATE);
         return result;
     }
 
@@ -104,36 +106,42 @@ public class V23Manager {
     }
 
     public Set<String> scan(String pattern) {
-        HashSet<String> result = new HashSet<>();
+        FirstGrabber grabber = new FirstGrabber();
+        scan(pattern, grabber);
+        return grabber.result;
+    }
+
+    public void scan(String pattern, Visitor visitor) {
         try {
             for (GlobReply reply : mNamespace.glob(mMTContext, pattern)) {
                 if (reply instanceof GlobReply.Entry) {
-                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                    for (MountedServer server : entry.getServers()) {
-                        String endPoint = server.getServer();
-                        Log.d(TAG, "Got endPoint = " + endPoint);
-                        result.add(endPoint);
-                        // Just take the first one.
-                        break;
-                    }
+                    visitor.visit(((GlobReply.Entry) reply).getElem());
                 }
             }
         } catch (VException e) {
             // TODO(jregan): Handle total v23 failure higher up the stack.
             throw new IllegalStateException(e);
         }
-        return result;
     }
 
     public String mount(String mountName, Object server) {
+        Log.d(TAG, "mount");
         try {
-            ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
+            // ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
+            ListenSpec spec = V.getListenSpec(mBaseContext).withAddress(
+                    new ListenSpec.Address("tcp", "localhost:0"));
             VContext ctx = V.withNewServer(
                     V.withListenSpec(mBaseContext, spec),
-                    mountName, server, null);
+                    mountName,
+                    server,
+                    VSecurity.newAllowEveryoneAuthorizer());
             mLiveServer = V.getServer(ctx);
+            Log.d(TAG, "Server status: " + mLiveServer.getStatus().getState());
             Endpoint[] endpoints = mLiveServer.getStatus().getEndpoints();
             Log.d(TAG, "Listening on endpoints: " + Arrays.toString(endpoints));
+            if (endpoints.length < 1) {
+                throw new IllegalStateException("No endpoints!");
+            }
             return endpoints[0].name();
         } catch (VException e) {
             // TODO(jregan): Handle total v23 failure higher up the stack.
@@ -142,6 +150,7 @@ public class V23Manager {
     }
 
     public void unMount() {
+        Log.d(TAG, "unMount");
         if (mLiveServer == null) {
             throw new IllegalStateException("No v32 service");
         }
@@ -157,6 +166,10 @@ public class V23Manager {
     }
 
     public enum Behavior {PERMISSIVE, STRICT}
+
+    public interface Visitor {
+        void visit(MountEntry entry);
+    }
 
     public static class Singleton {
         private static volatile V23Manager instance;
@@ -181,5 +194,21 @@ public class V23Manager {
     private static class FixedMt {
         static final String PI_MILK_CRATE = "192.168.86.254:8101";
         static final String JR_LAPTOP_AT_HOME = "192.168.2.71:23000";
+        static final String JR_LAPTOP_VEYRON = "192.168.8.106:23000";
+    }
+
+    /**
+     * For every server, take the first endpoint, ignore the rest.
+     */
+    private class FirstGrabber implements Visitor {
+        final HashSet<String> result = new HashSet<>();
+
+        public void visit(MountEntry entry) {
+            for (MountedServer server : entry.getServers()) {
+                String endPoint = server.getServer();
+                result.add(endPoint);
+                return;
+            }
+        }
     }
 }

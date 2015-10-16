@@ -95,8 +95,7 @@ public class ParticipantPeer extends Service implements Participant {
      * TODO(jregan): Assure legal mount name (remove blanks and such).
      */
     public String getMountName() {
-        return ParticipantScannerMt.ROOT_NAME + "/" +
-                getUserName().toLowerCase().trim();
+        return ParticipantScannerMt.ROOT_NAME + "/p_" + mDeck.getId();
     }
 
     @Override
@@ -107,15 +106,16 @@ public class ParticipantPeer extends Service implements Participant {
     @Override
     public Bundle toBundle() {
         Bundle b = new Bundle();
-        b.putString(B.PARTICIPANT_NAME, mUserName);
+        b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
         b.putString(B.PARTICIPANT_END_POINT, mEndpointStr);
+        b.putString(B.PARTICIPANT_NAME, mUserName);
         mDeck.toBundle(b);
         return b;
     }
 
     private void unpackBundle(Bundle b) {
         mDeck = DeckImpl.fromBundle(b);
-        mRole = Role.valueOf(b.getString(B.PARTICIPANT_ROLE));
+        mRole = (Role) b.get(Participant.B.PARTICIPANT_ROLE);
         mEndpointStr = b.getString(B.PARTICIPANT_END_POINT);
         mUserName = b.getString(B.PARTICIPANT_NAME);
     }
@@ -166,10 +166,14 @@ public class ParticipantPeer extends Service implements Participant {
         // TODO(jregan): Unpack blessings from the intent and pass them into
         // V.getPrincipal.
         unpackBundle(intent.getExtras());
+        Log.d(TAG, "role = " + mRole + ", deck=" + mDeck);
         V23Manager mgr = V23Manager.Singleton.get();
         mgr.init(getApplicationContext());
         ServerImpl server = new ServerImpl(this);
-        mEndpointStr = mgr.mount(getMountName(), server);
+        String mountName = getMountName();
+        Log.d(TAG, "mountName = " + mountName);
+        mEndpointStr = mgr.mount(mountName, server);
+        Log.d(TAG, "Got endpoint: " + mEndpointStr);
         return START_REDELIVER_INTENT;
     }
 

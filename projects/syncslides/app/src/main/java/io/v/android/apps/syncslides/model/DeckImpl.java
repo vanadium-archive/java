@@ -33,6 +33,12 @@ public class DeckImpl implements Deck {
         this(title, Unknown.THUMB);
     }
 
+    public String toString() {
+      return "[title=\""+ (mTitle == null ? "unknown" : mTitle) +
+              "\", id=" + (mDeckId == null ? "unknown" : mDeckId) +
+              ", thumb=" + (mThumb == null ? "no" : "yes") + "]";
+    }
+
     public static Deck fromBundle(Bundle b) {
         if (b == null) {
             throw new IllegalArgumentException("Need a bundle.");
