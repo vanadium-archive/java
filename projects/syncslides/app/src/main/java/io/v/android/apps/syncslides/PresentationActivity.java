@@ -126,8 +126,8 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Swap out the current fragment for a NavigateFragment. The presenter and audience members
-     * who join live presentations will be synced.
+     * Swap out the current fragment for a NavigateFragment. The presenter and
+     * audience members who join live presentations will be synced.
      *
      * @param slideNum the slide to show
      */
@@ -141,8 +141,8 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Swap out the current fragment for a NavigateFragment. Audience members who click on a slide
-     * from the slide list will start unsynced.
+     * Swap out the current fragment for a NavigateFragment. Audience members
+     * who click on a slide from the slide list will start unsynced.
      *
      * @param slideNum the slide to show
      */
@@ -159,16 +159,14 @@ public class PresentationActivity extends AppCompatActivity {
         Log.d(TAG, "beginAdvertising");
         Intent intent = new Intent(this, ParticipantPeer.class);
         intent.putExtras(packBundle(new Bundle()));
-        // TODO(jregan): putExtra(BLESSINGS_KEY, blessingsVom);
-        // TODO(jregan): send the intent
-        // stopService(intent);
-        // startService(intent);
+        stopService(intent);
+        startService(intent);
     }
 
     /**
-      * Starts a live presentation.  The presentation will be advertised to other
-      * devices as long as this activity is alive.
-      */
+     * Starts a live presentation.  The presentation will be advertised to other
+     * devices as long as this activity is alive.
+     */
     public void startPresentation() {
         DB db = DB.Singleton.get(getApplicationContext());
         db.createPresentation(mDeck.getId(), new DB.Callback<DB.CreatePresentationResult>() {
@@ -177,7 +175,9 @@ public class PresentationActivity extends AppCompatActivity {
                 Log.i(TAG, "Started presentation");
                 Toast.makeText(getApplicationContext(), "Started presentation",
                         Toast.LENGTH_SHORT).show();
-                beginAdvertising();
+                if (Participant.ENABLE_MT_DISCOVERY) {
+                    beginAdvertising();
+                }
             }
         });
         mRole = Role.PRESENTER;

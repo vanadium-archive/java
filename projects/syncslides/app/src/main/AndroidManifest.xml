@@ -17,6 +17,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".PresentationActivity"/>
+        <service
+            android:name=".discovery.ParticipantPeer"
+            android:exported="false"
+            android:label="Location Service"
+            android:process=":ParticipantPeer">
+        </service>
     </application>
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />

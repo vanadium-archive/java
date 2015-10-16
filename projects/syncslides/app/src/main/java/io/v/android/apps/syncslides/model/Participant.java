@@ -4,15 +4,24 @@
 
 package io.v.android.apps.syncslides.model;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 /**
  * Someone taking part in a presentation.
  *
- * An instance of this corresponds to one instance of a user running syncslides.
+ * An instance of this corresponds to one instance of a user running
+ * syncslides.
  */
 public interface Participant {
+    /**
+     * If true, enable MT-based (mounttable) discovery. Deck view will scan a MT
+     * to find live presentations. Clicking play on a presentation will start a
+     * service and try to mount it in a MT so other deck views can list it in
+     * the UX. MT location determined in
+     * {@link io.v.android.apps.syncslides.discovery.V23Manager}.
+     */
+    boolean ENABLE_MT_DISCOVERY = false;
+
     // Name of the user participating, intended to be visible to others. This
     // can be a colloquial name as opposed to a 'real' name or email address
     // extracted from a device or blessing.

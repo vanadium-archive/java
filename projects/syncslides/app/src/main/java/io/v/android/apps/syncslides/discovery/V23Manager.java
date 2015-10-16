@@ -205,8 +205,7 @@ public class V23Manager {
 
         public void visit(MountEntry entry) {
             for (MountedServer server : entry.getServers()) {
-                String endPoint = server.getServer();
-                result.add(endPoint);
+                result.add(server.getServer());
                 return;
             }
         }

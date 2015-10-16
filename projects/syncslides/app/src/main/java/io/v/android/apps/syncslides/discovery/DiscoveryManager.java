@@ -25,8 +25,6 @@ import io.v.android.apps.syncslides.model.Participant;
  */
 public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     private static final String TAG = "DiscoveryManager";
-    // If true, require a live MT to scan.  If false, fake the scan.
-    public static final boolean PRODUCTION_MODE = false;
     // Search result indicator.
     public static final int NOT_FOUND = -1;
     // Manages creation, mounting and unmounting of V23 services.
@@ -52,7 +50,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
             throw new IllegalStateException("Must have a listener.");
         }
         Log.d(TAG, "Starting");
-        if (PRODUCTION_MODE) {
+        if (Participant.ENABLE_MT_DISCOVERY) {
             if (mV23Manager == null) {
                 throw new IllegalStateException("Must have V23.");
             }
@@ -76,7 +74,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     public void stopEverything() {
         Log.d(TAG, "Stopping everything.");
         stop();
-        if (PRODUCTION_MODE) {
+        if (Participant.ENABLE_MT_DISCOVERY) {
             if (mV23Manager == null) {
                 throw new IllegalStateException("Must have V23.");
             }
@@ -151,7 +149,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
 
         private static DiscoveryManager makeInstance() {
             Log.d(TAG, "Creating singleton.");
-            if (PRODUCTION_MODE) {
+            if (Participant.ENABLE_MT_DISCOVERY) {
                 V23Manager manager = V23Manager.Singleton.get();
                 return new DiscoveryManager(
                         manager,
