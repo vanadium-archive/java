@@ -5,6 +5,7 @@
 package io.v.android.apps.syncslides;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,15 +13,18 @@ import android.view.View;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.discovery.ParticipantPeer;
+import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.DeckImpl;
+import io.v.android.apps.syncslides.model.Participant;
 
 public class PresentationActivity extends AppCompatActivity {
-
-    public static final String DECK_ID_KEY = "deck_id";
-    public static final String ROLE_KEY = "role";
-    public static final String TITLE_KEY = "title";
     private static final String TAG = "PresentationActivity";
-    private String mDeckId;
-    private String mTitle;
+
+    /**
+     * The deck to present.
+     */
+    private Deck mDeck;
     /**
      * The current role of the user.  This value can change during the lifetime
      * of the activity.
@@ -30,28 +34,35 @@ public class PresentationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         // Do this initialization early on in case it needs to start the AccountManager.
         DB.Singleton.get(getApplicationContext()).init(this);
 
         setContentView(R.layout.activity_presentation);
 
-        Bundle bundle = savedInstanceState;
-        if (bundle == null) {
-            bundle = getIntent().getExtras();
+        if (savedInstanceState == null) {
+            Log.d(TAG, "savedInstanceState is null");
+            mDeck = DeckImpl.fromBundle(getIntent().getExtras());
+            mRole = (Role) getIntent().getSerializableExtra(
+                    Participant.B.PARTICIPANT_ROLE);
+        } else {
+            Log.d(TAG, "savedInstanceState is NOT null");
+            mDeck = DeckImpl.fromBundle(savedInstanceState);
+            mRole = (Role) savedInstanceState.get(Participant.B.PARTICIPANT_ROLE);
         }
-        mDeckId = bundle.getString(DECK_ID_KEY);
-        mRole = (Role) bundle.get(ROLE_KEY);
-        mTitle = bundle.getString(TITLE_KEY);
 
+        // TODO(jregan): This appears to be an attempt to avoid fragment
+        // re-inflation, possibly the right thing to do is move the code
+        // below to another flow step, e.g. onRestoreInstanceState.
         if (savedInstanceState != null) {
             return;
         }
 
-        getSupportActionBar().setTitle(mTitle);
+        getSupportActionBar().setTitle(mDeck.getTitle());
 
         // If this is an audience member, we want them to jump straight to the fullscreen view.
         if (mRole == Role.AUDIENCE) {
-            NavigateFragment fragment = NavigateFragment.newInstanceSynced(mDeckId, 0, mRole);
+            NavigateFragment fragment = NavigateFragment.newInstanceSynced(mDeck.getId(), 0, mRole);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment, fragment)
@@ -63,16 +74,31 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // TODO(jregan): Stop advertising the live presentation if necessary.
+    protected void onSaveInstanceState(Bundle b) {
+        Log.d(TAG, "onSaveInstanceState1");
+        super.onSaveInstanceState(b);
+        Log.d(TAG, "onSaveInstanceState2");
+        packBundle(b);
+    }
+
+    private Bundle packBundle(Bundle b) {
+        mDeck.toBundle(b);
+        b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
+        return b;
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(DECK_ID_KEY, mDeckId);
-        outState.putSerializable(ROLE_KEY, mRole);
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop");
+        // Don't shutdown v23 at this point.
+        // TODO(jregan): Stop advertising the live presentation if necessary.
     }
 
     /**
@@ -106,7 +132,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void jumpToSlideSynced(int slideNum) {
         NavigateFragment fragment = NavigateFragment.newInstanceSynced(
-                mDeckId, slideNum, mRole);
+                mDeck.getId(), slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
@@ -121,26 +147,36 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void jumpToSlideUnsynced(int slideNum) {
         NavigateFragment fragment = NavigateFragment.newInstanceUnsynced(
-                mDeckId, slideNum, mRole);
+                mDeck.getId(), slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
                 .commit();
     }
 
+    private void beginAdvertising() {
+        Log.d(TAG, "beginAdvertising");
+        Intent intent = new Intent(this, ParticipantPeer.class);
+        intent.putExtras(packBundle(new Bundle()));
+        // TODO(jregan): putExtra(BLESSINGS_KEY, blessingsVom);
+        // TODO(jregan): send the intent
+        // stopService(intent);
+        // startService(intent);
+    }
+
     /**
-     * Starts a live presentation.  The presentation will be advertised to other
-     * devices as long as this activity is alive.
-     */
+      * Starts a live presentation.  The presentation will be advertised to other
+      * devices as long as this activity is alive.
+      */
     public void startPresentation() {
         DB db = DB.Singleton.get(getApplicationContext());
-        db.createPresentation(mDeckId, new DB.Callback<DB.CreatePresentationResult>() {
+        db.createPresentation(mDeck.getId(), new DB.Callback<DB.CreatePresentationResult>() {
             @Override
             public void done(DB.CreatePresentationResult startPresentationResult) {
                 Log.i(TAG, "Started presentation");
                 Toast.makeText(getApplicationContext(), "Started presentation",
                         Toast.LENGTH_SHORT).show();
-                // TODO(jregan): Advertise this presentation.
+                beginAdvertising();
             }
         });
         mRole = Role.PRESENTER;
@@ -154,7 +190,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void showFullscreenSlide(int slideNum) {
         FullscreenSlideFragment fullscreenSlideFragment =
-                FullscreenSlideFragment.newInstance(mDeckId, slideNum, mRole);
+                FullscreenSlideFragment.newInstance(mDeck.getId(), slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fullscreenSlideFragment)
@@ -163,7 +199,7 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     public void showSlideList() {
-        SlideListFragment slideList = SlideListFragment.newInstance(mDeckId, mRole);
+        SlideListFragment slideList = SlideListFragment.newInstance(mDeck.getId(), mRole);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment, slideList).commit();
     }
 }

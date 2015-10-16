@@ -15,6 +15,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import io.v.android.apps.syncslides.Role;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
@@ -40,9 +41,6 @@ public class ParticipantPeer extends Service implements Participant {
     private static final String TAG = "ParticipantPeer";
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormat.forPattern("hh_mm_ss_SSSS");
-    // Needed to allow this instance of ParticipantPeer to actually
-    // function as a service rather than as just a data bucket.
-    private final V23Manager mV23Manager;
     // V23 EndPoint of the V23 service representing the participant.
     private String mEndpointStr;
     // When did we last grab data from the endPoint?  Meaningful only in
@@ -55,12 +53,13 @@ public class ParticipantPeer extends Service implements Participant {
     private String mUserName;
     // Deck the user is presenting.  Can only present one at a time.
     private Deck mDeck;
+    // The role of the participant.
+    private Role mRole;
 
     public ParticipantPeer(String userName, Deck deck, String endPoint) {
         mUserName = userName;
         mDeck = deck;
         mEndpointStr = endPoint;
-        mV23Manager = null;
     }
 
     public ParticipantPeer(String endPoint) {
@@ -71,14 +70,15 @@ public class ParticipantPeer extends Service implements Participant {
         this(userName, deck, Unknown.END_POINT);
     }
 
+    public ParticipantPeer() {
+        this(Unknown.END_POINT);
+    }
+
     public static Participant fromBundle(Bundle b) {
         return new ParticipantPeer(
-                b.getString(B.USER_NAME),
-                new DeckImpl(
-                        b.getString(B.TITLE),
-                        (Bitmap) b.getParcelable(B.THUMB),
-                        b.getString(B.ID)),
-                b.getString(B.END_POINT));
+                b.getString(B.PARTICIPANT_NAME),
+                DeckImpl.fromBundle(b),
+                b.getString(B.PARTICIPANT_END_POINT));
     }
 
     @Override
@@ -106,11 +106,18 @@ public class ParticipantPeer extends Service implements Participant {
 
     @Override
     public Bundle toBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString(B.USER_NAME, mUserName);
-        bundle.putString(B.TITLE, mDeck.getTitle());
-        bundle.putParcelable(B.THUMB, mDeck.getThumb());
-        return bundle;
+        Bundle b = new Bundle();
+        b.putString(B.PARTICIPANT_NAME, mUserName);
+        b.putString(B.PARTICIPANT_END_POINT, mEndpointStr);
+        mDeck.toBundle(b);
+        return b;
+    }
+
+    private void unpackBundle(Bundle b) {
+        mDeck = DeckImpl.fromBundle(b);
+        mRole = Role.valueOf(b.getString(B.PARTICIPANT_ROLE));
+        mEndpointStr = b.getString(B.PARTICIPANT_END_POINT);
+        mUserName = b.getString(B.PARTICIPANT_NAME);
     }
 
     @Override
@@ -154,29 +161,28 @@ public class ParticipantPeer extends Service implements Participant {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "onStartCommand");
+        // TODO(jregan): Unpack blessings from the intent and pass them into
+        // V.getPrincipal.
+        unpackBundle(intent.getExtras());
+        V23Manager mgr = V23Manager.Singleton.get();
+        mgr.init(getApplicationContext());
         ServerImpl server = new ServerImpl(this);
-        mEndpointStr = mV23Manager.mount(getMountName(), server);
+        mEndpointStr = mgr.mount(getMountName(), server);
         return START_REDELIVER_INTENT;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mV23Manager.unMount();
+        V23Manager.Singleton.get().unMount();
         Log.d(TAG, "###### onDestroy");
     }
 
     private static class Unknown {
         static final String END_POINT = "unknownEndPoint";
         static final String USER_NAME = "unknownUserName";
-    }
-
-    private static class B {
-        static final String END_POINT = "endPoint";
-        static final String USER_NAME = "userName";
-        static final String TITLE = "title";
-        static final String ID = "id";
-        static final String THUMB = "thumb";
     }
 
     /**

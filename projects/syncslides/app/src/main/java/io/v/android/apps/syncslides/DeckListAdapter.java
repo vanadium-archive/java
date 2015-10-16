@@ -19,6 +19,8 @@ import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Participant;
+
 /**
  * Provides a list of decks to be shown in the RecyclerView of the
  * DeckChooserFragment.
@@ -118,12 +120,11 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         holder.mThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Clicking through to PresentationActivity.");
                 final Context context = v.getContext();
-                // Intent for the activity to open when user selects the thumbnail.
                 Intent intent = new Intent(context, PresentationActivity.class);
-                intent.putExtra(PresentationActivity.DECK_ID_KEY, deck.getId());
-                intent.putExtra(PresentationActivity.ROLE_KEY, role);
-                intent.putExtra(PresentationActivity.TITLE_KEY, deck.getTitle());
+                intent.putExtras(deck.toBundle(null));
+                intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
                 context.startActivity(intent);
             }
         });

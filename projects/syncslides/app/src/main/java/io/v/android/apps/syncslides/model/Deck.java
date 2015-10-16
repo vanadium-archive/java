@@ -5,6 +5,7 @@
 package io.v.android.apps.syncslides.model;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
 
 /**
  * A deck, aka a presentation.
@@ -25,4 +26,19 @@ public interface Deck {
      * Returns the deck id.
      */
     String getId();
+
+    /**
+     * Returns a bundled form of the instance; pass null for a new bundle,
+     * pass an existing bundle to overwrite its fields.
+     */
+    Bundle toBundle(Bundle b);
+
+    /**
+     * Keys for Bundle fields.
+     */
+    class B {
+        public static final String DECK_ID = "deck_id";
+        public static final String DECK_TITLE = "deck_title";
+        public static final String DECK_THUMB = "deck_thumb";
+    }
 }
