@@ -256,6 +256,142 @@ public class SyncbaseDB implements DB {
         }
         mInitialized = true;
     }
+    
+    @Override
+    public void createPresentation(final String deckId,
+                                   final Callback<CreatePresentationResult> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createPresentationRunnable(deckId, callback);
+            }
+        }).start();
+    }
+
+    private void createPresentationRunnable(final String deckId,
+                                            final Callback<CreatePresentationResult> callback) {
+        //final String presentationId = UUID.randomUUID().toString();
+        final String presentationId = "randomPresentationId1";
+        String prefix = NamingUtil.join(deckId, presentationId);
+        try {
+            // Add rows to Presentations table.
+            VPresentation presentation = new VPresentation();  // Empty for now.
+            mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
+            VCurrentSlide current = new VCurrentSlide(0);
+            mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
+                    current, VCurrentSlide.class);
+
+            mPresentations.setPrefixPermissions(mVContext, RowRange.prefix(prefix),
+                    mPermissions);
+            mDecks.setPrefixPermissions(mVContext, RowRange.prefix(deckId), mPermissions);
+
+            // Create the syncgroup.
+            final String syncgroupName = NamingUtil.join(
+                    mSyncbaseServer.getStatus().getMounts()[1].getName(),
+                    "%%sync/syncslides",
+                    prefix);
+            //final String syncgroupName = STATIC_SYNCGROUP;
+            Log.i(TAG, "Creating syncgroup " + syncgroupName);
+            Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
+            CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
+            try {
+                syncgroup.create(
+                        context,
+                        new SyncgroupSpec(
+                                SYNCGROUP_PRESENTATION_DESCRIPTION,
+                                // TODO(kash): Use real permissions.
+                                mPermissions,
+                                Arrays.asList(
+                                        new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
+                                        new SyncgroupPrefix(DECKS_TABLE, deckId)),
+                                Arrays.asList(NamingUtil.join("/", PI_MILK_CRATE, "sg")),
+                                false
+                        ),
+                        new SyncgroupMemberInfo((byte) 10));
+            } catch (VException e) {
+                if (e.is(Errors.EXIST)) {
+                    Log.i(TAG, "Syncgroup already exists");
+                } else {
+                    throw e;
+                }
+            }
+            Log.i(TAG, "Finished creating syncgroup");
+
+            Namespace namespace = V.getNamespace(mVContext);
+            namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
+            for (GlobReply reply : namespace.glob(mVContext, "...")) {
+                if (reply instanceof GlobReply.Entry) {
+                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                    Log.d(TAG, "Entry: " + entry.getName());
+                    for (MountedServer server : entry.getServers()) {
+                        String endPoint = server.getServer();
+                        Log.d(TAG, "Got endPoint = " + endPoint);
+                    }
+                }
+            }
+
+            // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
+            // here or somewhere else.  We're not going to demo sync across a user's
+            // devices right away, so we'll figure this out later.
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.done(new CreatePresentationResult(presentationId, syncgroupName));
+                }
+            });
+        } catch (VException e) {
+            // TODO(kash): Change Callback to take an error parameter.
+            handleError(e.toString());
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO(kash): fix me!
+                    callback.done(new CreatePresentationResult(presentationId, "dummy name"));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void joinPresentation(final String syncgroupName, final Callback<Void> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
+                    syncgroup.join(mVContext, new SyncgroupMemberInfo((byte) 1));
+                    for (String member : syncgroup.getMembers(mVContext).keySet()) {
+                        Log.i(TAG, "Member: " + member);
+                    }
+                    Namespace namespace = V.getNamespace(mVContext);
+                    namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
+                    for (GlobReply reply : namespace.glob(mVContext, "...")) {
+                        if (reply instanceof GlobReply.Entry) {
+                            MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                            Log.d(TAG, "Entry: " + entry.getName());
+                            for (MountedServer server : entry.getServers()) {
+                                String endPoint = server.getServer();
+                                Log.d(TAG, "Got endPoint = " + endPoint);
+                            }
+                        }
+                    }
+
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.done(null);
+                        }
+                    });
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
 
     @Override
     public void askQuestion(String identity) {
@@ -496,142 +632,6 @@ public class SyncbaseDB implements DB {
                     });
                 } catch (VException e) {
                     Log.e(TAG, e.toString());
-                }
-            }
-        }).start();
-    }
-
-    @Override
-    public void createPresentation(final String deckId,
-                                   final Callback<CreatePresentationResult> callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                createPresentationRunnable(deckId, callback);
-            }
-        }).start();
-    }
-
-    private void createPresentationRunnable(final String deckId,
-                                            final Callback<CreatePresentationResult> callback) {
-        //final String presentationId = UUID.randomUUID().toString();
-        final String presentationId = "randomPresentationId1";
-        String prefix = NamingUtil.join(deckId, presentationId);
-        try {
-            // Add rows to Presentations table.
-            VPresentation presentation = new VPresentation();  // Empty for now.
-            mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
-            VCurrentSlide current = new VCurrentSlide(0);
-            mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
-                    current, VCurrentSlide.class);
-
-            mPresentations.setPrefixPermissions(mVContext, RowRange.prefix(prefix),
-                    mPermissions);
-            mDecks.setPrefixPermissions(mVContext, RowRange.prefix(deckId), mPermissions);
-
-            // Create the syncgroup.
-            final String syncgroupName = NamingUtil.join(
-                    mSyncbaseServer.getStatus().getMounts()[1].getName(),
-                    "%%sync/syncslides",
-                    prefix);
-            //final String syncgroupName = STATIC_SYNCGROUP;
-            Log.i(TAG, "Creating syncgroup " + syncgroupName);
-            Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
-            CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
-            try {
-                syncgroup.create(
-                        context,
-                        new SyncgroupSpec(
-                                SYNCGROUP_PRESENTATION_DESCRIPTION,
-                                // TODO(kash): Use real permissions.
-                                mPermissions,
-                                Arrays.asList(
-                                        new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
-                                        new SyncgroupPrefix(DECKS_TABLE, deckId)),
-                                Arrays.asList(NamingUtil.join("/", PI_MILK_CRATE, "sg")),
-                                false
-                        ),
-                        new SyncgroupMemberInfo((byte) 10));
-            } catch (VException e) {
-                if (e.is(Errors.EXIST)) {
-                    Log.i(TAG, "Syncgroup already exists");
-                } else {
-                    throw e;
-                }
-            }
-            Log.i(TAG, "Finished creating syncgroup");
-
-            Namespace namespace = V.getNamespace(mVContext);
-            namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
-            for (GlobReply reply : namespace.glob(mVContext, "...")) {
-                if (reply instanceof GlobReply.Entry) {
-                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                    Log.d(TAG, "Entry: " + entry.getName());
-                    for (MountedServer server : entry.getServers()) {
-                        String endPoint = server.getServer();
-                        Log.d(TAG, "Got endPoint = " + endPoint);
-                    }
-                }
-            }
-
-            // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
-            // here or somewhere else.  We're not going to demo sync across a user's
-            // devices right away, so we'll figure this out later.
-
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.done(new CreatePresentationResult(presentationId, syncgroupName));
-                }
-            });
-        } catch (VException e) {
-            // TODO(kash): Change Callback to take an error parameter.
-            handleError(e.toString());
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    // TODO(kash): fix me!
-                    callback.done(new CreatePresentationResult(presentationId, "dummy name"));
-                }
-            });
-        }
-    }
-
-    @Override
-    public void joinPresentation(final String syncgroupName, final Callback<Void> callback) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
-                    syncgroup.join(mVContext, new SyncgroupMemberInfo((byte) 1));
-                    for (String member : syncgroup.getMembers(mVContext).keySet()) {
-                        Log.i(TAG, "Member: " + member);
-                    }
-                    Namespace namespace = V.getNamespace(mVContext);
-                    namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
-                    for (GlobReply reply : namespace.glob(mVContext, "...")) {
-                        if (reply instanceof GlobReply.Entry) {
-                            MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                            Log.d(TAG, "Entry: " + entry.getName());
-                            for (MountedServer server : entry.getServers()) {
-                                String endPoint = server.getServer();
-                                Log.d(TAG, "Got endPoint = " + endPoint);
-                            }
-                        }
-                    }
-
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.done(null);
-                        }
-                    });
-                } catch (VException e) {
-                    handleError(e.toString());
                 }
             }
         }).start();
