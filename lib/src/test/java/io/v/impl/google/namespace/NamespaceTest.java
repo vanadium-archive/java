@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.v.impl.google.services.mounttable.MountTableServer;
 import io.v.v23.V;
+import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
@@ -199,6 +200,18 @@ public class NamespaceTest extends TestCase {
             assertThat(((MountEntry) (reply.get(0).getElem())).getName()).isEqualTo("test/test");
 
         }
+    }
+
+    public void testGlobWithContextCancel() throws Exception {
+        Namespace n = V.getNamespace(ctx);
+        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
+
+        CancelableVContext cancelContext = ctx.withCancel();
+        FutureCallback<Iterable<GlobReply>> callback = new FutureCallback<>();
+        n.glob(cancelContext, "test/*", callback);
+        cancelContext.cancel();
+        List<GlobReply> replies = ImmutableList.copyOf(Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS));
+        assertThat(replies).isEmpty();
     }
 
     public void testResolve() throws Exception {
