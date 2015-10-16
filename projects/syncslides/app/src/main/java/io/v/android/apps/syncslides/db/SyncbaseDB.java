@@ -76,6 +76,7 @@ import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
+import io.v.v23.verror.Errors;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -493,11 +494,9 @@ public class SyncbaseDB implements DB {
                             callback.done(slides);
                         }
                     });
-
                 } catch (VException e) {
                     Log.e(TAG, e.toString());
                 }
-
             }
         }).start();
     }
@@ -554,9 +553,7 @@ public class SyncbaseDB implements DB {
                         ),
                         new SyncgroupMemberInfo((byte) 10));
             } catch (VException e) {
-                // TODO(kash): Use the verror ID instead of string matching.  I don't know
-                // how to get it from java though...
-                if (e.toString().contains("group name already exists")) {
+                if (e.is(Errors.EXIST)) {
                     Log.i(TAG, "Syncgroup already exists");
                 } else {
                     throw e;

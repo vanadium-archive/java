@@ -69,7 +69,8 @@ class CurrentSlideWatcher {
             }
         });
         mListeners.add(listener);
-        if (!hasListeners()) {
+        if (mListeners.size() == 1) {
+            // The first listener was just added.
             Log.i(TAG, "Starting thread");
             mThread.start();
         }
@@ -82,7 +83,7 @@ class CurrentSlideWatcher {
      */
     public void removeListener(DB.CurrentSlideListener listener) {
         mListeners.remove(listener);
-        if (!hasListeners()) {
+        if (mListeners.isEmpty()) {
             mVContext.cancel();
             mThread = null;
             mHandler.removeCallbacksAndMessages(null);
