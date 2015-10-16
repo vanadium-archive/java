@@ -134,8 +134,8 @@ public interface Database extends DatabaseCore, AccessController {
      * It is illegal to invoke this method with a reference to an already-committed blob.  If such
      * a reference is passed-in, no new writes are applied to the blob;  however, this method may
      * still return a valid {@link BlobWriter} and some of the writes on that writer may
-     * {@strong appear} to succeed, though it is not so (see comments on
-     * {@link BlobWriter#writeStream}.
+     * <strong>appear</strong> to succeed, though it is not so (see comments on
+     * {@link BlobWriter#stream}.
      *
      * @param ctx         vanadium context
      * @param ref         blob reference

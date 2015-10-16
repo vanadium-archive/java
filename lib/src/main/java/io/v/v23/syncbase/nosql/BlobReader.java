@@ -37,8 +37,8 @@ public interface BlobReader {
      *     <li> if the context used to create the {@link InputStream} is
      *          {@link io.v.v23.context.CancelableVContext#cancel canceled}, some of the
      *          subsequent {@link InputStream} {@link InputStream#read reads} may return valid
-     *          values.  In fact, there is no hard guarantees that {@strong any} subsequent reads
-     *          will fail.
+     *          values.  In fact, there is no hard guarantees that <strong>any</strong> subsequent
+     *          reads will fail.
      * </ul><p>
      *
      * @param ctx         vanadium context

@@ -81,7 +81,7 @@ public class Util {
      * Returns the relative names of all children of parentFullName.
      *
      * @param  ctx            Vanadium context
-     * @param  parentFullName Object name of parent component
+     * @param  globName       Object name of parent component
      * @throws VException     if a glob error occurred
      */
     public static String[] listChildren(VContext ctx, String globName) throws VException {

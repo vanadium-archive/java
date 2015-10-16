@@ -27,16 +27,17 @@ public interface BlobWriter {
      *     <li> it doesn't implement {@link OutputStream#flush}: the only way to ensure that the
      *          data is flushed is to call {@link OutputStream#close}.
      *     <li> if the blob is {@link #commit committed}, subsequent {@link OutputStream}
-     *          {@link OutputStream#write writes} are guaranteed {@strong NOT} to be applied to the
-     *          blob; however, they might "succeed", i.e., they may not throw an
+     *          {@link OutputStream#write writes} are guaranteed <strong>NOT</strong> to be applied
+     *          to the blob; however, they might "succeed", i.e., they may not throw an
      *          {@link java.io.IOException}.  Any subsequent {@link OutputStream#close} operation
      *          on the {@link OutputStream} are guaranteed to fail immediately.
      *     <li> likewise, if the context used to create the {@link OutputStream} is
      *          {@link io.v.v23.context.CancelableVContext#cancel canceled}, subsequent
-     *          {@link OutputStream} {@link OutputStream#write writes} are guaranteed {@strong NOT}
-     *          to be applied to the blob;  however, they might "succeed", i.e., they may not throw
-     *          an {@link java.io.IOException}.  Any subsequent {@link OutputStream#close} operation
-     *          on the {@link OutputStream} are guaranteed to fail immediately.
+     *          {@link OutputStream} {@link OutputStream#write writes} are guaranteed
+     *          <strong>NOT</strong> to be applied to the blob;  however, they might "succeed",
+     *          i.e., they may not throw an {@link java.io.IOException}.  Any subsequent
+     *          {@link OutputStream#close} operation on the {@link OutputStream} are guaranteed
+     *          to fail immediately.
      * </ul><p>
      *
      * If invoked on a committed blob, it is possible for this method to "succeed", i.e., to return
