@@ -11,11 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import com.google.common.collect.Iterators;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -138,7 +139,21 @@ class DatabaseImpl implements Database, BatchDatabase {
         CancelableVContext ctxC = ctx.withCancel();
         TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctxC,
                 new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
-        return new WatchChangeStreamImpl(ctxC, stream);
+        return new StreamImpl(ctxC, stream) {
+            @Override
+            public synchronized Iterator iterator() {
+                return Iterators.transform(super.iterator(), new Function<Change, WatchChange>() {
+                    @Override
+                    public WatchChange apply(Change change) {
+                        try {
+                            return convertToWatchChange(change);
+                        } catch (VException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        };
     }
     @Override
     public ResumeMarker getResumeMarker(VContext ctx) throws VException {
@@ -248,84 +263,36 @@ class DatabaseImpl implements Database, BatchDatabase {
         }
     }
 
-    private static class WatchChangeStreamImpl implements Stream<WatchChange> {
-        private final CancelableVContext ctxC;
-        private final TypedClientStream<Void, Change, Void> stream;
-        private volatile boolean isCanceled;
-        private volatile boolean isCreated;
+    private WatchChange convertToWatchChange(Change watchChange) throws VException {
+        Object value = watchChange.getValue().getElem();
+        if (!(value instanceof StoreChange)) {
+            throw new VException("Expected watch data to contain StoreChange, instead got: "
+                    + value);
+        }
+        StoreChange storeChange = (StoreChange) value;
+        ChangeType changeType;
+        switch (watchChange.getState()) {
+            case io.v.v23.services.watch.Constants.EXISTS:
+                changeType = ChangeType.PUT_CHANGE;
+                break;
+            case io.v.v23.services.watch.Constants.DOES_NOT_EXIST:
+                changeType = ChangeType.DELETE_CHANGE;
+                break;
+            default:
+                throw new VException(
+                        "Unsupported watch change state: " + watchChange.getState());
+        }
+        List<String> parts = splitInTwo(watchChange.getName(), "/");
+        String tableName = parts.get(0);
+        String rowName = parts.get(1);
+        return new WatchChange(tableName, rowName, changeType, storeChange.getValue(),
+                watchChange.getResumeMarker(), storeChange.getFromSync(),
+                watchChange.getContinued());
+    }
 
-
-        private WatchChangeStreamImpl(CancelableVContext ctxC,
-                                      TypedClientStream<Void, Change, Void> stream) {
-            this.ctxC = ctxC;
-            this.stream = stream;
-            this.isCanceled = this.isCreated = false;
-        }
-        // Implements Stream<WatchChange>.
-        @Override
-        public synchronized Iterator<WatchChange> iterator() {
-            if (isCreated) {
-                throw new RuntimeException("Can only create one ResultStream iterator.");
-            }
-            isCreated = true;
-            return new AbstractIterator<WatchChange>() {
-                @Override
-                protected WatchChange computeNext() {
-                    synchronized (WatchChangeStreamImpl.this) {
-                        if (isCanceled) {  // client canceled the stream
-                            return endOfData();
-                        }
-                        try {
-                            return convert(stream.recv());
-                        } catch (EOFException e) {  // legitimate end of stream
-                            return endOfData();
-                        } catch (VException e) {
-                            if (isCanceled) {
-                                return endOfData();
-                            }
-                            throw new RuntimeException("Error retrieving next stream element.", e);
-                        }
-                    }
-                }
-            };
-        }
-        @Override
-        public synchronized void cancel() throws VException {
-            isCanceled = true;
-            ctxC.cancel();
-        }
-
-        private WatchChange convert(Change watchChange) throws VException {
-            Object value = watchChange.getValue().getElem();
-            if (!(value instanceof StoreChange)) {
-                throw new VException("Expected watch data to contain StoreChange, instead got: "
-                        + value);
-            }
-            StoreChange storeChange = (StoreChange) value;
-            ChangeType changeType;
-            switch (watchChange.getState()) {
-                case io.v.v23.services.watch.Constants.EXISTS:
-                    changeType = ChangeType.PUT_CHANGE;
-                    break;
-                case io.v.v23.services.watch.Constants.DOES_NOT_EXIST:
-                    changeType = ChangeType.DELETE_CHANGE;
-                    break;
-                default:
-                    throw new VException(
-                            "Unsupported watch change state: " + watchChange.getState());
-            }
-            List<String> parts = splitInTwo(watchChange.getName(), "/");
-            String tableName = parts.get(0);
-            String rowName = parts.get(1);
-            return new WatchChange(tableName, rowName, changeType, storeChange.getValue(),
-                    watchChange.getResumeMarker(), storeChange.getFromSync(),
-                    watchChange.getContinued());
-        }
-
-        private static List<String> splitInTwo(String str, String separator) {
-            Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
-            return ImmutableList.of(
-                    iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
-        }
+    private static List<String> splitInTwo(String str, String separator) {
+        Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
+        return ImmutableList.of(
+                iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
     }
 }
