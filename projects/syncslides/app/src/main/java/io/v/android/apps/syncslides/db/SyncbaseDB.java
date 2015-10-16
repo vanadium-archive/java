@@ -598,14 +598,6 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public DBList<Slide> getSlides(String deckId) {
-        if (!mInitialized) {
-            return new NoopList<>();
-        }
-        return new SlideList(mVContext, mDB, deckId);
-    }
-
-    @Override
     public void getSlides(final String deckId, final Callback<List<Slide>> callback) {
         new Thread(new Runnable() {
             @Override
@@ -651,48 +643,11 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void setCurrentSlide(final String deckId, final String presentationId,
-                                final int slideNum) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String rowKey = NamingUtil.join(deckId, presentationId, CURRENT_SLIDE);
-                    Log.i(TAG, "Writing row " + rowKey + " with " + slideNum);
-                    mPresentations.put(mVContext, rowKey, new VCurrentSlide(slideNum),
-                            VCurrentSlide.class);
-                } catch (VException e) {
-                    handleError(e.toString());
-                }
-            }
-        }).start();
-    }
-
-    @Override
-    public void addCurrentSlideListener(String deckId, String presentationId,
-                                        CurrentSlideListener listener) {
-        String key = NamingUtil.join(deckId, presentationId);
-        Log.i(TAG, "addCurrentSlideListener " + key);
-        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
-        if (watcher == null) {
-            watcher = new CurrentSlideWatcher(mVContext, mDB, deckId, presentationId);
-            mCurrentSlideWatchers.put(key, watcher);
+    public DBList<Slide> getSlides(String deckId) {
+        if (!mInitialized) {
+            return new NoopList<>();
         }
-        watcher.addListener(listener);
-    }
-
-    @Override
-    public void removeCurrentSlideListener(String deckId, String presentationId,
-                                           CurrentSlideListener listener) {
-        String key = NamingUtil.join(deckId, presentationId);
-        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
-        if (watcher == null) {
-            return;
-        }
-        watcher.removeListener(listener);
-        if (!watcher.hasListeners()) {
-            mCurrentSlideWatchers.remove(key);
-        }
+        return new SlideList(mVContext, mDB, deckId);
     }
 
     private static class SlideList implements DBList {
@@ -890,6 +845,51 @@ public class SyncbaseDB implements DB {
             } catch (VException e) {
                 return "";
             }
+        }
+    }
+
+    @Override
+    public void setCurrentSlide(final String deckId, final String presentationId,
+                                final int slideNum) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String rowKey = NamingUtil.join(deckId, presentationId, CURRENT_SLIDE);
+                    Log.i(TAG, "Writing row " + rowKey + " with " + slideNum);
+                    mPresentations.put(mVContext, rowKey, new VCurrentSlide(slideNum),
+                            VCurrentSlide.class);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void addCurrentSlideListener(String deckId, String presentationId,
+                                        CurrentSlideListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        Log.i(TAG, "addCurrentSlideListener " + key);
+        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
+        if (watcher == null) {
+            watcher = new CurrentSlideWatcher(mVContext, mDB, deckId, presentationId);
+            mCurrentSlideWatchers.put(key, watcher);
+        }
+        watcher.addListener(listener);
+    }
+
+    @Override
+    public void removeCurrentSlideListener(String deckId, String presentationId,
+                                           CurrentSlideListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
+        if (watcher == null) {
+            return;
+        }
+        watcher.removeListener(listener);
+        if (!watcher.hasListeners()) {
+            mCurrentSlideWatchers.remove(key);
         }
     }
 
