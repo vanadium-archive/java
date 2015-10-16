@@ -1,1 +1,1 @@
-include 'lib', 'tests', 'android-lib', 'benchmarks:syncbench'
+include 'lib', 'tests', 'android-lib', 'benchmarks:syncbench', 'projects:syncslides', 'projects:syncslides:app'
