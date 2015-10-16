@@ -280,13 +280,15 @@ public class SyncbaseDB implements DB {
         private final CancelableVContext mVContext;
         private final Database mDB;
         private final Handler mHandler;
-        private volatile ResumeMarker mWatchMarker;
+        private ResumeMarker mWatchMarker;
+        private volatile boolean mIsDiscarded;
         private volatile Listener mListener;
         private List<Deck> mDecks;
 
         public DeckList(VContext vContext, Database db) {
             mVContext = vContext.withCancel();
             mDB = db;
+            mIsDiscarded = false;
             mDecks = Lists.newArrayList();
             mHandler = new Handler(Looper.getMainLooper());
             new Thread(new Runnable() {
@@ -405,13 +407,21 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public void discard() {
+        public synchronized void discard() {
             Log.i(TAG, "Discarding deck list.");
             mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
+            // We've canceled all the pending callbacks, but the handler might be just about
+            // to execute put()/get() and those messages wouldn't get canceled.  So we mark
+            // the list as discarded and count on put()/get() checking for it. (Note that
+            // put()/get() are synchronized along with this method.)
+            mIsDiscarded = true;
         }
 
-        private void put(Deck deck) {
+        private synchronized void put(Deck deck) {
+            if (mIsDiscarded) {
+                return;
+            }
             // Keep the same sorted order as the Syncbase table, otherwise decks will shuffle
             // whenever we refresh them.
             int idx = 0;
@@ -435,7 +445,10 @@ public class SyncbaseDB implements DB {
             }
         }
 
-        private void delete(String deckId) {
+        private synchronized void delete(String deckId) {
+            if (mIsDiscarded) {
+                return;
+            }
             for (int i = 0; i < mDecks.size(); ++i) {
                 if (mDecks.get(i).getId().equals(deckId)) {
                     mDecks.remove(i);
@@ -688,6 +701,7 @@ public class SyncbaseDB implements DB {
         private final Handler mHandler;
         private final String mDeckId;
         private ResumeMarker mWatchMarker;
+        private volatile boolean mIsDiscarded;
         // Storage for slides, mirroring the slides in the Syncbase.  Since slide numbers can
         // have "holes" in them (e.g., 1, 2, 4, 6, 8), we maintain a map from slide key
         // to the slide, as well as an ordered list which is returned to the caller.
@@ -700,6 +714,7 @@ public class SyncbaseDB implements DB {
             mVContext = vContext.withCancel();
             mDB = db;
             mDeckId = deckId;
+            mIsDiscarded = false;
             mSlidesMap = new TreeMap<>();
             mSlides = Lists.newArrayList();
             mHandler = new Handler(Looper.getMainLooper());
@@ -818,13 +833,21 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public void discard() {
+        public synchronized void discard() {
             Log.i(TAG, "Discarding slides list");
             mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
+            // We've canceled all the pending callbacks, but the handler might be just about
+            // to execute put()/get() and those messages wouldn't get canceled.  So we mark
+            // the list as discarded and count on put()/get() checking for it. (Note that
+            // put()/get() are synchronized along with this method.)
+            mIsDiscarded = true;
         }
 
-        private void put(String key, Slide slide) {
+        private synchronized void put(String key, Slide slide) {
+            if (mIsDiscarded) {
+                return;
+            }
             Slide oldSlide = mSlidesMap.put(key, slide);
             mSlides = Lists.newArrayList(mSlidesMap.values());
             int idx = mSlides.indexOf(slide);
@@ -841,7 +864,10 @@ public class SyncbaseDB implements DB {
             }
         }
 
-        private void delete(String key) {
+        private synchronized void delete(String key) {
+            if (mIsDiscarded) {
+                return;
+            }
             Slide deletedSlide = mSlidesMap.remove(key);
             if (deletedSlide == null) {
                 Log.e(TAG, "Deleting a slide that doesn't exist: " + key);
