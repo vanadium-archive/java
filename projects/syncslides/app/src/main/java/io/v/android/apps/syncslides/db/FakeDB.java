@@ -25,6 +25,7 @@ import java.util.Map;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Slide;
 
@@ -79,9 +80,9 @@ public class FakeDB implements DB {
         }
         mHandler = new Handler(Looper.getMainLooper());
         for (int i = 0; i < DECKTHUMBS.length; ++i) {
-            mDecks.add(new FakeDeck(
-                    BitmapFactory.decodeResource(context.getResources(), DECKTHUMBS[i]),
+            mDecks.add(new DeckImpl(
                     DECKTITLES[i],
+                    BitmapFactory.decodeResource(context.getResources(), DECKTHUMBS[i]),
                     String.valueOf(i)));
             mSlides.put(String.valueOf(i), new FakeSlideList(slides));
         }
@@ -93,33 +94,6 @@ public class FakeDB implements DB {
             }
         });
         mCurrentSlideWatcher.start();
-    }
-
-    private static class FakeDeck implements Deck {
-        private final String mTitle;
-        private final Bitmap mThumb;
-        private final String mDeckId;
-
-        FakeDeck(Bitmap thumb, String title, String deckId) {
-            mThumb = thumb;
-            mTitle = title;
-            mDeckId = deckId;
-        }
-
-        @Override
-        public Bitmap getThumb() {
-            return mThumb;
-        }
-
-        @Override
-        public String getTitle() {
-            return mTitle;
-        }
-
-        @Override
-        public String getId() {
-            return mDeckId;
-        }
     }
 
     private static class FakeSlide implements Slide {

@@ -38,4 +38,13 @@ public interface Participant {
 
     // For storage in Sets.
     int hashCode();
+
+    /**
+     * Keys for Bundle fields.
+     */
+    class B {
+        public static final String PARTICIPANT_ROLE = "participant_role";
+        public static final String PARTICIPANT_END_POINT = "participant_endPoint";
+        public static final String PARTICIPANT_NAME = "participant_name";
+    }
 }

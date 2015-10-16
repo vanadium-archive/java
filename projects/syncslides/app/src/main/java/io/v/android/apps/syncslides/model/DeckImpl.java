@@ -5,6 +5,7 @@
 package io.v.android.apps.syncslides.model;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
 
 /**
  * Application impl of Deck.
@@ -30,6 +31,30 @@ public class DeckImpl implements Deck {
 
     public DeckImpl(String title) {
         this(title, Unknown.THUMB);
+    }
+
+    public static Deck fromBundle(Bundle b) {
+        if (b == null) {
+            throw new IllegalArgumentException("Need a bundle.");
+        }
+        return new DeckImpl(
+                b.getString(B.DECK_TITLE),
+                (Bitmap) b.getParcelable(B.DECK_THUMB),
+                b.getString(B.DECK_ID));
+    }
+
+    @Override
+    public Bundle toBundle(Bundle b) {
+        if (b == null) {
+            b = new Bundle();
+        }
+        b.putString(B.DECK_TITLE, mTitle);
+        // TODO(jregan): Our thumbnails are too big!  We need to store
+        // them on disk, pass a file handle in the intent instead,
+        // and load them on the other side.
+        // ### b.putParcelable(B.DECK_THUMB, mThumb);
+        b.putString(B.DECK_ID, mDeckId);
+        return b;
     }
 
     @Override
