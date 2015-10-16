@@ -23,13 +23,13 @@ public class ParticipantScannerFake implements ParticipantScanner {
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
                     new ParticipantPeer(
-                            "Alice", new DeckImpl("Kale - Just eat it.")));
+                            "Alice", new DeckImpl("Kale - Just eat it.", null, "deckId1")));
         }
         // Bob has less to say than Alice.
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
                     new ParticipantPeer(
-                            "Bob", new DeckImpl("Java - Object deluge.")));
+                            "Bob", new DeckImpl("Java - Object deluge.", null, "deckId1")));
         }
         return participants;
     }
