@@ -11,12 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.joda.time.Duration;
 
@@ -24,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -42,6 +45,11 @@ import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
+import io.v.v23.naming.Endpoint;
+import io.v.v23.naming.GlobReply;
+import io.v.v23.naming.MountEntry;
+import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
@@ -61,6 +69,7 @@ import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
+import io.v.v23.syncbase.nosql.PrefixRange;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Syncgroup;
@@ -82,8 +91,8 @@ public class SyncbaseDB implements DB {
     private static final String SYNCBASE_DB = "syncslides";
     private static final String DECKS_TABLE = "Decks";
     private static final String NOTES_TABLE = "Notes";
-    private static final String PRESENTATIONS_TABLE = "Presentations";
-    private static final String CURRENT_SLIDE = "CurrentSlide";
+    static final String PRESENTATIONS_TABLE = "Presentations";
+    static final String CURRENT_SLIDE = "CurrentSlide";
     private static final String SYNCGROUP_PRESENTATION_DESCRIPTION = "Live Presentation";
     private static final String PI_MILK_CRATE = "192.168.86.254:8101";
 
@@ -102,9 +111,12 @@ public class SyncbaseDB implements DB {
     private Table mDecks;
     private Table mNotes;
     private Table mPresentations;
+    private Map<String, CurrentSlideWatcher> mCurrentSlideWatchers;
+    private Server mSyncbaseServer;
 
     SyncbaseDB(Context context) {
         mContext = context;
+        mCurrentSlideWatchers = Maps.newHashMap();
     }
 
     @Override
@@ -124,6 +136,7 @@ public class SyncbaseDB implements DB {
         AccessList acl = new AccessList(
                 ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
         mPermissions = new Permissions(ImmutableMap.of(
+                Constants.RESOLVE.getValue(), acl,
                 Constants.READ.getValue(), acl,
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
@@ -194,16 +207,21 @@ public class SyncbaseDB implements DB {
         storageDir.mkdirs();
 
         try {
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            String id = tm.getDeviceId();
+
             mVContext = SyncbaseServer.withNewServer(mVContext, new SyncbaseServer.Params()
                     .withPermissions(mPermissions)
+                    .withName(NamingUtil.join("/", PI_MILK_CRATE, id))
                     .withStorageRootDir(storageDir.getAbsolutePath()));
         } catch (SyncbaseServer.StartException e) {
             handleError("Couldn't start syncbase server");
             return;
         }
         try {
-            Server syncbaseServer = V.getServer(mVContext);
-            String serverName = "/" + syncbaseServer.getStatus().getEndpoints()[0];
+            mSyncbaseServer = V.getServer(mVContext);
+            Log.i(TAG, "Endpoints: " + Arrays.toString(mSyncbaseServer.getStatus().getEndpoints()));
+            String serverName = "/" + mSyncbaseServer.getStatus().getEndpoints()[0];
             SyncbaseService service = Syncbase.newService(serverName);
             SyncbaseApp app = service.getApp(SYNCBASE_APP);
             if (!app.exists(mVContext)) {
@@ -305,7 +323,9 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
-                watchForDeckChanges();
+                // TODO(spetrovic): Uncomment when fixing
+                // https://github.com/vanadium/java/issues/23.
+                //watchForDeckChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
             }
@@ -488,47 +508,132 @@ public class SyncbaseDB implements DB {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final String presentationId = UUID.randomUUID().toString();
-                String prefix = NamingUtil.join(deckId, presentationId);
+                createPresentationRunnable(deckId, callback);
+            }
+        }).start();
+    }
+
+    private void createPresentationRunnable(final String deckId,
+                                            final Callback<CreatePresentationResult> callback) {
+        //final String presentationId = UUID.randomUUID().toString();
+        final String presentationId = "randomPresentationId1";
+        String prefix = NamingUtil.join(deckId, presentationId);
+        try {
+            // Add rows to Presentations table.
+            VPresentation presentation = new VPresentation();  // Empty for now.
+            mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
+            VCurrentSlide current = new VCurrentSlide(0);
+            mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
+                    current, VCurrentSlide.class);
+
+            mPresentations.setPrefixPermissions(mVContext, RowRange.prefix(prefix),
+                    mPermissions);
+            mDecks.setPrefixPermissions(mVContext, RowRange.prefix(deckId), mPermissions);
+
+            // Create the syncgroup.
+            final String syncgroupName = NamingUtil.join(
+                    mSyncbaseServer.getStatus().getMounts()[1].getName(),
+                    "%%sync/syncslides",
+                    prefix);
+            //final String syncgroupName = STATIC_SYNCGROUP;
+            Log.i(TAG, "Creating syncgroup " + syncgroupName);
+            Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
+            CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
+            try {
+                syncgroup.create(
+                        context,
+                        new SyncgroupSpec(
+                                SYNCGROUP_PRESENTATION_DESCRIPTION,
+                                // TODO(kash): Use real permissions.
+                                mPermissions,
+                                Arrays.asList(
+                                        new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
+                                        new SyncgroupPrefix(DECKS_TABLE, deckId)),
+                                Arrays.asList(NamingUtil.join("/", PI_MILK_CRATE, "sg")),
+                                false
+                        ),
+                        new SyncgroupMemberInfo((byte) 10));
+            } catch (VException e) {
+                // TODO(kash): Use the verror ID instead of string matching.  I don't know
+                // how to get it from java though...
+                if (e.toString().contains("group name already exists")) {
+                    Log.i(TAG, "Syncgroup already exists");
+                } else {
+                    throw e;
+                }
+            }
+            Log.i(TAG, "Finished creating syncgroup");
+
+            Namespace namespace = V.getNamespace(mVContext);
+            namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
+            for (GlobReply reply : namespace.glob(mVContext, "...")) {
+                if (reply instanceof GlobReply.Entry) {
+                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                    Log.d(TAG, "Entry: " + entry.getName());
+                    for (MountedServer server : entry.getServers()) {
+                        String endPoint = server.getServer();
+                        Log.d(TAG, "Got endPoint = " + endPoint);
+                    }
+                }
+            }
+
+            // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
+            // here or somewhere else.  We're not going to demo sync across a user's
+            // devices right away, so we'll figure this out later.
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.done(new CreatePresentationResult(presentationId, syncgroupName));
+                }
+            });
+        } catch (VException e) {
+            // TODO(kash): Change Callback to take an error parameter.
+            handleError(e.toString());
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO(kash): fix me!
+                    callback.done(new CreatePresentationResult(presentationId, "dummy name"));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void joinPresentation(final String syncgroupName, final Callback<Void> callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    // Add rows to Presentations table.
-                    VPresentation presentation = new VPresentation();  // Empty for now.
-                    mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
-                    VCurrentSlide current = new VCurrentSlide(0);
-                    mPresentations.put(mVContext, NamingUtil.join(prefix, CURRENT_SLIDE),
-                            current, VCurrentSlide.class);
-
-                    // Create the syncgroup.
-                    final String syncgroupName = NamingUtil.join(mPresentations.fullName(), prefix);
-                    Log.i(TAG, "Creating syncgroup " + syncgroupName);
                     Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
-                    CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
-                    syncgroup.create(
-                            context,
-                            new SyncgroupSpec(SYNCGROUP_PRESENTATION_DESCRIPTION,
-                                    // TODO(kash): Use real permissions.
-                                    mPermissions,
-                                    Arrays.asList(
-                                            new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
-                                            new SyncgroupPrefix(DECKS_TABLE, deckId)),
-                                    Arrays.asList(PI_MILK_CRATE),
-                                    false
-                            ),
-                            new SyncgroupMemberInfo((byte) 10));
+                    syncgroup.join(mVContext, new SyncgroupMemberInfo((byte) 1));
+                    for (String member : syncgroup.getMembers(mVContext).keySet()) {
+                        Log.i(TAG, "Member: " + member);
+                    }
+                    Namespace namespace = V.getNamespace(mVContext);
+                    namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
+                    for (GlobReply reply : namespace.glob(mVContext, "...")) {
+                        if (reply instanceof GlobReply.Entry) {
+                            MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                            Log.d(TAG, "Entry: " + entry.getName());
+                            for (MountedServer server : entry.getServers()) {
+                                String endPoint = server.getServer();
+                                Log.d(TAG, "Got endPoint = " + endPoint);
+                            }
+                        }
+                    }
 
-                    // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
-                    // here or somewhere else.  We're not going to demo sync across a user's
-                    // devices right away, so we'll figure this out later.
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.done(
-                                    new CreatePresentationResult(presentationId, syncgroupName));
+                            callback.done(null);
                         }
                     });
                 } catch (VException e) {
-                    // TODO(kash): Change Callback to take an error parameter.
                     handleError(e.toString());
                 }
             }
@@ -536,11 +641,48 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void addCurrentSlideListener(CurrentSlideListener listener) {
+    public void setCurrentSlide(final String deckId, final String presentationId,
+                                final int slideNum) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String rowKey = NamingUtil.join(deckId, presentationId, CURRENT_SLIDE);
+                    Log.i(TAG, "Writing row " + rowKey + " with " + slideNum);
+                    mPresentations.put(mVContext, rowKey, new VCurrentSlide(slideNum),
+                            VCurrentSlide.class);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
     }
 
     @Override
-    public void removeCurrentSlideListener(CurrentSlideListener listener) {
+    public void addCurrentSlideListener(String deckId, String presentationId,
+                                        CurrentSlideListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        Log.i(TAG, "addCurrentSlideListener " + key);
+        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
+        if (watcher == null) {
+            watcher = new CurrentSlideWatcher(mVContext, mDB, deckId, presentationId);
+            mCurrentSlideWatchers.put(key, watcher);
+        }
+        watcher.addListener(listener);
+    }
+
+    @Override
+    public void removeCurrentSlideListener(String deckId, String presentationId,
+                                           CurrentSlideListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        CurrentSlideWatcher watcher = mCurrentSlideWatchers.get(key);
+        if (watcher == null) {
+            return;
+        }
+        watcher.removeListener(listener);
+        if (!watcher.hasListeners()) {
+            mCurrentSlideWatchers.remove(key);
+        }
     }
 
     private static class SlideList implements DBList {
@@ -607,7 +749,9 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
-                watchForSlideChanges();
+                // TODO(spetrovic): Uncomment when fixing
+                // https://github.com/vanadium/java/issues/23.
+                //watchForSlideChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
             }
@@ -736,8 +880,9 @@ public class SyncbaseDB implements DB {
 
     private void importDecks() {
         importDeckFromResources("deckId1", "Car Business", R.drawable.thumb_deck1);
-        importDeckFromResources("deckId2", "Baku Discovery", R.drawable.thumb_deck2);
-        importDeckFromResources("deckId3", "Vanadium", R.drawable.thumb_deck3);
+        // These slow down app startup, so skip these for now.
+//        importDeckFromResources("deckId2", "Baku Discovery", R.drawable.thumb_deck2);
+//        importDeckFromResources("deckId3", "Vanadium", R.drawable.thumb_deck3);
     }
 
     private static final int[] SLIDEDRAWABLES = new int[]{

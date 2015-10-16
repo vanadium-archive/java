@@ -62,7 +62,8 @@ public class PresentationActivity extends AppCompatActivity {
 
         // If this is an audience member, we want them to jump straight to the fullscreen view.
         if (mRole == Role.AUDIENCE) {
-            NavigateFragment fragment = NavigateFragment.newInstanceSynced(mDeck.getId(), 0, mRole);
+            NavigateFragment fragment = NavigateFragment.newInstanceSynced(
+                    mDeck.getId(), "randomPresentationId1", 0, mRole);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment, fragment)
@@ -132,7 +133,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void jumpToSlideSynced(int slideNum) {
         NavigateFragment fragment = NavigateFragment.newInstanceSynced(
-                mDeck.getId(), slideNum, mRole);
+                mDeck.getId(), "randomPresentationId1", slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
@@ -147,7 +148,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void jumpToSlideUnsynced(int slideNum) {
         NavigateFragment fragment = NavigateFragment.newInstanceUnsynced(
-                mDeck.getId(), slideNum, mRole);
+                mDeck.getId(), "randomPresentationId1", slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fragment)
@@ -190,7 +191,8 @@ public class PresentationActivity extends AppCompatActivity {
      */
     public void showFullscreenSlide(int slideNum) {
         FullscreenSlideFragment fullscreenSlideFragment =
-                FullscreenSlideFragment.newInstance(mDeck.getId(), slideNum, mRole);
+                FullscreenSlideFragment.newInstance(mDeck.getId(), "randomPresentationId1",
+                        slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment, fullscreenSlideFragment)

@@ -41,12 +41,14 @@ public class NavigateFragment extends Fragment {
 
     private static final String TAG = "NavigateFragment";
     private static final String DECK_ID_KEY = "deck_id_key";
+    private static final String PRESENTATION_ID_KEY = "presentation_id_key";
     private static final String SLIDE_NUM_KEY = "slide_num_key";
     private static final String ROLE_KEY = "role_key";
     private static final String SYNCED_KEY = "synced_key";
     private static final int DIALOG_REQUEST_CODE = 23;
 
     private String mDeckId;
+    private String mPresentationId;
     /**
      * The slide number for the live presentation, if any.
      */
@@ -75,21 +77,25 @@ public class NavigateFragment extends Fragment {
     private int mQuestionerPosition;
     private boolean mSynced;
     private DB.CurrentSlideListener mCurrentSlideListener;
+    private DB mDB;
     private TextView mSlideNumText;
 
-    public static NavigateFragment newInstanceSynced(String deckId, int slideNum, Role role) {
-        return newInstance(deckId, slideNum, role, true);
+    public static NavigateFragment newInstanceSynced(
+            String deckId, String presentationId, int slideNum, Role role) {
+        return newInstance(deckId, presentationId, slideNum, role, true);
     }
 
-    public static NavigateFragment newInstanceUnsynced(String deckId, int slideNum, Role role) {
-        return newInstance(deckId, slideNum, role, false);
+    public static NavigateFragment newInstanceUnsynced(
+            String deckId, String presentationId, int slideNum, Role role) {
+        return newInstance(deckId, presentationId, slideNum, role, false);
     }
 
     private static NavigateFragment newInstance(
-            String deckId, int slideNum, Role role, boolean synced) {
+            String deckId, String presentationId, int slideNum, Role role, boolean synced) {
         NavigateFragment fragment = new NavigateFragment();
         Bundle args = new Bundle();
         args.putString(DECK_ID_KEY, deckId);
+        args.putString(PRESENTATION_ID_KEY, presentationId);
         args.putInt(SLIDE_NUM_KEY, slideNum);
         args.putSerializable(ROLE_KEY, role);
         args.putBoolean(SYNCED_KEY, synced);
@@ -113,6 +119,7 @@ public class NavigateFragment extends Fragment {
             args = getArguments();
         }
         mDeckId = args.getString(DECK_ID_KEY);
+        mPresentationId = args.getString(PRESENTATION_ID_KEY);
         mCurrentSlideNum = 0;
         mLoadingCurrentSlide = -1;
         mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
@@ -209,11 +216,11 @@ public class NavigateFragment extends Fragment {
         });
         mQuestionsNum = (TextView) rootView.findViewById(R.id.questions_num);
         // Start off invisible for everyone.  If there are questions, this
-        // will be set to visible in the db.getQuestionerList() callback.
+        // will be set to visible in the mDB.getQuestionerList() callback.
         mQuestionsNum.setVisibility(View.INVISIBLE);
 
-        DB db = DB.Singleton.get(getActivity().getApplicationContext());
-        db.getSlides(mDeckId, new DB.Callback<List<Slide>>() {
+        mDB = DB.Singleton.get(getActivity().getApplicationContext());
+        mDB.getSlides(mDeckId, new DB.Callback<List<Slide>>() {
             @Override
             public void done(List<Slide> slides) {
                 mSlides = slides;
@@ -227,7 +234,7 @@ public class NavigateFragment extends Fragment {
             }
         });
         if (mRole == Role.PRESENTER) {
-            db.getQuestionerList(mDeckId, new DB.QuestionerListener() {
+            mDB.getQuestionerList(mDeckId, new DB.QuestionerListener() {
                 @Override
                 public void onChange(String[] questionerList) {
                     mQuestionerList = questionerList;
@@ -255,8 +262,7 @@ public class NavigateFragment extends Fragment {
                     NavigateFragment.this.currentSlideChanged(slideNum);
                 }
             };
-            DB.Singleton.get(getActivity().getApplicationContext())
-                    .addCurrentSlideListener(mCurrentSlideListener);
+            mDB.addCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         }
     }
 
@@ -265,8 +271,7 @@ public class NavigateFragment extends Fragment {
         super.onStop();
         ((PresentationActivity) getActivity()).setUiImmersive(false);
         if (mRole == Role.AUDIENCE) {
-            DB.Singleton.get(getActivity().getApplicationContext())
-                    .removeCurrentSlideListener(mCurrentSlideListener);
+            mDB.removeCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         }
     }
 
@@ -274,6 +279,7 @@ public class NavigateFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(DECK_ID_KEY, mDeckId);
+        outState.putString(PRESENTATION_ID_KEY, mPresentationId);
         outState.putInt(SLIDE_NUM_KEY, mUserSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
         outState.putBoolean(SYNCED_KEY, mSynced);
@@ -328,6 +334,9 @@ public class NavigateFragment extends Fragment {
         }
         if (mUserSlideNum < mSlides.size() - 1) {
             mUserSlideNum++;
+            if (mRole == Role.PRESENTER) {
+                mDB.setCurrentSlide(mDeckId, mPresentationId, mUserSlideNum);
+            }
             updateView();
             unsync();
         }
@@ -343,6 +352,9 @@ public class NavigateFragment extends Fragment {
         }
         if (mUserSlideNum > 0) {
             mUserSlideNum--;
+            if (mRole == Role.PRESENTER) {
+                mDB.setCurrentSlide(mDeckId, mPresentationId, mUserSlideNum);
+            }
             updateView();
             unsync();
         }

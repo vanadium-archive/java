@@ -19,10 +19,12 @@ import io.v.android.apps.syncslides.model.Slide;
 public class FullscreenSlideFragment extends Fragment {
 
     private static final String DECK_ID_KEY = "deck_id";
+    private static final String PRESENTATION_ID_KEY = "presentation_id";
     private static final String SLIDE_NUM_KEY = "slide_num";
     private static final String ROLE_KEY = "role";
 
     private String mDeckId;
+    private String mPresentationId;
     private int mSlideNum;
     /**
      * While mSlides is loading, we can't validate any slide numbers coming from DB.
@@ -34,10 +36,12 @@ public class FullscreenSlideFragment extends Fragment {
     private ImageView mFullScreenImage;
     private DB.CurrentSlideListener mCurrentSlideListener;
 
-    public static FullscreenSlideFragment newInstance(String deckId, int slideNum, Role role) {
+    public static FullscreenSlideFragment newInstance(String deckId, String presentationId,
+                                                      int slideNum, Role role) {
         FullscreenSlideFragment fragment = new FullscreenSlideFragment();
         Bundle args = new Bundle();
         args.putString(DECK_ID_KEY, deckId);
+        args.putString(PRESENTATION_ID_KEY, presentationId);
         args.putInt(SLIDE_NUM_KEY, slideNum);
         args.putSerializable(ROLE_KEY, role);
         fragment.setArguments(args);
@@ -52,6 +56,7 @@ public class FullscreenSlideFragment extends Fragment {
             args = getArguments();
         }
         mDeckId = args.getString(DECK_ID_KEY);
+        mPresentationId = args.getString(PRESENTATION_ID_KEY);
         mSlideNum = args.getInt(SLIDE_NUM_KEY);
         mLoadingSlideNum = -1;
         mRole = (Role) args.get(ROLE_KEY);
@@ -97,7 +102,7 @@ public class FullscreenSlideFragment extends Fragment {
                 }
             };
             DB.Singleton.get(getActivity().getApplicationContext())
-                    .addCurrentSlideListener(mCurrentSlideListener);
+                    .addCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         }
     }
 
@@ -106,7 +111,7 @@ public class FullscreenSlideFragment extends Fragment {
         super.onStop();
         if (mRole == Role.AUDIENCE) {
             DB.Singleton.get(getActivity().getApplicationContext())
-                    .removeCurrentSlideListener(mCurrentSlideListener);
+                    .removeCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         }
     }
 
@@ -114,6 +119,7 @@ public class FullscreenSlideFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(DECK_ID_KEY, mDeckId);
+        outState.putString(PRESENTATION_ID_KEY, mPresentationId);
         outState.putInt(SLIDE_NUM_KEY, mSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
     }
@@ -125,7 +131,7 @@ public class FullscreenSlideFragment extends Fragment {
             mLoadingSlideNum = slideNum;
             return;
         }
-        if (slideNum < 0 || slideNum > mSlides.size()) {
+        if (slideNum < 0 || slideNum >= mSlides.size()) {
             getFragmentManager().popBackStack();
             return;
         }

@@ -122,10 +122,28 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             public void onClick(View v) {
                 Log.d(TAG, "Clicking through to PresentationActivity.");
                 final Context context = v.getContext();
-                Intent intent = new Intent(context, PresentationActivity.class);
-                intent.putExtras(deck.toBundle(null));
-                intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
-                context.startActivity(intent);
+                if (role == Role.AUDIENCE) {
+                    DB.Singleton.get(context).joinPresentation(
+                            // TODO(kash): Use the real syncgroup name.
+                            "/192.168.86.254:8101/355499060906851/%%sync/syncslides/" +
+                                    "deckId1/randomPresentationId1",
+                            new DB.Callback<Void>() {
+                                @Override
+                                public void done(Void aVoid) {
+                                    // Intent for the activity to open when user selects the thumbnail.
+                                    Intent intent = new Intent(context, PresentationActivity.class);
+                                    intent.putExtras(deck.toBundle(null));
+                                    intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
+                                    context.startActivity(intent);
+                                }
+                            });
+                } else {
+                    // Intent for the activity to open when user selects the thumbnail.
+                    Intent intent = new Intent(context, PresentationActivity.class);
+                    intent.putExtras(deck.toBundle(null));
+                    intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
+                    context.startActivity(intent);
+                }
             }
         });
     }

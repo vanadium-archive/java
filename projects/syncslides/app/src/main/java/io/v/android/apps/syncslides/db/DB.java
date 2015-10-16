@@ -196,6 +196,23 @@ public interface DB {
      */
     void createPresentation(String deckId, Callback<CreatePresentationResult> callback);
 
+    /**
+     * Joins an existing presentation.
+     *
+     * @param syncgroupName the syncgroup to join
+     * @param callback called when the syncgroup is joined
+     */
+    void joinPresentation(String syncgroupName, Callback<Void> callback);
+
+    /**
+     * Sets the current slide so any audience members can switch to it.
+     *
+     * @param deckId the deck being presented
+     * @param presentationId the instance of the live presentation
+     * @param slideNum the new slide number
+     */
+    void setCurrentSlide(String deckId, String presentationId, int slideNum);
+
     interface CurrentSlideListener {
         /**
          * Called whenever the current slide of a live presentation changes.
@@ -207,11 +224,21 @@ public interface DB {
 
     /**
      * Add a listener for changes to the current slide of a live presentation.
+     *
+     * @param deckId the deck used in the presentation
+     * @param presentationId the presentation to watch for changes
+     * @param listener notified of changes
      */
-    void addCurrentSlideListener(CurrentSlideListener listener);
+    void addCurrentSlideListener(String deckId, String presentationId,
+                                 CurrentSlideListener listener);
 
     /**
      * Remove a listener that was previously passed to addCurrentSlideListener().
+     *
+     * @param deckId the deck used in the presentation
+     * @param presentationId the presentation being watched for changes
+     * @param listener previously passed to addCurrentSlideListener()
      */
-    void removeCurrentSlideListener(CurrentSlideListener listener);
+    void removeCurrentSlideListener(String deckId, String presentationId,
+                                    CurrentSlideListener listener);
 }

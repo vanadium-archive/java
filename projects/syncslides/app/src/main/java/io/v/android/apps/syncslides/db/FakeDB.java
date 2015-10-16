@@ -241,7 +241,23 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void addCurrentSlideListener(CurrentSlideListener listener) {
+    public void joinPresentation(String syncgroupName, final Callback<Void> callback) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.done(null);
+            }
+        });
+    }
+
+    @Override
+    public void setCurrentSlide(String deckId, String presentationId, int slideNum) {
+
+    }
+
+    @Override
+    public void addCurrentSlideListener(String deckId, String presentationId,
+                                        CurrentSlideListener listener) {
         mCurrentSlideListeners.add(listener);
         // TODO(kash): It would be better to fire off a notification of the current
         // slide right away.  That requires storing the current slide in some
@@ -249,7 +265,8 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void removeCurrentSlideListener(CurrentSlideListener listener) {
+    public void removeCurrentSlideListener(String deckId, String presentationId,
+                                           CurrentSlideListener listener) {
         mCurrentSlideListeners.remove(listener);
     }
 
