@@ -18,7 +18,6 @@ public class ParticipantScannerFake implements ParticipantScanner {
     private int mCounter = 0;
 
     public Set<Participant> scan() {
-        Log.d(TAG, "Fake scanning...");
         mCounter = (mCounter + 1) % 10;
         HashSet<Participant> participants = new HashSet<>();
         if (mCounter >= 2 && mCounter <= 8) {

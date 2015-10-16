@@ -5,6 +5,8 @@
 package io.v.android.apps.syncslides.discovery;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -37,10 +39,12 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     private final PeriodicTasker mTasker = new PeriodicTasker();
     private final List<Participant> mParticipants = new ArrayList<>();
     private Listener mListener;
+    private final Handler mHandler;
 
     private DiscoveryManager(V23Manager manager, Moderator moderator) {
         mV23Manager = manager;
         mModerator = moderator;
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     public DiscoveryManager start(Context context) {
@@ -84,14 +88,26 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     public void onTaskDone() {
         for (Participant p : mModerator.getFreshman()) {
             assert mParticipants.indexOf(p) == NOT_FOUND;
-            mParticipants.add(0, p);
-            mListener.notifyItemInserted(0);
+            final Participant fp = p;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mParticipants.add(0, fp);
+                    mListener.notifyItemInserted(0);
+                }
+            });
         }
         for (Participant p : mModerator.getGraduated()) {
-            int index = mParticipants.indexOf(p);
-            assert index != NOT_FOUND;
-            mParticipants.remove(index);
-            mListener.notifyItemRemoved(index);
+            final Participant fp = p;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    int index = mParticipants.indexOf(fp);
+                    assert index != NOT_FOUND;
+                    mParticipants.remove(index);
+                    mListener.notifyItemRemoved(index);
+                }
+            });
         }
     }
 

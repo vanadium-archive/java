@@ -61,7 +61,6 @@ class Moderator implements Runnable {
         if (mObserver == null) {
             throw new IllegalStateException("Must have an observer.");
         }
-        Log.d(TAG, "Run #" + mCounter);
         try {
             mCounter++;
             process(mScanner.scan());
