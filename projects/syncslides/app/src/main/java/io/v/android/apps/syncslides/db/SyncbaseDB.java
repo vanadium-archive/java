@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -107,7 +108,6 @@ public class SyncbaseDB implements DB {
     private Context mContext;
     private VContext mVContext;
     private Database mDB;
-    private DeckList mDeckList;
     private Table mDecks;
     private Table mNotes;
     private Table mPresentations;
@@ -209,7 +209,12 @@ public class SyncbaseDB implements DB {
         try {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             String id = tm.getDeviceId();
-
+            if (id == null) {
+                // NOTE(spetrovic): on a tablet, there is no TelephonyManager, so we try something
+                // else.
+                id = Settings.Secure.getString(
+                        mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+            }
             mVContext = SyncbaseServer.withNewServer(mVContext, new SyncbaseServer.Params()
                     .withPermissions(mPermissions)
                     .withName(NamingUtil.join("/", PI_MILK_CRATE, id))
@@ -249,7 +254,6 @@ public class SyncbaseDB implements DB {
             return;
         }
         mInitialized = true;
-        mDeckList = new DeckList(mVContext, mDB);
     }
 
     @Override
@@ -267,31 +271,29 @@ public class SyncbaseDB implements DB {
         if (!mInitialized) {
             return new NoopList<>();
         }
-        return mDeckList;
+        return new DeckList(mVContext, mDB);
     }
 
     private static class DeckList implements DBList {
 
-        private final VContext mVContext;
+        private final CancelableVContext mVContext;
         private final Database mDB;
         private final Handler mHandler;
-        private final Thread mFetcher;
         private volatile ResumeMarker mWatchMarker;
         private volatile Listener mListener;
         private List<Deck> mDecks;
 
         public DeckList(VContext vContext, Database db) {
-            mVContext = vContext;
+            mVContext = vContext.withCancel();
             mDB = db;
             mDecks = Lists.newArrayList();
             mHandler = new Handler(Looper.getMainLooper());
-            mFetcher = new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     fetchExistingDecks();
                 }
-            });
-            mFetcher.start();
+            }).start();
         }
 
         private void fetchExistingDecks() {
@@ -302,8 +304,6 @@ public class SyncbaseDB implements DB {
                 mWatchMarker = batch.getResumeMarker(mVContext);
                 DatabaseCore.ResultStream stream = batch.exec(mVContext,
                         "SELECT k, v FROM Decks WHERE Type(v) like \"%VDeck\"");
-                // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
-                // a new VContext so it can be cancelled.
                 for (List<VdlAny> row : stream) {
                     if (row.size() != 2) {
                         throw new VException("Wrong number of columns: " + row.size());
@@ -323,9 +323,7 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
-                // TODO(spetrovic): Uncomment when fixing
-                // https://github.com/vanadium/java/issues/23.
-                //watchForDeckChanges();
+                watchForDeckChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
             }
@@ -381,6 +379,7 @@ public class SyncbaseDB implements DB {
                     });
                 }
             }
+            Log.i(TAG, "Deck change thread exiting");
         }
 
         @Override
@@ -406,7 +405,8 @@ public class SyncbaseDB implements DB {
 
         @Override
         public void discard() {
-            mFetcher.interrupt();
+            Log.i(TAG, "Discarding deck list.");
+            mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
         }
 
@@ -686,12 +686,11 @@ public class SyncbaseDB implements DB {
     }
 
     private static class SlideList implements DBList {
-        private final VContext mVContext;
+        private final CancelableVContext mVContext;
         private final Database mDB;
         private final Handler mHandler;
-        private final Thread mFetcher;
         private final String mDeckId;
-        private volatile ResumeMarker mWatchMarker;
+        private ResumeMarker mWatchMarker;
         // Storage for slides, mirroring the slides in the Syncbase.  Since slide numbers can
         // have "holes" in them (e.g., 1, 2, 4, 6, 8), we maintain a map from slide key
         // to the slide, as well as an ordered list which is returned to the caller.
@@ -701,19 +700,18 @@ public class SyncbaseDB implements DB {
 
         public SlideList(VContext vContext, Database db, String deckId) {
             Log.i(TAG, "Fetching slides for " + deckId);
-            mVContext = vContext;
+            mVContext = vContext.withCancel();
             mDB = db;
             mDeckId = deckId;
             mSlidesMap = new TreeMap<>();
             mSlides = Lists.newArrayList();
             mHandler = new Handler(Looper.getMainLooper());
-            mFetcher = new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     fetchExistingSlides();
                 }
-            });
-            mFetcher.start();
+            }).start();
         }
 
         private void fetchExistingSlides() {
@@ -728,8 +726,6 @@ public class SyncbaseDB implements DB {
                 String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%VSlide\" " +
                         "AND k LIKE \"" + NamingUtil.join(mDeckId, "slides") + "%\"";
                 DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
-                // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
-                // a new VContext so it can be cancelled.
                 for (List<VdlAny> row : stream) {
                     if (row.size() != 2) {
                         throw new VException("Wrong number of columns: " + row.size());
@@ -749,9 +745,7 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
-                // TODO(spetrovic): Uncomment when fixing
-                // https://github.com/vanadium/java/issues/23.
-                //watchForSlideChanges();
+                watchForSlideChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
             }
@@ -766,6 +760,7 @@ public class SyncbaseDB implements DB {
                 Log.e(TAG, "Couldn't watch for changes to the Decks table: " + e.toString());
                 return;
             }
+
             for (WatchChange change : changeStream) {
                 if (!change.getTableName().equals(DECKS_TABLE)) {
                     Log.e(TAG, "Wrong change table name: " + change.getTableName() + ", wanted: " +
@@ -807,6 +802,7 @@ public class SyncbaseDB implements DB {
                     });
                 }
             }
+            Log.i(TAG, "Slides watcher thread exiting");
         }
 
         @Override
@@ -826,7 +822,8 @@ public class SyncbaseDB implements DB {
 
         @Override
         public void discard() {
-            mFetcher.interrupt();
+            Log.i(TAG, "Discarding slides list");
+            mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
         }
 
