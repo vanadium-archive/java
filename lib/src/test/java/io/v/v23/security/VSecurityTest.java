@@ -57,6 +57,16 @@ public class VSecurityTest extends TestCase {
             fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
                     Arrays.toString(blessings)));
         }
+        blessings = VSecurity.getBlessingNames(p2, aliceWorkFriend);
+        if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
+            fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
+                    Arrays.toString(blessings)));
+        }
+        blessings = VSecurity.getBlessingNames(p1, aliceWorkFriend);
+        if (!Arrays.equals(new String[]{}, blessings)) {
+            fail(String.format("Expected blessings [], got %s",
+                    Arrays.toString(blessings)));
+        }
     }
 
     public void testSigning() throws Exception {

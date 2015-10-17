@@ -101,8 +101,8 @@ public class ChatChannel {
         VPrincipal principal = V.getPrincipal(ctx);
         Blessings defaultBlessings = principal.blessingStore().defaultBlessings();
         List<BlessingPattern> patterns = new ArrayList<>();
-        for (String key : principal.blessingsInfo(defaultBlessings).keySet()) {
-            patterns.add(new BlessingPattern(key));
+        for (String blessing := VSecurity.getBlessingNames(principal, defaultBlessings)) {
+                patterns.add(new BlessingPattern(blessing))
         }
         AccessList myAcl = new AccessList(patterns, ImmutableList.<String>of());
         AccessList openAcl = new AccessList(ImmutableList.of(new BlessingPattern("...")),

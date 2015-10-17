@@ -5,22 +5,15 @@
 package io.v.v23.security;
 
 import com.google.common.collect.ImmutableList;
-
 import io.v.v23.context.VContext;
-import org.joda.time.DateTime;
-
-import io.v.v23.security.access.PermissionsAuthorizer;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.security.access.PermissionsAuthorizer;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
+import java.security.*;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +25,8 @@ public class VSecurity {
     private static native String[] nativeGetRemoteBlessingNames(VContext context, Call call)
             throws VException;
     private static native String[] nativeGetLocalBlessingNames(VContext context, Call call)
+            throws VException;
+    private static native String[] nativeGetBlessingNames(VPrincipal principal, Blessings blessings)
             throws VException;
     private static native String[] nativeGetSigningBlessingNames(VContext context,
             VPrincipal principal, Blessings blessings) throws VException;
@@ -190,9 +185,8 @@ public class VSecurity {
     /**
      * Returns the set of human-readable blessing names presented by the local end of the call.
      * <p>
-     * The blessing names are guaranteed to be rooted in {@code call.localPrincipal().roots()}.
-     * <p>
-     * This method does not validate caveats on the blessing names.
+     * This is merely a convenience over
+     * {@code getBlessingNames(call.localPrincipal(), call.localBlessings())}
      *
      * @param  context vanadium context
      * @param  call    security-related state associated with the call
@@ -204,6 +198,30 @@ public class VSecurity {
             return nativeGetLocalBlessingNames(context, call);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get blessings for call", e);
+        }
+    }
+
+    /**
+     * Returns the set of human-readable blessing names encapsulated in blessings.
+     * <p>
+     * The returned names are guaranteed to be rooted in {@link VPrincipal#roots}
+     * though caveats may not be validated.
+     * <p>
+     * The blessings must be bound to the provided principal. There is
+     * intentionally not API to obtain blessing names bound to other principals
+     * by ignoring caveats.  This is to prevent accidental authorization based
+     * on potentially invalid blessing names (since caveats are not validated).
+     *
+     * @param principal principal to which the provided blessings are bound
+     * @param blessings the blessings whose names are to be extracted
+     * @return          set of blessing names bound to principal, encapsulated
+     *                  in blessings (possibly empty, but never {@code null})
+     */
+    public static String[] getBlessingNames(VPrincipal principal, Blessings blessings) {
+        try {
+            return nativeGetBlessingNames(principal, blessings);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get blessing names", e);
         }
     }
 

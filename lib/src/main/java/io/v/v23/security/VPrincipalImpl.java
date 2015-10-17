@@ -47,8 +47,6 @@ class VPrincipalImpl implements VPrincipal {
             throws VException;
     private native VSignature nativeSign(long nativePtr, byte[] message) throws VException;
     private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
-    private native Map<String, Caveat[]> nativeBlessingsInfo(long nativePtr, Blessings blessings)
-            throws VException;
     private native BlessingStore nativeBlessingStore(long nativePtr) throws VException;
     private native BlessingRoots nativeRoots(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
@@ -87,15 +85,6 @@ class VPrincipalImpl implements VPrincipal {
             return nativePublicKey(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
-        }
-    }
-    @Override
-    public Map<String, Caveat[]> blessingsInfo(Blessings blessings) {
-        try {
-            return nativeBlessingsInfo(nativePtr, blessings);
-        } catch (VException e) {
-            throw new RuntimeException(
-                    "Couldn't get human-readable strings for blessings", e);
         }
     }
     @Override
