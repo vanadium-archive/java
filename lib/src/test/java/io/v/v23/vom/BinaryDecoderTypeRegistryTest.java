@@ -15,7 +15,7 @@ import io.v.testing.SkipOnAndroid;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlBool;
 import io.v.v23.vdl.VdlType;
-import io.v.v23.vom.testdata.NBool;
+import io.v.v23.vom.testdata.types.NBool;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -32,7 +32,7 @@ public class BinaryDecoderTypeRegistryTest {
 
     @Test
     public void testGuessType() throws Exception {
-        VdlType vdlType = Types.named("v.io/v23/vom/testdata.NBool", Types.BOOL);
+        VdlType vdlType = Types.named("v.io/v23/vom/testdata/types.NBool", Types.BOOL);
         String encoded = TestUtil.encode(new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
         try {

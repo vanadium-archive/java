@@ -25,8 +25,8 @@ import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlUint64;
 import io.v.v23.vdl.VdlUnion;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.vom.testdata.Constants;
-import io.v.v23.vom.testdata.NStruct;
+import io.v.v23.vom.testdata.data80.Constants;
+import io.v.v23.vom.testdata.types.NStruct;
 
 import java.util.Map;
 
@@ -62,7 +62,7 @@ public class BinaryEncoderTest extends TestCase {
             .build();
 
     public void testEncode() throws Exception {
-        for (io.v.v23.vom.testdata.TestCase test : Constants.TESTS) {
+        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
             VdlAny value = test.getValue();
             if (value.getElemType() == null) {
               assertEquals(test.getHex(), TestUtil.encode(VdlAny.VDL_TYPE, null));
