@@ -127,12 +127,6 @@ public class SyncbaseDB implements DB {
         }
         mHandler = new Handler(Looper.getMainLooper());
         mVContext = V.init(mContext);
-        try {
-            mVContext = V.withListenSpec(
-                    mVContext, V.getListenSpec(mVContext).withProxy("proxy"));
-        } catch (VException e) {
-            handleError("Couldn't setup vanadium proxy: " + e.getMessage());
-        }
         // TODO(kash): Set proper ACLs.
         AccessList acl = new AccessList(
                 ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
@@ -287,7 +281,7 @@ public class SyncbaseDB implements DB {
 
             // Create the syncgroup.
             final String syncgroupName = NamingUtil.join(
-                    mSyncbaseServer.getStatus().getMounts()[1].getName(),
+                    mSyncbaseServer.getStatus().getMounts()[0].getName(),
                     "%%sync/syncslides",
                     prefix);
             //final String syncgroupName = STATIC_SYNCGROUP;
