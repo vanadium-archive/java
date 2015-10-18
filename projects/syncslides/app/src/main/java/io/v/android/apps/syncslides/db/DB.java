@@ -12,6 +12,7 @@ import java.util.List;
 
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Slide;
 
 /**
@@ -78,33 +79,6 @@ public interface DB {
          * Indicates that the list is no longer needed and should stop notifying its listener.
          */
         void discard();
-    }
-
-    /**
-     * Add user to presenter's question queue.
-     *
-     * @param identity the user's identity name
-     */
-    void askQuestion(String identity);
-
-    /**
-     * Fetch the list of identities asking questions for the given deck.
-     *
-     * @param deckId   the deck to fetch
-     * @param callback runs on the UI thread when the slide data is loaded
-     */
-    void getQuestionerList(String deckId, QuestionerListener callback);
-
-    /** Listener for changes in the Q&A queue.
-     *
-     */
-    interface QuestionerListener {
-        /**
-         * This callback is run on the UI thread to detect changes in the number of questions asked.
-         *
-         * @param questionerList the list of identities in the questions queue
-         */
-        void onChange(String[] questionerList);
     }
 
     /**
@@ -241,4 +215,45 @@ public interface DB {
      */
     void removeCurrentSlideListener(String deckId, String presentationId,
                                     CurrentSlideListener listener);
+
+    interface QuestionListener {
+        /**
+         * Called whenever the set of questions changes.
+         *
+         * @param questions the new, complete set of questions
+         */
+        void onChange(List<Question> questions);
+    }
+
+    /**
+     * Set the listener for changes to the set of questions for a live presentation.
+     * There can be only one listener at a time.
+     *
+     * @param deckId the deck used in the presentation
+     * @param presentationId the presentation to watch for changes
+     * @param listener notified of changes
+     */
+    void setQuestionListener(String deckId, String presentationId,
+                             QuestionListener listener);
+
+    /**
+     * Remove the listener that was previously passed to setQuestionListener().
+     *
+     * @param deckId the deck used in the presentation
+     * @param presentationId the presentation being watched for changes
+     * @param listener previously passed to setQuestionListener()
+     */
+    void removeQuestionListener(String deckId, String presentationId,
+                                QuestionListener listener);
+
+    /**
+     * Add user to presenter's question queue.
+     *
+     * @param deckId the deck used in the presentation
+     * @param presentationId the presentation identifier
+     * @param firstName the user's first name
+     * @param lastName the user's last name
+     */
+    void askQuestion(String deckId, String presentationId,
+                     String firstName, String lastName);
 }

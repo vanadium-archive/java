@@ -15,18 +15,25 @@ import android.util.Log;
 
 import com.google.common.collect.Lists;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Listener;
+import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Slide;
 
 /**
@@ -71,6 +78,10 @@ public class FakeDB implements DB {
     private List<CurrentSlideListener> mCurrentSlideListeners;
     private Thread mCurrentSlideWatcher;
 
+    private final List<Question> mQuestions;
+    private final List<QuestionListener> mQuestionListeners;
+    private Thread mQuestionWatcher;
+
     public FakeDB(Context context) {
         Slide[] slides = new Slide[SLIDEDRAWABLES.length];
         for (int i = 0; i < slides.length; ++i) {
@@ -94,6 +105,25 @@ public class FakeDB implements DB {
             }
         });
         mCurrentSlideWatcher.start();
+
+        mQuestions = Lists.newArrayList();
+        Random random = new Random();
+        for (int i = 0; i < 5; i++) {
+            Question question = new Question(
+                    "queston"+i,
+                    "Questioner",
+                    "#"+i,
+                    DateTime.now().minus(Period.minutes(random.nextInt(5))));
+            mQuestions.add(question);
+        }
+        mQuestionListeners = Lists.newArrayList();
+        mQuestionWatcher = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                watchQuestions();
+            }
+        });
+        mQuestionWatcher.start();
     }
 
     private static class FakeSlide implements Slide {
@@ -204,21 +234,9 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void askQuestion(String identity) {
-        //TODO(afergan): send identity to syncbase
-    }
-
-    @Override
-    public void getQuestionerList(String deckId, final QuestionerListener callback) {
-        final String[] questionerList = new String[]{
-                "Audience member #1", "Audience member #2", "Audience member #3"};
-        // Run the callback asynchronously on the UI thread.
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onChange(questionerList);
-            }
-        });
+    public void askQuestion(String deckId, String presentationId,
+                            String firstName, String lastName) {
+        // Nothing to do.
     }
 
     @Override
@@ -268,6 +286,16 @@ public class FakeDB implements DB {
     public void removeCurrentSlideListener(String deckId, String presentationId,
                                            CurrentSlideListener listener) {
         mCurrentSlideListeners.remove(listener);
+    }
+
+    @Override
+    public void setQuestionListener(String deckId, String presentationId, QuestionListener listener) {
+        mQuestionListeners.add(listener);
+    }
+
+    @Override
+    public void removeQuestionListener(String deckId, String presentationId, QuestionListener listener) {
+        mQuestionListeners.remove(listener);
     }
 
     @Override
@@ -351,6 +379,28 @@ public class FakeDB implements DB {
             }
         } catch (InterruptedException e) {
             Log.e(TAG, "Current Slide Watcher interrupted " + e);
+        }
+    }
+
+    private void watchQuestions() {
+        try {
+            Random random = new Random();
+            while (!Thread.currentThread().isInterrupted()) {
+                Thread.sleep(5000);
+                Collections.shuffle(mQuestions);
+                int numQuestions = random.nextInt(mQuestions.size());
+                final List<Question> questions = mQuestions.subList(0, numQuestions);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (QuestionListener listener : mQuestionListeners) {
+                            listener.onChange(questions);
+                        }
+                    }
+                });
+            }
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Question Watcher interrupted " + e);
         }
     }
 }

@@ -123,9 +123,11 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 Log.d(TAG, "Clicking through to PresentationActivity.");
                 final Context context = v.getContext();
                 if (role == Role.AUDIENCE) {
+                    //String deviceId = "355499060906851";  // Black Nexus 6.
+                    String deviceId = "355499060490393"; // Nexus 6 ZX1G22MLNL
                     DB.Singleton.get(context).joinPresentation(
                             // TODO(kash): Use the real syncgroup name.
-                            "/192.168.86.254:8101/355499060906851/%%sync/syncslides/" +
+                            "/192.168.86.254:8101/"+deviceId+"/%%sync/syncslides/" +
                                     "deckId1/randomPresentationId1",
                             new DB.Callback<Void>() {
                                 @Override

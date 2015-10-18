@@ -95,6 +95,7 @@ public class SyncbaseDB implements DB {
     private static final String NOTES_TABLE = "Notes";
     static final String PRESENTATIONS_TABLE = "Presentations";
     static final String CURRENT_SLIDE = "CurrentSlide";
+    static final String QUESTIONS = "questions";
     private static final String SYNCGROUP_PRESENTATION_DESCRIPTION = "Live Presentation";
     private static final String PI_MILK_CRATE = "192.168.86.254:8101";
 
@@ -112,12 +113,14 @@ public class SyncbaseDB implements DB {
     private Table mDecks;
     private Table mNotes;
     private Table mPresentations;
-    private Map<String, CurrentSlideWatcher> mCurrentSlideWatchers;
+    private final Map<String, CurrentSlideWatcher> mCurrentSlideWatchers;
+    private final Map<String, QuestionWatcher> mQuestionWatchers;
     private Server mSyncbaseServer;
 
     SyncbaseDB(Context context) {
         mContext = context;
         mCurrentSlideWatchers = Maps.newHashMap();
+        mQuestionWatchers = Maps.newHashMap();
     }
 
     @Override
@@ -250,7 +253,7 @@ public class SyncbaseDB implements DB {
         }
         mInitialized = true;
     }
-    
+
     @Override
     public void createPresentation(final String deckId,
                                    final Callback<CreatePresentationResult> callback) {
@@ -385,16 +388,6 @@ public class SyncbaseDB implements DB {
                 }
             }
         }).start();
-    }
-
-    @Override
-    public void askQuestion(String identity) {
-
-    }
-
-    @Override
-    public void getQuestionerList(String deckId, QuestionerListener callback) {
-
     }
 
     @Override
@@ -885,6 +878,54 @@ public class SyncbaseDB implements DB {
         if (!watcher.hasListeners()) {
             mCurrentSlideWatchers.remove(key);
         }
+    }
+
+    @Override
+    public void setQuestionListener(String deckId, String presentationId,
+                                    QuestionListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        QuestionWatcher oldWatcher = mQuestionWatchers.get(key);
+        if (oldWatcher != null) {
+            oldWatcher.discard();
+        }
+        QuestionWatcher watcher = new QuestionWatcher(
+                new WatcherState(mVContext, mDB, deckId, presentationId),
+                listener);
+        mQuestionWatchers.put(key, watcher);
+    }
+
+    @Override
+    public void removeQuestionListener(String deckId, String presentationId, QuestionListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        QuestionWatcher oldWatcher = mQuestionWatchers.get(key);
+        if (oldWatcher != null) {
+            mQuestionWatchers.remove(oldWatcher);
+            oldWatcher.discard();
+        }
+    }
+
+    @Override
+    public void askQuestion(final String deckId, final String presentationId,
+                            final String firstName, final String lastName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String rowKey = NamingUtil.join(deckId, presentationId, QUESTIONS,
+                            UUID.randomUUID().toString());
+                    Log.i(TAG, "Writing row " + rowKey + " with " + firstName + " " + lastName);
+                    VQuestion question = new VQuestion(
+                            new VPerson(firstName, lastName),
+                            System.currentTimeMillis(),
+                            false // Not yet answered.
+                    );
+                    mPresentations.put(mVContext, rowKey, question, VQuestion.class);
+                    // TODO(kash): Set the ACL so nobody else can modify the question.
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
     }
 
     private void handleError(String msg) {

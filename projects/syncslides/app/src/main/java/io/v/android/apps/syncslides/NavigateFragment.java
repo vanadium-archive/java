@@ -30,6 +30,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Slide;
 
 /**
@@ -72,7 +73,8 @@ public class NavigateFragment extends Fragment {
     private EditText mNotes;
     private List<Slide> mSlides;
     private Role mRole;
-    private String[] mQuestionerList;
+    private List<Question> mQuestionList;
+    private DB.QuestionListener mQuestionListener;
     private boolean mEditing;
     private int mQuestionerPosition;
     private boolean mSynced;
@@ -233,20 +235,6 @@ public class NavigateFragment extends Fragment {
                 }
             }
         });
-        if (mRole == Role.PRESENTER) {
-            mDB.getQuestionerList(mDeckId, new DB.QuestionerListener() {
-                @Override
-                public void onChange(String[] questionerList) {
-                    mQuestionerList = questionerList;
-                    if (mQuestionerList.length > 0) {
-                        mQuestionsNum.setVisibility(View.VISIBLE);
-                        mQuestionsNum.setText(String.valueOf(mQuestionerList.length));
-                    } else {
-                        mQuestionsNum.setVisibility(View.INVISIBLE);
-                    }
-                }
-            });
-        }
 
         return rootView;
     }
@@ -264,6 +252,21 @@ public class NavigateFragment extends Fragment {
             };
             mDB.addCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         }
+        if (mRole == Role.PRESENTER) {
+            mQuestionListener = new DB.QuestionListener() {
+                @Override
+                public void onChange(List<Question> questions) {
+                    mQuestionList = questions;
+                    if (mQuestionList.size() > 0) {
+                        mQuestionsNum.setVisibility(View.VISIBLE);
+                        mQuestionsNum.setText(String.valueOf(mQuestionList.size()));
+                    } else {
+                        mQuestionsNum.setVisibility(View.INVISIBLE);
+                    }
+                }
+            };
+            mDB.setQuestionListener(mDeckId, mPresentationId, mQuestionListener);
+        }
     }
 
     @Override
@@ -272,6 +275,9 @@ public class NavigateFragment extends Fragment {
         ((PresentationActivity) getActivity()).setUiImmersive(false);
         if (mRole == Role.AUDIENCE) {
             mDB.removeCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
+        }
+        if (mRole == Role.PRESENTER) {
+            mDB.removeQuestionListener(mDeckId, mPresentationId, mQuestionListener);
         }
     }
 
@@ -385,18 +391,28 @@ public class NavigateFragment extends Fragment {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         switch (mRole) {
             case AUDIENCE:
-                db.askQuestion("Audience member #1");
+                db.askQuestion(mDeckId, mPresentationId, "Audience member", "#1");
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(),
                         "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
                 toast.show();
                 break;
             case PRESENTER:
-                DialogFragment dialog = QuestionDialogFragment.newInstance(mQuestionerList);
+                if (mQuestionList == null || mQuestionList.size() == 0) {
+                    break;
+                }
+                // TODO(kash): It would be better to pass the entire Question to the dialog.
+                String[] questioners = new String[mQuestionList.size()];
+                for (int i = 0; i < mQuestionList.size(); i++) {
+                    questioners[i] = mQuestionList.get(i).getFirstName() + " "
+                            + mQuestionList.get(i).getLastName();
+                }
+                DialogFragment dialog = QuestionDialogFragment.newInstance(questioners);
                 dialog.setTargetFragment(this, DIALOG_REQUEST_CODE);
                 dialog.show(getFragmentManager(), "QuestionerDialogFragment");
                 break;
             case BROWSER:
                 // Do nothing.
+                break;
         }
     }
 
@@ -452,7 +468,9 @@ public class NavigateFragment extends Fragment {
 
         ((PresentationActivity) getActivity()).setUiImmersive(true);
         Snackbar snack = Snackbar.make(getView(), getResources().getString(
-                        R.string.handoff_message) + " " + mQuestionerList[mQuestionerPosition],
+                        R.string.handoff_message) + " "
+                        + mQuestionList.get(mQuestionerPosition).getFirstName() + " "
+                        + mQuestionList.get(mQuestionerPosition).getLastName(),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getResources().getString(R.string.end_handoff),
                         snackbarClickListener)
