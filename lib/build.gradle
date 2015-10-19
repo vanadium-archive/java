@@ -104,7 +104,7 @@ task generateVdl(type: Exec, dependsOn: deleteVdl) {
     commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
 }
 
-tasks.'compileJava'.dependsOn(generateVdl)
+tasks.'processResources'.dependsOn(generateVdl)
 
 task checkVanadiumEnvironment {
     VanadiumEnvironment.getVanadiumEnvironment()
