@@ -404,8 +404,8 @@ public class SyncbaseDB implements DB {
         private final Database mDB;
         private final Handler mHandler;
         private ResumeMarker mWatchMarker;
-        private volatile boolean mIsDiscarded;
-        private volatile Listener mListener;
+        private boolean mIsDiscarded;
+        private Listener mListener;
         private List<Deck> mDecks;
 
         public DeckList(VContext vContext, Database db) {
@@ -530,18 +530,20 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public synchronized void discard() {
+        public void discard() {
             Log.i(TAG, "Discarding deck list.");
+            mIsDiscarded = true;
             mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
-            // We've canceled all the pending callbacks, but the handler might be just about
-            // to execute put()/get() and those messages wouldn't get canceled.  So we mark
-            // the list as discarded and count on put()/get() checking for it. (Note that
-            // put()/get() are synchronized along with this method.)
-            mIsDiscarded = true;
         }
 
-        private synchronized void put(Deck deck) {
+        private void put(Deck deck) {
+            // We need to check for mIsDiscarded (even though removeCallbacksAndMessages() has
+            // been called), because that method doesn't prevent future post()s being made on
+            // the handler.  So the following scenario is possible:
+            //    - fetcher thread is about to execute post().
+            //    - discard clears all pending messages from the handler.
+            //    - fetcher executes the post().
             if (mIsDiscarded) {
                 return;
             }
@@ -568,7 +570,13 @@ public class SyncbaseDB implements DB {
             }
         }
 
-        private synchronized void delete(String deckId) {
+        private void delete(String deckId) {
+            // We need to check for mIsDiscarded (even though removeCallbacksAndMessages() has
+            // been called), because that method doesn't prevent future post()s being made on
+            // the handler.  So the following scenario is possible:
+            //    - fetcher thread is about to execute post().
+            //    - discard clears all pending messages from the handler.
+            //    - fetcher executes the post().
             if (mIsDiscarded) {
                 return;
             }
@@ -643,7 +651,7 @@ public class SyncbaseDB implements DB {
         private final Handler mHandler;
         private final String mDeckId;
         private ResumeMarker mWatchMarker;
-        private volatile boolean mIsDiscarded;
+        private boolean mIsDiscarded;
         // Storage for slides, mirroring the slides in the Syncbase.  Since slide numbers can
         // have "holes" in them (e.g., 1, 2, 4, 6, 8), we maintain a map from slide key
         // to the slide, as well as an ordered list which is returned to the caller.
@@ -775,18 +783,20 @@ public class SyncbaseDB implements DB {
         }
 
         @Override
-        public synchronized void discard() {
+        public void discard() {
             Log.i(TAG, "Discarding slides list");
+            mIsDiscarded = true;
             mVContext.cancel();  // this will cause the watcher thread to exit
             mHandler.removeCallbacksAndMessages(null);
-            // We've canceled all the pending callbacks, but the handler might be just about
-            // to execute put()/get() and those messages wouldn't get canceled.  So we mark
-            // the list as discarded and count on put()/get() checking for it. (Note that
-            // put()/get() are synchronized along with this method.)
-            mIsDiscarded = true;
         }
 
-        private synchronized void put(String key, Slide slide) {
+        private void put(String key, Slide slide) {
+            // We need to check for mIsDiscarded (even though removeCallbacksAndMessages() has
+            // been called), because that method doesn't prevent future post()s being made on
+            // the handler.  So the following scenario is possible:
+            //    - fetcher thread is about to execute post().
+            //    - discard clears all pending messages from the handler.
+            //    - fetcher executes the post().
             if (mIsDiscarded) {
                 return;
             }
@@ -806,7 +816,13 @@ public class SyncbaseDB implements DB {
             }
         }
 
-        private synchronized void delete(String key) {
+        private void delete(String key) {
+            // We need to check for mIsDiscarded (even though removeCallbacksAndMessages() has
+            // been called), because that method doesn't prevent future post()s being made on
+            // the handler.  So the following scenario is possible:
+            //    - fetcher thread is about to execute post().
+            //    - discard clears all pending messages from the handler.
+            //    - fetcher executes the post().
             if (mIsDiscarded) {
                 return;
             }
