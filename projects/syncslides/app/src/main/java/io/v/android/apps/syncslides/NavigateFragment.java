@@ -45,9 +45,9 @@ public class NavigateFragment extends Fragment {
     private static final String PRESENTATION_ID_KEY = "presentation_id_key";
     private static final String SLIDE_NUM_KEY = "slide_num_key";
     private static final String ROLE_KEY = "role_key";
-    private static final String SYNCED_KEY = "synced_key";
     private static final int DIALOG_REQUEST_CODE = 23;
 
+    // TODO(afergan): Move state variables to activity.
     private String mDeckId;
     private String mPresentationId;
     /**
@@ -82,25 +82,14 @@ public class NavigateFragment extends Fragment {
     private DB mDB;
     private TextView mSlideNumText;
 
-    public static NavigateFragment newInstanceSynced(
+    public static NavigateFragment newInstance(
             String deckId, String presentationId, int slideNum, Role role) {
-        return newInstance(deckId, presentationId, slideNum, role, true);
-    }
-
-    public static NavigateFragment newInstanceUnsynced(
-            String deckId, String presentationId, int slideNum, Role role) {
-        return newInstance(deckId, presentationId, slideNum, role, false);
-    }
-
-    private static NavigateFragment newInstance(
-            String deckId, String presentationId, int slideNum, Role role, boolean synced) {
         NavigateFragment fragment = new NavigateFragment();
         Bundle args = new Bundle();
         args.putString(DECK_ID_KEY, deckId);
         args.putString(PRESENTATION_ID_KEY, presentationId);
         args.putInt(SLIDE_NUM_KEY, slideNum);
         args.putSerializable(ROLE_KEY, role);
-        args.putBoolean(SYNCED_KEY, synced);
         fragment.setArguments(args);
         return fragment;
     }
@@ -122,12 +111,14 @@ public class NavigateFragment extends Fragment {
         }
         mDeckId = args.getString(DECK_ID_KEY);
         mPresentationId = args.getString(PRESENTATION_ID_KEY);
-        mCurrentSlideNum = 0;
         mLoadingCurrentSlide = -1;
         mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
-        mSynced = args.getBoolean(SYNCED_KEY);
-
+        if (((PresentationActivity) getActivity()).getSynced()) {
+            sync();
+        } else {
+            unsync();
+        }
         final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
         mFabSync = rootView.findViewById(R.id.audience_sync_fab);
         if (mSynced || mRole != Role.AUDIENCE) {
@@ -189,12 +180,13 @@ public class NavigateFragment extends Fragment {
                 }
             }
         });
-        mSlideNumText = (TextView) rootView.findViewById(R.id.slide_num_text);
 
+        mSlideNumText = (TextView) rootView.findViewById(R.id.slide_num_text);
         mNotes = (EditText) rootView.findViewById(R.id.notes);
         mNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                ((PresentationActivity) getActivity()).getSupportActionBar().show();
                 mEditing = hasFocus;
                 getActivity().invalidateOptionsMenu();
                 unsync();
@@ -213,7 +205,11 @@ public class NavigateFragment extends Fragment {
         slideListIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((PresentationActivity)getActivity()).showSlideList();
+                if (mRole == Role.AUDIENCE) {
+                    ((PresentationActivity) getActivity()).showSlideList();
+                } else {
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
             }
         });
         mQuestionsNum = (TextView) rootView.findViewById(R.id.questions_num);
@@ -288,7 +284,6 @@ public class NavigateFragment extends Fragment {
         outState.putString(PRESENTATION_ID_KEY, mPresentationId);
         outState.putInt(SLIDE_NUM_KEY, mUserSlideNum);
         outState.putSerializable(ROLE_KEY, mRole);
-        outState.putBoolean(SYNCED_KEY, mSynced);
     }
 
     @Override
@@ -320,6 +315,7 @@ public class NavigateFragment extends Fragment {
     private void unsync() {
         if (mRole == Role.AUDIENCE && mSynced) {
             mSynced = false;
+            ((PresentationActivity) getActivity()).setUnsynced();
             mFabSync.setVisibility(View.VISIBLE);
         }
     }
@@ -327,6 +323,7 @@ public class NavigateFragment extends Fragment {
     private void sync() {
         mSynced = true;
         mUserSlideNum = mCurrentSlideNum;
+        ((PresentationActivity) getActivity()).setSynced();
         updateView();
     }
 

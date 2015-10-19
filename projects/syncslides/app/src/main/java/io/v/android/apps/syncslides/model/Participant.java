@@ -55,5 +55,6 @@ public interface Participant {
         public static final String PARTICIPANT_ROLE = "participant_role";
         public static final String PARTICIPANT_END_POINT = "participant_endPoint";
         public static final String PARTICIPANT_NAME = "participant_name";
+        public static final String PARTICIPANT_SYNCED = "participant_synced";
     }
 }

@@ -30,6 +30,9 @@ public class PresentationActivity extends AppCompatActivity {
      * of the activity.
      */
     private Role mRole;
+    // TODO(kash): Replace this with the presentation id.
+    private String mPresentationId = "randomPresentation1";
+    private boolean mSynced;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +48,12 @@ public class PresentationActivity extends AppCompatActivity {
             mDeck = DeckImpl.fromBundle(getIntent().getExtras());
             mRole = (Role) getIntent().getSerializableExtra(
                     Participant.B.PARTICIPANT_ROLE);
+            mSynced = true;
         } else {
             Log.d(TAG, "savedInstanceState is NOT null");
             mDeck = DeckImpl.fromBundle(savedInstanceState);
             mRole = (Role) savedInstanceState.get(Participant.B.PARTICIPANT_ROLE);
+            mSynced = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SYNCED);
         }
 
         // TODO(jregan): This appears to be an attempt to avoid fragment
@@ -62,12 +67,6 @@ public class PresentationActivity extends AppCompatActivity {
 
         // If this is an audience member, we want them to jump straight to the fullscreen view.
         if (mRole == Role.AUDIENCE) {
-            NavigateFragment fragment = NavigateFragment.newInstanceSynced(
-                    mDeck.getId(), "randomPresentationId1", 0, mRole);
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment, fragment)
-                    .commit();
             showFullscreenSlide(0);
         } else {
             showSlideList();
@@ -85,6 +84,7 @@ public class PresentationActivity extends AppCompatActivity {
     private Bundle packBundle(Bundle b) {
         mDeck.toBundle(b);
         b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
+        b.putBoolean(Participant.B.PARTICIPANT_SYNCED, mSynced);
         return b;
     }
 
@@ -126,35 +126,8 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Swap out the current fragment for a NavigateFragment. The presenter and
-     * audience members who join live presentations will be synced.
-     *
-     * @param slideNum the slide to show
+     * Start the service for advertising a presentation.
      */
-    public void jumpToSlideSynced(int slideNum) {
-        NavigateFragment fragment = NavigateFragment.newInstanceSynced(
-                mDeck.getId(), "randomPresentationId1", slideNum, mRole);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment, fragment)
-                .commit();
-    }
-
-    /**
-     * Swap out the current fragment for a NavigateFragment. Audience members
-     * who click on a slide from the slide list will start unsynced.
-     *
-     * @param slideNum the slide to show
-     */
-    public void jumpToSlideUnsynced(int slideNum) {
-        NavigateFragment fragment = NavigateFragment.newInstanceUnsynced(
-                mDeck.getId(), "randomPresentationId1", slideNum, mRole);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment, fragment)
-                .commit();
-    }
-
     private void beginAdvertising() {
         Log.d(TAG, "beginAdvertising");
         Intent intent = new Intent(this, ParticipantPeer.class);
@@ -181,27 +154,82 @@ public class PresentationActivity extends AppCompatActivity {
             }
         });
         mRole = Role.PRESENTER;
-        jumpToSlideSynced(0);
+        showNavigateFragment(0);
     }
 
     /**
-     * Adds the FullscreenSlideFragment to the main container and back stack.
+     * Switches to the fullscreen immersive slide presentation view.
      *
-     * @param slideNum the number of the slide to show full screen
+     * @param slideNum the number of the slide to show fullscreen
      */
     public void showFullscreenSlide(int slideNum) {
-        FullscreenSlideFragment fullscreenSlideFragment =
-                FullscreenSlideFragment.newInstance(mDeck.getId(), "randomPresentationId1",
-                        slideNum, mRole);
+        FullscreenSlideFragment fragment =
+                FullscreenSlideFragment.newInstance(
+                        mDeck.getId(), mPresentationId, slideNum, mRole);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
+    }
+
+    /**
+     * Shows the navigate fragment where the user can see the current slide and
+     * navigate to other components of the slide presentation.
+     *
+     * @param slideNum the number of the current slide to show in the fragment
+     */
+    public void showNavigateFragment(int slideNum) {
+        Log.d(TAG, String.valueOf(mSynced));
+        NavigateFragment fragment = NavigateFragment.newInstance(
+                mDeck.getId(), mPresentationId, slideNum, mRole);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
+    }
+
+    /**
+     * Shows the navigate fragment where the user can see the current slide
+     * and navigate to other components of the slide presentation. This version
+     * includes an add to the back stack so that the user can back out from the
+     * navigate fragment to slide list.
+     *
+     * @param slideNum the number of the current slide to show in the fragment
+     */
+    public void showNavigateFragmentWithBackStack(int slideNum) {
+        NavigateFragment fragment = NavigateFragment.newInstance(
+                mDeck.getId(), mPresentationId, slideNum, mRole);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment, fullscreenSlideFragment)
+                .replace(R.id.fragment, fragment)
                 .addToBackStack("")
                 .commit();
     }
 
+    /**
+     * Shows the slide list, where users can see the slides in a presentation
+     * and click on one to browse the deck, or press the play FAB to start
+     * presenting.
+     */
     public void showSlideList() {
-        SlideListFragment slideList = SlideListFragment.newInstance(mDeck.getId(), mRole);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, slideList).commit();
+        SlideListFragment fragment = SlideListFragment.newInstance(mDeck.getId(), mRole);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, fragment).commit();
     }
+
+    /**
+     * Return if the device is synced with the presenter (true if the device
+     * is the presenter).
+     */
+    public boolean getSynced() {
+        return mSynced;
+    }
+
+    /**
+     * Set the device to sync with the presenter.
+     */
+    public void setSynced() {
+        mSynced = true;
+    }
+
+    /**
+     * Unsync the current device with the presenter.
+     */
+    public void setUnsynced() {
+        mSynced = false;
+    }
+
 }

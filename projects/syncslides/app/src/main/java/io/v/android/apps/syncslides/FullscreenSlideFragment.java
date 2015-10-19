@@ -23,6 +23,7 @@ public class FullscreenSlideFragment extends Fragment {
     private static final String SLIDE_NUM_KEY = "slide_num";
     private static final String ROLE_KEY = "role";
 
+    // TODO(afergan): Move state variables to activity.
     private String mDeckId;
     private String mPresentationId;
     private int mSlideNum;
@@ -84,21 +85,20 @@ public class FullscreenSlideFragment extends Fragment {
         mFullScreenImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().popBackStack();
+                ((PresentationActivity)getActivity()).showNavigateFragment(mSlideNum);
             }
         });
-
         return rootView;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (mRole == Role.AUDIENCE) {
+        if (mRole == Role.AUDIENCE && ((PresentationActivity) getActivity()).getSynced()) {
             mCurrentSlideListener = new DB.CurrentSlideListener() {
                 @Override
                 public void onChange(int slideNum) {
-                    FullscreenSlideFragment.this.currentSlideChanged(slideNum);
+                    currentSlideChanged(slideNum);
                 }
             };
             DB.Singleton.get(getActivity().getApplicationContext())
@@ -132,8 +132,7 @@ public class FullscreenSlideFragment extends Fragment {
             return;
         }
         if (slideNum < 0 || slideNum >= mSlides.size()) {
-            getFragmentManager().popBackStack();
-            return;
+            ((PresentationActivity)getActivity()).showNavigateFragment(0);
         }
         mSlideNum = slideNum;
         mFullScreenImage.setImageBitmap(mSlides.get(mSlideNum).getImage());
