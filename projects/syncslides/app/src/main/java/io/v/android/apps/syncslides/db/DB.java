@@ -30,7 +30,7 @@ public interface DB {
                     if (result == null) {
                         // Switch between FakeDB and SyncbaseDB by commenting out one.
                         instance = result = new FakeDB(context);
-                        //instance = result = new SyncbaseDB(context);
+                        // instance = result = new SyncbaseDB(context);
                     }
                 }
             }
@@ -46,14 +46,6 @@ public interface DB {
      * @param activity implements onActivityResult() to call into DB.onActivityResult.
      */
     void init(Activity activity);
-
-    /**
-     * If init() sent an intent to another Activity, the result must be forwarded
-     * from our app's activity to this method.
-     *
-     * @return true if the requestCode matches an intent sent by this implementation.
-     */
-    boolean onActivityResult(int requestCode, int resultCode, Intent data);
 
     /**
      * Provides a list of elements via an API that fits well with RecyclerView.Adapter.

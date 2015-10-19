@@ -20,15 +20,13 @@ import io.v.android.apps.syncslides.model.Participant;
 /**
  * Singleton Discovery manager.
  *
- * Scans a mounttable to look for presentations, and permits mounting of
- * a service representing a live presentation.
+ * Scans a mounttable to look for presentations, and permits mounting of a
+ * service representing a live presentation.
  */
 public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     private static final String TAG = "DiscoveryManager";
     // Search result indicator.
     public static final int NOT_FOUND = -1;
-    // Manages creation, mounting and unmounting of V23 services.
-    private final V23Manager mV23Manager;
     // Scans a mount table to understand who's 'giving a presentation', hence
     // the name moderator.  With each scan, determines who's new
     // (freshman), still there (senior) and gone (graduated).
@@ -36,11 +34,25 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     // Runs the moderator's scan repeatedly.
     private final PeriodicTasker mTasker = new PeriodicTasker();
     private final List<Participant> mParticipants = new ArrayList<>();
-    private Listener mListener;
     private final Handler mHandler;
+    private Listener mListener;
 
-    private DiscoveryManager(V23Manager manager, Moderator moderator) {
-        mV23Manager = manager;
+    public static DiscoveryManager make() {
+        // If blessings not in place, use fake data.
+        boolean useRealDiscovery =
+                Participant.ENABLE_MT_DISCOVERY &&
+                        V23Manager.Singleton.get().isBlessed();
+        if (useRealDiscovery) {
+            Log.d(TAG, "Using real discovery.");
+            return new DiscoveryManager(
+                    new Moderator(new ParticipantScannerMt()));
+        }
+        Log.d(TAG, "Using fake discovery.");
+        return new DiscoveryManager(
+                new Moderator(new ParticipantScannerFake()));
+    }
+
+    private DiscoveryManager(Moderator moderator) {
         mModerator = moderator;
         mHandler = new Handler(Looper.getMainLooper());
     }
@@ -50,36 +62,17 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
             throw new IllegalStateException("Must have a listener.");
         }
         Log.d(TAG, "Starting");
-        if (Participant.ENABLE_MT_DISCOVERY) {
-            if (mV23Manager == null) {
-                throw new IllegalStateException("Must have V23.");
-            }
-            mV23Manager.init(context);
-        }
         // The observer is the guy who implements onTaskDone, and wants
         // to be notified when a scan is complete.
         mModerator.setObserver(this);
         mTasker.start(mModerator);
+        Log.d(TAG, "Done Starting");
         return this;
     }
 
     public void stop() {
         Log.d(TAG, "Stopping discovery");
         mTasker.stop();
-    }
-
-    /**
-     * Stops discovery and underlying V23 services.
-     */
-    public void stopEverything() {
-        Log.d(TAG, "Stopping everything.");
-        stop();
-        if (Participant.ENABLE_MT_DISCOVERY) {
-            if (mV23Manager == null) {
-                throw new IllegalStateException("Must have V23.");
-            }
-            mV23Manager.shutdown(V23Manager.Behavior.STRICT);
-        }
     }
 
     @Override
@@ -129,35 +122,6 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
         Log.d(TAG, "Discarding.");
         stop();
         mListener = null;
-    }
-
-    public static class Singleton {
-        private static volatile DiscoveryManager instance;
-
-        public static DiscoveryManager get() {
-            DiscoveryManager result = instance;
-            if (instance == null) {
-                synchronized (Singleton.class) {
-                    result = instance;
-                    if (result == null) {
-                        instance = result = makeInstance();
-                    }
-                }
-            }
-            return result;
-        }
-
-        private static DiscoveryManager makeInstance() {
-            Log.d(TAG, "Creating singleton.");
-            if (Participant.ENABLE_MT_DISCOVERY) {
-                V23Manager manager = V23Manager.Singleton.get();
-                return new DiscoveryManager(
-                        manager,
-                        new Moderator(new ParticipantScannerMt(manager)));
-            }
-            return new DiscoveryManager(
-                    null, new Moderator(new ParticipantScannerFake()));
-        }
     }
 }
 

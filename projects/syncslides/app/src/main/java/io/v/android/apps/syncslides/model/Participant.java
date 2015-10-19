@@ -20,7 +20,26 @@ public interface Participant {
      * the UX. MT location determined in
      * {@link io.v.android.apps.syncslides.discovery.V23Manager}.
      */
-    boolean ENABLE_MT_DISCOVERY = false;
+    boolean ENABLE_MT_DISCOVERY = true;
+
+    public static class Mt {
+        /**
+         * Every v23 service will be mounted in the namespace with a name
+         * prefixed by this.
+         */
+        public static String ROOT_NAME = "liveDeck";
+
+        /**
+         * TODO(jregan): Assure legal mount name (remove blanks and such).
+         */
+        public static String makeMountName(Deck deck) {
+            return ROOT_NAME + "/" + deck.getId();
+        }
+
+        public static String makeScanString() {
+            return ROOT_NAME + "/*";
+        }
+    }
 
     // Name of the user participating, intended to be visible to others. This
     // can be a colloquial name as opposed to a 'real' name or email address
@@ -31,13 +50,10 @@ public interface Participant {
     Deck getDeck();
 
     // Name of a service with participant information.
-    String getEndPoint();
+    String getServiceName();
 
     // Initially get or refresh data from the endPoint.
     void refreshData();
-
-    // Serializable form of this for storing, passing via Message, etc.
-    Bundle toBundle();
 
     // For debugging.
     String toString();
@@ -53,8 +69,10 @@ public interface Participant {
      */
     class B {
         public static final String PARTICIPANT_ROLE = "participant_role";
-        public static final String PARTICIPANT_END_POINT = "participant_endPoint";
+        public static final String PARTICIPANT_SHOULD_ADV = "participant_is_advertising";
+        public static final String PARTICIPANT_SERVICE_NAME = "participant_endPoint";
         public static final String PARTICIPANT_NAME = "participant_name";
+        public static final String PARTICIPANT_BLESSINGS = "participant_blessings";
         public static final String PARTICIPANT_SYNCED = "participant_synced";
     }
 }
