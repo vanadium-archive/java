@@ -4,6 +4,8 @@
 
 package io.v.android.apps.syncslides.discovery;
 
+import android.util.Log;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,27 +17,13 @@ import io.v.android.apps.syncslides.model.Participant;
 public class ParticipantScannerMt implements ParticipantScanner {
     private static final String TAG = "ParticipantScannerMt";
 
-    /**
-     * Every v23 service will be mounted in the namespace with a name prefixed
-     * by this.
-     */
-    public static String ROOT_NAME = "users/syncslides";
-
-    /**
-     * Used for V23 communication.
-     */
-    private final V23Manager mV23Manager;
-
-    public ParticipantScannerMt(V23Manager v23Manager) {
-        mV23Manager = v23Manager;
-    }
-
     @Override
     public Set<Participant> scan() {
-        Set<String> endPoints = mV23Manager.scan(ROOT_NAME + "/*");
         Set<Participant> result = new HashSet<>();
-        for (String endPoint : endPoints) {
-            result.add(new ParticipantPeer(endPoint));
+        for (String n : V23Manager.Singleton.get().scan(
+                Participant.Mt.makeScanString())) {
+            Log.d(TAG, "Found: " + n);
+            result.add(new ParticipantPeer(n));
         }
         return result;
     }

@@ -228,12 +228,6 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Nothing to do.
-        return false;
-    }
-
-    @Override
     public void askQuestion(String deckId, String presentationId,
                             String firstName, String lastName) {
         // Nothing to do.

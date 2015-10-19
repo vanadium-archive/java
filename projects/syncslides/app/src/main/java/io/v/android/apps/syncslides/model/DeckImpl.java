@@ -39,6 +39,20 @@ public class DeckImpl implements Deck {
               ", thumb=" + (mThumb == null ? "no" : "yes") + "]";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DeckImpl)) {
+            return false;
+        }
+        DeckImpl p = (DeckImpl) obj;
+        return mDeckId.equals(p.mDeckId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mDeckId.hashCode();
+    }
+
     public static Deck fromBundle(Bundle b) {
         if (b == null) {
             throw new IllegalArgumentException("Need a bundle.");

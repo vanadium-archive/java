@@ -13,7 +13,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
-import io.v.android.apps.syncslides.discovery.ParticipantPeer;
+import io.v.android.apps.syncslides.discovery.ParticipantServerImpl;
+import io.v.android.apps.syncslides.discovery.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
@@ -34,15 +35,28 @@ public class PresentationActivity extends AppCompatActivity {
     private String mPresentationId = "randomPresentation1";
     private boolean mSynced;
 
+    /**
+     * Once a user clicks 'present' - which happens at some unpredictable time
+     * after onStart, the user begins presenting the deck, and the system must
+     * advertise the presentation.   Once advertising is started, it doesn't
+     * stop until onStop is called.  If the activity is paused, advertising
+     * should continue.
+     */
+    private boolean mShouldBeAdvertising;
+    private boolean mIsAdvertising;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        // Do this initialization early on in case it needs to start the AccountManager.
+        // Immediately initialize V23, possibly sending user to the
+        // AccountManager to get blessings.
+        V23Manager.Singleton.get().init(getApplicationContext(), this);
         DB.Singleton.get(getApplicationContext()).init(this);
-
         setContentView(R.layout.activity_presentation);
 
+        mShouldBeAdvertising = false;
+        mIsAdvertising = false;
         if (savedInstanceState == null) {
             Log.d(TAG, "savedInstanceState is null");
             mDeck = DeckImpl.fromBundle(getIntent().getExtras());
@@ -54,6 +68,10 @@ public class PresentationActivity extends AppCompatActivity {
             mDeck = DeckImpl.fromBundle(savedInstanceState);
             mRole = (Role) savedInstanceState.get(Participant.B.PARTICIPANT_ROLE);
             mSynced = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SYNCED);
+            mShouldBeAdvertising = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SHOULD_ADV);
+            if (mShouldBeAdvertising) {
+                Log.d(TAG, "Need to restore advertising");
+            }
         }
 
         // TODO(jregan): This appears to be an attempt to avoid fragment
@@ -61,6 +79,10 @@ public class PresentationActivity extends AppCompatActivity {
         // below to another flow step, e.g. onRestoreInstanceState.
         if (savedInstanceState != null) {
             return;
+        }
+
+        if (mShouldBeAdvertising){
+            startAdvertising();
         }
 
         getSupportActionBar().setTitle(mDeck.getTitle());
@@ -74,32 +96,41 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle b) {
-        Log.d(TAG, "onSaveInstanceState1");
-        super.onSaveInstanceState(b);
-        Log.d(TAG, "onSaveInstanceState2");
-        packBundle(b);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult");
+        if (V23Manager.onActivityResult(
+                getApplicationContext(), requestCode, resultCode, data)) {
+            Log.d(TAG, "did the v23 result");
+            return;
+        }
+        // Any other activity results would be handled here.
     }
 
-    private Bundle packBundle(Bundle b) {
+    @Override
+    protected void onSaveInstanceState(Bundle b) {
+        Log.d(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(b);
         mDeck.toBundle(b);
         b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
         b.putBoolean(Participant.B.PARTICIPANT_SYNCED, mSynced);
-        return b;
+        b.putBoolean(Participant.B.PARTICIPANT_SHOULD_ADV, mShouldBeAdvertising);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
+        if (mShouldBeAdvertising){
+            startAdvertising();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
-        // Don't shutdown v23 at this point.
-        // TODO(jregan): Stop advertising the live presentation if necessary.
+        stopAdvertising();
     }
 
     /**
@@ -125,15 +156,43 @@ public class PresentationActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Start the service for advertising a presentation.
-     */
-    private void beginAdvertising() {
-        Log.d(TAG, "beginAdvertising");
-        Intent intent = new Intent(this, ParticipantPeer.class);
-        intent.putExtras(packBundle(new Bundle()));
-        stopService(intent);
-        startService(intent);
+    private boolean shouldUseV23() {
+        return Participant.ENABLE_MT_DISCOVERY && V23Manager.Singleton.get().isBlessed();
+    }
+
+    private void startAdvertising() {
+        Log.d(TAG, "startAdvertising");
+        mShouldBeAdvertising = true;
+        if (mIsAdvertising) {
+            Log.d(TAG, "Already advertising.");
+            return;
+        }
+        if (shouldUseV23()) {
+            V23Manager.Singleton.get().mount(
+                    Participant.Mt.makeMountName(mDeck),
+                    new ParticipantServerImpl(mDeck));
+            Log.d(TAG, "MT advertising started.");
+        } else {
+            Log.d(TAG, "No means to start advertising.");
+        }
+        mIsAdvertising = true;
+    }
+
+    private void stopAdvertising() {
+        Log.d(TAG, "stopAdvertising");
+        if (!mIsAdvertising) {
+            Log.d(TAG, "Not advertising.");
+            return;
+        }
+        if (shouldUseV23()) {
+            // At the moment, only one service can be mounted, and this call
+            // will unmount it if mounted, else do nothing.
+            V23Manager.Singleton.get().unMount();
+            Log.d(TAG, "MT advertising stopped.");
+        } else {
+            Log.d(TAG, "No advertising to stop.");
+        }
+        mIsAdvertising = false;
     }
 
     /**
@@ -148,9 +207,7 @@ public class PresentationActivity extends AppCompatActivity {
                 Log.i(TAG, "Started presentation");
                 Toast.makeText(getApplicationContext(), "Started presentation",
                         Toast.LENGTH_SHORT).show();
-                if (Participant.ENABLE_MT_DISCOVERY) {
-                    beginAdvertising();
-                }
+                startAdvertising();
             }
         });
         mRole = Role.PRESENTER;

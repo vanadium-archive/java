@@ -13,6 +13,10 @@ import android.view.Menu;
 import android.support.v4.widget.DrawerLayout;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.discovery.V23Manager;
+import io.v.android.v23.services.blessing.BlessingCreationException;
+import io.v.v23.security.Blessings;
+import io.v.v23.verror.VException;
 
 public class DeckChooserActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -27,7 +31,11 @@ public class DeckChooserActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Do this initialization early on in case it needs to start the AccountManager.
+        Log.d(TAG, "onCreate");
+        // Immediately initialize V23, possibly sending user to the
+        // AccountManager to get blessings.
+        V23Manager.Singleton.get().init(getApplicationContext(), this);
+
         mDB = DB.Singleton.get(getApplicationContext());
         mDB.init(this);
 
@@ -79,10 +87,12 @@ public class DeckChooserActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (mDB.onActivityResult(requestCode, resultCode, data)) {
+        Log.d(TAG, "onActivityResult");
+        if (V23Manager.onActivityResult(
+                getApplicationContext(), requestCode, resultCode, data)) {
+            Log.d(TAG, "did the v23 result");
             return;
         }
         // Any other activity results would be handled here.
     }
-
 }

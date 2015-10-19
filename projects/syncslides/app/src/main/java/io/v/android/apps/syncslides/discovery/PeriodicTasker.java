@@ -25,7 +25,7 @@ class PeriodicTasker {
             Duration.standardSeconds(2);
 
     private static final Duration WAIT_BETWEEN_TASKS =
-            Duration.standardSeconds(5);
+            V23Manager.MT_TIMEOUT.plus(Duration.standardSeconds(3));
 
     private ScheduledExecutorService mTimer = null;
 
@@ -40,6 +40,7 @@ class PeriodicTasker {
                 DELAY_BEFORE_FIRST_TASK.getMillis(),
                 WAIT_BETWEEN_TASKS.getMillis(),
                 TimeUnit.MILLISECONDS);
+        Log.d(TAG, "Done Starting");
     }
 
     void stop() {

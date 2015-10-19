@@ -41,7 +41,8 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             throw new IllegalStateException("Wrong lifecycle.");
         }
         Log.d(TAG, "Starting.");
-        DiscoveryManager dm = DiscoveryManager.Singleton.get();
+        DiscoveryManager dm = DiscoveryManager.make();
+        // Listening stops below in mLiveDecks.discard.
         dm.setListener(this);
         dm.start(context);
         mLiveDecks = dm;

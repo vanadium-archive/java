@@ -4,8 +4,6 @@
 
 package io.v.android.apps.syncslides.discovery;
 
-import android.util.Log;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,13 +21,15 @@ public class ParticipantScannerFake implements ParticipantScanner {
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
                     new ParticipantPeer(
-                            "Alice", new DeckImpl("Kale - Just eat it.", null, "deckId1")));
+                            "Alice", new DeckImpl(
+                            "Kale - Just eat it.", null, "deckByAlice")));
         }
         // Bob has less to say than Alice.
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
                     new ParticipantPeer(
-                            "Bob", new DeckImpl("Java - Object deluge.", null, "deckId1")));
+                            "Bob", new DeckImpl(
+                            "Java - Object deluge.", null, "deckByBob")));
         }
         return participants;
     }

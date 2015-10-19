@@ -6,7 +6,6 @@ package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -32,37 +31,27 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import io.v.android.apps.syncslides.R;
+import io.v.android.apps.syncslides.discovery.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.NoopList;
 import io.v.android.apps.syncslides.model.Slide;
 import io.v.android.apps.syncslides.model.SlideImpl;
-import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
-import io.v.android.v23.services.blessing.BlessingCreationException;
-import io.v.android.v23.services.blessing.BlessingService;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
-import io.v.v23.namespace.Namespace;
-import io.v.v23.naming.Endpoint;
-import io.v.v23.naming.GlobReply;
-import io.v.v23.naming.MountEntry;
-import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.Blessings;
-import io.v.v23.security.VPrincipal;
-import io.v.v23.security.VSecurity;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
+import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
@@ -70,7 +59,6 @@ import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
-import io.v.v23.syncbase.nosql.PrefixRange;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Syncgroup;
@@ -84,11 +72,6 @@ import io.v.v23.vom.VomUtil;
 public class SyncbaseDB implements DB {
 
     private static final String TAG = "SyncbaseDB";
-    /**
-     * The intent result code for when we get blessings from the account manager.
-     * The value must not conflict with any other blessing result codes.
-     */
-    private static final int BLESSING_REQUEST = 200;
     private static final String SYNCBASE_APP = "syncslides";
     private static final String SYNCBASE_DB = "syncslides";
     private static final String DECKS_TABLE = "Decks";
@@ -97,13 +80,7 @@ public class SyncbaseDB implements DB {
     static final String CURRENT_SLIDE = "CurrentSlide";
     static final String QUESTIONS = "questions";
     private static final String SYNCGROUP_PRESENTATION_DESCRIPTION = "Live Presentation";
-    private static final String PI_MILK_CRATE = "192.168.86.254:8101";
 
-    // If SyncbaseDB needs to start the AccountManager to get blessings, it will not
-    // finish its initialization, but the fragment that is trying to initialize
-    // DB will continue to load and use DB.  That fragment will reload when the
-    // AccountManager is finished, so if mInitialized is false, any DB methods should
-    // return noop values.
     private boolean mInitialized = false;
     private Handler mHandler;
     private Permissions mPermissions;
@@ -125,11 +102,12 @@ public class SyncbaseDB implements DB {
 
     @Override
     public void init(Activity activity) {
+        Log.d(TAG, "init");
         if (mInitialized) {
+            Log.d(TAG, "already initialized");
             return;
         }
         mHandler = new Handler(Looper.getMainLooper());
-        mVContext = V.init(mContext);
         // TODO(kash): Set proper ACLs.
         AccessList acl = new AccessList(
                 ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
@@ -138,68 +116,22 @@ public class SyncbaseDB implements DB {
                 Constants.READ.getValue(), acl,
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
-        getBlessings(activity);
-    }
 
-    private void getBlessings(Activity activity) {
-        Blessings blessings = null;
-        try {
-            // See if there are blessings stored in shared preferences.
-            blessings = BlessingsManager.getBlessings(mContext);
-        } catch (VException e) {
-            handleError("Error getting blessings from shared preferences " + e.getMessage());
-        }
-        if (blessings == null) {
-            // Request new blessings from the account manager via an intent.  This intent
-            // will call back to onActivityResult() which will continue with
-            // configurePrincipal().
-            refreshBlessings(activity);
+        // If blessings aren't in place, the fragment that called this
+        // initialization may continue to load and use DB, but nothing will
+        // work so DB methods should return noop values.  It's assumed that
+        // the calling fragment will send the user to the AccountManager,
+        // accept blessings on return, then re-call this init.
+        if (V23Manager.Singleton.get().isBlessed()) {
+            Log.d(TAG, "no blessings.");
             return;
         }
-        configurePrincipal(blessings);
-    }
-
-    private void refreshBlessings(Activity activity) {
-        Intent intent = BlessingService.newBlessingIntent(mContext);
-        activity.startActivityForResult(intent, BLESSING_REQUEST);
-    }
-
-    @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == BLESSING_REQUEST) {
-            try {
-                byte[] blessingsVom = BlessingService.extractBlessingReply(resultCode, data);
-                Blessings blessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
-                BlessingsManager.addBlessings(mContext, blessings);
-                Toast.makeText(mContext, "Success", Toast.LENGTH_SHORT).show();
-                configurePrincipal(blessings);
-            } catch (BlessingCreationException e) {
-                handleError("Couldn't create blessing: " + e.getMessage());
-            } catch (VException e) {
-                handleError("Couldn't derive blessing: " + e.getMessage());
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private void configurePrincipal(Blessings blessings) {
-        // TODO(kash): Probably better to do this not in the UI thread.
-        try {
-            VPrincipal p = V.getPrincipal(mVContext);
-            p.blessingStore().setDefaultBlessings(blessings);
-            p.blessingStore().set(blessings, new BlessingPattern("..."));
-            VSecurity.addToRoots(p, blessings);
-        } catch (VException e) {
-            handleError(String.format(
-                    "Couldn't set local blessing %s: %s", blessings, e.getMessage()));
-            return;
-        }
-        setupSyncbase(blessings);
+        mVContext = V23Manager.Singleton.get().getVContext();
+        setupSyncbase();
     }
 
     // TODO(kash): Run this in an AsyncTask so it doesn't block the UI.
-    private void setupSyncbase(Blessings blessings) {
+    private void setupSyncbase() {
         // Prepare the syncbase storage directory.
         File storageDir = new File(mContext.getFilesDir(), "syncbase");
         storageDir.mkdirs();
@@ -215,7 +147,7 @@ public class SyncbaseDB implements DB {
             }
             mVContext = SyncbaseServer.withNewServer(mVContext, new SyncbaseServer.Params()
                     .withPermissions(mPermissions)
-                    .withName(NamingUtil.join("/", PI_MILK_CRATE, id))
+                    .withName(V23Manager.syncName(id))
                     .withStorageRootDir(storageDir.getAbsolutePath()));
         } catch (SyncbaseServer.StartException e) {
             handleError("Couldn't start syncbase server");
@@ -301,7 +233,7 @@ public class SyncbaseDB implements DB {
                                 Arrays.asList(
                                         new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
                                         new SyncgroupPrefix(DECKS_TABLE, deckId)),
-                                Arrays.asList(NamingUtil.join("/", PI_MILK_CRATE, "sg")),
+                                Arrays.asList(V23Manager.syncName("sg")),
                                 false
                         ),
                         new SyncgroupMemberInfo((byte) 10));
@@ -314,18 +246,7 @@ public class SyncbaseDB implements DB {
             }
             Log.i(TAG, "Finished creating syncgroup");
 
-            Namespace namespace = V.getNamespace(mVContext);
-            namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
-            for (GlobReply reply : namespace.glob(mVContext, "...")) {
-                if (reply instanceof GlobReply.Entry) {
-                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                    Log.d(TAG, "Entry: " + entry.getName());
-                    for (MountedServer server : entry.getServers()) {
-                        String endPoint = server.getServer();
-                        Log.d(TAG, "Got endPoint = " + endPoint);
-                    }
-                }
-            }
+            V23Manager.Singleton.get().scan("...");
 
             // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
             // here or somewhere else.  We're not going to demo sync across a user's
@@ -363,19 +284,7 @@ public class SyncbaseDB implements DB {
                     for (String member : syncgroup.getMembers(mVContext).keySet()) {
                         Log.i(TAG, "Member: " + member);
                     }
-                    Namespace namespace = V.getNamespace(mVContext);
-                    namespace.setRoots(Arrays.asList("/" + PI_MILK_CRATE));
-                    for (GlobReply reply : namespace.glob(mVContext, "...")) {
-                        if (reply instanceof GlobReply.Entry) {
-                            MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                            Log.d(TAG, "Entry: " + entry.getName());
-                            for (MountedServer server : entry.getServers()) {
-                                String endPoint = server.getServer();
-                                Log.d(TAG, "Got endPoint = " + endPoint);
-                            }
-                        }
-                    }
-
+                    V23Manager.Singleton.get().scan("...");
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override

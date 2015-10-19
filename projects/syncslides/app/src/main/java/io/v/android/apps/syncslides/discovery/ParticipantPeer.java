@@ -4,23 +4,16 @@
 
 package io.v.android.apps.syncslides.discovery;
 
-import android.app.Service;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import io.v.android.apps.syncslides.Role;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
-import io.v.v23.context.VContext;
-import io.v.v23.rpc.ServerCall;
+import io.v.v23.verror.VException;
 
 /**
  * Someone taking part in a presentation.
@@ -37,65 +30,43 @@ import io.v.v23.rpc.ServerCall;
  * and run it as a server, using the (public) userName as part of the mount
  * name.
  */
-public class ParticipantPeer extends Service implements Participant {
+public class ParticipantPeer implements Participant {
     private static final String TAG = "ParticipantPeer";
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormat.forPattern("hh_mm_ss_SSSS");
-    // V23 EndPoint of the V23 service representing the participant.
-    private String mEndpointStr;
-    // When did we last grab data from the endPoint?  Meaningful only in
-    // 'audience' mode, where the contents of mUserName etc. came from a remote
-    // server rather than from being fed into the ctor.
-    private DateTime mRefreshTime;
-    // Name of the user participating, intended to be visible to others. This
-    // can be a colloquial name as opposed to a 'real' name or email address
-    // extracted from a device or blessing.
+    // V23 name of the V23 service representing the participant.
+    private String mServiceName;
+    // Visible name of human presenter.
+    // TODO(jregan): Switch to VPerson or the model equivalent.
     private String mUserName;
+    // When did we last grab data from the endPoint?
+    private DateTime mRefreshTime;
     // Deck the user is presenting.  Can only present one at a time.
     private Deck mDeck;
-    // The role of the participant.
-    private Role mRole;
+    private ParticipantClient mClient = null;
 
-    public ParticipantPeer(String userName, Deck deck, String endPoint) {
+    public ParticipantPeer(String userName, Deck deck, String serviceName) {
         mUserName = userName;
         mDeck = deck;
-        mEndpointStr = endPoint;
-    }
-
-    public ParticipantPeer(String endPoint) {
-        this(Unknown.USER_NAME, DeckImpl.DUMMY, endPoint);
+        mServiceName = serviceName;
     }
 
     public ParticipantPeer(String userName, Deck deck) {
-        this(userName, deck, Unknown.END_POINT);
+        this(userName, deck, Unknown.SERVER_NAME);
     }
 
-    public ParticipantPeer() {
-        this(Unknown.END_POINT);
-    }
-
-    public static Participant fromBundle(Bundle b) {
-        return new ParticipantPeer(
-                b.getString(B.PARTICIPANT_NAME),
-                DeckImpl.fromBundle(b),
-                b.getString(B.PARTICIPANT_END_POINT));
+    public ParticipantPeer(String serviceName) {
+        this(Unknown.USER_NAME, DeckImpl.DUMMY, serviceName);
     }
 
     @Override
-    public String getEndPoint() {
-        return mEndpointStr;
+    public String getServiceName() {
+        return mServiceName;
     }
 
     @Override
     public String getUserName() {
         return mUserName;
-    }
-
-    /**
-     * TODO(jregan): Assure legal mount name (remove blanks and such).
-     */
-    public String getMountName() {
-        return ParticipantScannerMt.ROOT_NAME + "/p_" + mDeck.getId();
     }
 
     @Override
@@ -104,107 +75,58 @@ public class ParticipantPeer extends Service implements Participant {
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle b = new Bundle();
-        b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
-        b.putString(B.PARTICIPANT_END_POINT, mEndpointStr);
-        b.putString(B.PARTICIPANT_NAME, mUserName);
-        mDeck.toBundle(b);
-        return b;
-    }
-
-    private void unpackBundle(Bundle b) {
-        mDeck = DeckImpl.fromBundle(b);
-        mRole = (Role) b.get(Participant.B.PARTICIPANT_ROLE);
-        mEndpointStr = b.getString(B.PARTICIPANT_END_POINT);
-        mUserName = b.getString(B.PARTICIPANT_NAME);
-    }
-
-    @Override
     public String toString() {
-        return mUserName + ":" + mDeck.getTitle() +
-                (mRefreshTime == null ?
-                        "" : ":" + mRefreshTime.toString(TIME_FMT));
+        return "[userName=\"" + mUserName +
+                "\", deck=" + mDeck +
+                ", time=" + getStringRefreshtime() + "]";
+    }
+
+    private String getStringRefreshtime() {
+        return mRefreshTime == null ?
+                "never" : mRefreshTime.toString(TIME_FMT);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Participant)) {
+        if (!(obj instanceof ParticipantPeer)) {
             return false;
         }
-        return mEndpointStr.equals(((ParticipantPeer) obj).mEndpointStr);
+        ParticipantPeer p = (ParticipantPeer) obj;
+        return mServiceName.equals(p.mServiceName) && mDeck.equals(p.mDeck);
     }
 
     @Override
     public int hashCode() {
-        return mEndpointStr.hashCode() + mDeck.getTitle().hashCode();
+        return mServiceName.hashCode() + mDeck.hashCode();
     }
 
     /**
-     * Make an RPC on the mEndpointStr to get title, snapshot, etc.
+     * Make an RPC on the mServiceName to get title, snapshot, etc.
      */
     @Override
     public void refreshData() {
-        Log.d(TAG, "Refreshing data for participant " + mUserName);
-        // TODO(jregan): make the rpc
-        mRefreshTime = DateTime.now();
-    }
+        Log.d(TAG, "Initiating refresh");
 
-    /**
-     * Binding not necessary - this service just answers requests from the
-     * outside, and doesn't communicate with the parent app.
-     */
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        Log.d(TAG, "onStartCommand");
-        // TODO(jregan): Unpack blessings from the intent and pass them into
-        // V.getPrincipal.
-        unpackBundle(intent.getExtras());
-        Log.d(TAG, "role = " + mRole + ", deck=" + mDeck);
-        V23Manager mgr = V23Manager.Singleton.get();
-        mgr.init(getApplicationContext());
-        ServerImpl server = new ServerImpl(this);
-        String mountName = getMountName();
-        Log.d(TAG, "mountName = " + mountName);
-        mEndpointStr = mgr.mount(mountName, server);
-        Log.d(TAG, "Got endpoint: " + mEndpointStr);
-        return START_REDELIVER_INTENT;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        V23Manager.Singleton.get().unMount();
-        Log.d(TAG, "###### onDestroy");
+        if (mClient == null) {
+            Log.d(TAG, "Grabbing client.");
+            mClient = ParticipantClientFactory.getParticipantClient(
+                    mServiceName);
+            Log.d(TAG, "Got client.");
+        }
+        try {
+            Log.d(TAG, "Calling get");
+            Description description = mClient.get(
+                    V23Manager.Singleton.get().getVContext());
+            mDeck = new DeckImpl(description.getTitle());
+            mRefreshTime = DateTime.now();
+            Log.d(TAG, "Completed refresh.");
+        } catch (VException e) {
+            e.printStackTrace();
+        }
     }
 
     private static class Unknown {
-        static final String END_POINT = "unknownEndPoint";
+        static final String SERVER_NAME = "unknownServerName";
         static final String USER_NAME = "unknownUserName";
-    }
-
-    /**
-     * Implementation of VDL Participant service.
-     */
-    private class ServerImpl implements ParticipantServer {
-        private final Participant mParticipant;
-
-        public ServerImpl(Participant p) {
-            mParticipant = p;
-        }
-
-        public Description get(VContext ctx, ServerCall call)
-                throws io.v.v23.verror.VException {
-            Description d = new Description();
-            d.setTitle(mParticipant.getDeck().getTitle());
-            d.setUserName(mParticipant.getUserName());
-            return d;
-        }
     }
 }
