@@ -31,7 +31,7 @@ public class PresentationActivity extends AppCompatActivity {
      */
     private Role mRole;
     // TODO(kash): Replace this with the presentation id.
-    private String mPresentationId = "randomPresentation1";
+    private String mPresentationId = "randomPresentationId1";
     private boolean mSynced;
 
     @Override
