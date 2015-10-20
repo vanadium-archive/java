@@ -18,6 +18,7 @@ import io.v.android.apps.syncslides.discovery.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
+import io.v.android.apps.syncslides.model.Role;
 
 public class PresentationActivity extends AppCompatActivity {
     private static final String TAG = "PresentationActivity";

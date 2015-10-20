@@ -20,6 +20,7 @@ import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Participant;
+import io.v.android.apps.syncslides.model.Role;
 
 /**
  * Provides a list of decks to be shown in the RecyclerView of the

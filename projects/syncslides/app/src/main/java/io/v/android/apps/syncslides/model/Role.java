@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.apps.syncslides;
+package io.v.android.apps.syncslides.model;
 
 /**
  * Represents the user's type of participation in the presentation.

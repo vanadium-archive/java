@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.model.Role;
 
 public class SlideListFragment extends Fragment {
     private static final String DECK_ID_KEY = "deck_id";

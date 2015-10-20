@@ -31,6 +31,7 @@ import java.util.List;
 
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.model.Question;
+import io.v.android.apps.syncslides.model.Role;
 import io.v.android.apps.syncslides.model.Slide;
 
 /**
