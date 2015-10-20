@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.misc.Config;
+import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Participant;
@@ -40,7 +42,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     public static DiscoveryManager make() {
         // If blessings not in place, use fake data.
         boolean useRealDiscovery =
-                Participant.ENABLE_MT_DISCOVERY &&
+                Config.MtDiscovery.ENABLE &&
                         V23Manager.Singleton.get().isBlessed();
         if (useRealDiscovery) {
             Log.d(TAG, "Using real discovery.");

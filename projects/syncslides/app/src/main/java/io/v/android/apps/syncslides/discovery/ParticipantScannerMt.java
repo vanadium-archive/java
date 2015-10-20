@@ -9,6 +9,8 @@ import android.util.Log;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.v.android.apps.syncslides.misc.Config;
+import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Participant;
 
 /**
@@ -21,7 +23,7 @@ public class ParticipantScannerMt implements ParticipantScanner {
     public Set<Participant> scan() {
         Set<Participant> result = new HashSet<>();
         for (String n : V23Manager.Singleton.get().scan(
-                Participant.Mt.makeScanString())) {
+                Config.MtDiscovery.makeScanString())) {
             Log.d(TAG, "Found: " + n);
             result.add(new ParticipantPeer(n));
         }

@@ -31,7 +31,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import io.v.android.apps.syncslides.R;
-import io.v.android.apps.syncslides.discovery.V23Manager;
+import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Listener;

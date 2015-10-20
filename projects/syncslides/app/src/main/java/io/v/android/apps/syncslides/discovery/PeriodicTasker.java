@@ -8,12 +8,11 @@ import android.util.Log;
 
 import org.joda.time.Duration;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import io.v.android.apps.syncslides.misc.V23Manager;
 
 /**
  * Repeatedly runs a task in a thread distinct from that which calls start().

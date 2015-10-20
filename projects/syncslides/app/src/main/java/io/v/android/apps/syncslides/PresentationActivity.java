@@ -14,7 +14,8 @@ import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.discovery.ParticipantServerImpl;
-import io.v.android.apps.syncslides.discovery.V23Manager;
+import io.v.android.apps.syncslides.misc.Config;
+import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
@@ -82,7 +83,7 @@ public class PresentationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mShouldBeAdvertising){
+        if (mShouldBeAdvertising) {
             startAdvertising();
         }
 
@@ -122,7 +123,7 @@ public class PresentationActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-        if (mShouldBeAdvertising){
+        if (mShouldBeAdvertising) {
             startAdvertising();
         }
     }
@@ -158,7 +159,7 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     private boolean shouldUseV23() {
-        return Participant.ENABLE_MT_DISCOVERY && V23Manager.Singleton.get().isBlessed();
+        return Config.MtDiscovery.ENABLE && V23Manager.Singleton.get().isBlessed();
     }
 
     private void startAdvertising() {
@@ -170,7 +171,7 @@ public class PresentationActivity extends AppCompatActivity {
         }
         if (shouldUseV23()) {
             V23Manager.Singleton.get().mount(
-                    Participant.Mt.makeMountName(mDeck),
+                    Config.MtDiscovery.makeMountName(mDeck),
                     new ParticipantServerImpl(mDeck));
             Log.d(TAG, "MT advertising started.");
         } else {
@@ -241,8 +242,8 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the navigate fragment where the user can see the current slide
-     * and navigate to other components of the slide presentation. This version
+     * Shows the navigate fragment where the user can see the current slide and
+     * navigate to other components of the slide presentation. This version
      * includes an add to the back stack so that the user can back out from the
      * navigate fragment to slide list.
      *
@@ -269,8 +270,8 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Return if the device is synced with the presenter (true if the device
-     * is the presenter).
+     * Return if the device is synced with the presenter (true if the device is
+     * the presenter).
      */
     public boolean getSynced() {
         return mSynced;

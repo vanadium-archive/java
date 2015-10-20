@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.apps.syncslides.discovery;
+package io.v.android.apps.syncslides.misc;
 
 import android.app.Activity;
 import android.content.Context;
@@ -56,8 +56,6 @@ public class V23Manager {
     private static final String TAG = "V23Manager";
     private static final ExecutorService mExecutor =
             Executors.newSingleThreadExecutor();
-    private static final String MT_ADDRESS = FixedMt.PI_MILK_CRATE;
-    // private static final String MT_ADDRESS = FixedMt.JR_MOTOX;
     private Context mAndroidCtx;
     private VContext mBaseContext = null;
     private Blessings mBlessings = null;
@@ -124,12 +122,12 @@ public class V23Manager {
      */
     public static List<String> determineNamespaceRoot() {
         List<String> result = new ArrayList<>();
-        result.add("/" + MT_ADDRESS);
+        result.add("/" + Config.MT_ADDRESS);
         return result;
     }
 
     public static String syncName(String id) {
-        return NamingUtil.join("/", MT_ADDRESS, id);
+        return NamingUtil.join("/", Config.MT_ADDRESS, id);
     }
 
     public VContext getVContext() {
@@ -311,7 +309,7 @@ public class V23Manager {
             @Override
             public void run() {
                 Log.d(TAG, "mounting on name \"" + mountName +
-                        "\" at table " + MT_ADDRESS);
+                        "\" at table " + Config.MT_ADDRESS);
                 try {
                     mLiveServer = makeServer(mountName, server);
                     Log.d(TAG, "  Server status proxies: " +
@@ -379,13 +377,4 @@ public class V23Manager {
         }
     }
 
-    /**
-     * Some fixed mount tables to try.
-     */
-    private static class FixedMt {
-        static final String PI_MILK_CRATE = "192.168.86.254:8101";
-        static final String JR_LAPTOP_AT_HOME = "192.168.2.71:23000";
-        static final String JR_LAPTOP_VEYRON = "192.168.8.106:23000";
-        static final String JR_MOTOX = "192.168.43.136:23000";
-    }
 }

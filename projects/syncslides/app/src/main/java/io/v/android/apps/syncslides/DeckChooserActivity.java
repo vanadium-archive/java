@@ -5,25 +5,23 @@
 package io.v.android.apps.syncslides;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.support.v4.widget.DrawerLayout;
 
 import io.v.android.apps.syncslides.db.DB;
-import io.v.android.apps.syncslides.discovery.V23Manager;
-import io.v.android.v23.services.blessing.BlessingCreationException;
-import io.v.v23.security.Blessings;
-import io.v.v23.verror.VException;
+import io.v.android.apps.syncslides.misc.V23Manager;
 
 public class DeckChooserActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private static final String TAG = "DeckChooser";
     /**
-     * Fragment managing the behaviors, interactions and deck of the navigation drawer.
+     * Fragment managing the behaviors, interactions and deck of the navigation
+     * drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private DB mDB;

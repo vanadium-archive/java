@@ -4,8 +4,6 @@
 
 package io.v.android.apps.syncslides.model;
 
-import android.os.Bundle;
-
 /**
  * Someone taking part in a presentation.
  *
@@ -13,33 +11,6 @@ import android.os.Bundle;
  * syncslides.
  */
 public interface Participant {
-    /**
-     * If true, enable MT-based (mounttable) discovery. Deck view will scan a MT
-     * to find live presentations. Clicking play on a presentation will start a
-     * service and try to mount it in a MT so other deck views can list it in
-     * the UX. MT location determined in
-     * {@link io.v.android.apps.syncslides.discovery.V23Manager}.
-     */
-    boolean ENABLE_MT_DISCOVERY = true;
-
-    public static class Mt {
-        /**
-         * Every v23 service will be mounted in the namespace with a name
-         * prefixed by this.
-         */
-        public static String ROOT_NAME = "liveDeck";
-
-        /**
-         * TODO(jregan): Assure legal mount name (remove blanks and such).
-         */
-        public static String makeMountName(Deck deck) {
-            return ROOT_NAME + "/" + deck.getId();
-        }
-
-        public static String makeScanString() {
-            return ROOT_NAME + "/*";
-        }
-    }
 
     // Name of the user participating, intended to be visible to others. This
     // can be a colloquial name as opposed to a 'real' name or email address

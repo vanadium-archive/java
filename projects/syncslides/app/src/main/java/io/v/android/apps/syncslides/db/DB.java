@@ -6,10 +6,10 @@ package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 
 import java.util.List;
 
+import io.v.android.apps.syncslides.misc.Config;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Question;
@@ -22,15 +22,15 @@ import io.v.android.apps.syncslides.model.Slide;
 public interface DB {
     class Singleton {
         private static volatile DB instance;
+
         public static DB get(Context context) {
             DB result = instance;
             if (instance == null) {
                 synchronized (Singleton.class) {
                     result = instance;
                     if (result == null) {
-                        // Switch between FakeDB and SyncbaseDB by commenting out one.
-                        instance = result = new FakeDB(context);
-                        // instance = result = new SyncbaseDB(context);
+                        instance = result = Config.Syncbase.ENABLE ?
+                                new SyncbaseDB(context) : new FakeDB(context);
                     }
                 }
             }
@@ -39,16 +39,18 @@ public interface DB {
     }
 
     /**
-     * Perform initialization steps.  This method must be called early in the lifetime
-     * of the activity.  As part of the initialization, it might send an intent to
-     * another activity.
+     * Perform initialization steps.  This method must be called early in the
+     * lifetime of the activity.  As part of the initialization, it might send
+     * an intent to another activity.
      *
-     * @param activity implements onActivityResult() to call into DB.onActivityResult.
+     * @param activity implements onActivityResult() to call into
+     *                 DB.onActivityResult.
      */
     void init(Activity activity);
 
     /**
-     * Provides a list of elements via an API that fits well with RecyclerView.Adapter.
+     * Provides a list of elements via an API that fits well with
+     * RecyclerView.Adapter.
      */
     interface DBList<E> {
 
@@ -63,12 +65,14 @@ public interface DB {
         E get(int i);
 
         /**
-         * Sets the listener for changes to the list.  There can only be one listener.
+         * Sets the listener for changes to the list.  There can only be one
+         * listener.
          */
         void setListener(Listener listener);
 
         /**
-         * Indicates that the list is no longer needed and should stop notifying its listener.
+         * Indicates that the list is no longer needed and should stop notifying
+         * its listener.
          */
         void discard();
     }
@@ -99,7 +103,7 @@ public interface DB {
     /**
      * Asynchronously fetch the slides for the given deck.
      *
-     * @param deckId the deck to fetch
+     * @param deckId   the deck to fetch
      * @param callback runs on the UI thread when the slide data is loaded
      */
     void getSlides(String deckId, Callback<List<Slide>> callback);
@@ -124,27 +128,27 @@ public interface DB {
     /**
      * Asynchronously deletes the deck and all of its slides.
      *
-     * @param deckId  id of the deck to delete
+     * @param deckId id of the deck to delete
      */
     void deleteDeck(String deckId);
 
     /**
      * Asynchronously deletes the deck and all of its slides.
      *
-     * @param deckId    id of the deck to delete
-     * @param callback  runs on the UI thread when the deck has been deleted
+     * @param deckId   id of the deck to delete
+     * @param callback runs on the UI thread when the deck has been deleted
      */
     void deleteDeck(String deckId, Callback<Void> callback);
 
     class CreatePresentationResult {
         /**
-         * A unique ID for the presentation.  All methods that deal with live presentation
-         * data (e.g. the current slide) use this ID.
+         * A unique ID for the presentation.  All methods that deal with live
+         * presentation data (e.g. the current slide) use this ID.
          */
         public String presentationId;
         /**
-         * This is the name of the syncgroup that was created for this presentation instance.
-         * Audience members must join this syncgroup.
+         * This is the name of the syncgroup that was created for this
+         * presentation instance. Audience members must join this syncgroup.
          */
         public String syncgroupName;
 
@@ -157,7 +161,7 @@ public interface DB {
     /**
      * Creates a new presentation by creating a syncgroup.
      *
-     * @param deckId the deck to use in the presentation
+     * @param deckId   the deck to use in the presentation
      * @param callback called when the presentation is created
      */
     void createPresentation(String deckId, Callback<CreatePresentationResult> callback);
@@ -166,16 +170,16 @@ public interface DB {
      * Joins an existing presentation.
      *
      * @param syncgroupName the syncgroup to join
-     * @param callback called when the syncgroup is joined
+     * @param callback      called when the syncgroup is joined
      */
     void joinPresentation(String syncgroupName, Callback<Void> callback);
 
     /**
      * Sets the current slide so any audience members can switch to it.
      *
-     * @param deckId the deck being presented
+     * @param deckId         the deck being presented
      * @param presentationId the instance of the live presentation
-     * @param slideNum the new slide number
+     * @param slideNum       the new slide number
      */
     void setCurrentSlide(String deckId, String presentationId, int slideNum);
 
@@ -191,9 +195,9 @@ public interface DB {
     /**
      * Add a listener for changes to the current slide of a live presentation.
      *
-     * @param deckId the deck used in the presentation
+     * @param deckId         the deck used in the presentation
      * @param presentationId the presentation to watch for changes
-     * @param listener notified of changes
+     * @param listener       notified of changes
      */
     void addCurrentSlideListener(String deckId, String presentationId,
                                  CurrentSlideListener listener);
@@ -201,9 +205,9 @@ public interface DB {
     /**
      * Remove a listener that was previously passed to addCurrentSlideListener().
      *
-     * @param deckId the deck used in the presentation
+     * @param deckId         the deck used in the presentation
      * @param presentationId the presentation being watched for changes
-     * @param listener previously passed to addCurrentSlideListener()
+     * @param listener       previously passed to addCurrentSlideListener()
      */
     void removeCurrentSlideListener(String deckId, String presentationId,
                                     CurrentSlideListener listener);
@@ -218,12 +222,12 @@ public interface DB {
     }
 
     /**
-     * Set the listener for changes to the set of questions for a live presentation.
-     * There can be only one listener at a time.
+     * Set the listener for changes to the set of questions for a live
+     * presentation. There can be only one listener at a time.
      *
-     * @param deckId the deck used in the presentation
+     * @param deckId         the deck used in the presentation
      * @param presentationId the presentation to watch for changes
-     * @param listener notified of changes
+     * @param listener       notified of changes
      */
     void setQuestionListener(String deckId, String presentationId,
                              QuestionListener listener);
@@ -231,9 +235,9 @@ public interface DB {
     /**
      * Remove the listener that was previously passed to setQuestionListener().
      *
-     * @param deckId the deck used in the presentation
+     * @param deckId         the deck used in the presentation
      * @param presentationId the presentation being watched for changes
-     * @param listener previously passed to setQuestionListener()
+     * @param listener       previously passed to setQuestionListener()
      */
     void removeQuestionListener(String deckId, String presentationId,
                                 QuestionListener listener);
@@ -241,10 +245,10 @@ public interface DB {
     /**
      * Add user to presenter's question queue.
      *
-     * @param deckId the deck used in the presentation
+     * @param deckId         the deck used in the presentation
      * @param presentationId the presentation identifier
-     * @param firstName the user's first name
-     * @param lastName the user's last name
+     * @param firstName      the user's first name
+     * @param lastName       the user's last name
      */
     void askQuestion(String deckId, String presentationId,
                      String firstName, String lastName);
