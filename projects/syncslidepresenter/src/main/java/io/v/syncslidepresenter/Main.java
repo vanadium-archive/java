@@ -13,9 +13,14 @@ import com.google.common.collect.ImmutableMap;
 
 import org.joda.time.Duration;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,11 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import io.v.android.apps.syncslides.db.VCurrentSlide;
@@ -70,13 +72,13 @@ public class Main {
     private static final String DECKS_TABLE = "Decks";
     private final Table presentations;
     private final Table decks;
-    private final JLabel label;
+    private final ImageViewer viewer;
 
     private Database db;
 
     private VContext context;
 
-    public static void main(String[] args) throws SyncbaseServer.StartException, VException {
+    public static void main(String[] args) throws SyncbaseServer.StartException, VException, IOException {
         Options options = new Options();
         JCommander commander = new JCommander(options);
         try {
@@ -138,27 +140,28 @@ public class Main {
             }
 
             JPanel panel = new JPanel(new GridBagLayout());
-            JLabel presentationLabel = new JLabel();
+            ScaleToFitJPanel presentationPanel = new ScaleToFitJPanel();
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.weightx = 1;
             constraints.weighty = 1;
             constraints.fill = GridBagConstraints.BOTH;
-            panel.add(presentationLabel);
+            panel.add(presentationPanel, constraints);
             frame.getContentPane().add(panel);
+            frame.pack();
 
-            Main m = new Main(baseContext, presentationLabel, db, decks, presentations);
+            Main m = new Main(baseContext, presentationPanel, db, decks, presentations);
             m.joinPresentation(options.presentationName, options.joinTimeoutSeconds,
                     options.currentSlideKey, options.slideRowFormat);
         }
     }
 
-    public Main(VContext context, JLabel presentationLabel, Database db, Table decks,
+    public Main(VContext context, ImageViewer viewer, Database db, Table decks,
                 Table presentations) throws VException {
         this.context = context;
         this.db = db;
         this.presentations = presentations;
         this.decks = decks;
-        this.label = presentationLabel;
+        this.viewer = viewer;
     }
 
     public void joinPresentation(final String syncgroupName,
@@ -192,7 +195,7 @@ public class Main {
                         currentSlide.getNum())).get(context, VSlide.class);
                 final BufferedImage image = ImageIO.read(
                         new ByteArrayInputStream(slide.getThumbnail()));
-                SwingUtilities.invokeLater(() -> label.setIcon(new ImageIcon(image)));
+                viewer.setImage(image);
             } catch (IOException | VException e) {
                 logger.log(Level.WARNING, "exception encountered while handling change event", e);
             }
@@ -245,5 +248,57 @@ public class Main {
 
         @Parameter(names = {"-h", "--help"}, description = "display this help message", help = true)
         private boolean help = false;
+    }
+
+    private static class ScaleToFitJPanel extends JPanel implements ImageViewer {
+        private Image image;
+
+        public ScaleToFitJPanel() {
+            super();
+            setPreferredSize(new Dimension(250, 250));
+            addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    repaint();
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            if (image != null) {
+                int width;
+                int height;
+                double containerRatio = 1.0d * getWidth() / getHeight();
+                double imageRatio = 1.0d * image.getWidth(null) / image.getHeight(null);
+
+                if (containerRatio < imageRatio) {
+                    width = getWidth();
+                    height = (int) (getWidth() / imageRatio);
+                } else {
+                    width = (int) (getHeight() * imageRatio);
+                    height = getHeight();
+                }
+
+                // Center the image in the container.
+                int x = (int) (((double) getWidth() / 2) - ((double) width / 2));
+                int y = (int) (((double) getHeight()/ 2) - ((double) height / 2));
+
+                g.drawImage(image, x, y, width, height, this);
+            }
+        }
+
+        @Override
+        public void setImage(Image image) {
+            this.image = image;
+            setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
+            repaint();
+        }
+    }
+
+    private interface ImageViewer {
+        void setImage(Image image);
     }
 }
