@@ -7,6 +7,7 @@ package io.v.syncslidepresenter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -14,9 +15,11 @@ import org.joda.time.Duration;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,6 +96,7 @@ public class Main {
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
         JFrame frame = new JFrame();
+        enableOSXFullscreen(frame);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
@@ -192,6 +196,24 @@ public class Main {
             } catch (IOException | VException e) {
                 logger.log(Level.WARNING, "exception encountered while handling change event", e);
             }
+        }
+    }
+
+    private static void enableOSXFullscreen(Window window) {
+        Preconditions.checkNotNull(window);
+        try {
+            // This class may not be present on the system (e.g. if we're not on MacOSX),
+            // use reflection so that we can make this an optional dependency.
+            Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+            Class params[] = new Class[]{Window.class, Boolean.TYPE};
+
+            @SuppressWarnings({"unchecked", "rawtypes"})
+            Method method = util.getMethod("setWindowCanFullScreen", params);
+            method.invoke(util, window, true);
+        } catch (ClassNotFoundException e) {
+            // Probably not on Mac OS X
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Couldn't enable fullscreen on Mac OS X", e);
         }
     }
 
