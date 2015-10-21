@@ -33,7 +33,7 @@ import java.util.UUID;
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
-import io.v.android.apps.syncslides.model.DeckImpl;
+import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.NoopList;
 import io.v.android.apps.syncslides.model.Slide;
@@ -93,11 +93,13 @@ public class SyncbaseDB implements DB {
     private final Map<String, CurrentSlideWatcher> mCurrentSlideWatchers;
     private final Map<String, QuestionWatcher> mQuestionWatchers;
     private Server mSyncbaseServer;
+    private final DeckFactory mDeckFactory;
 
     SyncbaseDB(Context context) {
         mContext = context;
         mCurrentSlideWatchers = Maps.newHashMap();
         mQuestionWatchers = Maps.newHashMap();
+        mDeckFactory = DeckFactory.Singleton.get(context);
     }
 
     @Override
@@ -304,22 +306,24 @@ public class SyncbaseDB implements DB {
         if (!mInitialized) {
             return new NoopList<>();
         }
-        return new DeckList(mVContext, mDB);
+        return new DeckList(mVContext, mDB, mDeckFactory);
     }
 
     private static class DeckList implements DBList {
 
         private final CancelableVContext mVContext;
         private final Database mDB;
+        private final DeckFactory mDeckFactory;
         private final Handler mHandler;
         private ResumeMarker mWatchMarker;
         private volatile boolean mIsDiscarded;
         private volatile Listener mListener;
         private List<Deck> mDecks;
 
-        public DeckList(VContext vContext, Database db) {
+        public DeckList(VContext vContext, Database db, DeckFactory df) {
             mVContext = vContext.withCancel();
             mDB = db;
+            mDeckFactory = df;
             mIsDiscarded = false;
             mDecks = Lists.newArrayList();
             mHandler = new Handler(Looper.getMainLooper());
@@ -345,12 +349,7 @@ public class SyncbaseDB implements DB {
                     }
                     String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched deck " + key);
-                    VDeck vDeck = (VDeck) row.get(1).getElem();
-                    final Deck deck = new DeckImpl(
-                            vDeck.getTitle(),
-                            BitmapFactory.decodeByteArray(
-                                    vDeck.getThumbnail(), 0, vDeck.getThumbnail().length),
-                            key);
+                    final Deck deck = mDeckFactory.make((VDeck) row.get(1).getElem(), key);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -393,11 +392,7 @@ public class SyncbaseDB implements DB {
                     } catch (VException e) {
                         Log.e(TAG, "Couldn't decode deck: " + e.toString());
                     }
-                    final Deck deck =
-                            new DeckImpl(vDeck.getTitle(),
-                                    BitmapFactory.decodeByteArray(
-                                            vDeck.getThumbnail(), 0, vDeck.getThumbnail().length),
-                                    key);
+                    final Deck deck = mDeckFactory.make(vDeck, key);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {

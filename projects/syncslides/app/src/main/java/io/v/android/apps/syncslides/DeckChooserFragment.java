@@ -36,7 +36,7 @@ import java.util.UUID;
 
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.model.Deck;
-import io.v.android.apps.syncslides.model.DeckImpl;
+import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Slide;
 import io.v.android.apps.syncslides.model.SlideImpl;
 
@@ -77,7 +77,6 @@ public class DeckChooserFragment extends Fragment {
                 onImportDeck();
             }
         });
-
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.deck_grid);
         mRecyclerView.setHasFixedSize(true);
 
@@ -208,7 +207,7 @@ public class DeckChooserFragment extends Fragment {
             String id = UUID.randomUUID().toString();
             String title = metadata.getString("Title");
             Bitmap thumb = readImage(dir, metadata.getString("Thumb"));
-            Deck deck = new DeckImpl(title, thumb, id);
+            Deck deck = DeckFactory.Singleton.get().make(title, thumb, id);
             Slide[] slides = readSlides(dir, metadata);
             // TODO(spetrovic): Do this asynchronously.
             DB.Singleton.get(getActivity().getApplicationContext()).importDeck(deck, slides);

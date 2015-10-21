@@ -14,6 +14,7 @@ import android.view.Menu;
 
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.misc.V23Manager;
+import io.v.android.apps.syncslides.model.DeckFactory;
 
 public class DeckChooserActivity extends AppCompatActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -30,6 +31,8 @@ public class DeckChooserActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
+        // Initialize the DeckFactory.
+        DeckFactory.Singleton.get(getApplicationContext());
         // Immediately initialize V23, possibly sending user to the
         // AccountManager to get blessings.
         V23Manager.Singleton.get().init(getApplicationContext(), this);

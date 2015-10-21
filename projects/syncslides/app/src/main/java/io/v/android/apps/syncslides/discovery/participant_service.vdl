@@ -8,20 +8,6 @@ import (
     "io/v/android/apps/syncslides/db"
 )
 
-type Description struct {
-	UserName string
-	Title string
-}
-
 type Participant interface {
-	Get() (Description | error)
-}
-
-// TODO(jregan):  Ditch Description in favor of db.VDeck.
-// so we get thumb automatically.  Rewire the remaining
-// code.  Add whatever else we need.
-// This is just a test of the code generator, and should
-// be removed shortly.
-type ChuckleParticipant interface {
 	Get() (db.VDeck | error)
 }

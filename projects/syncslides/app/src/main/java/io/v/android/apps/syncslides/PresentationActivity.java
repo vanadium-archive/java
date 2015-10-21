@@ -17,6 +17,7 @@ import io.v.android.apps.syncslides.discovery.ParticipantServerImpl;
 import io.v.android.apps.syncslides.misc.Config;
 import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
+import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
 import io.v.android.apps.syncslides.model.Role;
@@ -51,6 +52,8 @@ public class PresentationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
+        // Initialize the DeckFactory.
+        DeckFactory.Singleton.get(getApplicationContext());
         // Immediately initialize V23, possibly sending user to the
         // AccountManager to get blessings.
         V23Manager.Singleton.get().init(getApplicationContext(), this);

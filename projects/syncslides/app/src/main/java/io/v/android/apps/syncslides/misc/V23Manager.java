@@ -180,6 +180,10 @@ public class V23Manager {
         asyncConfigurePrincipal(blessings);
     }
 
+    public void flushServerFromCache(String name) {
+        V.getNamespace(mBaseContext).flushCacheEntry(mBaseContext, name);
+    }
+
     /**
      * v23 operations that require a blessing (almost everything) will fail if
      * attempted before this is true.

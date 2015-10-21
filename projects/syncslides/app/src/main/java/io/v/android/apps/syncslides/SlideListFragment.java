@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +64,8 @@ public class SlideListFragment extends Fragment {
                 bundle = getArguments();
             }
             mDeckId = bundle.getString(DECK_ID_KEY);
+            Log.d(TAG, "onCreateView - Got deckId = " + mDeckId);
+
             mRole = (Role) bundle.get(ROLE_KEY);
         }
 

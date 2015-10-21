@@ -6,32 +6,28 @@ package io.v.android.apps.syncslides.db;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import java.util.Collections;
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
-
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.model.Deck;
-import io.v.android.apps.syncslides.model.DeckImpl;
+import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Slide;
@@ -91,10 +87,8 @@ public class FakeDB implements DB {
         }
         mHandler = new Handler(Looper.getMainLooper());
         for (int i = 0; i < DECKTHUMBS.length; ++i) {
-            mDecks.add(new DeckImpl(
-                    DECKTITLES[i],
-                    BitmapFactory.decodeResource(context.getResources(), DECKTHUMBS[i]),
-                    String.valueOf(i)));
+            mDecks.add(DeckFactory.Singleton.get(context).make(
+                    DECKTITLES[i], DECKTHUMBS[i], i));
             mSlides.put(String.valueOf(i), new FakeSlideList(slides));
         }
         mCurrentSlideListeners = Lists.newArrayList();
@@ -110,9 +104,9 @@ public class FakeDB implements DB {
         Random random = new Random();
         for (int i = 0; i < 5; i++) {
             Question question = new Question(
-                    "queston"+i,
+                    "question" + i,
                     "Questioner",
-                    "#"+i,
+                    "#" + i,
                     DateTime.now().minus(Period.minutes(random.nextInt(5))));
             mQuestions.add(question);
         }

@@ -11,9 +11,6 @@ import android.os.Bundle;
  * Application impl of Deck.
  */
 public class DeckImpl implements Deck {
-    // For demos, debugging.
-    public static final Deck DUMMY = new DeckImpl(
-            Unknown.TITLE, Unknown.THUMB, Unknown.ID);
 
     private final String mTitle;
     private final Bitmap mThumb;
@@ -25,18 +22,10 @@ public class DeckImpl implements Deck {
         mDeckId = deckId;
     }
 
-    public DeckImpl(String title, Bitmap thumb) {
-        this(title, thumb, Unknown.ID);
-    }
-
-    public DeckImpl(String title) {
-        this(title, Unknown.THUMB);
-    }
-
     public String toString() {
-      return "[title=\""+ (mTitle == null ? "unknown" : mTitle) +
-              "\", id=" + (mDeckId == null ? "unknown" : mDeckId) +
-              ", thumb=" + (mThumb == null ? "no" : "yes") + "]";
+        return "[title=\"" + (mTitle == null ? "unknown" : mTitle) +
+                "\", id=" + (mDeckId == null ? "unknown" : mDeckId) +
+                ", thumb=" + (mThumb == null ? "no" : "yes") + "]";
     }
 
     @Override
@@ -69,8 +58,8 @@ public class DeckImpl implements Deck {
             b = new Bundle();
         }
         b.putString(B.DECK_TITLE, mTitle);
-        // TODO(jregan): Our thumbnails are too big!  We need to store
-        // them on disk, pass a file handle in the intent instead,
+        // TODO(jregan): Our thumbnails are too big for intent use.
+        // Could store on disk, pass a file handle in the intent instead,
         // and load them on the other side.
         // ### b.putParcelable(B.DECK_THUMB, mThumb);
         b.putString(B.DECK_ID, mDeckId);
@@ -92,9 +81,4 @@ public class DeckImpl implements Deck {
         return mDeckId;
     }
 
-    private static class Unknown {
-        static final String TITLE = "unknownTitle";
-        static final String ID = "unknownId";
-        static final Bitmap THUMB = null;
-    }
 }

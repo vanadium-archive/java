@@ -4,32 +4,44 @@
 
 package io.v.android.apps.syncslides.discovery;
 
+import android.content.Context;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import io.v.android.apps.syncslides.model.DeckImpl;
+import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
 
 public class ParticipantScannerFake implements ParticipantScanner {
     private static final String TAG = "ParticipantScannerFake";
 
+    protected final DeckFactory mDeckFactory;
+
     private int mCounter = 0;
+
+    public ParticipantScannerFake(Context context) {
+        this.mDeckFactory = DeckFactory.Singleton.get(context);
+    }
 
     public Set<Participant> scan() {
         mCounter = (mCounter + 1) % 10;
         HashSet<Participant> participants = new HashSet<>();
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
-                    new ParticipantPeer(
-                            "Alice", new DeckImpl(
-                            "Kale - Just eat it.", null, "deckByAlice")));
+                    ParticipantPeer.makeWithKnownDeck(
+                            "Alice",
+                            mDeckFactory.make(
+                                    "Kale - Just eat it.",
+                                    "deckByAlice")));
         }
         // Bob has less to say than Alice.
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
-                    new ParticipantPeer(
-                            "Bob", new DeckImpl(
-                            "Java - Object deluge.", null, "deckByBob")));
+                    ParticipantPeer.makeWithKnownDeck(
+                            "Bob",
+                            mDeckFactory.make(
+                                    "Java - Object deluge.",
+                                    "deckByBob")));
         }
         return participants;
     }

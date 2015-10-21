@@ -4,8 +4,12 @@
 
 package io.v.android.apps.syncslides.discovery;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+
+import io.v.android.apps.syncslides.db.VDeck;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.ServerCall;
@@ -21,12 +25,20 @@ public class ParticipantServerImpl implements ParticipantServer {
         mDeck = d;
     }
 
-    public Description get(VContext ctx, ServerCall call)
+    public VDeck get(VContext ctx, ServerCall call)
             throws io.v.v23.verror.VException {
         Log.d(TAG, "Responding to Get RPC.");
-        Description d = new Description();
+        Log.d(TAG, "  Sending mDeck = " + mDeck);
+        VDeck d = new VDeck();
         d.setTitle(mDeck.getTitle());
-        d.setUserName(mDeck.getId());
+        if (mDeck.getThumb() == null) {
+            Log.d(TAG, "  The response deck has no thumb.");
+        } else {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            Bitmap bitmap = mDeck.getThumb();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+            d.setThumbnail(stream.toByteArray());
+        }
         return d;
     }
 }

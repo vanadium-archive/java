@@ -24,7 +24,8 @@ public interface Participant {
     String getServiceName();
 
     // Initially get or refresh data from the endPoint.
-    void refreshData();
+    // Return true if call succeeds, false otherwise.
+    boolean refreshData();
 
     // For debugging.
     String toString();

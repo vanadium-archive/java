@@ -37,8 +37,6 @@ class Moderator implements Runnable {
     private final ParticipantScanner mScanner;
     // Notify this guy when task done; make it a list if more needed.
     private Observer mObserver;
-    // Counts runs for debugging.
-    private int mCounter = 0;
 
     public Moderator(ParticipantScanner scanner) {
         mScanner = scanner;
@@ -62,7 +60,6 @@ class Moderator implements Runnable {
             throw new IllegalStateException("Must have an observer.");
         }
         try {
-            mCounter++;
             process(mScanner.scan());
             mObserver.onTaskDone();
         } catch (Throwable t) {
@@ -78,11 +75,13 @@ class Moderator implements Runnable {
         mSenior.clear();
         mFreshman.clear();
 
+        Set<Participant> potentials = new HashSet<>();
+
         for (Participant p : latest) {
             if (current.contains(p)) {
                 mSenior.add(p);
             } else {
-                mFreshman.add(p);
+                potentials.add(p);
             }
         }
 
@@ -93,8 +92,11 @@ class Moderator implements Runnable {
             }
         }
 
-        for (Participant p : mFreshman) {
-            p.refreshData();
+
+        for (Participant p : potentials) {
+            if (p.refreshData()) {
+                mFreshman.add(p);
+            }
         }
     }
 

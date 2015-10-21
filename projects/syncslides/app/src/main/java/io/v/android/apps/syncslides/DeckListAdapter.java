@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 package io.v.android.apps.syncslides;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
+
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
@@ -42,7 +44,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             throw new IllegalStateException("Wrong lifecycle.");
         }
         Log.d(TAG, "Starting.");
-        DiscoveryManager dm = DiscoveryManager.make();
+        DiscoveryManager dm = DiscoveryManager.make(context);
         // Listening stops below in mLiveDecks.discard.
         dm.setListener(this);
         dm.start(context);
@@ -53,16 +55,19 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             public void notifyItemChanged(int position) {
                 DeckListAdapter.this.notifyItemChanged(mLiveDecks.getItemCount() + position);
             }
+
             @Override
             public void notifyItemInserted(int position) {
                 DeckListAdapter.this.notifyItemInserted(mLiveDecks.getItemCount() + position);
             }
+
             @Override
             public void notifyItemRemoved(int position) {
                 DeckListAdapter.this.notifyItemRemoved(mLiveDecks.getItemCount() + position);
             }
         });
     }
+
     /**
      * Stops any background monitoring of the underlying data.
      */
@@ -73,12 +78,14 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         mDecks.discard();
         mDecks = null;
     }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.deck_card, parent, false);
         return new ViewHolder(v);
     }
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int i) {
         final Deck deck;
@@ -129,7 +136,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                     String deviceId = "355499060490393"; // Nexus 6 ZX1G22MLNL
                     DB.Singleton.get(context).joinPresentation(
                             // TODO(kash): Use the real syncgroup name.
-                            "/192.168.86.254:8101/"+deviceId+"/%%sync/syncslides/" +
+                            "/192.168.86.254:8101/" + deviceId + "/%%sync/syncslides/" +
                                     "deckId1/randomPresentationId1",
                             new DB.Callback<Void>() {
                                 @Override
@@ -151,6 +158,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             }
         });
     }
+
     @Override
     public int getItemCount() {
         return mLiveDecks.getItemCount() + mDecks.getItemCount();

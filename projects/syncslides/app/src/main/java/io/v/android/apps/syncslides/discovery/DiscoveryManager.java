@@ -39,7 +39,7 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     private final Handler mHandler;
     private Listener mListener;
 
-    public static DiscoveryManager make() {
+    public static DiscoveryManager make(Context context) {
         // If blessings not in place, use fake data.
         boolean useRealDiscovery =
                 Config.MtDiscovery.ENABLE &&
@@ -47,11 +47,11 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
         if (useRealDiscovery) {
             Log.d(TAG, "Using real discovery.");
             return new DiscoveryManager(
-                    new Moderator(new ParticipantScannerMt()));
+                    new Moderator(new ParticipantScannerMt(context)));
         }
         Log.d(TAG, "Using fake discovery.");
         return new DiscoveryManager(
-                new Moderator(new ParticipantScannerFake()));
+                new Moderator(new ParticipantScannerFake(context)));
     }
 
     private DiscoveryManager(Moderator moderator) {
@@ -123,7 +123,6 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
     public void discard() {
         Log.d(TAG, "Discarding.");
         stop();
-        mListener = null;
     }
 }
 
