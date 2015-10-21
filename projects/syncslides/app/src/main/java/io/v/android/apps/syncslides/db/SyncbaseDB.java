@@ -281,6 +281,7 @@ public class SyncbaseDB implements DB {
             @Override
             public void run() {
                 try {
+                    Log.i(TAG, "Joining: " + syncgroupName);
                     Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
                     syncgroup.join(mVContext, new SyncgroupMemberInfo((byte) 1));
                     for (String member : syncgroup.getMembers(mVContext).keySet()) {
@@ -309,7 +310,7 @@ public class SyncbaseDB implements DB {
         return new DeckList(mVContext, mDB, mDeckFactory);
     }
 
-    private static class DeckList implements DBList {
+    private static class DeckList implements DBList<Deck> {
 
         private final CancelableVContext mVContext;
         private final Database mDB;

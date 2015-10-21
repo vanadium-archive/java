@@ -1,0 +1,44 @@
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: 'io.v.vdl'
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://maven.v.io'
+        }
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+    }
+}
+
+mainClassName = "io.v.syncslidepresenter"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':lib')
+    compile 'com.google.guava:guava:18'
+    compile 'com.beust:jcommander:1.48'
+}
+
+task copyLib(type: Copy) {
+    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.dylib'].join(File.separator))
+    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
+    destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
+}
+
+clean {
+    delete 'src/main/resources/libv23.so'
+    delete 'src/main/resources/libv23.dylib'
+}
+
+vdl {
+    inputPaths += [project(':projects:syncslides').projectDir.absolutePath + '/app/src/main/java']
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
