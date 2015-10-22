@@ -13,6 +13,8 @@ type Presentation struct {
     Deck db.VDeck
     Person db.VPerson
     DeckId string
+    PresentationId string
+    SyncgroupName string
 }
 
 type Participant interface {

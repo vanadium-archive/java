@@ -109,9 +109,13 @@ public class DiscoveryManager implements DB.DBList<Deck>, Moderator.Observer {
         return mParticipants.size();
     }
 
+    public Participant getParticipant(int i) {
+        return mParticipants.get(i);
+    }
+
     @Override
     public Deck get(int i) {
-        return mParticipants.get(i).getDeck();
+        return getParticipant(i).getDeck();
     }
 
     @Override
