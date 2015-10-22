@@ -124,7 +124,7 @@ public class SyncbaseDB implements DB {
         // work so DB methods should return noop values.  It's assumed that
         // the calling fragment will send the user to the AccountManager,
         // accept blessings on return, then re-call this init.
-        if (V23Manager.Singleton.get().isBlessed()) {
+        if (!V23Manager.Singleton.get().isBlessed()) {
             Log.d(TAG, "no blessings.");
             return;
         }
