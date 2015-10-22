@@ -126,6 +126,13 @@ public interface DB {
     void importDeck(Deck deck, Slide[] slides, Callback<Void> callback);
 
     /**
+     * Synchronously gets a deck by Id.  Returns null if not found.
+     *
+     * @param deckId id of the deck to get
+     */
+    Deck getDeck(String deckId);
+
+    /**
      * Asynchronously deletes the deck and all of its slides.
      *
      * @param deckId id of the deck to delete

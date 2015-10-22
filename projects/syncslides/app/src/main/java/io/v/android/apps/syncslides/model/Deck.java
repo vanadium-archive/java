@@ -28,17 +28,9 @@ public interface Deck {
     String getId();
 
     /**
-     * Returns a bundled form of the instance; pass null for a new bundle,
-     * pass an existing bundle to overwrite its fields.
-     */
-    Bundle toBundle(Bundle b);
-
-    /**
-     * Keys for Bundle fields.
+     * Keys for Bundle/Intent fields.
      */
     class B {
         public static final String DECK_ID = "deck_id";
-        public static final String DECK_TITLE = "deck_title";
-        public static final String DECK_THUMB = "deck_thumb";
     }
 }

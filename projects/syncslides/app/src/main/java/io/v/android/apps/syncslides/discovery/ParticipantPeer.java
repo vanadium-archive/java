@@ -4,17 +4,22 @@
 
 package io.v.android.apps.syncslides.discovery;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.ByteArrayOutputStream;
+
 import io.v.android.apps.syncslides.db.VDeck;
 import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
+import io.v.v23.context.VContext;
+import io.v.v23.rpc.ServerCall;
 import io.v.v23.verror.VException;
 
 /**
@@ -148,5 +153,34 @@ public class ParticipantPeer implements Participant {
     private static class Unknown {
         static final String SERVER_NAME = "unknownServerName";
         static final String USER_NAME = "unknownUserName";
+    }
+
+    /**
+     * Serves data used in deck discovery.
+     */
+    public static class Server implements ParticipantServer {
+        private static final String TAG = "ParticipantServer";
+        private final Deck mDeck;
+
+        public Server(Deck d) {
+            mDeck = d;
+        }
+
+        public VDeck get(VContext ctx, ServerCall call)
+                throws VException {
+            Log.d(TAG, "Responding to Get RPC.");
+            Log.d(TAG, "  Sending mDeck = " + mDeck);
+            VDeck d = new VDeck();
+            d.setTitle(mDeck.getTitle());
+            if (mDeck.getThumb() == null) {
+                Log.d(TAG, "  The response deck has no thumb.");
+            } else {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                Bitmap bitmap = mDeck.getThumb();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+                d.setThumbnail(stream.toByteArray());
+            }
+            return d;
+        }
     }
 }
