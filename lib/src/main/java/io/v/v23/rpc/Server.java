@@ -34,26 +34,6 @@ public interface Server {
     ServerStatus getStatus();
 
     /**
-     * Returns an iterator over server's network changes.  The returned iterator blocks
-     * if there aren't any immediate changes.  Some change events may be lost if the reader is
-     * too slow in its iterations.
-     * <p>
-     * You should be aware that the iterator:
-     * <p><ul>
-     *     <li>can be created <strong>only</strong> once</li>
-     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
-     * </ul>
-     */
-    Iterable<NetworkChange> watchNetwork();
-
-    /**
-     * Unregisters an iterator previously returned via {@link #watchNetwork}.
-     *
-     * @param it an iterator previously returned via {@link #watchNetwork}
-     */
-    void unwatchNetwork(Iterable<NetworkChange> it);
-
-    /**
      * Gracefully stops all services on this server.  New calls are rejected, but any in-flight
      * calls are allowed to complete.  All published mountpoints are unmounted.  This call waits for
      * this process to complete and returns once the server has been shut down.

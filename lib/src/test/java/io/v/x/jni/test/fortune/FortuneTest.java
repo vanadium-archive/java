@@ -17,7 +17,6 @@ import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
-import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
@@ -241,17 +240,6 @@ public class FortuneTest extends TestCase {
                 fail(String.format("Expected error %s, got %s", FortuneServerImpl.COMPLEX_ERROR, e));
             }
         }
-    }
-
-    public void testWatchNetwork() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
-
-        // TODO(spetrovic): Figure out how to force network change in android and test that the
-        // changes get announced on this channel.
-        Server s = V.getServer(ctx);
-        Iterable<NetworkChange> channel = s.watchNetwork();
-        s.unwatchNetwork(channel);
     }
 
     public void testContext() throws Exception {

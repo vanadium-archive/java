@@ -4,8 +4,6 @@
 
 package io.v.impl.google.rpc;
 
-import io.v.impl.google.channel.ChannelIterable;
-import io.v.v23.rpc.NetworkChange;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.verror.VException;
@@ -16,9 +14,6 @@ public class ServerImpl implements Server {
     private native void nativeAddName(long nativePtr, String name) throws VException;
     private native void nativeRemoveName(long nativePtr, String name);
     private native ServerStatus nativeGetStatus(long nativePtr) throws VException;
-    private native Iterable<NetworkChange> nativeWatchNetwork(long nativePtr) throws VException;
-    private native void nativeUnwatchNetwork(long nativePtr, ChannelIterable<NetworkChange> channel)
-            throws VException;
     private native void nativeStop(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
@@ -40,25 +35,6 @@ public class ServerImpl implements Server {
             return nativeGetStatus(this.nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get status", e);
-        }
-    }
-    @Override
-    public Iterable<NetworkChange> watchNetwork() {
-        try {
-            return nativeWatchNetwork(this.nativePtr);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't watch network", e);
-        }
-    }
-    @Override
-    public void unwatchNetwork(Iterable<NetworkChange> it) {
-        if (it == null || !(it instanceof ChannelIterable)) {
-            return;
-        }
-        try {
-            nativeUnwatchNetwork(this.nativePtr, (ChannelIterable<NetworkChange>) it);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't unwatch network", e);
         }
     }
     @Override
