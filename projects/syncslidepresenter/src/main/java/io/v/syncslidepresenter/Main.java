@@ -109,10 +109,9 @@ public class Main {
         Permissions permissions = new Permissions(ImmutableMap.of("1", acl));
         String name = NamingUtil.join(options.mountPrefix, UUID.randomUUID().toString());
         logger.info("Mounting new syncbase server at " + name);
-        baseContext = SyncbaseServer.withNewServer(
-                baseContext.withTimeout(Duration.standardSeconds(options.mountTimeoutSeconds)),
+        VContext mountContext = SyncbaseServer.withNewServer(baseContext,
                 new SyncbaseServer.Params().withPermissions(permissions).withName(name));
-        final Server server = V.getServer(baseContext);
+        final Server server = V.getServer(mountContext);
         if (server.getStatus().getEndpoints().length > 0) {
             logger.info("Mounted syncbase server at the following endpoints: ");
             for (Endpoint e : server.getStatus().getEndpoints()) {
@@ -229,10 +228,6 @@ public class Main {
                 description = "the presentation to watch")
         private String presentationName = "/192.168.86.254:8101/990005300000537/%%sync/"
                 + "syncslides/deckId1/randomPresentationId1";
-
-        @Parameter(names = {"--mountTimeout"},
-                description = "the number of seconds to wait for the syncbase server to be created")
-        private int mountTimeoutSeconds = 10;
 
         @Parameter(names = {"--joinTimeout"},
                 description = "the number of seconds to wait to join the presentation")
