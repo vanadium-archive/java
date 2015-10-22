@@ -326,6 +326,17 @@ public class FakeDB implements DB {
     }
 
     @Override
+    public Deck getDeck(String deckId) {
+        for (int i = 0; i < mDecks.getItemCount(); i++) {
+            Deck result = mDecks.get(i);
+            if (result.getId().equals(deckId)) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void deleteDeck(String deckId) {
         mDecks.delete(deckId);
     }

@@ -961,6 +961,20 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
+    public Deck getDeck(String deckId) {
+        VDeck vDeck = null;
+        try {
+            vDeck = (VDeck) mDecks.get(mVContext, deckId, VDeck.class);
+        } catch (VException e) {
+            handleError(e.toString());
+        }
+        if (vDeck != null) {
+            return mDeckFactory.make(vDeck, deckId);
+        }
+        return null;
+    }
+
+    @Override
     public void deleteDeck(String deckId) {
         try {
             mDecks.deleteRange(mVContext, RowRange.prefix(deckId));

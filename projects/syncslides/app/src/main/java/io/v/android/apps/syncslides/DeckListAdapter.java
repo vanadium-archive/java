@@ -87,13 +87,13 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int i) {
+    public void onBindViewHolder(final ViewHolder holder, int deckIndex) {
         final Deck deck;
         final Role role;
         // If the position is less than the number of live presentation decks, get deck card from
         // there (and don't allow the user to delete the deck). If not, get the card from the DB.
-        if (i < mLiveDecks.getItemCount()) {
-            deck = mLiveDecks.get(i);
+        if (deckIndex < mLiveDecks.getItemCount()) {
+            deck = mLiveDecks.get(deckIndex);
             holder.mToolbarLiveNow
                     .setText(holder.itemView.getResources().getString(R.string.presentation_live));
             holder.mToolbarLiveNow.setVisibility(View.VISIBLE);
@@ -101,7 +101,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
             holder.mToolbar.getMenu().clear();
             role = Role.AUDIENCE;
         } else {
-            deck = mDecks.get(i - mLiveDecks.getItemCount());
+            deck = mDecks.get(deckIndex - mLiveDecks.getItemCount());
             // TODO(afergan): Set actual date here.
             holder.mToolbarLastOpened.setText("Opened on Oct 26, 2015");
             holder.mToolbarLastOpened.setVisibility(View.VISIBLE);
@@ -141,22 +141,21 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                             new DB.Callback<Void>() {
                                 @Override
                                 public void done(Void aVoid) {
-                                    // Intent for the activity to open when user selects the thumbnail.
-                                    Intent intent = new Intent(context, PresentationActivity.class);
-                                    intent.putExtras(deck.toBundle(null));
-                                    intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
-                                    context.startActivity(intent);
+                                    showSlides(context, deck, role);
                                 }
                             });
                 } else {
-                    // Intent for the activity to open when user selects the thumbnail.
-                    Intent intent = new Intent(context, PresentationActivity.class);
-                    intent.putExtras(deck.toBundle(null));
-                    intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
-                    context.startActivity(intent);
+                    showSlides(context, deck, role);
                 }
             }
         });
+    }
+
+    private void showSlides(Context context, Deck deck, Role role) {
+        Intent intent = new Intent(context, PresentationActivity.class);
+        intent.putExtra(Deck.B.DECK_ID, deck.getId());
+        intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
+        context.startActivity(intent);
     }
 
     @Override

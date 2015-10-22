@@ -42,9 +42,6 @@ public interface Participant {
     class B {
         public static final String PARTICIPANT_ROLE = "participant_role";
         public static final String PARTICIPANT_SHOULD_ADV = "participant_is_advertising";
-        public static final String PARTICIPANT_SERVICE_NAME = "participant_endPoint";
-        public static final String PARTICIPANT_NAME = "participant_name";
-        public static final String PARTICIPANT_BLESSINGS = "participant_blessings";
         public static final String PARTICIPANT_SYNCED = "participant_synced";
     }
 }

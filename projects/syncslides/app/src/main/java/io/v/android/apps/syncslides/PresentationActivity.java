@@ -13,12 +13,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
-import io.v.android.apps.syncslides.discovery.ParticipantServerImpl;
+import io.v.android.apps.syncslides.discovery.ParticipantPeer;
 import io.v.android.apps.syncslides.misc.Config;
 import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
-import io.v.android.apps.syncslides.model.DeckImpl;
 import io.v.android.apps.syncslides.model.Participant;
 import io.v.android.apps.syncslides.model.Role;
 
@@ -62,22 +61,30 @@ public class PresentationActivity extends AppCompatActivity {
 
         mShouldBeAdvertising = false;
         mIsAdvertising = false;
+        String deckId;
         if (savedInstanceState == null) {
             Log.d(TAG, "savedInstanceState is null");
-            mDeck = DeckImpl.fromBundle(getIntent().getExtras());
+            deckId = getIntent().getStringExtra(Deck.B.DECK_ID);
             mRole = (Role) getIntent().getSerializableExtra(
                     Participant.B.PARTICIPANT_ROLE);
             mSynced = true;
         } else {
             Log.d(TAG, "savedInstanceState is NOT null");
-            mDeck = DeckImpl.fromBundle(savedInstanceState);
             mRole = (Role) savedInstanceState.get(Participant.B.PARTICIPANT_ROLE);
+            deckId = savedInstanceState.getString(Deck.B.DECK_ID);
             mSynced = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SYNCED);
             mShouldBeAdvertising = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SHOULD_ADV);
             if (mShouldBeAdvertising) {
                 Log.d(TAG, "Need to restore advertising");
             }
         }
+
+        Log.d(TAG, "Role = " + mRole);
+        mDeck = DB.Singleton.get(getApplicationContext()).getDeck(deckId);
+        if (mDeck == null) {
+            throw new IllegalArgumentException("Unusable deckId: "+ deckId);
+        }
+        Log.d(TAG, "Using deck: " + mDeck);
 
         // TODO(jregan): This appears to be an attempt to avoid fragment
         // re-inflation, possibly the right thing to do is move the code
@@ -114,10 +121,10 @@ public class PresentationActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle b) {
-        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(b);
-        mDeck.toBundle(b);
+        Log.d(TAG, "onSaveInstanceState");
         b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
+        b.putString(Deck.B.DECK_ID, mDeck.getId());
         b.putBoolean(Participant.B.PARTICIPANT_SYNCED, mSynced);
         b.putBoolean(Participant.B.PARTICIPANT_SHOULD_ADV, mShouldBeAdvertising);
     }
@@ -175,7 +182,7 @@ public class PresentationActivity extends AppCompatActivity {
         if (shouldUseV23()) {
             V23Manager.Singleton.get().mount(
                     Config.MtDiscovery.makeMountName(mDeck),
-                    new ParticipantServerImpl(mDeck));
+                    new ParticipantPeer.Server(mDeck));
             Log.d(TAG, "MT advertising started.");
         } else {
             Log.d(TAG, "No means to start advertising.");
