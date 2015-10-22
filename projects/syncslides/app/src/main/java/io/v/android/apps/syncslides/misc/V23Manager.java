@@ -183,7 +183,7 @@ public class V23Manager {
                     BLESSING_REQUEST);
             return;
         }
-        asyncConfigurePrincipal(blessings);
+        configurePrincipal(blessings);
     }
 
     public void flushServerFromCache(String name) {
@@ -222,15 +222,6 @@ public class V23Manager {
         }
         Log.d(TAG, "blessings stored: " +
                 (mBlessings == null ? "NONE!" : mBlessings.toString()));
-    }
-
-    private void asyncConfigurePrincipal(final Blessings blessings) {
-        mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                configurePrincipal(blessings);
-            }
-        });
     }
 
     public void shutdown(Behavior behavior) {
