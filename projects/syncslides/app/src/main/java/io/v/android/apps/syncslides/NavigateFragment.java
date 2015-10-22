@@ -128,16 +128,18 @@ public class NavigateFragment extends Fragment {
             mFabSync.setVisibility(View.VISIBLE);
         }
 
-        mFabSync.setOnClickListener(new View.OnClickListener() {
+        mFabSync.setOnClickListener(new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 sync();
                 mFabSync.setVisibility(View.INVISIBLE);
             }
         });
-        View.OnClickListener previousSlideListener = new View.OnClickListener() {
+        View.OnClickListener previousSlideListener = new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 previousSlide();
             }
         };
@@ -146,9 +148,10 @@ public class NavigateFragment extends Fragment {
         mPrevThumb = (ImageView) rootView.findViewById(R.id.prev_thumb);
         mPrevThumb.setOnClickListener(previousSlideListener);
 
-        View.OnClickListener nextSlideListener = new View.OnClickListener() {
+        View.OnClickListener nextSlideListener = new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 nextSlide();
             }
         };
@@ -166,16 +169,18 @@ public class NavigateFragment extends Fragment {
         mNextThumb.setOnClickListener(nextSlideListener);
         mQuestions = (ImageView) rootView.findViewById(R.id.questions);
         // TODO(kash): Hide the mQuestions button if mRole == BROWSER.
-        mQuestions.setOnClickListener(new View.OnClickListener() {
+        mQuestions.setOnClickListener(new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 questionButton();
             }
         });
         mCurrentSlide = (ImageView) rootView.findViewById(R.id.slide_current_medium);
-        mCurrentSlide.setOnClickListener(new View.OnClickListener() {
+        mCurrentSlide.setOnClickListener(new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 if (mRole == Role.AUDIENCE || mRole == Role.BROWSER) {
                     ((PresentationActivity) getActivity()).showFullscreenSlide(mUserSlideNum);
                 }
@@ -193,6 +198,7 @@ public class NavigateFragment extends Fragment {
                 unsync();
             }
         });
+
         // The parent of mNotes needs to be focusable in order to clear focus
         // from mNotes when done editing.  We set the attributes in code rather
         // than in XML because it is too easy to add an extra level of layout
@@ -203,9 +209,10 @@ public class NavigateFragment extends Fragment {
         parent.setFocusableInTouchMode(true);
 
         View slideListIcon = rootView.findViewById(R.id.slide_list);
-        slideListIcon.setOnClickListener(new View.OnClickListener() {
+        slideListIcon.setOnClickListener(new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 if (mRole == Role.AUDIENCE) {
                     ((PresentationActivity) getActivity()).showSlideList();
                 } else {
@@ -299,18 +306,24 @@ public class NavigateFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
-                mNotes.clearFocus();
-                InputMethodManager inputManager =
-                        (InputMethodManager) getContext().
-                                getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(
-                        getActivity().getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
-                ((PresentationActivity) getActivity()).setUiImmersive(true);
+                saveNotes();
                 return true;
         }
         return false;
+    }
+
+    public void saveNotes() {
+        if (mEditing) {
+            Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
+            mNotes.clearFocus();
+            InputMethodManager inputManager =
+                    (InputMethodManager) getContext().
+                            getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(
+                    getActivity().getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+            ((PresentationActivity) getActivity()).setUiImmersive(true);
+        }
     }
 
     private void unsync() {
@@ -457,9 +470,10 @@ public class NavigateFragment extends Fragment {
      */
     private void handoffControl() {
         //TODO(afergan): Change slide presenter to the audience member at mQuestionerPosition.
-        View.OnClickListener snackbarClickListener = new View.OnClickListener() {
+        View.OnClickListener snackbarClickListener = new NavigateClickListener() {
             @Override
             public void onClick(View v) {
+                super.onClick(v);
                 //TODO(afergan): End handoff, presenter regains control of presentation.
             }
         };
@@ -503,6 +517,13 @@ public class NavigateFragment extends Fragment {
             ViewGroup grandparent = (ViewGroup) thumb.getParent().getParent();
             ViewGroup.LayoutParams thumbParams = thumb.getLayoutParams();
             thumbParams.height = (int) ((9 / 16.0) * grandparent.getMeasuredWidth());
+        }
+    }
+
+    public class NavigateClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            saveNotes();
         }
     }
 }

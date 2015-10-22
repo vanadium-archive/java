@@ -27,7 +27,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter" />
 
                 <TextView
                     android:id="@+id/slide_num_text"
@@ -39,7 +39,7 @@
                     android:background="@drawable/nav_hint"
                     android:paddingLeft="@dimen/nav_hint_padding"
                     android:paddingRight="@dimen/nav_hint_padding"
-                    android:textColor="@color/nav_hint_text"/>
+                    android:textColor="@color/nav_hint_text" />
 
             </RelativeLayout>
 
@@ -86,10 +86,10 @@
                         android:layout_height="wrap_content"
                         android:layout_alignRight="@id/questions"
                         android:layout_alignTop="@id/questions"
-                        android:gravity="center"
-                        android:textSize="@dimen/nav_question_num_size"
                         android:background="@drawable/orange_circle"
-                        android:textColor="@color/nav_question_num_text"/>
+                        android:gravity="center"
+                        android:textColor="@color/nav_question_num_text"
+                        android:textSize="@dimen/nav_question_num_size" />
                 </RelativeLayout>
 
 
@@ -140,12 +140,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/blue_grey_50"
         android:gravity="left"
         android:hint="@string/notes_hint"
-        android:textSize="18sp"
-        android:scrollbars="vertical"
         android:inputType="textMultiLine|textAutoComplete|textCapSentences"
-        android:background="@color/blue_grey_50"/>
+        android:scrollbars="vertical"
+        android:textSize="18sp" />
 
     <!-- Display the next and previous slide thumbnails. -->
     <LinearLayout
@@ -166,6 +166,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
+                android:background="@color/blue_grey_50"
                 android:scaleType="fitCenter" />
 
             <TextView
@@ -193,6 +194,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
+                android:background="@color/blue_grey_50"
                 android:scaleType="fitCenter" />
 
             <TextView
