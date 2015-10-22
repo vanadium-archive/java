@@ -45,7 +45,7 @@ public class Config {
          * Every v23 service will be mounted in the namespace with a name
          * prefixed by this.
          */
-        private static String LIVE_PRESENTATION_PREFIX = "liveDeck";
+        private static String LIVE_PRESENTATION_PREFIX = "powerDeck";
 
         /**
          * TODO(jregan): Assure legal mount name (remove blanks and such).

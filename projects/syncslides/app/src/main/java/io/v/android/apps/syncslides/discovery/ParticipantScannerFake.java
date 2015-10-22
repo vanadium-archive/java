@@ -9,6 +9,7 @@ import android.content.Context;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.v.android.apps.syncslides.db.VPerson;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
 
@@ -29,7 +30,7 @@ public class ParticipantScannerFake implements ParticipantScanner {
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
-                            "Alice",
+                            new VPerson("Liz", "Lemon"),
                             mDeckFactory.make(
                                     "Kale - Just eat it.",
                                     "deckByAlice")));
@@ -38,7 +39,7 @@ public class ParticipantScannerFake implements ParticipantScanner {
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
-                            "Bob",
+                            new VPerson("Jack", "Donaghy"),
                             mDeckFactory.make(
                                     "Java - Object deluge.",
                                     "deckByBob")));

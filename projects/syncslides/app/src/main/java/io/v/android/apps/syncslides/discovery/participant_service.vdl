@@ -8,6 +8,13 @@ import (
     "io/v/android/apps/syncslides/db"
 )
 
+// Who's presenting, and what are they presenting?
+type Presentation struct {
+    Deck db.VDeck
+    Person db.VPerson
+    DeckId string
+}
+
 type Participant interface {
-	Get() (db.VDeck | error)
+	Get() (Presentation | error)
 }

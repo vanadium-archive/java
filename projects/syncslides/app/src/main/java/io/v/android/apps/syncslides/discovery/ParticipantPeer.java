@@ -14,6 +14,8 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.ByteArrayOutputStream;
 
 import io.v.android.apps.syncslides.db.VDeck;
+import io.v.android.apps.syncslides.db.VPerson;
+import io.v.android.apps.syncslides.discovery.Presentation;
 import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
@@ -43,9 +45,8 @@ public class ParticipantPeer implements Participant {
             DateTimeFormat.forPattern("hh_mm_ss_SSSS");
     // V23 name of the V23 service representing the participant.
     private final String mServiceName;
-    // Visible name of human presenter.
-    // TODO(jregan): Switch to VPerson or the model equivalent.
-    private String mUserName;
+    // Person presenting.
+    private VPerson mUser;
     // When did we last grab data from the endPoint?
     private DateTime mRefreshTime;
     // Deck the user is presenting.  Can only present one at a time.
@@ -54,8 +55,8 @@ public class ParticipantPeer implements Participant {
     private final DeckFactory mDeckFactory;
 
     private ParticipantPeer(
-            String userName, Deck deck, String serviceName, DeckFactory deckFactory) {
-        mUserName = userName;
+            VPerson user, Deck deck, String serviceName, DeckFactory deckFactory) {
+        mUser = user;
         mDeck = deck;
         mServiceName = serviceName;
         mDeckFactory = deckFactory;
@@ -63,11 +64,13 @@ public class ParticipantPeer implements Participant {
 
     public static ParticipantPeer makeWithServiceName(
             String serviceName, DeckFactory deckFactory) {
-        return new ParticipantPeer(Unknown.USER_NAME, null, serviceName, deckFactory);
+        return new ParticipantPeer(
+                // The person and deck are obtained from the given service.
+                null, null, serviceName, deckFactory);
     }
 
-    public static ParticipantPeer makeWithKnownDeck(String userName, Deck deck) {
-        return new ParticipantPeer(userName, deck, Unknown.SERVER_NAME, null);
+    public static ParticipantPeer makeWithKnownDeck(VPerson user, Deck deck) {
+        return new ParticipantPeer(user, deck, Unknown.SERVER_NAME, null);
     }
 
     @Override
@@ -77,8 +80,8 @@ public class ParticipantPeer implements Participant {
     }
 
     @Override
-    public String getUserName() {
-        return mUserName;
+    public VPerson getUser() {
+        return mUser;
     }
 
     @Override
@@ -88,7 +91,7 @@ public class ParticipantPeer implements Participant {
 
     @Override
     public String toString() {
-        return "[userName=\"" + mUserName +
+        return "[user=\"" + mUser +
                 "\", deck=" + mDeck +
                 ", time=" + getStringRefreshtime() + "]";
     }
@@ -133,18 +136,10 @@ public class ParticipantPeer implements Participant {
         Log.d(TAG, "Got client = " + client.toString());
         try {
             Log.d(TAG, "Calling get...");
-            VDeck vDeck = client.get(
+            Presentation p = client.get(
                     V23Manager.Singleton.get().getVContext());
-            Log.d(TAG, "Back with vDeck = "+ vDeck.toString());
-            byte[] bytes = vDeck.getThumbnail();
-            if (bytes != null && bytes.length > 0) {
-                Log.d(TAG, " Seem to have a thumb");
-            } else {
-                Log.d(TAG, " No thumb");
-            }
-            Deck newDeck = mDeckFactory.make(vDeck, "whatShouldTheIdBe");
+            mDeck = mDeckFactory.make(p.getDeck(), p.getDeckId());
             mRefreshTime = DateTime.now();
-            mDeck = newDeck;
             Log.d(TAG, "  Got deck = " + mDeck);
             return true;
         } catch (VException e) {
@@ -164,27 +159,20 @@ public class ParticipantPeer implements Participant {
      */
     public static class Server implements ParticipantServer {
         private static final String TAG = "ParticipantServer";
-        private final Deck mDeck;
+        private final Presentation mPresentation;
 
-        public Server(Deck d) {
-            mDeck = d;
+        public Server(VDeck d, String deckId, VPerson user) {
+            Presentation p = new Presentation();
+            p.setDeck(d);
+            p.setDeckId(deckId);
+            p.setPerson(user);
+            mPresentation = p;
         }
 
-        public VDeck get(VContext ctx, ServerCall call)
+        public Presentation get(VContext ctx, ServerCall call)
                 throws VException {
             Log.d(TAG, "Responding to Get RPC.");
-            Log.d(TAG, "  Sending mDeck = " + mDeck);
-            VDeck d = new VDeck();
-            d.setTitle(mDeck.getTitle());
-            if (mDeck.getThumb() == null) {
-                Log.d(TAG, "  The response deck has no thumb.");
-            } else {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                Bitmap bitmap = mDeck.getThumb();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-                d.setThumbnail(stream.toByteArray());
-            }
-            return d;
+            return mPresentation;
         }
     }
 }

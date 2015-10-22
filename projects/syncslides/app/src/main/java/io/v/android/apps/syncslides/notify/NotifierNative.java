@@ -53,7 +53,7 @@ public class NotifierNative implements Notifier {
                 .setFullScreenIntent(contentIntent, false)
                 .setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle(p.getUserName())
+                .setContentTitle(p.getUser().getLastName())
                 .setContentText(p.getDeck().getTitle())
                 // TODO(jregan): Need a better icon.
                 .setSmallIcon(R.drawable.orange_circle)

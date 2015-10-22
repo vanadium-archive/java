@@ -7,7 +7,10 @@ package io.v.android.apps.syncslides.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
+
+import java.io.ByteArrayOutputStream;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.db.VDeck;
@@ -58,11 +61,28 @@ public class DeckFactory {
                 id);
     }
 
+    public VDeck make(Deck deck) {
+        VDeck vd = new VDeck();
+        vd.setTitle(deck.getTitle());
+        vd.setThumbnail(makeBytesFromBitmap(deck.getThumb()));
+        return vd;
+    }
+
     public Deck make(String title, Bitmap thumb, String id) {
         title = (title == null || title.isEmpty()) ? Unknown.TITLE : title;
         thumb = (thumb == null) ? mDefaultThumb : thumb;
         id = (id == null || id.isEmpty()) ? Unknown.ID : id;
         return new DeckImpl(title, thumb, id);
+    }
+
+    private byte[] makeBytesFromBitmap(Bitmap thumb) {
+        if (thumb == null) {
+            return new byte[0];
+        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        thumb.compress(
+                Bitmap.CompressFormat.JPEG, 60 /* quality */, stream);
+        return stream.toByteArray();
     }
 
     public static class Singleton {

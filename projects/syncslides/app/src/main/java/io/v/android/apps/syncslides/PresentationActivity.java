@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.db.VPerson;
 import io.v.android.apps.syncslides.discovery.ParticipantPeer;
 import io.v.android.apps.syncslides.misc.Config;
 import io.v.android.apps.syncslides.misc.V23Manager;
@@ -33,6 +34,11 @@ public class PresentationActivity extends AppCompatActivity {
      * of the activity.
      */
     private Role mRole;
+    /**
+     * Makes decks, handles deck conversions.
+     */
+    private DeckFactory mDeckFactory;
+
     // TODO(kash): Replace this with the presentation id.
     private String mPresentationId = "randomPresentationId1";
     private boolean mSynced;
@@ -52,7 +58,7 @@ public class PresentationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         // Initialize the DeckFactory.
-        DeckFactory.Singleton.get(getApplicationContext());
+        mDeckFactory = DeckFactory.Singleton.get(getApplicationContext());
         // Immediately initialize V23, possibly sending user to the
         // AccountManager to get blessings.
         V23Manager.Singleton.get().init(getApplicationContext(), this);
@@ -182,7 +188,10 @@ public class PresentationActivity extends AppCompatActivity {
         if (shouldUseV23()) {
             V23Manager.Singleton.get().mount(
                     Config.MtDiscovery.makeMountName(mDeck),
-                    new ParticipantPeer.Server(mDeck));
+                    new ParticipantPeer.Server(
+                            mDeckFactory.make(mDeck), mDeck.getId(),
+                            // TODO(jregan): Get actual user name from device.
+                            new VPerson("Jenna", "Maroney")));
             Log.d(TAG, "MT advertising started.");
         } else {
             Log.d(TAG, "No means to start advertising.");

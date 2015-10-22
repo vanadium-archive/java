@@ -4,6 +4,8 @@
 
 package io.v.android.apps.syncslides.model;
 
+import io.v.android.apps.syncslides.db.VPerson;
+
 /**
  * Someone taking part in a presentation.
  *
@@ -12,10 +14,8 @@ package io.v.android.apps.syncslides.model;
  */
 public interface Participant {
 
-    // Name of the user participating, intended to be visible to others. This
-    // can be a colloquial name as opposed to a 'real' name or email address
-    // extracted from a device or blessing.
-    String getUserName();
+    // User presenting.
+    VPerson getUser();
 
     // Deck the user may be presenting.
     Deck getDeck();
