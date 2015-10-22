@@ -7,6 +7,8 @@ package io.v.android.apps.syncslides.misc;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.v.android.apps.syncslides.SignInActivity;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
@@ -172,8 +175,11 @@ public class V23Manager {
                 throw new IllegalArgumentException(
                         "Cannot get blessings without an activity to return to.");
             }
+            // Get the signed-in user's email to generate the blessings from.
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(androidCtx);
+            String userEmail = prefs.getString(SignInActivity.PREF_USER_ACCOUNT_NAME, "");
             activity.startActivityForResult(
-                    BlessingService.newBlessingIntent(androidCtx),
+                    BlessingService.newBlessingIntent(androidCtx, userEmail),
                     BLESSING_REQUEST);
             return;
         }

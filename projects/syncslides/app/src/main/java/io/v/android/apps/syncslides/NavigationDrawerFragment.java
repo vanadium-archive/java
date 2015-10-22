@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -31,6 +36,7 @@ import android.widget.ListView;
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment {
+    private static final String TAG = "NavigationDrawer";
 
     /**
      * Remember the position of the selected item.
@@ -56,6 +62,7 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
+    private JSONObject mUserProfile;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
@@ -70,8 +77,14 @@ public class NavigationDrawerFragment extends Fragment {
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mUserLearnedDrawer = prefs.getBoolean(PREF_USER_LEARNED_DRAWER, false);
+        String userProfileJsonStr = prefs.getString(SignInActivity.PREF_USER_PROFILE_JSON, "");
+        try {
+            mUserProfile = new JSONObject(userProfileJsonStr);
+        } catch (JSONException e) {
+            Log.e(TAG, "Couldn't parse user profile data: " + userProfileJsonStr);
+        }
 
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
@@ -100,15 +113,33 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+        mDrawerListView.setAdapter(new ArrayAdapter<JSONObject>(
                 getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
+                android.R.layout.simple_list_item_activated_2,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_account1),
-                        getString(R.string.title_account2),
-                        getString(R.string.title_account3),
-                }));
+                new JSONObject[]{mUserProfile}) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                JSONObject userProfile = getItem(position);
+                String name = "";
+                String email = "";
+                if (userProfile != null) {
+                    try {
+                        name = userProfile.getString("name");
+                        email = userProfile.getString("email");
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error reading from user profile: " + e.getMessage());
+                    }
+                }
+                if (name.isEmpty() && email.isEmpty()) {
+                    name = "USER1";
+                }
+                View view = super.getView(position, convertView, parent);
+                ((TextView) view.findViewById(android.R.id.text1)).setText(name);
+                ((TextView) view.findViewById(android.R.id.text2)).setText(email);
+                return view;
+            }
+        });
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -269,7 +300,7 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         /**
          * Called when an item in the navigation drawer is selected.
          */

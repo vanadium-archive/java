@@ -1,29 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="io.v.android.apps.syncslides"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.v.android.apps.syncslides" >
+
+    <uses-sdk android:minSdkVersion="22" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
-            android:name=".DeckChooserActivity"
-            android:label="@string/app_name">
+            android:name=".SignInActivity"
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PresentationActivity"/>
+        <activity
+            android:name=".DeckChooserActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity android:name=".PresentationActivity" />
         <service
             android:name=".discovery.ParticipantPeer"
             android:exported="false"
             android:label="Location Service"
-            android:process=":ParticipantPeer">
+            android:process=":ParticipantPeer" >
         </service>
     </application>
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 </manifest>
