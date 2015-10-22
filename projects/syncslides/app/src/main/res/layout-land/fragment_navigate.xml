@@ -18,10 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@color/blue_grey_50"
             android:gravity="left"
             android:hint="@string/notes_hint"
-            android:textSize="18sp"
-            android:background="@color/blue_grey_50"/>
+            android:textSize="18sp" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
+                android:background="@color/blue_grey_50"
                 android:scaleType="fitCenter" />
 
             <TextView
@@ -60,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
+                android:background="@color/blue_grey_50"
                 android:scaleType="fitCenter" />
 
             <TextView

@@ -43,6 +43,12 @@ public class QuestionDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((PresentationActivity) getActivity()).setUiImmersive(true);
+    }
+
     // Send back the position of the questioner to the NavigateFragment.
     private void sendResult(int position) {
         Intent intent = new Intent();

@@ -216,7 +216,7 @@ public class PresentationActivity extends AppCompatActivity {
             }
         });
         mRole = Role.PRESENTER;
-        showNavigateFragment(0);
+        showNavigateFragmentWithBackStack(0);
     }
 
     /**
