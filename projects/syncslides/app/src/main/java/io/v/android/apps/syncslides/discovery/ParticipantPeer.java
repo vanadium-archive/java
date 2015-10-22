@@ -119,6 +119,10 @@ public class ParticipantPeer implements Participant {
      */
     @Override
     public boolean refreshData() {
+        if (mServiceName.equals(Unknown.SERVER_NAME)) {
+            // Don't attempt refresh.
+            return true;
+        }
         Log.d(TAG, "refreshData");
         // Flush, since the server might have died and restarted, invalidating
         // cached endpoints.
