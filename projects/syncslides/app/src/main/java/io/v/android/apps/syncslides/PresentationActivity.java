@@ -21,7 +21,6 @@ import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
 import io.v.android.apps.syncslides.model.Role;
-import io.v.v23.services.binary.PartInfo;
 
 public class PresentationActivity extends AppCompatActivity {
     private static final String TAG = "PresentationActivity";
@@ -97,7 +96,17 @@ public class PresentationActivity extends AppCompatActivity {
             }
         }
 
-        mDeck = DB.Singleton.get(getApplicationContext()).getDeck(deckId);
+        // TODO(kash): This is a total hack.  I thought that the deck would be
+        // loaded by this point, but we aren't actually guaranteed that.  After
+        // this is fixed, we can uncomment handleError in SyncbaseDB.getDeck().
+        while ((mDeck = DB.Singleton.get(getApplicationContext()).getDeck(deckId)) == null) {
+            Log.d(TAG, "Waiting for deck to load...");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if (mDeck == null) {
             throw new IllegalArgumentException("Unusable deckId: "+ deckId);
         }
