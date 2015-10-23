@@ -101,7 +101,7 @@ class CurrentSlideWatcher {
         Log.i(TAG, "notifyListeners " + slide);
         mCurrentSlide = slide;
         for (DB.CurrentSlideListener listener : mListeners) {
-            Log.i(TAG, "notifying listner " + listener);
+            Log.i(TAG, "notifying listener " + listener);
             listener.onChange(mCurrentSlide.getNum());
         }
     }

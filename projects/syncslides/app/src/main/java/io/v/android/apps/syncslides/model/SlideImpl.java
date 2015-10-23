@@ -11,7 +11,7 @@ import android.graphics.Bitmap;
  */
 public class SlideImpl implements Slide {
     private final Bitmap mThumbnail;
-    private final String mNotes;
+    private String mNotes;
 
     public SlideImpl(Bitmap thumbnail, String notes) {
         mThumbnail = thumbnail;
@@ -26,5 +26,10 @@ public class SlideImpl implements Slide {
     @Override
     public String getNotes() {
         return mNotes;
+    }
+
+    @Override
+    public void setNotes(String notes) {
+        mNotes = notes;
     }
 }

@@ -4,7 +4,6 @@
 
 package io.v.android.apps.syncslides.db;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -771,6 +770,27 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
+    public void setSlideNotes(final String deckId, final int slideNum, final String slideNotes) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String rowKey = slideRowKey(deckId, slideNum);
+                    Log.i(TAG, "Saving notes " + rowKey + " with " + slideNotes);
+                    Table notesTable = mDB.getTable(NOTES_TABLE);
+                    notesTable.put(mVContext, rowKey, new VNote(slideNotes), VNote.class);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
+
+    private String slideRowKey(String deckId, int slideNum) {
+        return NamingUtil.join(deckId, "slides", String.format("%04d", slideNum));
+    }
+
+    @Override
     public void addCurrentSlideListener(String deckId, String presentationId,
                                         CurrentSlideListener listener) {
         String key = NamingUtil.join(deckId, presentationId);
@@ -938,7 +958,7 @@ public class SyncbaseDB implements DB {
     }
 
     private void putSlide(String prefix, int idx, byte[] thumbData, String note) throws VException {
-        String key = NamingUtil.join(prefix, "slides", String.format("%04d", idx));
+        String key = slideRowKey(prefix, idx);
         Log.i(TAG, "Adding slide " + key);
         if (!mDecks.getRow(key).exists(mVContext)) {
             mDecks.put(

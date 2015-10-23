@@ -185,6 +185,15 @@ public interface DB {
      */
     void setCurrentSlide(String deckId, String presentationId, int slideNum);
 
+    /**
+     * Saves notes for the specified slide.
+     *
+     * @param deckId         the deck being presented
+     * @param slideNum       the current slide number
+     * @param slideNotes     the text of the slide's notes
+     */
+    void setSlideNotes(String deckId, int slideNum, String slideNotes);
+
     interface CurrentSlideListener {
         /**
          * Called whenever the current slide of a live presentation changes.

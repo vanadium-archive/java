@@ -19,4 +19,9 @@ public interface Slide {
      * Returns the slide notes.
      */
     String getNotes();
+
+    /**
+     * Sets the slide notes.
+     */
+    void setNotes(String notes);
 }

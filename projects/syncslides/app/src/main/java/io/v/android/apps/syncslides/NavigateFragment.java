@@ -312,9 +312,16 @@ public class NavigateFragment extends Fragment {
         return false;
     }
 
+    /**
+     * If the user is editing the text field and the text has changed, save the
+     * notes locally and in Syncbase.
+     */
     public void saveNotes() {
-        if (mEditing) {
+        final String notes = mNotes.getText().toString();
+        if (mEditing && (!notes.equals(mSlides.get(mUserSlideNum).getNotes()))) {
             Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
+            mSlides.get(mUserSlideNum).setNotes(notes);
+            mDB.setSlideNotes(mDeckId, mUserSlideNum, notes);
             mNotes.clearFocus();
             InputMethodManager inputManager =
                     (InputMethodManager) getContext().

@@ -4,7 +4,6 @@
 
 package io.v.android.apps.syncslides.db;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -121,7 +120,7 @@ public class FakeDB implements DB {
     }
 
     private static class FakeSlide implements Slide {
-        private final String mSlideNotes;
+        private String mSlideNotes;
         private final Bitmap mSlideImage;
 
         FakeSlide(Bitmap slideImage, String slideNotes) {
@@ -137,6 +136,11 @@ public class FakeDB implements DB {
         @Override
         public String getNotes() {
             return mSlideNotes;
+        }
+
+        @Override
+        public void setNotes(String notes) {
+            mSlideNotes = notes;
         }
     }
 
@@ -260,6 +264,11 @@ public class FakeDB implements DB {
     public void setCurrentSlide(String deckId, String presentationId, int slideNum) {
 
     }
+
+    @Override
+    public void setSlideNotes(String deckId, int slideNum, String slideNotes) {
+
+     }
 
     @Override
     public void addCurrentSlideListener(String deckId, String presentationId,
