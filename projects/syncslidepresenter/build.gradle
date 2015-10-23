@@ -13,7 +13,7 @@ buildscript {
     }
 }
 
-mainClassName = "io.v.syncslidepresenter"
+mainClassName = "io.v.syncslidepresenter.Main"
 
 repositories {
     mavenCentral()
@@ -25,11 +25,13 @@ dependencies {
     compile 'com.beust:jcommander:1.48'
 }
 
-task copyLib(type: Copy) {
+task copyLib(type: Copy, dependsOn: project(':lib').tasks.'copyVanadiumLib') {
     from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.dylib'].join(File.separator))
     from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
     destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
 }
+
+tasks.'processResources'.dependsOn(copyLib)
 
 clean {
     delete 'src/main/resources/libv23.so'
