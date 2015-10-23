@@ -7,6 +7,7 @@ package io.v.syncslidepresenter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -25,6 +26,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,11 +39,18 @@ import javax.swing.WindowConstants;
 
 import io.v.android.apps.syncslides.db.VCurrentSlide;
 import io.v.android.apps.syncslides.db.VSlide;
+import io.v.android.apps.syncslides.discovery.ParticipantClient;
+import io.v.android.apps.syncslides.discovery.ParticipantClientFactory;
+import io.v.android.apps.syncslides.discovery.Presentation;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
+import io.v.v23.naming.GlobReply;
+import io.v.v23.naming.MountEntry;
+import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.access.AccessList;
@@ -155,8 +165,11 @@ public class Main {
             frame.pack();
 
             Main m = new Main(baseContext, presentationPanel, db, decks, presentations);
-            m.joinPresentation(options.presentationName, options.joinTimeoutSeconds,
-                    options.currentSlideKey, options.slideRowFormat);
+
+            Presentation presentation = new Discovery(
+                    baseContext, options.mountPrefix, options.deckPrefix).getPresentation();
+            logger.info("Using presentation: " + presentation);
+            m.joinPresentation(presentation, options.joinTimeoutSeconds, options.slideRowFormat);
         }
     }
 
@@ -169,11 +182,10 @@ public class Main {
         this.viewer = viewer;
     }
 
-    public void joinPresentation(final String syncgroupName,
+    public void joinPresentation(final Presentation presentation,
                                  int joinTimeoutSeconds,
-                                 String currentSlideKey,
                                  String slideRowFormat) throws VException {
-        Syncgroup syncgroup = db.getSyncgroup(syncgroupName);
+        Syncgroup syncgroup = db.getSyncgroup(presentation.getSyncgroupName());
         syncgroup.join(context.withTimeout(Duration.standardSeconds(joinTimeoutSeconds)),
                 new SyncgroupMemberInfo((byte) 1));
         for (String member : syncgroup.getMembers(context).keySet()) {
@@ -185,7 +197,10 @@ public class Main {
         }
         BatchDatabase batch = db.beginBatch(context, null);
         ResumeMarker marker = batch.getResumeMarker(context);
-        Stream<WatchChange> watchStream = db.watch(context, presentations.name(), currentSlideKey,
+        String rowKey = Joiner.on("/").join(presentation.getDeckId(), presentation
+                .getPresentationId(), "CurrentSlide");
+        logger.info("going to watch row key " + rowKey);
+        Stream<WatchChange> watchStream = db.watch(context, presentations.name(), rowKey,
                 marker);
 
         for (WatchChange w : watchStream) {
@@ -226,6 +241,10 @@ public class Main {
     }
 
     public static class Options {
+        @Parameter(names = {"-d", "--deckPrefix"},
+                description = "mounttable prefix for live presentations.")
+        private String deckPrefix = "happyDeck";
+
         @Parameter(names = {"-m", "--mountPrefix"}, description = "the base path in the namespace"
                 + " where the syncbase service will be mounted")
         private String mountPrefix = "/192.168.86.254:8101";
@@ -238,10 +257,6 @@ public class Main {
         @Parameter(names = {"--joinTimeout"},
                 description = "the number of seconds to wait to join the presentation")
         private int joinTimeoutSeconds = 10;
-
-        @Parameter(names = {"-k", "--currentSlideKey"},
-                description = "the row key containing the current slide")
-        private String currentSlideKey = "deckId1/randomPresentationId1/CurrentSlide";
 
         @Parameter(names = {"-f", "--slideRowFormat"},
                 description = "a pattern specifying where slide rows are found")
@@ -301,5 +316,64 @@ public class Main {
 
     private interface ImageViewer {
         void setImage(Image image);
+    }
+
+    private static class Discovery {
+        public static final Duration MT_TIMEOUT =
+                Duration.standardSeconds(10);
+
+        private final VContext context;
+        private final String mtName;
+        private final String deckPrefix;
+
+        public Discovery(VContext context, String mtName, String deckPrefix) {
+            this.context = context;
+            this.mtName = mtName;
+            this.deckPrefix = deckPrefix;
+        }
+
+        private Set<String> scan(String pattern) {
+            logger.info("Scanning MT " + mtName + " with pattern \"" + pattern + "\"");
+            try {
+                Namespace ns = V.getNamespace(context);
+                ns.setRoots(ImmutableList.of(mtName));
+                Set<String> result = new HashSet<String>();
+                VContext ctx = context.withTimeout(MT_TIMEOUT);
+                for (GlobReply reply : V.getNamespace(ctx).glob(ctx, pattern)) {
+                    if (reply instanceof GlobReply.Entry) {
+                        MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                        result.add(entry.getName());
+                        for (MountedServer server : entry.getServers()) {
+                            logger.info("    endPoint: \"" + server.getServer() + "\"");
+                        }
+                    }
+                }
+                return result;
+            } catch (VException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        private Presentation findPreso(String serviceName) {
+            V.getNamespace(context).flushCacheEntry(context, serviceName);
+            ParticipantClient client =
+                    ParticipantClientFactory.getParticipantClient(serviceName);
+            try {
+                Presentation p = client.get(context.withTimeout(
+                        Duration.standardSeconds(5)));
+                return p;
+            } catch (VException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        public Presentation getPresentation() {
+            Set<String> services = scan(deckPrefix + "/*");
+            if (services.size() < 1) {
+                return null;
+            }
+            // Just grab the first one.
+            return findPreso(services.iterator().next());
+        }
     }
 }
