@@ -201,8 +201,7 @@ public class SyncbaseDB implements DB {
 
     private void createPresentationRunnable(final String deckId,
                                             final Callback<CreatePresentationResult> callback) {
-        //final String presentationId = UUID.randomUUID().toString();
-        final String presentationId = "randomPresentationId1";
+        final String presentationId = UUID.randomUUID().toString();
         String prefix = NamingUtil.join(deckId, presentationId);
         try {
             // Add rows to Presentations table.
@@ -221,7 +220,6 @@ public class SyncbaseDB implements DB {
                     mSyncbaseServer.getStatus().getMounts()[0].getName(),
                     "%%sync/syncslides",
                     prefix);
-            //final String syncgroupName = STATIC_SYNCGROUP;
             Log.i(TAG, "Creating syncgroup " + syncgroupName);
             Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
             CancelableVContext context = mVContext.withTimeout(Duration.millis(5000));
@@ -247,8 +245,6 @@ public class SyncbaseDB implements DB {
                 }
             }
             Log.i(TAG, "Finished creating syncgroup");
-
-            V23Manager.Singleton.get().scan("...");
 
             // TODO(kash): Create a syncgroup for Notes?  Not sure if we should do that
             // here or somewhere else.  We're not going to demo sync across a user's
@@ -288,7 +284,6 @@ public class SyncbaseDB implements DB {
                     for (String member : syncgroup.getMembers(mVContext).keySet()) {
                         Log.i(TAG, "Member: " + member);
                     }
-                    V23Manager.Singleton.get().scan("...");
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         @Override
