@@ -776,6 +776,23 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
+    public void setSlideNotes(final String deckId, final int slideNum,
+                                final String slideNotes) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String rowKey = NamingUtil.join(deckId, String.valueOf(slideNum), NOTES_TABLE);
+                    Log.i(TAG, "Saving notes " + rowKey + " with " + slideNotes);
+                    mNotes.put(mVContext, rowKey, new VNote(slideNotes), VNote.class);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
+
+    @Override
     public void addCurrentSlideListener(String deckId, String presentationId,
                                         CurrentSlideListener listener) {
         String key = NamingUtil.join(deckId, presentationId);

@@ -262,6 +262,11 @@ public class FakeDB implements DB {
     }
 
     @Override
+    public void setSlideNotes(String deckId, int slideNum, String slideNotes) {
+        
+    }
+
+    @Override
     public void addCurrentSlideListener(String deckId, String presentationId,
                                         CurrentSlideListener listener) {
         mCurrentSlideListeners.add(listener);
