@@ -16,7 +16,7 @@
         <ImageView
             android:id="@+id/deck_thumb"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/deck_thumb_height"
             android:scaleType="centerCrop"/>
 
         <!-- Display the title of the deck and a menu to configure it. -->
