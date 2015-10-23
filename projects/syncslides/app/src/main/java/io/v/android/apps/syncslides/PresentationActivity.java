@@ -71,7 +71,6 @@ public class PresentationActivity extends AppCompatActivity {
         // Immediately initialize V23, possibly sending user to the
         // AccountManager to get blessings.
         V23Manager.Singleton.get().init(getApplicationContext(), this);
-        DB.Singleton.get(getApplicationContext()).init(this);
         setContentView(R.layout.activity_presentation);
 
         mShouldBeAdvertising = false;

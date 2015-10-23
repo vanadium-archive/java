@@ -39,14 +39,9 @@ public interface DB {
     }
 
     /**
-     * Perform initialization steps.  This method must be called early in the
-     * lifetime of the activity.  As part of the initialization, it might send
-     * an intent to another activity.
-     *
-     * @param activity implements onActivityResult() to call into
-     *                 DB.onActivityResult.
+     * Perform initialization steps.
      */
-    void init(Activity activity);
+    void init();
 
     /**
      * Provides a list of elements via an API that fits well with

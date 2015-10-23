@@ -217,7 +217,7 @@ public class FakeDB implements DB {
 
 
     @Override
-    public void init(Activity activity) {
+    public void init() {
         // Nothing to do.
     }
 

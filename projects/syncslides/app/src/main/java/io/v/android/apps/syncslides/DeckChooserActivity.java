@@ -38,7 +38,6 @@ public class DeckChooserActivity extends AppCompatActivity
         V23Manager.Singleton.get().init(getApplicationContext(), this);
 
         mDB = DB.Singleton.get(getApplicationContext());
-        mDB.init(this);
 
         setContentView(R.layout.activity_deck_chooser);
 

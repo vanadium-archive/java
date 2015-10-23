@@ -103,7 +103,7 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void init(Activity activity) {
+    public void init() {
         Log.d(TAG, "init");
         if (mInitialized) {
             Log.d(TAG, "already initialized");

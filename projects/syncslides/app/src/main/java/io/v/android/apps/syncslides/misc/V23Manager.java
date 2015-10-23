@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.v.android.apps.syncslides.SignInActivity;
+import io.v.android.apps.syncslides.db.DB;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
@@ -100,6 +101,7 @@ public class V23Manager {
             Log.d(TAG, "unpacking blessing");
             Blessings blessings = unpackBlessings(androidCtx, resultCode, data);
             Singleton.get().configurePrincipal(blessings);
+            DB.Singleton.get(androidCtx).init();
         } catch (BlessingCreationException e) {
             throw new IllegalStateException(e);
         } catch (VException e) {
@@ -184,6 +186,7 @@ public class V23Manager {
             return;
         }
         configurePrincipal(blessings);
+        DB.Singleton.get(mAndroidCtx).init();
     }
 
     public void flushServerFromCache(String name) {
