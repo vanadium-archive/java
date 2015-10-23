@@ -315,7 +315,7 @@ public class NavigateFragment extends Fragment {
     public void saveNotes() {
         if (mEditing) {
             Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
-            mDB.setSlideNotes(mDeckId, mCurrentSlideNum, mNotes.getText().toString());
+            mDB.setSlideNotes(mDeckId, mUserSlideNum, mNotes.getText().toString());
             mNotes.clearFocus();
             InputMethodManager inputManager =
                     (InputMethodManager) getContext().

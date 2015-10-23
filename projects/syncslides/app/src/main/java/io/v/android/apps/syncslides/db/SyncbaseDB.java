@@ -782,8 +782,11 @@ public class SyncbaseDB implements DB {
             @Override
             public void run() {
                 try {
-                    String rowKey = NamingUtil.join(deckId, String.valueOf(slideNum), NOTES_TABLE);
+                    String rowKey =
+                            NamingUtil.join(deckId, "slide", String.format("%04d", slideNum));
                     Log.i(TAG, "Saving notes " + rowKey + " with " + slideNotes);
+                    //Table notesTable = batch.getTable(NOTES_TABLE);
+                    //notesTable.put(mVContext, key, VNote.class))
                     mNotes.put(mVContext, rowKey, new VNote(slideNotes), VNote.class);
                 } catch (VException e) {
                     handleError(e.toString());
