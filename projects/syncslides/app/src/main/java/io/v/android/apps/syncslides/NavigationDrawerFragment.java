@@ -79,11 +79,15 @@ public class NavigationDrawerFragment extends Fragment {
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedDrawer = prefs.getBoolean(PREF_USER_LEARNED_DRAWER, false);
+        mUserProfile = new JSONObject();
+        // See if user profile has been stored in shared preferences.
         String userProfileJsonStr = prefs.getString(SignInActivity.PREF_USER_PROFILE_JSON, "");
-        try {
-            mUserProfile = new JSONObject(userProfileJsonStr);
-        } catch (JSONException e) {
-            Log.e(TAG, "Couldn't parse user profile data: " + userProfileJsonStr);
+        if (!userProfileJsonStr.isEmpty()) {
+            try {
+                mUserProfile = new JSONObject(userProfileJsonStr);
+            } catch (JSONException e) {
+                Log.e(TAG, "Couldn't parse user profile data: " + userProfileJsonStr);
+            }
         }
 
         if (savedInstanceState != null) {
