@@ -115,11 +115,6 @@ public class NavigateFragment extends Fragment {
         mLoadingCurrentSlide = -1;
         mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
-        if (((PresentationActivity) getActivity()).getSynced()) {
-            sync();
-        } else {
-            unsync();
-        }
         final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
         mFabSync = rootView.findViewById(R.id.audience_sync_fab);
         if (mSynced || mRole != Role.AUDIENCE) {
@@ -233,12 +228,17 @@ public class NavigateFragment extends Fragment {
                 // The CurrentSlideListener could have been notified while we were waiting for
                 // the slides to load.
                 if (mLoadingCurrentSlide != -1) {
-                    currentSlideChanged(mLoadingCurrentSlide);
+                    currentSlideChanged(mUserSlideNum);
                 } else {
                     updateView();
                 }
             }
         });
+        if (((PresentationActivity) getActivity()).getSynced()) {
+            sync();
+        } else {
+            unsync();
+        }
 
         return rootView;
     }
