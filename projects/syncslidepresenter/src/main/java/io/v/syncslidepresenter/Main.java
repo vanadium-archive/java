@@ -62,7 +62,13 @@ import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 /**
- * The entry point for syncslidepresenter.
+ * The entry point for syncslidepresenter. To run:
+ *
+ * <pre>
+ *     cd $JIRI_ROOT/release/java
+ *     ./gradlew :projects:syncslidepresenter:installDist
+ *     ./projects/syncslidepresenter/build/install/syncslidepresenter/bin/syncslidepresenter
+ * </pre>
  */
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
