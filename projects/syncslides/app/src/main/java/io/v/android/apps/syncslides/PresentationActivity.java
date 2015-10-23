@@ -21,6 +21,7 @@ import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
 import io.v.android.apps.syncslides.model.Role;
+import io.v.v23.services.binary.PartInfo;
 
 public class PresentationActivity extends AppCompatActivity {
     private static final String TAG = "PresentationActivity";
@@ -39,8 +40,16 @@ public class PresentationActivity extends AppCompatActivity {
      */
     private DeckFactory mDeckFactory;
 
-    // TODO(kash): Replace this with the presentation id.
-    private String mPresentationId = "randomPresentationId1";
+    /**
+     * The presentation ID.
+     */
+    private String mPresentationId;
+
+    /**
+     * The syncgroup name.
+     */
+    private String mSyncgroupName;
+
     private boolean mSynced;
 
     /**
@@ -73,11 +82,15 @@ public class PresentationActivity extends AppCompatActivity {
             deckId = getIntent().getStringExtra(Deck.B.DECK_ID);
             mRole = (Role) getIntent().getSerializableExtra(
                     Participant.B.PARTICIPANT_ROLE);
+            mPresentationId = getIntent().getStringExtra(Participant.B.PRESENTATION_ID);
+            mSyncgroupName = getIntent().getStringExtra(Participant.B.SYNCGROUP_NAME);
             mSynced = true;
         } else {
             Log.d(TAG, "savedInstanceState is NOT null");
             mRole = (Role) savedInstanceState.get(Participant.B.PARTICIPANT_ROLE);
             deckId = savedInstanceState.getString(Deck.B.DECK_ID);
+            mPresentationId = savedInstanceState.getString(Participant.B.PRESENTATION_ID);
+            mSyncgroupName = savedInstanceState.getString(Participant.B.SYNCGROUP_NAME);
             mSynced = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SYNCED);
             mShouldBeAdvertising = savedInstanceState.getBoolean(Participant.B.PARTICIPANT_SHOULD_ADV);
             if (mShouldBeAdvertising) {
@@ -85,12 +98,24 @@ public class PresentationActivity extends AppCompatActivity {
             }
         }
 
-        Log.d(TAG, "Role = " + mRole);
         mDeck = DB.Singleton.get(getApplicationContext()).getDeck(deckId);
         if (mDeck == null) {
             throw new IllegalArgumentException("Unusable deckId: "+ deckId);
         }
-        Log.d(TAG, "Using deck: " + mDeck);
+        Log.d(TAG, "Unpacked state:");
+        Log.d(TAG, "  mShouldBeAdvertising = " + mShouldBeAdvertising);
+        Log.d(TAG, "                 mRole = " + mRole);
+        Log.d(TAG, "       mPresentationId = " + mPresentationId);
+        Log.d(TAG, "        mSyncgroupName = " + mSyncgroupName);
+        Log.d(TAG, "                  Deck = " + mDeck);
+        Log.d(TAG, "               mSynced = " + mSynced);
+
+        if (mRole.equals(Role.AUDIENCE)) {
+            if (mPresentationId.equals(Participant.Unknown.PRESENTATION_ID) ||
+                    mSyncgroupName.equals(Participant.Unknown.SYNCGROUP_NAME)) {
+                throw new IllegalArgumentException("Cannot be an audience.");
+            }
+        }
 
         // TODO(jregan): This appears to be an attempt to avoid fragment
         // re-inflation, possibly the right thing to do is move the code
@@ -130,6 +155,8 @@ public class PresentationActivity extends AppCompatActivity {
         super.onSaveInstanceState(b);
         Log.d(TAG, "onSaveInstanceState");
         b.putSerializable(Participant.B.PARTICIPANT_ROLE, mRole);
+        b.putString(Participant.B.PRESENTATION_ID, mPresentationId);
+        b.putString(Participant.B.SYNCGROUP_NAME, mSyncgroupName);
         b.putString(Deck.B.DECK_ID, mDeck.getId());
         b.putBoolean(Participant.B.PARTICIPANT_SYNCED, mSynced);
         b.putBoolean(Participant.B.PARTICIPANT_SHOULD_ADV, mShouldBeAdvertising);
@@ -189,10 +216,16 @@ public class PresentationActivity extends AppCompatActivity {
             V23Manager.Singleton.get().mount(
                     Config.MtDiscovery.makeMountName(mDeck),
                     new ParticipantPeer.Server(
-                            mDeckFactory.make(mDeck), mDeck.getId(),
-                            // TODO(jregan): Get actual user name from device.
-                            new VPerson("Jenna", "Maroney")));
-            Log.d(TAG, "MT advertising started.");
+                            mDeckFactory.make(mDeck),
+                            mDeck.getId(),
+                            // TODO(jregan): Get user name from device.
+                            new VPerson("Jenna", "Maroney"),
+                            mSyncgroupName,
+                            mPresentationId));
+            Log.d(TAG, "MT advertising started:");
+            Log.d(TAG, "    mSyncgroupName = " + mSyncgroupName);
+            Log.d(TAG, "   mPresentationId = " + mPresentationId);
+            Log.d(TAG, "             mDeck = " + mDeck);
         } else {
             Log.d(TAG, "No means to start advertising.");
         }
@@ -224,15 +257,17 @@ public class PresentationActivity extends AppCompatActivity {
         DB db = DB.Singleton.get(getApplicationContext());
         db.createPresentation(mDeck.getId(), new DB.Callback<DB.CreatePresentationResult>() {
             @Override
-            public void done(DB.CreatePresentationResult startPresentationResult) {
+            public void done(DB.CreatePresentationResult result) {
                 Log.i(TAG, "Started presentation");
                 Toast.makeText(getApplicationContext(), "Started presentation",
                         Toast.LENGTH_SHORT).show();
+                mPresentationId = result.presentationId;
+                mSyncgroupName = result.syncgroupName;
                 startAdvertising();
+                showNavigateFragmentWithBackStack(0);
             }
         });
         mRole = Role.PRESENTER;
-        showNavigateFragmentWithBackStack(0);
     }
 
     /**

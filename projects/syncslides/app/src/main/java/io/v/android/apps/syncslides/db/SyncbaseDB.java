@@ -283,6 +283,7 @@ public class SyncbaseDB implements DB {
                 try {
                     Log.i(TAG, "Joining: " + syncgroupName);
                     Syncgroup syncgroup = mDB.getSyncgroup(syncgroupName);
+                    Log.d(TAG, "syncgroup = " + syncgroup);
                     syncgroup.join(mVContext, new SyncgroupMemberInfo((byte) 1));
                     for (String member : syncgroup.getMembers(mVContext).keySet()) {
                         Log.i(TAG, "Member: " + member);

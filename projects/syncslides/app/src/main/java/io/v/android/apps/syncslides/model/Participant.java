@@ -20,6 +20,12 @@ public interface Participant {
     // Deck the user may be presenting.
     Deck getDeck();
 
+    // The presentation ID.
+    String getPresentationId();
+
+    // The syncgroup name.
+    String getSyncgroupName();
+
     // Name of a service with participant information.
     String getServiceName();
 
@@ -40,8 +46,15 @@ public interface Participant {
      * Keys for Bundle fields.
      */
     class B {
+        public static final String SYNCGROUP_NAME = "participant_syncgroup_name";
+        public static final String PRESENTATION_ID = "participant_pres_id";
         public static final String PARTICIPANT_ROLE = "participant_role";
         public static final String PARTICIPANT_SHOULD_ADV = "participant_is_advertising";
         public static final String PARTICIPANT_SYNCED = "participant_synced";
+    }
+
+    class Unknown {
+        public static final String SYNCGROUP_NAME = "unknown_syncgroup";
+        public static final String PRESENTATION_ID = "unknown_pres_id";
     }
 }

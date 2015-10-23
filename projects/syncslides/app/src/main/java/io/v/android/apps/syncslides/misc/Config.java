@@ -29,7 +29,7 @@ public class Config {
         /**
          * If true, enable use of syncbase as the DB, else use a fake.
          */
-        public static final boolean ENABLE = false;
+        public static final boolean ENABLE = true;
     }
 
     public static class MtDiscovery {
@@ -45,7 +45,7 @@ public class Config {
          * Every v23 service will be mounted in the namespace with a name
          * prefixed by this.
          */
-        private static String LIVE_PRESENTATION_PREFIX = "powerDeck";
+        private static String LIVE_PRESENTATION_PREFIX = "happyDeck";
 
         /**
          * TODO(jregan): Assure legal mount name (remove blanks and such).

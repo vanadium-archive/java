@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -51,6 +52,10 @@ public class ParticipantPeer implements Participant {
     private DateTime mRefreshTime;
     // Deck the user is presenting.  Can only present one at a time.
     private Deck mDeck;
+    // The presentation ID.
+    private String mPresentationId;
+    // The syncgroup name.
+    private String mSyncgroupName;
     // Used to make decks after RPCs.
     private final DeckFactory mDeckFactory;
 
@@ -87,6 +92,16 @@ public class ParticipantPeer implements Participant {
     @Override
     public Deck getDeck() {
         return mDeck;
+    }
+
+    @Override
+    public String getPresentationId() {
+        return mPresentationId;
+    }
+
+    @Override
+    public String getSyncgroupName() {
+        return mSyncgroupName;
     }
 
     @Override
@@ -135,12 +150,18 @@ public class ParticipantPeer implements Participant {
                 ParticipantClientFactory.getParticipantClient(mServiceName);
         Log.d(TAG, "Got client = " + client.toString());
         try {
-            Log.d(TAG, "Calling get...");
+            Log.d(TAG, "Starting RPC to service \"" + mServiceName + "\"...");
             Presentation p = client.get(
-                    V23Manager.Singleton.get().getVContext());
+                    V23Manager.Singleton.get().getVContext().withTimeout(
+                            Duration.standardSeconds(5)));
             mDeck = mDeckFactory.make(p.getDeck(), p.getDeckId());
+            mSyncgroupName = p.getSyncgroupName();
+            mPresentationId = p.getPresentationId();
             mRefreshTime = DateTime.now();
-            Log.d(TAG, "  Got deck = " + mDeck);
+            Log.d(TAG, "   Discovered:");
+            Log.d(TAG, "               mDeck = " + mDeck);
+            Log.d(TAG, "      mSyncgroupName = " + mSyncgroupName);
+            Log.d(TAG, "     mPresentationId = " + mPresentationId);
             return true;
         } catch (VException e) {
             Log.d(TAG, "RPC failed, leaving current deck in place.");
@@ -161,11 +182,15 @@ public class ParticipantPeer implements Participant {
         private static final String TAG = "ParticipantServer";
         private final Presentation mPresentation;
 
-        public Server(VDeck d, String deckId, VPerson user) {
+        public Server(
+                VDeck d, String deckId, VPerson user,
+                String syncGroupName, String presentationId) {
             Presentation p = new Presentation();
             p.setDeck(d);
             p.setDeckId(deckId);
             p.setPerson(user);
+            p.setSyncgroupName(syncGroupName);
+            p.setPresentationId(presentationId);
             mPresentation = p;
         }
 

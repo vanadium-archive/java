@@ -32,7 +32,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         implements Listener {
     private static final String TAG = "DeckListAdapter";
     private DB.DBList<Deck> mDecks;
-    private DB.DBList<Deck> mLiveDecks;
+    private DiscoveryManager mLiveDecks;
     private DB mDB;
 
     public DeckListAdapter(DB db) {
@@ -87,7 +87,7 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int deckIndex) {
+    public void onBindViewHolder(final ViewHolder holder, final int deckIndex) {
         final Deck deck;
         final Role role;
         // If the position is less than the number of live presentation decks, get deck card from
@@ -132,28 +132,37 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
                 Log.d(TAG, "Clicking through to PresentationActivity.");
                 final Context context = v.getContext();
                 if (role == Role.AUDIENCE) {
-                    //String deviceId = "355499060906851";  // Black Nexus 6.
-                    String deviceId = "355499060490393"; // Nexus 6 ZX1G22MLNL
+                    final Participant p = mLiveDecks.getParticipant(deckIndex);
+                    Log.d(TAG, "Joining:");
+                    Log.d(TAG, "  syncgroupName = " + p.getSyncgroupName());
+                    Log.d(TAG, " presentationId = " + p.getPresentationId());
                     DB.Singleton.get(context).joinPresentation(
-                            // TODO(kash): Use the real syncgroup name.
-                            "/192.168.86.254:8101/" + deviceId + "/%%sync/syncslides/" +
-                                    "deckId1/randomPresentationId1",
+                            p.getSyncgroupName(),
                             new DB.Callback<Void>() {
                                 @Override
                                 public void done(Void aVoid) {
-                                    showSlides(context, deck, role);
+                                    showSlides(
+                                            context, deck, role,
+                                            p.getSyncgroupName(),
+                                            p.getPresentationId());
                                 }
                             });
                 } else {
-                    showSlides(context, deck, role);
+                    showSlides(
+                            context, deck, role,
+                            Participant.Unknown.SYNCGROUP_NAME,
+                            Participant.Unknown.PRESENTATION_ID);
                 }
             }
         });
     }
 
-    private void showSlides(Context context, Deck deck, Role role) {
+    private void showSlides(Context context, Deck deck, Role role,
+                            String syncName, String presId) {
         Intent intent = new Intent(context, PresentationActivity.class);
         intent.putExtra(Deck.B.DECK_ID, deck.getId());
+        intent.putExtra(Participant.B.SYNCGROUP_NAME, syncName);
+        intent.putExtra(Participant.B.PRESENTATION_ID, presId);
         intent.putExtra(Participant.B.PARTICIPANT_ROLE, role);
         context.startActivity(intent);
     }
