@@ -517,11 +517,11 @@ public class SyncbaseDB implements DB {
                         String key = (String) row.get(0).getElem();
                         Log.i(TAG, "Fetched slide " + key);
                         VSlide slide = (VSlide) row.get(1).getElem();
-                        VNote note = (VNote) table.get(mVContext, key, VNote.class);
+                        String note = notesForSlide(mVContext, table, key);
                         slides.add(new SlideImpl(
                                 BitmapFactory.decodeByteArray(
                                         slide.getThumbnail(), 0, slide.getThumbnail().length),
-                                note.getText()));
+                                note));
                     }
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
@@ -595,7 +595,7 @@ public class SyncbaseDB implements DB {
                     final String key = (String) row.get(0).getElem();
                     Log.i(TAG, "Fetched slide " + key);
                     VSlide slide = (VSlide) row.get(1).getElem();
-                    String notes = notesForSlide(notesTable, key);
+                    String notes = notesForSlide(mVContext, notesTable, key);
                     final SlideImpl newSlide = new SlideImpl(
                             BitmapFactory.decodeByteArray(
                                     slide.getThumbnail(), 0, slide.getThumbnail().length),
@@ -643,7 +643,7 @@ public class SyncbaseDB implements DB {
                     } catch (VException e) {
                         Log.e(TAG, "Couldn't decode slide: " + e.toString());
                     }
-                    String notes = notesForSlide(notesTable, key);
+                    String notes = notesForSlide(mVContext, notesTable, key);
                     final SlideImpl slide = new SlideImpl(
                             BitmapFactory.decodeByteArray(
                                     vSlide.getThumbnail(), 0, vSlide.getThumbnail().length),
@@ -742,12 +742,15 @@ public class SyncbaseDB implements DB {
             }
         }
 
-        private String notesForSlide(Table notesTable, String key) {
-            try {
-                return ((VNote) notesTable.get(mVContext, key, VNote.class)).getText();
-            } catch (VException e) {
-                return "";
-            }
+    }
+
+    private static String notesForSlide(VContext context, Table notesTable, String key) {
+        try {
+            return ((VNote) notesTable.get(context, key, VNote.class)).getText();
+        } catch (VException e) {
+            // TODO(kash): Should really differentiate between row not existing
+            // and some server error.
+            return "";
         }
     }
 
@@ -982,7 +985,9 @@ public class SyncbaseDB implements DB {
         try {
             vDeck = (VDeck) mDecks.get(mVContext, deckId, VDeck.class);
         } catch (VException e) {
-            handleError(e.toString());
+            // TODO(kash): Uncomment this when PresentationActivity.onCreate no
+            // longer needs to loop on getDeck(), waiting for it to return non-null.
+            //handleError(e.toString());
         }
         if (vDeck != null) {
             return mDeckFactory.make(vDeck, deckId);
