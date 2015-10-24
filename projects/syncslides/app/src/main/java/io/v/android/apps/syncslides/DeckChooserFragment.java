@@ -229,9 +229,11 @@ public class DeckChooserFragment extends Fragment {
         Slide[] ret = new Slide[slides.length()];
         for (int i = 0; i < slides.length(); ++i) {
             JSONObject slide = slides.getJSONObject(i);
+            // TODO(jregan): Avoid the extra image conversion work.
+            // Reading into a bitmap, only to compress into bytes again.
             Bitmap thumb = readImage(dir, slide.getString("Thumb"));
             String note = slide.getString("Note");
-            ret[i] = new SlideImpl(thumb, note);
+            ret[i] = new SlideImpl(DeckFactory.makeBytesFromBitmap(thumb), note);
         }
         return ret;
     }

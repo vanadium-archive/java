@@ -518,10 +518,7 @@ public class SyncbaseDB implements DB {
                         Log.i(TAG, "Fetched slide " + key);
                         VSlide slide = (VSlide) row.get(1).getElem();
                         String note = notesForSlide(mVContext, table, key);
-                        slides.add(new SlideImpl(
-                                BitmapFactory.decodeByteArray(
-                                        slide.getThumbnail(), 0, slide.getThumbnail().length),
-                                note));
+                        slides.add(new SlideImpl(slide.getThumbnail(), note));
                     }
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
@@ -596,10 +593,7 @@ public class SyncbaseDB implements DB {
                     Log.i(TAG, "Fetched slide " + key);
                     VSlide slide = (VSlide) row.get(1).getElem();
                     String notes = notesForSlide(mVContext, notesTable, key);
-                    final SlideImpl newSlide = new SlideImpl(
-                            BitmapFactory.decodeByteArray(
-                                    slide.getThumbnail(), 0, slide.getThumbnail().length),
-                            notes);
+                    final SlideImpl newSlide = new SlideImpl(slide.getThumbnail(), notes);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -644,10 +638,7 @@ public class SyncbaseDB implements DB {
                         Log.e(TAG, "Couldn't decode slide: " + e.toString());
                     }
                     String notes = notesForSlide(mVContext, notesTable, key);
-                    final SlideImpl slide = new SlideImpl(
-                            BitmapFactory.decodeByteArray(
-                                    vSlide.getThumbnail(), 0, vSlide.getThumbnail().length),
-                            notes);
+                    final SlideImpl slide = new SlideImpl(vSlide.getThumbnail(), notes);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {

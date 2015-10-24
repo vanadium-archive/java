@@ -5,22 +5,24 @@
 package io.v.android.apps.syncslides.model;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 /**
  * Application impl of Slide.
  */
 public class SlideImpl implements Slide {
-    private final Bitmap mThumbnail;
+    private final byte[] mThumbnail;
     private String mNotes;
 
-    public SlideImpl(Bitmap thumbnail, String notes) {
+    public SlideImpl(byte[] thumbnail, String notes) {
         mThumbnail = thumbnail;
         mNotes = notes;
     }
 
     @Override
     public Bitmap getImage() {
-        return mThumbnail;
+        return BitmapFactory.decodeByteArray(
+                mThumbnail, 0 /* offset */, mThumbnail.length);
     }
 
     @Override

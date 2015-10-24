@@ -75,7 +75,7 @@ public class DeckFactory {
         return new DeckImpl(title, thumb, id);
     }
 
-    private byte[] makeBytesFromBitmap(Bitmap thumb) {
+    public static byte[] makeBytesFromBitmap(Bitmap thumb) {
         if (thumb == null) {
             return new byte[0];
         }
