@@ -78,7 +78,6 @@ public class NavigateFragment extends Fragment {
     private DB.QuestionListener mQuestionListener;
     private boolean mEditing;
     private int mQuestionerPosition;
-    private boolean mSynced;
     private DB.CurrentSlideListener mCurrentSlideListener;
     private DB mDB;
     private TextView mSlideNumText;
@@ -113,11 +112,11 @@ public class NavigateFragment extends Fragment {
         mDeckId = args.getString(DECK_ID_KEY);
         mPresentationId = args.getString(PRESENTATION_ID_KEY);
         mLoadingCurrentSlide = -1;
-        mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
+        mCurrentSlideNum = mUserSlideNum = args.getInt(SLIDE_NUM_KEY);
         mRole = (Role) args.get(ROLE_KEY);
         final View rootView = inflater.inflate(R.layout.fragment_navigate, container, false);
         mFabSync = rootView.findViewById(R.id.audience_sync_fab);
-        if (mSynced || mRole != Role.AUDIENCE) {
+        if (((PresentationActivity) getActivity()).getSynced() || mRole != Role.AUDIENCE) {
             mFabSync.setVisibility(View.INVISIBLE);
         } else {
             mFabSync.setVisibility(View.VISIBLE);
@@ -228,10 +227,9 @@ public class NavigateFragment extends Fragment {
                 // The CurrentSlideListener could have been notified while we were waiting for
                 // the slides to load.
                 if (mLoadingCurrentSlide != -1) {
-                    currentSlideChanged(mUserSlideNum);
-                } else {
-                    updateView();
+                    currentSlideChanged(mLoadingCurrentSlide);
                 }
+                updateView();
             }
         });
         if (((PresentationActivity) getActivity()).getSynced()) {
@@ -334,15 +332,13 @@ public class NavigateFragment extends Fragment {
     }
 
     private void unsync() {
-        if (mRole == Role.AUDIENCE && mSynced) {
-            mSynced = false;
+        if (mRole == Role.AUDIENCE && ((PresentationActivity) getActivity()).getSynced()) {
             ((PresentationActivity) getActivity()).setUnsynced();
             mFabSync.setVisibility(View.VISIBLE);
         }
     }
 
     private void sync() {
-        mSynced = true;
         mUserSlideNum = mCurrentSlideNum;
         ((PresentationActivity) getActivity()).setSynced();
         updateView();
@@ -395,7 +391,7 @@ public class NavigateFragment extends Fragment {
             return;
         }
         mCurrentSlideNum = slideNum;
-        if (mSynced) {
+        if (((PresentationActivity) getActivity()).getSynced()) {
             mUserSlideNum = slideNum;
             updateView();
         }
