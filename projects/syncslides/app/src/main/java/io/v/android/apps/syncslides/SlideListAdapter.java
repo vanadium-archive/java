@@ -36,7 +36,7 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
             @Override
             public void onClick(View v) {
                 int position = mRecyclerView.getChildAdapterPosition(v);
-                ((PresentationActivity) v.getContext()).showNavigateFragmentWithBackStack(position);
+                ((PresentationActivity) v.getContext()).navigateToSlide(position);
             }
         });
         return new ViewHolder(v);

@@ -7,6 +7,7 @@ package io.v.android.apps.syncslides;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -108,7 +109,7 @@ public class PresentationActivity extends AppCompatActivity {
             }
         }
         if (mDeck == null) {
-            throw new IllegalArgumentException("Unusable deckId: "+ deckId);
+            throw new IllegalArgumentException("Unusable deckId: " + deckId);
         }
         Log.d(TAG, "Unpacked state:");
         Log.d(TAG, "  mShouldBeAdvertising = " + mShouldBeAdvertising);
@@ -272,7 +273,7 @@ public class PresentationActivity extends AppCompatActivity {
                 mPresentationId = result.presentationId;
                 mSyncgroupName = result.syncgroupName;
                 startAdvertising();
-                showNavigateFragmentWithBackStack(0);
+                navigateToSlide(0);
             }
         });
         mRole = Role.PRESENTER;
@@ -304,21 +305,26 @@ public class PresentationActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the navigate fragment where the user can see the current slide and
-     * navigate to other components of the slide presentation. This version
-     * includes an add to the back stack so that the user can back out from the
-     * navigate fragment to slide list.
+     * Shows the navigate fragment where the user can see the given slide and
+     * navigate to other components of the slide presentation. If the role is
+     * not AUDIENCE, this version includes an add to the back stack so that
+     * the user can back out from the navigate fragment to slide list.
      *
-     * @param slideNum the number of the current slide to show in the fragment
+     * @param slideNum the number of the slide to show in the fragment
      */
-    public void showNavigateFragmentWithBackStack(int slideNum) {
+    public void navigateToSlide(int slideNum) {
+        // The user picked this specific slide.  Don't try to stay synced.
+        setUnsynced();
+
         NavigateFragment fragment = NavigateFragment.newInstance(
                 mDeck.getId(), mPresentationId, slideNum, mRole);
-        getSupportFragmentManager()
+        FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment, fragment)
-                .addToBackStack("")
-                .commit();
+                .replace(R.id.fragment, fragment);
+        if (mRole != Role.AUDIENCE) {
+            transaction.addToBackStack("");
+        }
+        transaction.commit();
     }
 
     /**
