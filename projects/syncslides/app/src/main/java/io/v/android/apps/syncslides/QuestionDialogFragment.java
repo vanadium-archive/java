@@ -12,19 +12,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import java.util.List;
+
+import io.v.android.apps.syncslides.model.Question;
+
 /**
  * Dialog for the presenter to pick a questioner.
  */
 public class QuestionDialogFragment extends DialogFragment {
-    public static final String QUESTION_BUNDLE_KEY = "questioner_position";
+    public static final String QUESTION_ID_KEY = "question_id_key";
     private static final String QUESTIONER_LIST_KEY = "questioner_list_key";
 
-    private String[] mQuestionerList;
-
-    public static QuestionDialogFragment newInstance(String[] questionerList) {
+    public static QuestionDialogFragment newInstance(List<Question> questions) {
         QuestionDialogFragment fragment = new QuestionDialogFragment();
         Bundle args = new Bundle();
-        args.putStringArray(QUESTIONER_LIST_KEY, questionerList);
+        args.putParcelableArray(QUESTIONER_LIST_KEY, questions.toArray(new Question[0]));
         fragment.setArguments(args);
         return fragment;
     }
@@ -32,12 +34,17 @@ public class QuestionDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
-        mQuestionerList = args.getStringArray(QUESTIONER_LIST_KEY);
+        final Question[] questions = (Question[]) args.getParcelableArray(QUESTIONER_LIST_KEY);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        String[] questioners = new String[questions.length];
+        for (int i = 0; i < questions.length; i++) {
+            questioners[i] = questions[i].getFirstName() + " "
+                    + questions[i].getLastName();
+        }
         builder.setTitle(R.string.question_message)
-                .setItems(mQuestionerList, new DialogInterface.OnClickListener() {
+                .setItems(questioners, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        sendResult(which);
+                        sendResult(questions[which].getId());
                     }
                 });
         return builder.create();
@@ -49,10 +56,10 @@ public class QuestionDialogFragment extends DialogFragment {
         ((PresentationActivity) getActivity()).setUiImmersive(true);
     }
 
-    // Send back the position of the questioner to the NavigateFragment.
-    private void sendResult(int position) {
+    // Send back the question's ID to the NavigateFragment.
+    private void sendResult(String id) {
         Intent intent = new Intent();
-        intent.putExtra(QUESTION_BUNDLE_KEY, position);
+        intent.putExtra(QUESTION_ID_KEY, id);
         getTargetFragment().onActivityResult(
                 getTargetRequestCode(), Activity.RESULT_OK, intent);
     }

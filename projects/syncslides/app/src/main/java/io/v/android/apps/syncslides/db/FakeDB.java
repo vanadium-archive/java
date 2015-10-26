@@ -106,7 +106,8 @@ public class FakeDB implements DB {
                     "question" + i,
                     "Questioner",
                     "#" + i,
-                    DateTime.now().minus(Period.minutes(random.nextInt(5))));
+                    DateTime.now().minus(Period.minutes(random.nextInt(5)))
+                            .toInstant().getMillis());
             mQuestions.add(question);
         }
         mQuestionListeners = Lists.newArrayList();
@@ -229,6 +230,26 @@ public class FakeDB implements DB {
     public void askQuestion(String deckId, String presentationId,
                             String firstName, String lastName) {
         // Nothing to do.
+    }
+
+    @Override
+    public void handoffQuestion(String deckId, String presentationId, String questionId) {
+        // Not implemented.
+    }
+
+    @Override
+    public void resumeControl(String deckId, String presentationId) {
+        // Not implemented.
+    }
+
+    @Override
+    public void setDriverListener(String deckId, String presentationId, DriverListener listener) {
+        // Not implemented.
+    }
+
+    @Override
+    public void removeDriverListener(String deckId, String presentationId, DriverListener listener) {
+        // Not implemented.
     }
 
     @Override

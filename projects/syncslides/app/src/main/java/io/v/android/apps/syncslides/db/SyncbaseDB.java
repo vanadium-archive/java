@@ -44,9 +44,11 @@ import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.Blessings;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
@@ -64,6 +66,7 @@ import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
+import io.v.v23.vdl.VdlOptional;
 import io.v.v23.verror.Errors;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -91,6 +94,7 @@ public class SyncbaseDB implements DB {
     private Table mPresentations;
     private final Map<String, CurrentSlideWatcher> mCurrentSlideWatchers;
     private final Map<String, QuestionWatcher> mQuestionWatchers;
+    private final Map<String, DriverWatcher> mDriverWatchers;
     private Server mSyncbaseServer;
     private final DeckFactory mDeckFactory;
 
@@ -98,6 +102,7 @@ public class SyncbaseDB implements DB {
         mContext = context;
         mCurrentSlideWatchers = Maps.newHashMap();
         mQuestionWatchers = Maps.newHashMap();
+        mDriverWatchers = Maps.newHashMap();
         mDeckFactory = DeckFactory.Singleton.get(context);
     }
 
@@ -109,14 +114,6 @@ public class SyncbaseDB implements DB {
             return;
         }
         mHandler = new Handler(Looper.getMainLooper());
-        // TODO(kash): Set proper ACLs.
-        AccessList acl = new AccessList(
-                ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
-        mPermissions = new Permissions(ImmutableMap.of(
-                Constants.RESOLVE.getValue(), acl,
-                Constants.READ.getValue(), acl,
-                Constants.WRITE.getValue(), acl,
-                Constants.ADMIN.getValue(), acl));
 
         // If blessings aren't in place, the fragment that called this
         // initialization may continue to load and use DB, but nothing will
@@ -133,6 +130,19 @@ public class SyncbaseDB implements DB {
 
     // TODO(kash): Run this in an AsyncTask so it doesn't block the UI.
     private void setupSyncbase() {
+        Blessings blessings = V23Manager.Singleton.get().getBlessings();
+        AccessList everyoneAcl = new AccessList(
+                ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
+        AccessList justMeAcl = new AccessList(
+                ImmutableList.of(new BlessingPattern(blessings.toString())),
+                ImmutableList.<String>of());
+
+        mPermissions = new Permissions(ImmutableMap.of(
+                Constants.RESOLVE.getValue(), everyoneAcl,
+                Constants.READ.getValue(), justMeAcl,
+                Constants.WRITE.getValue(), justMeAcl,
+                Constants.ADMIN.getValue(), justMeAcl));
+
         // Prepare the syncbase storage directory.
         File storageDir = new File(mContext.getFilesDir(), "syncbase");
         storageDir.mkdirs();
@@ -203,6 +213,24 @@ public class SyncbaseDB implements DB {
         final String presentationId = UUID.randomUUID().toString();
         String prefix = NamingUtil.join(deckId, presentationId);
         try {
+            Blessings blessings = V23Manager.Singleton.get().getBlessings();
+            AccessList everyoneAcl = new AccessList(
+                    ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
+            AccessList justMeAcl = new AccessList(
+                    ImmutableList.of(new BlessingPattern(blessings.toString())),
+                    ImmutableList.<String>of());
+
+            Permissions groupReadPermissions = new Permissions(ImmutableMap.of(
+                    Constants.RESOLVE.getValue(), everyoneAcl,
+                    Constants.READ.getValue(), everyoneAcl,
+                    Constants.WRITE.getValue(), justMeAcl,
+                    Constants.ADMIN.getValue(), justMeAcl));
+            Permissions groupWritePermissions = new Permissions(ImmutableMap.of(
+                    Constants.RESOLVE.getValue(), everyoneAcl,
+                    Constants.READ.getValue(), everyoneAcl,
+                    Constants.WRITE.getValue(), justMeAcl,
+                    Constants.ADMIN.getValue(), justMeAcl));
+
             // Add rows to Presentations table.
             VPresentation presentation = new VPresentation();  // Empty for now.
             mPresentations.put(mVContext, prefix, presentation, VPresentation.class);
@@ -211,8 +239,13 @@ public class SyncbaseDB implements DB {
                     current, VCurrentSlide.class);
 
             mPresentations.setPrefixPermissions(mVContext, RowRange.prefix(prefix),
-                    mPermissions);
-            mDecks.setPrefixPermissions(mVContext, RowRange.prefix(deckId), mPermissions);
+                    groupReadPermissions);
+            // Anybody can add a question.
+            mPresentations.setPrefixPermissions(
+                    mVContext,
+                    RowRange.prefix(NamingUtil.join(prefix, QUESTIONS)),
+                    groupWritePermissions);
+            mDecks.setPrefixPermissions(mVContext, RowRange.prefix(deckId), groupReadPermissions);
 
             // Create the syncgroup.
             final String syncgroupName = NamingUtil.join(
@@ -227,8 +260,7 @@ public class SyncbaseDB implements DB {
                         context,
                         new SyncgroupSpec(
                                 SYNCGROUP_PRESENTATION_DESCRIPTION,
-                                // TODO(kash): Use real permissions.
-                                mPermissions,
+                                groupReadPermissions,
                                 Arrays.asList(
                                         new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
                                         new SyncgroupPrefix(DECKS_TABLE, deckId)),
@@ -838,6 +870,7 @@ public class SyncbaseDB implements DB {
     @Override
     public void askQuestion(final String deckId, final String presentationId,
                             final String firstName, final String lastName) {
+        final Blessings blessings = V23Manager.Singleton.get().getBlessings();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -845,13 +878,38 @@ public class SyncbaseDB implements DB {
                     String rowKey = NamingUtil.join(deckId, presentationId, QUESTIONS,
                             UUID.randomUUID().toString());
                     Log.i(TAG, "Writing row " + rowKey + " with " + firstName + " " + lastName);
+                    BatchDatabase batch = mDB.beginBatch(mVContext, null);
+                    Table presentations = batch.getTable(PRESENTATIONS_TABLE);
                     VQuestion question = new VQuestion(
-                            new VPerson(firstName, lastName),
+                            new VPerson(blessings.toString(), firstName, lastName),
                             System.currentTimeMillis(),
                             false // Not yet answered.
                     );
-                    mPresentations.put(mVContext, rowKey, question, VQuestion.class);
-                    // TODO(kash): Set the ACL so nobody else can modify the question.
+                    presentations.put(mVContext, rowKey, question, VQuestion.class);
+
+                    // There should be PrefixPermissions on
+                    //    <deckId>/<presentationId>/questions
+                    //    <deckId>/<presentationId>
+                    //    ""
+                    // We want to copy <deckId>/<presentationId> for our question but also
+                    // add ourselves.
+                    PrefixPermissions[] permissions =
+                            presentations.getPrefixPermissions(mVContext, rowKey);
+                    for (PrefixPermissions prefix : permissions) {
+                        Log.i(TAG, "Found permissions: " + prefix.toString());
+                    }
+                    if (permissions.length < 3) {
+                        handleError("Missing permissions for questions: "
+                                + Arrays.toString(permissions));
+                        batch.abort(mVContext);
+                        return;
+                    }
+                    Permissions perms = permissions[1].getPerms();
+                    perms.get(Constants.WRITE.getValue()).getIn().add(
+                            new BlessingPattern(blessings.toString()));
+                    presentations.setPrefixPermissions(mVContext, RowRange.prefix(rowKey), perms);
+
+                    batch.commit(mVContext);
                 } catch (VException e) {
                     handleError(e.toString());
                 }
@@ -859,13 +917,142 @@ public class SyncbaseDB implements DB {
         }).start();
     }
 
-    private void handleError(String msg) {
+    @Override
+    public void handoffQuestion(final String deckId, final String presentationId,
+                                final String questionId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BatchDatabase batch = mDB.beginBatch(mVContext, null);
+                    Table presentations = batch.getTable(PRESENTATIONS_TABLE);
+
+                    // Mark the question as answered so it disappears from the list.
+                    String questionKey =
+                            NamingUtil.join(deckId, presentationId, QUESTIONS, questionId);
+                    VQuestion question =
+                            (VQuestion) presentations.get(mVContext, questionKey, VQuestion.class);
+                    if (question.getAnswered()) {
+                        // Already answered.  Nothing to do.
+                        batch.abort(mVContext);
+                        return;
+                    }
+                    question.setAnswered(true);
+                    presentations.put(mVContext, questionKey, question, VQuestion.class);
+
+                    // Set the questioner as the driver of the presentation.
+                    String presentationKey = NamingUtil.join(deckId, presentationId);
+                    VPresentation presentation = new VPresentation();
+                    presentation.setDriver(VdlOptional.of(question.getQuestioner()));
+                    presentations.put(mVContext, presentationKey, presentation,
+                            VPresentation.class);
+
+                    // Give the questioner permission to set the current slide.
+                    String currentSlideKey = NamingUtil.join(deckId, presentationId, CURRENT_SLIDE);
+                    Blessings blessings = V23Manager.Singleton.get().getBlessings();
+                    AccessList everyoneAcl = new AccessList(
+                            ImmutableList.of(new BlessingPattern("...")),
+                            ImmutableList.<String>of());
+                    AccessList questionerAcl = new AccessList(
+                            ImmutableList.of(
+                                    new BlessingPattern(question.getQuestioner().getBlessing())),
+                            ImmutableList.<String>of());
+                    AccessList justMeAcl = new AccessList(
+                            ImmutableList.of(new BlessingPattern(blessings.toString())),
+                            ImmutableList.<String>of());
+                    Permissions permissions = new Permissions(ImmutableMap.of(
+                            Constants.RESOLVE.getValue(), everyoneAcl,
+                            Constants.READ.getValue(), everyoneAcl,
+                            Constants.WRITE.getValue(), questionerAcl,
+                            Constants.ADMIN.getValue(), justMeAcl));
+                    presentations.setPrefixPermissions(mVContext, RowRange.prefix(currentSlideKey),
+                            permissions);
+
+                    batch.commit(mVContext);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void resumeControl(final String deckId, final String presentationId) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BatchDatabase batch = mDB.beginBatch(mVContext, null);
+                    Table presentations = batch.getTable(PRESENTATIONS_TABLE);
+
+                    // Clear the driver of the presentation.
+                    String presentationKey = NamingUtil.join(deckId, presentationId);
+                    VPresentation presentation = new VPresentation();
+                    presentations.put(mVContext, presentationKey, presentation,
+                            VPresentation.class);
+
+                    // Give the questioner permission to set the current slide.
+                    String currentSlideKey = NamingUtil.join(deckId, presentationId, CURRENT_SLIDE);
+                    Blessings blessings = V23Manager.Singleton.get().getBlessings();
+                    AccessList everyoneAcl = new AccessList(
+                            ImmutableList.of(new BlessingPattern("...")),
+                            ImmutableList.<String>of());
+                    AccessList justMeAcl = new AccessList(
+                            ImmutableList.of(new BlessingPattern(blessings.toString())),
+                            ImmutableList.<String>of());
+                    Permissions permissions = new Permissions(ImmutableMap.of(
+                            Constants.RESOLVE.getValue(), everyoneAcl,
+                            Constants.READ.getValue(), everyoneAcl,
+                            Constants.WRITE.getValue(), justMeAcl,
+                            Constants.ADMIN.getValue(), justMeAcl));
+                    presentations.setPrefixPermissions(mVContext, RowRange.prefix(currentSlideKey),
+                            permissions);
+
+                    batch.commit(mVContext);
+                } catch (VException e) {
+                    handleError(e.toString());
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void setDriverListener(String deckId, String presentationId, DriverListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        DriverWatcher oldWatcher = mDriverWatchers.get(key);
+        if (oldWatcher != null) {
+            oldWatcher.discard();
+        }
+        DriverWatcher watcher = new DriverWatcher(
+                new WatcherState(mVContext, mDB, deckId, presentationId),
+                listener);
+        mDriverWatchers.put(key, watcher);
+    }
+
+    @Override
+    public void removeDriverListener(String deckId, String presentationId,
+                                     DriverListener listener) {
+        String key = NamingUtil.join(deckId, presentationId);
+        DriverWatcher oldWatcher = mDriverWatchers.get(key);
+        if (oldWatcher != null) {
+            mDriverWatchers.remove(oldWatcher);
+            oldWatcher.discard();
+        }
+    }
+
+
+    private void handleError(final String msg) {
         Log.e(TAG, msg);
-        Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mContext, msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void importDecks() {
-        importDeckFromResources("deckId1", "Car Business", R.drawable.thumb_deck1);
+        importDeckFromResources(UUID.randomUUID().toString(), "Car Business", R.drawable.thumb_deck1);
         // These slow down app startup, so skip these for now.
 //        importDeckFromResources("deckId2", "Baku Discovery", R.drawable.thumb_deck2);
 //        importDeckFromResources("deckId3", "Vanadium", R.drawable.thumb_deck3);

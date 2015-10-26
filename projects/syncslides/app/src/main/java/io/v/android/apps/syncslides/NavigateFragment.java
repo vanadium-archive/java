@@ -30,9 +30,12 @@ import android.widget.Toast;
 import java.util.List;
 
 import io.v.android.apps.syncslides.db.DB;
+import io.v.android.apps.syncslides.db.VPerson;
+import io.v.android.apps.syncslides.misc.V23Manager;
 import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Role;
 import io.v.android.apps.syncslides.model.Slide;
+import io.v.v23.security.Blessings;
 
 /**
  * Provides both the presenter and audience views for navigating through a presentation.
@@ -76,8 +79,10 @@ public class NavigateFragment extends Fragment {
     private Role mRole;
     private List<Question> mQuestionList;
     private DB.QuestionListener mQuestionListener;
+    private boolean mDriving = false;
+    private DB.DriverListener mDriverListener;
     private boolean mEditing;
-    private int mQuestionerPosition;
+    private String mQuestionId;
     private DB.CurrentSlideListener mCurrentSlideListener;
     private DB mDB;
     private TextView mSlideNumText;
@@ -245,14 +250,27 @@ public class NavigateFragment extends Fragment {
     public void onStart() {
         super.onStart();
         ((PresentationActivity) getActivity()).setUiImmersive(true);
+        mCurrentSlideListener = new DB.CurrentSlideListener() {
+            @Override
+            public void onChange(int slideNum) {
+                NavigateFragment.this.currentSlideChanged(slideNum);
+            }
+        };
+        mDB.addCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         if (mRole == Role.AUDIENCE) {
-            mCurrentSlideListener = new DB.CurrentSlideListener() {
+            final Blessings blessings = V23Manager.Singleton.get().getBlessings();
+            mDriverListener = new DB.DriverListener() {
                 @Override
-                public void onChange(int slideNum) {
-                    NavigateFragment.this.currentSlideChanged(slideNum);
+                public void onChange(VPerson driver) {
+                    if (driver != null && driver.getBlessing().equals(blessings.toString())) {
+                        mDriving = true;
+                    } else {
+                        mDriving = false;
+                    }
+
                 }
             };
-            mDB.addCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
+            mDB.setDriverListener(mDeckId, mPresentationId, mDriverListener);
         }
         if (mRole == Role.PRESENTER) {
             mQuestionListener = new DB.QuestionListener() {
@@ -275,8 +293,9 @@ public class NavigateFragment extends Fragment {
     public void onStop() {
         super.onStop();
         ((PresentationActivity) getActivity()).setUiImmersive(false);
+        mDB.removeCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
         if (mRole == Role.AUDIENCE) {
-            mDB.removeCurrentSlideListener(mDeckId, mPresentationId, mCurrentSlideListener);
+            mDB.removeDriverListener(mDeckId, mPresentationId, mDriverListener);
         }
         if (mRole == Role.PRESENTER) {
             mDB.removeQuestionListener(mDeckId, mPresentationId, mQuestionListener);
@@ -317,7 +336,7 @@ public class NavigateFragment extends Fragment {
     public void saveNotes() {
         final String notes = mNotes.getText().toString();
         if (mEditing && (!notes.equals(mSlides.get(mUserSlideNum).getNotes()))) {
-            Toast.makeText(getContext(), "Saving notes", Toast.LENGTH_SHORT).show();
+            toast("Saving notes");
             mSlides.get(mUserSlideNum).setNotes(notes);
             mDB.setSlideNotes(mDeckId, mUserSlideNum, notes);
             mNotes.clearFocus();
@@ -354,7 +373,7 @@ public class NavigateFragment extends Fragment {
         }
         if (mUserSlideNum < mSlides.size() - 1) {
             mUserSlideNum++;
-            if (mRole == Role.PRESENTER) {
+            if (mRole == Role.PRESENTER || mDriving) {
                 mDB.setCurrentSlide(mDeckId, mPresentationId, mUserSlideNum);
             }
             updateView();
@@ -372,7 +391,7 @@ public class NavigateFragment extends Fragment {
         }
         if (mUserSlideNum > 0) {
             mUserSlideNum--;
-            if (mRole == Role.PRESENTER) {
+            if (mRole == Role.PRESENTER || mDriving) {
                 mDB.setCurrentSlide(mDeckId, mPresentationId, mUserSlideNum);
             }
             updateView();
@@ -405,22 +424,15 @@ public class NavigateFragment extends Fragment {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         switch (mRole) {
             case AUDIENCE:
+                // TODO(kash): Get the real user name from shared preferences.
                 db.askQuestion(mDeckId, mPresentationId, "Audience member", "#1");
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(),
-                        "You have been added to the Q&A queue.", Toast.LENGTH_LONG);
-                toast.show();
+                toast("You have been added to the Q&A queue.");
                 break;
             case PRESENTER:
                 if (mQuestionList == null || mQuestionList.size() == 0) {
                     break;
                 }
-                // TODO(kash): It would be better to pass the entire Question to the dialog.
-                String[] questioners = new String[mQuestionList.size()];
-                for (int i = 0; i < mQuestionList.size(); i++) {
-                    questioners[i] = mQuestionList.get(i).getFirstName() + " "
-                            + mQuestionList.get(i).getLastName();
-                }
-                DialogFragment dialog = QuestionDialogFragment.newInstance(questioners);
+                DialogFragment dialog = QuestionDialogFragment.newInstance(mQuestionList);
                 dialog.setTargetFragment(this, DIALOG_REQUEST_CODE);
                 dialog.show(getFragmentManager(), "QuestionerDialogFragment");
                 break;
@@ -458,10 +470,7 @@ public class NavigateFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == DIALOG_REQUEST_CODE) {
-            // TODO(afergan): Using the position is insufficient if the list of questioners changes
-            // while the dialog is showing.
-            mQuestionerPosition = data.getIntExtra(
-                    QuestionDialogFragment.QUESTION_BUNDLE_KEY, 0);
+            mQuestionId = data.getStringExtra(QuestionDialogFragment.QUESTION_ID_KEY);
             handoffControl();
         }
     }
@@ -472,20 +481,34 @@ public class NavigateFragment extends Fragment {
      * text.
      */
     private void handoffControl() {
-        //TODO(afergan): Change slide presenter to the audience member at mQuestionerPosition.
+        Question handoff = null;
+        for (Question question : mQuestionList) {
+            if (question.getId().equals(mQuestionId)) {
+                handoff = question;
+                break;
+            }
+        }
+        if (handoff == null) {
+            toast("No such question");
+            return;
+        }
+
+        sync();
+        mDB.handoffQuestion(mDeckId, mPresentationId, handoff.getId());
+
         View.OnClickListener snackbarClickListener = new NavigateClickListener() {
             @Override
             public void onClick(View v) {
                 super.onClick(v);
-                //TODO(afergan): End handoff, presenter regains control of presentation.
+                mDB.resumeControl(mDeckId, mPresentationId);
             }
         };
 
         ((PresentationActivity) getActivity()).setUiImmersive(true);
-        Snackbar snack = Snackbar.make(getView(), getResources().getString(
-                        R.string.handoff_message) + " "
-                        + mQuestionList.get(mQuestionerPosition).getFirstName() + " "
-                        + mQuestionList.get(mQuestionerPosition).getLastName(),
+        Snackbar snack = Snackbar.make(
+                getView(),
+                getResources().getString(R.string.handoff_message) + " "
+                        + handoff.getFirstName() + " " + handoff.getLastName(),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getResources().getString(R.string.end_handoff),
                         snackbarClickListener)
@@ -521,6 +544,10 @@ public class NavigateFragment extends Fragment {
             ViewGroup.LayoutParams thumbParams = thumb.getLayoutParams();
             thumbParams.height = (int) ((9 / 16.0) * grandparent.getMeasuredWidth());
         }
+    }
+
+    private void toast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     public class NavigateClickListener implements View.OnClickListener {

@@ -76,11 +76,14 @@ class QuestionWatcher {
             Stream<KeyValue> stream = presentations.scan(mState.vContext, RowRange.prefix(prefix));
             for (KeyValue keyValue : stream) {
                 VQuestion value = (VQuestion) VomUtil.decode(keyValue.getValue(), VQuestion.class);
+                if (value.getAnswered()) {
+                    continue;
+                }
                 final Question question = new Question(
-                        keyValue.getKey(),
+                        lastPart(keyValue.getKey()),
                         value.getQuestioner().getFirstName(),
                         value.getQuestioner().getLastName(),
-                        new DateTime(value.getTime()));
+                        value.getTime());
                 mState.handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -94,15 +97,26 @@ class QuestionWatcher {
                     batch.getResumeMarker(mState.vContext));
             for (WatchChange change : watch) {
                 Log.i(TAG, "Found change " + change.getChangeType());
+                final String id = lastPart(change.getRowName());
                 if (change.getChangeType().equals(ChangeType.PUT_CHANGE)) {
                     VQuestion vQuestion = (VQuestion) VomUtil.decode(
                             change.getVomValue(), VQuestion.class);
                     Log.i(TAG, "Change " + change);
+                    if (vQuestion.getAnswered()) {
+                        mState.handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.i(TAG, "Question was answered");
+                                delete(id);
+                            }
+                        });
+                        continue;
+                    }
                     final Question question = new Question(
-                            change.getRowName(),
+                            id,
                             vQuestion.getQuestioner().getFirstName(),
                             vQuestion.getQuestioner().getLastName(),
-                            new DateTime(vQuestion.getTime()));
+                            vQuestion.getTime());
                     mState.handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -110,7 +124,6 @@ class QuestionWatcher {
                         }
                     });
                 } else { // ChangeType.DELETE_CHANGE
-                    final String id = change.getRowName();
                     mState.handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -156,8 +169,17 @@ class QuestionWatcher {
             if (mQuestions.get(i).getId().equals(id)) {
                 mQuestions.remove(i);
                 mListener.onChange(Lists.newArrayList(mQuestions));
+                return;
             }
         }
+        Log.i(TAG, "Could not find question " + id);
     }
 
+    /**
+     * Splits the name into parts and returns the last one.
+     */
+    private static String lastPart(String name) {
+        List<String> split = NamingUtil.split(name);
+        return split.get(split.size() - 1);
+    }
 }

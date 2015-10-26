@@ -30,16 +30,24 @@ public class ParticipantScannerFake implements ParticipantScanner {
         if (mCounter >= 2 && mCounter <= 8) {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
-                            new VPerson("Liz", "Lemon"),
+                            new VPerson(
+                                    "dev.v.io/u/liz.lemon@gmail.com/android/io.v" +
+                                            ".android.apps.syncslides",
+                                    "Liz",
+                                    "Lemon"),
                             mDeckFactory.make(
                                     "Kale - Just eat it.",
                                     "deckByAlice")));
         }
-        // Bob has less to say than Alice.
+        // Jack has less to say than Liz.
         if (mCounter >= 4 && mCounter <= 6) {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
-                            new VPerson("Jack", "Donaghy"),
+                            new VPerson(
+                                    "dev.v.io/u/jack.donaghy@gmail.com/android/io.v" +
+                                            ".android.apps.syncslides",
+                                    "Jack",
+                                    "Donaghy"),
                             mDeckFactory.make(
                                     "Java - Object deluge.",
                                     "deckByBob")));

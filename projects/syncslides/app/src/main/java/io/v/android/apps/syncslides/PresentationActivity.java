@@ -228,7 +228,11 @@ public class PresentationActivity extends AppCompatActivity {
                             mDeckFactory.make(mDeck),
                             mDeck.getId(),
                             // TODO(jregan): Get user name from device.
-                            new VPerson("Jenna", "Maroney"),
+                            new VPerson(
+                                    "dev.v.io/u/great.presenter@gmail.com/android/io.v" +
+                                            ".android.apps.syncslides",
+                                    "Great",
+                                    "Presenter"),
                             mSyncgroupName,
                             mPresentationId));
             Log.d(TAG, "MT advertising started:");

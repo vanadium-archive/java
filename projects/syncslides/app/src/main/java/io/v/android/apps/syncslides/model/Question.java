@@ -4,28 +4,42 @@
 
 package io.v.android.apps.syncslides.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.joda.time.DateTime;
 
 /**
  * Represents a question asked by the audience.
  */
-public class Question {
+public class Question implements Parcelable {
     private String mId;
     private String mFirstName;
     private String mLastName;
-    private DateTime mTime;
+    /**
+     * Time at which the question was asked in ms since the epoch.  Stored as
+     * a long rather than DateTime because it is easier to serialize this way.
+     */
+    private long mTime;
 
     /**
      * @param id a uuid
      * @param firstName the first name of the questioner
      * @param lastName the last name of the questioner
-     * @param time the time at which the question was asked
+     * @param time the time at which the question was asked in ms since the epoch
      */
-    public Question(String id, String firstName, String lastName, DateTime time) {
+    public Question(String id, String firstName, String lastName, long time) {
         mId = id;
         mFirstName = firstName;
         mLastName = lastName;
         mTime = time;
+    }
+
+    private Question(Parcel source) {
+        mId = source.readString();
+        mFirstName = source.readString();
+        mLastName = source.readString();
+        mTime = source.readLong();
     }
 
     /**
@@ -54,6 +68,33 @@ public class Question {
      * Returns the time at which the question was asked.
      */
     public DateTime getTime() {
-        return mTime;
+        return new DateTime(mTime);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mFirstName);
+        dest.writeString(mLastName);
+        dest.writeLong(mTime);
+    }
+
+    public static final Parcelable.Creator<Question> CREATOR =
+            new Parcelable.Creator<Question>() {
+
+                @Override
+                public Question createFromParcel(Parcel source) {
+                    return new Question(source);
+                }
+
+                @Override
+                public Question[] newArray(int size) {
+                    return new Question[size];
+                }
+            };
 }

@@ -33,6 +33,7 @@ type VPresentation struct {
 
 // Person represents either an audience member or the presenter.
 type VPerson struct{
+    Blessing string
     FirstName string
     LastName string
 }

@@ -209,6 +209,13 @@ public class V23Manager {
         return mBlessings != null;
     }
 
+    /**
+     * Returns the blessings for this process.
+     */
+    public Blessings getBlessings() {
+        return mBlessings;
+    }
+
     private void configurePrincipal(final Blessings blessings) {
         Log.d(TAG, "configurePrincipal: blessings=" +
                 (blessings == null ? "null" : blessings.toString()));

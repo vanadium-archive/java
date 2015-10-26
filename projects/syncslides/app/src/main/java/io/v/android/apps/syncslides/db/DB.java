@@ -4,7 +4,6 @@
 
 package io.v.android.apps.syncslides.db;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.util.List;
@@ -188,9 +187,9 @@ public interface DB {
     /**
      * Saves notes for the specified slide.
      *
-     * @param deckId         the deck being presented
-     * @param slideNum       the current slide number
-     * @param slideNotes     the text of the slide's notes
+     * @param deckId     the deck being presented
+     * @param slideNum   the current slide number
+     * @param slideNotes the text of the slide's notes
      */
     void setSlideNotes(String deckId, int slideNum, String slideNotes);
 
@@ -263,4 +262,49 @@ public interface DB {
      */
     void askQuestion(String deckId, String presentationId,
                      String firstName, String lastName);
+
+    /**
+     * Give control of the presentation to the questioner.  Mark the question as answered.
+     *
+     * @param deckId         the deck used in the presentation
+     * @param presentationId the presentation identifier
+     * @param questionId     the question being answered
+     */
+    void handoffQuestion(String deckId, String presentationId, String questionId);
+
+    /**
+     * Take back control of the presentation from the questioner.
+     *
+     * @param deckId         the deck used in the presentation
+     * @param presentationId the presentation identifier
+     */
+    void resumeControl(String deckId, String presentationId);
+
+    interface DriverListener {
+        /**
+         * Called whenever the presentation's driver changes.
+         *
+         * @param driver the temporary driver of the presentation.  null means that the
+         *               original presenter has control.
+         */
+        void onChange(VPerson driver);
+    }
+
+    /**
+     * Set the listener for changes to the driver of the presentation.
+     *
+     * @param deckId         the deck used in the presentation
+     * @param presentationId the presentation identifier
+     * @param listener       notified of changes
+     */
+    void setDriverListener(String deckId, String presentationId, DriverListener listener);
+
+    /**
+     * Remove the listener that was previously passed to setDriverListener().
+     *
+     * @param deckId         the deck used in the presentation
+     * @param presentationId the presentation identifier
+     * @param listener       previously passed to setDriverListener()
+     */
+    void removeDriverListener(String deckId, String presentationId, DriverListener listener);
 }
