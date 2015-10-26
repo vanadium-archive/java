@@ -211,8 +211,9 @@ public class Main {
                         VCurrentSlide.class);
                 logger.info("Current slide: " + currentSlide);
                 // Read the corresponding slide.
-                VSlide slide = (VSlide) decks.getRow(String.format(slideRowFormat,
-                        currentSlide.getNum())).get(context, VSlide.class);
+                String row = String.format(slideRowFormat, presentation.getDeckId(),
+                        currentSlide.getNum());
+                VSlide slide = (VSlide) decks.getRow(row).get(context, VSlide.class);
                 final BufferedImage image = ImageIO.read(
                         new ByteArrayInputStream(slide.getThumbnail()));
                 viewer.setImage(image);
@@ -260,7 +261,7 @@ public class Main {
 
         @Parameter(names = {"-f", "--slideRowFormat"},
                 description = "a pattern specifying where slide rows are found")
-        private String slideRowFormat = "deckId1/slides/%04d";
+        private String slideRowFormat = "%s/slides/%04d";
 
         @Parameter(names = {"-h", "--help"}, description = "display this help message", help = true)
         private boolean help = false;
