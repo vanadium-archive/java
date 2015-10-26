@@ -14,10 +14,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,8 +44,10 @@ import java.net.URL;
 public class SignInActivity extends AppCompatActivity {
     private static final String TAG = "SignInActivity";
 
-    public static final String PREF_USER_ACCOUNT_NAME = "user_account";
-    public static final String PREF_USER_PROFILE_JSON = "user_profile";
+    private static final String PREF_USER_ACCOUNT_NAME = "user_account";
+    private static final String PREF_USER_NAME_FROM_CONTACTS = "user_name_from_contacts";
+    private static final String PREF_USER_NAME_FROM_PROFILE = "user_name_from_profile";
+    private static final String PREF_USER_PROFILE_JSON = "user_profile";
 
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     private static final int REQUEST_CODE_FETCH_USER_PROFILE_APPROVAL = 1001;
@@ -56,6 +60,43 @@ public class SignInActivity extends AppCompatActivity {
     private SharedPreferences mPrefs;
     private String mAccountName;
     private ProgressDialog mProgressDialog;
+
+    /**
+     * Returns the best-effort email of the signed-in user.
+     */
+    public static String getUserEmail(Context ctx) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return prefs.getString(PREF_USER_ACCOUNT_NAME, "");
+    }
+
+    /**
+     * Returns the best-effort full name of the signed-in user.
+     */
+    public static String getUserName(Context ctx) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        // First try to read the user name we obtained from profile, as it's most accurate.
+        if (prefs.contains(PREF_USER_NAME_FROM_PROFILE)) {
+            return prefs.getString(PREF_USER_NAME_FROM_PROFILE, "Anonymous User");
+        }
+        return prefs.getString(PREF_USER_NAME_FROM_CONTACTS, "Anonymous User");
+    }
+
+    /**
+     * Returns the Google profile information of the signed-in user, or {@code null} if the
+     * profile information couldn't be retrieved.
+     */
+    public static JSONObject getUserProfile(Context ctx) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String userProfileJsonStr = prefs.getString(PREF_USER_PROFILE_JSON, "");
+        if (!userProfileJsonStr.isEmpty()) {
+            try {
+                return new JSONObject(userProfileJsonStr);
+            } catch (JSONException e) {
+                Log.e(TAG, "Couldn't parse user profile data: " + userProfileJsonStr);
+            }
+        }
+        return null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +148,33 @@ public class SignInActivity extends AppCompatActivity {
         editor.putString(PREF_USER_ACCOUNT_NAME, accountName);
         editor.commit();
 
-        fetchUserProfile();
+        fetchUserNameFromContacts();
+
+        // NOTE(spetrovic): For demo purposes, fetching user profile is too risky as it requires
+        // internet access.  So we disable it for now.
+        //fetchUserProfile();
+        finishActivity();
+    }
+
+    private void fetchUserNameFromContacts() {
+        // Get the user's full name from Contacts.
+        Cursor c = getContentResolver().query(ContactsContract.Profile.CONTENT_URI,
+                null, null, null, null);
+        String[] columnNames = c.getColumnNames();
+        String userName = "Anonymous User";
+        while (c.moveToNext()) {
+            for (int j = 0; j < columnNames.length; j++) {
+                String columnName = columnNames[j];
+                if (!columnName.equals(ContactsContract.Contacts.DISPLAY_NAME)) {
+                    continue;
+                }
+                userName = c.getString(c.getColumnIndex(columnName));
+            }
+        }
+        c.close();
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putString(PREF_USER_NAME_FROM_CONTACTS, userName);
+        editor.commit();
     }
 
     private void fetchUserProfile() {
@@ -144,9 +211,15 @@ public class SignInActivity extends AppCompatActivity {
         if (userProfile != null) {
             SharedPreferences.Editor editor = mPrefs.edit();
             editor.putString(PREF_USER_PROFILE_JSON, userProfile.toString());
+            try {
+                if (userProfile.has("name") && !userProfile.getString("name").isEmpty()) {
+                    editor.putString(PREF_USER_NAME_FROM_PROFILE, userProfile.getString("name"));
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Couldn't read user name from user profile: " + e.getMessage());
+            }
             editor.commit();
         }
-
         finishActivity();
     }
 

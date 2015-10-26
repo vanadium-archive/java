@@ -425,7 +425,7 @@ public class NavigateFragment extends Fragment {
         switch (mRole) {
             case AUDIENCE:
                 db.askQuestion(mDeckId, mPresentationId,
-                        ((PresentationActivity) getActivity()).getFullName());
+                        SignInActivity.getUserName(getActivity()));
                 toast("You have been added to the Q&A queue.");
                 break;
             case PRESENTER:

@@ -178,8 +178,7 @@ public class V23Manager {
                         "Cannot get blessings without an activity to return to.");
             }
             // Get the signed-in user's email to generate the blessings from.
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(androidCtx);
-            String userEmail = prefs.getString(SignInActivity.PREF_USER_ACCOUNT_NAME, "");
+            String userEmail = SignInActivity.getUserEmail(androidCtx);
             activity.startActivityForResult(
                     BlessingService.newBlessingIntent(androidCtx, userEmail),
                     BLESSING_REQUEST);

@@ -64,10 +64,6 @@ public class PresentationActivity extends AppCompatActivity {
      */
     private boolean mShouldBeAdvertising;
     private boolean mIsAdvertising;
-    /**
-     * The human-readable, full name of the user.
-     */
-    private String mFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,22 +99,6 @@ public class PresentationActivity extends AppCompatActivity {
                 Log.d(TAG, "Need to restore advertising");
             }
         }
-
-        // Get the user's full name from Contacts.
-        Cursor c = getContentResolver().query(ContactsContract.Profile.CONTENT_URI,
-                null, null, null, null);
-        String[] columnNames = c.getColumnNames();
-        mFullName = "Anonymous User";
-        while (c.moveToNext()) {
-            for (int j = 0; j < columnNames.length; j++) {
-                String columnName = columnNames[j];
-                if (!columnName.equals(ContactsContract.Contacts.DISPLAY_NAME)) {
-                    continue;
-                }
-                mFullName = c.getString(c.getColumnIndex(columnName));
-            }
-        }
-        c.close();
 
         // TODO(kash): This is a total hack.  I thought that the deck would be
         // loaded by this point, but we aren't actually guaranteed that.  After
@@ -252,7 +232,7 @@ public class PresentationActivity extends AppCompatActivity {
                     new ParticipantPeer.Server(
                             mDeckFactory.make(mDeck),
                             mDeck.getId(),
-                            new VPerson(blessings.toString(), mFullName),
+                            new VPerson(blessings.toString(), SignInActivity.getUserName(this)),
                             mSyncgroupName,
                             mPresentationId));
             Log.d(TAG, "MT advertising started:");
@@ -382,9 +362,4 @@ public class PresentationActivity extends AppCompatActivity {
     public void setUnsynced() {
         mSynced = false;
     }
-
-    /**
-     * Return the human-readable, full name of the user.
-     */
-    public String getFullName() { return mFullName; }
 }
