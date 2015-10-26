@@ -257,11 +257,9 @@ public interface DB {
      *
      * @param deckId         the deck used in the presentation
      * @param presentationId the presentation identifier
-     * @param firstName      the user's first name
-     * @param lastName       the user's last name
+     * @param name           the user's full name
      */
-    void askQuestion(String deckId, String presentationId,
-                     String firstName, String lastName);
+    void askQuestion(String deckId, String presentationId, String name);
 
     /**
      * Give control of the presentation to the questioner.  Mark the question as answered.

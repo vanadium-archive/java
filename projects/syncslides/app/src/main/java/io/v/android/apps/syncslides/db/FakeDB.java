@@ -104,8 +104,7 @@ public class FakeDB implements DB {
         for (int i = 0; i < 5; i++) {
             Question question = new Question(
                     "question" + i,
-                    "Questioner",
-                    "#" + i,
+                    "Questioner #" + i,
                     DateTime.now().minus(Period.minutes(random.nextInt(5)))
                             .toInstant().getMillis());
             mQuestions.add(question);
@@ -227,8 +226,7 @@ public class FakeDB implements DB {
     }
 
     @Override
-    public void askQuestion(String deckId, String presentationId,
-                            String firstName, String lastName) {
+    public void askQuestion(String deckId, String presentationId, String name) {
         // Nothing to do.
     }
 

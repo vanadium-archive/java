@@ -6,7 +6,9 @@ package io.v.android.apps.syncslides;
 
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,6 +24,7 @@ import io.v.android.apps.syncslides.model.Deck;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
 import io.v.android.apps.syncslides.model.Role;
+import io.v.v23.security.Blessings;
 
 public class PresentationActivity extends AppCompatActivity {
     private static final String TAG = "PresentationActivity";
@@ -61,6 +64,10 @@ public class PresentationActivity extends AppCompatActivity {
      */
     private boolean mShouldBeAdvertising;
     private boolean mIsAdvertising;
+    /**
+     * The human-readable, full name of the user.
+     */
+    private String mFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +103,22 @@ public class PresentationActivity extends AppCompatActivity {
                 Log.d(TAG, "Need to restore advertising");
             }
         }
+
+        // Get the user's full name from Contacts.
+        Cursor c = getContentResolver().query(ContactsContract.Profile.CONTENT_URI,
+                null, null, null, null);
+        String[] columnNames = c.getColumnNames();
+        mFullName = "Anonymous User";
+        while (c.moveToNext()) {
+            for (int j = 0; j < columnNames.length; j++) {
+                String columnName = columnNames[j];
+                if (!columnName.equals(ContactsContract.Contacts.DISPLAY_NAME)) {
+                    continue;
+                }
+                mFullName = c.getString(c.getColumnIndex(columnName));
+            }
+        }
+        c.close();
 
         // TODO(kash): This is a total hack.  I thought that the deck would be
         // loaded by this point, but we aren't actually guaranteed that.  After
@@ -222,17 +245,14 @@ public class PresentationActivity extends AppCompatActivity {
             return;
         }
         if (shouldUseV23()) {
-            V23Manager.Singleton.get().mount(
+            V23Manager v23Manager = V23Manager.Singleton.get();
+            Blessings blessings = v23Manager.getBlessings();
+            v23Manager.mount(
                     Config.MtDiscovery.makeMountName(mDeck),
                     new ParticipantPeer.Server(
                             mDeckFactory.make(mDeck),
                             mDeck.getId(),
-                            // TODO(jregan): Get user name from device.
-                            new VPerson(
-                                    "dev.v.io/u/great.presenter@gmail.com/android/io.v" +
-                                            ".android.apps.syncslides",
-                                    "Great",
-                                    "Presenter"),
+                            new VPerson(blessings.toString(), mFullName),
                             mSyncgroupName,
                             mPresentationId));
             Log.d(TAG, "MT advertising started:");
@@ -363,4 +383,8 @@ public class PresentationActivity extends AppCompatActivity {
         mSynced = false;
     }
 
+    /**
+     * Return the human-readable, full name of the user.
+     */
+    public String getFullName() { return mFullName; }
 }

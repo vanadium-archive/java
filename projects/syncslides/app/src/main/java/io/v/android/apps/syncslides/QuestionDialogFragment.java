@@ -38,8 +38,7 @@ public class QuestionDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         String[] questioners = new String[questions.length];
         for (int i = 0; i < questions.length; i++) {
-            questioners[i] = questions[i].getFirstName() + " "
-                    + questions[i].getLastName();
+            questioners[i] = questions[i].getName();
         }
         builder.setTitle(R.string.question_message)
                 .setItems(questioners, new DialogInterface.OnClickListener() {

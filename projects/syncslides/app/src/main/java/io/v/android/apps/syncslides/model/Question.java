@@ -14,8 +14,7 @@ import org.joda.time.DateTime;
  */
 public class Question implements Parcelable {
     private String mId;
-    private String mFirstName;
-    private String mLastName;
+    private String mName;
     /**
      * Time at which the question was asked in ms since the epoch.  Stored as
      * a long rather than DateTime because it is easier to serialize this way.
@@ -24,21 +23,18 @@ public class Question implements Parcelable {
 
     /**
      * @param id a uuid
-     * @param firstName the first name of the questioner
-     * @param lastName the last name of the questioner
+     * @param name the name of the questioner
      * @param time the time at which the question was asked in ms since the epoch
      */
-    public Question(String id, String firstName, String lastName, long time) {
+    public Question(String id, String name, long time) {
         mId = id;
-        mFirstName = firstName;
-        mLastName = lastName;
+        mName = name;
         mTime = time;
     }
 
     private Question(Parcel source) {
         mId = source.readString();
-        mFirstName = source.readString();
-        mLastName = source.readString();
+        mName = source.readString();
         mTime = source.readLong();
     }
 
@@ -50,18 +46,11 @@ public class Question implements Parcelable {
     }
 
    /**
-     * Returns the first name of the questioner.
+     * Returns the name of the questioner.
      */
-    public String getFirstName() {
-        return mFirstName;
+    public String getName() {
+        return mName;
 
-    }
-
-    /**
-     * Returns the last name of the questioner.
-     */
-    public String getLastName() {
-        return mLastName;
     }
 
     /**
@@ -79,8 +68,7 @@ public class Question implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mId);
-        dest.writeString(mFirstName);
-        dest.writeString(mLastName);
+        dest.writeString(mName);
         dest.writeLong(mTime);
     }
 

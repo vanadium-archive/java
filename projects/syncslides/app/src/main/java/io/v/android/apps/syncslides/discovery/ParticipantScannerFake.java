@@ -33,8 +33,7 @@ public class ParticipantScannerFake implements ParticipantScanner {
                             new VPerson(
                                     "dev.v.io/u/liz.lemon@gmail.com/android/io.v" +
                                             ".android.apps.syncslides",
-                                    "Liz",
-                                    "Lemon"),
+                                    "Liz Lemon"),
                             mDeckFactory.make(
                                     "Kale - Just eat it.",
                                     "deckByAlice")));
@@ -46,8 +45,7 @@ public class ParticipantScannerFake implements ParticipantScanner {
                             new VPerson(
                                     "dev.v.io/u/jack.donaghy@gmail.com/android/io.v" +
                                             ".android.apps.syncslides",
-                                    "Jack",
-                                    "Donaghy"),
+                                    "Jack Donaghy"),
                             mDeckFactory.make(
                                     "Java - Object deluge.",
                                     "deckByBob")));

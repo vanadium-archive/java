@@ -869,7 +869,7 @@ public class SyncbaseDB implements DB {
 
     @Override
     public void askQuestion(final String deckId, final String presentationId,
-                            final String firstName, final String lastName) {
+                            final String personName) {
         final Blessings blessings = V23Manager.Singleton.get().getBlessings();
         new Thread(new Runnable() {
             @Override
@@ -877,11 +877,11 @@ public class SyncbaseDB implements DB {
                 try {
                     String rowKey = NamingUtil.join(deckId, presentationId, QUESTIONS,
                             UUID.randomUUID().toString());
-                    Log.i(TAG, "Writing row " + rowKey + " with " + firstName + " " + lastName);
+                    Log.i(TAG, "Writing row " + rowKey + " with " + personName);
                     BatchDatabase batch = mDB.beginBatch(mVContext, null);
                     Table presentations = batch.getTable(PRESENTATIONS_TABLE);
                     VQuestion question = new VQuestion(
-                            new VPerson(blessings.toString(), firstName, lastName),
+                            new VPerson(blessings.toString(), personName),
                             System.currentTimeMillis(),
                             false // Not yet answered.
                     );

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">aaaSyncSlides</string>
+    <string name="app_name">SyncSlides</string>
 
     <string name="title_account1">Account 1</string>
     <string name="title_account2">Account 2</string>

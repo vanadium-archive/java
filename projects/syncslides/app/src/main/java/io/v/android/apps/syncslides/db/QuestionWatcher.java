@@ -81,8 +81,7 @@ class QuestionWatcher {
                 }
                 final Question question = new Question(
                         lastPart(keyValue.getKey()),
-                        value.getQuestioner().getFirstName(),
-                        value.getQuestioner().getLastName(),
+                        value.getQuestioner().getName(),
                         value.getTime());
                 mState.handler.post(new Runnable() {
                     @Override
@@ -114,8 +113,7 @@ class QuestionWatcher {
                     }
                     final Question question = new Question(
                             id,
-                            vQuestion.getQuestioner().getFirstName(),
-                            vQuestion.getQuestioner().getLastName(),
+                            vQuestion.getQuestioner().getName(),
                             vQuestion.getTime());
                     mState.handler.post(new Runnable() {
                         @Override

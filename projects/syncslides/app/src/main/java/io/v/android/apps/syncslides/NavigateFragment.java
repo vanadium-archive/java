@@ -424,8 +424,8 @@ public class NavigateFragment extends Fragment {
         DB db = DB.Singleton.get(getActivity().getApplicationContext());
         switch (mRole) {
             case AUDIENCE:
-                // TODO(kash): Get the real user name from shared preferences.
-                db.askQuestion(mDeckId, mPresentationId, "Audience member", "#1");
+                db.askQuestion(mDeckId, mPresentationId,
+                        ((PresentationActivity) getActivity()).getFullName());
                 toast("You have been added to the Q&A queue.");
                 break;
             case PRESENTER:
@@ -507,8 +507,7 @@ public class NavigateFragment extends Fragment {
         ((PresentationActivity) getActivity()).setUiImmersive(true);
         Snackbar snack = Snackbar.make(
                 getView(),
-                getResources().getString(R.string.handoff_message) + " "
-                        + handoff.getFirstName() + " " + handoff.getLastName(),
+                getResources().getString(R.string.handoff_message) + " " + handoff.getName(),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getResources().getString(R.string.end_handoff),
                         snackbarClickListener)

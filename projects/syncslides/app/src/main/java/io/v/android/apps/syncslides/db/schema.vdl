@@ -34,8 +34,8 @@ type VPresentation struct {
 // Person represents either an audience member or the presenter.
 type VPerson struct{
     Blessing string
-    FirstName string
-    LastName string
+    // The person's full name.
+    Name string
 }
 
 // CurrentSlide contains state for the live presentation.  It is separate from the
