@@ -62,7 +62,8 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
-    private JSONObject mUserProfile;
+    private String mUserEmail;
+    private String mUserName;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
@@ -79,16 +80,8 @@ public class NavigationDrawerFragment extends Fragment {
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedDrawer = prefs.getBoolean(PREF_USER_LEARNED_DRAWER, false);
-        mUserProfile = new JSONObject();
-        // See if user profile has been stored in shared preferences.
-        String userProfileJsonStr = prefs.getString(SignInActivity.PREF_USER_PROFILE_JSON, "");
-        if (!userProfileJsonStr.isEmpty()) {
-            try {
-                mUserProfile = new JSONObject(userProfileJsonStr);
-            } catch (JSONException e) {
-                Log.e(TAG, "Couldn't parse user profile data: " + userProfileJsonStr);
-            }
-        }
+        mUserEmail = SignInActivity.getUserEmail(getActivity());
+        mUserName = SignInActivity.getUserName(getActivity());
 
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
@@ -117,30 +110,16 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<JSONObject>(
+        mDrawerListView.setAdapter(new ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_2,
                 android.R.id.text1,
-                new JSONObject[]{mUserProfile}) {
+                new String[]{ mUserName }) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                JSONObject userProfile = getItem(position);
-                String name = "";
-                String email = "";
-                if (userProfile != null) {
-                    try {
-                        name = userProfile.getString("name");
-                        email = userProfile.getString("email");
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error reading from user profile: " + e.getMessage());
-                    }
-                }
-                if (name.isEmpty() && email.isEmpty()) {
-                    name = "USER1";
-                }
                 View view = super.getView(position, convertView, parent);
-                ((TextView) view.findViewById(android.R.id.text1)).setText(name);
-                ((TextView) view.findViewById(android.R.id.text2)).setText(email);
+                ((TextView) view.findViewById(android.R.id.text1)).setText(mUserName);
+                ((TextView) view.findViewById(android.R.id.text2)).setText(mUserEmail);
                 return view;
             }
         });
