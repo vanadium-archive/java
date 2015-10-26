@@ -42,5 +42,5 @@ vdl {
     inputPaths += [project(':projects:syncslides').projectDir.absolutePath + '/app/src/main/java']
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
