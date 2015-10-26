@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import io.v.android.apps.syncslides.db.DB;
 import io.v.android.apps.syncslides.discovery.DiscoveryManager;
 import io.v.android.apps.syncslides.model.Deck;
@@ -103,7 +106,10 @@ public class DeckListAdapter extends RecyclerView.Adapter<DeckListAdapter.ViewHo
         } else {
             deck = mDecks.get(deckIndex - mLiveDecks.getItemCount());
             // TODO(afergan): Set actual date here.
-            holder.mToolbarLastOpened.setText("Opened on Oct 26, 2015");
+            final Calendar cal = Calendar.getInstance();
+            holder.mToolbarLastOpened.setText("Opened on "
+                    + cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US) + " "
+                    + cal.get(Calendar.DAY_OF_MONTH) + ", " + cal.get(Calendar.YEAR));
             holder.mToolbarLastOpened.setVisibility(View.VISIBLE);
             holder.mToolbarLiveNow.setVisibility(View.GONE);
             holder.mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
