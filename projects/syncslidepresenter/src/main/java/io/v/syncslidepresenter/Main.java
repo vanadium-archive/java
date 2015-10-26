@@ -24,6 +24,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -126,7 +127,8 @@ public class Main {
         String name = NamingUtil.join(options.mountPrefix, UUID.randomUUID().toString());
         logger.info("Mounting new syncbase server at " + name);
         VContext mountContext = SyncbaseServer.withNewServer(baseContext,
-                new SyncbaseServer.Params().withPermissions(permissions).withName(name));
+                new SyncbaseServer.Params().withPermissions(permissions).withName(name)
+                .withStorageRootDir(options.storageRootDir));
         final Server server = V.getServer(mountContext);
         if (server.getStatus().getEndpoints().length > 0) {
             logger.info("Mounted syncbase server at the following endpoints: ");
@@ -242,6 +244,11 @@ public class Main {
     }
 
     public static class Options {
+        @Parameter(names = {"-s", "--storageRootDir"},
+                description = "the root directory to use for local storage")
+        private String storageRootDir = Joiner.on(File.separator).join(
+                System.getProperty("java.io.tmpdir"), "syncslidepresenter-storage");
+
         @Parameter(names = {"-d", "--deckPrefix"},
                 description = "mounttable prefix for live presentations.")
         private String deckPrefix = "happyDeck";
