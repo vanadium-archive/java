@@ -250,11 +250,6 @@ public class Main {
                 + " where the syncbase service will be mounted")
         private String mountPrefix = "/192.168.86.254:8101";
 
-        @Parameter(names = {"-p", "--presentationName"},
-                description = "the presentation to watch")
-        private String presentationName = "/192.168.86.254:8101/990005300000537/%%sync/"
-                + "syncslides/deckId1/randomPresentationId1";
-
         @Parameter(names = {"--joinTimeout"},
                 description = "the number of seconds to wait to join the presentation")
         private int joinTimeoutSeconds = 10;
