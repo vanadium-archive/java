@@ -14,6 +14,9 @@ buildscript {
 }
 
 mainClassName = "io.v.syncslidepresenter.Main"
+// Work around potential freezes in Java/Vanadium binaries
+// described by http://v.io/i/567.
+applicationDefaultJvmArgs = ['-XX:+UnlockDiagnosticVMOptions', '-XX:-LogEvents']
 
 repositories {
     mavenCentral()
