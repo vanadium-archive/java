@@ -339,15 +339,15 @@ public class NavigateFragment extends Fragment {
             toast("Saving notes");
             mSlides.get(mUserSlideNum).setNotes(notes);
             mDB.setSlideNotes(mDeckId, mUserSlideNum, notes);
-            mNotes.clearFocus();
-            InputMethodManager inputManager =
-                    (InputMethodManager) getContext().
-                            getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(
-                    getActivity().getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-            ((PresentationActivity) getActivity()).setUiImmersive(true);
         }
+        mNotes.clearFocus();
+        InputMethodManager inputManager =
+                (InputMethodManager) getContext().
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(
+                getActivity().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+        ((PresentationActivity) getActivity()).setUiImmersive(true);
     }
 
     private void unsync() {
