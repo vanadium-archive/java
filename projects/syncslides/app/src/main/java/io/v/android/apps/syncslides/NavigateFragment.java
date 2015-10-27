@@ -344,9 +344,11 @@ public class NavigateFragment extends Fragment {
         InputMethodManager inputManager =
                 (InputMethodManager) getContext().
                         getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(
-                getActivity().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+        if (getActivity().getCurrentFocus() != null) {
+            inputManager.hideSoftInputFromWindow(
+                    getActivity().getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
         ((PresentationActivity) getActivity()).setUiImmersive(true);
     }
 
