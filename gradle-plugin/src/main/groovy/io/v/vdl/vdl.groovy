@@ -31,7 +31,16 @@ class VdlPlugin implements Plugin<Project> {
         def prepareTask = project.task('prepareVdl') {
             doLast {
                 generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"))
-                generateTask.commandLine('build/vdltool/vdl-' + getOsName(), '--builtin_vdlroot', 'generate', '--lang=java', "--java-out-dir=${project.vdl.outputPath}", 'all')
+                List<String> commandLine = ['build/vdltool/vdl-' + getOsName(),
+                                            '--builtin_vdlroot', 'generate',
+                                            '--lang=java',
+                                            "--java-out-dir=${project.vdl.outputPath}"
+                ]
+                if (!project.vdl.packageTranslations.isEmpty()) {
+                    commandLine.add('--java-out-pkg=' + project.vdl.packageTranslations.join(','))
+                }
+                commandLine.add('all')
+                generateTask.commandLine(commandLine)
             }
         }
         def removeVdlRootTask = project.task('removeVdlRoot', type: Delete) {
@@ -96,6 +105,7 @@ class VdlConfiguration {
     List<String> inputPaths = []
     String outputPath = "generated-src/vdl"
     String vdlToolPath = ""
+    List<String> packageTranslations = []
 
     // If true, code generated for the vdlroot vdl package will be emitted.
     // Typically, users will want to leave this set to false as they will
