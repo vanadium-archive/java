@@ -197,6 +197,7 @@ public class Main {
         logger.info("inside startSwingServer");
         // Make command-Q do the same as closing the main frame (i.e. exit).
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+        System.setProperty("java.rmi.server.hostname", "localhost");
 
         JFrame frame = new JFrame();
         enableOSXFullscreen(frame);
