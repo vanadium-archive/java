@@ -50,7 +50,7 @@ import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
-import io.v.v23.services.syncbase.nosql.SyncgroupPrefix;
+import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.Syncbase;
@@ -262,8 +262,8 @@ public class SyncbaseDB implements DB {
                                 SYNCGROUP_PRESENTATION_DESCRIPTION,
                                 groupReadPermissions,
                                 Arrays.asList(
-                                        new SyncgroupPrefix(PRESENTATIONS_TABLE, prefix),
-                                        new SyncgroupPrefix(DECKS_TABLE, deckId)),
+                                        new TableRow(PRESENTATIONS_TABLE, prefix),
+                                        new TableRow(DECKS_TABLE, deckId)),
                                 Arrays.asList(V23Manager.syncName("sg")),
                                 false
                         ),
