@@ -157,7 +157,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumSyncbaseEnvironment)
 
 // Copy the shared library to its ultimate destination.
 task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-    from jiriRoot + '/release/go/pkg/android_arm_shared/v.io/x/jni'
+    from jiriRoot + '/release/go/pkg/android_arm_shared_shared/v.io/x/jni'
     into 'src/main/jniLibs/armeabi-v7a'
     include 'main.a'
     rename 'main.a', 'libv23.so'
