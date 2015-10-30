@@ -15,20 +15,17 @@ import java.util.Iterator;
  * An implementation of {@link VIterable} that reads data from an underlying Go channel.
  */
 class ChannelIterable<T> implements VIterable<T> {
-    private final long nativeValuePtr;
-    private final long nativeErrorPtr;
-    private final long nativeSourcePtr;
-    private volatile VException error;
+    private final long nativeChanPtr;
+    private final long nativeConvertPtr;
+    private VException error;
 
-    private native Object nativeReadValue(long nativeValuePtr, long nativeErrorPtr)
+    private native Object nativeReadValue(long nativeChanPtr, long nativeConvertPtr)
             throws EOFException, VException;
-    private native void nativeFinalize(
-            long nativeValuePtr, long nativeErrorPtr, long nativeSourcePtr);
+    private native void nativeFinalize(long nativeChanPtr, long nativeConvertPtr);
 
-    private ChannelIterable(long nativeValuePtr, long nativeErrorPtr, long nativeSourcePtr) {
-        this.nativeValuePtr = nativeValuePtr;
-        this.nativeErrorPtr = nativeErrorPtr;
-        this.nativeSourcePtr = nativeSourcePtr;
+    private ChannelIterable(long nativeChanPtr, long nativeConvertPtr) {
+        this.nativeChanPtr = nativeChanPtr;
+        this.nativeConvertPtr = nativeConvertPtr;
     }
 
     @Override
@@ -54,11 +51,11 @@ class ChannelIterable<T> implements VIterable<T> {
     }
 
     private T readValue() throws EOFException, VException {
-        return (T) nativeReadValue(nativeValuePtr, nativeErrorPtr);
+        return (T) nativeReadValue(nativeChanPtr, nativeConvertPtr);
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(nativeValuePtr, nativeErrorPtr, nativeSourcePtr);
+        nativeFinalize(nativeChanPtr, nativeConvertPtr);
     }
 }
