@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import io.v.v23.VIterable;
 import org.joda.time.Duration;
 
 import java.awt.Dimension;
@@ -78,7 +79,6 @@ import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.RowRange;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
@@ -251,14 +251,13 @@ public class Main {
         String rowKey = Joiner.on("/").join(presentation.getDeckId(), presentation
                 .getPresentationId(), "CurrentSlide");
         logger.info("going to watch row key " + rowKey);
-        Stream<WatchChange> watchStream = db.watch(context, presentations.name(), rowKey,
-                marker);
+        VIterable<WatchChange> changes = db.watch(context, presentations.name(), rowKey, marker);
 
-        for (WatchChange w : watchStream) {
-            logger.info("Change detected in " + w.getRowName());
-            logger.info("Type: " + w.getChangeType());
+        for (WatchChange change : changes) {
+            logger.info("Change detected in " + change.getRowName());
+            logger.info("Type: " + change.getChangeType());
             try {
-                VCurrentSlide currentSlide = (VCurrentSlide) VomUtil.decode(w.getVomValue(),
+                VCurrentSlide currentSlide = (VCurrentSlide) VomUtil.decode(change.getVomValue(),
                         VCurrentSlide.class);
                 logger.info("Current slide: " + currentSlide);
                 // Read the corresponding slide.
@@ -269,6 +268,10 @@ public class Main {
             } catch (IOException | VException e) {
                 logger.log(Level.WARNING, "exception encountered while handling change event", e);
             }
+        }
+
+        if (changes.error() != null) {
+            logger.log(Level.WARNING, "Premature end of slide changes: " + changes.error());
         }
     }
 
