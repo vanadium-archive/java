@@ -10,6 +10,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
+import io.v.v23.VIterable;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
@@ -19,6 +20,7 @@ import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
+import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.BlobReader;
 import io.v.v23.syncbase.nosql.BlobWriter;
@@ -27,7 +29,6 @@ import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.util.Util;
@@ -211,16 +212,16 @@ public class SyncbaseTest extends TestCase {
         table.put(ctx, "baz", baz, Baz.class);
 
         {
-            DatabaseCore.ResultStream stream = db.exec(ctx,
+            DatabaseCore.QueryResults results = db.exec(ctx,
                     "select k, v.Name from " + TABLE_NAME + " where Type(v) like \"%Baz\"");
-            assertThat(stream.columnNames()).containsExactly("k", "v.Name");
-            assertThat(stream).containsExactly(ImmutableList.of(
+            assertThat(results.columnNames()).containsExactly("k", "v.Name");
+            assertThat(results).containsExactly(ImmutableList.of(
                     new VdlAny(String.class, "baz"), new VdlAny(String.class, baz.name)));
         }
         {
-            DatabaseCore.ResultStream stream = db.exec(ctx, "select k, v from " + TABLE_NAME);
-            assertThat(stream.columnNames()).containsExactly("k", "v");
-            assertThat(stream).containsExactly(
+            DatabaseCore.QueryResults results = db.exec(ctx, "select k, v from " + TABLE_NAME);
+            assertThat(results.columnNames()).containsExactly("k", "v");
+            assertThat(results).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "bar"), new VdlAny(Bar.class, bar)),
                     ImmutableList.of(new VdlAny(String.class, "baz"), new VdlAny(Baz.class, baz)),
                     ImmutableList.of(new VdlAny(String.class, "foo"), new VdlAny(Foo.class, foo))
@@ -234,8 +235,8 @@ public class SyncbaseTest extends TestCase {
         Foo foo = new Foo(4, "f");
         Bar bar = new Bar(0.5f, "b");
         Baz baz = new Baz("John Doe", true);
+        ResumeMarker marker = db.getResumeMarker(ctx);
 
-        Stream<WatchChange> watchStream = db.watch(ctx, TABLE_NAME, "b", db.getResumeMarker(ctx));
         table.put(ctx, "foo", foo, Foo.class);
         table.put(ctx, "bar", bar, Bar.class);
         table.put(ctx, "baz", baz, Baz.class);
@@ -248,10 +249,11 @@ public class SyncbaseTest extends TestCase {
                         VomUtil.encode(baz, Baz.class), null, false, false),
                 new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
                         new byte[0], null, false, false ));
-        Iterator<WatchChange> iterator = watchStream.iterator();
+        CancelableVContext ctxC = ctx.withCancel();
+        Iterator<WatchChange> it = db.watch(ctxC, TABLE_NAME, "b", marker).iterator();
         for (WatchChange expected : expectedChanges) {
-            assertThat(iterator.hasNext());
-            WatchChange actual = iterator.next();
+            assertThat(it.hasNext());
+            WatchChange actual = it.next();
             assertThat(actual.getTableName()).isEqualTo(expected.getTableName());
             assertThat(actual.getRowName()).isEqualTo(expected.getRowName());
             assertThat(actual.getChangeType()).isEqualTo(expected.getChangeType());
@@ -259,7 +261,7 @@ public class SyncbaseTest extends TestCase {
             assertThat(actual.isFromSync()).isEqualTo(expected.isFromSync());
             assertThat(actual.isContinued()).isEqualTo(expected.isContinued());
         }
-        watchStream.cancel();
+        ctxC.cancel();
     }
 
     public void testDatabaseWatchWithContextCancel() throws Exception {
@@ -267,7 +269,7 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createApp(createService()));
         createTable(db);
 
-        Stream<WatchChange> watchStream = db.watch(
+        VIterable<WatchChange> it = db.watch(
                 cancelCtx, TABLE_NAME, "b", db.getResumeMarker(ctx));
         new Thread(new Runnable() {
             @Override
@@ -275,7 +277,7 @@ public class SyncbaseTest extends TestCase {
                 cancelCtx.cancel();
             }
         }).start();
-        assertThat(watchStream).isEmpty();
+        assertThat(it).isEmpty();
     }
 
     public void testBatch() throws Exception {

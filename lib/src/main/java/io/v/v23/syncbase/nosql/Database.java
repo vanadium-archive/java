@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
@@ -82,7 +83,7 @@ public interface Database extends DatabaseCore, AccessController {
 
     /**
      * Allows a client to watch for updates to the database. For each watch request, the client will
-     * receive a reliable stream of watch events without re-ordering.
+     * receive a reliable iterator of watch events without re-ordering.
      * <p>
      * See {@link io.v.v23.services.watch.GlobWatcherClient} for a detailed explanation of the
      * watch behavior.
@@ -97,16 +98,18 @@ public interface Database extends DatabaseCore, AccessController {
      * <li>abort the batch,</li>
      * <li>start watching for changes to the data using the {@link ResumeMarker}.</li>
      * </ol><p>
+     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * stop the watch operation and terminate the iterator early.
      *
      * @param ctx                 vanadium context
      * @param tableRelativeName   relative name of the table to watch
      * @param rowPrefix           prefix of the rows to watch
      * @param resumeMarker        {@link ResumeMarker} from which the changes will be monitored
-     * @return                    a stream of changes
+     * @return                    a (potentially-infinite) iterator of changes
      * @throws VException         if there was an error setting up this watch request
      */
-    Stream<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
-                              ResumeMarker resumeMarker) throws VException;
+    VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
+                                 ResumeMarker resumeMarker) throws VException;
 
     /**
      * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.

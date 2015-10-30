@@ -7,9 +7,9 @@ package io.v.android.apps.syncslides.db;
 import android.util.Log;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VIterable;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.verror.VException;
@@ -67,10 +67,10 @@ class DriverWatcher {
                 postInUiThread(presentation.getDriver().getElem());
             }
 
-            Stream<WatchChange> watch = mState.db.watch(
+            VIterable<WatchChange> changes = mState.db.watch(
                     mState.vContext, SyncbaseDB.PRESENTATIONS_TABLE, row,
                     batch.getResumeMarker(mState.vContext));
-            for (WatchChange change : watch) {
+            for (WatchChange change : changes) {
                 Log.i(TAG, "Found change " + change.getChangeType());
                 if (!change.getRowName().equals(row)) {
                     continue;

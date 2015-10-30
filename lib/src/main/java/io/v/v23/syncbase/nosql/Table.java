@@ -6,6 +6,7 @@ package io.v.v23.syncbase.nosql;
 
 import java.lang.reflect.Type;
 
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.KeyValue;
@@ -131,13 +132,16 @@ public interface Table {
      * It is legal to perform writes concurrently with {@link #scan scan()}. The returned stream
      * reads from a consistent snapshot taken at the time of the method and will not reflect
      * subsequent writes to keys not yet reached by the stream.
+     * <p>
+     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * stop the scan and terminate the iterator early.
      *
      * @param  ctx         Vanadium context
      * @param  range       range of rows to be read
      * @return             a stream used for iterating over the snapshot of the provided rows
      * @throws VException  if the scan stream couldn't be created
      */
-    Stream<KeyValue> scan(VContext ctx, RowRange range) throws VException;
+    VIterable<KeyValue> scan(VContext ctx, RowRange range) throws VException;
 
     /**
      * Returns an array of {@link PrefixPermissions} (i.e., {@code (prefix, perms)} pairs) for

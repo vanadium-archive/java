@@ -29,7 +29,6 @@ public class Namespace {
     public static List<GlobReply> glob(String root, VContext ctx) throws VException {
         io.v.v23.namespace.Namespace n = V.getNamespace(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        Iterable<GlobReply> chan = n.glob(ctxT, root.isEmpty() ? "*" : root + "/*");
-        return ImmutableList.copyOf(chan);
+        return ImmutableList.copyOf(n.glob(ctxT, root.isEmpty() ? "*" : root + "/*"));
     }
 }

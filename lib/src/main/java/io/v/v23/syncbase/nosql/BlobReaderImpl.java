@@ -4,11 +4,13 @@
 
 package io.v.v23.syncbase.nosql;
 
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.vdl.VdlUint64;
 import io.v.v23.verror.VException;
 
@@ -35,10 +37,10 @@ class BlobReaderImpl implements BlobReader {
         return new BlobInputStream(stream);
     }
     @Override
-    public Stream<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException {
+    public VIterable<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException {
         TypedClientStream<Void, BlobFetchStatus, Void> stream =
                 client.fetchBlob(ctx, ref, new VdlUint64(priority));
-        return new StreamImpl(ctx.withCancel(), stream);
+        return new TypedStreamIterable(stream);
     }
     @Override
     public long size(VContext ctx) throws VException {

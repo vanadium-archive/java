@@ -12,6 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
+import io.v.v23.VIterable;
 import junit.framework.TestCase;
 
 import org.joda.time.Duration;
@@ -190,7 +191,7 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
         {
-            final FutureCallback<Iterable<GlobReply>> callback = new FutureCallback<>();
+            final FutureCallback<VIterable<GlobReply>> callback = new FutureCallback<>();
             n.glob(ctx, "test/*", callback);
 
             List<GlobReply> reply = ImmutableList.copyOf(
@@ -207,7 +208,7 @@ public class NamespaceTest extends TestCase {
         n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
 
         CancelableVContext cancelContext = ctx.withCancel();
-        FutureCallback<Iterable<GlobReply>> callback = new FutureCallback<>();
+        FutureCallback<VIterable<GlobReply>> callback = new FutureCallback<>();
         n.glob(cancelContext, "test/*", callback);
         cancelContext.cancel();
         List<GlobReply> replies = ImmutableList.copyOf(Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS));

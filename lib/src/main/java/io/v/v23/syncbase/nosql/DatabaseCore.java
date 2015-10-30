@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.vdl.VdlAny;
@@ -42,20 +43,24 @@ public interface DatabaseCore {
     String[] listTables(VContext ctx) throws VException;
 
     /**
-     * Executes a SyncQL query, returning a {@link ResultStream} object that allows the caller to
+     * Executes a SyncQL query, returning a {@link QueryResults} object that allows the caller to
      * iterate over arrays of values for each row that matches the query.
      * <p>
      * It is legal to perform writes concurrently with {@link #exec exec()}. The returned stream reads
      * from a consistent snapshot taken at the time of the method and will not reflect subsequent
      * writes to keys not yet reached by the stream.
+     * <p>
+     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * stop the query execution and terminate the returned iterator early.
+
      *
      * @param  ctx        Vanadium context
      * @param  query      a SyncQL query
-     * @return            a {@link ResultStream} object that allows the caller to iterate over
+     * @return            a {@link QueryResults} object that allows the caller to iterate over
      *                    arrays of values for each row that matches the query
      * @throws VException if there was an error executing the query
      */
-    ResultStream exec(VContext ctx, String query) throws VException;
+    QueryResults exec(VContext ctx, String query) throws VException;
 
     /**
      * Returns the {@link ResumeMarker} that points to the current state of the database.
@@ -68,7 +73,7 @@ public interface DatabaseCore {
      * An interface for iterating through rows resulting from a
      * {@link DatabaseCore#exec DatabaseCore.exec()}.
      */
-    interface ResultStream extends Stream<List<VdlAny>> {
+    interface QueryResults extends VIterable<List<VdlAny>> {
         /**
          * Returns an array of column names that matched the query.  The size of the {@link VdlAny}
          * list returned in every iteration will match the size of this array.

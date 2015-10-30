@@ -2,12 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.v23.syncbase.nosql;
+package io.v.v23.vdl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
-import io.v.v23.context.CancelableVContext;
-import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.VIterable;
 import io.v.v23.verror.Errors;
 import io.v.v23.verror.VException;
 
@@ -15,18 +14,15 @@ import java.io.EOFException;
 import java.util.Iterator;
 
 /**
- * Implementation of the {@link Stream} interface that reads from a VDL stream.
+ * Implementation of {@link VIterable} that reads from a {@link TypedClientStream}.
  */
-class StreamImpl<T> implements Stream<T> {
-    private final CancelableVContext ctxC;
+public class TypedStreamIterable<T> implements VIterable<T> {
     private final TypedClientStream<Void, T, Void> stream;
-    private volatile boolean isCanceled;
     private volatile boolean isCreated;
+    protected VException error;
 
-    StreamImpl(CancelableVContext ctxC, TypedClientStream<Void, T, Void> stream) {
-        this.ctxC = ctxC;
+    public TypedStreamIterable(TypedClientStream<Void, T, Void> stream) {
         this.stream = stream;
-        this.isCanceled = this.isCreated = false;
     }
     @Override
     public synchronized Iterator<T> iterator() {
@@ -35,27 +31,24 @@ class StreamImpl<T> implements Stream<T> {
         return new AbstractIterator<T>() {
             @Override
             protected T computeNext() {
-                synchronized (StreamImpl.this) {
-                    if (isCanceled) {  // client canceled the stream
-                        return endOfData();
-                    }
+                synchronized (TypedStreamIterable.this) {
                     try {
                         return stream.recv();
                     } catch (EOFException e) {  // legitimate end of stream
                         return endOfData();
                     } catch (VException e) {
-                        if (isCanceled || Errors.CANCELED.getID().equals(e.getID())) {
-                            return endOfData();
+                        if (!Errors.CANCELED.getID().equals(e.getID())) {  // stream not canceled
+                            error = e;
                         }
-                        throw new RuntimeException("Error retrieving next stream element.", e);
+                        return endOfData();
                     }
                 }
             }
         };
     }
+
     @Override
-    public synchronized void cancel() throws VException {
-        this.isCanceled = true;
-        this.ctxC.cancel();
+    public VException error() {
+        return error;
     }
 }

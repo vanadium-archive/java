@@ -13,12 +13,12 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VIterable;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.verror.VException;
@@ -122,10 +122,10 @@ class CurrentSlideWatcher {
                     }
                 });
             }
-            Stream<WatchChange> changeStream;
-            changeStream = mDB.watch(mVContext, SyncbaseDB.PRESENTATIONS_TABLE, rowKey,
+            VIterable<WatchChange> changes =
+                    mDB.watch(mVContext, SyncbaseDB.PRESENTATIONS_TABLE, rowKey,
                     batch.getResumeMarker(mVContext));
-            for (WatchChange change : changeStream) {
+            for (WatchChange change : changes) {
                 if (!change.getTableName().equals(SyncbaseDB.PRESENTATIONS_TABLE)) {
                     Log.e(TAG, "Wrong change table name: " + change.getTableName() + ", wanted: " +
                             SyncbaseDB.PRESENTATIONS_TABLE);

@@ -4,6 +4,7 @@
 
 package io.v.impl.google.namespace;
 
+import io.v.v23.VIterable;
 import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
@@ -25,11 +26,11 @@ import io.v.v23.verror.VException;
 public class NamespaceImpl implements Namespace {
     private final long nativePtr;
 
-    private static native Iterable<GlobReply> nativeGlob(
+    private static native VIterable<GlobReply> nativeGlob(
             long nativePtr, VContext context, String pattern, Options options) throws VException;
 
     private static native void nativeGlobAsync(long nativePtr, VContext context, String pattern,
-                                               Options options, Callback<Iterable<GlobReply>>
+                                               Options options, Callback<VIterable<GlobReply>>
                                                        callback) throws VException;
 
     private static native void nativeMount(long nativePtr, VContext context, String name,
@@ -221,25 +222,25 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public Iterable<GlobReply> glob(VContext context, String pattern) throws VException {
+    public VIterable<GlobReply> glob(VContext context, String pattern) throws VException {
         return glob(context, pattern, (Options) null);
     }
 
     @Override
-    public Iterable<GlobReply> glob(VContext context, String pattern, Options options)
+    public VIterable<GlobReply> glob(VContext context, String pattern, Options options)
             throws VException {
         return nativeGlob(nativePtr, context, pattern, options);
     }
 
     @Override
-    public void glob(VContext context, String pattern, Callback<Iterable<GlobReply>> callback)
+    public void glob(VContext context, String pattern, Callback<VIterable<GlobReply>> callback)
             throws VException {
         glob(context, pattern, null, callback);
     }
 
     @Override
     public void glob(VContext context, String pattern, Options options,
-                     Callback<Iterable<GlobReply>> callback) throws VException {
+                     Callback<VIterable<GlobReply>> callback) throws VException {
         nativeGlobAsync(nativePtr, context, pattern, options, callback);
     }
 

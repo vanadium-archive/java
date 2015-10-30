@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VIterable;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.TableClient;
@@ -17,6 +18,7 @@ import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.verror.VException;
 
 class TableImpl implements Table {
@@ -86,11 +88,10 @@ class TableImpl implements Table {
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override
-    public Stream<KeyValue> scan(VContext ctx, RowRange range) throws VException {
-        CancelableVContext ctxC = ctx.withCancel();
-        TypedClientStream<Void, KeyValue, Void> stream = this.client.scan(ctxC, this.schemaVersion,
+    public VIterable<KeyValue> scan(VContext ctx, RowRange range) throws VException {
+        TypedClientStream<Void, KeyValue, Void> stream = this.client.scan(ctx, this.schemaVersion,
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
-        return new StreamImpl(ctxC, stream);
+        return new TypedStreamIterable(stream);
     }
     @Override
     public PrefixPermissions[] getPrefixPermissions(VContext ctx, String key) throws VException {

@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import io.v.v23.VIterable;
 import org.joda.time.Duration;
 
 import java.io.ByteArrayOutputStream;
@@ -61,7 +62,6 @@ import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.RowRange;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
@@ -189,7 +189,7 @@ public class SyncbaseDB implements DB {
             if (!mPresentations.exists(mVContext)) {
                 mPresentations.create(mVContext, mPermissions);
             }
-            //importDecks();
+            importDecks();
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
             return;
@@ -369,9 +369,9 @@ public class SyncbaseDB implements DB {
             try {
                 BatchDatabase batch = mDB.beginBatch(mVContext, null);
                 mWatchMarker = batch.getResumeMarker(mVContext);
-                DatabaseCore.ResultStream stream = batch.exec(mVContext,
+                DatabaseCore.QueryResults results = batch.exec(mVContext,
                         "SELECT k, v FROM Decks WHERE Type(v) like \"%VDeck\"");
-                for (List<VdlAny> row : stream) {
+                for (List<VdlAny> row : results) {
                     if (row.size() != 2) {
                         throw new VException("Wrong number of columns: " + row.size());
                     }
@@ -385,6 +385,9 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
+                if (results.error() != null) {
+                    Log.e(TAG, "Couldn't get all decks due to error: " + results.error());
+                }
                 watchForDeckChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
@@ -392,14 +395,14 @@ public class SyncbaseDB implements DB {
         }
 
         private void watchForDeckChanges() {
-            Stream<WatchChange> changeStream = null;
+            VIterable<WatchChange> changes = null;
             try {
-                changeStream = mDB.watch(mVContext, DECKS_TABLE, "", mWatchMarker);
+                changes = mDB.watch(mVContext, DECKS_TABLE, "", mWatchMarker);
             } catch (VException e) {
                 Log.e(TAG, "Couldn't watch for changes to the Decks table: " + e.toString());
                 return;
             }
-            for (WatchChange change : changeStream) {
+            for (WatchChange change : changes) {
                 if (!change.getTableName().equals(DECKS_TABLE)) {
                     Log.e(TAG, "Wrong change table name: " + change.getTableName() + ", wanted: " +
                             DECKS_TABLE);
@@ -436,6 +439,9 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
+            }
+            if (changes.error() != null) {
+                Log.e(TAG, "Deck change thread exited early due to error: " + changes.error());
             }
             Log.i(TAG, "Deck change thread exiting");
         }
@@ -538,11 +544,11 @@ public class SyncbaseDB implements DB {
 
                     String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%VSlide\" " +
                             "AND k LIKE \"" + NamingUtil.join(deckId, "slides") + "%\"";
-                    DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
+                    DatabaseCore.QueryResults results = batch.exec(mVContext, query);
                     // TODO(kash): Abort execution if interrupted.  Perhaps we should derive
                     // a new VContext so it can be cancelled.
                     final List<Slide> slides = Lists.newArrayList();
-                    for (List<VdlAny> row : stream) {
+                    for (List<VdlAny> row : results) {
                         if (row.size() != 2) {
                             throw new VException("Wrong number of columns: " + row.size());
                         }
@@ -551,6 +557,9 @@ public class SyncbaseDB implements DB {
                         VSlide slide = (VSlide) row.get(1).getElem();
                         String note = notesForSlide(mVContext, table, key);
                         slides.add(new SlideImpl(slide.getThumbnail(), note));
+                    }
+                    if (results.error() != null) {
+                        Log.e(TAG, "Couldn't get all slides due to error: " + results.error());
                     }
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
@@ -616,8 +625,8 @@ public class SyncbaseDB implements DB {
 
                 String query = "SELECT k, v FROM Decks WHERE Type(v) LIKE \"%VSlide\" " +
                         "AND k LIKE \"" + NamingUtil.join(mDeckId, "slides") + "%\"";
-                DatabaseCore.ResultStream stream = batch.exec(mVContext, query);
-                for (List<VdlAny> row : stream) {
+                DatabaseCore.QueryResults results = batch.exec(mVContext, query);
+                for (List<VdlAny> row : results) {
                     if (row.size() != 2) {
                         throw new VException("Wrong number of columns: " + row.size());
                     }
@@ -633,6 +642,9 @@ public class SyncbaseDB implements DB {
                         }
                     });
                 }
+                if (results.error() != null) {
+                    Log.e(TAG, "Couldn't get all slides due to error: " + results.error());
+                }
                 watchForSlideChanges();
             } catch (VException e) {
                 Log.e(TAG, e.toString());
@@ -641,15 +653,15 @@ public class SyncbaseDB implements DB {
 
         private void watchForSlideChanges() {
             Table notesTable = mDB.getTable(NOTES_TABLE);
-            Stream<WatchChange> changeStream;
+            VIterable<WatchChange> changes;
             try {
-                changeStream = mDB.watch(mVContext, DECKS_TABLE, "", mWatchMarker);
+                changes = mDB.watch(mVContext, DECKS_TABLE, "", mWatchMarker);
             } catch (VException e) {
                 Log.e(TAG, "Couldn't watch for changes to the Decks table: " + e.toString());
                 return;
             }
 
-            for (WatchChange change : changeStream) {
+            for (WatchChange change : changes) {
                 if (!change.getTableName().equals(DECKS_TABLE)) {
                     Log.e(TAG, "Wrong change table name: " + change.getTableName() + ", wanted: " +
                             DECKS_TABLE);
@@ -687,7 +699,10 @@ public class SyncbaseDB implements DB {
                     });
                 }
             }
-            Log.i(TAG, "Slides watcher thread exiting");
+            if (changes.error() != null) {
+                Log.e(TAG, "Slides change thread exited early due to error: " + changes.error());
+            }
+            Log.i(TAG, "Slides change thread exiting");
         }
 
         @Override

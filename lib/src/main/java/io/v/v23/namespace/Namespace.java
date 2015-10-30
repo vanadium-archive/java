@@ -4,6 +4,7 @@
 
 package io.v.v23.namespace;
 
+import io.v.v23.VIterable;
 import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
@@ -248,7 +249,7 @@ public interface Namespace {
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    Iterable<GlobReply> glob(VContext context, String pattern) throws VException;
+    VIterable<GlobReply> glob(VContext context, String pattern) throws VException;
 
     /**
      * Returns the iterator over all names matching the provided pattern. Note that due to the
@@ -266,6 +267,9 @@ public interface Namespace {
      * <ul>
      *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
      * </ul>
+     * <p>
+     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * stop the glob operation and terminate the iterator early.
      *
      * @param context a client context
      * @param pattern a pattern that should be matched
@@ -273,43 +277,22 @@ public interface Namespace {
      * @return        an iterator over {@link GlobReply} objects matching the provided pattern
      * @throws VException if an error is encountered
      */
-    Iterable<GlobReply> glob(VContext context, String pattern, Options options)
-            throws VException;
+    VIterable<GlobReply> glob(VContext context, String pattern, Options options) throws VException;
 
     /**
      * A shortcut for {@link #glob(VContext, String, Options, Callback)} with a {@code null} options
      * parameter.
      */
-    void glob(VContext context, String pattern, Callback<Iterable<GlobReply>> callback)
+    void glob(VContext context, String pattern, Callback<VIterable<GlobReply>> callback)
             throws VException;
 
     /**
-     * Asynchronously returns the iterator over all names matching the provided pattern. This
-     * function returns immediately and the given non-{@code null} callback is called when the
-     * operation completes (either successfully or with a failure). Generally, the callback will
-     * be called when at least one entry can be read from the iterator. Subsequent calls to
-     * {@code next} may block. You should not use the iterator on threads that should not block.
-     * <p>
-     * You should be aware that the iterator:
-     * <p><ul>
-     *     <li>can be created <strong>only</strong> once</li>
-     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
-     * </ul>
-     * <p>
-     * A particular implementation of this interface chooses which options to support, but at the
-     * minimum it must handle the following pre-defined options:
-     * <ul>
-     *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
-     * </ul>
+     * Asynchronous version of {@link #glob(VContext, String, Options)}.
      *
-     * @param context a client context
-     * @param pattern a pattern that should be matched
-     * @param options options to pass to the implementation as described above, or {@code null}
-     * @param callback a callback whose {@code onSuccess} method will be passed the {@link Iterable}
-     *                 over {@link GlobReply} objects matching the provided pattern
-     * @throws VException if an error is encountered
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
      */
-    void glob(VContext context, String pattern, Options options, Callback<Iterable<GlobReply>>
+    void glob(VContext context, String pattern, Options options, Callback<VIterable<GlobReply>>
             callback) throws VException;
 
     /**
@@ -322,7 +305,8 @@ public interface Namespace {
      *
      * @param roots the roots that will be used to turn relative paths into absolute paths, or
      *              {@code null} to clear the currently configured set of roots. Each entry should
-     *              be a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">
+     *              be a Vanadium name, see also
+     *              <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">
      *              the Name entry</a> in the glossary
      */
     void setRoots(List<String> roots) throws VException;

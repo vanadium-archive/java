@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 
 import com.google.common.collect.Iterators;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VIterable;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
@@ -32,6 +33,7 @@ import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
@@ -77,10 +79,9 @@ class DatabaseImpl implements Database, BatchDatabase {
         return x.toArray(new String[x.size()]);
     }
     @Override
-    public ResultStream exec(VContext ctx, String query) throws VException {
-        CancelableVContext ctxC = ctx.withCancel();
+    public QueryResults exec(VContext ctx, String query) throws VException {
         TypedClientStream<Void, List<VdlAny>, Void> stream =
-                this.client.exec(ctxC, getSchemaVersion(), query);
+                this.client.exec(ctx, getSchemaVersion(), query);
 
         // The first row contains column names, pull them off the stream.
         List<VdlAny> row = null;
@@ -99,7 +100,7 @@ class DatabaseImpl implements Database, BatchDatabase {
                         "names (of type String), got type: " + elem.getClass());
             }
         }
-        return new ResultStreamImpl(ctxC, stream, Arrays.asList(columnNames));
+        return new QueryResultsImpl(stream, Arrays.asList(columnNames));
     }
 
     // Implements AccessController interface.
@@ -134,12 +135,11 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new DatabaseImpl(this.parentFullName, this.name, batchSuffix, this.schema);
     }
     @Override
-    public Stream<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
-                                     ResumeMarker resumeMarker) throws VException {
-        CancelableVContext ctxC = ctx.withCancel();
-        TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctxC,
+    public VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
+                                        ResumeMarker resumeMarker) throws VException {
+        TypedClientStream<Void, Change, Void> stream = this.client.watchGlob(ctx,
                 new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker));
-        return new StreamImpl(ctxC, stream) {
+        return new TypedStreamIterable(stream) {
             @Override
             public synchronized Iterator iterator() {
                 return Iterators.transform(super.iterator(), new Function<Change, WatchChange>() {
@@ -249,12 +249,13 @@ class DatabaseImpl implements Database, BatchDatabase {
         return this.schema.getMetadata().getVersion();
     }
 
-    private static class ResultStreamImpl extends StreamImpl<List<VdlAny>> implements ResultStream {
+    private static class QueryResultsImpl
+            extends TypedStreamIterable<List<VdlAny>> implements QueryResults {
         private final List<String> columnNames;
 
-        private ResultStreamImpl(CancelableVContext ctxC, TypedClientStream<Void,
-                List<VdlAny>, Void> stream, List<String> columnNames) {
-            super(ctxC, stream);
+        private QueryResultsImpl(TypedClientStream<Void, List<VdlAny>, Void> stream,
+                            List<String> columnNames) {
+            super(stream);
             this.columnNames = columnNames;
         }
         @Override

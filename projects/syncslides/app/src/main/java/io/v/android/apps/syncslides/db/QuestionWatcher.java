@@ -14,11 +14,11 @@ import java.util.List;
 
 import io.v.android.apps.syncslides.model.Question;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VIterable;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.RowRange;
-import io.v.v23.syncbase.nosql.Stream;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.verror.VException;
@@ -73,14 +73,14 @@ class QuestionWatcher {
             Log.i(TAG, "Watching questions: " + prefix);
             BatchDatabase batch = mState.db.beginBatch(mState.vContext, null);
             Table presentations = batch.getTable(SyncbaseDB.PRESENTATIONS_TABLE);
-            Stream<KeyValue> stream = presentations.scan(mState.vContext, RowRange.prefix(prefix));
-            for (KeyValue keyValue : stream) {
-                VQuestion value = (VQuestion) VomUtil.decode(keyValue.getValue(), VQuestion.class);
+            VIterable<KeyValue> rows = presentations.scan(mState.vContext, RowRange.prefix(prefix));
+            for (KeyValue row : rows) {
+                VQuestion value = (VQuestion) VomUtil.decode(row.getValue(), VQuestion.class);
                 if (value.getAnswered()) {
                     continue;
                 }
                 final Question question = new Question(
-                        lastPart(keyValue.getKey()),
+                        lastPart(row.getKey()),
                         value.getQuestioner().getName(),
                         value.getTime());
                 mState.handler.post(new Runnable() {
@@ -91,10 +91,10 @@ class QuestionWatcher {
                 });
             }
 
-            Stream<WatchChange> watch = mState.db.watch(
+            VIterable<WatchChange> changes = mState.db.watch(
                     mState.vContext, SyncbaseDB.PRESENTATIONS_TABLE, prefix,
                     batch.getResumeMarker(mState.vContext));
-            for (WatchChange change : watch) {
+            for (WatchChange change : changes) {
                 Log.i(TAG, "Found change " + change.getChangeType());
                 final String id = lastPart(change.getRowName());
                 if (change.getChangeType().equals(ChangeType.PUT_CHANGE)) {

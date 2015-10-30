@@ -4,6 +4,7 @@
 
 package io.v.v23.syncbase.nosql;
 
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -55,9 +56,12 @@ public interface BlobReader {
      * priority blobs are prefetched before the lower priority ones.  However an ongoing blob
      * transfer is not interrupted.
      * <p>
-     * The return {@link Stream} can be used to track the progress of the prefetch.  When the
-     * {@link Stream} exhausts all of the iterable elements, the blob is guaranteed to have
+     * The returned iterator can be used to track the progress of the prefetch.  When the
+     * iterator exhausts all of the iterable elements, the blob is guaranteed to have
      * been entirely copied to a local cache.
+     * <p>
+     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * stop the prefetch and terminate the iterator early.
      * <p>
      * This method doesn't block.
      *
@@ -66,7 +70,7 @@ public interface BlobReader {
      * @return            a stream used for tracking the progress of the prefetch
      * @throws VException if the blob couldn't be prefetched
      */
-    Stream<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException;
+    VIterable<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException;
 
     /**
      * Deletes the blob's local cached copy.
