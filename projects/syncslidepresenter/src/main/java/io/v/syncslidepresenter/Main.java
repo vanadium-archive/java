@@ -11,8 +11,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Uninterruptibles;
 
-import io.v.v23.VIterable;
 import org.joda.time.Duration;
 
 import java.awt.Dimension;
@@ -29,8 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.rmi.AlreadyBoundException;
@@ -40,6 +38,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,6 +60,7 @@ import io.v.android.apps.syncslides.discovery.Presentation;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.V;
+import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
@@ -94,14 +95,16 @@ import io.v.v23.vom.VomUtil;
  *     ./projects/syncslidepresenter/build/install/syncslidepresenter/bin/syncslidepresenter
  * </pre>
  *
- * <p>For reasons not yet fully understood, applications running both Swing and Vanadium freeze
- * randomly (at least on Mac OS X). We work around this by running two JVMs. The main JVM will
- * create a sub-JVM in a separate thread, and will then proceed to join a syncgroup and look for
- * slide data. Once a new slide is detected, the bytes representing the slide will be sent to
- * the sub-JVM via RMI.
+ * <p>For reasons not yet fully understood, applications running both Swing and
+ * Vanadium freeze randomly (at least on Mac OS X). We work around this by
+ * running two JVMs. The main JVM will create a sub-JVM in a separate thread,
+ * and will then proceed to join a syncgroup and look for slide data. Once a new
+ * slide is detected, the bytes representing the slide will be sent to the
+ * sub-JVM via RMI.
  *
- * <p>The sub-JVM simply listens for slide bytes and then, using {@link ImageIO#read}, decodes
- * those bytes and displays the resulting image in a JFrame.
+ * <p>The sub-JVM simply listens for slide bytes and then, using {@link
+ * ImageIO#read}, decodes those bytes and displays the resulting image in a
+ * JFrame.
  */
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -156,7 +159,7 @@ public class Main {
         logger.info("Mounting new syncbase server at " + name);
         VContext mountContext = SyncbaseServer.withNewServer(baseContext,
                 new SyncbaseServer.Params().withPermissions(permissions).withName(name)
-                .withStorageRootDir(options.storageRootDir));
+                        .withStorageRootDir(options.storageRootDir));
         final Server server = V.getServer(mountContext);
         if (server.getStatus().getEndpoints().length > 0) {
             logger.info("Mounted syncbase server at the following endpoints: ");
@@ -187,7 +190,8 @@ public class Main {
             Main m = new Main(baseContext, viewer, db, decks, presentations);
 
             Presentation presentation = new Discovery(
-                    baseContext, options.mountPrefix, options.deckPrefix).getPresentation();
+                    baseContext, options.mountPrefix,
+                    options.deckPrefix, options.maxMtScanCount).getPresentation();
             logger.info("Using presentation: " + presentation);
             m.joinPresentation(presentation, options.joinTimeoutSeconds, options.slideRowFormat);
         }
@@ -314,6 +318,10 @@ public class Main {
                 description = "the number of seconds to wait to join the presentation")
         private int joinTimeoutSeconds = 10;
 
+        @Parameter(names = {"--maxMtScanCount"},
+                description = "max number of times to scan MT looking for presentations.")
+        private int maxMtScanCount = 10;
+
         @Parameter(names = {"-f", "--slideRowFormat"},
                 description = "a pattern specifying where slide rows are found")
         private String slideRowFormat = "%s/slides/%04d";
@@ -360,7 +368,7 @@ public class Main {
 
                 // Center the image in the container.
                 int x = (int) (((double) getWidth() / 2) - ((double) width / 2));
-                int y = (int) (((double) getHeight()/ 2) - ((double) height / 2));
+                int y = (int) (((double) getHeight() / 2) - ((double) height / 2));
 
                 g.drawImage(image, x, y, width, height, this);
             }
@@ -481,20 +489,26 @@ public class Main {
         private final VContext context;
         private final String mtName;
         private final String deckPrefix;
+        private final int maxMtScanCount;
 
-        public Discovery(VContext context, String mtName, String deckPrefix) {
+        public Discovery(VContext context, String mtName, String deckPrefix, int maxMtScanCount) {
             this.context = context;
             this.mtName = mtName;
             this.deckPrefix = deckPrefix;
+            this.maxMtScanCount = maxMtScanCount;
         }
 
-        private Set<String> scan(String pattern) {
+        private Set<String> scan(String pattern) throws VException {
             logger.info("Scanning MT " + mtName + " with pattern \"" + pattern + "\"");
-            try {
-                Namespace ns = V.getNamespace(context);
-                ns.setRoots(ImmutableList.of(mtName));
-                Set<String> result = new HashSet<String>();
-                VContext ctx = context.withTimeout(MT_TIMEOUT);
+            Namespace ns = V.getNamespace(context);
+            ns.setRoots(ImmutableList.of(mtName));
+            VContext ctx = context.withTimeout(MT_TIMEOUT);
+            Set<String> result = new HashSet<>();
+            for (int i = 0; i < maxMtScanCount; i++) {
+                if (i > 0) {
+                    // Wait a little before trying again.
+                    Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                }
                 for (GlobReply reply : V.getNamespace(ctx).glob(ctx, pattern)) {
                     if (reply instanceof GlobReply.Entry) {
                         MountEntry entry = ((GlobReply.Entry) reply).getElem();
@@ -504,30 +518,25 @@ public class Main {
                         }
                     }
                 }
-                return result;
-            } catch (VException e) {
-                throw new IllegalStateException(e);
+                if (!result.isEmpty()) {
+                    return result;
+                }
             }
+            throw new IllegalStateException(
+                    "Unable to find service matching " + pattern +
+                            " after " + maxMtScanCount + " attempts.");
         }
 
-        private Presentation findPreso(String serviceName) {
+        private Presentation findPreso(String serviceName) throws VException {
             V.getNamespace(context).flushCacheEntry(context, serviceName);
             ParticipantClient client =
                     ParticipantClientFactory.getParticipantClient(serviceName);
-            try {
-                Presentation p = client.get(context.withTimeout(
-                        Duration.standardSeconds(5)));
-                return p;
-            } catch (VException e) {
-                throw new IllegalStateException(e);
-            }
+            return client.get(context.withTimeout(
+                    Duration.standardSeconds(5)));
         }
 
-        public Presentation getPresentation() {
+        public Presentation getPresentation() throws VException {
             Set<String> services = scan(deckPrefix + "/*");
-            if (services.size() < 1) {
-                return null;
-            }
             // Just grab the first one.
             return findPreso(services.iterator().next());
         }
