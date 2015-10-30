@@ -15,11 +15,11 @@ apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
 
 android {
-    buildToolsVersion '21.1.2'
-    compileSdkVersion 19
+    buildToolsVersion '22.0.1'
+    compileSdkVersion 22
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
     }
 
     lintOptions {
@@ -41,7 +41,7 @@ dependencies {
     androidTestCompile 'com.google.truth:truth:0.25'
     // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
     // should be fixed when http://git.io/vIXec is checked in and a release is made.
-    androidTestCompile('com.android.support:support-v4:21.0.0')
+    androidTestCompile 'com.android.support:support-v4:21.0.0'
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
     }
