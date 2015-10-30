@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 /**
  * Binary encoding and decoding routines.
  */
-final class BinaryUtil {
+public final class BinaryUtil {
     /**
      * Every binary stream starts with this magic byte, to distinguish the binary encoding from
      * the JSON encoding. Note that every valid JSON encoding must start with an ASCII character,or
