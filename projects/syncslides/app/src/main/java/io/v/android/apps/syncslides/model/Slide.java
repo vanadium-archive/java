@@ -11,6 +11,11 @@ import android.graphics.Bitmap;
  */
 public interface Slide {
     /**
+     * Returns a Bitmap of the slide thumbnail.
+     */
+    Bitmap getThumb();
+
+    /**
      * Returns a Bitmap of the slide image.
      */
     Bitmap getImage();

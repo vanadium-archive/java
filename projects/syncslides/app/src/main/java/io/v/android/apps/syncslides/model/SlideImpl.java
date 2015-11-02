@@ -12,17 +12,25 @@ import android.graphics.BitmapFactory;
  */
 public class SlideImpl implements Slide {
     private final byte[] mThumbnail;
+    private final byte[] mImage;
     private String mNotes;
 
-    public SlideImpl(byte[] thumbnail, String notes) {
+    public SlideImpl(byte[] thumbnail, byte[] image, String notes) {
         mThumbnail = thumbnail;
+        mImage = image;
         mNotes = notes;
+    }
+
+    @Override
+    public Bitmap getThumb() {
+        return BitmapFactory.decodeByteArray(
+                mThumbnail, 0 /* offset */, mThumbnail.length);
     }
 
     @Override
     public Bitmap getImage() {
         return BitmapFactory.decodeByteArray(
-                mThumbnail, 0 /* offset */, mThumbnail.length);
+                mImage, 0 /* offset */, mImage.length);
     }
 
     @Override

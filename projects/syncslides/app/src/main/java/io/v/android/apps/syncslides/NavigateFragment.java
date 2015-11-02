@@ -450,7 +450,7 @@ public class NavigateFragment extends Fragment {
             return;
         }
         if (mUserSlideNum > 0) {
-            setThumbBitmap(mPrevThumb, mSlides.get(mUserSlideNum - 1).getImage());
+            setThumbBitmap(mPrevThumb, mSlides.get(mUserSlideNum - 1).getThumb());
         } else {
             setThumbNull(mPrevThumb);
         }
@@ -458,7 +458,7 @@ public class NavigateFragment extends Fragment {
         if (mUserSlideNum == mSlides.size() - 1) {
             setThumbNull(mNextThumb);
         } else {
-            setThumbBitmap(mNextThumb, mSlides.get(mUserSlideNum + 1).getImage());
+            setThumbBitmap(mNextThumb, mSlides.get(mUserSlideNum + 1).getThumb());
         }
         if (!mSlides.get(mUserSlideNum).getNotes().equals("")) {
             mNotes.setText(mSlides.get(mUserSlideNum).getNotes());

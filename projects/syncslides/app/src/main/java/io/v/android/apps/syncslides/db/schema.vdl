@@ -12,10 +12,12 @@ type VDeck struct {
 
 // Slide contains the image content for the slide.
 type VSlide struct {
-    // A low-res version of the image stored as PNG.
+    // A low-res version of the image.
     Thumbnail []byte
-    // A high-res version of the image stored as PNG.
-    //Fullsize Blobref
+    // A high-res version of the image.
+    // TODO(spetrovic): The type of this field should really be a BlobRef, but we can't reference
+    // non-VDLROOT vdl types from Java just yet.
+    ImageRef string
 }
 
 // Note contains private-to-the-user notes for a specific slide.

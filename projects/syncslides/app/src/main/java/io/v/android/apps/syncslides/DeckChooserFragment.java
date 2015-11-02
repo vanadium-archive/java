@@ -161,11 +161,13 @@ public class DeckChooserFragment extends Fragment {
      *     "Thumb" : "<filename>,
      *     "Slides" : [
      *          {
-     *              "Thumb" : "<filename1>",
+     *              "Thumb" : "<thumb_filename1>",
+     *              "Image" : "<image_filename1>",
      *              "Note" : "<note1>"
      *          },
      *          {
-     *              "Thumb" : "<filename2>",
+     *              "Thumb" : "<thumb_filename2>",
+     *              "Image" : "<image_filename2>",
      *              "Note" : "<note2>"
      *          },
      *
@@ -231,9 +233,15 @@ public class DeckChooserFragment extends Fragment {
             JSONObject slide = slides.getJSONObject(i);
             // TODO(jregan): Avoid the extra image conversion work.
             // Reading into a bitmap, only to compress into bytes again.
-            Bitmap thumb = readImage(dir, slide.getString("Thumb"));
+            byte[] thumbData =
+                    DeckFactory.makeBytesFromBitmap(readImage(dir, slide.getString("Thumb")));
+            byte[] imageData = thumbData;
+            if (slide.has("Image")) {
+                imageData =
+                        DeckFactory.makeBytesFromBitmap(readImage(dir, slide.getString("Image")));
+            }
             String note = slide.getString("Note");
-            ret[i] = new SlideImpl(DeckFactory.makeBytesFromBitmap(thumb), note);
+            ret[i] = new SlideImpl(thumbData, imageData, note);
         }
         return ret;
     }

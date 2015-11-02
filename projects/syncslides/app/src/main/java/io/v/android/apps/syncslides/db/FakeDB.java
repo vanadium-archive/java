@@ -129,6 +129,10 @@ public class FakeDB implements DB {
         }
 
         @Override
+        public Bitmap getThumb() {
+            return mSlideImage;
+        }
+        @Override
         public Bitmap getImage() {
             return mSlideImage;
         }

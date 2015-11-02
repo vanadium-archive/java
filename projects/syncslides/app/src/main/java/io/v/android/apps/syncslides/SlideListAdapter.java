@@ -46,7 +46,7 @@ public class SlideListAdapter extends RecyclerView.Adapter<SlideListAdapter.View
     public void onBindViewHolder(ViewHolder holder, int i) {
         Slide slide = mSlides.get(i);
         holder.mNotes.setText(slide.getNotes());
-        holder.mImage.setImageBitmap(slide.getImage());
+        holder.mImage.setImageBitmap(slide.getThumb());
     }
 
     @Override

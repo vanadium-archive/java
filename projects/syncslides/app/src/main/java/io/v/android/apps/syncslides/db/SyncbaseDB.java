@@ -18,12 +18,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.ByteStreams;
 
 import io.v.v23.VIterable;
 import org.joda.time.Duration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,7 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.TableRow;
@@ -58,6 +62,7 @@ import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.syncbase.nosql.BatchDatabase;
+import io.v.v23.syncbase.nosql.BlobWriter;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
@@ -556,7 +561,13 @@ public class SyncbaseDB implements DB {
                         Log.i(TAG, "Fetched slide " + key);
                         VSlide slide = (VSlide) row.get(1).getElem();
                         String note = notesForSlide(mVContext, table, key);
-                        slides.add(new SlideImpl(slide.getThumbnail(), note));
+                        slides.add(new SlideImpl(slide.getThumbnail(),
+                                // TODO(spetrovic): syncbase isn't syncing blobs across machines
+                                // right now because the image's VDL type is 'string', not
+                                // 'BlobRef'.  Until this is fixed, use thumbnail as the image.
+                                slide.getThumbnail(),
+                                //getImageBytes(mVContext, mDB, new BlobRef(slide.getImageRef())),
+                                note));
                     }
                     if (results.error() != null) {
                         Log.e(TAG, "Couldn't get all slides due to error: " + results.error());
@@ -634,7 +645,8 @@ public class SyncbaseDB implements DB {
                     Log.i(TAG, "Fetched slide " + key);
                     VSlide slide = (VSlide) row.get(1).getElem();
                     String notes = notesForSlide(mVContext, notesTable, key);
-                    final SlideImpl newSlide = new SlideImpl(slide.getThumbnail(), notes);
+                    final SlideImpl newSlide = new SlideImpl(slide.getThumbnail(),
+                            getImageBytes(mVContext, mDB, new BlobRef(slide.getImageRef())), notes);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -678,17 +690,19 @@ public class SyncbaseDB implements DB {
                     VSlide vSlide = null;
                     try {
                         vSlide = (VSlide) VomUtil.decode(change.getVomValue(), VSlide.class);
-                    } catch (VException e) {
-                        Log.e(TAG, "Couldn't decode slide: " + e.toString());
-                    }
-                    String notes = notesForSlide(mVContext, notesTable, key);
-                    final SlideImpl slide = new SlideImpl(vSlide.getThumbnail(), notes);
-                    mHandler.post(new Runnable() {
+                        String notes = notesForSlide(mVContext, notesTable, key);
+                        final SlideImpl slide = new SlideImpl(vSlide.getThumbnail(),
+                                getImageBytes(mVContext, mDB, new BlobRef(vSlide.getImageRef())),
+                                notes);
+                        mHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             put(key, slide);
                         }
                     });
+                    } catch (VException e) {
+                        Log.e(TAG, "Couldn't decode slide: " + e.toString());
+                    }
                 } else {  // ChangeType.DELETE_CHANGE
                     // Existing slide deleted.
                     mHandler.post(new Runnable() {
@@ -1099,9 +1113,10 @@ public class SyncbaseDB implements DB {
 
     private void importDeckFromResources(String prefix, String title, int resourceId) {
         try {
-            putDeck(prefix, title, getImageBytes(resourceId));
+            putDeck(prefix, title, getImageBytes(mContext, resourceId));
             for (int i = 0; i < SLIDENOTES.length; i++) {
-                putSlide(prefix, i, getImageBytes(SLIDEDRAWABLES[i]), SLIDENOTES[i]);
+                putSlide(prefix, i, getImageBytes(mContext, SLIDEDRAWABLES[i]),
+                        getImageBytes(mContext, SLIDEDRAWABLES[i]), SLIDENOTES[i]);
             }
         } catch (VException e) {
             handleError(e.toString());
@@ -1115,7 +1130,8 @@ public class SyncbaseDB implements DB {
             putDeck(deck.getId(), deck.getTitle(), getImageBytes(deck.getThumb()));
             for (int i = 0; i < slides.length; ++i) {
                 io.v.android.apps.syncslides.model.Slide slide = slides[i];
-                putSlide(deck.getId(), i, getImageBytes(slide.getImage()), slide.getNotes());
+                putSlide(deck.getId(), i, getImageBytes(slide.getThumb()),
+                        getImageBytes(slide.getImage()), slide.getNotes());
             }
         } catch (VException e) {
             handleError(e.toString());
@@ -1153,14 +1169,24 @@ public class SyncbaseDB implements DB {
         }
     }
 
-    private void putSlide(String prefix, int idx, byte[] thumbData, String note) throws VException {
+    private void putSlide(String prefix, int idx, byte[] thumbData, byte[] imageData, String note)
+            throws VException {
         String key = slideRowKey(prefix, idx);
         Log.i(TAG, "Adding slide " + key);
+        BlobWriter writer = mDB.writeBlob(mVContext, null);
+        try {
+            OutputStream out = writer.stream(mVContext);
+            out.write(imageData);
+            out.close();
+        } catch (IOException e) {
+            throw new VException("Couldn't write slide: " + key + ": " + e.getMessage());
+        }
+        writer.commit(mVContext);
         if (!mDecks.getRow(key).exists(mVContext)) {
             mDecks.put(
                     mVContext,
                     key,
-                    new VSlide(thumbData),
+                    new VSlide(thumbData, writer.getRef().getValue()),
                     VSlide.class);
         }
         Log.i(TAG, "Adding note: " + note);
@@ -1215,14 +1241,22 @@ public class SyncbaseDB implements DB {
         }.start();
     }
 
-    private byte[] getImageBytes(int resourceId) {
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
+    private static byte[] getImageBytes(Context ctx, int resourceId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(ctx.getResources(), resourceId);
         return getImageBytes(bitmap);
     }
 
-    private byte[] getImageBytes(Bitmap bitmap) {
+    private static byte[] getImageBytes(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
         return stream.toByteArray();
+    }
+
+    private static byte[] getImageBytes(VContext ctx, Database db, BlobRef ref) throws VException {
+        try {
+            return ByteStreams.toByteArray(db.readBlob(ctx, ref).stream(ctx, 0));
+        } catch (IOException e) {
+            throw new VException(e.getMessage());
+        }
     }
 }
