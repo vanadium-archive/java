@@ -144,7 +144,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumSyncbaseEnvironment)
     if (newStyleProfiles()) {
         environment 'GOOS': 'android'
         environment 'GOARCH': 'arm'
-        commandLine jiriBin, 'go', '--target=android', 'install',
+        commandLine jiriBin, 'go', '--target=arm-android', 'install',
                 '-buildmode=c-shared', '-v', '-tags', 'android',
                 '-installsuffix=shared', 'v.io/x/jni/main'
     } else {
