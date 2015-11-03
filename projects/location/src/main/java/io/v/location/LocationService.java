@@ -27,6 +27,7 @@ import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VCertificate;
+import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -43,7 +44,7 @@ public class LocationService extends Service {
         if (blessingsVom == null || blessingsVom.isEmpty()) {
             String msg = "Couldn't start LocationService: null or empty encoded blessings.";
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            android.util.Log.i(TAG, msg);
+            Log.i(TAG, msg);
             return START_REDELIVER_INTENT;
         }
         try {
@@ -52,48 +53,38 @@ public class LocationService extends Service {
             if (blessings == null) {
                 String msg = "Couldn't start LocationService: null blessings.";
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                android.util.Log.i(TAG, msg);
+                Log.i(TAG, msg);
                 return START_REDELIVER_INTENT;
             }
-            startLocationService(blessings);
+            storeBlessings(blessings);
+            startLocationService(determineMountPoint(blessings));
         } catch (VException e) {
             String msg = "Couldn't start LocationService: " + e.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            android.util.Log.i(TAG, msg);
+            Log.i(TAG, msg);
         }
         return START_REDELIVER_INTENT;
     }
 
-    private void startLocationService(Blessings blessings) {
-        try {
-            // Update vanadium state with the new blessings.
-            VPrincipal p = V.getPrincipal(mBaseContext);
-            p.blessingStore().setDefaultBlessings(blessings);
-            p.blessingStore().set(blessings, new BlessingPattern("..."));
-            VSecurity.addToRoots(p, blessings);
-            String mountPoint;
-            String prefix = mountNameFromBlessings(blessings);
-            if ("".equals(prefix)) {
-                mountPoint = "";
-                Log.w(TAG, "Could not determine mount point from blessings '" + blessings + "'");
-            } else {
-                mountPoint = "users/" + prefix + "/location";
-                Log.i(TAG, "Mounting server at " + mountPoint);
-            }
-            VeyronLocationService locationService = new VeyronLocationService(
-                    (LocationManager) getSystemService(Context.LOCATION_SERVICE));
-            ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
-            VContext ctx = V.withNewServer(
-                    V.withListenSpec(mBaseContext, spec), mountPoint, locationService, null);
-            Server server = V.getServer(ctx);
-            Log.i(TAG, "Listening on endpoints: " + Arrays.toString(
-                    server.getStatus().getEndpoints()));
-            Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-        } catch (VException e) {
-            String msg = "Couldn't start LocationService: " + e.getMessage();
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            android.util.Log.i(TAG, msg);
-        }
+    private void startLocationService(String mountPoint) throws VException {
+        VeyronLocationService locationService = new VeyronLocationService(
+                (LocationManager) getSystemService(Context.LOCATION_SERVICE));
+        ListenSpec spec = V.getListenSpec(mBaseContext).withProxy("proxy");
+        Log.i(TAG, "Mounting server at " + mountPoint);
+        VContext ctx = V.withNewServer(
+                V.withListenSpec(mBaseContext, spec), mountPoint, locationService, null);
+        Server server = V.getServer(ctx);
+        Log.i(TAG, "Listening on endpoints: " + Arrays.toString(
+                server.getStatus().getEndpoints()));
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+    }
+
+    // Update vanadium state with the new blessings.
+    private void storeBlessings(Blessings blessings) throws VException {
+        VPrincipal p = V.getPrincipal(mBaseContext);
+        p.blessingStore().setDefaultBlessings(blessings);
+        p.blessingStore().set(blessings, new BlessingPattern("..."));
+        VSecurity.addToRoots(p, blessings);
     }
 
     @Override
@@ -102,12 +93,13 @@ public class LocationService extends Service {
         return null;
     }
 
-    private static class VeyronLocationService implements LocationServer  {
+    private static class VeyronLocationService implements LocationServer {
         private final LocationManager manager;
 
         private VeyronLocationService(LocationManager manager) {
             this.manager = manager;
         }
+
         @Override
         public LatLng get(VContext context, ServerCall call) throws VException {
             Criteria criteria = new Criteria();
@@ -124,7 +116,12 @@ public class LocationService extends Service {
         }
     }
 
-    private static String mountNameFromBlessings(Blessings blessings) {
+    private static String determineMountPoint(Blessings blessings) {
+        String name = userEmailFromBlessings(blessings);
+        return name.isEmpty() ? "" : "users/" + name + "/location";
+    }
+
+    private static String userEmailFromBlessings(Blessings blessings) {
         for (List<VCertificate> chain : blessings.getCertificateChains()) {
             for (VCertificate certificate : Lists.reverse(chain)) {
                 if (certificate.getExtension().contains("@")) {
@@ -132,6 +129,7 @@ public class LocationService extends Service {
                 }
             }
         }
+        Log.w(TAG, "Could not determine name from blessings '" + blessings + "'");
         return "";
     }
 }

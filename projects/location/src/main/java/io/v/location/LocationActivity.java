@@ -25,6 +25,41 @@ import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
+/**
+ * To install on a device:
+ *
+ *   cd $JIRI_ROOT/vanadium/release/java/projects/location
+ *   gradle assembleDebug
+ *   adb install -r build/outputs/apk/location-debug.apk
+ *
+ * At runtime, the location service is mounted on the public dev.v.io table.
+ *
+ * To access it from a command line, first get a blessing from dev.v.io.
+ * Assuming you've done a standard install (see instructions at v.io) enter:
+ *
+ *   $V_BIN/principal --v23.credentials /tmp/creds seekblessings -browser=false
+ *
+ * Visit the URL using a browser logged into an account that matches the account
+ * used on your device, and click BLESS.  This installs a blessing on your
+ * computer that can be used to access your phone's location service.
+ *
+ * For convenience, define a service name env variable:
+ *
+ *   serviceName=users/${YOUR_EMAIL}/android/location
+ *
+ * List the service:
+ *
+ *   $V_BIN/namespace --v23.credentials /tmp/creds glob -l $serviceName
+ *
+ * Query its signature:
+ *
+ *   $V_BIN/vrpc --v23.credentials /tmp/creds signature $serviceName
+ *
+ * Obtain the phone's location:
+ *
+ *   $V_BIN/vrpc --v23.credentials /tmp/creds call $serviceName get
+ *
+ */
 public class LocationActivity extends Activity {
     private static final String TAG = "LocationActivity";
     private static final int BLESSING_REQUEST = 1;
