@@ -16,9 +16,19 @@ public interface Slide {
     Bitmap getThumb();
 
     /**
+     * Returns the raw thumbnail data.
+     */
+    byte[] getThumbData();
+
+    /**
      * Returns a Bitmap of the slide image.
      */
     Bitmap getImage();
+
+    /**
+     * Returns the raw image data.
+     */
+    byte[] getImageData();
 
     /**
      * Returns the slide notes.

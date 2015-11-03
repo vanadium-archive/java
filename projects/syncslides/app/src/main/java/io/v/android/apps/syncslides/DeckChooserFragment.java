@@ -208,11 +208,10 @@ public class DeckChooserFragment extends Fragment {
         try {
             String id = UUID.randomUUID().toString();
             String title = metadata.getString("Title");
-            Bitmap thumb = readImage(dir, metadata.getString("Thumb"));
-            Deck deck = DeckFactory.Singleton.get().make(title, thumb, id);
+            byte[] thumbData = readImage(dir, metadata.getString("Thumb"));
+            Deck deck = DeckFactory.Singleton.get().make(title, thumbData, id);
             Slide[] slides = readSlides(dir, metadata);
-            // TODO(spetrovic): Do this asynchronously.
-            DB.Singleton.get(getActivity().getApplicationContext()).importDeck(deck, slides);
+            DB.Singleton.get(getActivity().getApplicationContext()).importDeck(deck, slides, null);
         } catch (JSONException e) {
             toast("Invalid format for deck metadata: " + e.getMessage());
             return;
@@ -231,14 +230,10 @@ public class DeckChooserFragment extends Fragment {
         Slide[] ret = new Slide[slides.length()];
         for (int i = 0; i < slides.length(); ++i) {
             JSONObject slide = slides.getJSONObject(i);
-            // TODO(jregan): Avoid the extra image conversion work.
-            // Reading into a bitmap, only to compress into bytes again.
-            byte[] thumbData =
-                    DeckFactory.makeBytesFromBitmap(readImage(dir, slide.getString("Thumb")));
+            byte[] thumbData = readImage(dir, slide.getString("Thumb"));
             byte[] imageData = thumbData;
             if (slide.has("Image")) {
-                imageData =
-                        DeckFactory.makeBytesFromBitmap(readImage(dir, slide.getString("Image")));
+                imageData = readImage(dir, slide.getString("Image"));
             }
             String note = slide.getString("Note");
             ret[i] = new SlideImpl(thumbData, imageData, note);
@@ -246,14 +241,14 @@ public class DeckChooserFragment extends Fragment {
         return ret;
     }
 
-    private Bitmap readImage(DocumentFile dir, String fileName) throws IOException {
+    private byte[] readImage(DocumentFile dir, String fileName) throws IOException {
         DocumentFile file = dir.findFile(fileName);
         if (file == null) {
             throw new FileNotFoundException(
-                    "Thumbnail file doesn't exist: " + fileName);
+                    "Image file doesn't exist: " + fileName);
         }
-        return MediaStore.Images.Media.getBitmap(
-                getActivity().getContentResolver(), file.getUri());
+        return ByteStreams.toByteArray(
+                getActivity().getContentResolver().openInputStream(file.getUri()));
     }
 
     private void toast(String msg) {

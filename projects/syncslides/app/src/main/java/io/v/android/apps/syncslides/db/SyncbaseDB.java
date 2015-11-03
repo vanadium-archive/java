@@ -194,7 +194,7 @@ public class SyncbaseDB implements DB {
             if (!mPresentations.exists(mVContext)) {
                 mPresentations.create(mVContext, mPermissions);
             }
-            importDecks();
+            //importDecks();
         } catch (VException e) {
             handleError("Couldn't setup syncbase service: " + e.getMessage());
             return;
@@ -1113,10 +1113,11 @@ public class SyncbaseDB implements DB {
 
     private void importDeckFromResources(String prefix, String title, int resourceId) {
         try {
-            putDeck(prefix, title, getImageBytes(mContext, resourceId));
+            putDeck(prefix, title, DeckFactory.imageDataFromResource(mContext, resourceId));
             for (int i = 0; i < SLIDENOTES.length; i++) {
-                putSlide(prefix, i, getImageBytes(mContext, SLIDEDRAWABLES[i]),
-                        getImageBytes(mContext, SLIDEDRAWABLES[i]), SLIDENOTES[i]);
+                putSlide(prefix, i, DeckFactory.imageDataFromResource(mContext, SLIDEDRAWABLES[i]),
+                        DeckFactory.imageDataFromResource(mContext, SLIDEDRAWABLES[i]),
+                        SLIDENOTES[i]);
             }
         } catch (VException e) {
             handleError(e.toString());
@@ -1124,14 +1125,13 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void importDeck(io.v.android.apps.syncslides.model.Deck deck,
-                           io.v.android.apps.syncslides.model.Slide[] slides) {
+    public void importDeck(Deck deck, Slide[] slides) {
         try {
-            putDeck(deck.getId(), deck.getTitle(), getImageBytes(deck.getThumb()));
+            putDeck(deck.getId(), deck.getTitle(), deck.getThumbData());
             for (int i = 0; i < slides.length; ++i) {
-                io.v.android.apps.syncslides.model.Slide slide = slides[i];
-                putSlide(deck.getId(), i, getImageBytes(slide.getThumb()),
-                        getImageBytes(slide.getImage()), slide.getNotes());
+                Slide slide = slides[i];
+                putSlide(deck.getId(),
+                        i, slide.getThumbData(), slide.getImageData(), slide.getNotes());
             }
         } catch (VException e) {
             handleError(e.toString());
@@ -1139,9 +1139,7 @@ public class SyncbaseDB implements DB {
     }
 
     @Override
-    public void importDeck(final io.v.android.apps.syncslides.model.Deck deck,
-                           final io.v.android.apps.syncslides.model.Slide[] slides,
-                           final Callback<Void> callback) {
+    public void importDeck(final Deck deck, final Slide[] slides, final Callback<Void> callback) {
         new Thread() {
             @Override
             public void run() {
@@ -1239,17 +1237,6 @@ public class SyncbaseDB implements DB {
                 }
             }
         }.start();
-    }
-
-    private static byte[] getImageBytes(Context ctx, int resourceId) {
-        Bitmap bitmap = BitmapFactory.decodeResource(ctx.getResources(), resourceId);
-        return getImageBytes(bitmap);
-    }
-
-    private static byte[] getImageBytes(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-        return stream.toByteArray();
     }
 
     private static byte[] getImageBytes(VContext ctx, Database db, BlobRef ref) throws VException {

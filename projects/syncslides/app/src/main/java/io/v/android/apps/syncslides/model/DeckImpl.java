@@ -5,18 +5,18 @@
 package io.v.android.apps.syncslides.model;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 /**
- * Application impl of Deck.
+ * An implementation of {@link Deck} interface.
  */
 public class DeckImpl implements Deck {
-
     private final String mTitle;
-    private final Bitmap mThumb;
+    private final byte[] mThumb;
     private final String mDeckId;
 
-    public DeckImpl(String title, Bitmap thumb, String deckId) {
+    public DeckImpl(String title, byte[] thumb, String deckId) {
         mTitle = title;
         mThumb = thumb;
         mDeckId = deckId;
@@ -36,22 +36,22 @@ public class DeckImpl implements Deck {
         DeckImpl p = (DeckImpl) obj;
         return mDeckId.equals(p.mDeckId);
     }
-
     @Override
     public int hashCode() {
         return mDeckId.hashCode();
     }
-
     @Override
     public Bitmap getThumb() {
+        return BitmapFactory.decodeByteArray(mThumb, 0, mThumb.length);
+    }
+    @Override
+    public byte[] getThumbData() {
         return mThumb;
     }
-
     @Override
     public String getTitle() {
         return mTitle;
     }
-
     @Override
     public String getId() {
         return mDeckId;
