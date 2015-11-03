@@ -53,14 +53,19 @@ class VdlPlugin implements Plugin<Project> {
         vdlTask.dependsOn(removeVdlRootTask)
         project.clean.delete(project.vdl.outputPath)
 
-        if (project.plugins.hasPlugin('java')) {
-            project.compileJava.dependsOn(vdlTask)
-            project.sourceSets.main.java.srcDirs += project.vdl.outputPath
-        }
+        project.afterEvaluate {
+            if (project.plugins.hasPlugin('java')) {
+                project.compileJava.dependsOn(vdlTask)
+                project.sourceSets.main.java.srcDirs += project.vdl.outputPath
+                project.vdl.inputPaths.each {
+                    project.sourceSets.main.resources.srcDirs(it).include('**/*.vdl')
+                }
+            }
 
-        if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
-            project.tasks.'preBuild'.dependsOn(vdlTask)
-            project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
+            if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
+                project.tasks.'preBuild'.dependsOn(vdlTask)
+                project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
+            }
         }
     }
 
