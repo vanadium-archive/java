@@ -23,26 +23,14 @@ import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.BufferedReader;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,17 +82,6 @@ import io.v.v23.vom.VomUtil;
  *     ./gradlew :projects:syncslidepresenter:installDist
  *     ./projects/syncslidepresenter/build/install/syncslidepresenter/bin/syncslidepresenter
  * </pre>
- *
- * <p>For reasons not yet fully understood, applications running both Swing and
- * Vanadium freeze randomly (at least on Mac OS X). We work around this by
- * running two JVMs. The main JVM will create a sub-JVM in a separate thread,
- * and will then proceed to join a syncgroup and look for slide data. Once a new
- * slide is detected, the bytes representing the slide will be sent to the
- * sub-JVM via RMI.
- *
- * <p>The sub-JVM simply listens for slide bytes and then, using {@link
- * ImageIO#read}, decodes those bytes and displays the resulting image in a
- * JFrame.
  */
 public class Main {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -112,7 +89,6 @@ public class Main {
     private static final String SYNCBASE_DB = "syncslides";
     private static final String PRESENTATIONS_TABLE = "Presentations";
     private static final String DECKS_TABLE = "Decks";
-    private static final int MAX_PORT_PICKER_ATTEMPTS = 100;
     private final Table presentations;
     private final Table decks;
     private final ImageViewer viewer;
@@ -121,9 +97,7 @@ public class Main {
 
     private VContext context;
 
-    public static void main(String[] args)
-            throws SyncbaseServer.StartException, VException, IOException, NotBoundException,
-            AlreadyBoundException {
+    public static void main(String[] args) throws SyncbaseServer.StartException, VException, IOException {
         Options options = new Options();
         JCommander commander = new JCommander(options);
         try {
@@ -139,16 +113,13 @@ public class Main {
             return;
         }
 
-        ImageViewer viewer = null;
-        if (options.swing) {
-            // We're just going to be running Swing. Do that and then stop.
-            startSwingServer();
-            return;
-        }
+        // Make command-Q do the same as closing the main frame (i.e. exit).
+        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
-        // Otherwise, we're a Vanadium client. Connect to the swing server and then
-        // set up vanadium.
-        viewer = startAndConnectToSwingServer(options.swingServerTimeoutSeconds);
+        JFrame frame = new JFrame();
+        enableOSXFullscreen(frame);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setVisible(true);
 
         VContext baseContext = V.init();
 
@@ -187,7 +158,17 @@ public class Main {
                 presentations.create(baseContext, permissions);
             }
 
-            Main m = new Main(baseContext, viewer, db, decks, presentations);
+            JPanel panel = new JPanel(new GridBagLayout());
+            ScaleToFitJPanel presentationPanel = new ScaleToFitJPanel();
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.weightx = 1;
+            constraints.weighty = 1;
+            constraints.fill = GridBagConstraints.BOTH;
+            panel.add(presentationPanel, constraints);
+            frame.getContentPane().add(panel);
+            frame.pack();
+
+            Main m = new Main(baseContext, presentationPanel, db, decks, presentations);
 
             Presentation presentation = new Discovery(
                     baseContext, options.mountPrefix,
@@ -195,37 +176,6 @@ public class Main {
             logger.info("Using presentation: " + presentation);
             m.joinPresentation(presentation, options.joinTimeoutSeconds, options.slideRowFormat);
         }
-    }
-
-    private static void startSwingServer() throws IOException, AlreadyBoundException {
-        logger.info("inside startSwingServer");
-        // Make command-Q do the same as closing the main frame (i.e. exit).
-        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
-        System.setProperty("java.rmi.server.hostname", "localhost");
-
-        JFrame frame = new JFrame();
-        enableOSXFullscreen(frame);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        ScaleToFitJPanel presentationPanel = new ScaleToFitJPanel();
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.fill = GridBagConstraints.BOTH;
-        panel.add(presentationPanel, constraints);
-        frame.getContentPane().add(panel);
-        frame.pack();
-
-        int port = pickUnusedPort();
-        LocateRegistry.createRegistry(port);
-        String name = "//localhost:" + port + "/" + UUID.randomUUID();
-        logger.info("swing server binding to " + name);
-        Naming.bind(name, new RemoteImageViewer(presentationPanel));
-
-        // The parent JVM will expect to read this value.
-        System.out.println(name);
     }
 
     public Main(VContext context, ImageViewer viewer, Database db, Table decks,
@@ -268,7 +218,9 @@ public class Main {
                 String row = String.format(slideRowFormat, presentation.getDeckId(),
                         currentSlide.getNum());
                 VSlide slide = (VSlide) decks.getRow(row).get(context, VSlide.class);
-                viewer.setImage(slide.getThumbnail());
+                final BufferedImage image = ImageIO.read(
+                        new ByteArrayInputStream(slide.getThumbnail()));
+                viewer.setImage(image);
             } catch (IOException | VException e) {
                 logger.log(Level.WARNING, "exception encountered while handling change event", e);
             }
@@ -307,9 +259,6 @@ public class Main {
                 description = "mounttable prefix for live presentations.")
         private String deckPrefix = "happyDeck";
 
-        @Parameter(names = {"--swing"})
-        private boolean swing = false;
-
         @Parameter(names = {"-m", "--mountPrefix"}, description = "the base path in the namespace"
                 + " where the syncbase service will be mounted")
         private String mountPrefix = "/192.168.86.254:8101";
@@ -328,10 +277,6 @@ public class Main {
 
         @Parameter(names = {"-h", "--help"}, description = "display this help message", help = true)
         private boolean help = false;
-
-        @Parameter(names = {"--swingServerTimeoutSeconds"},
-                description = "the amount of time to wait for the swing server to start")
-        private int swingServerTimeoutSeconds = 10;
     }
 
     private static class ScaleToFitJPanel extends JPanel implements ImageViewer {
@@ -375,111 +320,15 @@ public class Main {
         }
 
         @Override
-        public void setImage(byte[] imageData) throws RemoteException {
-            try {
-                this.image = ImageIO.read(new ByteArrayInputStream(imageData));
-                setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
-                repaint();
-            } catch (IOException e) {
-                throw new RemoteException("Could not set image", e);
-            }
+        public void setImage(Image image) {
+            this.image = image;
+            setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
+            repaint();
         }
     }
 
-    private interface ImageViewer extends Remote {
-        void setImage(byte[] imageData) throws RemoteException;
-    }
-
-    private static class RemoteImageViewer extends UnicastRemoteObject implements ImageViewer {
-        private final ImageViewer viewer;
-
-        protected RemoteImageViewer(ImageViewer viewer) throws RemoteException {
-            super();
-
-            this.viewer = viewer;
-        }
-
-        @Override
-        public void setImage(byte[] imageData) throws RemoteException {
-            viewer.setImage(imageData);
-        }
-    }
-
-    private static ImageViewer startAndConnectToSwingServer(int timeoutSeconds) throws IOException,
-            NotBoundException {
-        String javaHome = System.getProperty("java.home");
-        if (javaHome == null) {
-            throw new IllegalStateException("System property java.home is not set");
-        }
-        File javaBin = new File(javaHome, Joiner.on(File.separator).join("bin", "java"));
-        if (!javaBin.exists() || !javaBin.canExecute()) {
-            throw new IllegalStateException("Java binary " + javaBin
-                    + " does not exist or is not executable");
-        }
-        ProcessBuilder builder = new ProcessBuilder(javaBin.getAbsolutePath(),
-                "-classpath", System.getProperty("java.class.path"),
-                Main.class.getCanonicalName(), "--swing");
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        logger.info("starting " + builder.command());
-        // The first line of output should be the address to which we should connect.
-        final Process process = builder.start();
-        logger.info("started " + process);
-
-        // Get a timeout timer going.
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.schedule(new Runnable() {
-            @Override
-            public void run() {
-                process.destroyForcibly();
-            }
-        }, timeoutSeconds, TimeUnit.SECONDS);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String name = reader.readLine();
-        // If the timeout didn't fire, we don't want it killing our process now!
-        service.shutdownNow();
-        if (name != null) {
-            logger.info("vanadium listener sending slide images to " + name);
-            ImageViewer viewer = (ImageViewer) Naming.lookup(name);
-            // Hack: when the swing viewer exits, terminate our main app.
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    do {
-                        try {
-                            process.waitFor();
-                            break;
-                        } catch (InterruptedException e) {
-                            // Ignored.
-                        }
-                    } while (true);
-                    System.exit(0);
-                }
-            }, "SwingServerTerminationWatcher").start();
-            return viewer;
-        } else {
-            throw new IOException("could not read slide name");
-        }
-    }
-
-    private static int pickUnusedPort() throws IOException {
-        for (int i = 0; i < MAX_PORT_PICKER_ATTEMPTS; i++) {
-            ServerSocket socket = new ServerSocket();
-            try {
-                socket.bind(new InetSocketAddress(0));
-                int port = ((InetSocketAddress) socket.getLocalSocketAddress()).getPort();
-                return port;
-            } catch (IOException e) {
-                // Couldn't bind, try again.
-            } finally {
-                try {
-                    socket.close();
-                } catch (IOException closeException) {
-                    logger.log(Level.WARNING, "Exception caught during close", closeException);
-                }
-            }
-        }
-
-        throw new IOException("Couldn't locate unused port");
+    private interface ImageViewer {
+        void setImage(Image image);
     }
 
     private static class Discovery {
