@@ -13,10 +13,12 @@ import android.util.Log;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Listener;
 import io.v.android.apps.syncslides.model.Question;
 import io.v.android.apps.syncslides.model.Slide;
+import io.v.android.apps.syncslides.model.SlideImpl;
 
 /**
  * A fake implementation of DB for manual testing purposes.
@@ -80,9 +83,8 @@ public class FakeDB implements DB {
     public FakeDB(Context context) {
         Slide[] slides = new Slide[SLIDEDRAWABLES.length];
         for (int i = 0; i < slides.length; ++i) {
-            slides[i] = new FakeSlide(
-                    BitmapFactory.decodeResource(context.getResources(), SLIDEDRAWABLES[i]),
-                    SLIDENOTES[i]);
+            byte[] slide = DeckFactory.imageDataFromResource(context, SLIDEDRAWABLES[i]);
+            slides[i] = new SlideImpl(slide, slide, SLIDENOTES[i]);
         }
         mHandler = new Handler(Looper.getMainLooper());
         for (int i = 0; i < DECKTHUMBS.length; ++i) {
@@ -117,35 +119,6 @@ public class FakeDB implements DB {
             }
         });
         mQuestionWatcher.start();
-    }
-
-    private static class FakeSlide implements Slide {
-        private String mSlideNotes;
-        private final Bitmap mSlideImage;
-
-        FakeSlide(Bitmap slideImage, String slideNotes) {
-            mSlideImage = slideImage;
-            mSlideNotes = slideNotes;
-        }
-
-        @Override
-        public Bitmap getThumb() {
-            return mSlideImage;
-        }
-        @Override
-        public Bitmap getImage() {
-            return mSlideImage;
-        }
-
-        @Override
-        public String getNotes() {
-            return mSlideNotes;
-        }
-
-        @Override
-        public void setNotes(String notes) {
-            mSlideNotes = notes;
-        }
     }
 
     private static class FakeDeckList implements DBList<Deck> {

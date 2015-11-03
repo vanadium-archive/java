@@ -18,6 +18,11 @@ public interface Deck {
     Bitmap getThumb();
 
     /**
+     * Returns raw thumbnail data.
+     */
+    byte[] getThumbData();
+
+    /**
      * Returns the title of the deck.
      */
     String getTitle();

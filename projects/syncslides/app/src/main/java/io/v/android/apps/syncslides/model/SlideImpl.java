@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 /**
- * Application impl of Slide.
+ * An implementation of {@link Slide} interface.
  */
 public class SlideImpl implements Slide {
     private final byte[] mThumbnail;
@@ -23,21 +23,24 @@ public class SlideImpl implements Slide {
 
     @Override
     public Bitmap getThumb() {
-        return BitmapFactory.decodeByteArray(
-                mThumbnail, 0 /* offset */, mThumbnail.length);
+        return BitmapFactory.decodeByteArray(mThumbnail, 0 /* offset */, mThumbnail.length);
     }
-
+    @Override
+    public byte[] getThumbData() {
+        return mThumbnail;
+    }
     @Override
     public Bitmap getImage() {
-        return BitmapFactory.decodeByteArray(
-                mImage, 0 /* offset */, mImage.length);
+        return BitmapFactory.decodeByteArray(mImage, 0 /* offset */, mImage.length);
     }
-
+    @Override
+    public byte[] getImageData() {
+        return mImage;
+    }
     @Override
     public String getNotes() {
         return mNotes;
     }
-
     @Override
     public void setNotes(String notes) {
         mNotes = notes;

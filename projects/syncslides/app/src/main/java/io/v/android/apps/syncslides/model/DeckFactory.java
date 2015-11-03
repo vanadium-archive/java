@@ -10,7 +10,10 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.common.io.ByteStreams;
+
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import io.v.android.apps.syncslides.R;
 import io.v.android.apps.syncslides.db.VDeck;
@@ -20,18 +23,13 @@ import io.v.android.apps.syncslides.db.VDeck;
  */
 public class DeckFactory {
     private static final String TAG = "DeckFactory";
-    protected final Bitmap mDefaultThumb;
+    protected final byte[] mDefaultThumb;
     private final Context mContext;
 
     // Singleton
     private DeckFactory(Context c) {
         mContext = c;
-        mDefaultThumb = makeDefaultThumb(c);
-    }
-
-    private static Bitmap makeDefaultThumb(Context c) {
-        return BitmapFactory.decodeResource(
-                c.getResources(), R.drawable.thumb_deck1);
+        mDefaultThumb = imageDataFromResource(c, R.drawable.thumb_deck1);
     }
 
     public Deck make() {
@@ -43,46 +41,40 @@ public class DeckFactory {
     }
 
     public Deck make(String title, int index, int id) {
-        return make(
-                title,
-                BitmapFactory.decodeResource(mContext.getResources(), index),
-                String.valueOf(id));
+        return make(title, imageDataFromResource(mContext, index), String.valueOf(id));
     }
 
     public Deck make(VDeck vDeck, String id) {
         if (vDeck.getThumbnail() == null) {
             Log.d(TAG, "vDeck missing thumb; vdeck = " + vDeck);
         }
-        return make(
-                vDeck.getTitle(),
-                vDeck.getThumbnail() == null ? null :
-                        BitmapFactory.decodeByteArray(
-                                vDeck.getThumbnail(), 0, vDeck.getThumbnail().length),
-                id);
+        return make(vDeck.getTitle(), vDeck.getThumbnail(), id);
     }
 
     public VDeck make(Deck deck) {
         VDeck vd = new VDeck();
         vd.setTitle(deck.getTitle());
-        vd.setThumbnail(makeBytesFromBitmap(deck.getThumb()));
+        vd.setThumbnail(deck.getThumbData());
         return vd;
     }
 
-    public Deck make(String title, Bitmap thumb, String id) {
-        title = (title == null || title.isEmpty()) ? Unknown.TITLE : title;
-        thumb = (thumb == null) ? mDefaultThumb : thumb;
-        id = (id == null || id.isEmpty()) ? Unknown.ID : id;
+    public Deck make(String title, byte[] thumb, String id) {
+        title = title == null || title.isEmpty() ? Unknown.TITLE : title;
+        thumb = thumb == null ? mDefaultThumb : thumb;
+        id = id == null || id.isEmpty() ? Unknown.ID : id;
         return new DeckImpl(title, thumb, id);
     }
 
-    public static byte[] makeBytesFromBitmap(Bitmap thumb) {
-        if (thumb == null) {
+    /**
+     * Decodes raw image data from the given resource.  Returns empty data on error.
+     */
+    public static byte[] imageDataFromResource(Context c, int id) {
+        try {
+            return ByteStreams.toByteArray(c.getResources().openRawResource(id));
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading image data from resource: " + e.getMessage());
             return new byte[0];
         }
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        thumb.compress(
-                Bitmap.CompressFormat.JPEG, 60 /* quality */, stream);
-        return stream.toByteArray();
     }
 
     public static class Singleton {
