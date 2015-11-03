@@ -1,1 +1,3 @@
-include 'lib', 'tests', 'android-lib', 'benchmarks:syncbench', 'projects:syncslides', 'projects:syncslides:app', 'projects:syncslidepresenter', 'projects:discovery_sample', 'projects:discovery_sample:app'
+include 'lib', 'tests', 'android-lib', 'benchmarks:syncbench', 'projects:syncslides:android', 'projects:syncslides:android:app', 'projects:syncslidepresenter', 'projects:discovery_sample', 'projects:discovery_sample:app'
+project(':projects:syncslides:android').projectDir = new File(settingsDir, '../projects/syncslides/android')
+project(':projects:syncslides:android:app').projectDir = new File(settingsDir, '../projects/syncslides/android/app')
