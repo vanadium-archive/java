@@ -90,6 +90,28 @@ class VdlPluginTest {
         }
     }
 
+    @Test
+    public void inheritsVdlSettingsFromProjectDependency() {
+        Project rootProject = ProjectBuilder.builder().withName('rootProject').build()
+        // Create a VDL project on which our main project depends.
+        Project vdlProject = ProjectBuilder.builder().withParent(rootProject).withName('someVdlProject').build()
+        vdlProject.pluginManager.apply 'java'
+        vdlProject.pluginManager.apply VdlPlugin.class
+        vdlProject.extensions.configure(VdlConfiguration, new ClosureBackedAction<VdlConfiguration>({
+            inputPaths += 'hello/world'
+        }))
+
+        Project project = ProjectBuilder.builder().withParent(rootProject).build()
+        project.pluginManager.apply 'java'
+        project.pluginManager.apply VdlPlugin.class
+        project.dependencies.add('compile', vdlProject)
+
+        rootProject.evaluate()
+        project.evaluate()
+
+        assertThat(project.extensions.vdl.inputPaths).contains([vdlProject.getProjectDir(), 'hello/world'].join(File.separator))
+    }
+
     private static void createVdlToolJar(File outputFile, String entryName, String vdlBinContents) {
         JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(outputFile))
         outputStream.putNextEntry(new ZipEntry(entryName))

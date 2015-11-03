@@ -4,6 +4,7 @@ package io.v.vdl
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
@@ -11,8 +12,6 @@ import org.gradle.api.tasks.Exec
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 
 class VdlPlugin implements Plugin<Project> {
     String inputPath
@@ -70,7 +69,9 @@ class VdlPlugin implements Plugin<Project> {
                 // extract the VDL files to a directory and add that directory to the VDLPATH.
                 boolean extracted = false
                 project.configurations.compile.each {
-                    if (it.getName().endsWith('.jar')) {
+                    // The file may not exist if it comes from a project dependency (we may not
+                    // have built that project yet). If this is the case, just ignore.
+                    if (it.getName().endsWith('.jar') && it.exists()) {
                         extracted = extractVdlFiles(it, new File(project.getProjectDir(), project.vdl.transitiveVdlDir)) || extracted
                     }
                 }
@@ -85,7 +86,35 @@ class VdlPlugin implements Plugin<Project> {
                 project.tasks.'preBuild'.dependsOn(vdlTask)
                 project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
             }
+
+            // Collect up all the configurations looking for VDL project dependencies.
+            Set<String> inputPaths = new HashSet<>()
+            addVdlInputPathsForProject(project, inputPaths)
+            project.vdl.inputPaths = inputPaths.asList()
         }
+    }
+
+    private static void addVdlInputPathsForProject(Project project, Set<String> inputPaths) {
+        if (project == null) {
+            return
+        }
+        Object extension = project.extensions.findByName('vdl')
+        if (extension != null) {
+            extension.inputPaths.each {
+                File newPath = new File(it)
+                if (!newPath.isAbsolute()) {
+                    newPath = new File(project.getProjectDir(), it)
+                }
+                inputPaths.add(newPath.getAbsolutePath())
+            }
+        }
+        project.configurations.each({
+            it.dependencies.each({
+                if (it instanceof ProjectDependency) {
+                    addVdlInputPathsForProject(it.getDependencyProject(), inputPaths)
+                }
+            })
+        })
     }
 
     /**
@@ -128,7 +157,7 @@ class VdlPlugin implements Plugin<Project> {
             input.close()
             output.close()
         }
-        return extracted;
+        return extracted
     }
 
     private static void copy(InputStream source, OutputStream destination) {
