@@ -41,7 +41,7 @@ import io.v.x.chat.vdl.ChatServer;
 
 public class ChatChannel {
     private final String name;
-    private final VContext ctx;
+    private VContext ctx;
     private final ChatChannelListener listener;
 
     private static final int MAX_NAME_RETRIES = 25;
@@ -101,8 +101,8 @@ public class ChatChannel {
         VPrincipal principal = V.getPrincipal(ctx);
         Blessings defaultBlessings = principal.blessingStore().defaultBlessings();
         List<BlessingPattern> patterns = new ArrayList<>();
-        for (String blessing := VSecurity.getBlessingNames(principal, defaultBlessings)) {
-                patterns.add(new BlessingPattern(blessing))
+        for (String blessing : VSecurity.getBlessingNames(principal, defaultBlessings)) {
+             patterns.add(new BlessingPattern(blessing));
         }
         AccessList myAcl = new AccessList(patterns, ImmutableList.<String>of());
         AccessList openAcl = new AccessList(ImmutableList.of(new BlessingPattern("...")),
