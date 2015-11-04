@@ -4,10 +4,14 @@ package io.v.vdl
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
+
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
 
 class VdlPlugin implements Plugin<Project> {
     String inputPath
@@ -60,13 +64,57 @@ class VdlPlugin implements Plugin<Project> {
                 project.vdl.inputPaths.each {
                     project.sourceSets.main.resources.srcDirs(it).include('**/*.vdl')
                 }
+
+                // If the classpath contains any JAR files and those JAR files contain any VDL files,
+                // extract the VDL files to a directory and add that directory to the VDLPATH.
+                boolean extracted = false
+                project.configurations.compile.each {
+                    // The file may not exist if it comes from a project dependency (we may not
+                    // have built that project yet). If this is the case, just ignore.
+                    if (it.getName().endsWith('.jar') && it.exists()) {
+                        extracted = extractVdlFiles(it, new File(project.getProjectDir(), project.vdl.transitiveVdlDir)) || extracted
+                    }
+                }
+
+                if (extracted) {
+                    project.vdl.inputPaths += project.vdl.transitiveVdlDir
+                    project.clean.delete(project.vdl.transitiveVdlDir)
+                }
             }
 
             if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
                 project.tasks.'preBuild'.dependsOn(vdlTask)
                 project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
             }
+
+            // Collect up all the configurations looking for VDL project dependencies.
+            Set<String> inputPaths = new HashSet<>()
+            addVdlInputPathsForProject(project, inputPaths)
+            project.vdl.inputPaths = inputPaths.asList()
         }
+    }
+
+    private static void addVdlInputPathsForProject(Project project, Set<String> inputPaths) {
+        if (project == null) {
+            return
+        }
+        Object extension = project.extensions.findByName('vdl')
+        if (extension != null) {
+            extension.inputPaths.each {
+                File newPath = new File(it)
+                if (!newPath.isAbsolute()) {
+                    newPath = new File(project.getProjectDir(), it)
+                }
+                inputPaths.add(newPath.getAbsolutePath())
+            }
+        }
+        project.configurations.each({
+            it.dependencies.each({
+                if (it instanceof ProjectDependency) {
+                    addVdlInputPathsForProject(it.getDependencyProject(), inputPaths)
+                }
+            })
+        })
     }
 
     /**
@@ -84,6 +132,43 @@ class VdlPlugin implements Plugin<Project> {
         }
 
         return result
+    }
+
+    /**
+     * Extracts any vdl files in the given jar file to the given destination directory. Returns
+     * {@code true} if any files were extracted.
+     */
+    private static boolean extractVdlFiles(File jarFile, File destination) {
+        JarFile jar = new JarFile(jarFile)
+        Enumeration<JarEntry> entries = jar.entries()
+        boolean extracted = false
+        while (entries.hasMoreElements()) {
+            JarEntry entry = entries.nextElement()
+            if (entry.isDirectory() || !entry.getName().endsWith('.vdl')) {
+                continue
+            }
+            // Create the file's directory.
+            File destinationFile = new File(destination, entry.getName())
+            destinationFile.getParentFile().mkdirs()
+            InputStream input = jar.getInputStream(entry)
+            OutputStream output = new FileOutputStream(destinationFile)
+            copy(input, output)
+            extracted = true
+            input.close()
+            output.close()
+        }
+        return extracted
+    }
+
+    private static void copy(InputStream source, OutputStream destination) {
+        byte[] buffer = new byte[1 << 16]
+        while (true) {
+            int r = source.read(buffer)
+            if (r == -1) {
+                return
+            }
+            destination.write(buffer, 0, r)
+        }
     }
 
     private static isMacOsX() {
@@ -109,12 +194,20 @@ class VdlConfiguration {
     String vanadiumRoot
     List<String> inputPaths = []
     String outputPath = "generated-src/vdl"
+
+    /**
+     * Any VDL files in any JAR files in the transitive closure of this project's dependencies will
+     * be extracted to this directory. This directory will also be deleted by the 'clean' task.
+     */
+    String transitiveVdlDir = "generated-src/transitive-vdl-files"
     String vdlToolPath = ""
     List<String> packageTranslations = []
 
-    // If true, code generated for the vdlroot vdl package will be emitted.
-    // Typically, users will want to leave this set to false as they will
-    // already get the vdlroot package by depending on the :lib project.
+    /**
+     * If true, code generated for the vdlroot vdl package will be emitted.
+     * Typically, users will want to leave this set to false as they will
+     * already get the vdlroot package by depending on the :lib project.
+     */
     boolean generateVdlRoot = false;
 }
 
