@@ -153,14 +153,8 @@ public class SyncbaseDB implements DB {
         storageDir.mkdirs();
 
         try {
-            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            String id = tm.getDeviceId();
-            if (id == null) {
-                // NOTE(spetrovic): on a tablet, there is no TelephonyManager, so we try something
-                // else.
-                id = Settings.Secure.getString(
+            String id = Settings.Secure.getString(
                         mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-            }
             mVContext = SyncbaseServer.withNewServer(mVContext, new SyncbaseServer.Params()
                     .withPermissions(mPermissions)
                     .withName(V23Manager.syncName(id))
