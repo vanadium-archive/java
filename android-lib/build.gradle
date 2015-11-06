@@ -113,8 +113,8 @@ task checkVanadiumEnvironment() {
 
 task checkVanadiumSyncbaseEnvironment(type: Exec, dependsOn: checkVanadiumEnvironment) {
     if (newStyleProfiles()) {
-        commandLine jiriBin, 'v23-profile', 'env',
-            '-profile=syncbase', '--target=arm-android', 'V23_TARGET_INSTALLATION_DIR='
+        commandLine jiriBin, 'v23-profile', 'list',
+            '--info', 'Target.InstallationDir', '--target=arm-android', 'syncbase'
     } else {
         commandLine "echo", [jiriRoot, 'third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator)
     }
