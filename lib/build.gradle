@@ -1,5 +1,17 @@
+buildscript {
+    repositories {
+        maven {
+            url "http://maven.v.io/"
+        }
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'maven-publish'
+apply plugin: 'io.v.vdl'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -60,8 +72,6 @@ public static newStyleProfiles() {
 
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
-def vdlPath = [jiriRoot, 'release', 'go', 'src'].join(File.separator)
-def vdlBin = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
 
@@ -90,23 +100,6 @@ class VanadiumEnvironment {
     }
 }
 
-task buildVdlTool(type: Exec) {
-    commandLine jiriBin, 'go', 'install', 'v.io/x/ref/cmd/vdl'
-}
-
-// Delete the previously-generated VDL files, as they might conflict with the new ones.
-task deleteVdl(type: Delete, dependsOn: buildVdlTool) {
-    delete "generated-src/vdl"
-}
-
-task generateVdl(type: Exec, dependsOn: deleteVdl) {
-    environment VDLPATH: vdlPath
-    commandLine vdlBin, 'generate', '--lang=java', '--java-out-dir=generated-src/vdl', 'all'
-}
-
-tasks.'processResources'.dependsOn(generateVdl)
-tasks.'compileJava'.dependsOn(generateVdl)
-
 task checkVanadiumEnvironment {
     VanadiumEnvironment.getVanadiumEnvironment()
 
@@ -125,7 +118,6 @@ task checkVanadiumEnvironment {
                 + "linux/darwin systems, not: " + getOS())
     }
 }
-
 
 task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
     def existingPath = System.getenv('PATH')
@@ -291,4 +283,9 @@ publishing {
             url "http://srdjan.mtv:8081/nexus/content/repositories/test_repo"
         }
     }
+}
+
+vdl {
+    inputPaths += [jiriRoot, 'release', 'go', 'src'].join(File.separator)
+    generateVdlRoot = true
 }
