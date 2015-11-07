@@ -45,12 +45,14 @@ import io.v.v23.verror.VException;
  * </pre></blockquote><p>
  */
 public class V {
-    private static native void nativeInit() throws VException;
+    private static native void nativeInitLib() throws VException;
+    private static native VContext nativeInitLogging(VContext ctx, Options opts) throws VException;
     private static native void nativeShutdown(VContext context);
 
-    private static volatile VContext context = null;
+    protected static volatile VContext context = null;
+    protected static volatile boolean initDone = false;
+    protected static volatile boolean initGlobalDone = false;
     private static volatile VRuntime runtime = null;
-    private static volatile boolean initOnceDone = false;
 
     private static boolean isDarwin() {
         return System.getProperty("os.name").toLowerCase().contains("os x");
@@ -60,8 +62,10 @@ public class V {
         return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
-    private static synchronized void initOnce() {
-        if (initOnceDone) {
+    // Initializes the global (i.e., static) state.  Any code that should survive the sequences
+    // of V.init()/V.shutdown()/V.init()/... should go here.
+    protected static void initGlobal() {
+        if (initGlobalDone) {
             return;
         }
         List<Throwable> errors = new ArrayList<Throwable>();
@@ -100,12 +104,10 @@ public class V {
             }
         }
         try {
-            nativeInit();
+            nativeInitLib();
         } catch (VException e) {
             throw new RuntimeException("Could not initialize v23 native library", e);
         }
-
-        // Register caveat validators.
         try {
             CaveatRegistry.register(
                     io.v.v23.security.Constants.CONST_CAVEAT,
@@ -120,9 +122,32 @@ public class V {
         } catch (VException e) {
             throw new RuntimeException("Couldn't register caveat validators", e);
         }
-
-        initOnceDone = true;
+        initGlobalDone = true;
     }
+
+    protected static void initV(Options opts) {
+        // See if a runtime was provided as an option.
+        if (opts.get(OptionDefs.RUNTIME) != null) {
+            runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
+        } else {
+            // Use the default runtime implementation.
+            try {
+                runtime = VRuntimeImpl.create(opts);
+            } catch (VException e) {
+                throw new RuntimeException("Couldn't initialize Google Vanadium Runtime", e);
+            }
+        }
+        context = runtime.getContext();
+    }
+
+    private static void initLogging(Options opts) {
+        try {
+            context = nativeInitLogging(context, opts);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't initialize logging", e);
+        }
+    }
+
     /**
      * Initializes the Vanadium environment, returning the base context.  Calling this method
      * multiple times will always return the result of the first call to {@link #init init},
@@ -149,27 +174,17 @@ public class V {
      * @return      base context
      */
     public static VContext init(Options opts) {
-        if (context != null) return context;
+        if (initDone) return context;
         synchronized (V.class) {
-            if (context != null) return context;
-            initOnce();
+            if (initDone) return context;
             if (opts == null) opts = new Options();
-            // See if a runtime was provided as an option.
-            if (opts.get(OptionDefs.RUNTIME) != null) {
-                runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
-            } else {
-                // Use the default runtime implementation.
-                try {
-                    runtime = VRuntimeImpl.create(opts);
-                } catch (VException e) {
-                    throw new RuntimeException("Couldn't initialize Google Vanadium Runtime", e);
-                }
-            }
-            context = runtime.getContext();
-
+            initGlobal();
+            initV(opts);
+            initLogging(opts);
             // Set the VException component name to this binary name.
             context = VException.contextWithComponentName(
                     context, System.getProperty("program.name", ""));
+            initDone = true;
             return context;
         }
     }
@@ -194,6 +209,7 @@ public class V {
         synchronized (V.class) {
             Preconditions.checkState(context != null,
                     "no context to shutdown, did you call init()?");
+            initDone = false;
             runtime.shutdown();
             context = null;
             runtime = null;
@@ -448,7 +464,9 @@ public class V {
     }
 
     private static VRuntime getRuntime() {
-        init(null);
+        if (runtime == null) {
+            throw new RuntimeException("Vanadium runtime is null: did you call V.init()?");
+        }
         return runtime;
     }
 

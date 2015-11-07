@@ -20,11 +20,23 @@ public class OptionDefs {
     public static final String CLIENT = "io.v.v23.CLIENT";
 
     /**
-     * A key for an option of type {@link java.lang.Boolean} that if provided and {@code true}
+     * A key for an option of type {@link Boolean} that if provided and {@code true}
      * causes clients to ignore the blessings in remote (server) endpoint during authorization.
      * With this option enabled, clients are susceptible to man-in-the-middle attacks where an
      * imposter server has taken over the network address of a real server.
      */
     public static final String SKIP_SERVER_ENDPOINT_AUTHORIZATION =
             "io.v.v23.SKIP_SERVER_ENDPOINT_AUTHORIZATION";
+
+    /**
+     * A key for an option of type {@link Integer} that specifies the level of verbosity for the
+     * for the {@code V} logs in the vanadium code.
+     */
+    public static final String LOG_LEVEL = "io.v.v23.LOG_LEVEL";
+
+    /**
+     * A key for an option of type {@link Boolean} that specifies whether all logs should be
+     * written to standard error instead of files.
+     */
+    public static final String LOG_TO_STDERR = "io.v.v23.LOG_TO_STDERR";
 }

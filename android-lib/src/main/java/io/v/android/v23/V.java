@@ -34,7 +34,15 @@ import java.security.interfaces.ECPublicKey;
  * and then delegates to the Java {@link io.v.v23.V} methods.
  */
 public class V extends io.v.v23.V {
-    private static volatile VContext context = null;
+    private static native VContext nativeInitLogging(VContext ctx, Options opts) throws VException;
+
+    private static void initLogging(Options opts) {
+        try {
+            context = nativeInitLogging(context, opts);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't initialize logging", e);
+        }
+    }
 
     /**
      * Initializes the Vanadium environment, returning the base context.  Calling this method
@@ -53,22 +61,19 @@ public class V extends io.v.v23.V {
      * @return             base context
      */
     public static VContext init(Context androidCtx, Options opts) {
-        if (context != null) return context;
+        if (initDone) return context;
         synchronized (V.class) {
-            if (context != null) return context;
+            if (initDone) return context;
             if (androidCtx == null) {
                 throw new RuntimeException("Android context must be non-null.");
             }
-            context = io.v.v23.V.init(opts);
-            RedirectStderr.Start();
-            // Attach principal and listen spec to the context.
-            try {
-                context = V.withPrincipal(context, createPrincipal(androidCtx));
-            } catch (VException e) {
-                throw new RuntimeException("Couldn't setup Vanadium Runtime options", e);
-            }
+            if (opts == null) opts = new Options();
+            initGlobal();
+            initV(opts);
+            initLogging(opts);
             // Set the VException component name to the Android context package name.
             context = VException.contextWithComponentName(context, androidCtx.getPackageName());
+            initDone = true;
             return context;
         }
     }
@@ -79,8 +84,8 @@ public class V extends io.v.v23.V {
      *
      * @return base context
      */
-    public static VContext init(Context ctx) {
-        return V.init(ctx, null);
+    public static VContext init(Context androidCtx) {
+        return V.init(androidCtx, null);
     }
 
     private static VPrincipal createPrincipal(Context ctx) throws VException {
