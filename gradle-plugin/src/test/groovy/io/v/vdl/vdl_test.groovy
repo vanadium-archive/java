@@ -76,12 +76,12 @@ class VdlPluginTest {
             outputPath = 'generated-src/vdl'
         }))
 
-        VdlPlugin.extractTransitiveVdlFilesAndUpdateInputPaths(vdlProjectB)
+        Set<String> inputPaths = VdlPlugin.extractTransitiveVdlFilesAndGetInputPaths(vdlProjectB)
 
         // vdlProjectB should now have two VDLPATH elements:
         //   - generated-src/transitive-vdl, containing whatever/jar.vdl and projectA.vdl
         //   - src/main/java, containing no vdl files
-        assertThat(vdlProjectB.vdl.inputPaths).containsExactly('generated-src/transitive-vdl', 'src/main/java')
+        assertThat(inputPaths).containsExactly('generated-src/transitive-vdl', 'src/main/java')
         assertThat(new File(vdlProjectB.getProjectDir(), 'generated-src/transitive-vdl/whatever/jar.vdl').exists()).isTrue()
         assertThat(new File(vdlProjectB.getProjectDir(), 'generated-src/transitive-vdl/projectA.vdl').exists()).isTrue()
         assertThat(VdlPlugin.getJavaOutDirs(vdlProjectB)).containsExactly('src/main/java->generated-src/vdl', vdlProjectB.vdl.transitiveVdlDir + '->' + vdlProjectB.vdl.transitiveVdlDir)

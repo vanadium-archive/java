@@ -34,7 +34,7 @@ class VdlPlugin implements Plugin<Project> {
         }
         def prepareTask = project.task('prepareVdl') {
             doLast {
-                extractTransitiveVdlFilesAndUpdateInputPaths(project)
+                project.vdl.inputPaths = extractTransitiveVdlFilesAndGetInputPaths(project).asList()
                 List<String> outDirs = getJavaOutDirs(project)
                 generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"))
                 List<String> commandLine = ['build/vdltool/vdl-' + getOsName(),
@@ -73,25 +73,27 @@ class VdlPlugin implements Plugin<Project> {
         }
     }
 
-    public static void extractTransitiveVdlFilesAndUpdateInputPaths(Project project) {
-        boolean addTransitiveVdlDir = false
+    public static Set<String> extractTransitiveVdlFilesAndGetInputPaths(Project project) {
+        Set<String> result = new LinkedHashSet<>(project.vdl.inputPaths)
         // Go through the dependencies of all configurations looking for jar files containing
         // VDL files.
         project.configurations.each({
             it.each({
                 if (it.getName().endsWith('.jar') && it.exists()) {
-                    addTransitiveVdlDir = extractVdlFiles(it, new File(project.getProjectDir(), project.vdl.transitiveVdlDir)) || addTransitiveVdlDir
+                    if (extractVdlFiles(it, new File(project.getProjectDir(), project.vdl.transitiveVdlDir))) {
+                        result.add(project.vdl.transitiveVdlDir)
+                    }
                 }
             })
         })
 
         // Now recursively descend through the project's project dependencies looking for
         // VDL projects.
-        Set<String> inputPaths = new LinkedHashSet<>()
-        addVdlInputPathsForProject(project, inputPaths)
+        Set<String> projectInputPaths = new LinkedHashSet<>()
+        addVdlInputPathsForProject(project, projectInputPaths)
         // Copy any VDL files in any input path to the transitive VDL directory.
         project.copy {
-            inputPaths.each({
+            projectInputPaths.each({
                 from(it) {
                     include '**/*.vdl'
                     includeEmptyDirs = false
@@ -100,11 +102,10 @@ class VdlPlugin implements Plugin<Project> {
 
             into project.vdl.transitiveVdlDir
         }
-        addTransitiveVdlDir = !inputPaths.isEmpty() || addTransitiveVdlDir
-
-        if (addTransitiveVdlDir) {
-            project.vdl.inputPaths += project.vdl.transitiveVdlDir
+        if (!projectInputPaths.isEmpty()) {
+            result.add(project.vdl.transitiveVdlDir)
         }
+        return result
     }
 
     public static List<String> getJavaOutDirs(Project project) {
