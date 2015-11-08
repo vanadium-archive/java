@@ -45,7 +45,7 @@ class VdlPluginTest {
     }
 
     @Test
-    public void transitiveVdlDependencies() {
+    public void multipleVdlDependencies() {
         Project rootProject = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withName('root').build()
 
         // Create a VDL project with no dependencies.
@@ -90,6 +90,47 @@ class VdlPluginTest {
         assertThat(new File(vdlProjectB.getProjectDir(), 'generated-src/transitive-vdl/whatever/jar.vdl').exists()).isTrue()
         assertThat(new File(vdlProjectB.getProjectDir(), 'generated-src/transitive-vdl/projectA.vdl').exists()).isTrue()
         assertThat(VdlPlugin.getJavaOutDirs(vdlProjectB)).containsExactly('src/main/java->generated-src/vdl', vdlProjectB.vdl.transitiveVdlDir + '->' + vdlProjectB.vdl.transitiveVdlDir)
+    }
+
+    @Test
+    public void transitiveVdlDependencies() {
+        Project rootProject = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withName('root').build()
+
+        // Create a VDL project with no dependencies.
+        Project vdlProjectA = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withParent(rootProject).withName('vdlProjectA').build()
+        vdlProjectA.pluginManager.apply('java')
+        // Create a fake VDL file in the project's source directory.
+        File sourceDir = new File(vdlProjectA.getProjectDir(), 'src/main/java')
+        assertThat(sourceDir.mkdirs()).isTrue()
+        assertThat(new File(sourceDir, "projectA.vdl").createNewFile()).isTrue()
+        vdlProjectA.pluginManager.apply(VdlPlugin.class)
+        vdlProjectA.extensions.configure(VdlConfiguration, new ClosureBackedAction<VdlConfiguration>({
+            inputPaths += sourceDir.getPath()
+        }))
+
+        // Create a regular (non-VDL) project B that depends on VDL project A.
+        Project regularProjectB = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withParent(rootProject).withName('regularProjectB').build()
+        regularProjectB.pluginManager.apply('java')
+        regularProjectB.dependencies.add('compile', vdlProjectA)
+
+        // Create a VDL project that depends on project B and should therefore transitively depend on A's VDL files.
+        Project vdlProjectC = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withParent(rootProject).withName('vdlProjectC').build()
+        vdlProjectC.pluginManager.apply('java')
+        vdlProjectC.pluginManager.apply(VdlPlugin.class)
+        vdlProjectC.dependencies.add('compile', regularProjectB)
+        vdlProjectC.extensions.configure(VdlConfiguration, new ClosureBackedAction<VdlConfiguration>({
+            inputPaths += 'some/directory'
+        }))
+        vdlProjectC.evaluate()
+
+        Set<String> inputPaths = VdlPlugin.extractTransitiveVdlFilesAndGetInputPaths(vdlProjectC)
+
+        // vdlProjectC should now have two VDLPATH elements:
+        //   - generated-src/transitive-vdl, containing projectA.vdl
+        //   - some/directory, containing no vdl files
+        assertThat(inputPaths).containsExactly('generated-src/transitive-vdl', 'some/directory')
+        assertThat(new File(vdlProjectC.getProjectDir(), 'generated-src/transitive-vdl/projectA.vdl').exists()).isTrue()
+        assertThat(VdlPlugin.getJavaOutDirs(vdlProjectC)).containsExactly('some/directory->generated-src/vdl', vdlProjectC.vdl.transitiveVdlDir + '->' + vdlProjectC.vdl.transitiveVdlDir)
     }
 
     private static void createVdlToolJar(File outputFile, String entryName, String vdlBinContents) {
