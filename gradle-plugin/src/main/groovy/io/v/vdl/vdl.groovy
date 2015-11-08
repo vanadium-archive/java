@@ -14,9 +14,6 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 class VdlPlugin implements Plugin<Project> {
-    String inputPath
-    String outputPath
-
     void apply(Project project) {
         project.extensions.create('vdl', VdlConfiguration)
 
