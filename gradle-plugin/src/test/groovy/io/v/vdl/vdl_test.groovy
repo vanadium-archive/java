@@ -5,7 +5,9 @@ import io.v.vdl.VdlPlugin
 import org.gradle.api.Project
 import org.gradle.api.internal.ClosureBackedAction
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import java.util.jar.JarEntry
 import java.util.jar.JarOutputStream
@@ -15,6 +17,9 @@ import java.util.zip.ZipOutputStream
 import static com.google.common.truth.Truth.assertThat
 
 class VdlPluginTest {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Test
     public void vdlPluginTest() {
         Project project = ProjectBuilder.builder().build()
@@ -41,10 +46,10 @@ class VdlPluginTest {
 
     @Test
     public void transitiveVdlDependencies() {
-        Project rootProject = ProjectBuilder.builder().withName('root').build()
+        Project rootProject = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withName('root').build()
 
         // Create a VDL project with no dependencies.
-        Project vdlProjectA = ProjectBuilder.builder().withParent(rootProject).withName('vdlProjectA').build()
+        Project vdlProjectA = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withParent(rootProject).withName('vdlProjectA').build()
         vdlProjectA.pluginManager.apply('java')
         // Create a fake VDL file in the project's source directory.
         File sourceDir = new File(vdlProjectA.getProjectDir(), 'src/main/java')
@@ -65,7 +70,7 @@ class VdlPluginTest {
         stream.flush()
         stream.close()
 
-        Project vdlProjectB = ProjectBuilder.builder().withParent(rootProject).withName('vdlProjectB').build()
+        Project vdlProjectB = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withParent(rootProject).withName('vdlProjectB').build()
         vdlProjectB.pluginManager.apply(VdlPlugin.class)
         vdlProjectB.pluginManager.apply('java')
         vdlProjectB.repositories.flatDir(dirs: jarFile.getParent())
