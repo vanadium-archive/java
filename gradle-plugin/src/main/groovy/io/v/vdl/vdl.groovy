@@ -25,8 +25,8 @@ class VdlPlugin implements Plugin<Project> {
             into { new File(project.buildDir, 'vdltool') }
         }
         def clearVdlOutputTask = project.task('clearVdlOutput', type: Delete) {
-            delete project.vdl.outputPath
-            delete project.vdl.transitiveVdlDir
+            delete { project.vdl.outputPath }
+            delete { project.vdl.transitiveVdlDir }
         }
         def generateTask = project.task('generateVdl', type: Exec) {
         }
@@ -53,7 +53,7 @@ class VdlPlugin implements Plugin<Project> {
         }
         def removeVdlRootTask = project.task('removeVdlRoot', type: Delete) {
             onlyIf { !project.vdl.generateVdlRoot }
-            delete project.vdl.outputPath + '/io/v/v23/vdlroot/'
+            delete { project.vdl.outputPath + '/io/v/v23/vdlroot/' }
         }
         extractTask.dependsOn(prepareTask)
         generateTask.dependsOn(clearVdlOutputTask)
@@ -61,22 +61,23 @@ class VdlPlugin implements Plugin<Project> {
         removeVdlRootTask.dependsOn(generateTask)
         vdlTask.dependsOn(removeVdlRootTask)
 
-        if (project.hasProperty('clean')) {
-            project.clean.delete(project.vdl.outputPath)
-            project.clean.delete(project.vdl.transitiveVdlDir)
-        }
-
-        if (project.plugins.hasPlugin('java')) {
-            project.compileJava.dependsOn(vdlTask)
-            project.sourceSets.main.java.srcDirs += project.vdl.outputPath
-        }
-
-        if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
-            project.tasks.'preBuild'.dependsOn(vdlTask)
-            project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
-        }
-
         project.afterEvaluate({
+            if (project.hasProperty('clean')) {
+                project.clean.delete(project.vdl.outputPath)
+                project.clean.delete(project.vdl.transitiveVdlDir)
+            }
+
+            if (project.plugins.hasPlugin('java')) {
+                project.compileJava.dependsOn(vdlTask)
+                project.sourceSets.main.java.srcDirs += project.vdl.outputPath
+            }
+
+            if (project.plugins.hasPlugin('com.android.library')
+                    || project.plugins.hasPlugin('com.android.application')) {
+                project.tasks.'preBuild'.dependsOn(vdlTask)
+                project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
+            }
+
             if (project.plugins.hasPlugin('java')) {
                 // Add VDL files in VDL input paths to project resources.
                 project.vdl.inputPaths.each {
