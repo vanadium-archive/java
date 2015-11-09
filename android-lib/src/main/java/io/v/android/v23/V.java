@@ -73,6 +73,12 @@ public class V extends io.v.v23.V {
             initLogging(opts);
             // Set the VException component name to the Android context package name.
             context = VException.contextWithComponentName(context, androidCtx.getPackageName());
+            try {
+                // Initialize the principal.
+                context = V.withPrincipal(context, createPrincipal(androidCtx));
+            } catch (VException e) {
+                throw new RuntimeException("Couldn't setup Vanadium principal", e);
+            }
             initDone = true;
             return context;
         }
