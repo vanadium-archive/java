@@ -58,6 +58,7 @@ class VdlPlugin implements Plugin<Project> {
 
         if (project.hasProperty('clean')) {
             project.clean.delete(project.vdl.outputPath)
+            project.clean.delete(project.vdl.transitiveVdlDir)
         }
 
         if (project.plugins.hasPlugin('java')) {
