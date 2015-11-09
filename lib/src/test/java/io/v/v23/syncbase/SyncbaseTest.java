@@ -321,7 +321,8 @@ public class SyncbaseTest extends TestCase {
         SyncgroupSpec spec = new SyncgroupSpec("test", allowAll,
             ImmutableList.of(new TableRow(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
-        SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo((byte) 1);
+        SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
+	memberInfo.setSyncPriority((byte) 1);
         Syncgroup group = db.getSyncgroup(groupName);
         {
             group.create(ctx, spec, memberInfo);
