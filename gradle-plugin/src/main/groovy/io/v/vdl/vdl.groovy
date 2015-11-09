@@ -9,6 +9,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
+import org.gradle.language.jvm.tasks.ProcessResources
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -31,9 +32,9 @@ class VdlPlugin implements Plugin<Project> {
         }
         def prepareTask = project.task('prepareVdl') {
             doLast {
-                project.vdl.inputPaths = extractTransitiveVdlFilesAndGetInputPaths(project).asList()
+                List<String> vdlPaths = extractTransitiveVdlFilesAndGetInputPaths(project).asList()
                 List<String> outDirs = getJavaOutDirs(project)
-                generateTask.environment(VDLPATH: project.vdl.inputPaths.join(":"))
+                generateTask.environment(VDLPATH: vdlPaths.join(":"))
                 List<String> commandLine = ['build/vdltool/vdl-' + getOsName(),
                                             '--builtin_vdlroot', 'generate',
                                             '--lang=java',
@@ -68,6 +69,20 @@ class VdlPlugin implements Plugin<Project> {
             project.tasks.'preBuild'.dependsOn(vdlTask)
             project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
         }
+
+        project.afterEvaluate({
+            if (project.plugins.hasPlugin('java')) {
+                // Add VDL files in VDL input paths to project resources.
+                project.vdl.inputPaths.each {
+                    project.sourceSets.main.resources.srcDirs(it).include('**/*.vdl')
+                }
+
+                // Ensure that empty directories are not copied.
+                project.tasks.withType(ProcessResources, {
+                    it.setIncludeEmptyDirs(false)
+                })
+            }
+        })
     }
 
     public static Set<String> extractTransitiveVdlFilesAndGetInputPaths(Project project) {
