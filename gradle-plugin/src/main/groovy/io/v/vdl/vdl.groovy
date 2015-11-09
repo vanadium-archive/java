@@ -24,6 +24,10 @@ class VdlPlugin implements Plugin<Project> {
             }
             into { new File(project.buildDir, 'vdltool') }
         }
+        def clearVdlOutputTask = project.task('clearVdlOutput', type: Delete) {
+            delete project.vdl.outputPath
+            delete project.vdl.transitiveVdlDir
+        }
         def generateTask = project.task('generateVdl', type: Exec) {
         }
         def vdlTask = project.task('vdl') {
@@ -52,6 +56,7 @@ class VdlPlugin implements Plugin<Project> {
             delete project.vdl.outputPath + '/io/v/v23/vdlroot/'
         }
         extractTask.dependsOn(prepareTask)
+        generateTask.dependsOn(clearVdlOutputTask)
         generateTask.dependsOn(extractTask)
         removeVdlRootTask.dependsOn(generateTask)
         vdlTask.dependsOn(removeVdlRootTask)
