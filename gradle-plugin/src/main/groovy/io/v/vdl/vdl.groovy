@@ -2,6 +2,7 @@
 
 package io.v.vdl
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
@@ -38,11 +39,13 @@ class VdlPlugin implements Plugin<Project> {
             doLast {
                 List<String> vdlPaths = extractTransitiveVdlFilesAndGetInputPaths(project).asList()
                 List<String> outDirs = getJavaOutDirs(project)
+
+                generateTask.environment(VDLROOT: getVdlRootPath(project))
                 generateTask.environment(VDLPATH: vdlPaths.join(":"))
                 List<String> commandLine = ['build/vdltool/vdl-' + getOsName(),
                                             '--builtin_vdlroot', 'generate',
                                             '--lang=java',
-                                            "--java-out-dir=" + outDirs.join(",")
+                                            '--java-out-dir=' + outDirs.join(",")
                 ]
                 if (!project.vdl.packageTranslations.isEmpty()) {
                     commandLine.add('--java-out-pkg=' + project.vdl.packageTranslations.join(','))
@@ -90,6 +93,23 @@ class VdlPlugin implements Plugin<Project> {
                 })
             }
         })
+    }
+
+    public static String getVdlRootPath(Project project) {
+        if (null == project.vdl.vdlRootPath || "".equals(project.vdl.vdlRootPath)) {
+            // Look in the transitive VDL files, it should be there so long as the project depends
+            // on VDL.
+            File candidateVdlRoot = new File(
+                    new File(project.getProjectDir(), project.vdl.transitiveVdlDir), 'v.io/v23/vdlroot')
+            if (candidateVdlRoot.exists() && candidateVdlRoot.isDirectory()) {
+                return candidateVdlRoot.getPath()
+            }
+
+            throw new InvalidUserDataException('could not determine a value for VDLROOT, '
+                    + 'you should check to ensure your project depends on vanadium')
+        } else {
+            return project.vdl.vdlRootPath
+        }
     }
 
     public static Set<String> extractTransitiveVdlFilesAndGetInputPaths(Project project) {
@@ -235,8 +255,8 @@ class VdlPlugin implements Plugin<Project> {
 }
 
 class VdlConfiguration {
-    String vanadiumRoot
     List<String> inputPaths = []
+    String vdlRootPath = ""
     String outputPath = "generated-src/vdl"
     String transitiveVdlDir = "generated-src/transitive-vdl"
     String vdlToolPath = ""

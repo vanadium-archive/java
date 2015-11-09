@@ -145,6 +145,45 @@ class VdlPluginTest {
                 vdlProjectC.vdl.transitiveVdlDir + '->' + vdlProjectC.vdl.transitiveVdlDir)
     }
 
+    @Test
+    public void determineVdlRoot() {
+        Project rootProject = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder()).withName('root')
+                .build()
+
+        // Create a VDL project with no dependencies.
+        Project vdlProjectA = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder())
+                .withParent(rootProject).withName('vdlProjectA').build()
+        vdlProjectA.pluginManager.apply('java')
+        // Create a fake VDL file in the project's source directory.
+        File sourceDir = new File(vdlProjectA.getProjectDir(), 'release/go/src/v.io/v23/vdlroot')
+        assertThat(sourceDir.mkdirs()).isTrue()
+        assertThat(new File(sourceDir, "root.vdl").createNewFile()).isTrue()
+        vdlProjectA.pluginManager.apply(VdlPlugin.class)
+        vdlProjectA.extensions.configure(VdlConfiguration, new ClosureBackedAction<VdlConfiguration>({
+            inputPaths += 'release/go/src'
+        }))
+
+        // Create a VDL project that depends on project B and should therefore have the vdlroot in
+        // its transitive VDL files.
+        Project vdlProjectB = ProjectBuilder.builder().withProjectDir(temporaryFolder.newFolder())
+                .withParent(rootProject).withName('vdlProjectB').build()
+        vdlProjectB.pluginManager.apply('java')
+        vdlProjectB.pluginManager.apply(VdlPlugin.class)
+        vdlProjectB.dependencies.add('compile', vdlProjectA)
+        vdlProjectB.extensions.configure(VdlConfiguration, new ClosureBackedAction<VdlConfiguration>({
+            inputPaths += 'some/directory'
+        }))
+        vdlProjectB.evaluate()
+
+        VdlPlugin.extractTransitiveVdlFilesAndGetInputPaths(vdlProjectB)
+
+        // vdlProjectB's VDLROOT should be set to the vdlroot inside the transitive-vdl dir.
+        assertThat(VdlPlugin.getVdlRootPath(vdlProjectB)).isEqualTo(new File(vdlProjectB.getProjectDir(),
+                '/generated-src/transitive-vdl/v.io/v23/vdlroot').getAbsolutePath())
+        assertThat(new File(vdlProjectB.getProjectDir(), 'generated-src/transitive-vdl/v.io/v23/vdlroot')
+                .isDirectory()).isTrue()
+    }
+
     private static void createVdlToolJar(File outputFile, String entryName, String vdlBinContents) {
         JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(outputFile))
         outputStream.putNextEntry(new ZipEntry(entryName))
