@@ -10,25 +10,22 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.common.base.Joiner;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import io.v.impl.google.lib.discovery.ScanHandler;
-import io.v.x.ref.lib.discovery.Advertisement;
+import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Update;
+import io.v.v23.discovery.VDiscovery;
 
-public class ScanHandlerAdapter extends BaseAdapter implements ScanHandler{
-
-    List<Advertisement> knownAdvertisements;
+public class ScanHandlerAdapter extends BaseAdapter implements VDiscovery.ScanCallback {
+    List<Service> knownAdvertisements;
 
     List<DataSetObserver> observers;
 
@@ -69,15 +66,15 @@ public class ScanHandlerAdapter extends BaseAdapter implements ScanHandler{
         if (view == null) {
             view = inflater.inflate(R.layout.item, null);
         }
-        Advertisement adv = knownAdvertisements.get(i);
+        Service service = knownAdvertisements.get(i);
         TextView displayName = (TextView)view.findViewById(R.id.display_name);
-        displayName.setText(adv.getService().getInstanceName());
+        displayName.setText(service.getInstanceName());
         TextView interfaceName = (TextView)view.findViewById(R.id.interface_name);
-        interfaceName.setText(adv.getService().getInterfaceName());
+        interfaceName.setText(service.getInterfaceName());
         TextView addrs = (TextView)view.findViewById(R.id.addrs);
-        addrs.setText(Joiner.on(",").join(adv.getService().getAddrs()));
+        addrs.setText(Joiner.on(",").join(service.getAddrs()));
         ListView attrs = (ListView)view.findViewById(R.id.attributes);
-        attrs.setAdapter(new AttrAdapter(inflater, adv.getService().getAttrs()));
+        attrs.setAdapter(new AttrAdapter(inflater, service.getAttrs()));
         return view;
     }
 
@@ -97,12 +94,18 @@ public class ScanHandlerAdapter extends BaseAdapter implements ScanHandler{
     }
 
     @Override
-    public void handleUpdate(Advertisement advertisement) {
-        if (!advertisement.getLost()) {
-            knownAdvertisements.add(advertisement);
+    public void handleUpdate(Update update) {
+        if (update instanceof Update.Found) {
+            Update.Found found = (Update.Found) update;
+            knownAdvertisements.add(found.getElem().getService());
         } else {
-            advertisement.setLost(false);
-            knownAdvertisements.remove(advertisement);
+            Update.Lost lost = (Update.Lost) update;
+            for (int i = 0; i < knownAdvertisements.size(); i++) {
+                if (Arrays.equals(knownAdvertisements.get(i).getInstanceUuid(), lost.getElem().getInstanceUuid())) {
+                    knownAdvertisements.remove(i);
+                    break;
+                }
+            }
         }
         activity.runOnUiThread(new Runnable() {
             @Override

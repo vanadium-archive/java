@@ -17,6 +17,7 @@ import java.util.List;
 
 import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.VDiscovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -461,6 +462,17 @@ public class V {
      */
     public static ListenSpec getListenSpec(VContext ctx) {
         return getRuntime().getListenSpec(ctx);
+    }
+
+    /**
+     * Returns the {@code VDiscovery} attached to the given context, or {@code null} if no discovery
+     * instance is attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * instance will never be {@code null}.
+     */
+    public static VDiscovery getDiscovery(VContext ctx) {
+        return getRuntime().getDiscovery(ctx);
     }
 
     private static VRuntime getRuntime() {

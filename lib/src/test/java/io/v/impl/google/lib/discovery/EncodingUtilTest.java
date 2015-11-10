@@ -4,10 +4,10 @@
 
 package io.v.impl.google.lib.discovery;
 
-
 import junit.framework.TestCase;
 
 import java.io.IOException;
+
 import java.util.Arrays;
 
 import io.v.x.ref.lib.discovery.EncryptionAlgorithm;

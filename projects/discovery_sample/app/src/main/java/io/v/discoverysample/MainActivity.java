@@ -14,11 +14,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.v.android.libs.discovery.ble.BlePlugin;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
@@ -28,6 +26,8 @@ import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
+import io.v.v23.discovery.VDiscovery;
+import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
     private Button scanButton;
     private Button advertiseButton;
     private Blessings blessings;
-    private BlePlugin plugin;
+    private VDiscovery discovery;
 
     private VContext rootCtx;
     private CancelableVContext scanCtx;
@@ -115,36 +115,41 @@ public class MainActivity extends Activity {
     }
 
     private void flipAdvertise() {
-        if (plugin == null) {
-            plugin = new BlePlugin(this);
+        if (discovery == null) {
+            discovery = V.getDiscovery(rootCtx);
         }
 
         if (!isAdvertising) {
             isAdvertising = true;
 
             advCtx = rootCtx.withCancel();
-            try {
-                plugin.addAdvertisement(advCtx, advertisement);
-                advertiseButton.setText("Stop Advertisement");
-            } catch (IOException e) {
-                advCtx.cancel();
-                isAdvertising = false;
-            }
+            final Button advButton = advertiseButton;
+            discovery.advertise(advCtx, advertisement.getService(), new ArrayList<BlessingPattern>(),
+                    new VDiscovery.AdvertiseDoneCallback() {
+                        @Override
+                        public void done() {
+                            isAdvertising = false;
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    advButton.setText("Advertise");
+                                }
+                            });
+                        }
+                    });
+            advertiseButton.setText("Stop Advertisement");
         } else {
-            isAdvertising = false;
             advCtx.cancel();
-            advertiseButton.setText("Advertise");
         }
     }
     private void flipScan() {
-        if (plugin == null) {
-            plugin = new BlePlugin(this);
+        if (discovery == null) {
+            discovery = V.getDiscovery(rootCtx);
         }
+
         if (!isScanning) {
             scanCtx = rootCtx.withCancel();
-            plugin.addScanner(scanCtx,
-                    UUIDUtil.UUIDForInterfaceName("v.io/x/ref.Interface"),
-                    adapter);
+            discovery.scan(scanCtx, "v.InterfaceName=\"v.io/x/ref.Interface\"", adapter);
             isScanning = true;
             scanButton.setText("Stop scanning");
         } else {

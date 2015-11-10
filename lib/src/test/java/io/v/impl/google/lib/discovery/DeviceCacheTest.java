@@ -17,7 +17,7 @@ import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
 import io.v.x.ref.lib.discovery.Uuid;
 
 /**
- * Testis for {@link DeviceCache}.
+ * Tests for {@link DeviceCache}.
  */
 public class DeviceCacheTest extends TestCase {
     private abstract class CountingHandler implements ScanHandler {

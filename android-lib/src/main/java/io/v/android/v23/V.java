@@ -34,11 +34,11 @@ import java.security.interfaces.ECPublicKey;
  * and then delegates to the Java {@link io.v.v23.V} methods.
  */
 public class V extends io.v.v23.V {
-    private static native VContext nativeInitLogging(VContext ctx, Options opts) throws VException;
+    private static native VContext nativeInit(VContext ctx, Context androidContext, Options opts) throws VException;
 
-    private static void initLogging(Options opts) {
+    private static void initLogging(Context androidContext, Options opts) {
         try {
-            context = nativeInitLogging(context, opts);
+            context = nativeInit(context, androidContext, opts);
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize logging", e);
         }
@@ -67,10 +67,11 @@ public class V extends io.v.v23.V {
             if (androidCtx == null) {
                 throw new RuntimeException("Android context must be non-null.");
             }
+
             if (opts == null) opts = new Options();
             initGlobal();
             initV(opts);
-            initLogging(opts);
+            initLogging(androidCtx, opts);
             // Set the VException component name to the Android context package name.
             context = VException.contextWithComponentName(context, androidCtx.getPackageName());
             try {

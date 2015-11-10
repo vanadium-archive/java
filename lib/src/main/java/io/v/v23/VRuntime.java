@@ -5,6 +5,7 @@
 package io.v.v23;
 
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.VDiscovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -192,6 +193,15 @@ public interface VRuntime {
      * Returns the base context associated with the runtime.
      */
     VContext getContext();
+
+    /**
+     * Returns the {@code VDiscovery} attached to the given context, or {@code null} if no discovery
+     * instance is attached.
+     * <p>
+     * If the passed in context is derived from the context returned by {@link #getContext()},
+     * the returned discovery instance will never be {@code null}.
+     */
+    VDiscovery getDiscovery(VContext ctx);
 
     /**
      * Shuts down the runtime, allowing the runtime to release resources, shutdown services and

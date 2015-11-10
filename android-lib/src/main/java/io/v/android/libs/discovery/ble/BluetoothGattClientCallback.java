@@ -57,7 +57,7 @@ public class BluetoothGattClientCallback extends BluetoothGattCallback {
             }
             services.put(service.getUuid(), new HashMap<UUID, byte[]>());
             // We only keep track of the characteristics that can be read.
-            for (BluetoothGattCharacteristic ch : chars) {
+            for (BluetoothGattCharacteristic ch : service.getCharacteristics()) {
                 if ((ch.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
                     chars.add(ch);
                 }

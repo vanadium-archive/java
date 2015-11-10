@@ -7,6 +7,7 @@ package io.v.impl.google.rt;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.VDiscovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -40,6 +41,8 @@ public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeWithListenSpec(VContext ctx, ListenSpec spec)
             throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
+
+    private static native VDiscovery nativeGetDiscovery(VContext ctx) throws VException;
 
     // Attaches a server to the given context.  Used by this class and other classes
     // that natively create a server.
@@ -124,6 +127,15 @@ public class VRuntimeImpl implements VRuntime {
             return nativeGetListenSpec(ctx);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get listen spec: ", e);
+        }
+    }
+
+    @Override
+    public VDiscovery getDiscovery(VContext ctx) {
+        try {
+            return nativeGetDiscovery(ctx);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get discovery: ", e);
         }
     }
     @Override
