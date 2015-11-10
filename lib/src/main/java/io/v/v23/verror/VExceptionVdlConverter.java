@@ -5,6 +5,7 @@
  package io.v.v23.verror;
 
 import io.v.v23.vdl.NativeTypes.Converter;
+import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -13,6 +14,7 @@ import io.v.v23.vdl.WireRetryCode;
 import io.v.v23.verror.VException.ActionCode;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public final class VExceptionVdlConverter extends Converter {
     }
 
     @Override
-    public VException nativeFromVdlValue(VdlValue value) {
+    public Object nativeFromVdlValue(VdlValue value) {
         assertInstanceOf(value, WireError.class);
         WireError error = (WireError) value;
         VException.IDAction idAction = new VException.IDAction(error.getId(),
@@ -67,6 +69,18 @@ public final class VExceptionVdlConverter extends Converter {
             params[i] = paramVal.getElem();
             paramTypes[i] = paramVal.getElemType();
         }
-        return new VException(idAction, error.getMsg(), params, paramTypes);
+        VException v = new VException(idAction, error.getMsg(), params, paramTypes);
+        // See if a subclass can handle further conversion.
+        Class<?> c = Types.loadClassForVdlName(v.getID());
+        if (c != null) {
+            try {
+                Constructor constructor = c.getDeclaredConstructor(VException.class);
+                if (!constructor.isAccessible()) {
+                    constructor.setAccessible(true);
+                }
+                return constructor.newInstance(v);
+            } catch (Exception e) {}
+        }
+        return v;
     }
 }

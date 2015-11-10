@@ -87,11 +87,14 @@ public class V extends io.v.v23.V {
     /**
      * Initializes the Vanadium environment without options.  See
      * {@link #init(Context,Options)} for more information.
-     *
-     * @return base context
      */
     public static VContext init(Context androidCtx) {
         return V.init(androidCtx, null);
+    }
+
+    @Deprecated
+    public static VContext init() {
+        throw new RuntimeException("Must call Android init with a context.");
     }
 
     private static VPrincipal createPrincipal(Context ctx) throws VException {

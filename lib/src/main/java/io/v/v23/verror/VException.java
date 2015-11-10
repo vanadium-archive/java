@@ -380,7 +380,7 @@ public class VException extends Exception {
         this.paramTypes = paramTypes;
     }
 
-    private VException(VException other) {
+    protected VException(VException other) {
         this(other.id, other.getMessage(), other.params, other.paramTypes);
     }
 
@@ -445,7 +445,7 @@ public class VException extends Exception {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
+        if (!(obj instanceof VException)) return false;
         VException other = (VException) obj;
         return this.getID().equals(other.getID());
     }

@@ -320,6 +320,10 @@ public final class Types {
      * if there is no converter from provided java type to its VDL wire representation.
      */
     public static NativeTypes.Converter getNativeTypeConverter(Type type) {
+        if (type instanceof Class && VException.class.isAssignableFrom((Class) type)) {
+            // We use the converter for VException to convert all of its subclasses as well.
+            type = VException.class;
+        }
         return nativeTypeRegistry.get(type);
     }
 
@@ -430,9 +434,9 @@ public final class Types {
      * Tries to load a Java class that was generated from named VDL type.
      *
      * @param name the name of VDL type
-     * @return true iff the class was found
+     * @return loaded class if the class was found, or {@code null} otherwise
      */
-    public static boolean loadClassForVdlName(String name) {
+    public static Class<?> loadClassForVdlName(String name) {
         String[] parts = name.split("/");
         for (int i = 0; i < parts.length - 1; i++) {
             List<String> subparts = Arrays.asList(parts[i].split("\\."));
@@ -441,11 +445,10 @@ public final class Types {
         }
         String className = Joiner.on(".").join(parts);
         try {
-            // lookup and load class
-            Class.forName(className);
-            return true;
+            // Lookup and load class.
+            return Class.forName(className);
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
-            return false;
+            return null;
         }
     }
 
