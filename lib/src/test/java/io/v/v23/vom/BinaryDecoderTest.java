@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -16,7 +17,6 @@ import org.joda.time.Duration;
 
 import io.v.v23.V;
 import io.v.v23.vdl.Types;
-import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
@@ -81,81 +81,107 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeVException() throws Exception {
-        final Serializable[] params = {
+        Serializable[] params = {
                 1,
                 "2",
                 ImmutableList.<String>of("3"),
                 ImmutableMap.<String, String>of("4", "")
         };
-        final Type[] paramTypes = {
+        Type[] paramTypes = {
                 Integer.class,
                 String.class,
                 new TypeToken<List<String>>(){}.getType(),
                 new TypeToken<Map<String, String>>(){}.getType()
         };
-        final VException.IDAction id = VException.register(
+        VException.IDAction id = VException.register(
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
-        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
-        final Object decoded = TestUtil.decode(encoded);
+        VException v = new VException(id, "en", "test", "test", params, paramTypes);
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        Object decoded = TestUtil.decode(encoded);
         if (!v.deepEquals(decoded)) {
             fail(String.format("Expected error %s, got %s", v, decoded));
         }
     }
 
     public void testDecodeVExceptionBadParams() throws Exception {
-        final Serializable[] params = {
+        Serializable[] params = {
                 ImmutableList.<String>of("3"),
                 ImmutableMap.<String, String>of("4", "")
         };
-        final Type[] paramTypes = {
+        Type[] paramTypes = {
                 List.class,
                 Map.class
         };
-        final VException.IDAction id = VException.register(
+        VException.IDAction id = VException.register(
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVExceptionBadParams",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
-        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
-        final Object decoded = TestUtil.decode(encoded);
-        final VException expected = new VException(id, "en", "test", "test");
+        VException v = new VException(id, "en", "test", "test", params, paramTypes);
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        Object decoded = TestUtil.decode(encoded);
+        VException expected = new VException(id, "en", "test", "test");
         if (!expected.deepEquals(decoded)) {
             fail(String.format("Expected error %s, got %s", v, decoded));
         }
     }
 
     public void testDecodeEncodeVException() throws Exception {
-        final Serializable[] params = {
+        Serializable[] params = {
                 1,
                 "2",
                 ImmutableList.<String>of("3"),
                 ImmutableMap.<String, String>of("4", "")
         };
-        final Type[] paramTypes = {
+        Type[] paramTypes = {
                 Integer.class,
                 String.class,
                 new TypeToken<List<String>>(){}.getType(),
                 new TypeToken<Map<String, String>>(){}.getType()
         };
-        final VException.IDAction id = VException.register(
+        VException.IDAction id = VException.register(
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeEncodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
-        final VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
-        final Object decoded = TestUtil.decode(encoded);
+        VException v = new VException(id, "en", "test", "test", params, paramTypes);
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        Object decoded = TestUtil.decode(encoded);
         if (!(decoded instanceof VException)) {
             fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
         }
-        final VException decodedV = (VException) decoded;
-        final byte[] reEncoded = TestUtil.hexStringToBytes(
+        VException decodedV = (VException) decoded;
+        byte[] reEncoded = TestUtil.hexStringToBytes(
                 TestUtil.encode(VException.class, decodedV));
         assertEquals(Arrays.toString(encoded), Arrays.toString(reEncoded));
     }
 
+    public void testDecodeSubVException() throws Exception {
+        SubVException v = new SubVException();
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(SubVException.class, v));
+        Object decoded = TestUtil.decode(encoded);
+        VException expected = new SubVException();
+        assertThat(decoded).isInstanceOf(SubVException.class);
+        if (!expected.deepEquals(decoded)) {
+            fail(String.format("Expected error %s, got %s", v, decoded));
+        }
+    }
+
+    private static class SubVException extends VException {
+        static final io.v.v23.verror.VException.IDAction ID_ACTION =
+                VException.register("v.io/v23/vom/BinaryDecoderTest$SubVException",
+                        VException.ActionCode.NO_RETRY, "{1} {2} {_}");
+
+        SubVException(VException e) {
+            super(e);
+        }
+
+        SubVException() {
+            super(ID_ACTION, "en", "test", "test", new Serializable[]{ 5 },
+                    new Type[]{ Integer.class });
+        }
+    }
+
     private void assertDecodeEncode(Object value) throws Exception {
-        final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value.getClass(), value));
-        final Object decoded = TestUtil.decode(encoded);
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value.getClass(), value));
+        Object decoded = TestUtil.decode(encoded);
         assertEquals(value, decoded);
     }
 
