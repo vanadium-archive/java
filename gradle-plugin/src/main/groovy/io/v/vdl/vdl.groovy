@@ -64,23 +64,23 @@ class VdlPlugin implements Plugin<Project> {
         removeVdlRootTask.dependsOn(generateTask)
         vdlTask.dependsOn(removeVdlRootTask)
 
+        if (project.plugins.hasPlugin('com.android.library')
+                || project.plugins.hasPlugin('com.android.application')) {
+            project.tasks.'preBuild'.dependsOn(vdlTask)
+            project.android.sourceSets.main.java.srcDir({ project.vdl.outputPath })
+        }
+
+        if (project.plugins.hasPlugin('java')) {
+            project.compileJava.dependsOn(vdlTask)
+            project.sourceSets.main.java.srcDir({ project.vdl.outputPath })
+        }
+
+        if (project.hasProperty('clean')) {
+            project.clean.delete({ project.vdl.outputPath })
+            project.clean.delete({ project.vdl.transitiveVdlDir })
+        }
+
         project.afterEvaluate({
-            if (project.hasProperty('clean')) {
-                project.clean.delete(project.vdl.outputPath)
-                project.clean.delete(project.vdl.transitiveVdlDir)
-            }
-
-            if (project.plugins.hasPlugin('java')) {
-                project.compileJava.dependsOn(vdlTask)
-                project.sourceSets.main.java.srcDirs += project.vdl.outputPath
-            }
-
-            if (project.plugins.hasPlugin('com.android.library')
-                    || project.plugins.hasPlugin('com.android.application')) {
-                project.tasks.'preBuild'.dependsOn(vdlTask)
-                project.android.sourceSets.main.java.srcDirs += project.vdl.outputPath
-            }
-
             if (project.plugins.hasPlugin('java')) {
                 // Add VDL files in VDL input paths to project resources.
                 project.vdl.inputPaths.each {
@@ -260,7 +260,7 @@ class VdlConfiguration {
     String outputPath = "generated-src/vdl"
     String transitiveVdlDir = "generated-src/transitive-vdl"
     String vdlToolPath = ""
-    List<String> packageTranslations = []
+    List<String> packageTranslations = ["v.io->io/v"]
 
     // If true, code generated for the vdlroot vdl package will be emitted.
     // Typically, users will want to leave this set to false as they will
