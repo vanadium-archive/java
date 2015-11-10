@@ -29,14 +29,32 @@ public class OptionDefs {
             "io.v.v23.SKIP_SERVER_ENDPOINT_AUTHORIZATION";
 
     /**
-     * A key for an option of type {@link Integer} that specifies the level of verbosity for the
-     * for the {@code V} logs in the vanadium code.
+     * A key for an option of type {@link String} that specifies the directory that should be
+     * used for storing the log files.  If not present, logs will be written into the system's
+     * temporary directory.
      */
-    public static final String LOG_LEVEL = "io.v.v23.LOG_LEVEL";
+    public static final String LOG_DIR = "io.v.v23.LOG_DIR";
 
     /**
      * A key for an option of type {@link Boolean} that specifies whether all logs should be
      * written to standard error instead of files.
      */
     public static final String LOG_TO_STDERR = "io.v.v23.LOG_TO_STDERR";
+
+    /**
+     * A key for an option of type {@link Integer} that specifies the level of verbosity for the
+     * for the {@code V} logs in the vanadium code.
+     */
+    public static final String LOG_VLEVEL = "io.v.v23.LOG_VLEVEL";
+
+    /**
+     * A key for an option of type {@link String} that specifies the comma-separated list of
+     * {@code pattern=N}, where pattern is a literal file name (minus the extension suffix) or
+     * a glob pattern, and N is the level of verbosity for the {@code V} logs in the vanadium code.
+     * For example:
+     * <p><blockquote><pre>
+     *     vsync*=5,VRuntime=2
+     * </pre></blockquote><p>
+     */
+    public static final String LOG_VMODULE = "io.v.v23.LOG_VMODULE";
 }
