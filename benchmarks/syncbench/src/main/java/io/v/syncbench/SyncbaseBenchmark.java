@@ -92,7 +92,7 @@ public class SyncbaseBenchmark {
     @Benchmark
     public void benchmarkImageFetchingByQuery(int reps) throws VException {
         for (int i = 0; i < reps; i++) {
-            DatabaseCore.ResultStream stream = database.exec(baseContext, "select v from someTable");
+            DatabaseCore.QueryResults stream = database.exec(baseContext, "select v from someTable");
             for (List<VdlAny> result : stream) {
                 byte[] fetchedBytes = (byte[]) result.get(0).getElem();
                 if (!Arrays.equals(fetchedBytes, imageBytes)) {
