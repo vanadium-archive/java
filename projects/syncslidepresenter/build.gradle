@@ -20,29 +20,20 @@ applicationDefaultJvmArgs = ['-XX:+UnlockDiagnosticVMOptions', '-XX:-LogEvents']
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://maven.v.io'
+    }
 }
 
 dependencies {
-    compile project(':lib')
+    compile 'io.v:vanadium:0.1-SNAPSHOT'
     compile 'com.google.guava:guava:18'
     compile 'com.beust:jcommander:1.48'
 }
 
-task copyLib(type: Copy, dependsOn: project(':lib').tasks.'copyVanadiumLib') {
-    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.dylib'].join(File.separator))
-    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
-    destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
-}
-
-tasks.'processResources'.dependsOn(copyLib)
-
-clean {
-    delete 'src/main/resources/libv23.so'
-    delete 'src/main/resources/libv23.dylib'
-}
-
 vdl {
-    inputPaths += [project(':projects:syncslides').projectDir.absolutePath + '/app/src/main/java']
+    inputPaths += [new File('../../../projects/syncslides/android/app/src/main/java').getCanonicalPath()]
+    inputPaths += [new File('../../projects/syncslides/app/src/main/java').getCanonicalPath()]
 }
 
 sourceCompatibility = '1.7'
