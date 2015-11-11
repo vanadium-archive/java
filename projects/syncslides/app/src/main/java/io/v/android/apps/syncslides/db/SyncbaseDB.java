@@ -266,7 +266,7 @@ public class SyncbaseDB implements DB {
                                 Arrays.asList(V23Manager.syncName("sg")),
                                 false
                         ),
-                        new SyncgroupMemberInfo((byte) 10));
+                        new SyncgroupMemberInfo((byte) 10, false));
             } catch (VException e) {
                 if (e.is(Errors.EXIST)) {
                     Log.i(TAG, "Syncgroup already exists");
