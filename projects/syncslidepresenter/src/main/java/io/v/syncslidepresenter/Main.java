@@ -192,7 +192,7 @@ public class Main {
                                  String slideRowFormat) throws VException {
         Syncgroup syncgroup = db.getSyncgroup(presentation.getSyncgroupName());
         syncgroup.join(context.withTimeout(Duration.standardSeconds(joinTimeoutSeconds)),
-                new SyncgroupMemberInfo((byte) 1));
+                new SyncgroupMemberInfo((byte) 1, false));
         for (String member : syncgroup.getMembers(context).keySet()) {
             logger.info("Member: " + member);
         }

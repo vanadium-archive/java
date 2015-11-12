@@ -63,8 +63,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':lib')
-    compile project(':android-lib')
+    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
 }
 
 vdl {
