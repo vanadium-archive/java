@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
+    }
+}
+
+apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
@@ -58,16 +70,60 @@ platforms.each({ platform ->
     pomDependencies.append(dependencyNode)
 })
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+javadoc {
+    if (JavaVersion.current().isJava8Compatible()) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+}
+
+// Adds XML nodes representing fields required for publication to Maven central to the given node.
+def addMavenCentralMetadata(Node node) {
+    node.appendNode('name', 'Vanadium VDL Gradle plugin')
+    node.appendNode('description',
+            'A Gradle plugin to make it easy to use VDL in Java or Android projects')
+    node.appendNode('url', 'https://github.com/vanadium/java/tree/master/gradle-plugin')
+
+    def license = node.appendNode('licenses').appendNode('license')
+    license.appendNode('name', 'New BSD License')
+    license.appendNode('url', 'https://github.com/vanadium/java/blob/master/LICENSE')
+    license.appendNode('distribution', 'repo')
+
+    node.appendNode('scm').appendNode('url',
+            'https://github.com/vanadium/java/tree/master/gradle-plugin')
+
+    def developerInfo = node.appendNode('developers').appendNode('developer')
+    developerInfo.appendNode('id', 'vanadium')
+    developerInfo.appendNode('name', 'The Vanadium Contributors')
+    developerInfo.appendNode('email', 'vanadium-discuss@v.io')
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId 'io.v'
             artifactId 'gradle-plugin'
-            version '0.1-SNAPSHOT'
+            version '0.1'
 
             from components.java
 
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
             pom.withXml {
+                addMavenCentralMetadata(asNode())
                 asNode().append(pomDependencies)
             }
         }
@@ -76,23 +132,31 @@ publishing {
             "mavenNatives${platform.name}"(MavenPublication) {
                 groupId 'io.v'
                 artifactId "gradle-plugin-vdltool-${platform.name}"
-                version '0.1-SNAPSHOT'
+                version '0.1'
 
                 artifact project.tasks."natives-${platform.name}"
+
+                pom.withXml {
+                    addMavenCentralMetadata(asNode())
+                }
             }
         })
     }
     repositories {
         maven {
             credentials {
-                username 'admin'
-                password 'admin123'
+                username nexusUsername
+                password nexusPassword
             }
-            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
+            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
         }
     }
 }
 
 wrapper {
     gradleVersion = '2.4'
+}
+
+nexusStaging {
+    packageGroup = 'io.v'
 }
