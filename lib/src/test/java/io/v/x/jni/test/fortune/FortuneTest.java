@@ -40,6 +40,7 @@ import io.v.v23.vdl.TypedClientStream;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -82,10 +83,10 @@ public class FortuneTest extends TestCase {
         try {
             client.get(ctxT);
             fail("Expected exception during call to get() before call to add()");
+        } catch (NoFortunesException e) {
+            // OK
         } catch (VException e) {
-            if (!e.is(Errors.ERR_NO_FORTUNES)) {
-                fail(String.format("Expected error %s, got %s", Errors.ERR_NO_FORTUNES, e));
-            }
+            fail("Expected NoFortuneException, got: " + e);
         }
         String firstMessage = "First fortune";
         client.add(ctxT, firstMessage);
@@ -125,9 +126,7 @@ public class FortuneTest extends TestCase {
             result.getFuture().get();
             fail("Should have failed!");
         } catch (ExecutionException e) {
-            assertThat(e.getCause()).isInstanceOf(VException.class);
-            assertThat(((VException) e.getCause()).getAction())
-                    .isEqualTo(io.v.v23.verror.Errors.CANCELED.getAction());
+            assertThat(e.getCause()).isInstanceOf(CanceledException.class);
         }
     }
 

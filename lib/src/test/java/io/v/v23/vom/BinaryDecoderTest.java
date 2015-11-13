@@ -166,7 +166,7 @@ public class BinaryDecoderTest extends TestCase {
 
     private static class SubVException extends VException {
         static final io.v.v23.verror.VException.IDAction ID_ACTION =
-                VException.register("v.io/v23/vom/BinaryDecoderTest$SubVException",
+                VException.register("v.io/v23/vom.BinaryDecoderTest$SubVException",
                         VException.ActionCode.NO_RETRY, "{1} {2} {_}");
 
         SubVException(VException e) {

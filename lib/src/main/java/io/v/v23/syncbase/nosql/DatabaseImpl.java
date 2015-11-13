@@ -29,7 +29,6 @@ import io.v.v23.services.watch.Change;
 import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.Util;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.vdl.TypedClientStream;
@@ -37,6 +36,8 @@ import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
+import io.v.v23.verror.BadStateException;
+import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
 
 class DatabaseImpl implements Database, BatchDatabase {
@@ -186,33 +187,24 @@ class DatabaseImpl implements Database, BatchDatabase {
     @Override
     public boolean upgradeIfOutdated(VContext ctx) throws VException {
         if (this.schema == null) {
-            throw new VException(io.v.v23.flow.Errors.BAD_STATE, ctx,
-                    "Schema or SchemaMetadata cannot be null. A valid Schema needs to be used " +
-                    "when creating a database handle.");
+            throw new BadStateException(ctx);
         }
         if (this.schema.getMetadata().getVersion() < 0) {
-            throw new VException(io.v.v23.flow.Errors.BAD_STATE, ctx,
-                    "Schema version cannot be less than zero.");
+            throw new BadStateException(ctx);
         }
         SchemaManager schemaManager = new SchemaManager(this.fullName);
         SchemaMetadata currMetadata = null;
         try {
-             currMetadata = schemaManager.getSchemaMetadata(ctx);
-        } catch (VException eGet) {
+            currMetadata = schemaManager.getSchemaMetadata(ctx);
+        } catch (NoExistException eFirst) {
             // If the client app did not set a schema as part of Database.Create(),
-            // getSchemaMetadata() will return Errors.NO_EXIST. If so we set the schema
+            // getSchemaMetadata() will throws NoExistException. If so we set the schema
             // here.
-            if (!eGet.getID().equals(io.v.v23.verror.Errors.NO_EXIST)) {
-                throw eGet;
-            }
             try {
                 schemaManager.setSchemaMetadata(ctx, this.schema.getMetadata());
-            } catch (VException eSet) {
-                if (!eSet.getID().equals(io.v.v23.verror.Errors.NO_EXIST)) {
-                    throw eSet;
-                }
+            } catch (NoExistException eSecond) {
+                return false;
             }
-            return false;
         }
         if (currMetadata.getVersion() >= this.schema.getMetadata().getVersion()) {
             return false;
