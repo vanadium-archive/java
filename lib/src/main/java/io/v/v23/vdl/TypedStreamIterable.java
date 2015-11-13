@@ -7,7 +7,7 @@ package io.v.v23.vdl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import io.v.v23.VIterable;
-import io.v.v23.verror.Errors;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 import java.io.EOFException;
@@ -36,10 +36,10 @@ public class TypedStreamIterable<T> implements VIterable<T> {
                         return stream.recv();
                     } catch (EOFException e) {  // legitimate end of stream
                         return endOfData();
+                    } catch (CanceledException e) {  // context canceled
+                        return endOfData();
                     } catch (VException e) {
-                        if (!Errors.CANCELED.getID().equals(e.getID())) {  // stream not canceled
-                            error = e;
-                        }
+                        error = e;
                         return endOfData();
                     }
                 }

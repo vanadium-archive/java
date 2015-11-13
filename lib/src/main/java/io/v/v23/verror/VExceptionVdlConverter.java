@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
- package io.v.v23.verror;
+package io.v.v23.verror;
 
 import io.v.v23.vdl.NativeTypes.Converter;
 import io.v.v23.vdl.Types;
@@ -71,7 +71,11 @@ public final class VExceptionVdlConverter extends Converter {
         }
         VException v = new VException(idAction, error.getMsg(), params, paramTypes);
         // See if a subclass can handle further conversion.
-        Class<?> c = Types.loadClassForVdlName(v.getID());
+        String path = classPath(v.getID());
+        Class<?> c = Types.loadClassForVdlName(path);
+        if (c == null) {
+            c = Types.loadClassForVdlName(path + "Exception");
+        }
         if (c != null) {
             try {
                 Constructor constructor = c.getDeclaredConstructor(VException.class);
@@ -82,5 +86,15 @@ public final class VExceptionVdlConverter extends Converter {
             } catch (Exception e) {}
         }
         return v;
+    }
+
+    private static String classPath(String errId) {
+        int idx = errId.lastIndexOf(".");
+        if (idx < 0) {
+            return errId;
+        }
+        String errName = errId.substring(idx + 1);
+        errName = Character.toUpperCase(errName.charAt(0)) + errName.substring(1);
+        return errId.substring(0, idx) + "/" + errName;
     }
 }

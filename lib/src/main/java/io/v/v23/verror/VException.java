@@ -11,7 +11,9 @@ import io.v.v23.vdl.VdlType;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -46,12 +48,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * is the name of the component (typically server or binary name), and the second is the name of the
  * operation (such as an RPC or sub-command) that encountered the error.  Other parameters typically
  * identify the object(s) on which the error occurred.  This convention is normally applied by
- * {@link #VException(IDAction,VContext,Serializable...)}, which fetches the language, component name
+ * {@link #VException(IDAction,VContext,Object...)}, which fetches the language, component name
  * and operation name from the current context:
  * <p><blockquote><pre>
  * VException e = new VException(someNewError, ctx, "object_on_which_error_occurred");
  * </pre></blockquote><p>
- * The {@link #VException(IDAction,String,String,String,Serializable...)} constructor can be used
+ * The {@link #VException(IDAction,String,String,String,Object...)} constructor can be used
  * to specify these things explicitly:
  * <p><blockquote><pre>
  * VException e = new VException(
@@ -213,9 +215,9 @@ public class VException extends Exception {
     }
 
     private static VException create(IDAction idAction, String language, String componentName,
-            String opName, Serializable[] params, VdlType[] paramTypes) {
+            String opName, Object[] params, VdlType[] paramTypes) {
         if (params == null) {
-            params = new Serializable[0];
+            params = new Object[0];
         }
         if (paramTypes == null) {
             paramTypes = new VdlType[0];
@@ -229,18 +231,34 @@ public class VException extends Exception {
             params = Arrays.copyOf(params, length);
             paramTypes = Arrays.copyOf(paramTypes, length);
         }
+        // Remove non-serializable params and params with null types.
+        List<Serializable> newParams = new ArrayList<>(params.length + 2);
+        List<VdlType> newParamTypes = new ArrayList<>(paramTypes.length + 2);
+        for (int i = 0; i < params.length; ++i) {
+            if (!(params[i] instanceof Serializable)) {
+                System.err.println(String.format(
+                        "Dropping parameter #%d (%s) that isn't serializable", i, params[i]));
+                continue;
+            }
+            if (paramTypes[i] == null) {
+                System.err.println(String.format(
+                        "Dropping parameter #%d (%s) whose type doesn't have a matching VdlType.",
+                        i, params[i]));
+                continue;
+            }
+            newParams.add((Serializable)params[i]);
+            newParamTypes.add(paramTypes[i]);
+        }
+
         // Append componentName and opName to params.
-        Serializable[] newParams = new Serializable[params.length + 2];
-        VdlType[] newParamTypes = new VdlType[paramTypes.length + 2];
-        newParams[0] = componentName;
-        newParamTypes[0] = Types.STRING;
-        newParams[1] = opName;
-        newParamTypes[1] = Types.STRING;
-        System.arraycopy(params, 0, newParams, 2, params.length);
-        System.arraycopy(paramTypes, 0, newParamTypes, 2, params.length);
+        newParams.add(0, componentName);
+        newParamTypes.add(0, Types.STRING);
+        newParams.add(1, opName);
+        newParamTypes.add(1, Types.STRING);
         String msg = Language.getDefaultCatalog().format(
-                    language, idAction.getID(), (Object[]) newParams);
-        return new VException(idAction, msg, newParams, newParamTypes);
+                    language, idAction.getID(), newParams.toArray());
+        return new VException(idAction, msg, newParams.toArray(new Serializable[newParams.size()]),
+                newParamTypes.toArray(new VdlType[newParamTypes.size()]));
     }
 
     private static String componentNameFromContext(VContext ctx) {
@@ -281,7 +299,7 @@ public class VException extends Exception {
         return language;
     }
 
-    private static Type[] createParamTypes(Serializable[] params) {
+    private static Type[] createParamTypes(Object[] params) {
         Type[] ret = new Type[params.length];
         for (int i = 0; i < params.length; ++i) {
             ret[i] = params[i] == null ? String.class : params[i].getClass();
@@ -312,32 +330,32 @@ public class VException extends Exception {
     private final VdlType[] paramTypes;  // non-null, same length as params
 
     /**
-     * Creates a new {@code Errors.UNKNOWN} error in English and empty
+     * Creates a new {@link UnknownException} error in English and empty
      * component/operation names.
      *
      * @param  msg error message
      */
     public VException(String msg) {
-        this(Errors.UNKNOWN, (VContext) null, msg);
+        this(UnknownException.ID_ACTION, (VContext) null, msg);
     }
 
     /**
-     * Same as {@link #VException(IDAction,String,String,String,Serializable...)} but
+     * Same as {@link #VException(IDAction,String,String,String,Object...)} but
      * obtains the language, component name, and operation name from the given context.  If the
      * provided context is {@code null}, default values are used.
      */
-    public VException(IDAction idAction, VContext ctx, Serializable... params) {
+    public VException(IDAction idAction, VContext ctx, Object... params) {
         this(idAction, ctx, params, createParamTypes(params));
     }
 
     /**
-     * Same as {@link #VException(IDAction,VContext,Serializable...)} but explicitly provides the
+     * Same as {@link #VException(IDAction,VContext,Object...)} but explicitly provides the
      * types for all parameters.  This is necessary as parameters may need to be VOM-encoded (to be
      * shipped across the wire), and Java doesn't always have the ability to deduce the right type
      * from the value (e.g., generic parameters like {@code List<String>} or
      * {@code Map<String, Integer>}).
      */
-    public VException(IDAction idAction, VContext ctx, Serializable[] params, Type[] paramTypes) {
+    public VException(IDAction idAction, VContext ctx, Object[] params, Type[] paramTypes) {
         // TODO(spetrovic): implement the opName support.
         this(idAction, languageFromContext(ctx), componentNameFromContext(ctx),
                 "", params, paramTypes);
@@ -356,19 +374,19 @@ public class VException extends Exception {
      * @param  params        error message parameters
      */
     public VException(IDAction idAction, String language, String componentName, String opName,
-            Serializable... params) {
+            Object... params) {
         this(idAction, language, componentName, opName, params, createParamTypes(params));
     }
 
     /**
-     * Same as {@link #VException(IDAction,String,String,String,Serializable...)} but
+     * Same as {@link #VException(IDAction,String,String,String,Object...)} but
      * explicitly provides the types for all parameters.  This is necessary as parameters may need
      * to be VOM-encoded (to be shipped across the wire), and Java doesn't always have the ability
      * to deduce the right type from the value (e.g., generic parameters like {@code List<String>}
      * or {@code Map<String, Integer>}).
      */
     public VException(IDAction idAction, String language, String componentName, String opName,
-            Serializable[] params, Type[] paramTypes) {
+            Object[] params, Type[] paramTypes) {
         this(create(idAction, language, componentName,
                 opName, params, convertParamTypes(paramTypes)));
     }

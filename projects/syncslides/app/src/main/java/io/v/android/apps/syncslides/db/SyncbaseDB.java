@@ -72,7 +72,7 @@ import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
-import io.v.v23.verror.Errors;
+import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -267,12 +267,8 @@ public class SyncbaseDB implements DB {
                                 false
                         ),
                         new SyncgroupMemberInfo((byte) 10, false));
-            } catch (VException e) {
-                if (e.is(Errors.EXIST)) {
-                    Log.i(TAG, "Syncgroup already exists");
-                } else {
-                    throw e;
-                }
+            } catch (ExistException e) {
+                Log.i(TAG, "Syncgroup already exists");
             }
             Log.i(TAG, "Finished creating syncgroup");
 

@@ -6,7 +6,7 @@ package io.v.v23.syncbase.nosql;
 
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
-import io.v.v23.services.syncbase.nosql.Errors;
+import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
 import io.v.v23.verror.VException;
 
 /**
@@ -54,13 +54,13 @@ public class NoSql {
             try {
                 batch.commit(ctx);
                 return;
+            } catch (ConcurrentBatchException e) {
+                // retry
             } catch (VException e) {
-                if (!e.getID().equals(Errors.CONCURRENT_BATCH)) {
-                    throw e;
-                }
+                throw e;
             }
         }
-        throw Errors.newConcurrentBatch(ctx);
+        throw new ConcurrentBatchException(ctx);
     }
 
     private NoSql() {}
