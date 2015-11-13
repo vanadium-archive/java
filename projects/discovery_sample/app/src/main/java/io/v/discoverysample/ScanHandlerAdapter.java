@@ -67,13 +67,13 @@ public class ScanHandlerAdapter extends BaseAdapter implements VDiscovery.ScanCa
             view = inflater.inflate(R.layout.item, null);
         }
         Service service = knownAdvertisements.get(i);
-        TextView displayName = (TextView)view.findViewById(R.id.display_name);
+        TextView displayName = (TextView) view.findViewById(R.id.display_name);
         displayName.setText(service.getInstanceName());
-        TextView interfaceName = (TextView)view.findViewById(R.id.interface_name);
+        TextView interfaceName = (TextView) view.findViewById(R.id.interface_name);
         interfaceName.setText(service.getInterfaceName());
-        TextView addrs = (TextView)view.findViewById(R.id.addrs);
+        TextView addrs = (TextView) view.findViewById(R.id.addrs);
         addrs.setText(Joiner.on(",").join(service.getAddrs()));
-        ListView attrs = (ListView)view.findViewById(R.id.attributes);
+        ListView attrs = (ListView) view.findViewById(R.id.attributes);
         attrs.setAdapter(new AttrAdapter(inflater, service.getAttrs()));
         return view;
     }

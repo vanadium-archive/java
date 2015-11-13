@@ -8,20 +8,19 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.android.v23.services.blessing.BlessingService;
-import io.v.impl.google.lib.discovery.UUIDUtil;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attributes;
@@ -31,47 +30,37 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-import io.v.x.ref.lib.discovery.Advertisement;
-import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
-
 
 public class MainActivity extends Activity {
-
+    private static final Service SERVICE_TO_ADVERTISE = ServiceAdvert.make();
+    private static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
     private static final int BLESSINGS_REQUEST = 1;
     private Button chooseBlessingsButton;
     private Button scanButton;
     private Button advertiseButton;
     private Blessings blessings;
     private VDiscovery discovery;
-
     private VContext rootCtx;
     private CancelableVContext scanCtx;
     private CancelableVContext advCtx;
-
-    private boolean isScanning;
-    private boolean isAdvertising;
-
     private ScanHandlerAdapter adapter;
-
-    private Advertisement advertisement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         rootCtx = V.init(this);
-        isScanning = false;
-        isAdvertising = false;
+        discovery = V.getDiscovery(rootCtx);
 
         setContentView(R.layout.activity_main);
-        chooseBlessingsButton = (Button)findViewById(R.id.blessingsButton);
+        chooseBlessingsButton = (Button) findViewById(R.id.blessingsButton);
         chooseBlessingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fetchBlessings(false);
+                fetchBlessings();
             }
         });
 
-        scanButton = (Button)findViewById(R.id.scanForService);
+        scanButton = (Button) findViewById(R.id.scanForService);
         scanButton.setEnabled(false);
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,19 +78,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        byte[] instanceId = {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15};
-        Attributes attrs = new Attributes();
-        attrs.put("foo", "bar");
-        List<String> addrs = new ArrayList<>();
-        addrs.add("localhost:2000");
-        String interfaceName = "v.io/x/ref.Interface";
-        advertisement = new Advertisement(
-                new Service(instanceId, "Android instance",
-                        interfaceName, attrs, addrs),
-                UUIDUtil.UUIDToUuid(UUIDUtil.UUIDForInterfaceName(interfaceName)),
-                new EncryptionAlgorithm(0),
-                null,
-                false);
         adapter = new ScanHandlerAdapter(this);
         ListView devices = (ListView) findViewById(R.id.list_view);
         devices.setAdapter(adapter);
@@ -115,20 +91,14 @@ public class MainActivity extends Activity {
     }
 
     private void flipAdvertise() {
-        if (discovery == null) {
-            discovery = V.getDiscovery(rootCtx);
-        }
-
-        if (!isAdvertising) {
-            isAdvertising = true;
-
+        if (advCtx == null) {
             advCtx = rootCtx.withCancel();
             final Button advButton = advertiseButton;
-            discovery.advertise(advCtx, advertisement.getService(), new ArrayList<BlessingPattern>(),
+            discovery.advertise(
+                    advCtx, SERVICE_TO_ADVERTISE, NO_PATTERNS,
                     new VDiscovery.AdvertiseDoneCallback() {
                         @Override
                         public void done() {
-                            isAdvertising = false;
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -140,26 +110,23 @@ public class MainActivity extends Activity {
             advertiseButton.setText("Stop Advertisement");
         } else {
             advCtx.cancel();
+            advCtx = null;
         }
     }
-    private void flipScan() {
-        if (discovery == null) {
-            discovery = V.getDiscovery(rootCtx);
-        }
 
-        if (!isScanning) {
+    private void flipScan() {
+        if (scanCtx == null) {
             scanCtx = rootCtx.withCancel();
-            discovery.scan(scanCtx, "v.InterfaceName=\"v.io/x/ref.Interface\"", adapter);
-            isScanning = true;
+            discovery.scan(scanCtx, ServiceAdvert.QUERY, adapter);
             scanButton.setText("Stop scanning");
         } else {
-            isScanning = false;
             scanCtx.cancel();
             scanButton.setText("Start Scan");
+            scanCtx = null;
         }
     }
 
-    private void fetchBlessings(boolean startScan) {
+    private void fetchBlessings() {
         Intent intent = BlessingService.newBlessingIntent(this);
         startActivityForResult(intent, BLESSINGS_REQUEST);
     }
@@ -172,13 +139,11 @@ public class MainActivity extends Activity {
                     // The Account Manager will pass us the blessings to use as
                     // an array of bytes. Use VomUtil to decode them...
                     byte[] blessingsVom =
-                        BlessingService.extractBlessingReply(resultCode, data);
+                            BlessingService.extractBlessingReply(resultCode, data);
                     blessings = (Blessings) VomUtil.decode(blessingsVom, Blessings.class);
                     BlessingsManager.addBlessings(this, blessings);
                     Toast.makeText(this, "Success, ready to listen!",
                             Toast.LENGTH_SHORT).show();
-
-                    // Enable the "start service" button.
                     scanButton.setEnabled(true);
                     advertiseButton.setEnabled(true);
                 } catch (BlessingCreationException e) {
@@ -191,18 +156,37 @@ public class MainActivity extends Activity {
                 return;
         }
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    private static class ServiceAdvert {
+        // Required type/interface name, probably a URL into a web-based
+        // ontology.  Necessary for querying.
+        private static final String INTERFACE_NAME = "v.io/x/ref.Thermostat";
+
+        // Required service address(es).
+        private static final String[] ADDRESSES = {"localhost:2001", "localhost:2002"};
+
+        // Optional universally unique identifier of the service.
+        // If omitted, the discovery service will invent a value.
+        private static final byte[] INSTANCE_UUID = {0, 1, 2};
+
+        // Optional service name intended for humans.
+        private static final String INSTANCE_NAME = "livingRoomThermostat";
+
+        // Optional arbitrary key value pairs to supplement the service description.
+        private static Attributes makeAttributes() {
+            Attributes attrs = new Attributes();
+            attrs.put("maxTemp", "451");
+            return attrs;
         }
 
-        return super.onOptionsItemSelected(item);
+        // To limit scans to see only this service.
+        static final String QUERY = "v.InterfaceName=\"" + INTERFACE_NAME + "\"";
+
+        // Make a service description (not an actual service).
+        static Service make() {
+            return new Service(
+                    INSTANCE_UUID, INSTANCE_NAME, INTERFACE_NAME,
+                    makeAttributes(), Arrays.asList(ADDRESSES));
+        }
     }
 }
