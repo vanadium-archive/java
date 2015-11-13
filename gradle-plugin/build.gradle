@@ -9,58 +9,54 @@ repositories {
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-def isLinux() {
-    return System.properties['os.name'].toLowerCase().contains("linux")
-}
-
-def isMacOsX() {
-    return System.properties['os.name'].toLowerCase().contains("os x")
-}
-
-def String getOsName() {
-    if (isLinux()) {
-        return "linux";
-    } else if (isMacOsX()) {
-        return "macosx";
-    } else {
-        throw new IllegalStateException("Unsupported operating system " + System.properties.'os.name')
-    }
-}
-
 dependencies {
     compile gradleApi()
     compile localGroovy()
     testCompile 'com.google.truth:truth:0.27'
 }
 
-task buildVdl(type: Exec) {
-    description 'Build the VDL tool'
-    group 'Build'
-    commandLine 'jiri', 'go', 'build', '-o', 'build/vdltool/vdl-' + getOsName(), 'v.io/x/ref/cmd/vdl'
+class VdlPlatform {
+    final String name
+    final String goOs
+    final String goArch
+
+    VdlPlatform(String name, String goOs, String goArch) {
+        this.name = name
+        this.goOs = goOs
+        this.goArch = goArch
+    }
 }
 
-task natives(type: Jar, dependsOn: buildVdl) {
-    from 'build/vdltool/vdl-' + getOsName()
-}
+def platforms = [new VdlPlatform("linux", "linux", "amd64"),
+                 new VdlPlatform("macosx", "darwin", "amd64")]
 
-tasks.'processResources'.dependsOn(buildVdl)
+def pomDependencies = new Node(null, 'dependencies')
 
-def pomDependencyText = '''
-<dependencies>
-    <dependency>
-        <groupId>io.v</groupId>
-        <artifactId>gradle-plugin-vdltool-linux</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-        <groupId>io.v</groupId>
-        <artifactId>gradle-plugin-vdltool-macosx</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </dependency>
-</dependencies>
-'''
+platforms.each({ platform ->
+    task "buildVdl${platform.name}"(type: Exec) {
+        description 'Build the VDL tool'
+        group 'Build'
+        environment GOOS: platform.goOs
+        environment GOARCH: platform.goArch
+        commandLine 'jiri', 'go', 'build', '-o', "build/vdltool/vdl-${platform.name}",
+                'v.io/x/ref/cmd/vdl'
+    }
 
-def pomDependencies = new XmlParser().parseText(pomDependencyText)
+    task "natives-${platform.name}"(type: Jar, dependsOn: "buildVdl${platform.name}") {
+        from 'build/vdltool/vdl-' + platform.name
+    }
+
+    tasks.'processResources'.dependsOn("buildVdl${platform.name}")
+
+    def dependencyNode = new XmlParser().parseText("""
+<dependency>
+    <groupId>io.v</groupId>
+    <artifactId>gradle-plugin-vdltool-${platform.name}</artifactId>
+    <version>0.1-SNAPSHOT</version>
+</dependency>
+""")
+    pomDependencies.append(dependencyNode)
+})
 
 publishing {
     publications {
@@ -76,13 +72,15 @@ publishing {
             }
         }
 
-        mavenNatives(MavenPublication) {
-            groupId 'io.v'
-            artifactId 'gradle-plugin-vdltool-' + getOsName()
-            version '0.1-SNAPSHOT'
+        platforms.each({ platform ->
+            "mavenNatives${platform.name}"(MavenPublication) {
+                groupId 'io.v'
+                artifactId "gradle-plugin-vdltool-${platform.name}"
+                version '0.1-SNAPSHOT'
 
-            artifact natives
-        }
+                artifact project.tasks."natives-${platform.name}"
+            }
+        })
     }
     repositories {
         maven {
