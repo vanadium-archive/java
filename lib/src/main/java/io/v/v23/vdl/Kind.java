@@ -13,6 +13,7 @@ public enum Kind {
     UINT16,
     UINT32,
     UINT64,
+    INT8,
     INT16,
     INT32,
     INT64,

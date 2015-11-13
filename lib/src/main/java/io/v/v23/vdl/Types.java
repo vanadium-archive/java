@@ -68,6 +68,11 @@ public final class Types {
     public static final VdlType UINT64 = createPrimitiveType(Kind.UINT64);
 
     /**
+     * The {@code VdlType} object representing the VDL type int8, it is unnamed.
+     */
+    public static final VdlType INT8 = createPrimitiveType(Kind.INT8);
+
+    /**
      * The {@code VdlType} object representing the VDL type int16, it is unnamed.
      */
     public static final VdlType INT16 = createPrimitiveType(Kind.INT16);
@@ -124,6 +129,7 @@ public final class Types {
         typeCache.put(VdlUint16.class, UINT16);
         typeCache.put(VdlUint32.class, UINT32);
         typeCache.put(VdlUint64.class, UINT64);
+        typeCache.put(VdlInt8.class, INT8);
         typeCache.put(VdlInt16.class, INT16);
         typeCache.put(VdlInt32.class, INT32);
         typeCache.put(VdlInt64.class, INT64);
