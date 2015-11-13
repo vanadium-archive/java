@@ -5,8 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="19"
-        android:targetSdkVersion="20" />
+        android:minSdkVersion="21"
+        android:targetSdkVersion="21" />
 
     <!-- Needed for Security -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
