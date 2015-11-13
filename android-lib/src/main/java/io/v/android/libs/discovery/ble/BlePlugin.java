@@ -155,7 +155,9 @@ public class BlePlugin {
                     res = Arrays.copyOfRange(total, offset, finalByte);
                     bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, res);
                 } else {
-                    bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0,  res);
+                    // This should probably be an error, but a bug in the paypal/gatt code causes an
+                    // infinite loop if this returns an error rather than the empty value.
+                    bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0,  res);
                 }
             }
         });

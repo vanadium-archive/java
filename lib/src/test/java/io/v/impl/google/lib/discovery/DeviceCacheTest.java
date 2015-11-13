@@ -5,7 +5,10 @@
 package io.v.impl.google.lib.discovery;
 
 import junit.framework.TestCase;
+
+import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +30,10 @@ public class DeviceCacheTest extends TestCase {
         public void handleUpdate(Advertisement adv) {}
     }
 
+    public void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
     public void testSaveDeveice() {
         DeviceCache cache = new DeviceCache(new Duration(1000 * 60 * 60));
         // The advertisements here are not relevant since we are just checking
@@ -36,6 +43,7 @@ public class DeviceCacheTest extends TestCase {
         assertFalse(cache.haveSeenHash(hash, "newDevice"));
         cache.saveDevice(hash, advs, "newDevice");
         assertTrue(cache.haveSeenHash(hash, "newDevice"));
+        cache.shutdownCache();
     }
 
     public void testSaveDeviceWithDifferentHashCode() {
@@ -50,6 +58,7 @@ public class DeviceCacheTest extends TestCase {
         cache.saveDevice(hash + 1, advs, "newDevice");
         assertTrue(cache.haveSeenHash(hash + 1, "newDevice"));
         assertFalse(cache.haveSeenHash(hash, "newDevice"));
+        cache.shutdownCache();
     }
 
     public void testAddingScannerBeforeSavingDevice() {
@@ -85,6 +94,7 @@ public class DeviceCacheTest extends TestCase {
 
         // Make sure that the handler is called;
         assertEquals(1, handler.mNumCalls);
+        cache.shutdownCache();
     }
 
     public void testAddingScannerAfterSavingDevice() {
@@ -120,6 +130,7 @@ public class DeviceCacheTest extends TestCase {
 
         // Make sure that the handler is called;
         assertEquals(1, handler.mNumCalls);
+        cache.shutdownCache();
     }
 
     public void testRemovingAnAdvertisementCallsHandler() {
@@ -168,6 +179,7 @@ public class DeviceCacheTest extends TestCase {
 
         // Make sure that the handler is called;
         assertEquals(2, handler.mNumCalls);
+        cache.shutdownCache();
     }
 
     public void testAddingtheSameAdvertisementDoesNotCallsHandler() {
@@ -205,5 +217,78 @@ public class DeviceCacheTest extends TestCase {
 
         // Make sure that the handler is called;
         assertEquals(1, handler.mNumCalls);
+        cache.shutdownCache();
+    }
+
+    public void testCacheEvictionCallsHandler() {
+        DeviceCache cache = new DeviceCache(new Duration(1000 * 60 * 60));
+        Set<Advertisement> advs = new HashSet<>();
+        long hash = 10001;
+        assertFalse(cache.haveSeenHash(hash, "newDevice"));
+
+        Service service1 = new Service();
+        service1.setInterfaceName("randomInterface");
+        Uuid uuid1 = UUIDUtil.UUIDToUuid(UUID.randomUUID());
+        final Advertisement adv1 = new Advertisement(service1, uuid1, new EncryptionAlgorithm(0), null, false);
+        advs.add(adv1);
+
+        CountingHandler handler = new CountingHandler() {
+            @Override
+            public void handleUpdate(Advertisement advertisement) {
+                // The first call should be an add and the second call should be
+                // a remove.
+                if (mNumCalls == 0) {
+                    assertEquals(adv1, advertisement);
+                } else {
+                    Advertisement removed = new Advertisement(
+                            adv1.getService(), adv1.getServiceUuid(),
+                            adv1.getEncryptionAlgorithm(), adv1.getEncryptionKeys(), true);
+                    assertEquals(removed, advertisement);
+                }
+                mNumCalls++;
+            }
+        };
+
+        long cacheTime = DateTimeUtils.currentTimeMillis();
+        cache.saveDevice(hash, advs, "newDevice");
+        cache.addScanner(new VScanner(UUIDUtil.UuidToUUID(uuid1), handler));
+
+        DateTimeUtils.setCurrentMillisFixed(cacheTime + 1000 * 60 * 61);
+        cache.removeStaleEntries();
+        // Make sure that the handler is called;
+        assertEquals(2, handler.mNumCalls);
+        cache.shutdownCache();
+    }
+
+    public void testCacheEvictionClearsAllState() {
+        DeviceCache cache = new DeviceCache(new Duration(1000 * 60 * 60));
+        Set<Advertisement> advs = new HashSet<>();
+        long hash = 10001;
+        assertFalse(cache.haveSeenHash(hash, "newDevice"));
+
+        Service service1 = new Service();
+        service1.setInterfaceName("randomInterface");
+        Uuid uuid1 = UUIDUtil.UUIDToUuid(UUID.randomUUID());
+        final Advertisement adv1 = new Advertisement(service1, uuid1, new EncryptionAlgorithm(0), null, false);
+        advs.add(adv1);
+
+        CountingHandler handler = new CountingHandler() {
+            @Override
+            public void handleUpdate(Advertisement advertisement) {
+               mNumCalls++;
+            }
+        };
+
+        long cacheTime = DateTimeUtils.currentTimeMillis();
+        cache.saveDevice(hash, advs, "newDevice");
+
+        DateTimeUtils.setCurrentMillisFixed(cacheTime + 1000 * 60 * 61);
+        cache.removeStaleEntries();
+
+        cache.addScanner(new VScanner(UUIDUtil.UuidToUUID(uuid1), handler));
+
+        // Make sure that the handler is never called.
+        assertEquals(0, handler.mNumCalls);
+        cache.shutdownCache();
     }
 }

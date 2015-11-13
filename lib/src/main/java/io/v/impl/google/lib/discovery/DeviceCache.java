@@ -10,13 +10,18 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.v.x.ref.lib.discovery.Advertisement;
@@ -35,12 +40,51 @@ public class DeviceCache {
     final private SetMultimap<UUID, Advertisement> knownServices = HashMultimap.create();
     final private Map<Integer, VScanner> scannersById = new HashMap<>();
     final private SetMultimap<UUID, VScanner> scannersByUUID = HashMultimap.create();
+    ScheduledExecutorService timer;
+
 
     final private Duration maxAge;
 
 
-    public DeviceCache(Duration maxAge) {
+    public DeviceCache(final Duration maxAge) {
         this.maxAge = maxAge;
+        this.timer = Executors.newSingleThreadScheduledExecutor();
+        long periodicity = maxAge.getMillis() / 2;
+        timer.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                removeStaleEntries();
+            }
+        }, periodicity, periodicity, TimeUnit.MILLISECONDS);
+    }
+
+    void removeStaleEntries() {
+        synchronized (this) {
+            Iterator<Map.Entry<Long, CacheEntry>> it = cachedDevices.entrySet().iterator();
+
+            while (it.hasNext()) {
+                Map.Entry<Long, CacheEntry> mapEntry = it.next();
+                CacheEntry entry = mapEntry.getValue();
+                if (entry.lastSeen.plus(maxAge).isBeforeNow()) {
+                    it.remove();
+                    knownIds.remove(entry.deviceId);
+                    for (Advertisement adv : entry.advertisements) {
+                        UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
+                        knownServices.remove(uuid, adv);
+                        adv.setLost(true);
+                        handleUpdate(adv);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Cleans up the cache's state and shutdowns the eviction thread.
+     */
+    public void shutdownCache() {
+        timer.shutdown();
     }
 
     /**
@@ -54,7 +98,7 @@ public class DeviceCache {
         synchronized (this) {
             CacheEntry entry = cachedDevices.get(hash);
             if (entry != null) {
-                entry.lastSeen = new Date();
+                entry.lastSeen = new Instant();
                 if (!entry.deviceId.equals(deviceId)) {
                     // This probably happened becuase a device has changed it's ble mac address.
                     // We need to update the mac address for this entry.
@@ -159,14 +203,14 @@ public class DeviceCache {
 
         long hash;
 
-        Date lastSeen;
+        Instant lastSeen;
 
         String deviceId;
 
         CacheEntry(Set<Advertisement> advs, long hash, String deviceId) {
             advertisements = advs;
             this.hash = hash;
-            lastSeen = new Date();
+            lastSeen = new Instant();
             this.deviceId = deviceId;
         }
     }
