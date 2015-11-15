@@ -65,6 +65,8 @@ public class RoutingId {
     }
 
     private static byte[] hexStringToByteArray(String s) {
+        // TODO(suharshs): We should really be using some Hex library for this
+        // function and toString.
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
@@ -80,14 +82,13 @@ public class RoutingId {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder(2 * value.length);
-        for (int i = 0; i < value.length; i++) {
-            int low = value[i] & 0xF;
-            int high = (value[i] >> 8) & 0xF;
-            builder.append(Character.forDigit(low, 16));
-            builder.append(Character.forDigit(high, 16));
+        char[] hexChars = new char[value.length * 2];
+        for ( int j = 0; j < value.length; j++ ) {
+            int v = value[j] & 0xFF;
+            hexChars[j * 2] = Character.forDigit(v >>> 4, 16);
+            hexChars[j * 2 + 1] = Character.forDigit(v & 0x0F, 16);
         }
-        return builder.toString();
+        return new String(hexChars);
     }
 
     @Override
