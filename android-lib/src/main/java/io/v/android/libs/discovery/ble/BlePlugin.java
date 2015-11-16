@@ -23,7 +23,10 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
+import android.support.v4.content.ContextCompat;
+import android.Manifest;
 
 import org.joda.time.Duration;
 
@@ -89,6 +92,9 @@ public class BlePlugin {
 
     private final Context androidContext;
 
+    // If isEnabled is false, then all operations on the ble plugin are no-oped.  This wil only
+    // be false if the ble hardware is inaccessible.
+    private boolean isEnabled = false;
 
     // A thread to wait for the cancellation of a particular advertisement.  VContext.done().await()
     // is blocking so have to spin up a thread per outstanding advertisement.
@@ -126,10 +132,20 @@ public class BlePlugin {
     }
 
     public BlePlugin(Context androidContext) {
+        this.androidContext = androidContext;
         cachedDevices = new DeviceCache(Duration.standardMinutes(1));
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(androidContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        isEnabled = true;
         bluetoothLeAdvertise = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
         bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
-        this.androidContext = androidContext;
         BluetoothManager manager = (BluetoothManager) androidContext.getSystemService(
                 Context.BLUETOOTH_SERVICE);
         bluetoothGattServer = manager.openGattServer(androidContext,
@@ -179,6 +195,9 @@ public class BlePlugin {
     }
 
     public void addAdvertisement(VContext ctx, Advertisement advertisement) throws IOException {
+        if (!isEnabled) {
+            return;
+        }
         BluetoothGattService service = convertToService(advertisement);
         synchronized (advertisementLock) {
             int currentId = nextAdv++;
@@ -204,6 +223,9 @@ public class BlePlugin {
     }
 
     public void addScanner(VContext ctx, UUID serviceUUID,  ScanHandler handler) {
+        if (!isEnabled) {
+            return;
+        }
         VScanner scanner = new VScanner(serviceUUID, handler);
         int currentId = cachedDevices.addScanner(scanner);
         synchronized (scannerLock) {
