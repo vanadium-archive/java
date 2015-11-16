@@ -124,8 +124,8 @@ task checkVanadiumSyncbaseEnvironment(type: Exec, dependsOn: checkVanadiumEnviro
         if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
             throw new InvalidUserDataException(
                 syncbaseOutputDir.toString() + " does not exist or is not a directory. "
-                + "You probably didn't install the android base profile. Try    running\n\n"
-                + "jiri v23-profile install --target=android=arm-android base"
+                + "You probably didn't install the android base profile. Try running\n\n"
+                + "jiri v23-profile install --target=arm-android base"
                 + "\n\nand then try building again"
             )
         }
