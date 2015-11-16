@@ -34,13 +34,14 @@ import java.security.interfaces.ECPublicKey;
  * and then delegates to the Java {@link io.v.v23.V} methods.
  */
 public class V extends io.v.v23.V {
-    private static native VContext nativeInit(VContext ctx, Context androidContext, Options opts) throws VException;
+    private static native void nativeInitAndroid(Context androidContext, Options opts)
+            throws VException;
 
-    private static void initLogging(Context androidContext, Options opts) {
+    private static void initAndroid(Context androidContext, Options opts) {
         try {
-            context = nativeInit(context, androidContext, opts);
+            nativeInitAndroid(androidContext, opts);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't initialize logging", e);
+            throw new RuntimeException("Couldn't initialize Android", e);
         }
     }
 
@@ -69,9 +70,9 @@ public class V extends io.v.v23.V {
             }
 
             if (opts == null) opts = new Options();
-            initGlobal();
-            initV(opts);
-            initLogging(androidCtx, opts);
+            initGlobalShared();
+            initShared(opts);
+            initAndroid(androidCtx, opts);
             // Set the VException component name to the Android context package name.
             context = VException.contextWithComponentName(context, androidCtx.getPackageName());
             try {

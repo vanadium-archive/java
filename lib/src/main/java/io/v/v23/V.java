@@ -46,8 +46,8 @@ import io.v.v23.verror.VException;
  * </pre></blockquote><p>
  */
 public class V {
-    private static native void nativeInitLib() throws VException;
-    private static native VContext nativeInitLogging(VContext ctx, Options opts) throws VException;
+    private static native void nativeInitGlobal() throws VException;
+    private static native void nativeInitJava(Options opts) throws VException;
     private static native void nativeShutdown(VContext context);
 
     protected static volatile VContext context = null;
@@ -63,9 +63,9 @@ public class V {
         return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
-    // Initializes the global (i.e., static) state.  Any code that should survive the sequences
+    // Initializes the global (i.e., static) state.  Any code that should survive the sequence
     // of V.init()/V.shutdown()/V.init()/... should go here.
-    protected static void initGlobal() {
+    protected static void initGlobalShared() {
         if (initGlobalDone) {
             return;
         }
@@ -105,7 +105,7 @@ public class V {
             }
         }
         try {
-            nativeInitLib();
+            nativeInitGlobal();
         } catch (VException e) {
             throw new RuntimeException("Could not initialize v23 native library", e);
         }
@@ -126,7 +126,7 @@ public class V {
         initGlobalDone = true;
     }
 
-    protected static void initV(Options opts) {
+    protected static void initShared(Options opts) {
         // See if a runtime was provided as an option.
         if (opts.get(OptionDefs.RUNTIME) != null) {
             runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
@@ -141,11 +141,11 @@ public class V {
         context = runtime.getContext();
     }
 
-    private static void initLogging(Options opts) {
+    private static void initJava(Options opts) {
         try {
-            context = nativeInitLogging(context, opts);
+            nativeInitJava(opts);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't initialize logging", e);
+            throw new RuntimeException("Couldn't initialize Java", e);
         }
     }
 
@@ -179,9 +179,9 @@ public class V {
         synchronized (V.class) {
             if (initDone) return context;
             if (opts == null) opts = new Options();
-            initGlobal();
-            initV(opts);
-            initLogging(opts);
+            initGlobalShared();
+            initShared(opts);
+            initJava(opts);
             // Set the VException component name to this binary name.
             context = VException.contextWithComponentName(
                     context, System.getProperty("program.name", ""));
