@@ -57,13 +57,13 @@ public interface Database extends DatabaseCore, AccessController {
      *   <li> Reads (e.g. {@code get}s, {@code scan}s) inside a batch operate over a consistent
      *   snapshot taken during {@link #beginBatch beginBatch()}, and will see the effects of prior
      *   writes performed inside the batch.</li>
-     *   <li> {@link BatchDatabase#commit commit()} may fail with
-     *   {@link io.v.v23.services.syncbase.nosql.Errors#CONCURRENT_BATCH CONCURRENT_BATCH},
+     *   <li> {@link BatchDatabase#commit commit()} may throw
+     *   {@link io.v.v23.services.syncbase.nosql.ConcurrentBatchException},
      *   indicating that after {@link #beginBatch beginBatch()} but before
      *   {@link BatchDatabase#commit commit()}, some concurrent routine wrote to a key that matches
      *   a key or row-range read inside this batch.</li>
-     *   <li> Other methods will never fail with error
-     *   {@link io.v.v23.services.syncbase.nosql.Errors#CONCURRENT_BATCH CONCURRENT_BATCH},
+     *   <li> Other methods will never throw
+     *   {@link io.v.v23.services.syncbase.nosql.ConcurrentBatchException},
      *   even if it is known that {@link BatchDatabase#commit commit()} will fail with this
      *   error.</li>
      * </ul>
