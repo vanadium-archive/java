@@ -1,14 +1,11 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'https://maven.v.io'
-        }
     }
     dependencies {
         // We are going to define a custom VDL service. The Vanadium
         // Gradle plugin makes that easier, so let's use that.
-        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+        classpath 'io.v:gradle-plugin:0.1'
         // Use the Android SDK manager, which will automatically download
         // the required Android SDK.
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
