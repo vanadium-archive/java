@@ -101,7 +101,7 @@ public class ScanHandlerAdapter extends BaseAdapter implements VDiscovery.ScanCa
         } else {
             Update.Lost lost = (Update.Lost) update;
             for (int i = 0; i < knownAdvertisements.size(); i++) {
-                if (Arrays.equals(knownAdvertisements.get(i).getInstanceUuid(), lost.getElem().getInstanceUuid())) {
+                if (lost.getElem().getInstanceId().equals(knownAdvertisements.get(i).getInstanceId())) {
                     knownAdvertisements.remove(i);
                     break;
                 }

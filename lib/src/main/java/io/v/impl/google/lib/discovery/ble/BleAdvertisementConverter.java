@@ -25,7 +25,7 @@ import io.v.x.ref.lib.discovery.plugins.ble.Constants;
  * Converts from {@link Advertisement} to the gatt services and vice-versa.
  */
 public class BleAdvertisementConverter {
-    private static Charset utf8 = Charset.forName("UTF-8");
+    private static Charset enc = Charset.forName("UTF-8");
 
     /**
      * Converts from {@link Advertisement} to the ble representation.
@@ -37,15 +37,16 @@ public class BleAdvertisementConverter {
             throws IOException {
         Map<UUID, byte[]> attr = new HashMap<>();
         Service service = adv.getService();
+        attr.put(UUID.fromString(Constants.INSTANCE_ID_UUID),
+                service.getInstanceId().getBytes(enc));
         attr.put(UUID.fromString(Constants.INTERFACE_NAME_UUID),
-                service.getInterfaceName().getBytes(utf8));
-        attr.put(UUID.fromString(Constants.INSTANCE_UUID), service.getInstanceUuid());
+                service.getInterfaceName().getBytes(enc));
         attr.put(UUID.fromString(Constants.ADDRS_UUID),
                 EncodingUtil.packAddresses(service.getAddrs()));
 
         String instanceName = service.getInstanceName();
-        if (instanceName != null && !instanceName.equals("")) {
-            attr.put(UUID.fromString(Constants.INSTANCE_NAME_UUID), instanceName.getBytes(utf8));
+        if (instanceName != null && !instanceName.isEmpty()) {
+            attr.put(UUID.fromString(Constants.INSTANCE_NAME_UUID), instanceName.getBytes(enc));
         }
 
         if (adv.getEncryptionAlgorithm().getValue() != 0) {
@@ -58,7 +59,7 @@ public class BleAdvertisementConverter {
             String key = keyAndValue.getKey();
             UUID attrKey = UUIDUtil.UUIDForAttributeKey(key);
             String attrValue = key + "=" + keyAndValue.getValue();
-            attr.put(attrKey, attrValue.getBytes(utf8));
+            attr.put(attrKey, attrValue.getBytes(enc));
         }
         return attr;
     }
@@ -73,7 +74,7 @@ public class BleAdvertisementConverter {
     public static Advertisement bleAttrToVAdvertisement(Map<UUID, byte[]> attr)
             throws IOException {
         Map<String, String> cleanAttrs = new HashMap<String, String>();
-        byte[] instanceId = null;
+        String instanceId = null;
         String interfaceName = null;
         String instanceName = null;
         List<String> addrs = null;
@@ -84,12 +85,12 @@ public class BleAdvertisementConverter {
             String uuidKey = entry.getKey().toString();
             System.out.println("key is " + uuidKey);
             byte[] value = entry.getValue();
-            if (uuidKey.equals(Constants.INSTANCE_UUID)) {
-                instanceId = value;
+            if (uuidKey.equals(Constants.INSTANCE_ID_UUID)) {
+                instanceId = new String(value, enc);
             } else if (uuidKey.equals(Constants.INSTANCE_NAME_UUID)) {
-                instanceName = new String(value, utf8);
+                instanceName = new String(value, enc);
             } else if (uuidKey.equals(Constants.INTERFACE_NAME_UUID)) {
-                interfaceName = new String(value, utf8);
+                interfaceName = new String(value, enc);
             } else if (uuidKey.equals(Constants.ADDRS_UUID)) {
                 addrs = EncodingUtil.unpackAddresses(value);
             } else if (uuidKey.equals(Constants.ENCRYPTION_UUID)) {
@@ -97,7 +98,7 @@ public class BleAdvertisementConverter {
                 encryptionAlgo = res.getEncryptionAlgorithm();
                 encryptionKeys = res.getKeys();
             } else {
-                String keyAndValue = new String(value, utf8);
+                String keyAndValue = new String(value, enc);
                 String[] parts = keyAndValue.split("=", 2);
                 if (parts.length != 2) {
                     System.err.println("Failed to parse key and value" + keyAndValue);
@@ -107,8 +108,7 @@ public class BleAdvertisementConverter {
             }
         }
         return new Advertisement(
-                new Service(instanceId, instanceName, interfaceName, new Attributes(cleanAttrs),
-                        addrs),
+                new Service(instanceId, instanceName, interfaceName, new Attributes(cleanAttrs), addrs),
                 UUIDUtil.UUIDToUuid(UUIDUtil.UUIDForInterfaceName(interfaceName)),
                 new EncryptionAlgorithm(encryptionAlgo),
                 encryptionKeys,

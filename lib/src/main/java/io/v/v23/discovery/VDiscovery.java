@@ -48,7 +48,8 @@ public interface VDiscovery {
      *
      * @param ctx a context that will be used to stop the advertisement; the advertisement will end
      *            when the context is cancelled or timed out
-     * @param service the service with the attributes to advertises
+     * @param service the service with the attributes to advertises; this may be update with
+     *            a random unique identifier if service.instanceId is not specified.
      * @param visibility a set of blessing patterns for whom this advertisement is meant; any entity
      *                   not matching a pattern here won't know what the advertisement is
      * @param cb a callback that is notified when the advertisement is done (either because
