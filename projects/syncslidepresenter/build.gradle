@@ -4,12 +4,10 @@ apply plugin: 'io.v.vdl'
 
 buildscript {
     repositories {
-        maven {
-            url 'https://maven.v.io'
-        }
+        mavenCentral()
     }
     dependencies {
-        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+        classpath 'io.v:gradle-plugin:0.1'
     }
 }
 

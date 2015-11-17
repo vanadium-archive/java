@@ -1,13 +1,10 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.2'
-        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+        classpath 'io.v:gradle-plugin:0.1'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }

@@ -1,11 +1,9 @@
 buildscript {
     repositories {
-        maven {
-            url "http://maven.v.io/"
-        }
+        mavenCentral()
     }
     dependencies {
-        classpath 'io.v:gradle-plugin:0.1-SNAPSHOT'
+        classpath 'io.v:gradle-plugin:0.1'
     }
 }
 
