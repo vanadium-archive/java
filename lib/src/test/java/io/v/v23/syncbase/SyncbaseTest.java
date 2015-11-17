@@ -115,7 +115,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(service.listApps(ctx)).isEmpty();
         app.create(ctx, allowAll);
         assertThat(app.exists(ctx)).isTrue();
-        assertThat(Arrays.asList(service.listApps(ctx))).containsExactly(app.name());
+        assertThat(service.listApps(ctx)).containsExactly(app.name());
         assertThat(app.listDatabases(ctx)).isEmpty();
         app.destroy(ctx);
         assertThat(app.exists(ctx)).isFalse();
@@ -134,7 +134,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(app.listDatabases(ctx)).isEmpty();
         db.create(ctx, allowAll);
         assertThat(db.exists(ctx)).isTrue();
-        assertThat(Arrays.asList(app.listDatabases(ctx))).containsExactly(db.name());
+        assertThat(app.listDatabases(ctx)).containsExactly(db.name());
         assertThat(db.listTables(ctx)).isEmpty();
         db.destroy(ctx);
         assertThat(db.exists(ctx)).isFalse();
@@ -326,7 +326,7 @@ public class SyncbaseTest extends TestCase {
         Syncgroup group = db.getSyncgroup(groupName);
         {
             group.create(ctx, spec, memberInfo);
-            assertThat(Arrays.asList(db.listSyncgroupNames(ctx))).containsExactly(groupName);
+            assertThat(db.listSyncgroupNames(ctx)).containsExactly(groupName);
             assertThat(group.getSpec(ctx).values()).containsExactly(spec);
             assertThat(group.getMembers(ctx).values()).containsExactly(memberInfo);
             assertThat(group.join(ctx, memberInfo)).isEqualTo(spec);

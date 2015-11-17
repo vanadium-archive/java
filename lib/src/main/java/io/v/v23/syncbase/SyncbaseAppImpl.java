@@ -4,11 +4,14 @@
 
 package io.v.v23.syncbase;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.rpc.Callback;
+import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.AppClient;
 import io.v.v23.services.syncbase.AppClientFactory;
 import io.v.v23.syncbase.nosql.Database;
@@ -43,28 +46,64 @@ class SyncbaseAppImpl implements SyncbaseApp {
         return this.client.exists(ctx);
     }
     @Override
+    public void exists(VContext ctx, Callback<Boolean> callback) throws VException {
+        client.exists(ctx, callback);
+    }
+    @Override
     public Database getNoSqlDatabase(String relativeName, Schema schema) {
         return NoSql.newDatabase(this.fullName, relativeName, schema);
     }
     @Override
-    public String[] listDatabases(VContext ctx) throws VException {
+    public List<String> listDatabases(VContext ctx) throws VException {
         return Util.listChildren(ctx, this.fullName);
+    }
+    @Override
+    public void listDatabases(VContext ctx, Callback<List<String>> callback) throws VException {
+        Util.listChildren(ctx, this.fullName, callback);
     }
     @Override
     public void create(VContext ctx, Permissions perms) throws VException {
         this.client.create(ctx, perms);
     }
     @Override
+    public void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException {
+        client.create(ctx, perms, callback);
+    }
+    @Override
     public void destroy(VContext ctx) throws VException {
         this.client.destroy(ctx);
+    }
+    @Override
+    public void destroy(VContext ctx, Callback<Void> callback) throws VException {
+        this.client.destroy(ctx, callback);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
         this.client.setPermissions(ctx, perms, version);
     }
     @Override
+    public void setPermissions(VContext ctx, Permissions perms, String version,
+                               Callback<Void> callback) throws VException {
+        client.setPermissions(ctx, perms, version, callback);
+    }
+    @Override
     public Map<String, Permissions> getPermissions(VContext ctx) throws VException {
         AppClient.GetPermissionsOut perms = this.client.getPermissions(ctx);
         return ImmutableMap.of(perms.version, perms.perms);
+    }
+    @Override
+    public void getPermissions(VContext ctx, final Callback<Map<String, Permissions>> callback)
+            throws VException {
+        client.getPermissions(ctx, new Callback<ObjectClient.GetPermissionsOut>() {
+            @Override
+            public void onSuccess(ObjectClient.GetPermissionsOut result) {
+                callback.onSuccess(ImmutableMap.of(result.version, result.perms));
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                callback.onFailure(error);
+            }
+        });
     }
 }

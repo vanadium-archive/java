@@ -4,12 +4,15 @@
 
 package io.v.v23.syncbase;
 
+import io.v.v23.rpc.Callback;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Schema;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.VException;
+
+import java.util.List;
 
 /**
  * A handle for an app running as part of a {@link SyncbaseService}.
@@ -37,6 +40,14 @@ public interface SyncbaseApp extends AccessController {
     boolean exists(VContext ctx) throws VException;
 
     /**
+     * Asynchronous version of {@link #exists(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void exists(VContext ctx, Callback<Boolean> callback) throws VException;
+
+    /**
      * Returns a handle for a NoSQL database with the provided name.
      * <p>
      * Note that this database may not yet exist and can be created using the
@@ -55,7 +66,15 @@ public interface SyncbaseApp extends AccessController {
      * @param  ctx        Vanadium context
      * @throws VException if the list of database names couldn't be retrieved
      */
-    String[] listDatabases(VContext ctx) throws VException;
+    List<String> listDatabases(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #listDatabases(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void listDatabases(VContext ctx, Callback<List<String>> callback) throws VException;
 
     /**
      * Creates the app.
@@ -68,10 +87,26 @@ public interface SyncbaseApp extends AccessController {
     void create(VContext ctx, Permissions perms) throws VException;
 
     /**
+     * Asynchronous version of {@link #create(VContext, Permissions)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException;
+
+    /**
      * Destroys the app.
      *
      * @param  ctx        Vanadium context
      * @throws VException if the app couldn't be destroyed
      */
     void destroy(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #destroy(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void destroy(VContext ctx, Callback<Void> callback) throws VException;
 }

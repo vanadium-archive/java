@@ -5,18 +5,24 @@
 package io.v.v23.syncbase.util;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Ordering;
+import com.google.common.util.concurrent.SettableFuture;
+import com.google.common.util.concurrent.Uninterruptibles;
+import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.V;
+import io.v.v23.VIterable;
+import io.v.v23.context.VContext;
+import io.v.v23.namespace.Namespace;
+import io.v.v23.naming.GlobReply;
+import io.v.v23.rpc.Callback;
+import io.v.v23.verror.VException;
 
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import io.v.impl.google.naming.NamingUtil;
-import io.v.v23.V;
-import io.v.v23.context.VContext;
-import io.v.v23.namespace.Namespace;
-import io.v.v23.naming.GlobReply;
-import io.v.v23.verror.VException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Various NoSQL utility methods.
@@ -81,42 +87,87 @@ public class Util {
      * Returns the relative names of all children of parentFullName.
      *
      * @param  ctx            Vanadium context
-     * @param  globName       Object name of parent component
+     * @param  parentFullName Object name of parent component
      * @throws VException     if a glob error occurred
      */
-    public static String[] listChildren(VContext ctx, String globName) throws VException {
-        Namespace n = V.getNamespace(ctx);
-        ArrayList<String> names = new ArrayList<String>();
-        try {
-            for (GlobReply reply : n.glob(ctx, NamingUtil.join(globName, "*"))) {
-                if (reply instanceof GlobReply.Entry) {
-                    String fullName = ((GlobReply.Entry) reply).getElem().getName();
-                    int idx = fullName.lastIndexOf('/');
-                    if (idx == -1) {
-                      throw new VException("Unexpected glob() reply name: " + fullName);
-                    }
-                    String escName = fullName.substring(idx + 1, fullName.length());
-                    // Component names within object names are always escaped.
-                    // See comment in server/nosql/dispatcher.go for
-                    // explanation. If unescape throws an exception, there's a
-                    // bug in the Syncbase server. Glob should return names with
-                    // escaped components.
-                    names.add(unescape(escName));
-                } else if (reply instanceof GlobReply.Error) {
-                    // TODO(sadovsky): Surface these errors somehow. (We don't
-                    // want to throw an exception, since some names may simply
-                    // be hidden to this client.)
-                } else if (reply == null) {
-                    throw new VException("null glob() reply");
-                } else {
-                    throw new VException("Unrecognized glob() reply type: " + reply.getClass());
-                }
+    public static List<String> listChildren(VContext ctx, String parentFullName) throws VException {
+        final SettableFuture<List<String>> future = SettableFuture.create();
+        Callback<List<String>> callback = new Callback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> result) {
+                future.set(result);
             }
-        } catch (RuntimeException e) {  // error during iteration
-            throw (VException) e.getCause();
+
+            @Override
+            public void onFailure(VException error) {
+                future.setException(error);
+            }
+        };
+        listChildren(ctx, parentFullName, callback);
+        try {
+            return Uninterruptibles.getUninterruptibly(future);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof VException) {
+                throw (VException) e.getCause();
+            } else {
+                throw new RuntimeException(e);
+            }
         }
-        Collections.sort(names, Collator.getInstance());
-        return names.toArray(new String[names.size()]);
+    }
+
+    public static void listChildren(VContext ctx, String parentFullName,
+                                    final Callback<List<String>> callback) throws VException {
+        Callback<VIterable<GlobReply>> globCallback = new Callback<VIterable<GlobReply>>() {
+            @Override
+            public void onSuccess(VIterable<GlobReply> result) {
+                List<String> names = new ArrayList<>();
+
+                try {
+                    for (GlobReply reply : result) {
+                        if (reply instanceof GlobReply.Entry) {
+                            String fullName = ((GlobReply.Entry) reply).getElem().getName();
+                            int idx = fullName.lastIndexOf('/');
+                            if (idx == -1) {
+                                callback.onFailure(new VException("Unexpected glob() reply name: "
+                                        + "" + fullName));
+
+                                return;
+                            }
+                            String escName = fullName.substring(idx + 1, fullName.length());
+                            // Component names within object names are always escaped.
+                            // See comment in server/nosql/dispatcher.go for
+                            // explanation. If unescape throws an exception, there's a
+                            // bug in the Syncbase server. Glob should return names with
+                            // escaped components.
+                            names.add(unescape(escName));
+                        } else if (reply instanceof GlobReply.Error) {
+                            // TODO(sadovsky): Surface these errors somehow. (We don't
+                            // want to throw an exception, since some names may simply
+                            // be hidden to this client.)
+                        } else if (reply == null) {
+                            callback.onFailure(new VException("null glob() reply"));
+                        } else {
+                            callback.onFailure(new VException("Unrecognized glob() reply type: "
+                                    + reply.getClass()));
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    // error during iteration
+                    callback.onFailure((VException) e.getCause());
+                }
+
+                callback.onSuccess(
+                        Ordering.from(Collator.getInstance()).immutableSortedCopy(names));
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                callback.onFailure(error);
+            }
+        };
+
+        Namespace n = V.getNamespace(ctx);
+        n.glob(ctx, NamingUtil.join(parentFullName, "*"), globCallback);
     }
 
     /**

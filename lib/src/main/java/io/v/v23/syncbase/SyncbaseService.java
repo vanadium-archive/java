@@ -7,6 +7,8 @@ import io.v.v23.context.VContext;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.verror.VException;
 
+import java.util.List;
+
 /**
  * The interface for a Vanadium Syncbase service.
  */
@@ -33,5 +35,5 @@ public interface SyncbaseService extends AccessController {
      * @param  ctx        Vanadium context
      * @throws VException if the list of app names couldn't be retrieved
      */
-    String[] listApps(VContext ctx) throws VException;
+    List<String> listApps(VContext ctx) throws VException;
 }
