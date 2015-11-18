@@ -1,19 +1,6 @@
-import com.google.common.hash.Hashing
-import com.google.common.io.Files
-import org.apache.http.HttpEntity
-import org.apache.http.HttpResponse
-import org.apache.http.HttpStatus
-import org.apache.http.auth.AuthScope
-import org.apache.http.auth.UsernamePasswordCredentials
-import org.apache.http.client.HttpClient
-import org.apache.http.client.methods.HttpPut
-import org.apache.http.entity.FileEntity
-import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.DefaultHttpClient
-
 // You should change this after releasing a new version of the gradle plugin. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/gradle-plugin.
-def releaseVersion = '0.1'
+def releaseVersion = '0.4'
 
 buildscript {
     repositories {
@@ -22,16 +9,14 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
-        classpath 'org.apache.httpcomponents:httpclient:4.5.1'
-        classpath 'com.google.guava:guava:18.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
     }
 }
 
-apply plugin: 'io.codearte.nexus-staging'
-apply plugin: 'groovy'
 apply plugin: 'maven-publish'
+apply plugin: 'groovy'
 apply plugin: 'wrapper'
+apply plugin: 'com.jfrog.bintray'
 
 repositories {
     mavenCentral()
@@ -74,6 +59,7 @@ platforms.each({ platform ->
     }
 
     task "natives-${platform.name}"(type: Jar, dependsOn: "buildVdl${platform.name}") {
+        baseName "natives-${platform.name}"
         from 'build/vdltool/vdl-' + platform.name
     }
 
@@ -161,132 +147,33 @@ publishing {
             }
         })
     }
-    repositories {
-        maven {
-            credentials {
-                username nexusUsername
-                password nexusPassword
-            }
-            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-        }
-    }
 }
 
 wrapper {
     gradleVersion = '2.4'
 }
 
-nexusStaging {
-    packageGroup = 'io.v'
-}
-
-class SignFiles extends DefaultTask {
-    List<Closure<FileCollection>> files = new ArrayList<>()
-
-    public void sign(Closure<FileCollection> files) {
-        this.files.add(files)
-    }
-
-    @TaskAction
-    public void doSigning() {
-        files.each { fileCollectionClosure ->
-            fileCollectionClosure().each { file ->
-                project.exec {
-                    commandLine 'gpg', '--batch', '--no-tty', '-q', '--yes', '--passphrase', project.nexusPassword, '--detach-sign', '-a', file
-                }
+bintray {
+    user = bintrayUsername
+    key = bintrayApiKey
+    pkg {
+        desc = 'A Gradle plugin for using VDL in your projects'
+        websiteUrl = 'https://github.com/vanadium/java/tree/master/gradle-plugin'
+        repo = 'io.v'
+        name = 'gradle-plugin'
+        licenses = ['BSD New']
+        vcsUrl = 'https://github.com/vanadium/java.git'
+        version {
+            name = releaseVersion
+            gpg {
+                sign = true
             }
         }
+        userOrg = 'vanadium'
+    }
+    publications = ['mavenJava']
+    platforms.each { platform ->
+        publications += "mavenNatives${platform.name}"
     }
 }
 
-class UploadSignedFiles extends DefaultTask {
-    String uploadUrlPrefix
-    List<SignFiles> signFilesTasks = new ArrayList<>()
-
-    public void uploadUrlPrefix(String url) {
-        this.uploadUrlPrefix = url
-    }
-
-    public void upload(SignFiles signTask) {
-        dependsOn(signTask)
-        signFilesTasks.add(signTask)
-    }
-
-    private static HttpResponse put(HttpClient client, File file, String url) {
-        return put(client, new FileEntity(file), url)
-    }
-
-    private static HttpResponse put(HttpClient client, HttpEntity entity, String url) {
-        print("Upload ${url}... ")
-        HttpPut put = new HttpPut(url)
-        put.setEntity(entity)
-        HttpResponse response = client.execute(put)
-        int statusCode = response.getStatusLine().getStatusCode()
-        if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
-            throw new RuntimeException("Could not upload ${url}," +
-                    " request status code was not 200 or 201: ${response.getStatusLine()}")
-        }
-        put.releaseConnection()
-        println('Done')
-        return response
-    }
-
-    private static void putChecksums(HttpClient client, File file, String urlBase) {
-        byte[] fileContents = Files.toByteArray(file)
-        String md5sum = Hashing.md5().newHasher().putBytes(fileContents).hash().toString()
-        String sha1sum = Hashing.sha1().newHasher().putBytes(fileContents).hash().toString()
-        put(client, new StringEntity(md5sum), "${urlBase}.md5")
-        put(client, new StringEntity(sha1sum), "${urlBase}.sha1")
-    }
-
-    @TaskAction
-    public void doUploads() {
-        HttpClient client = new DefaultHttpClient()
-        client.getCredentialsProvider().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(project.nexusUsername, project.nexusPassword))
-        signFilesTasks.each { task ->
-            task.files.each { fileCollectionClosure ->
-                def filesToUpload = fileCollectionClosure()
-                filesToUpload.each { file ->
-                    String url = "${uploadUrlPrefix}/${file.getName()}"
-                    File signatureFile = new File("${file.getAbsolutePath()}.asc")
-                    UploadSignedFiles.put(client, file, url)
-                    UploadSignedFiles.put(client, signatureFile, "${url}.asc")
-                    UploadSignedFiles.putChecksums(client, file, url)
-                    UploadSignedFiles.putChecksums(client, signatureFile, "${url}.asc")
-                }
-            }
-        }
-    }
-}
-
-task publishWithSignatures() {
-    description 'Publish binaries and signatures to Maven'
-    group 'Publishing'
-}
-
-def signAndUpload(String name, Closure<FileCollection> files, String url) {
-    def signTask = task "sign-${name}"(type: SignFiles) {
-        sign(files)
-    }
-
-    def uploadTask = task "upload-${name}"(type: UploadSignedFiles) {
-        uploadUrlPrefix url
-        upload signTask
-    }
-
-    publishWithSignatures.dependsOn(uploadTask)
-    uploadTask.dependsOn(tasks.publish)
-}
-
-platforms.each({ platform ->
-    signAndUpload(platform.name, {
-        project.fileTree("${project.buildDir}/tmp/publishMavenNatives${platform.name}PublicationToMavenRepository")
-                    .include(["**/*.pom", "**/*.jar", "**/maven-metadata.xml"])
-    }, publishing.repositories.maven.url.toString() + "/io/v/gradle-plugin-vdltool-${platform.name}/${releaseVersion}")
-})
-
-signAndUpload("plugin", {
-    fileTree("${project.buildDir}/tmp/publishMavenJavaPublicationToMavenRepository")
-            .include(["**/*.pom", "**/*.jar", "**/maven-metadata.xml"])
-}, publishing.repositories.maven.url.toString() + "/io/v/gradle-plugin/${releaseVersion}")
