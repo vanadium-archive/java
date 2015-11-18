@@ -4,6 +4,7 @@
 
 package io.v.android.impl.google.services.blessing;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -13,10 +14,13 @@ import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
 
@@ -38,7 +42,7 @@ import io.v.v23.vom.VomUtil;
  * <p>
  * The provided email address must be already present on the phone.
  */
-public class BlessingActivity extends Activity {
+public class BlessingActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String TAG = "BlessingActivity";
     private static final int REQUEST_CODE_USER_APPROVAL = 1000;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1001;
@@ -106,7 +110,25 @@ public class BlessingActivity extends Activity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permission[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_USER_APPROVAL:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getBlessing();
+                    return;
+                }
+                replyWithError("User didn't give proposed permissions.");
+                break;
+        }
+    }
+
     private void getBlessing() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_CODE_USER_APPROVAL);
+            return;
+        }
         Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
         Account account = null;
         for (int i = 0; i < accounts.length; i++) {

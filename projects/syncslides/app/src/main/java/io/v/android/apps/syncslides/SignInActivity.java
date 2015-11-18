@@ -4,6 +4,7 @@
 
 package io.v.android.apps.syncslides;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -14,12 +15,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,11 +55,16 @@ public class SignInActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     private static final int REQUEST_CODE_FETCH_USER_PROFILE_APPROVAL = 1001;
+    private static final int REQUEST_CODE_READ_CONTACTS = 100;
 
     private static final String OAUTH_PROFILE = "email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
     private static final String OAUTH_USERINFO_URL =
             "https://www.googleapis.com/oauth2/v2/userinfo";
+
+    // NOTE(spetrovic): For demo purposes, fetching user profile is too risky as it requires
+    // internet access.  So we disable it for now.
+    private static final boolean FETCH_PROFILE = false;
 
     private SharedPreferences mPrefs;
     private String mAccountName;
@@ -136,6 +145,20 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permission[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_READ_CONTACTS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    requestContactsDone();
+                    return;
+                }
+                Log.e(TAG, "User didn't approve read contacts");
+                fetchUserProfile();
+            }
+        }
+    }
+
     private void pickAccount() {
         Intent chooseIntent = AccountManager.newChooseAccountIntent(
                 null, null, new String[]{"com.google"}, false, null, null, null, null);
@@ -148,12 +171,18 @@ public class SignInActivity extends AppCompatActivity {
         editor.putString(PREF_USER_ACCOUNT_NAME, accountName);
         editor.commit();
 
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            requestContactsDone();
+            return;
+        }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_CODE_READ_CONTACTS);
+    }
+
+    private void requestContactsDone() {
         fetchUserNameFromContacts();
 
-        // NOTE(spetrovic): For demo purposes, fetching user profile is too risky as it requires
-        // internet access.  So we disable it for now.
-        //fetchUserProfile();
-        finishActivity();
+         fetchUserProfile();
     }
 
     private void fetchUserNameFromContacts() {
@@ -178,6 +207,10 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfile() {
+        if (!FETCH_PROFILE) {
+            fetchUserProfileDone(null);
+            return;
+        }
         AccountManager manager = (AccountManager) getSystemService(Context.ACCOUNT_SERVICE);
         Account[] accounts = manager.getAccountsByType("com.google");
         Account account = null;
