@@ -154,8 +154,8 @@ wrapper {
 }
 
 bintray {
-    user = project.getProperty('bintrayUsername')
-    key = project.getProperty('bintrayApiKey')
+    user = project.properties.bintrayUsername
+    key = project.properties.bintrayApiKey
     pkg {
         desc = 'A Gradle plugin for using VDL in your projects'
         websiteUrl = 'https://github.com/vanadium/java/tree/master/gradle-plugin'
