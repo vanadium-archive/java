@@ -1,3 +1,5 @@
+import groovy.json.internal.Charsets
+
 buildscript {
     repositories {
         mavenCentral()
@@ -190,6 +192,8 @@ tasks.'test' << {
 task buildVanadiumLib(dependsOn: copyVanadiumLib) {}
 
 task sourceJar(type: Jar) {
+    baseName 'sources'
+
     from sourceSets.main.allJava
 }
 
@@ -200,11 +204,14 @@ javadoc {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName 'javadoc'
+
     from javadoc.destinationDir
 }
 
 task natives(type: Jar, dependsOn: buildVanadiumLib) {
     baseName 'natives'
+
     if (isLinux()) {
         from 'build/libs/libv23.so'
     } else if (isDarwin()) {
@@ -212,6 +219,15 @@ task natives(type: Jar, dependsOn: buildVanadiumLib) {
     } else {
         throw new InvalidUserDataException("unsupported operating system: " + getOS())
     }
+}
+
+task emptyJar(type: Jar) {
+    baseName 'empty'
+
+    project.buildDir.mkdirs()
+    File explanation = new File(project.buildDir, 'empty-jar.txt')
+    explanation.setText('This artifact has no Java sources or javadoc', Charsets.US_ASCII.name())
+    from explanation
 }
 
 def pomDependencyText = """
@@ -289,6 +305,10 @@ publishing {
             // No archives in this one, it's a meta package only.
             artifacts.clear()
 
+            // Maven Central does require source and javadoc jars
+            artifact source: emptyJar, classifier: 'sources'
+            artifact source: emptyJar, classifier: 'javadoc'
+
             pom.withXml {
                 for (Node node : pomDependencies.children()) {
                     asNode().dependencies[0].append(node)
@@ -301,6 +321,10 @@ publishing {
             groupId 'io.v'
             artifactId 'vanadium-natives-' + getOsName()
             version releaseVersion
+
+            // Maven Central does require source and javadoc jars
+            artifact source: emptyJar, classifier: 'sources'
+            artifact source: emptyJar, classifier: 'javadoc'
 
             artifact natives
 
