@@ -22,11 +22,11 @@ public interface VPrincipal {
      * Binds extensions of blessings held by this principal to another principal (represented by
      * its public key).
      * <p>
-     * For example, a principal with the blessings {@code "google/alice"} and
-     * {@code "vanadium/alice"} can bind the blessings {@code "google/alice/friend"} and
-     * {@code "vanadium/alice/friend"} to another principal using:
+     * For example, a principal with the blessings {@code "google:alice"} and
+     * {@code "vanadium:alice"} can bind the blessings {@code "google:alice:friend"} and
+     * {@code "vanadium:alice:friend"} to another principal using:
      * <p><blockquote><pre>
-     *   {@literal bless(<other principal>, <google/alice, vanadium/alice>, "friend", ...)}
+     *   {@literal bless(<other principal>, <google:alice, vanadium:alice>, "friend", ...)}
      * </pre></blockquote><p>
      * To discourage unconstrained delegation of authority, the interface requires at least one
      * caveat to be provided. If unconstrained delegation is desired, the

@@ -29,23 +29,23 @@ public class BlessingRootsTest extends TestCase {
         BlessingRoots roots = principal.roots();
         ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));
-        roots.add(keys[1], new BlessingPattern("google/foo"));
-        roots.add(keys[0], new BlessingPattern("google/$"));
+        roots.add(keys[1], new BlessingPattern("google:foo"));
+        roots.add(keys[0], new BlessingPattern("google:$"));
 
         Map<ECPublicKey, String[]> recognized =
                 ImmutableMap.<ECPublicKey, String[]>builder()
                 .put(keys[0], new String[]{
-                        "vanadium", "vanadium/foo", "vanadium/foo/bar", "google" })
-                .put(keys[1], new String[]{ "google/foo", "google/foo/bar" })
+                        "vanadium", "vanadium:foo", "vanadium:foo:bar", "google" })
+                .put(keys[1], new String[]{ "google:foo", "google:foo:bar" })
                 .put(keys[2], new String[]{ })
                 .build();
         Map<ECPublicKey, String[]> notRecognized =
                 ImmutableMap.<ECPublicKey, String[]>builder()
-                .put(keys[0], new String[]{ "google/foo", "foo", "foo/bar" })
+                .put(keys[0], new String[]{ "google:foo", "foo", "foo:bar" })
                 .put(keys[1], new String[]{
-                        "google", "google/bar", "vanadium", "vanadium/foo", "foo", "foo/bar" })
-                .put(keys[2], new String[] { "vanadium", "vanadium/foo", "vanadium/bar", "google",
-                        "google/foo", "google/bar", "foo", "foo/bar" })
+                        "google", "google:bar", "vanadium", "vanadium:foo", "foo", "foo:bar" })
+                .put(keys[2], new String[] { "vanadium", "vanadium:foo", "vanadium:bar", "google",
+                        "google:foo", "google:bar", "foo", "foo:bar" })
                 .build();
         for (Map.Entry<ECPublicKey, String[]> entry : recognized.entrySet()) {
             ECPublicKey key = entry.getKey();
@@ -78,14 +78,14 @@ public class BlessingRootsTest extends TestCase {
         BlessingRoots roots = principal.roots();
         ECPublicKey[] keys = { mintPublicKey(), mintPublicKey(), mintPublicKey(), mintPublicKey() };
         roots.add(keys[0], new BlessingPattern("vanadium"));
-        roots.add(keys[1], new BlessingPattern("google/foo"));
-        roots.add(keys[0], new BlessingPattern("google/$"));
-        roots.add(keys[3], new BlessingPattern("google/$"));
+        roots.add(keys[1], new BlessingPattern("google:foo"));
+        roots.add(keys[0], new BlessingPattern("google:$"));
+        roots.add(keys[3], new BlessingPattern("google:$"));
 
         Multimap<BlessingPattern, ECPublicKey> map = roots.dump();
         assertThat(map).hasSize(keys.length);
-        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/$"))).containsAllOf(keys[0], keys[3]);
-        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google/foo"))).containsExactly(keys[1]);
+        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google:$"))).containsAllOf(keys[0], keys[3]);
+        assertThat((Iterable<ECPublicKey>) map.get(new BlessingPattern("google:foo"))).containsExactly(keys[1]);
     }
 
     private static ECPublicKey mintPublicKey() throws VException {

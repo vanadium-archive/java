@@ -60,11 +60,11 @@ import java.lang.reflect.Type;
  *         {@literal @}Override
  *         public ServiceObjectWithAuthorizer lookup(String suffix) throws VException {
  *             Permissions acls = new Permissions(ImmutableMap.of(
- *             "R", new AccessList(ImmutableList.of(new BlessingPattern("alice/friends/..."),
- *                                                  new BlessingPattern("alice/family/...")),
+ *             "R", new AccessList(ImmutableList.of(new BlessingPattern("alice:friends:..."),
+ *                                                  new BlessingPattern("alice:family:...")),
  *                                 null),
- *             "W", new AccessList(ImmutableList.of(new BlessingPattern("alice/family/..."),
- *                                                  new BlessingPattern("alice/colleagues/...")),
+ *             "W", new AccessList(ImmutableList.of(new BlessingPattern("alice:family:..."),
+ *                                                  new BlessingPattern("alice:colleagues:...")),
  *                                 null)));
  *             return new ServiceObjectWithAuthorizer(
  *                     newInvoker(), VSecurity.newPermissionsAuthorizer(acls, MyTag.class));
@@ -73,9 +73,9 @@ import java.lang.reflect.Type;
  * </li>
  * </ol>
  * With the above dispatcher, the server will grant access to a peer with the blessing
- * {@code "alice/friend/bob"} access only to the {@code Get} and {@code GetIndex} methods.
- * A peer presenting the blessing {@code "alice/colleague/carol"} will get access only to the
- * {@code Set} and {@code SetIndex} methods. A peer presenting {@code "alice/family/mom"} will
+ * {@code "alice:friend:bob"} access only to the {@code Get} and {@code GetIndex} methods.
+ * A peer presenting the blessing {@code "alice:colleague:carol"} will get access only to the
+ * {@code Set} and {@code SetIndex} methods. A peer presenting {@code "alice:family:mom"} will
  * get access to all methods, even {@code GetAndSet} - which requires that the blessing appear
  * in the ACLs for both the {@code ReadAccess} and {@code WriteAccess} tags.
  */

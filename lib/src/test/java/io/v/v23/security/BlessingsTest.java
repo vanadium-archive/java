@@ -35,7 +35,7 @@ public class BlessingsTest extends TestCase {
         VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
+                alice, "work:friend", VSecurity.newUnconstrainedUseCaveat());
         if (!Arrays.equals(
                 aliceWorkFriend.publicKey().getEncoded(), p2.publicKey().getEncoded())) {
             fail(String.format("Expected public key: %s, got %s",

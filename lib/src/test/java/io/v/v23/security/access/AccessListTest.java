@@ -28,24 +28,24 @@ public class AccessListTest extends TestCase {
             AccessList acl = new AccessList(
                     ImmutableList.of(
                             (new BlessingPattern("google")).makeNonExtendable(),
-                            new BlessingPattern("google/alice")),
+                            new BlessingPattern("google:alice")),
                     null);
-            assertThat(acl.includes("google", "google/alice")).isTrue();
-            assertThat(acl.includes("google", "google/bob")).isTrue();
-            assertThat(acl.includes("google/bob")).isFalse();
+            assertThat(acl.includes("google", "google:alice")).isTrue();
+            assertThat(acl.includes("google", "google:bob")).isTrue();
+            assertThat(acl.includes("google:bob")).isFalse();
             assertThat(acl.includes("batmap")).isFalse();
         }
         {
             AccessList acl = new AccessList(
                     ImmutableList.of(
                             (new BlessingPattern("google")).makeNonExtendable(),
-                            new BlessingPattern("google/alice")),
-                    ImmutableList.of("google/alice/home"));
+                            new BlessingPattern("google:alice")),
+                    ImmutableList.of("google:alice:home"));
 
             assertThat(acl.includes("google")).isTrue();
-            assertThat(acl.includes("google/alice/work")).isTrue();
-            assertThat(acl.includes("google/alice/home")).isFalse();
-            assertThat(acl.includes("google/alice/home/wifi")).isFalse();
+            assertThat(acl.includes("google:alice:work")).isTrue();
+            assertThat(acl.includes("google:alice:home")).isFalse();
+            assertThat(acl.includes("google:alice:home:wifi")).isFalse();
         }
     }
 }
