@@ -1,8 +1,10 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'io.v:gradle-plugin:0.1'
     }
 }
@@ -10,9 +12,14 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'io.v.vdl'
+apply plugin: 'com.jfrog.bintray'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
+
+// You should change this after releasing a new version of the library. See the
+// list of published versions at https://repo1.maven.org/maven2/io/v/vanadium.
+def releaseVersion = '0.1'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.7'
@@ -161,8 +168,8 @@ if (isLinux()) {
 // Add shared library dependency to our tests.
 tasks.withType(Test) {
     if (isDarwin()) {
-	// TODO(sjr): remove these when
-	// https://github.com/vanadium/issues/issues/567 is resolved.
+        // TODO(sjr): remove these when
+        // https://github.com/vanadium/issues/issues/567 is resolved.
         jvmArgs '-XX:+UnlockDiagnosticVMOptions'
         jvmArgs '-XX:-LogEvents'
     }
@@ -197,6 +204,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 task natives(type: Jar, dependsOn: buildVanadiumLib) {
+    baseName 'natives'
     if (isLinux()) {
         from 'build/libs/libv23.so'
     } else if (isDarwin()) {
@@ -206,34 +214,55 @@ task natives(type: Jar, dependsOn: buildVanadiumLib) {
     }
 }
 
-def pomDependencyText = '''
+def pomDependencyText = """
 <dependencies>
     <dependency>
         <groupId>io.v</groupId>
         <artifactId>vanadium-without-natives</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${releaseVersion}</version>
     </dependency>
     <dependency>
         <groupId>io.v</groupId>
         <artifactId>vanadium-natives-linux</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${releaseVersion}</version>
     </dependency>
     <dependency>
         <groupId>io.v</groupId>
         <artifactId>vanadium-natives-macosx</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${releaseVersion}</version>
     </dependency>
 </dependencies>
-'''
+"""
 
 def pomDependencies = new XmlParser().parseText(pomDependencyText)
+
+// Adds XML nodes representing fields required for publication to Maven central to the given node.
+def addMavenCentralMetadata(Node node) {
+    node.appendNode('name', 'Vanadium Java library')
+    node.appendNode('description',
+            'Java libraries for writing Vanadium applications')
+    node.appendNode('url', 'https://github.com/vanadium/java')
+
+    def license = node.appendNode('licenses').appendNode('license')
+    license.appendNode('name', 'New BSD License')
+    license.appendNode('url', 'https://github.com/vanadium/java/blob/master/LICENSE')
+    license.appendNode('distribution', 'repo')
+
+    node.appendNode('scm').appendNode('url',
+            'https://github.com/vanadium/java.git')
+
+    def developerInfo = node.appendNode('developers').appendNode('developer')
+    developerInfo.appendNode('id', 'vanadium')
+    developerInfo.appendNode('name', 'The Vanadium Contributors')
+    developerInfo.appendNode('email', 'vanadium-discuss@v.io')
+}
 
 publishing {
     publications {
         mavenNoNatives(MavenPublication) {
             groupId 'io.v'
             artifactId 'vanadium-without-natives'
-            version '0.1-SNAPSHOT'
+            version releaseVersion
 
             from components.java
 
@@ -244,12 +273,16 @@ publishing {
             artifact javadocJar {
                 classifier "javadoc"
             }
+
+            pom.withXml {
+                addMavenCentralMetadata(asNode())
+            }
         }
 
         mavenJava(MavenPublication) {
             groupId 'io.v'
             artifactId 'vanadium'
-            version '0.1-SNAPSHOT'
+            version releaseVersion
 
             from components.java
 
@@ -260,25 +293,20 @@ publishing {
                 for (Node node : pomDependencies.children()) {
                     asNode().dependencies[0].append(node)
                 }
+                addMavenCentralMetadata(asNode())
             }
         }
 
         mavenNatives(MavenPublication) {
             groupId 'io.v'
             artifactId 'vanadium-natives-' + getOsName()
-            version '0.1-SNAPSHOT'
+            version releaseVersion
 
             artifact natives
-        }
-    }
 
-    repositories {
-        maven {
-            credentials {
-                username 'admin'
-                password 'admin123'
+            pom.withXml {
+                addMavenCentralMetadata(asNode())
             }
-            url "http://srdjan.mtv:8081/nexus/content/repositories/test_repo"
         }
     }
 }
@@ -288,3 +316,25 @@ vdl {
     vdlRootPath = [jiriRoot, 'release', 'go', 'src', 'v.io', 'v23', 'vdlroot'].join(File.separator)
     generateVdlRoot = true
 }
+
+bintray {
+    user = project.properties.bintrayUsername
+    key = project.properties.bintrayApiKey
+    pkg {
+        desc = 'Java libraries for writing Vanadium applications'
+        websiteUrl = 'https://github.com/vanadium/java'
+        repo = 'io.v'
+        name = 'vanadium'
+        licenses = ['BSD New']
+        vcsUrl = 'https://github.com/vanadium/java.git'
+        version {
+            name = releaseVersion
+            gpg {
+                sign = true
+            }
+        }
+        userOrg = 'vanadium'
+    }
+    publications = ['mavenJava', 'mavenNoNatives', 'mavenNatives']
+}
+
