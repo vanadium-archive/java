@@ -71,10 +71,10 @@ public class BlessingPattern extends WireBlessingPattern {
      * For example:
      * <p><blockquote><pre>
      *     BlessingPattern onlyAlice =
-     *             new BlessingPattern("google/alice")).makeNonExtendable();
+     *             new BlessingPattern("google:alice")).makeNonExtendable();
      *     onlyAlice.isMatchedBy("google");                  // returns true
-     *     onlyAlice.isMatchedBy("google/alice");            // returns true
-     *     onlyAlice.isMatchedBy("google/alice/bob");        // returns false
+     *     onlyAlice.isMatchedBy("google:alice");            // returns true
+     *     onlyAlice.isMatchedBy("google:alice:bob");        // returns false
      * </pre></blockquote><p>
      *
      * @return a pattern that is not matched by any extension of the blessings that are

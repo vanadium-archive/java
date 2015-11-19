@@ -31,12 +31,12 @@ public class VSecurityTest extends TestCase {
         VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
+                alice, "work:friend", VSecurity.newUnconstrainedUseCaveat());
         Call call = VSecurity.newCall(
                 new CallParams().withRemoteBlessings(aliceWorkFriend).withLocalPrincipal(p2));
         String[] blessings = VSecurity.getRemoteBlessingNames(context, call);
-        if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
-            fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
+        if (!Arrays.equals(new String[]{ "alice:work:friend" }, blessings)) {
+            fail(String.format("Expected blessings [\"alice:work:friend\"], got %s",
                     Arrays.toString(blessings)));
         }
     }
@@ -49,17 +49,17 @@ public class VSecurityTest extends TestCase {
         VSecurity.addToRoots(p2, alice);
 
         Blessings aliceWorkFriend = p1.bless(p2.publicKey(),
-                alice, "work/friend", VSecurity.newUnconstrainedUseCaveat());
+                alice, "work:friend", VSecurity.newUnconstrainedUseCaveat());
         Call call = VSecurity.newCall(
                 new CallParams().withLocalBlessings(aliceWorkFriend).withLocalPrincipal(p2));
         String[] blessings = VSecurity.getLocalBlessingNames(context, call);
-        if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
-            fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
+        if (!Arrays.equals(new String[]{ "alice:work:friend" }, blessings)) {
+            fail(String.format("Expected blessings [\"alice:work:friend\"], got %s",
                     Arrays.toString(blessings)));
         }
         blessings = VSecurity.getBlessingNames(p2, aliceWorkFriend);
-        if (!Arrays.equals(new String[]{ "alice/work/friend" }, blessings)) {
-            fail(String.format("Expected blessings [\"alice/work/friend\"], got %s",
+        if (!Arrays.equals(new String[]{ "alice:work:friend" }, blessings)) {
+            fail(String.format("Expected blessings [\"alice:work:friend\"], got %s",
                     Arrays.toString(blessings)));
         }
         blessings = VSecurity.getBlessingNames(p1, aliceWorkFriend);
@@ -102,6 +102,6 @@ public class VSecurityTest extends TestCase {
         VSecurity.addToRoots(p, passing);
 
         String[] signingBlessingNames = VSecurity.getSigningBlessingNames(context, p, union);
-        assertThat(Arrays.asList(signingBlessingNames)).containsExactly("alice/passing");
+        assertThat(Arrays.asList(signingBlessingNames)).containsExactly("alice:passing");
     }
 }

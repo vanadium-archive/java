@@ -58,15 +58,15 @@ public class PermissionsAuthorizerTest {
                         null),
                 "W", new AccessList(
                         ImmutableList.of(
-                                new BlessingPattern("ali/family"),
+                                new BlessingPattern("ali:family"),
                                 new BlessingPattern("bob"),
-                                new BlessingPattern("che/$")),
+                                new BlessingPattern("che:$")),
                         ImmutableList.of(
-                                "bob/acquaintances")),
+                                "bob:acquaintances")),
                 "X", new AccessList(
                         ImmutableList.of(
-                                new BlessingPattern("ali/family/boss/$"),
-                                new BlessingPattern("superman/$")),
+                                new BlessingPattern("ali:family:boss:$"),
+                                new BlessingPattern("superman:$")),
                         null)
         ));
         try {
@@ -99,22 +99,22 @@ public class PermissionsAuthorizerTest {
         return Arrays.asList(new Object[][]{
                 {"get", ImmutableList.of(), true},
                 {"get", ImmutableList.of("ali"), true},
-                {"get", ImmutableList.of("bob/friend", "che/enemy"), true},
-                {"put", ImmutableList.of("ali/family/mom"), true},
-                {"put", ImmutableList.of("bob/friends"), true},
+                {"get", ImmutableList.of("bob:friend", "che:enemy"), true},
+                {"put", ImmutableList.of("ali:family:mom"), true},
+                {"put", ImmutableList.of("bob:friends"), true},
                 // granted because of "che"
-                {"put", ImmutableList.of("bob/acquantainces/carol", "che"), true},
+                {"put", ImmutableList.of("bob:acquantainces:carol", "che"), true},
                 {"resolve", ImmutableList.of("superman"), true},
-                {"resolve", ImmutableList.of("ali/family/boss"), true},
+                {"resolve", ImmutableList.of("ali:family:boss"), true},
 
-                {"put", ImmutableList.of("ali", "bob/acquaintances", "bob/acquaintances/dave",
-                        "che/friend", "dave"), false},
-                {"resolve", ImmutableList.of("ali", "ali/friend", "ali/family", "ali/family/friend",
-                        "alice/family/boss/friend", "superman/friend"), false},
+                {"put", ImmutableList.of("ali", "bob:acquaintances", "bob:acquaintances:dave",
+                        "che:friend", "dave"), false},
+                {"resolve", ImmutableList.of("ali", "ali:friend", "ali:family", "ali:family:friend",
+                        "alice:family:boss:friend", "superman:friend"), false},
                 // Since there are no tags on the noTags method, it has an
                 // empty ACL.  No client will have access.
                 {"noTags", ImmutableList.of(
-                        "ali", "ali/family/boss", "bob", "che", "superman"), false}
+                        "ali", "ali:family:boss", "bob", "che", "superman"), false}
         });
     }
 

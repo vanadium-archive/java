@@ -81,13 +81,13 @@ public class PermissionsAuthorizerTest {
             {
                 GroupClient client = GroupClientFactory.getGroupClient(groupNameReaders);
                 client.create(CONTEXT, allowAll, ImmutableList.of(
-                        new BlessingPatternChunk("root/alice"),
-                        new BlessingPatternChunk("root/bob")));
+                        new BlessingPatternChunk("root:alice"),
+                        new BlessingPatternChunk("root:bob")));
             }
             {
                 GroupClient client = GroupClientFactory.getGroupClient(groupNameWriters);
                 client.create(CONTEXT, allowAll, ImmutableList.of(
-                        new BlessingPatternChunk("root/alice")));
+                        new BlessingPatternChunk("root:alice")));
             }
 
             AUTHORIZER = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
@@ -118,13 +118,13 @@ public class PermissionsAuthorizerTest {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"get", io.v.v23.security.access.Constants.READ,
-                        ImmutableList.of("root/alice"), true},
+                        ImmutableList.of("root:alice"), true},
                 {"get", io.v.v23.security.access.Constants.WRITE,
-                        ImmutableList.of("root/alice"), true},
+                        ImmutableList.of("root:alice"), true},
                 {"get", io.v.v23.security.access.Constants.READ,
-                        ImmutableList.of("root/bob"), true},
+                        ImmutableList.of("root:bob"), true},
                 {"put", io.v.v23.security.access.Constants.WRITE,
-                        ImmutableList.of("root/bob"), false}
+                        ImmutableList.of("root:bob"), false}
         });
     }
 

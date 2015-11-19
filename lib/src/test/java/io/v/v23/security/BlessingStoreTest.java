@@ -36,7 +36,7 @@ public class BlessingStoreTest extends TestCase {
                 .put(new BlessingPattern(""), blessingA)
                 .put(new BlessingPattern("foo..."), blessingA)
                 .put(new BlessingPattern("...foo"), blessingB)
-                .put(new BlessingPattern("foo/.../bar"), blessingB)
+                .put(new BlessingPattern("foo:...:bar"), blessingB)
                 .build();
 
         for (Map.Entry<BlessingPattern, Blessings> entry : want.entrySet()) {
@@ -76,7 +76,7 @@ public class BlessingStoreTest extends TestCase {
         Blessings blessingAll = newBlessing(principal, "all", "C");
         store.set(blessingAll, new BlessingPattern("..."));
         store.set(blessingFoo, new BlessingPattern("foo"));
-        store.set(blessingBar, new BlessingPattern("bar/$"));
+        store.set(blessingBar, new BlessingPattern("bar:$"));
 
         Map<String[], Blessings> testdata =
                ImmutableMap.<String[], Blessings>builder()
@@ -84,12 +84,12 @@ public class BlessingStoreTest extends TestCase {
                .put(new String[]{ "baz" }, blessingAll)
                .put(new String[]{ "foo" }, VSecurity.unionOfBlessings(blessingAll, blessingFoo))
                .put(new String[]{ "bar" }, VSecurity.unionOfBlessings(blessingAll, blessingBar))
-               .put(new String[]{ "foo/foo" },
+               .put(new String[]{ "foo:foo" },
                        VSecurity.unionOfBlessings(blessingAll, blessingFoo))
-               .put(new String[] { "bar/baz" }, blessingAll)
-               .put(new String[] { "foo/foo/bar" },
+               .put(new String[] { "bar:baz" }, blessingAll)
+               .put(new String[] { "foo:foo:bar" },
                        VSecurity.unionOfBlessings(blessingAll, blessingFoo))
-               .put(new String[] { "bar/foo", "foo" },
+               .put(new String[] { "bar:foo", "foo" },
                        VSecurity.unionOfBlessings(blessingAll, blessingFoo))
                .put(new String[] { "bar", "foo" },
                        VSecurity.unionOfBlessings(blessingAll, blessingFoo, blessingBar))
