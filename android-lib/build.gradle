@@ -1,9 +1,11 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
@@ -13,6 +15,11 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
+apply plugin: 'com.jfrog.bintray'
+
+// You should change this after releasing a new version of the library. See the
+// list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
+def releaseVersion = '0.1'
 
 android {
     buildToolsVersion '23.0.1'
@@ -174,15 +181,36 @@ task sourceJar(type: Jar) {
     classifier "source"
 }
 
-def pomDependencyText = '''
+// Adds XML nodes representing fields required for publication to Maven central to the given node.
+def addMavenCentralMetadata(Node node) {
+    node.appendNode('name', 'Vanadium Android library')
+    node.appendNode('description',
+            'Java libraries for writing Vanadium Android applications')
+    node.appendNode('url', 'https://github.com/vanadium/java/tree/master/android-lib')
+
+    def license = node.appendNode('licenses').appendNode('license')
+    license.appendNode('name', 'New BSD License')
+    license.appendNode('url', 'https://github.com/vanadium/java/blob/master/LICENSE')
+    license.appendNode('distribution', 'repo')
+
+    node.appendNode('scm').appendNode('url',
+            'https://github.com/vanadium/java.git')
+
+    def developerInfo = node.appendNode('developers').appendNode('developer')
+    developerInfo.appendNode('id', 'vanadium')
+    developerInfo.appendNode('name', 'The Vanadium Contributors')
+    developerInfo.appendNode('email', 'vanadium-discuss@v.io')
+}
+
+def pomDependencyText = """
 <dependencies>
     <dependency>
         <groupId>io.v</groupId>
         <artifactId>vanadium-without-natives</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${releaseVersion}</version>
     </dependency>
 </dependencies>
-'''
+"""
 
 def pomDependencies = new XmlParser().parseText(pomDependencyText)
 
@@ -191,22 +219,15 @@ publishing {
         androidLibrary(MavenPublication) {
             groupId 'io.v'
             artifactId 'vanadium-android'
-            version '0.1-SNAPSHOT'
-            artifact(sourceJar)
-            artifact("$buildDir/outputs/aar/android-lib-release.aar")
+            version releaseVersion
+
+            artifact sourceJar
+            artifact "$buildDir/outputs/aar/android-lib-release.aar"
 
             pom.withXml {
+                addMavenCentralMetadata(asNode())
                 asNode().append(pomDependencies)
             }
-        }
-    }
-    repositories {
-        maven {
-            credentials {
-                username 'admin'
-                password 'admin123'
-            }
-            url "http://srdjan.mtv:8081/nexus/content/repositories/test_repo"
         }
     }
 }
@@ -215,5 +236,27 @@ wrapper {
     gradleVersion = '2.4'
 }
 
-tasks.'preBuild'.dependsOn(copyVanadiumLib)
-tasks.'publish'.dependsOn(tasks.'assemble')
+tasks.preBuild.dependsOn(copyVanadiumLib)
+tasks.publishToMavenLocal.dependsOn(tasks.assemble)
+tasks.bintrayUpload.dependsOn(tasks.assemble)
+
+bintray {
+    user = project.properties.bintrayUsername
+    key = project.properties.bintrayApiKey
+    pkg {
+        desc = 'Java libraries for writing Vanadium Android applications'
+        websiteUrl = 'https://github.com/vanadium/java'
+        repo = 'io.v'
+        name = 'vanadium-android'
+        licenses = ['BSD New']
+        vcsUrl = 'https://github.com/vanadium/java.git'
+        version {
+            name = releaseVersion
+            gpg {
+                sign = true
+            }
+        }
+        userOrg = 'vanadium'
+    }
+    publications = ['androidLibrary']
+}
