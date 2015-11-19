@@ -64,6 +64,13 @@ class VdlPlugin implements Plugin<Project> {
         removeVdlRootTask.dependsOn(generateTask)
         vdlTask.dependsOn(removeVdlRootTask)
 
+        if (project.vdl.formatGeneratedVdl) {
+            def formatTask = project.task('formatGeneratedVdlFiles', type: FormatTask) {
+                format project.fileTree({ project.vdl.outputPath }).include('**/*.java')
+            }
+            formatTask.dependsOn(removeVdlRootTask)
+            vdlTask.dependsOn(formatTask)
+        }
         if (project.plugins.hasPlugin('com.android.library')
                 || project.plugins.hasPlugin('com.android.application')) {
             project.tasks.'preBuild'.dependsOn(vdlTask)
@@ -261,6 +268,7 @@ class VdlConfiguration {
     String transitiveVdlDir = "generated-src/transitive-vdl"
     String vdlToolPath = ""
     List<String> packageTranslations = ["v.io->io/v"]
+    boolean formatGeneratedVdl = true
 
     // If true, code generated for the vdlroot vdl package will be emitted.
     // Typically, users will want to leave this set to false as they will

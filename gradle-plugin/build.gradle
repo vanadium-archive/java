@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the gradle plugin. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/gradle-plugin.
-def releaseVersion = '0.4'
+def releaseVersion = '0.5'
 
 buildscript {
     repositories {
@@ -28,6 +28,7 @@ targetCompatibility = '1.7'
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compile 'com.google.googlejavaformat:google-java-format:0.1-alpha'
     testCompile 'com.google.truth:truth:0.27'
 }
 
@@ -129,7 +130,9 @@ publishing {
 
             pom.withXml {
                 addMavenCentralMetadata(asNode())
-                asNode().append(pomDependencies)
+                for (Node node : pomDependencies.children()) {
+                    asNode().dependencies[0].append(node)
+                }
             }
         }
 
