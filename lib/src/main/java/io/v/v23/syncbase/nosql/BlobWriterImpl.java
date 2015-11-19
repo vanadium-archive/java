@@ -7,7 +7,7 @@ package io.v.v23.syncbase.nosql;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
-import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.vdl.ClientSendStream;
 import io.v.v23.verror.VException;
 
 import java.io.BufferedOutputStream;
@@ -29,8 +29,7 @@ public class BlobWriterImpl implements BlobWriter {
     }
     @Override
     public OutputStream stream(VContext ctx) throws VException {
-        TypedClientStream<byte[], Void, Void> stream = client.putBlob(ctx, ref);
-        return new BufferedOutputStream(new BlobOutputStream(stream), 1 << 14);
+        return new BufferedOutputStream(new BlobOutputStream(client.putBlob(ctx, ref)), 1 << 14);
     }
     @Override
     public void commit(VContext ctx) throws VException {
@@ -46,10 +45,10 @@ public class BlobWriterImpl implements BlobWriter {
     }
 
     private static class BlobOutputStream extends OutputStream {
-        private final TypedClientStream<byte[], Void, Void> stream;
+        private final ClientSendStream<byte[], Void> stream;
         private boolean closed = false;
 
-        BlobOutputStream(TypedClientStream<byte[], Void, Void> stream) {
+        BlobOutputStream(ClientSendStream<byte[], Void> stream) {
             this.stream = stream;
         }
         @Override

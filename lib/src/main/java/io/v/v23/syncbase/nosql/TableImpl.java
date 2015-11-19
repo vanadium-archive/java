@@ -14,11 +14,8 @@ import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.TableClient;
 import io.v.v23.services.syncbase.nosql.TableClientFactory;
 import io.v.v23.syncbase.util.Util;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.vdl.TypedClientStream;
-import io.v.v23.vdl.TypedStreamIterable;
 import io.v.v23.verror.VException;
 
 class TableImpl implements Table {
@@ -35,40 +32,40 @@ class TableImpl implements Table {
         this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName));
         this.name = relativeName;
         this.schemaVersion = schemaVersion;
-        this.client = TableClientFactory.getTableClient(this.fullName);
+        this.client = TableClientFactory.getTableClient(fullName);
     }
 
     @Override
     public String name() {
-        return this.name;
+        return name;
     }
     @Override
     public String fullName() {
-        return this.fullName;
+        return fullName;
     }
     @Override
     public void create(VContext ctx, Permissions perms) throws VException {
-        this.client.create(ctx, this.schemaVersion, perms);
+        client.create(ctx, schemaVersion, perms);
     }
     @Override
     public void destroy(VContext ctx) throws VException {
-        this.client.destroy(ctx, this.schemaVersion);
+        client.destroy(ctx, schemaVersion);
     }
     @Override
     public boolean exists(VContext ctx) throws VException {
-        return this.client.exists(ctx, this.schemaVersion);
+        return client.exists(ctx, schemaVersion);
     }
     @Override
     public Permissions getPermissions(VContext ctx) throws VException {
-        return this.client.getPermissions(ctx, this.schemaVersion);
+        return client.getPermissions(ctx, schemaVersion);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms) throws VException {
-        this.client.setPermissions(ctx, this.schemaVersion, perms);
+        client.setPermissions(ctx, schemaVersion, perms);
     }
     @Override
     public Row getRow(String key) {
-        return new RowImpl(this.fullName, key, this.schemaVersion);
+        return new RowImpl(fullName, key, schemaVersion);
     }
     @Override
     public Object get(VContext ctx, String key, Type type) throws VException {
@@ -84,28 +81,27 @@ class TableImpl implements Table {
     }
     @Override
     public void deleteRange(VContext ctx, RowRange range) throws VException {
-        this.client.deleteRange(ctx, this.schemaVersion,
+        client.deleteRange(ctx, schemaVersion,
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override
     public VIterable<KeyValue> scan(VContext ctx, RowRange range) throws VException {
-        TypedClientStream<Void, KeyValue, Void> stream = this.client.scan(ctx, this.schemaVersion,
+        return client.scan(ctx, schemaVersion,
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
-        return new TypedStreamIterable(stream);
     }
     @Override
     public PrefixPermissions[] getPrefixPermissions(VContext ctx, String key) throws VException {
-        List<PrefixPermissions> perms = this.client.getPrefixPermissions(
-                ctx, this.schemaVersion, key);
+        List<PrefixPermissions> perms = client.getPrefixPermissions(
+                ctx, schemaVersion, key);
         return perms.toArray(new PrefixPermissions[perms.size()]);
     }
     @Override
     public void setPrefixPermissions(VContext ctx, PrefixRange prefix, Permissions perms)
             throws VException {
-        this.client.setPrefixPermissions(ctx, this.schemaVersion, prefix.getPrefix(), perms);
+        client.setPrefixPermissions(ctx, schemaVersion, prefix.getPrefix(), perms);
     }
     @Override
     public void deletePrefixPermissions(VContext ctx, PrefixRange prefix) throws VException {
-        this.client.deletePrefixPermissions(ctx, this.schemaVersion, prefix.getPrefix());
+        client.deletePrefixPermissions(ctx, schemaVersion, prefix.getPrefix());
     }
 }

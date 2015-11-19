@@ -44,7 +44,7 @@ public interface VDiscovery {
      * provided callback will be invoked when advertising stops.
      * <p>
      * It is an error to have simultaneously active advertisements for two identical
-     * instances (i.e., {@link Service#instanceUuid}s).
+     * instances (i.e., {@link Service#instanceId}s).
      *
      * @param ctx a context that will be used to stop the advertisement; the advertisement will end
      *            when the context is cancelled or timed out
@@ -64,7 +64,7 @@ public interface VDiscovery {
      * Scanning will continue until the context is canceled or exceeds its deadline.
      * <p>
      * The query is a {@code WHERE} expression of {@code syncQL} query against scanned services,
-     * where keys are {@link Service#instanceUuid}s and values are {@link Service}s.
+     * where keys are {@link Service#instanceId}s and values are {@link Service}s.
      * <p>
      * Examples:
      * <p><blockquote><pre>

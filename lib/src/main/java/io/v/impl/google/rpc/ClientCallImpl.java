@@ -20,7 +20,7 @@ public class ClientCallImpl implements ClientCall {
     private final long nativePtr;
     private final Stream stream;
 
-    private native void nativeCloseSend() throws VException;
+    private native void nativeCloseSend(long nativePtr) throws VException;
     private native byte[][] nativeFinish(long nativePtr, int numResults);
     private native void nativeFinishAsync(long nativePtr, int numResults, Callback<byte[][]> callback);
     private native void nativeFinalize(long nativePtr);
@@ -33,7 +33,7 @@ public class ClientCallImpl implements ClientCall {
     // Implements io.v.v23.rpc.ClientCall.
     @Override
     public void closeSend() throws VException {
-        nativeCloseSend();
+        nativeCloseSend(nativePtr);
     }
     @Override
     public Object[] finish(Type[] types) throws VException {

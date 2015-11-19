@@ -4,6 +4,7 @@
 package io.v.v23.syncbase;
 
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.syncbase.util.AccessController;
 import io.v.v23.verror.VException;
 
@@ -36,4 +37,12 @@ public interface SyncbaseService extends AccessController {
      * @throws VException if the list of app names couldn't be retrieved
      */
     List<String> listApps(VContext ctx) throws VException;
+
+    /**
+     * Asynchronous version of {@link #listApps(VContext)}.
+     *
+     * @throws VException if there was an error creating the asynchronous call. In this case, no
+     *                    methods on {@code callback} will be called.
+     */
+    void listApps(VContext ctx, Callback<List<String>> callback) throws VException;
 }

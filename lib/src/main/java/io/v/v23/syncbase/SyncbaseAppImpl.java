@@ -30,20 +30,20 @@ class SyncbaseAppImpl implements SyncbaseApp {
     SyncbaseAppImpl(String parentFullName, String relativeName) {
         this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName));
         this.name = relativeName;
-        this.client = AppClientFactory.getAppClient(this.fullName);
+        this.client = AppClientFactory.getAppClient(fullName);
     }
 
     @Override
     public String name() {
-        return this.name;
+        return name;
     }
     @Override
     public String fullName() {
-        return this.fullName;
+        return fullName;
     }
     @Override
     public boolean exists(VContext ctx) throws VException {
-        return this.client.exists(ctx);
+        return client.exists(ctx);
     }
     @Override
     public void exists(VContext ctx, Callback<Boolean> callback) throws VException {
@@ -51,19 +51,19 @@ class SyncbaseAppImpl implements SyncbaseApp {
     }
     @Override
     public Database getNoSqlDatabase(String relativeName, Schema schema) {
-        return NoSql.newDatabase(this.fullName, relativeName, schema);
+        return NoSql.newDatabase(fullName, relativeName, schema);
     }
     @Override
     public List<String> listDatabases(VContext ctx) throws VException {
-        return Util.listChildren(ctx, this.fullName);
+        return Util.listChildren(ctx, fullName);
     }
     @Override
     public void listDatabases(VContext ctx, Callback<List<String>> callback) throws VException {
-        Util.listChildren(ctx, this.fullName, callback);
+        Util.listChildren(ctx, fullName, callback);
     }
     @Override
     public void create(VContext ctx, Permissions perms) throws VException {
-        this.client.create(ctx, perms);
+        client.create(ctx, perms);
     }
     @Override
     public void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException {
@@ -71,15 +71,15 @@ class SyncbaseAppImpl implements SyncbaseApp {
     }
     @Override
     public void destroy(VContext ctx) throws VException {
-        this.client.destroy(ctx);
+        client.destroy(ctx);
     }
     @Override
     public void destroy(VContext ctx, Callback<Void> callback) throws VException {
-        this.client.destroy(ctx, callback);
+        client.destroy(ctx, callback);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
-        this.client.setPermissions(ctx, perms, version);
+        client.setPermissions(ctx, perms, version);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version,
@@ -88,7 +88,7 @@ class SyncbaseAppImpl implements SyncbaseApp {
     }
     @Override
     public Map<String, Permissions> getPermissions(VContext ctx) throws VException {
-        AppClient.GetPermissionsOut perms = this.client.getPermissions(ctx);
+        AppClient.GetPermissionsOut perms = client.getPermissions(ctx);
         return ImmutableMap.of(perms.version, perms.perms);
     }
     @Override

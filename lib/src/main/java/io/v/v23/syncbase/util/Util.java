@@ -121,41 +121,40 @@ public class Util {
             @Override
             public void onSuccess(VIterable<GlobReply> result) {
                 List<String> names = new ArrayList<>();
-
-                try {
-                    for (GlobReply reply : result) {
-                        if (reply instanceof GlobReply.Entry) {
-                            String fullName = ((GlobReply.Entry) reply).getElem().getName();
-                            int idx = fullName.lastIndexOf('/');
-                            if (idx == -1) {
-                                callback.onFailure(new VException("Unexpected glob() reply name: "
-                                        + "" + fullName));
-
-                                return;
-                            }
-                            String escName = fullName.substring(idx + 1, fullName.length());
-                            // Component names within object names are always escaped.
-                            // See comment in server/nosql/dispatcher.go for
-                            // explanation. If unescape throws an exception, there's a
-                            // bug in the Syncbase server. Glob should return names with
-                            // escaped components.
-                            names.add(unescape(escName));
-                        } else if (reply instanceof GlobReply.Error) {
-                            // TODO(sadovsky): Surface these errors somehow. (We don't
-                            // want to throw an exception, since some names may simply
-                            // be hidden to this client.)
-                        } else if (reply == null) {
-                            callback.onFailure(new VException("null glob() reply"));
-                        } else {
-                            callback.onFailure(new VException("Unrecognized glob() reply type: "
-                                    + reply.getClass()));
+                for (GlobReply reply : result) {
+                    if (reply instanceof GlobReply.Entry) {
+                        String fullName = ((GlobReply.Entry) reply).getElem().getName();
+                        int idx = fullName.lastIndexOf('/');
+                        if (idx == -1) {
+                            callback.onFailure(new VException("Unexpected glob() reply name: "
+                                    + "" + fullName));
+                            return;
                         }
+                        String escName = fullName.substring(idx + 1, fullName.length());
+                        // Component names within object names are always escaped.
+                        // See comment in server/nosql/dispatcher.go for
+                        // explanation. If unescape throws an exception, there's a
+                        // bug in the Syncbase server. Glob should return names with
+                        // escaped components.
+                        names.add(unescape(escName));
+                    } else if (reply instanceof GlobReply.Error) {
+                        // TODO(sadovsky): Surface these errors somehow. (We don't
+                        // want to throw an exception, since some names may simply
+                        // be hidden to this client.)
+                    } else if (reply == null) {
+                        callback.onFailure(new VException("null glob() reply"));
+                        return;
+                    } else {
+                        callback.onFailure(new VException("Unrecognized glob() reply type: "
+                                + reply.getClass()));
+                        return;
                     }
-                } catch (RuntimeException e) {
-                    // error during iteration
-                    callback.onFailure((VException) e.getCause());
                 }
-
+                if (result.error() != null) {
+                    // Error during iteration.
+                    callback.onFailure((VException) result.error());
+                    return;
+                }
                 callback.onSuccess(
                         Ordering.from(Collator.getInstance()).immutableSortedCopy(names));
             }

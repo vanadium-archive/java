@@ -15,6 +15,7 @@ import org.joda.time.Duration;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +37,7 @@ import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
-import io.v.v23.vdl.TypedClientStream;
+import io.v.v23.vdl.ClientStream;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
@@ -136,19 +137,16 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        TypedClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
+        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
         client.add(ctxT, msg);
-        try {
-            for (int i = 0; i < 5; ++i) {
-                stream.send(true);
-                assertEquals(msg, stream.recv());
-            }
-        } catch (EOFException e) {
-            fail("Reached unexpected stream EOF: " + e.getMessage());
+        for (int i = 0; i < 5; ++i) {
+            stream.send(true);
         }
-        int total = stream.finish();
-        assertEquals(5, total);
+        stream.close();
+        assertThat(stream).containsExactly(msg, msg, msg, msg, msg);
+        int result = stream.finish();
+        assertEquals(5, result);
     }
 
     public void testAsyncStreaming() throws Throwable {
@@ -159,17 +157,17 @@ public class FortuneTest extends TestCase {
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         final String msg = "The only fortune";
         client.add(ctxT, msg);
-        FutureCallback<TypedClientStream<Boolean, String, Integer>> callback
-                = new FutureCallback<>();
+        FutureCallback<ClientStream<Boolean, String, Integer>> callback = new FutureCallback<>();
         client.streamingGet(ctxT, callback);
-        TypedClientStream<Boolean, String, Integer> stream
+        ClientStream<Boolean, String, Integer> stream
                 = Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
         for (int i = 0; i < 5; i++) {
             stream.send(true);
-            assertEquals(msg, stream.recv());
         }
-        int total = stream.finish();
-        assertEquals(5, total);
+        stream.close();
+        assertThat(stream).containsExactly(msg, msg, msg, msg, msg);
+        int result = stream.finish();
+        assertEquals(5, result);
     }
 
     public void testMultiple() throws Exception {

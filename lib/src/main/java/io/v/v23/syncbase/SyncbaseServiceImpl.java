@@ -29,19 +29,23 @@ class SyncbaseServiceImpl implements SyncbaseService {
 
     @Override
     public String fullName() {
-        return this.fullName;
+        return fullName;
     }
     @Override
     public SyncbaseApp getApp(String relativeName) {
-        return new SyncbaseAppImpl(this.fullName, relativeName);
+        return new SyncbaseAppImpl(fullName, relativeName);
     }
     @Override
     public List<String> listApps(VContext ctx) throws VException {
-        return Util.listChildren(ctx, this.fullName);
+        return Util.listChildren(ctx, fullName);
+    }
+    @Override
+    public void listApps(VContext ctx, Callback<List<String>> callback) throws VException {
+        Util.listChildren(ctx, fullName, callback);
     }
     @Override
     public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
-        this.client.setPermissions(ctx, perms, version);
+        client.setPermissions(ctx, perms, version);
     }
 
     @Override
@@ -52,7 +56,7 @@ class SyncbaseServiceImpl implements SyncbaseService {
 
     @Override
     public Map<String, Permissions> getPermissions(VContext ctx) throws VException {
-        ServiceClient.GetPermissionsOut perms = this.client.getPermissions(ctx);
+        ServiceClient.GetPermissionsOut perms = client.getPermissions(ctx);
         return ImmutableMap.of(perms.version, perms.perms);
     }
 

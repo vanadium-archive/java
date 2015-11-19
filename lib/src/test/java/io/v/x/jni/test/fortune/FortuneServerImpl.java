@@ -13,11 +13,10 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.vdl.TypedStream;
+import io.v.v23.vdl.ServerStream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
 
-import java.io.EOFException;
 import java.util.concurrent.CountDownLatch;
 
 public class FortuneServerImpl implements FortuneServer, Globber {
@@ -65,25 +64,20 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     }
 
     @Override
-    public int streamingGet(VContext context, ServerCall call, TypedStream<String, Boolean> stream)
+    public int streamingGet(VContext context, ServerCall call, ServerStream<String, Boolean> stream)
             throws VException {
         int numSent = 0;
-        while (true) {
-            try {
-                stream.recv();
-            } catch (VException e) {
-                throw new VException(
-                        "Server couldn't receive a boolean item: " + e.getMessage());
-            } catch (EOFException e) {
-                break;
-            }
+        for (Boolean val : stream) {
             try {
                 stream.send(get(context, call));
-                } catch (VException e) {
-                    throw new VException(
+            } catch (VException e) {
+                throw new VException(
                         "Server couldn't send a string item: " + e.getMessage());
             }
             ++numSent;
+        }
+        if (stream.error() != null) {
+            throw stream.error();
         }
         return numSent;
     }

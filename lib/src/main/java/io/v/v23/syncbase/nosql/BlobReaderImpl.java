@@ -9,14 +9,14 @@ import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
-import io.v.v23.vdl.TypedClientStream;
-import io.v.v23.vdl.TypedStreamIterable;
+import io.v.v23.vdl.ClientRecvStream;
 import io.v.v23.vdl.VdlUint64;
 import io.v.v23.verror.VException;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 class BlobReaderImpl implements BlobReader {
     private final DatabaseClient client;
@@ -33,15 +33,14 @@ class BlobReaderImpl implements BlobReader {
     }
     @Override
     public InputStream stream(VContext ctx, long offset) throws VException {
-        TypedClientStream<Void, byte[], Void> stream = client.getBlob(ctx, ref, offset);
+        ClientRecvStream<byte[], Void> stream = client.getBlob(ctx, ref, offset);
         return new BlobInputStream(stream);
     }
     @Override
     public VIterable<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException {
-        TypedClientStream<Void, BlobFetchStatus, Void> stream =
-                client.fetchBlob(ctx, ref, new VdlUint64(priority));
-        return new TypedStreamIterable(stream);
+        return client.fetchBlob(ctx, ref, new VdlUint64(priority));
     }
+
     @Override
     public long size(VContext ctx) throws VException {
         return client.getBlobSize(ctx, ref);
@@ -64,14 +63,16 @@ class BlobReaderImpl implements BlobReader {
     }
 
     private static class BlobInputStream extends InputStream {
-        private final TypedClientStream<Void, byte[], Void> stream;
+        private final ClientRecvStream<byte[], Void> stream;
+        private final Iterator<byte[]> streamIt;
         private boolean closed = false;
         private byte[] lastRecv = null;
         private int lastRecvRemaining = 0;
         private boolean eof = false;
 
-        BlobInputStream(TypedClientStream<Void, byte[], Void> stream) {
+        BlobInputStream(ClientRecvStream<byte[], Void> stream) {
             this.stream = stream;
+            this.streamIt = stream.iterator();
         }
 
         @Override
@@ -84,7 +85,7 @@ class BlobReaderImpl implements BlobReader {
                 return;
             }
             try {
-                this.stream.finish();
+                stream.finish();
                 closed = true;
             } catch (VException e) {
                 throw new IOException(e);
@@ -123,13 +124,14 @@ class BlobReaderImpl implements BlobReader {
             while (need > 0) {
                 if (lastRecvRemaining <= 0) {
                     try {
-                        lastRecv = stream.recv();
+                        lastRecv = streamIt.next();
                         lastRecvRemaining = lastRecv.length;
-                    } catch (EOFException e) {
+                    } catch (NoSuchElementException e) {
                         eof = true;
                         break;
-                    } catch (VException e) {
-                        throw new IOException(e);
+                    }
+                    if (stream.error() != null) {
+                        throw new IOException(stream.error());
                     }
                 }
                 int copyLen = len > lastRecvRemaining ? lastRecvRemaining : len;

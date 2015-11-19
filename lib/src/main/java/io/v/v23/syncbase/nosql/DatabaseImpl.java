@@ -4,11 +4,13 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.VIterable;
+import io.v.v23.VIterables;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
@@ -24,8 +26,7 @@ import io.v.v23.services.watch.Change;
 import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.Util;
-import io.v.v23.vdl.TypedClientStream;
-import io.v.v23.vdl.TypedStreamIterable;
+import io.v.v23.vdl.ClientRecvStream;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
@@ -33,12 +34,12 @@ import io.v.v23.verror.BadStateException;
 import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
 
-import java.io.EOFException;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 class DatabaseImpl implements Database, BatchDatabase {
     private final String parentFullName;
@@ -81,27 +82,7 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public QueryResults exec(VContext ctx, String query) throws VException {
-        TypedClientStream<Void, List<VdlAny>, Void> stream =
-                this.client.exec(ctx, getSchemaVersion(), query);
-
-        // The first row contains column names, pull them off the stream.
-        List<VdlAny> row = null;
-        try {
-            row = stream.recv();
-        } catch (EOFException e) {
-            throw new VException("Got empty exec() stream for query: " + query);
-        }
-        String[] columnNames = new String[row.size()];
-        for (int i = 0; i < row.size(); ++i) {
-            Serializable elem = row.get(i).getElem();
-            if (elem instanceof String) {
-                columnNames[i] = (String) elem;
-            } else {
-                throw new VException("Expected first row in exec() stream to contain column " +
-                        "names (of type String), got type: " + elem.getClass());
-            }
-        }
-        return new QueryResultsImpl(stream, Arrays.asList(columnNames));
+        return new QueryResultsImpl(client.exec(ctx, getSchemaVersion(), query));
     }
 
     // Implements AccessController interface.
@@ -189,15 +170,16 @@ class DatabaseImpl implements Database, BatchDatabase {
     @Override
     public VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
                                         ResumeMarker resumeMarker) throws VException {
-        final TypedClientStream<Void, WatchChange, Void> stream = transformStream(this.client.watchGlob(ctx,
-                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"), resumeMarker)),
-                new VFunction<Change, WatchChange>() {
-            @Override
-            public WatchChange apply(Change input) throws VException {
-                return convertToWatchChange(input);
-            }
-        });
-        return new TypedStreamIterable<WatchChange>(stream);
+        return VIterables.transform(
+                client.watchGlob(ctx,
+                        new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
+                                resumeMarker)),
+                new VIterables.TransformFunction<Change, WatchChange>() {
+                    @Override
+                    public WatchChange apply(Change input) throws VException {
+                        return convertToWatchChange(input);
+                    }
+                });
     }
 
     @Override
@@ -205,19 +187,19 @@ class DatabaseImpl implements Database, BatchDatabase {
                       ResumeMarker resumeMarker, final Callback<VIterable<WatchChange>> callback)
             throws VException {
         final CancelableVContext ctxC = ctx.withCancel();
-        Callback<TypedClientStream<Void, Change, Void>> watchCallback =
-                new Callback<TypedClientStream<Void, Change, Void>>() {
+        Callback<ClientRecvStream<Change, Void>> watchCallback =
+                new Callback<ClientRecvStream<Change, Void>>() {
             @Override
-            public void onSuccess(TypedClientStream<Void, Change, Void> result) {
+            public void onSuccess(ClientRecvStream<Change, Void> result) {
                 callback.onSuccess(
-                        new TypedStreamIterable<>(transformStream(result, new VFunction<Change, WatchChange>() {
-                    @Override
-                    public WatchChange apply(Change input) throws VException {
-                        return convertToWatchChange(input);
-                    }
-                })));
+                        VIterables.transform(result,
+                                new VIterables.TransformFunction<Change, WatchChange>() {
+                                    @Override
+                                    public WatchChange apply(Change input) throws VException {
+                                        return convertToWatchChange(input);
+                                    }
+                                }));
             }
-
             @Override
             public void onFailure(VException error) {
                 callback.onFailure(error);
@@ -363,14 +345,45 @@ class DatabaseImpl implements Database, BatchDatabase {
         return this.schema.getMetadata().getVersion();
     }
 
-    private static class QueryResultsImpl
-            extends TypedStreamIterable<List<VdlAny>> implements QueryResults {
+    private static class QueryResultsImpl implements QueryResults {
+        private final VIterable<List<VdlAny>> iterable;
+        private final Iterator<List<VdlAny>> it;
+        private boolean calledIterator;
         private final List<String> columnNames;
 
-        private QueryResultsImpl(TypedClientStream<Void, List<VdlAny>, Void> stream,
-                            List<String> columnNames) {
-            super(stream);
-            this.columnNames = columnNames;
+        private QueryResultsImpl(VIterable<List<VdlAny>> iterable) throws VException {
+            this.iterable = iterable;
+            // Iterator can be created only once, so cache the iterator here as we need
+            // to use it just below.
+            it = iterable.iterator();
+
+            // The first row should contain column names, pull them off the stream.
+            List<VdlAny> row;
+            try {
+                row = it.next();
+            } catch (NoSuchElementException e) {
+                throw new VException("Got empty exec() stream.");
+            }
+            columnNames = new ArrayList(row.size());
+            for (int i = 0; i < row.size(); ++i) {
+                Serializable elem = row.get(i).getElem();
+                if (elem instanceof String) {
+                    columnNames.add((String) elem);
+                } else {
+                    throw new VException("Expected first row in exec() stream to contain column " +
+                            "names (of type String), got type: " + elem.getClass());
+                }
+            }
+        }
+        @Override
+        public Iterator<List<VdlAny>> iterator() {
+            Preconditions.checkState(!calledIterator, "Can only create one iterator.");
+            calledIterator = true;
+            return it;
+        }
+        @Override
+        public VException error() {
+            return iterable.error();
         }
         @Override
         public List<String> columnNames() {
@@ -409,30 +422,5 @@ class DatabaseImpl implements Database, BatchDatabase {
         Iterator<String> iter = Splitter.on(separator).limit(2).split(str).iterator();
         return ImmutableList.of(
                 iter.hasNext() ? iter.next() : "", iter.hasNext() ? iter.next() : "");
-    }
-
-    private interface VFunction<T, U> {
-        U apply(T input) throws VException;
-    }
-
-    private static <SendT, RecvT, NewRecvT, FinishT> TypedClientStream<SendT, NewRecvT, FinishT>
-            transformStream(final TypedClientStream<SendT, RecvT, FinishT> inputStream,
-                            final VFunction<RecvT, NewRecvT> transformFunction) {
-        return new TypedClientStream<SendT, NewRecvT, FinishT>() {
-            @Override
-            public FinishT finish() throws VException {
-                return inputStream.finish();
-            }
-
-            @Override
-            public void send(SendT item) throws VException {
-                inputStream.send(item);
-            }
-
-            @Override
-            public NewRecvT recv() throws EOFException, VException {
-                return transformFunction.apply(inputStream.recv());
-            }
-        };
     }
 }

@@ -23,6 +23,7 @@ public interface BatchDatabase extends DatabaseCore {
 
     /**
      * Asynchronous version of {@link #commit(VContext)}.
+     *
      * @throws VException if there was an error creating the asynchronous call. In this case, no
      *                    methods on {@code callback} will be called.
      */
