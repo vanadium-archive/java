@@ -14,9 +14,6 @@ apply plugin: 'io.v.vdl'
 apply plugin: 'wrapper'
 repositories {
     mavenCentral()
-    maven {
-        url 'https://maven.v.io/'
-    }
 }
 android {
     compileSdkVersion 19
@@ -31,7 +28,7 @@ android {
     }
 }
 dependencies {
-    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
+    compile 'io.v:vanadium-android:0.1'
 }
 vdl {
     inputPaths += 'src/main/java'

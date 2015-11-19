@@ -14,14 +14,11 @@ apply plugin: 'java'
 mainClassName = 'io.v.chat.Main'
 
 repositories {
-    maven {
-        url "https://maven.v.io/"
-    }
     mavenCentral()
 }
 
 dependencies {
-    compile 'io.v:vanadium:0.1-SNAPSHOT'
+    compile 'io.v:vanadium:0.1'
     compile 'com.googlecode.lanterna:lanterna:2.1.9'
     testCompile 'junit:junit:4.12'
 }

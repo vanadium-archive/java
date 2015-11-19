@@ -25,9 +25,6 @@ apply plugin: 'io.v.vdl'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://maven.v.io/'
-    }
 }
 
 android {
@@ -60,7 +57,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
+    compile 'io.v:vanadium-android:0.1'
 }
 
 vdl {

@@ -1,8 +1,5 @@
 repositories {
     mavenCentral()
-    maven {
-        url "https://maven.v.io"
-    }
 }
 
 apply plugin: 'java'

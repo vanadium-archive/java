@@ -18,13 +18,10 @@ applicationDefaultJvmArgs = ['-XX:+UnlockDiagnosticVMOptions', '-XX:-LogEvents']
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://maven.v.io'
-    }
 }
 
 dependencies {
-    compile 'io.v:vanadium:0.1-SNAPSHOT'
+    compile 'io.v:vanadium:0.1'
     compile 'com.google.guava:guava:18'
     compile 'com.beust:jcommander:1.48'
 }
