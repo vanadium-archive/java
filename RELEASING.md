@@ -119,7 +119,7 @@ Coming soon
 [Vanadium Bintray organization]: https://bintray.com/vanadium
 [Sonatype JIRA]: https://issues.sonatype.org/
 [JIRA account creation]: https://issues.sonatype.org/secure/Signup!default.jspa
-[vanadium-dicuss mailing list]: mailto:vanadium-discuss@v.io
+[vanadium-discuss mailing list]: mailto:vanadium-discuss@v.io
 [JCenter Gradle plugin]: https://jcenter.bintray.com/io/v/gradle-plugin/
 [Gradle plugin Bintray]: https://bintray.com/vanadium/io.v/gradle-plugin/view
 [Maven Central page]: https://repo1.maven.org/maven2/io/v/gradle-plugin/
