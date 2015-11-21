@@ -5,6 +5,8 @@
 package io.v.impl.google.rpc;
 
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
@@ -39,23 +41,6 @@ public class ClientImpl implements Client {
     private ClientImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
-    // Implement io.v.v23.rpc.Client.
-    @Override
-    public ClientCall startCall(VContext context, String name,
-            String method, Object[] args, Type[] argTypes) throws VException {
-        return startCall(context, name, method, args, argTypes, (Options) null);
-    }
-    @Override
-    public ClientCall startCall(VContext context, String name,
-                                String method, Object[] args, Type[] argTypes, Options opts)
-            throws VException {
-        if (opts == null) {
-            opts = new Options();
-        }
-        checkStartCallArgs(name, method, args, argTypes);
-        return nativeStartCall(this.nativePtr, context, name, getMethodName(method),
-                getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts));
-    }
 
     private boolean shouldSkipServerAuth(Options opts) {
         return !opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION)
@@ -63,21 +48,34 @@ public class ClientImpl implements Client {
                     : opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class);
     }
 
+    // Implement io.v.v23.rpc.Client.
     @Override
-    public void startCall(VContext context, String name, String method, Object[] args, Type[]
-            argTypes, Callback<ClientCall> callback) throws VException {
-        startCall(context, name, method, args, argTypes, null, callback);
+    public ListenableFuture<ClientCall> startCall(
+            VContext context, String name, String method, Object[] args, Type[] argTypes) throws VException {
+        return startCall(context, name, method, args, argTypes, null);
     }
     @Override
-    public void startCall(VContext context, String name, String method, Object[] args, Type[]
-            argTypes, Options opts, Callback<ClientCall> callback) throws VException {
-        Preconditions.checkNotNull(callback);
+    public ListenableFuture<ClientCall> startCall(VContext context, String name, String method, Object[] args, Type[]
+            argTypes, Options opts) throws VException {
+        final SettableFuture<ClientCall> future = SettableFuture.create();
         if (opts == null) {
             opts = new Options();
         }
         checkStartCallArgs(name, method, args, argTypes);
+        Callback<ClientCall> callback = new Callback<ClientCall>() {
+            @Override
+            public void onSuccess(ClientCall result) {
+                future.set(result);
+            }
+
+            @Override
+            public void onFailure(VException error) {
+                future.setException(error);
+            }
+        };
         nativeStartCallAsync(this.nativePtr, context, name, getMethodName(method),
-                getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts), callback);
+            getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts), callback);
+        return future;
     }
 
     private String getMethodName(String method) {

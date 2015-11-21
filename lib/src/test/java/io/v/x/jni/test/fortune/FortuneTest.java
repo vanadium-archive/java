@@ -46,6 +46,8 @@ import io.v.v23.verror.VException;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static io.v.v23.VFutures.sync;
+
 public class FortuneTest extends TestCase {
     private static final String TEST_INVOKER_FORTUNE = "Test invoker fortune";
 
@@ -227,8 +229,10 @@ public class FortuneTest extends TestCase {
 
         Client c = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        ClientCall call = c.startCall(ctxT, name(), "__Signature", new Object[0], new Type[0]);
-        Object[] results = call.finish(new Type[] { new TypeToken<Interface[]>() {}.getType() });
+        ClientCall call = sync(
+                c.startCall(ctxT, name(), "__Signature", new Object[0], new Type[0]));
+        Object[] results = sync(
+                call.finish(new Type[] { new TypeToken<Interface[]>() {}.getType() }));
         assertThat(results.length == 1).isTrue();
         Interface[] signature = (Interface[]) results[0];
         assertThat(signature.length >= 1).isTrue();
