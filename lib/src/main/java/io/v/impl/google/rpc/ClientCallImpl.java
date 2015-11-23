@@ -4,6 +4,8 @@
 
 package io.v.impl.google.rpc;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.ClientCall;
@@ -21,7 +23,6 @@ public class ClientCallImpl implements ClientCall {
     private final Stream stream;
 
     private native void nativeCloseSend(long nativePtr) throws VException;
-    private native byte[][] nativeFinish(long nativePtr, int numResults);
     private native void nativeFinishAsync(long nativePtr, int numResults, Callback<byte[][]> callback);
     private native void nativeFinalize(long nativePtr);
 
@@ -36,29 +37,16 @@ public class ClientCallImpl implements ClientCall {
         nativeCloseSend(nativePtr);
     }
     @Override
-    public Object[] finish(Type[] types) throws VException {
-        byte[][] vomResults = nativeFinish(nativePtr, types.length);
-        if (vomResults.length != types.length) {
-            throw new VException(String.format(
-                    "Mismatch in number of results, want %s, have %s",
-                    types.length, vomResults.length));
-        }
-        // VOM-decode results.
-        Object[] ret = new Object[types.length];
-        for (int i = 0; i < types.length; i++) {
-            ret[i] = VomUtil.decode(vomResults[i], types[i]);
-        }
-        return ret;
-    }
-    @Override
-    public void finish(final Type[] types, final Callback<Object[]> callback) {
+    public ListenableFuture<Object[]> finish(final Type[] types) throws VException {
+        final SettableFuture<Object[]> future = SettableFuture.create();
         nativeFinishAsync(nativePtr, types.length, new Callback<byte[][]>() {
             @Override
             public void onSuccess(byte[][] vomResults) {
                 if (vomResults.length != types.length) {
-                    callback.onFailure(new VException(String.format(
+                    future.setException(new VException(String.format(
                             "Mismatch in number of results, want %s, have %s",
                             types.length, vomResults.length)));
+                    return;
                 }
                 // VOM-decode results.
                 Object[] ret = new Object[types.length];
@@ -66,18 +54,19 @@ public class ClientCallImpl implements ClientCall {
                     try {
                         ret[i] = VomUtil.decode(vomResults[i], types[i]);
                     } catch (VException e) {
-                        callback.onFailure(e);
+                        future.setException(e);
                         return;
                     }
                 }
-                callback.onSuccess(ret);
+                future.set(ret);
             }
 
             @Override
             public void onFailure(VException error) {
-                callback.onFailure(error);
+                future.setException(error);
             }
         });
+        return future;
     }
     // Implements io.v.v23.rpc.Stream.
     @Override
