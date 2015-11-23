@@ -23,7 +23,7 @@ public class ClientCallImpl implements ClientCall {
     private final Stream stream;
 
     private native void nativeCloseSend(long nativePtr) throws VException;
-    private native void nativeFinishAsync(long nativePtr, int numResults, Callback<byte[][]> callback);
+    private native void nativeFinish(long nativePtr, int numResults, Callback<byte[][]> callback);
     private native void nativeFinalize(long nativePtr);
 
     private ClientCallImpl(long nativePtr, Stream stream) {
@@ -39,7 +39,7 @@ public class ClientCallImpl implements ClientCall {
     @Override
     public ListenableFuture<Object[]> finish(final Type[] types) throws VException {
         final SettableFuture<Object[]> future = SettableFuture.create();
-        nativeFinishAsync(nativePtr, types.length, new Callback<byte[][]>() {
+        nativeFinish(nativePtr, types.length, new Callback<byte[][]>() {
             @Override
             public void onSuccess(byte[][] vomResults) {
                 if (vomResults.length != types.length) {
