@@ -35,7 +35,7 @@ public class SettingsActivity extends PreferenceActivity {
         mIdServicePref = new EditTextPreference(this);
         mIdServicePref.setKey(IDENTITY_SERVICE_NAME);
         mIdServicePref.setOnPreferenceChangeListener(mPrefChangeListener);
-        mIdServicePref.setDefaultValue("identity/dev.v.io/u/google");
+        mIdServicePref.setDefaultValue("identity/dev.v.io:u/google");
         mIdServicePref.setTitle("Vanadium Identity Service Name");
         mIdServicePref.setDialogTitle(mIdServicePref.getTitle());
         mIdServicePref.setSummary(mIdServicePref.getText());

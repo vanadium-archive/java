@@ -196,7 +196,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                             .add(ecPublicKey, new BlessingPattern(name));
                 }
                 OAuthBlesserClient blesser =
-                        OAuthBlesserClientFactory.getOAuthBlesserClient("identity/dev.v.io/u/google");
+                        OAuthBlesserClientFactory.getOAuthBlesserClient("identity/dev.v.io:u/google");
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
                 OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
                         blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0],
