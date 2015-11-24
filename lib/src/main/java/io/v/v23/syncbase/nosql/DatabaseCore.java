@@ -3,6 +3,8 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.watch.ResumeMarker;
@@ -28,19 +30,20 @@ public interface DatabaseCore {
 
     /**
      * Returns the table with the given name.
+     * <p>
+     * This is a non-blocking method.
      *
      * @param  relativeName name of the table; must not contain slashes
      */
     Table getTable(String relativeName);
 
     /**
-     * Returns a list of all table names.
+     * Returns a new {@link ListenableFuture} whose result is a list of all table names.
      *
      * @param  ctx        Vanadium context
      * @return            a list of all table names
-     * @throws VException if the list of table names couldn't be retrieved
      */
-    String[] listTables(VContext ctx) throws VException;
+    ListenableFuture<List<String>> listTables(VContext ctx);
 
     /**
      * Executes a SyncQL query, returning a {@link QueryResults} object that allows the caller to
@@ -52,22 +55,20 @@ public interface DatabaseCore {
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
      * stop the query execution and terminate the returned iterator early.
-
      *
      * @param  ctx        Vanadium context
      * @param  query      a SyncQL query
-     * @return            a {@link QueryResults} object that allows the caller to iterate over
-     *                    arrays of values for each row that matches the query
-     * @throws VException if there was an error executing the query
+     * @return            a {@link ListenableFuture} whose result is a {@link QueryResults} object
+     *                    that allows the caller to iterate over arrays of values for each row that
+     *                    matches the query
      */
-    QueryResults exec(VContext ctx, String query) throws VException;
+    ListenableFuture<QueryResults> exec(VContext ctx, String query);
 
     /**
-     * Returns the {@link ResumeMarker} that points to the current state of the database.
-     *
-     * @throws VException if there was an error obtaining the {@link ResumeMarker}
+     * Returns a new {@link ListenableFuture} whose result is the {@link ResumeMarker} that points
+     * to the current state of the database.
      */
-    ResumeMarker getResumeMarker(VContext ctx) throws VException;
+    ListenableFuture<ResumeMarker> getResumeMarker(VContext ctx);
 
     /**
      * An interface for iterating through rows resulting from a

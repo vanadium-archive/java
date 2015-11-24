@@ -51,8 +51,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static com.google.common.truth.Truth.assertThat;
+import static io.v.v23.VFutures.sync;
 
 /**
  * Client-server syncbase tests.
@@ -101,7 +103,7 @@ public class SyncbaseTest extends TestCase {
     public void testService() throws Exception {
         SyncbaseService service = createService();
         assertThat(service.fullName()).isEqualTo(serverEndpoint.name());
-        assertThat(service.listApps(ctx)).isEmpty();
+        assertThat(sync(service.listApps(ctx))).isEmpty();
     }
 
     public void testApp() throws Exception {
@@ -111,15 +113,15 @@ public class SyncbaseTest extends TestCase {
         assertThat(app.name()).isEqualTo(APP_NAME);
         assertThat(app.fullName()).isEqualTo(
             NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME)));
-        assertThat(app.exists(ctx)).isFalse();
-        assertThat(service.listApps(ctx)).isEmpty();
-        app.create(ctx, allowAll);
-        assertThat(app.exists(ctx)).isTrue();
-        assertThat(service.listApps(ctx)).containsExactly(app.name());
-        assertThat(app.listDatabases(ctx)).isEmpty();
-        app.destroy(ctx);
-        assertThat(app.exists(ctx)).isFalse();
-        assertThat(service.listApps(ctx)).isEmpty();
+        assertThat(sync(app.exists(ctx))).isFalse();
+        assertThat(sync(service.listApps(ctx))).isEmpty();
+        sync(app.create(ctx, allowAll));
+        assertThat(sync(app.exists(ctx))).isTrue();
+        assertThat(sync(service.listApps(ctx))).containsExactly(app.name());
+        assertThat(sync(app.listDatabases(ctx))).isEmpty();
+        sync(app.destroy(ctx));
+        assertThat(sync(app.exists(ctx))).isFalse();
+        assertThat(sync(service.listApps(ctx))).isEmpty();
     }
 
     public void testDatabase() throws Exception {
@@ -130,15 +132,15 @@ public class SyncbaseTest extends TestCase {
         assertThat(db.name()).isEqualTo(DB_NAME);
         assertThat(db.fullName()).isEqualTo(
                 NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME));
-        assertThat(db.exists(ctx)).isFalse();
-        assertThat(app.listDatabases(ctx)).isEmpty();
-        db.create(ctx, allowAll);
-        assertThat(db.exists(ctx)).isTrue();
-        assertThat(app.listDatabases(ctx)).containsExactly(db.name());
-        assertThat(db.listTables(ctx)).isEmpty();
-        db.destroy(ctx);
-        assertThat(db.exists(ctx)).isFalse();
-        assertThat(app.listDatabases(ctx)).isEmpty();
+        assertThat(sync(db.exists(ctx))).isFalse();
+        assertThat(sync(app.listDatabases(ctx))).isEmpty();
+        sync(db.create(ctx, allowAll));
+        assertThat(sync(db.exists(ctx))).isTrue();
+        assertThat(sync(app.listDatabases(ctx))).containsExactly(db.name());
+        assertThat(sync(db.listTables(ctx))).isEmpty();
+        sync(db.destroy(ctx));
+        assertThat(sync(db.exists(ctx))).isFalse();
+        assertThat(sync(app.listDatabases(ctx))).isEmpty();
     }
 
     public void testTable() throws Exception {
@@ -149,34 +151,34 @@ public class SyncbaseTest extends TestCase {
         assertThat(table.name()).isEqualTo(TABLE_NAME);
         assertThat(table.fullName()).isEqualTo(
             NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME));
-        assertThat(table.exists(ctx)).isFalse();
-        assertThat(db.listTables(ctx)).isEmpty();
-        table.create(ctx, allowAll);
-        assertThat(table.exists(ctx)).isTrue();
-        assertThat(Arrays.asList(db.listTables(ctx))).containsExactly(TABLE_NAME);
+        assertThat(sync(table.exists(ctx))).isFalse();
+        assertThat(sync(db.listTables(ctx))).isEmpty();
+        sync(table.create(ctx, allowAll));
+        assertThat(sync(table.exists(ctx))).isTrue();
+        assertThat(sync(db.listTables(ctx))).containsExactly(TABLE_NAME);
 
-        assertThat(table.getRow("row1").exists(ctx)).isFalse();
-        table.put(ctx, "row1", "value1", String.class);
-        assertThat(table.getRow("row1").exists(ctx)).isTrue();
-        assertThat(table.get(ctx, "row1", String.class)).isEqualTo("value1");
-        table.delete(ctx, "row1");
-        assertThat(table.getRow("row1").exists(ctx)).isFalse();
-        table.put(ctx, "row1", "value1", String.class);
-        table.put(ctx, "row2", "value2", String.class);
-        assertThat(table.getRow("row1").exists(ctx)).isTrue();
-        assertThat(table.getRow("row2").exists(ctx)).isTrue();
-        assertThat(table.get(ctx, "row1", String.class)).isEqualTo("value1");
-        assertThat(table.get(ctx, "row2", String.class)).isEqualTo("value2");
-        assertThat(table.scan(ctx, RowRange.range("row1", "row3"))).containsExactly(
+        assertThat(sync(table.getRow("row1").exists(ctx))).isFalse();
+        sync(table.put(ctx, "row1", "value1", String.class));
+        assertThat(sync(table.getRow("row1").exists(ctx))).isTrue();
+        assertThat(sync(table.get(ctx, "row1", String.class))).isEqualTo("value1");
+        sync(table.delete(ctx, "row1"));
+        assertThat(sync(table.getRow("row1").exists(ctx))).isFalse();
+        sync(table.put(ctx, "row1", "value1", String.class));
+        sync(table.put(ctx, "row2", "value2", String.class));
+        assertThat(sync(table.getRow("row1").exists(ctx))).isTrue();
+        assertThat(sync(table.getRow("row2").exists(ctx))).isTrue();
+        assertThat(sync(table.get(ctx, "row1", String.class))).isEqualTo("value1");
+        assertThat(sync(table.get(ctx, "row2", String.class))).isEqualTo("value2");
+        assertThat(sync(table.scan(ctx, RowRange.range("row1", "row3")))).containsExactly(
                 new KeyValue("row1", VomUtil.encode("value1", String.class)),
                 new KeyValue("row2", VomUtil.encode("value2", String.class)));
-        table.deleteRange(ctx, RowRange.range("row1", "row3"));
-        assertThat(table.getRow("row1").exists(ctx)).isFalse();
-        assertThat(table.getRow("row2").exists(ctx)).isFalse();
+        sync(table.deleteRange(ctx, RowRange.range("row1", "row3")));
+        assertThat(sync(table.getRow("row1").exists(ctx))).isFalse();
+        assertThat(sync(table.getRow("row2").exists(ctx))).isFalse();
 
-        table.destroy(ctx);
-        assertThat(table.exists(ctx)).isFalse();
-        assertThat(db.listTables(ctx)).isEmpty();
+        sync(table.destroy(ctx));
+        assertThat(sync(table.exists(ctx))).isFalse();
+        assertThat(sync(db.listTables(ctx))).isEmpty();
     }
 
     public void testRow() throws Exception {
@@ -187,17 +189,17 @@ public class SyncbaseTest extends TestCase {
         assertThat(row.fullName()).isEqualTo(
                 NamingUtil.join(serverEndpoint.name(), Util.escape(APP_NAME), DB_NAME, TABLE_NAME,
                         Util.escape(ROW_NAME)));
-        assertThat(row.exists(ctx)).isFalse();
-        row.put(ctx, "value", String.class);
-        assertThat(row.exists(ctx)).isTrue();
-        assertThat(row.get(ctx, String.class)).isEqualTo("value");
-        assertThat(table.get(ctx, ROW_NAME, String.class)).isEqualTo("value");
-        row.delete(ctx);
-        assertThat(row.exists(ctx)).isFalse();
-        table.put(ctx, ROW_NAME, "value", String.class);
-        assertThat(row.exists(ctx)).isTrue();
-        assertThat(row.get(ctx, String.class)).isEqualTo("value");
-        assertThat(table.get(ctx, ROW_NAME, String.class)).isEqualTo("value");
+        assertThat(sync(row.exists(ctx))).isFalse();
+        sync(row.put(ctx, "value", String.class));
+        assertThat(sync(row.exists(ctx))).isTrue();
+        assertThat(sync(row.get(ctx, String.class))).isEqualTo("value");
+        assertThat(sync(table.get(ctx, ROW_NAME, String.class))).isEqualTo("value");
+        sync(row.delete(ctx));
+        assertThat(sync(row.exists(ctx))).isFalse();
+        sync(table.put(ctx, ROW_NAME, "value", String.class));
+        assertThat(sync(row.exists(ctx))).isTrue();
+        assertThat(sync(row.get(ctx, String.class))).isEqualTo("value");
+        assertThat(sync(table.get(ctx, ROW_NAME, String.class))).isEqualTo("value");
     }
 
     public void testDatabaseExec() throws Exception {
@@ -207,19 +209,20 @@ public class SyncbaseTest extends TestCase {
         Bar bar = new Bar(0.5f, "b");
         Baz baz = new Baz("John Doe", true);
 
-        table.put(ctx, "foo", foo, Foo.class);
-        table.put(ctx, "bar", bar, Bar.class);
-        table.put(ctx, "baz", baz, Baz.class);
+        sync(table.put(ctx, "foo", foo, Foo.class));
+        sync(table.put(ctx, "bar", bar, Bar.class));
+        sync(table.put(ctx, "baz", baz, Baz.class));
 
         {
-            DatabaseCore.QueryResults results = db.exec(ctx,
-                    "select k, v.Name from " + TABLE_NAME + " where Type(v) like \"%Baz\"");
+            DatabaseCore.QueryResults results = sync(db.exec(ctx,
+                    "select k, v.Name from " + TABLE_NAME + " where Type(v) like \"%Baz\""));
             assertThat(results.columnNames()).containsExactly("k", "v.Name");
             assertThat(results).containsExactly(ImmutableList.of(
                     new VdlAny(String.class, "baz"), new VdlAny(String.class, baz.name)));
         }
         {
-            DatabaseCore.QueryResults results = db.exec(ctx, "select k, v from " + TABLE_NAME);
+            DatabaseCore.QueryResults results =
+                    sync(db.exec(ctx, "select k, v from " + TABLE_NAME));
             assertThat(results.columnNames()).containsExactly("k", "v");
             assertThat(results).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "bar"), new VdlAny(Bar.class, bar)),
@@ -235,12 +238,12 @@ public class SyncbaseTest extends TestCase {
         Foo foo = new Foo(4, "f");
         Bar bar = new Bar(0.5f, "b");
         Baz baz = new Baz("John Doe", true);
-        ResumeMarker marker = db.getResumeMarker(ctx);
+        ResumeMarker marker = sync(db.getResumeMarker(ctx));
 
-        table.put(ctx, "foo", foo, Foo.class);
-        table.put(ctx, "bar", bar, Bar.class);
-        table.put(ctx, "baz", baz, Baz.class);
-        table.getRow("baz").delete(ctx);
+        sync(table.put(ctx, "foo", foo, Foo.class));
+        sync(table.put(ctx, "bar", bar, Bar.class));
+        sync(table.put(ctx, "baz", baz, Baz.class));
+        sync(table.getRow("baz").delete(ctx));
 
         ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
                 new WatchChange(TABLE_NAME, "bar", ChangeType.PUT_CHANGE,
@@ -250,7 +253,7 @@ public class SyncbaseTest extends TestCase {
                 new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
                         new byte[0], null, false, false ));
         CancelableVContext ctxC = ctx.withCancel();
-        Iterator<WatchChange> it = db.watch(ctxC, TABLE_NAME, "b", marker).iterator();
+        Iterator<WatchChange> it = sync(db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
         for (WatchChange expected : expectedChanges) {
             assertThat(it.hasNext());
             WatchChange actual = it.next();
@@ -269,8 +272,8 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createApp(createService()));
         createTable(db);
 
-        VIterable<WatchChange> it = db.watch(
-                cancelCtx, TABLE_NAME, "b", db.getResumeMarker(ctx));
+        VIterable<WatchChange> it = sync(db.watch(
+                cancelCtx, TABLE_NAME, "b", sync(db.getResumeMarker(ctx))));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -283,30 +286,30 @@ public class SyncbaseTest extends TestCase {
     public void testBatch() throws Exception {
         Database db = createDatabase(createApp(createService()));
         Table table = createTable(db);
-        assertThat(table.scan(ctx, RowRange.prefix(""))).isEmpty();
+        assertThat(sync(table.scan(ctx, RowRange.prefix("")))).isEmpty();
 
-        BatchDatabase batchFoo = db.beginBatch(ctx, null);
+        BatchDatabase batchFoo = sync(db.beginBatch(ctx, null));
         Table batchFooTable = batchFoo.getTable(TABLE_NAME);
-        assertThat(batchFooTable.exists(ctx)).isTrue();
-        batchFooTable.put(ctx, ROW_NAME, "foo", String.class);
+        assertThat(sync(batchFooTable.exists(ctx))).isTrue();
+        sync(batchFooTable.put(ctx, ROW_NAME, "foo", String.class));
         // Assert that value is visible inside the batch but not outside.
-        assertThat(batchFooTable.get(ctx, ROW_NAME, String.class)).isEqualTo("foo");
-        assertThat(table.getRow(ROW_NAME).exists(ctx)).isFalse();
+        assertThat(sync(batchFooTable.get(ctx, ROW_NAME, String.class))).isEqualTo("foo");
+        assertThat(sync(table.getRow(ROW_NAME).exists(ctx))).isFalse();
 
-        BatchDatabase batchBar = db.beginBatch(ctx, null);
+        BatchDatabase batchBar = sync(db.beginBatch(ctx, null));
         Table batchBarTable = batchBar.getTable(TABLE_NAME);
-        assertThat(batchBarTable.exists(ctx)).isTrue();
-        batchBarTable.put(ctx, ROW_NAME, "foo", String.class);
+        assertThat(sync(batchBarTable.exists(ctx))).isTrue();
+        sync(batchBarTable.put(ctx, ROW_NAME, "foo", String.class));
         // Assert that value is visible inside the batch but not outside.
-        assertThat(batchBarTable.get(ctx, ROW_NAME, String.class)).isEqualTo("foo");
-        assertThat(table.getRow(ROW_NAME).exists(ctx)).isFalse();
+        assertThat(sync(batchBarTable.get(ctx, ROW_NAME, String.class))).isEqualTo("foo");
+        assertThat(sync(table.getRow(ROW_NAME).exists(ctx))).isFalse();
 
-        batchFoo.commit(ctx);
+        sync(batchFoo.commit(ctx));
         // Assert that the value is visible outside the batch.
-        assertThat(table.get(ctx, ROW_NAME, String.class)).isEqualTo("foo");
+        assertThat(sync(table.get(ctx, ROW_NAME, String.class))).isEqualTo("foo");
 
         try {
-            batchBar.commit(ctx);
+            sync(batchBar.commit(ctx));
             fail("Expected batchBar.commit() to fail");
         } catch (VException e) {
             // ok
@@ -325,26 +328,26 @@ public class SyncbaseTest extends TestCase {
 	memberInfo.setSyncPriority((byte) 1);
         Syncgroup group = db.getSyncgroup(groupName);
         {
-            group.create(ctx, spec, memberInfo);
-            assertThat(db.listSyncgroupNames(ctx)).containsExactly(groupName);
-            assertThat(group.getSpec(ctx).values()).containsExactly(spec);
-            assertThat(group.getMembers(ctx).values()).containsExactly(memberInfo);
-            assertThat(group.join(ctx, memberInfo)).isEqualTo(spec);
+            sync(group.create(ctx, spec, memberInfo));
+            assertThat(sync(db.listSyncgroupNames(ctx))).containsExactly(groupName);
+            assertThat(sync(group.getSpec(ctx)).values()).containsExactly(spec);
+            assertThat(sync(group.getMembers(ctx)).values()).containsExactly(memberInfo);
+            assertThat(sync(group.join(ctx, memberInfo))).isEqualTo(spec);
         }
         // TODO(spetrovic): test leave() and destroy().
 
         SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", allowAll,
             ImmutableList.of(new TableRow(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
-        assertThat(group.getSpec(ctx).keySet()).isNotEmpty();
-        String version = group.getSpec(ctx).keySet().iterator().next();
-        group.setSpec(ctx, specRMW, version);
-        assertThat(group.getSpec(ctx).values()).containsExactly(specRMW);
+        assertThat(sync(group.getSpec(ctx)).keySet()).isNotEmpty();
+        String version = sync(group.getSpec(ctx)).keySet().iterator().next();
+        sync(group.setSpec(ctx, specRMW, version));
+        assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specRMW);
         SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", allowAll,
             ImmutableList.of(new TableRow(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
-        group.setSpec(ctx, specOverwrite, "");
-        assertThat(group.getSpec(ctx).values()).containsExactly(specOverwrite);
+        sync(group.setSpec(ctx, specOverwrite, ""));
+        assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specOverwrite);
     }
 
     // TODO(spetrovic): Test Database.upgradeIfOutdated().
@@ -352,17 +355,17 @@ public class SyncbaseTest extends TestCase {
     public void testBlobSmall() throws Exception {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
-        OutputStream out = writer.stream(ctx);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data);
         out.close();
-        assertThat(writer.size(ctx)).isEqualTo(data.length);
-        writer.commit(ctx);
+        assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
+        sync(writer.commit(ctx));
         BlobRef ref = writer.getRef();
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -372,62 +375,62 @@ public class SyncbaseTest extends TestCase {
             data[i] = (byte)(i & 0xFF);
         }
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
-        OutputStream out = writer.stream(ctx);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data);
         out.close();
-        assertThat(writer.size(ctx)).isEqualTo(data.length);
-        writer.commit(ctx);
+        assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
+        sync(writer.commit(ctx));
         BlobRef ref = writer.getRef();
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
         assertThat(actual).isEqualTo(data);
     }
 
     public void testBlobWriteResume() throws Exception {
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         {
             // Write, part 1.
-            OutputStream out = writer.stream(ctx);
+            OutputStream out = sync(writer.stream(ctx));
             out.write(data, 0, data.length / 2);
             out.close();
-            assertThat(writer.size(ctx)).isEqualTo(data.length / 2);
+            assertThat(sync(writer.size(ctx))).isEqualTo(data.length / 2);
         }
         {
             // Write, part 2.
-            writer = db.writeBlob(ctx, ref);
-            assertThat(writer.size(ctx)).isEqualTo(5);
-            OutputStream out = writer.stream(ctx);
+            writer = sync(db.writeBlob(ctx, ref));
+            assertThat(sync(writer.size(ctx))).isEqualTo(5);
+            OutputStream out = sync(writer.stream(ctx));
             out.write(data, data.length / 2, data.length / 2);
             out.close();
-            assertThat(writer.size(ctx)).isEqualTo(data.length);
-            writer.commit(ctx);
+            assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
+            sync(writer.commit(ctx));
         }
         // Read.
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
         assertThat(actual).isEqualTo(data);
     }
 
     public void testBlobWriteCommitted() throws Exception {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
-        OutputStream out = writer.stream(ctx);
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data);
         out.close();
-        assertThat(writer.size(ctx)).isEqualTo(data.length);
-        writer.commit(ctx);
+        assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
+        sync(writer.commit(ctx));
 
         try {
-            out = writer.stream(ctx);
+            out = sync(writer.stream(ctx));
             out.write(data);
             out.close();
             fail("write of a committed blob should fail");
@@ -435,7 +438,7 @@ public class SyncbaseTest extends TestCase {
             // OK
         }
         try {
-            writer.commit(ctx);
+            sync(writer.commit(ctx));
             fail("commit of a committed blob should fail");
         } catch (VException e) {
             // OK
@@ -443,19 +446,19 @@ public class SyncbaseTest extends TestCase {
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
         assertThat(actual).isEqualTo(data);
     }
 
     public void testBlobWriteCancelable() throws Exception {
         Database db = createDatabase(createApp(createService()));
         CancelableVContext ctxC = ctx.withCancel();
-        BlobWriter writer = db.writeBlob(ctxC, null);
+        BlobWriter writer = sync(db.writeBlob(ctxC, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
         // Write 1st chunk.
-        OutputStream out = writer.stream(ctxC);
+        OutputStream out = sync(writer.stream(ctxC));
         out.write(data, 0, data.length / 2);
         ctxC.cancel();
         // Write 2nd chunk.
@@ -470,67 +473,61 @@ public class SyncbaseTest extends TestCase {
 
     public void testBlobReadUncommitted() throws Exception {
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
-        OutputStream out = writer.stream(ctx);
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data, 0, data.length);
         out.close();
 
         BlobReader reader = db.readBlob(ctx, ref);
         try {
             byte[] actual = new byte[data.length];
-            ByteStreams.readFully(reader.stream(ctx, 0), actual);
+            ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
             fail("read of an uncommitted blob should fail");
-        } catch (VException e) {
-            // OK
-        } catch (IOException e) {
+        } catch (VException | IOException e) {
             // OK
         }
         try {
-            Iterator<BlobFetchStatus> iter = reader.prefetch(ctx, 0).iterator();
-            iter.next();
-            fail("prefetch of an uncommitted blob should fail");
-        } catch (VException e) {
-            // OK
-        } catch (RuntimeException e) {
+            sync(reader.prefetch(ctx, 0)).iterator().next();
+        } catch (VException | NoSuchElementException e) {
             // OK
         }
     }
 
     public void testBlobReadPrefetch() throws Exception {
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
-        OutputStream out = writer.stream(ctx);
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data, 0, data.length);
         out.close();
-        writer.commit(ctx);
+        sync(writer.commit(ctx));
 
         // Prefetch
         BlobReader reader = db.readBlob(ctx, ref);
-        for (BlobFetchStatus status : reader.prefetch(ctx, 0)) {}
+        for (BlobFetchStatus status : sync(reader.prefetch(ctx, 0))) {}
         // Read
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(reader.stream(ctx, 0), actual);
+        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
         assertThat(actual).isEqualTo(data);
     }
 
     public void testBlobReadClosedStream() throws Exception {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         Database db = createDatabase(createApp(createService()));
-        BlobWriter writer = db.writeBlob(ctx, null);
-        OutputStream out = writer.stream(ctx);
+        BlobWriter writer = sync(db.writeBlob(ctx, null));
+        OutputStream out = sync(writer.stream(ctx));
         out.write(data);
         out.close();
-        assertThat(writer.size(ctx)).isEqualTo(data.length);
-        writer.commit(ctx);
+        assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
+        sync(writer.commit(ctx));
         BlobRef ref = writer.getRef();
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length / 2];
-        InputStream in = reader.stream(ctx, 0);
+        InputStream in = sync(reader.stream(ctx, 0));
         // Read 1st chunk.
         ByteStreams.readFully(in, actual);
         assertThat(actual).isEqualTo(new byte[]{1, 2, 3, 4, 5});
@@ -552,19 +549,19 @@ public class SyncbaseTest extends TestCase {
 
     private SyncbaseApp createApp(SyncbaseService service) throws Exception {
         SyncbaseApp app = service.getApp(APP_NAME);
-        app.create(ctx, allowAll);
+        sync(app.create(ctx, allowAll));
         return app;
     }
 
     private Database createDatabase(SyncbaseApp app) throws Exception {
         Database db = app.getNoSqlDatabase(DB_NAME, null);
-        db.create(ctx, allowAll);
+        sync(db.create(ctx, allowAll));
         return db;
     }
 
     private Table createTable(Database db) throws Exception {
         Table table = db.getTable(TABLE_NAME);
-        table.create(ctx, allowAll);
+        sync(table.create(ctx, allowAll));
         return table;
     }
 

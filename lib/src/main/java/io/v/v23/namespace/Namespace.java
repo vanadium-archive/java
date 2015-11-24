@@ -4,6 +4,8 @@
 
 package io.v.v23.namespace;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.VIterable;
 import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
@@ -27,11 +29,11 @@ public interface Namespace {
      * A shortcut for {@link #mount(VContext, String, String, Duration, Options)} with a {@code
      * null} options parameter.
      */
-    void mount(VContext context, String name, String server, Duration ttl) throws VException;
+    ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl);
 
     /**
-     * Mounts the server object address under the object name, expiring after {@code ttl}. {@code
-     * ttl} of zero implies an implementation-specific high value (essentially forever).
+     * Mounts the server object address under the object name, expiring after {@code ttl};
+     * {@code ttl} of zero implies an implementation-specific high value (essentially forever).
      * <p>
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
@@ -47,32 +49,15 @@ public interface Namespace {
      *               section of the Naming Concepts document
      * @param ttl the duration for which the mount should live
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @throws VException if the server object address could not be mounted
      */
-    void mount(VContext context, String name, String server, Duration ttl, Options options)
-            throws VException;
-
-    /**
-     * A shortcut for {@link #mount(VContext, String, String, Duration, Options, Callback)} with
-     * a {@code null} options parameter.
-     */
-    void mount(VContext context, String name, String server, Duration ttl, Callback<Void> callback)
-            throws VException;
-
-    /**
-     * Asynchronous version of {@link #mount(VContext, String, String, Duration, Options)} that
-     * takes in a callback whose {@code onSuccess} method will be called when the operation
-     * completes successfully, and whose {@code onFailure} will be called if an error is
-     * encountered.
-     */
-    void mount(VContext context, String name, String server, Duration ttl, Options options,
-               Callback<Void> callback) throws VException;
+    ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl,
+                                 Options options);
 
     /**
      * A shortcut for {@link #unmount(VContext, String, String, Options)} with a {@code null}
      * options parameter.
      */
-    void unmount(VContext context, String name, String server) throws VException;
+    ListenableFuture<Void> unmount(VContext context, String name, String server);
 
     /**
      * Unmounts the server object address from the object name, or if {@code server} is empty,
@@ -91,34 +76,18 @@ public interface Namespace {
      *               <a href="https://github.com/vanadium/docs/blob/master/concepts/naming.md#object-names">the Object names</a>
      *               section of the Naming Concepts document
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @throws VException if the server object address could not be unmounted
      */
-    void unmount(VContext context, String name, String server, Options options) throws VException;
-
-    /**
-     * A shortcut for {@link #unmount(VContext, String, String, Options, Callback)} with a {@code
-     * null} options parameter.
-     */
-    void unmount(VContext context, String name, String server, Callback<Void> callback) throws
-            VException;
-
-    /**
-     * Asynchronous version of {@link #unmount(VContext, String, String, Options)} that takes
-     * in a callback whose {@code onSuccess} method will be called when the operation completes
-     * successfully, and whose {@code onFailure} will be called if an error is encountered.
-     */
-    void unmount(VContext context, String name, String server, Options options, Callback<Void>
-            callback) throws VException;
+    ListenableFuture<Void> unmount(VContext context, String name, String server, Options options);
 
     /**
      * A shortcut for {@link #delete(VContext, String, boolean, Options)} with a {@code null}
      * options parameter.
      */
-    void delete(VContext context, String name, boolean deleteSubtree) throws VException;
+    ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree);
 
     /**
-     * Deletes the name from a mount table. If the name has any children in its mount table, it (and
-     * its children) will only be removed if {@code deleteSubtree} is true.
+     * Deletes the name from a mount table. If the name has any children in its mount table, it
+     * (and its children) will only be removed if {@code deleteSubtree} is true.
      * <p>
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
@@ -132,31 +101,15 @@ public interface Namespace {
      *             glossary
      * @param deleteSubtree whether the entire tree rooted at {@code name} should be deleted
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @throws VException if the name could not be deleted
      */
-    void delete(VContext context, String name, boolean deleteSubtree, Options options)
-            throws VException;
-
-    /**
-     * A shortcut for {@link #delete(VContext, String, boolean, Options, Callback)} with a {@code
-     * null} options parameter.
-     */
-    void delete(VContext context, String name, boolean deleteSubtree, Callback<Void> callback)
-            throws VException;
-
-    /**
-     * Asynchronous version of {@link #delete(VContext, String, boolean, Options)} that takes
-     * in a callback whose {@code onSuccess} method will be called when the operation completes
-     * successfully, and whose {@code onFailure} will be called if an error is encountered.
-     */
-    void delete(VContext context, String name, boolean deleteSubtree, Options options,
-                Callback<Void> callback) throws VException;
+    ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree,
+                                  Options options);
 
     /**
      * A shortcut for {@link #resolve(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    MountEntry resolve(VContext context, String name) throws VException;
+    ListenableFuture<MountEntry> resolve(VContext context, String name);
 
     /**
      * Resolves the object name into its mounted servers.
@@ -172,31 +125,16 @@ public interface Namespace {
      *             <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the Name entry</a> in the
      *             glossary
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return the {@link MountEntry} to which the name resolves, or {@code null} if it does not
-     *         resolve
-     * @throws VException if an error occurred during name resolution
+     * @return a new {@link ListenableFuture} whose result is the {@link MountEntry} to which the
+     *         name resolves, or {@code null} if it does not resolve
      */
-    MountEntry resolve(VContext context, String name, Options options) throws VException;
+    ListenableFuture<MountEntry> resolve(VContext context, String name, Options options);
 
     /**
-     * A shortcut for {@link #resolve(VContext, String, Options, Callback)} with a {@code null}
+     * A shortcut for {@link #resolveToMountTable(VContext, String, Options)} with a {@code null}
      * options parameter.
      */
-    void resolve(VContext context, String name, Callback<MountEntry> callback) throws VException;
-
-    /**
-     * Asynchronous version of {@link #resolve(VContext, String, Options)} that takes in a
-     * callback whose {@code onSuccess} method will be called when the operation completes
-     * successfully, and whose {@code onFailure} will be called if an error is encountered.
-     */
-    void resolve(VContext context, String name, Options options, Callback<MountEntry> callback)
-            throws VException;
-
-    /**
-     * A shortcut for {@link #resolve(VContext, String, Options)} with a {@code null} options
-     * parameter.
-     */
-    MountEntry resolveToMountTable(VContext context, String name) throws VException;
+    ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name);
 
     /**
      * Resolves the object name into the mounttables directly responsible for the name.
@@ -212,36 +150,23 @@ public interface Namespace {
      *             <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the Name entry</a> in the
      *             glossary
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return the {@link MountEntry} of the mounttable server directly responsible for
-     *         {@code name}, or {@code null} if {@code name} does not resolve
-     * @throws VException if an error occurred during name resolution
+     * @return a new {@link ListenableFuture} whose result is the {@link MountEntry} of the
+     *         mounttable server directly responsible for {@code name}, or {@code null} if
+     *         {@code name} does not resolve
      */
-    MountEntry resolveToMountTable(VContext context, String name, Options options)
-            throws VException;
-
-    /**
-     * A shortcut for {@link #resolve(VContext, String, Options, Callback)} with a {@code null}
-     * options parameter.
-     */
-    void resolveToMountTable(VContext context, String name, Callback<MountEntry> callback) throws
-            VException;
-
-    /**
-     * Asynchronous version of {@link #resolveToMountTable(VContext, String, Options)} that takes
-     * in a callback whose {@code onSuccess} method will be called when the operation completes
-     * successfully, and whose {@code onFailure} will be called if an error is encountered.
-     */
-    void resolveToMountTable(VContext context, String name, Options options, Callback<MountEntry>
-            callback) throws VException;
+    ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name,
+                                                     Options options);
 
     /**
      * Flushes resolution information cached for the given name. If anything was flushed it returns
      * {@code true}.
+     * <p>
+     * This is a non-blocking method.
      *
      * @param context a client context
      * @param name a Vanadium name, see also <a href="https://github.com/vanadium/docs/blob/master/glossary.md#object-name">the
      *             Name entry</a> in the glossary
-     * @return {@code true} if resolution information was for the name was flushed
+     * @return {@code true} iff resolution information for the name was successfully flushed
      */
     boolean flushCacheEntry(VContext context, String name);
 
@@ -249,12 +174,13 @@ public interface Namespace {
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    VIterable<GlobReply> glob(VContext context, String pattern) throws VException;
+    ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern);
 
     /**
-     * Returns the iterator over all names matching the provided pattern. Note that due to the
-     * inherently asynchronous nature of Vanadium's glob API, you should assume that calls to
-     * the returned iterator's {@code next} method may block.
+     * Returns a new {@link ListenableFuture} whose result is the iterator over all names
+     * matching the provided pattern. Note that due to the inherently asynchronous nature of
+     * Vanadium's glob API, you should assume that calls to the returned iterator's {@code next}
+     * method may block.
      * <p>
      * You should be aware that the iterator:
      * <p><ul>
@@ -274,26 +200,10 @@ public interface Namespace {
      * @param context a client context
      * @param pattern a pattern that should be matched
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return        an iterator over {@link GlobReply} objects matching the provided pattern
-     * @throws VException if an error is encountered
+     * @return        a new {@link ListenableFuture} whose result an iterator over {@link GlobReply}
+     *                objects matching the provided pattern
      */
-    VIterable<GlobReply> glob(VContext context, String pattern, Options options) throws VException;
-
-    /**
-     * A shortcut for {@link #glob(VContext, String, Options, Callback)} with a {@code null} options
-     * parameter.
-     */
-    void glob(VContext context, String pattern, Callback<VIterable<GlobReply>> callback)
-            throws VException;
-
-    /**
-     * Asynchronous version of {@link #glob(VContext, String, Options)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void glob(VContext context, String pattern, Options options, Callback<VIterable<GlobReply>>
-            callback) throws VException;
+    ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern, Options options);
 
     /**
      * Sets the roots that the local namespace is relative to.
@@ -302,6 +212,8 @@ public interface Namespace {
      * relative to these roots. The roots will be tried in the order that they are specified in
      * {@code roots} list. Calling this method with an empty list will clear the currently
      * configured set of roots.
+     * <p>
+     * This is a non-blocking method.
      *
      * @param roots the roots that will be used to turn relative paths into absolute paths, or
      *              {@code null} to clear the currently configured set of roots. Each entry should
@@ -315,11 +227,11 @@ public interface Namespace {
      * A shortcut for {@link #setPermissions(VContext, String, Permissions, String, Options)} with a
      * {@code null} options parameter.
      */
-    void setPermissions(VContext context, String name, Permissions permissions, String version)
-            throws VException;
+    ListenableFuture<Void> setPermissions(VContext context, String name, Permissions permissions,
+                                          String version);
 
     /**
-     * Sets the Permissions in a node in a mount table. If the caller tries to set a permission that
+     * Sets the permissions in a node in a mount table. If the caller tries to set a permission that
      * removes them from {@link io.v.v23.security.access.Constants#ADMIN}, the caller's original
      * admin blessings will be retained.
      * <p>
@@ -337,39 +249,21 @@ public interface Namespace {
      *                a {@link VException} is thrown indicating that this call had no effect. If the
      *                version number is not specified, no version check is performed
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @throws VException if an error is encountered (e.g. if the caller does not have permission to
-     *                    change the permissions)
      */
-    void setPermissions(VContext context, String name, Permissions permissions, String version,
-                        Options options) throws VException;
-
-    /**
-     * A shortcut for {@link #setPermissions(VContext, String, Permissions, String, Options,
-     * Callback)} with a {@code null} options parameter.
-     */
-    void setPermissions(VContext context, String name, Permissions permissions, String version,
-                        Callback<Void> callback) throws VException;
-
-    /**
-     * Asynchronous version of {@link #setPermissions(VContext, String, Permissions, String,
-     * Options)} that takes in a callback whose {@code onSuccess} method will be called when the
-     * operation completes successfully, and whose {@code onFailure} will be called if an error is
-     * encountered.
-     */
-    void setPermissions(VContext context, String name, Permissions permissions, String version,
-                        Options options, Callback<Void> callback) throws VException;
+    ListenableFuture<Void> setPermissions(VContext context, String name, Permissions permissions,
+                                          String version, Options options);
 
     /**
      * A shortcut for {@link #getPermissions(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    Map<String, Permissions> getPermissions(VContext context, String name) throws VException;
+    ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name);
 
     /**
-     * Returns the Permissions in a node in a mount table. The returned map will contain a single
-     * entry whose key is the permissions version (see {@link #setPermissions(VContext, String,
-     * Permissions, String, Options)}) and whose value is the permissions corresponding to that
-     * version.
+     * Returns a new {@link ListenableFuture} whose result are the Permissions in a node in a mount
+     * table. The returned map will contain a single entry whose key is the permissions version
+     * (see {@link #setPermissions(VContext, String, Permissions, String, Options)}) and whose value
+     * is the permissions corresponding to that version.
      * <p>
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
@@ -381,23 +275,7 @@ public interface Namespace {
      * @param name the name of the node
      * @param options options to pass to the implementation as described above, or {@code null}
      * @return a single-entry map from permissions version to permissions for the named object
-     * @throws VException if an error is encountered
      */
-    Map<String, Permissions> getPermissions(VContext context, String name, Options options)
-            throws VException;
-
-    /**
-     * A shortcut for {@link #getPermissions(VContext, String, Options, Callback)} with a
-     * {@code null} options parameter.
-     */
-    void getPermissions(VContext context, String name, Callback<Map<String, Permissions>>
-            callback) throws VException;
-
-    /**
-     * Asynchronous version of {@link #getPermissions(VContext, String, Options)} that takes in a
-     * callback whose {@code onSuccess} method will be called when the operation completes
-     * successfully, and whose {@code onFailure} will be called if an error is encountered.
-     */
-    void getPermissions(VContext context, String name, Options options, Callback<Map<String,
-            Permissions>> callback) throws VException;
+    ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name,
+                                                              Options options);
 }

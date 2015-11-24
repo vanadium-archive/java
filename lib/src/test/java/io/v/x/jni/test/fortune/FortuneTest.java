@@ -6,6 +6,7 @@ package io.v.x.jni.test.fortune;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
@@ -45,6 +46,7 @@ import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 import static com.google.common.truth.Truth.assertThat;
+import static io.v.v23.VFutures.sync;
 
 import static io.v.v23.VFutures.sync;
 
@@ -84,7 +86,7 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
-            client.get(ctxT);
+            sync(client.get(ctxT));
             fail("Expected exception during call to get() before call to add()");
         } catch (NoFortunesException e) {
             // OK
@@ -92,24 +94,11 @@ public class FortuneTest extends TestCase {
             fail("Expected NoFortuneException, got: " + e);
         }
         String firstMessage = "First fortune";
-        client.add(ctxT, firstMessage);
-        assertEquals(firstMessage, client.get(ctxT));
+        sync(client.add(ctxT, firstMessage));
+        assertThat(sync(client.get(ctxT))).isEqualTo(firstMessage);
     }
 
-    public void testAsyncFortune() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
-
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
-        VContext ctxT = ctx.withTimeout(new Duration(2000000)); // 20s
-        client.add(ctxT, "Hello world");
-        FutureCallback<String> result = new FutureCallback<>();
-        client.get(ctxT, result);
-        assertThat(Uninterruptibles.getUninterruptibly(
-                result.getFuture(), 5, TimeUnit.SECONDS)).isNotEmpty();
-    }
-
-    public void testAsyncFortuneWithCancel() throws Exception {
+    public void testFortuneWithCancel() throws Exception {
         CountDownLatch callLatch = new CountDownLatch(1);
         FortuneServer server = new FortuneServerImpl(callLatch);
         ctx = V.withNewServer(ctx, "", server, null);
@@ -117,19 +106,18 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        client.add(ctxT, "Hello world");
-        FutureCallback<String> result = new FutureCallback<>();
-        client.get(cancelCtx, result);
+        sync(client.add(ctxT, "Hello world"));
+        ListenableFuture<String> result = client.get(cancelCtx);
         // Cancel the RPC.
         cancelCtx.cancel();
         // Allow the server RPC impl to finish.
         callLatch.countDown();
         // The call should have failed, it was canceled before it completed.
         try {
-            result.getFuture().get();
-            fail("Should have failed!");
-        } catch (ExecutionException e) {
-            assertThat(e.getCause()).isInstanceOf(CanceledException.class);
+            sync(result);
+            fail("get() should have failed");
+        } catch (CanceledException e) {
+            // OK
         }
     }
 
@@ -139,31 +127,10 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
+        ClientStream<Boolean, String, Integer> stream = sync(client.streamingGet(ctxT));
         String msg = "The only fortune";
-        client.add(ctxT, msg);
+        sync(client.add(ctxT, msg));
         for (int i = 0; i < 5; ++i) {
-            stream.send(true);
-        }
-        stream.close();
-        assertThat(stream).containsExactly(msg, msg, msg, msg, msg);
-        int result = stream.finish();
-        assertEquals(5, result);
-    }
-
-    public void testAsyncStreaming() throws Throwable {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
-
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
-        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        final String msg = "The only fortune";
-        client.add(ctxT, msg);
-        FutureCallback<ClientStream<Boolean, String, Integer>> callback = new FutureCallback<>();
-        client.streamingGet(ctxT, callback);
-        ClientStream<Boolean, String, Integer> stream
-                = Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
-        for (int i = 0; i < 5; i++) {
             stream.send(true);
         }
         stream.close();
@@ -179,9 +146,9 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
-        client.add(ctxT, firstMessage);
+        sync(client.add(ctxT, firstMessage));
 
-        FortuneClient.MultipleGetOut ret = client.multipleGet(ctxT);
+        FortuneClient.MultipleGetOut ret = sync(client.multipleGet(ctxT));
         assertEquals(firstMessage, ret.fortune);
         assertEquals(firstMessage, ret.another);
     }
@@ -193,9 +160,9 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
-            client.getComplexError(ctxT);
+            sync(client.getComplexError(ctxT));
             fail("Expected exception during call to getComplexError()");
-        } catch (VException e) {
+        } catch (ComplexException e) {
             if (!FortuneServerImpl.COMPLEX_ERROR.deepEquals(e)) {
                 fail(String.format("Expected error %s, got %s",
                         FortuneServerImpl.COMPLEX_ERROR, e));
@@ -210,7 +177,7 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
-            client.testServerCall(ctxT);
+            sync(client.testServerCall(ctxT));
         } catch (VException e) {
             fail("Context check failed: " + e.getMessage());
         }
@@ -244,7 +211,7 @@ public class FortuneTest extends TestCase {
         ctx = V.withNewServer(ctx, "", server, null);
 
         List<GlobReply> globResult
-                = ImmutableList.copyOf(V.getNamespace(ctx).glob(ctx, name() + "/*"));
+                = ImmutableList.copyOf(sync(V.getNamespace(ctx).glob(ctx, name() + "/*")));
         assertThat(globResult).hasSize(2);
         assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
         assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())
@@ -257,7 +224,7 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
+        assertThat(sync(client.get(ctxT))).isEqualTo(TEST_INVOKER_FORTUNE);
     }
 
     public void testCustomDispatcherReturningAServer() throws Exception {
@@ -273,8 +240,8 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
-        client.add(ctxT, firstMessage);
-        assertEquals(firstMessage, client.get(ctxT));
+        sync(client.add(ctxT, firstMessage));
+        assertThat(sync(client.get(ctxT))).isEqualTo(firstMessage);
     }
 
     public void testCustomDispatcherReturningAnInvoker() throws Exception {
@@ -288,7 +255,7 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        assertThat(client.get(ctxT)).isEqualTo(TEST_INVOKER_FORTUNE);
+        assertThat(sync(client.get(ctxT))).isEqualTo(TEST_INVOKER_FORTUNE);
     }
 
     private static class TestInvoker implements Invoker {
@@ -339,23 +306,4 @@ public class FortuneTest extends TestCase {
             responseChannel.close();
         }
     }
-
-    private static class FutureCallback<T> implements Callback<T> {
-        private final SettableFuture<T> future = SettableFuture.create();
-
-        public Future<T> getFuture() {
-            return future;
-        }
-
-        @Override
-        public void onSuccess(T result) {
-            future.set(result);
-        }
-
-        @Override
-        public void onFailure(VException error) {
-            future.setException(error);
-        }
-    }
-
 }

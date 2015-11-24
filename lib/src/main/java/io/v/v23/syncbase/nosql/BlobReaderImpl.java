@@ -4,6 +4,10 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
@@ -32,34 +36,47 @@ class BlobReaderImpl implements BlobReader {
         return ref;
     }
     @Override
-    public InputStream stream(VContext ctx, long offset) throws VException {
-        ClientRecvStream<byte[], Void> stream = client.getBlob(ctx, ref, offset);
-        return new BlobInputStream(stream);
+    public ListenableFuture<InputStream> stream(VContext ctx, long offset) {
+        return Futures.transform(client.getBlob(ctx, ref, offset),
+                new Function<ClientRecvStream<byte[], Void>, InputStream>() {
+            @Override
+            public InputStream apply(ClientRecvStream<byte[], Void> stream) {
+                return new BlobInputStream(stream);
+            }
+        });
     }
     @Override
-    public VIterable<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException {
-        return client.fetchBlob(ctx, ref, new VdlUint64(priority));
+    public ListenableFuture<VIterable<BlobFetchStatus>> prefetch(VContext ctx, long priority) {
+        return Futures.transform(client.fetchBlob(ctx, ref, new VdlUint64(priority)),
+                new Function<ClientRecvStream<BlobFetchStatus, Void>, VIterable<BlobFetchStatus>>()
+                {
+                    @Override
+                    public VIterable<BlobFetchStatus> apply(
+                            ClientRecvStream<BlobFetchStatus, Void> result) {
+                        return result;
+                    }
+                });
     }
 
     @Override
-    public long size(VContext ctx) throws VException {
+    public ListenableFuture<Long> size(VContext ctx) {
         return client.getBlobSize(ctx, ref);
     }
     @Override
-    public void delete(VContext ctx) throws VException {
-        client.deleteBlob(ctx, ref);
+    public ListenableFuture<Void> delete(VContext ctx) {
+        return client.deleteBlob(ctx, ref);
     }
     @Override
-    public void pin(VContext ctx) throws VException {
-        client.pinBlob(ctx, ref);
+    public ListenableFuture<Void> pin(VContext ctx) {
+        return client.pinBlob(ctx, ref);
     }
     @Override
-    public void unpin(VContext ctx) throws VException {
-        client.unpinBlob(ctx, ref);
+    public ListenableFuture<Void> unpin(VContext ctx) {
+        return client.unpinBlob(ctx, ref);
     }
     @Override
-    public void keep(VContext ctx, long rank) throws VException {
-        client.keepBlob(ctx, ref, new VdlUint64(rank));
+    public ListenableFuture<Void> keep(VContext ctx, long rank) {
+        return client.keepBlob(ctx, ref, new VdlUint64(rank));
     }
 
     private static class BlobInputStream extends InputStream {

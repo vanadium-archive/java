@@ -4,6 +4,10 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
@@ -28,20 +32,26 @@ public class BlobWriterImpl implements BlobWriter {
         return ref;
     }
     @Override
-    public OutputStream stream(VContext ctx) throws VException {
-        return new BufferedOutputStream(new BlobOutputStream(client.putBlob(ctx, ref)), 1 << 14);
+    public ListenableFuture<OutputStream> stream(VContext ctx) {
+        return Futures.transform(client.putBlob(ctx, ref),
+                new Function<ClientSendStream<byte[], Void>, OutputStream>() {
+                    @Override
+                    public OutputStream apply(ClientSendStream<byte[], Void> result) {
+                        return new BufferedOutputStream(new BlobOutputStream(result), 1 << 14);
+                    }
+                });
     }
     @Override
-    public void commit(VContext ctx) throws VException {
-        client.commitBlob(ctx, ref);
+    public ListenableFuture<Void> commit(VContext ctx) {
+        return client.commitBlob(ctx, ref);
     }
     @Override
-    public long size(VContext ctx) throws VException {
+    public ListenableFuture<Long> size(VContext ctx) {
         return client.getBlobSize(ctx, ref);
     }
     @Override
-    public void delete(VContext ctx) throws VException {
-        client.deleteBlob(ctx, ref);
+    public ListenableFuture<Void> delete(VContext ctx) {
+        return client.deleteBlob(ctx, ref);
     }
 
     private static class BlobOutputStream extends OutputStream {

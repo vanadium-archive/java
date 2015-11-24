@@ -4,6 +4,14 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.FutureFallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
@@ -20,7 +28,7 @@ public class NoSql {
     /**
      * Interface for a batch operation that is executed as part of {@link #runInBatch runInBatch()}.
      */
-    public static interface BatchOperation {
+    public interface BatchOperation {
         /**
          * Performs the batch operation.
          *
@@ -28,7 +36,7 @@ public class NoSql {
          * @throws VException if there was an error performing the operation;  if thrown, the
          *                    batch operation is aborted
          */
-        void run(BatchDatabase db) throws VException;
+        ListenableFuture<Void> run(BatchDatabase db);
     }
 
     /**
@@ -39,28 +47,84 @@ public class NoSql {
      * @param  db         database on which the batch operation is to be performed
      * @param  opts       batch configuration
      * @param  op         batch operation
-     * @throws VException if there was an error executing the given batch operation
      */
-    public static void runInBatch(VContext ctx, Database db, BatchOptions opts, BatchOperation op)
-            throws VException {
-        for (int i = 0; i < 3; ++i) {
-            BatchDatabase batch = db.beginBatch(ctx, opts);
-            try {
-                op.run(batch);
-            } catch (VException e) {
-                batch.abort(ctx);
-                throw e;
+    public static ListenableFuture<Void> runInBatch(VContext ctx, Database db,
+                                                    BatchOptions opts, BatchOperation op) {
+        return Futures.transform(Futures.immediateFuture(false), getRetryFn(ctx, db, opts, op, 0));
+    }
+
+    private static AsyncFunction<Boolean, Void> getRetryFn(final VContext ctx,
+                                                           final Database db,
+                                                           final BatchOptions opts,
+                                                           final BatchOperation op,
+                                                           final int round) {
+        return new AsyncFunction<Boolean, Void>() {
+            @Override
+            public ListenableFuture<Void> apply(Boolean success) throws Exception {
+                if (success) {
+                    return Futures.immediateFuture(null);
+                }
+                if (round >= 3) {
+                    throw new ConcurrentBatchException(ctx);
+                }
+                return Futures.transform(tryBatch(ctx, db, opts, op),
+                        getRetryFn(ctx, db, opts, op, round + 1));
             }
-            try {
-                batch.commit(ctx);
-                return;
-            } catch (ConcurrentBatchException e) {
-                // retry
-            } catch (VException e) {
-                throw e;
+        };
+    }
+
+    private static ListenableFuture<Boolean> tryBatch(final VContext ctx,
+                                                      final Database db,
+                                                      final BatchOptions opts,
+                                                      final BatchOperation op) {
+        final SettableFuture<Boolean> ret = SettableFuture.create();
+        Futures.addCallback(db.beginBatch(ctx, opts), new FutureCallback<BatchDatabase>() {
+            @Override
+            public void onFailure(Throwable t) {
+                ret.setException(t);
             }
-        }
-        throw new ConcurrentBatchException(ctx);
+
+            @Override
+            public void onSuccess(final BatchDatabase batch) {
+                Futures.addCallback(op.run(batch), new FutureCallback<Void>() {
+                    @Override
+                    public void onFailure(final Throwable t) {
+                        Futures.addCallback(batch.abort(ctx), new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                ret.setException(t);
+                            }
+
+                            @Override
+                            public void onFailure(Throwable newT) {
+                                ret.setException(t);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        Futures.addCallback(batch.commit(ctx), new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                ret.set(true);  // success
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                if (t instanceof ConcurrentBatchException) {
+                                    // retry
+                                    ret.set(false);
+                                } else {
+                                    ret.setException(t);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        return ret;
     }
 
     private NoSql() {}

@@ -3,6 +3,8 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.lang.reflect.Type;
 
 import io.v.v23.context.VContext;
@@ -23,21 +25,19 @@ public interface Row {
     String fullName();
 
     /**
-     * Returns {@code true} iff this row exists and the caller has permissions
-     * to access it.
+     * Returns a new {@link ListenableFuture} whose result is {@code true} iff this row exists and
+     * the caller has permissions to access it.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the row's existence couldn't be determined
      */
-    boolean exists(VContext ctx) throws VException;
+    ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
      * Deletes this row.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the row couldn't be deleted
      */
-    void delete(VContext ctx) throws VException;
+    ListenableFuture<Void> delete(VContext ctx);
 
     /**
      * Returns the value for this row.
@@ -45,17 +45,14 @@ public interface Row {
      * Throws a {@link VException} if the row doesn't exist.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the value couldn't be retrieved or if its type doesn't match the
-     *                    provided type
      */
-    Object get(VContext ctx, Type type) throws VException;
+    ListenableFuture<Object> get(VContext ctx, Type type);
 
     /**
      * Writes the given value for this row.
      *
      * @param  ctx        Vanadium context
      * @param  value      value to write
-     * @throws VException if the value couldn't be written
      */
-    void put(VContext ctx, Object value, Type type) throws VException;
+    ListenableFuture<Void> put(VContext ctx, Object value, Type type);
 }

@@ -4,6 +4,8 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Preconditions;
+
 import io.v.v23.services.syncbase.nosql.SchemaMetadata;
 
 /**
@@ -26,6 +28,8 @@ public class Schema {
      * Note: {@link SchemaUpgrader} is purely local and is not persisted.
      */
     public Schema(SchemaMetadata metadata, SchemaUpgrader upgrader) {
+        Preconditions.checkNotNull(metadata);
+        Preconditions.checkNotNull(upgrader);
         this.metadata = metadata;
         this.upgrader = upgrader;
     }

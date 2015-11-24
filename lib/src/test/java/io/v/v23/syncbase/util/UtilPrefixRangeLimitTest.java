@@ -48,11 +48,11 @@ public class UtilPrefixRangeLimitTest {
 
     @Test
     public void testPrefixRangeStart() {
-        assertThat(Util.prefixRangeStart(this.prefix)).isEqualTo(this.expectedStart);
+        assertThat(Util.prefixRangeStart(prefix)).isEqualTo(expectedStart);
     }
 
     @Test
     public void testPrefixRangeLimit() {
-        assertThat(Util.prefixRangeLimit(this.prefix)).isEqualTo(this.expectedLimit);
+        assertThat(Util.prefixRangeLimit(prefix)).isEqualTo(expectedLimit);
     }
 }

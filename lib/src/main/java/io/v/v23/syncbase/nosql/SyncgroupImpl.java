@@ -6,14 +6,17 @@ package io.v.v23.syncbase.nosql;
 
 import java.util.Map;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
+import io.v.v23.services.syncbase.nosql.SyncgroupManagerClient;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.context.VContext;
-import io.v.v23.verror.VException;
 
 class SyncgroupImpl implements Syncgroup {
     private final String name;
@@ -26,36 +29,43 @@ class SyncgroupImpl implements Syncgroup {
         this.dbClient = DatabaseClientFactory.getDatabaseClient(dbFullName);
     }
     @Override
-    public void create(VContext ctx, SyncgroupSpec spec, SyncgroupMemberInfo info) throws VException {
-        this.dbClient.createSyncgroup(ctx, this.name, spec, info);
+    public ListenableFuture<Void> create(VContext ctx, SyncgroupSpec spec,
+                                         SyncgroupMemberInfo info) {
+        return dbClient.createSyncgroup(ctx, name, spec, info);
     }
     @Override
-    public SyncgroupSpec join(VContext ctx, SyncgroupMemberInfo info) throws VException {
-        return this.dbClient.joinSyncgroup(ctx, this.name, info);
+    public ListenableFuture<SyncgroupSpec> join(VContext ctx, SyncgroupMemberInfo info) {
+        return dbClient.joinSyncgroup(ctx, name, info);
     }
     @Override
-    public void leave(VContext ctx) throws VException {
-        this.dbClient.leaveSyncgroup(ctx, this.name);
+    public ListenableFuture<Void> leave(VContext ctx) {
+        return dbClient.leaveSyncgroup(ctx, name);
     }
     @Override
-    public void destroy(VContext ctx) throws VException {
-        this.dbClient.destroySyncgroup(ctx, this.name);
+    public ListenableFuture<Void> destroy(VContext ctx) {
+        return dbClient.destroySyncgroup(ctx, name);
     }
     @Override
-    public void eject(VContext ctx, String member) throws VException {
-        this.dbClient.ejectFromSyncgroup(ctx, this.name, member);
+    public ListenableFuture<Void> eject(VContext ctx, String member) {
+        return dbClient.ejectFromSyncgroup(ctx, name, member);
     }
     @Override
-    public Map<String, SyncgroupSpec> getSpec(VContext ctx) throws VException {
-        DatabaseClient.GetSyncgroupSpecOut spec = this.dbClient.getSyncgroupSpec(ctx, this.name);
-        return ImmutableMap.of(spec.version, spec.spec);
+    public ListenableFuture<Map<String, SyncgroupSpec>> getSpec(VContext ctx) {
+        return Futures.transform(dbClient.getSyncgroupSpec(ctx, name), new Function<
+                SyncgroupManagerClient.GetSyncgroupSpecOut, Map<String, SyncgroupSpec>>() {
+            @Override
+            public Map<String, SyncgroupSpec> apply(
+                    SyncgroupManagerClient.GetSyncgroupSpecOut spec) {
+                return ImmutableMap.of(spec.version, spec.spec);
+            }
+        });
     }
     @Override
-    public void setSpec(VContext ctx, SyncgroupSpec spec, String version) throws VException {
-        this.dbClient.setSyncgroupSpec(ctx, this.name, spec, version);
+    public ListenableFuture<Void> setSpec(VContext ctx, SyncgroupSpec spec, String version) {
+        return dbClient.setSyncgroupSpec(ctx, name, spec, version);
     }
     @Override
-    public Map<String, SyncgroupMemberInfo> getMembers(VContext ctx) throws VException {
-        return this.dbClient.getSyncgroupMembers(ctx, this.name);
+    public ListenableFuture<Map<String, SyncgroupMemberInfo>> getMembers(VContext ctx) {
+        return dbClient.getSyncgroupMembers(ctx, name);
     }
 }

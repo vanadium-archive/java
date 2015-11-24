@@ -9,6 +9,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
@@ -44,6 +46,7 @@ import io.v.v23.services.permissions.ObjectServer;
 import io.v.v23.verror.VException;
 
 import static com.google.common.truth.Truth.assertThat;
+import static io.v.v23.VFutures.sync;
 
 /**
  * Test the {@link NamespaceImpl} implementation.
@@ -111,189 +114,84 @@ public class NamespaceTest extends TestCase {
 
     public void testMountAndUnmount() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        assertThat(globNames(n.glob(ctx, "test/*"))).containsExactly("test/test");
-        n.unmount(ctx, "test/test", "");
-        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
-    }
-
-    public void testMountAndUnmountAsync() throws Exception {
-        Namespace n = V.getNamespace(ctx);
-        {
-            FutureCallback<Void> callback = new FutureCallback<>();
-            n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1),
-                    callback);
-            assertThat(
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS))
-                    .isNull();
-        }
-
-        assertThat(globNames(n.glob(ctx, "test/*"))).containsExactly("test/test");
-        {
-            final FutureCallback<Void> callback = new FutureCallback<>();
-            n.unmount(ctx, "test/test", "", callback);
-            assertThat(
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS))
-                    .isNull();
-        }
-
-        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        assertThat(globNames(sync(n.glob(ctx, "test/*")))).containsExactly("test/test");
+        sync(n.unmount(ctx, "test/test", ""));
+        assertThat(globNames(sync(n.glob(ctx, "test/*")))).isEmpty();
     }
 
     public void testDelete() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        n.mount(ctx, "test/test/test2", dummyServerEndpoint.name(), Duration.standardDays(1));
-        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
+        sync(n.mount(ctx, "test/test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        sync(n.mount(ctx, "test/test/test2", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        assertThat(globNames(sync(n.glob(ctx, "test/*/*")))).containsExactly(
                 "test/test/test", "test/test/test2");
         // Shouldn't delete anything since the dir contains children.
         try {
-            n.delete(ctx, "test/test", false);
+            sync(n.delete(ctx, "test/test", false));
             fail("Namespace.delete() should have failed because a directory has children");
         } catch (VException e) {
             // OK
         }
-        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
+        assertThat(globNames(sync(n.glob(ctx, "test/*/*")))).containsExactly(
                 "test/test/test", "test/test/test2");
-        n.delete(ctx, "test/test", true);
-        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
+        sync(n.delete(ctx, "test/test", true));
+        assertThat(globNames(sync(n.glob(ctx, "test/*")))).isEmpty();
     }
 
-    public void testDeleteAsync() throws Exception {
+    public void testGlob() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        n.mount(ctx, "test/test/test2", dummyServerEndpoint.name(), Duration.standardDays(1));
-        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
-                "test/test/test", "test/test/test2");
-        {
-            final FutureCallback<Void> callback = new FutureCallback<>();
-            n.delete(ctx, "test/test", false, callback);
-            try {
-                Uninterruptibles.getUninterruptibly(callback.getFuture());
-                fail("expected an ExecutionException whose cause is a VException");
-            } catch (ExecutionException e) {
-                assertThat(e.getCause()).isInstanceOf(VException.class);
-            }
-        }
-
-        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
-                "test/test/test", "test/test/test2");
-        {
-            final FutureCallback<Void> callback = new FutureCallback<>();
-            n.delete(ctx, "test/test", true, callback);
-            assertThat(Uninterruptibles.getUninterruptibly(
-                    callback.getFuture(), 1, TimeUnit.SECONDS)).isNull();
-        }
-        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
-    }
-
-    public void testGlobAsync() throws Exception {
-        Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        {
-            final FutureCallback<VIterable<GlobReply>> callback = new FutureCallback<>();
-            n.glob(ctx, "test/*", callback);
-
-            List<GlobReply> reply = ImmutableList.copyOf(
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS));
-            assertThat(reply).hasSize(1);
-            assertThat(reply.get(0).getElem()).isInstanceOf(MountEntry.class);
-            assertThat(((MountEntry) (reply.get(0).getElem())).getName()).isEqualTo("test/test");
-
-        }
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        List<GlobReply> result = Lists.newArrayList(sync(n.glob(ctx, "test/*")));
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getElem()).isInstanceOf(MountEntry.class);
+        assertThat(((MountEntry) (result.get(0).getElem())).getName()).isEqualTo("test/test");
     }
 
     public void testGlobWithContextCancel() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
 
         CancelableVContext cancelContext = ctx.withCancel();
-        FutureCallback<VIterable<GlobReply>> callback = new FutureCallback<>();
-        n.glob(cancelContext, "test/*", callback);
+        ListenableFuture<VIterable<GlobReply>> result = n.glob(cancelContext, "test/*");
         cancelContext.cancel();
-        List<GlobReply> replies = ImmutableList.copyOf(Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS));
+        List<GlobReply> replies = Lists.newArrayList(result.get());
         assertThat(replies).isEmpty();
     }
 
     public void testResolve() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        MountEntry entry = n.resolve(ctx, "test/test");
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        MountEntry entry = sync(n.resolve(ctx, "test/test"));
         assertThat(entry).isNotNull();
         assertThat(entry.getServers()).isNotNull();
         assertThat(entry.getServers()).hasSize(1);
         assertThat(entry.getServers().get(0).getServer()).isEqualTo(dummyServerEndpoint.name());
-
-    }
-
-    public void testResolveAsync() throws Exception {
-        Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        {
-            FutureCallback<MountEntry> callback = new FutureCallback<>();
-            n.resolve(ctx, "test/test", callback);
-
-            MountEntry entry =
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
-            assertThat(entry).isNotNull();
-            assertThat(entry.getServers()).isNotNull();
-            assertThat(entry.getServers()).hasSize(1);
-            assertThat(entry.getServers().get(0).getServer()).isEqualTo(dummyServerEndpoint
-                    .name());
-        }
     }
 
     public void testResolveToMountTable() throws Exception {
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        MountEntry entry = n.resolveToMountTable(ctx, "test/test");
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        MountEntry entry = sync(n.resolveToMountTable(ctx, "test/test"));
         assertThat(entry).isNotNull();
         assertThat(entry.getServers()).isNotNull();
         assertThat(entry.getServers()).hasSize(1);
         assertThat(entry.getServers().get(0).getServer()).isEqualTo(mountTableEndpoint.name());
     }
 
-    public void testResolveToMountTableAsync() throws Exception {
-        Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        {
-            FutureCallback<MountEntry> callback = new FutureCallback<>();
-            n.resolveToMountTable(ctx, "test/test", callback);
-            MountEntry entry =
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
-            assertThat(entry).isNotNull();
-            assertThat(entry.getServers()).isNotNull();
-            assertThat(entry.getServers()).hasSize(1);
-            assertThat(entry.getServers().get(0).getServer()).isEqualTo(mountTableEndpoint
-                    .name());
-        }
-    }
-
-    public void testPermissionsAsync() throws Exception {
+    public void testPermissions() throws Exception {
         AccessList acl = new AccessList(ImmutableList.of(new BlessingPattern("...")),
                 ImmutableList.<String>of());
         Namespace n = V.getNamespace(ctx);
-        n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1));
-        {
-            final FutureCallback<Void> callback = new FutureCallback<>();
-            n.setPermissions(ctx, "test/test", new Permissions(ImmutableMap.of("1", acl)), "1",
-                    callback);
-            assertThat(Uninterruptibles.getUninterruptibly(callback.getFuture(), 1,
-                    TimeUnit.SECONDS)).isNull();
-        }
-
-        {
-            final FutureCallback<Map<String, Permissions>> callback = new FutureCallback<>();
-            n.getPermissions(ctx, "test/test", callback);
-            Map<String, Permissions> permissions =
-                    Uninterruptibles.getUninterruptibly(callback.getFuture(), 1, TimeUnit.SECONDS);
-            assertThat(permissions).isNotNull();
-            assertThat(permissions).hasSize(1);
-            // TODO(sjr): figure out what is actually in this map
-            assertThat(permissions).containsKey("2");
-        }
-
+        sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
+        sync(n.setPermissions(ctx, "test/test", new Permissions(ImmutableMap.of("1", acl)), "1"));
+        Map<String, Permissions> permissions = sync(n.getPermissions(ctx, "test/test"));
+        assertThat(permissions).isNotNull();
+        assertThat(permissions).hasSize(1);
+        // TODO(sjr): figure out what is actually in this map
+        assertThat(permissions).containsKey("2");
     }
+
     private static class DummyServer implements ObjectServer {
         @Override
         public void setPermissions(VContext ctx, ServerCall call, Permissions permissions,
@@ -303,24 +201,6 @@ public class NamespaceTest extends TestCase {
         @Override
         public GetPermissionsOut getPermissions(VContext ctx, ServerCall call) throws VException {
             throw new VException("Unimplemented!");
-        }
-    }
-
-    private static class FutureCallback<T> implements Callback<T> {
-        private final SettableFuture<T> future = SettableFuture.create();
-
-        public Future<T> getFuture() {
-            return future;
-        }
-
-        @Override
-        public void onSuccess(T result) {
-            future.set(result);
-        }
-
-        @Override
-        public void onFailure(VException error) {
-            future.setException(error);
         }
     }
 }

@@ -4,6 +4,10 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.lang.reflect.Type;
 
 import io.v.impl.google.naming.NamingUtil;
@@ -30,28 +34,37 @@ class RowImpl implements Row {
     }
     @Override
     public String key() {
-        return this.key;
+        return key;
     }
     @Override
     public String fullName() {
-        return this.fullName;
+        return fullName;
     }
     @Override
-    public boolean exists(VContext ctx) throws VException {
-        return this.client.exists(ctx, this.schemaVersion);
+    public ListenableFuture<Boolean> exists(VContext ctx) {
+        return client.exists(ctx, schemaVersion);
     }
     @Override
-    public void delete(VContext ctx) throws VException {
-        this.client.delete(ctx, this.schemaVersion);
+    public ListenableFuture<Void> delete(VContext ctx) {
+        return client.delete(ctx, schemaVersion);
     }
     @Override
-    public Object get(VContext ctx, Type type) throws VException {
-        byte[] data = this.client.get(ctx, this.schemaVersion);
-        return VomUtil.decode(data, type);
+    public ListenableFuture<Object> get(VContext ctx, final Type type) {
+        return Futures.transform(client.get(ctx, schemaVersion),
+                new AsyncFunction<byte[], Object>() {
+                    @Override
+                    public ListenableFuture<Object> apply(byte[] data) throws Exception {
+                        return Futures.immediateFuture(VomUtil.decode(data, type));
+                    }
+                });
     }
     @Override
-    public void put(VContext ctx, Object value, Type type) throws VException {
-        byte[] data = VomUtil.encode(value, type);
-        this.client.put(ctx, this.schemaVersion, data);
+    public ListenableFuture<Void> put(VContext ctx, Object value, Type type) {
+        try {
+            byte[] data = VomUtil.encode(value, type);
+            return client.put(ctx, schemaVersion, data);
+        } catch (VException e) {
+            return Futures.immediateFailedFuture(e);
+        }
     }
 }

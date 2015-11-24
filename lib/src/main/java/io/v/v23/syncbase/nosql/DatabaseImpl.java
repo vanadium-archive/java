@@ -4,16 +4,21 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.VIterable;
 import io.v.v23.VIterables;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
@@ -74,275 +79,205 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new TableImpl(this.fullName, relativeName, getSchemaVersion());
     }
     @Override
-    public String[] listTables(VContext ctx) throws VException {
+    public ListenableFuture<List<String>> listTables(VContext ctx) {
         // See comment in v.io/v23/services/syncbase/nosql/service.vdl for why
         // we can't implement listTables using Glob (via Util.listChildren).
-        List<String> x = this.client.listTables(ctx);
-        return x.toArray(new String[x.size()]);
+        return client.listTables(ctx);
     }
     @Override
-    public QueryResults exec(VContext ctx, String query) throws VException {
-        return new QueryResultsImpl(client.exec(ctx, getSchemaVersion(), query));
-    }
-
-    // Implements AccessController interface.
-    @Override
-    public void setPermissions(VContext ctx, Permissions perms, String version) throws VException {
-        this.client.setPermissions(ctx, perms, version);
-    }
-
-    @Override
-    public void setPermissions(VContext ctx, Permissions perms, String version,
-                               Callback<Void> callback) throws VException {
-        client.setPermissions(ctx, perms, version, callback);
-    }
-
-    @Override
-    public Map<String, Permissions> getPermissions(VContext ctx) throws VException {
-        DatabaseClient.GetPermissionsOut perms = this.client.getPermissions(ctx);
-        return ImmutableMap.of(perms.version, perms.perms);
-    }
-
-    @Override
-    public void getPermissions(VContext ctx, final Callback<Map<String, Permissions>> callback)
-            throws VException {
-        client.getPermissions(ctx, new Callback<ObjectClient.GetPermissionsOut>() {
-            @Override
-            public void onSuccess(ObjectClient.GetPermissionsOut result) {
-                callback.onSuccess(ImmutableMap.of(result.version, result.perms));
-            }
-
-            @Override
-            public void onFailure(VException error) {
-                callback.onFailure(error);
-            }
-        });
-    }
-
-    // Implements Database interface.
-    @Override
-    public boolean exists(VContext ctx) throws VException {
-        return this.client.exists(ctx, getSchemaVersion());
-    }
-    @Override
-    public void exists(VContext ctx, Callback<Boolean> callback) throws VException {
-        client.exists(ctx, getSchemaVersion(), callback);
-    }
-    @Override
-    public void create(VContext ctx, Permissions perms) throws VException {
-        VdlOptional metadataOpt = this.schema != null
-                ? VdlOptional.of(this.schema.getMetadata())
-                : new VdlOptional<SchemaMetadata>(Types.optionalOf(SchemaMetadata.VDL_TYPE));
-        this.client.create(ctx, metadataOpt, perms);
-    }
-    @Override
-    public void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException {
-        VdlOptional metadataOpt = this.schema != null
-                ? VdlOptional.of(this.schema.getMetadata())
-                : new VdlOptional<SchemaMetadata>(Types.optionalOf(SchemaMetadata.VDL_TYPE));
-        client.create(ctx, metadataOpt, perms, callback);
-    }
-    @Override
-    public void destroy(VContext ctx) throws VException {
-        this.client.destroy(ctx, getSchemaVersion());
-    }
-    @Override
-    public void destroy(VContext ctx, Callback<Void> callback) throws VException {
-        client.destroy(ctx, getSchemaVersion(), callback);
-    }
-    public BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException {
-        String batchSuffix = this.client.beginBatch(ctx, getSchemaVersion(), opts);
-        return new DatabaseImpl(this.parentFullName, this.name, batchSuffix, this.schema);
-    }
-    public void beginBatch(VContext ctx, BatchOptions opts, final Callback<BatchDatabase> callback) throws VException {
-        client.beginBatch(ctx, getSchemaVersion(), opts, new Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                callback.onSuccess(new DatabaseImpl(parentFullName, name, result, schema));
-            }
-
-            @Override
-            public void onFailure(VException error) {
-                callback.onFailure(error);
-            }
-        });
-    }
-    @Override
-    public VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
-                                        ResumeMarker resumeMarker) throws VException {
-        return VIterables.transform(
-                client.watchGlob(ctx,
-                        new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
-                                resumeMarker)),
-                new VIterables.TransformFunction<Change, WatchChange>() {
+    public ListenableFuture<QueryResults> exec(VContext ctx, String query) {
+        return Futures.transform(client.exec(ctx, getSchemaVersion(), query),
+                new AsyncFunction<ClientRecvStream<List<VdlAny>, Void>, QueryResults>() {
                     @Override
-                    public WatchChange apply(Change input) throws VException {
-                        return convertToWatchChange(input);
+                    public ListenableFuture<QueryResults> apply(
+                            ClientRecvStream<List<VdlAny>, Void> stream) throws Exception {
+                        return Futures.<QueryResults>immediateFuture(new QueryResultsImpl(stream));
                     }
                 });
     }
 
+    // Implements AccessController interface.
     @Override
-    public void watch(VContext ctx, String tableRelativeName, String rowPrefix,
-                      ResumeMarker resumeMarker, final Callback<VIterable<WatchChange>> callback)
-            throws VException {
-        final CancelableVContext ctxC = ctx.withCancel();
-        Callback<ClientRecvStream<Change, Void>> watchCallback =
-                new Callback<ClientRecvStream<Change, Void>>() {
-            @Override
-            public void onSuccess(ClientRecvStream<Change, Void> result) {
-                callback.onSuccess(
-                        VIterables.transform(result,
+    public ListenableFuture<Void> setPermissions(VContext ctx, Permissions perms, String version) {
+        return client.setPermissions(ctx, perms, version);
+    }
+
+    @Override
+    public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx) {
+        return Futures.transform(client.getPermissions(ctx),
+                new Function<ObjectClient.GetPermissionsOut, Map<String, Permissions>>() {
+                    @Override
+                    public Map<String, Permissions> apply(ObjectClient.GetPermissionsOut perms) {
+                        return ImmutableMap.of(perms.version, perms.perms);
+                    }
+                });
+    }
+
+    // Implements Database interface.
+    @Override
+    public ListenableFuture<Boolean> exists(VContext ctx) {
+        return client.exists(ctx, getSchemaVersion());
+    }
+    @Override
+    public ListenableFuture<Void> create(VContext ctx, Permissions perms) {
+        VdlOptional metadataOpt = schema != null
+                ? VdlOptional.of(schema.getMetadata())
+                : new VdlOptional<SchemaMetadata>(Types.optionalOf(SchemaMetadata.VDL_TYPE));
+        return client.create(ctx, metadataOpt, perms);
+    }
+    @Override
+    public ListenableFuture<Void> destroy(VContext ctx) {
+        return client.destroy(ctx, getSchemaVersion());
+    }
+    public ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts) {
+        return Futures.transform(client.beginBatch(ctx, getSchemaVersion(), opts),
+                new Function<String, BatchDatabase>() {
+                    @Override
+                    public BatchDatabase apply(String batchSuffix) {
+                        return new DatabaseImpl(parentFullName, name, batchSuffix, schema);
+                    }
+                });
+    }
+    @Override
+    public ListenableFuture<VIterable<WatchChange>> watch(VContext ctx, String tableRelativeName,
+                                                          String rowPrefix,
+                                                          ResumeMarker resumeMarker) {
+        return Futures.transform(client.watchGlob(ctx,
+                        new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
+                                resumeMarker)),
+                new Function<ClientRecvStream<Change, Void>, VIterable<WatchChange>>() {
+                    @Override
+                    public VIterable<WatchChange> apply(ClientRecvStream<Change, Void> stream) {
+                        return VIterables.transform(stream,
                                 new VIterables.TransformFunction<Change, WatchChange>() {
                                     @Override
                                     public WatchChange apply(Change input) throws VException {
                                         return convertToWatchChange(input);
                                     }
-                                }));
-            }
-            @Override
-            public void onFailure(VException error) {
-                callback.onFailure(error);
-            }
-        };
-        client.watchGlob(ctxC, new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix +
-                "*"), resumeMarker), watchCallback);
+                                });
+                    }
+                });
     }
     @Override
-    public ResumeMarker getResumeMarker(VContext ctx) throws VException {
-        return this.client.getResumeMarker(ctx);
+    public ListenableFuture<ResumeMarker> getResumeMarker(VContext ctx) {
+        return client.getResumeMarker(ctx);
     }
     @Override
     public Syncgroup getSyncgroup(String name) {
-        return new SyncgroupImpl(this.fullName, name);
+        return new SyncgroupImpl(fullName, name);
     }
     @Override
-    public List<String> listSyncgroupNames(VContext ctx) throws VException {
+    public ListenableFuture<List<String>> listSyncgroupNames(VContext ctx) {
         return client.getSyncgroupNames(ctx);
     }
     @Override
-    public void listSyncgroupNames(VContext ctx, Callback<List<String>> callback)
-            throws VException {
-        client.getSyncgroupNames(ctx, callback);
+    public ListenableFuture<BlobWriter> writeBlob(VContext ctx, BlobRef ref) {
+        ListenableFuture<BlobRef> refFuture = ref == null
+                                            ? client.createBlob(ctx)
+                                            : Futures.immediateFuture(ref);
+        return Futures.transform(refFuture, new Function<BlobRef, BlobWriter>() {
+            @Override
+            public BlobWriter apply(BlobRef ref) {
+                return new BlobWriterImpl(client, ref);
+            }
+        });
     }
     @Override
-    public BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException {
-        if (ref == null) {
-            ref = client.createBlob(ctx);
-        }
-        return new BlobWriterImpl(client, ref);
-    }
-    @Override
-    public void writeBlob(VContext ctx, BlobRef ref, final Callback<BlobWriter> callback)
-            throws VException {
-        if (ref != null) {
-            callback.onSuccess(new BlobWriterImpl(client, ref));
-        } else {
-            client.createBlob(ctx, new Callback<BlobRef>() {
-                @Override
-                public void onSuccess(BlobRef result) {
-                    callback.onSuccess(new BlobWriterImpl(client, result));
-                }
-
-                @Override
-                public void onFailure(VException error) {
-                    callback.onFailure(error);
-                }
-            });
-        }
-    }
-    @Override
-    public BlobReader readBlob(VContext ctx, BlobRef ref) throws VException {
+    public BlobReader readBlob(VContext ctx, BlobRef ref) throws VException{
         if (ref == null) {
             throw new VException("Must pass a non-null blob ref.");
         }
         return new BlobReaderImpl(client, ref);
     }
     @Override
-    public void readBlob(VContext ctx, BlobRef ref, Callback<BlobReader> callback)
-            throws VException {
-        callback.onSuccess(readBlob(ctx, ref));
-    }
-    @Override
-    public boolean upgradeIfOutdated(VContext ctx) throws VException {
-        if (this.schema == null) {
-            throw new BadStateException(ctx);
+    public ListenableFuture<Boolean> upgradeIfOutdated(final VContext ctx) {
+        if (schema == null) {
+            Futures.immediateFailedFuture(new BadStateException(ctx));
         }
-        if (this.schema.getMetadata().getVersion() < 0) {
-            throw new BadStateException(ctx);
+        if (schema.getMetadata().getVersion() < 0) {
+            Futures.immediateFailedFuture(new BadStateException(ctx));
         }
-        SchemaManager schemaManager = new SchemaManager(this.fullName);
-        SchemaMetadata currMetadata = null;
-        try {
-            currMetadata = schemaManager.getSchemaMetadata(ctx);
-        } catch (NoExistException eFirst) {
-            // If the client app did not set a schema as part of Database.Create(),
-            // getSchemaMetadata() will throws NoExistException. If so we set the schema
-            // here.
-            try {
-                schemaManager.setSchemaMetadata(ctx, this.schema.getMetadata());
-            } catch (NoExistException eSecond) {
-                return false;
-            }
-        }
-        if (currMetadata.getVersion() >= this.schema.getMetadata().getVersion()) {
-            return false;
-        }
-        // Call the Upgrader provided by the app to upgrade the schema.
-        //
-        // TODO(jlodhia): disable sync before running Upgrader and reenable
-        // once Upgrader is finished.
-        //
-        // TODO(jlodhia): prevent other processes (local/remote) from accessing
-        // the database while upgrade is in progress.
-        this.schema.getUpgrader().run(this,
-                currMetadata.getVersion(), this.schema.getMetadata().getVersion());
-
-        // Update the schema metadata in db to the latest version.
-        schemaManager.setSchemaMetadata(ctx, this.schema.getMetadata());
-        return true;
-    }
-
-    @Override
-    public void upgradeIfOutdated(final VContext ctx, final Callback<Boolean> callback)
-            throws VException {
-        Thread thread = new Thread(new Runnable() {
+        final SchemaManager schemaManager = new SchemaManager(fullName);
+        final SettableFuture<Boolean> ret = SettableFuture.create();
+        Futures.addCallback(schemaManager.getSchemaMetadata(ctx),
+                new FutureCallback<SchemaMetadata>() {
             @Override
-            public void run() {
+            public void onFailure(Throwable t) {
+                if (t instanceof NoExistException) {
+                    // If the client app did not set a schema as part of database creation,
+                    // getSchemaMetadata() will throw NoExistException. In this case, we set the
+                    // schema here.
+                    Futures.addCallback(schemaManager.setSchemaMetadata(ctx, schema.getMetadata()),
+                            new FutureCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void result) {
+                                    ret.set(false);
+                                }
+                                @Override
+                                public void onFailure(Throwable t) {
+                                    // The database may not yet exist. If so, setSchemaMetadata
+                                    // will throw NoExistException, and here we return set the
+                                    // return value of 'false'; otherwise, we fail the
+                                    // return future.
+                                    if (t instanceof NoExistException) {
+                                        ret.set(false);
+                                    } else {
+                                        ret.setException(t);
+                                    }
+                                }
+                            }
+                    );
+                } else {
+                    ret.setException(t);
+                }
+            }
+            @Override
+            public void onSuccess(SchemaMetadata currMetadata) {
+                // Call the Upgrader provided by the app to upgrade the schema.
+                //
+                // TODO(jlodhia): disable sync before running Upgrader and reenable
+                // once Upgrader is finished.
+                //
+                // TODO(jlodhia): prevent other processes (local/remote) from accessing
+                // the database while upgrade is in progress.
                 try {
-                    callback.onSuccess(upgradeIfOutdated(ctx));
-                } catch (VException error) {
-                    callback.onFailure(error);
+                    schema.getUpgrader().run(DatabaseImpl.this,
+                            currMetadata.getVersion(), schema.getMetadata().getVersion());
+                    // Update the schema metadata in db to the latest version.
+                    Futures.addCallback(schemaManager.setSchemaMetadata(ctx, schema.getMetadata()),
+                            new FutureCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void result) {
+                                    ret.set(true);
+                                }
+                                @Override
+                                public void onFailure(Throwable t) {
+                                    ret.setException(t);
+                                }
+                            });
+                } catch (VException e) {
+                    ret.setException(e);
                 }
             }
         });
-        thread.setName("DB update thread");
-        thread.start();
+        return ret;
     }
 
     // Implements BatchDatabase.
     @Override
-    public void commit(VContext ctx) throws VException {
-        this.client.commit(ctx, getSchemaVersion());
+    public ListenableFuture<Void> commit(VContext ctx) {
+        return client.commit(ctx, getSchemaVersion());
     }
     @Override
-    public void commit(VContext ctx, Callback<Void> callback) throws VException {
-        client.commit(ctx, getSchemaVersion(), callback);
-    }
-    @Override
-    public void abort(VContext ctx) throws VException {
-        this.client.abort(ctx, getSchemaVersion());
-    }
-    @Override
-    public void abort(VContext ctx, Callback<Void> callback) throws VException {
-        client.abort(ctx, getSchemaVersion(), callback);
+    public ListenableFuture<Void> abort(VContext ctx) {
+        return client.abort(ctx, getSchemaVersion());
     }
 
     private int getSchemaVersion() {
-        if (this.schema == null) {
+        if (schema == null) {
             return -1;
         }
-        return this.schema.getMetadata().getVersion();
+        return schema.getMetadata().getVersion();
     }
 
     private static class QueryResultsImpl implements QueryResults {
@@ -364,7 +299,7 @@ class DatabaseImpl implements Database, BatchDatabase {
             } catch (NoSuchElementException e) {
                 throw new VException("Got empty exec() stream.");
             }
-            columnNames = new ArrayList(row.size());
+            columnNames = new ArrayList<String>(row.size());
             for (int i = 0; i < row.size(); ++i) {
                 Serializable elem = row.get(i).getElem();
                 if (elem instanceof String) {
@@ -387,7 +322,7 @@ class DatabaseImpl implements Database, BatchDatabase {
         }
         @Override
         public List<String> columnNames() {
-            return this.columnNames;
+            return columnNames;
         }
     }
 

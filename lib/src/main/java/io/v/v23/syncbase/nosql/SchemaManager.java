@@ -4,24 +4,25 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
 import io.v.v23.services.syncbase.nosql.SchemaMetadata;
-import io.v.v23.verror.VException;
 
 class SchemaManager {
     private final DatabaseClient client;
 
     SchemaManager(String dbFullName) {
-        this.client = DatabaseClientFactory.getDatabaseClient(dbFullName);
+        client = DatabaseClientFactory.getDatabaseClient(dbFullName);
     }
 
-    SchemaMetadata getSchemaMetadata(VContext ctx) throws VException {
-        return this.client.getSchemaMetadata(ctx);
+    ListenableFuture<SchemaMetadata> getSchemaMetadata(VContext ctx) {
+        return client.getSchemaMetadata(ctx);
     }
 
-    void setSchemaMetadata(VContext ctx, SchemaMetadata metadata) throws VException {
-        this.client.setSchemaMetadata(ctx, metadata);
+    ListenableFuture<Void> setSchemaMetadata(VContext ctx, SchemaMetadata metadata) {
+        return client.setSchemaMetadata(ctx, metadata);
     }
 }

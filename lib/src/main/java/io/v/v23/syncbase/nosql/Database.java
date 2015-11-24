@@ -3,9 +3,10 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -20,22 +21,14 @@ import java.util.List;
  */
 public interface Database extends DatabaseCore, AccessController {
     /**
-     * Returns {@code true} iff this database exists and the user has sufficient
-     * permissions to access it.
+     * Returns a new {@link ListenableFuture} whose result is {@code true} iff this database exists
+     * and the user has sufficient permissions to access it.
      *
      * @param  ctx        Vanadium context
      * @return            {@code true} iff this database exists and the user has sufficient
      *                    permissions to access it
-     * @throws VException if the database's existence couldn't be determined
      */
-    boolean exists(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #exists(VContext)}.
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void exists(VContext ctx, Callback<Boolean> callback) throws VException;
+    ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
      * Creates this database.
@@ -44,31 +37,15 @@ public interface Database extends DatabaseCore, AccessController {
      * @param  perms      database permissions; if {@code null},
      *                    {@link io.v.v23.syncbase.SyncbaseApp}'s
      *                    permissions are used
-     * @throws VException if the database couldn't be created
      */
-    void create(VContext ctx, Permissions perms) throws VException;
-
-    /**
-     * Asynchronous version of {@link #create(VContext, Permissions)}.
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void create(VContext ctx, Permissions perms, Callback<Void> callback) throws VException;
+    ListenableFuture<Void> create(VContext ctx, Permissions perms);
 
     /**
      * Destroys this database.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the database couldn't be destroyed
      */
-    void destroy(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #destroy(VContext)}.
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void destroy(VContext ctx, Callback<Void> callback) throws VException;
+    ListenableFuture<Void> destroy(VContext ctx);
 
     /**
      * Creates a new "batch", i.e., a handle to a set of reads and writes to the database that
@@ -99,19 +76,10 @@ public interface Database extends DatabaseCore, AccessController {
      *
      * @param  ctx        Vanadium context
      * @param  opts       batch options
-     * @return            a handle to a set of reads and writes to the database that should be
-     *                    considered an atomic unit
-     * @throws VException if the batch couldn't be created
+     * @return            a new {@link ListenableFuture} whose result is a handle to a set of reads
+     *                    and writes to the database that should be considered an atomic unit
      */
-    BatchDatabase beginBatch(VContext ctx, BatchOptions opts) throws VException;
-
-    /**
-     * Asynchronous version of {@link #beginBatch(VContext, BatchOptions)}.
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void beginBatch(VContext ctx, BatchOptions opts, Callback<BatchDatabase> callback)
-            throws VException;
+    ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts);
 
     /**
      * Allows a client to watch for updates to the database. For each watch request, the client will
@@ -137,23 +105,11 @@ public interface Database extends DatabaseCore, AccessController {
      * @param tableRelativeName   relative name of the table to watch
      * @param rowPrefix           prefix of the rows to watch
      * @param resumeMarker        {@link ResumeMarker} from which the changes will be monitored
-     * @return                    a (potentially-infinite) iterator of changes
-     * @throws VException         if there was an error setting up this watch request
+     * @return                    a new {@link ListenableFuture} whose result is a
+     *                            (potentially-infinite) iterator of changes
      */
-    VIterable<WatchChange> watch(VContext ctx, String tableRelativeName, String rowPrefix,
-                                 ResumeMarker resumeMarker) throws VException;
-
-
-    /**
-     * Asynchronous version of {@link #watch(VContext, String, String, ResumeMarker)}. The callback
-     * is called once the stream is established, not necessarily when there is any
-     * {@link WatchChange} instance available for reading.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void watch(VContext ctx, String tableRelativeName, String rowPrefix,
-               ResumeMarker resumeMarker, Callback<VIterable<WatchChange>> callback) throws VException;
+    ListenableFuture<VIterable<WatchChange>> watch(VContext ctx, String tableRelativeName,
+                                                   String rowPrefix, ResumeMarker resumeMarker);
 
     /**
      * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.
@@ -163,20 +119,12 @@ public interface Database extends DatabaseCore, AccessController {
     Syncgroup getSyncgroup(String name);
 
     /**
-     * Returns the global names of all {@link Syncgroup}s attached to this database.
+     * Returns a {@link ListenableFuture} whose result are the global names of all
+     * {@link Syncgroup}s attached to this database.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if the syncgroup names couldn't be retrieved
      */
-    List<String> listSyncgroupNames(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #listSyncgroupNames(VContext)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void listSyncgroupNames(VContext ctx, Callback<List<String>> callback) throws VException;
+    ListenableFuture<List<String>> listSyncgroupNames(VContext ctx);
 
     /**
      * Opens a blob for writing.
@@ -194,18 +142,10 @@ public interface Database extends DatabaseCore, AccessController {
      *
      * @param ctx         vanadium context
      * @param ref         blob reference
-     * @return            a writer used for writing to the blob
-     * @throws VException if the blob couldn't be opened for writing
+     * @return            a {@link ListenableFuture} whose result is a writer used for writing to
+     *                    the blob
      */
-    BlobWriter writeBlob(VContext ctx, BlobRef ref) throws VException;
-
-    /**
-     * Asynchronous version of {@link #writeBlob(VContext, BlobRef)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void writeBlob(VContext ctx, BlobRef ref, Callback<BlobWriter> callback) throws VException;
+    ListenableFuture<BlobWriter> writeBlob(VContext ctx, BlobRef ref);
 
     /**
      * Opens a blob for reading.
@@ -213,22 +153,16 @@ public interface Database extends DatabaseCore, AccessController {
      * It is illegal to invoke this method with a reference to an un-committed blob.  If such a
      * reference is passed-in, no reads of the blob will succeed, though this method itself
      * may not fail (i.e., it may return a {@link BlobReader} object).
+     * <p>
+     * This is a non-blocking method.
      *
      * @param ctx         vanadium context
      * @param ref         blob reference
-     * @return            a reader used for reading from the blob
+     * @return            a {@link ListenableFuture} whose result is a reader used for reading from
+     *                    the blob
      * @throws VException if the blob couldn't be opened for reading
      */
     BlobReader readBlob(VContext ctx, BlobRef ref) throws VException;
-
-
-    /**
-     * Asynchronous version of {@link #readBlob(VContext, BlobRef)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void readBlob(VContext ctx, BlobRef ref, Callback<BlobReader> callback) throws VException;
 
     /**
      * Compares the current schema version of the database with the schema version provided while
@@ -240,18 +174,10 @@ public interface Database extends DatabaseCore, AccessController {
      * this method skips schema check and the caller is responsible for maintaining schema sanity.
      *
      * @param  ctx        Vanadium context
-     * @return            {@code true} iff the database schema had to be upgraded, i.e., if the
-     *                    current database schema version was lower than the schema version with
-     *                    which the database was created
-     * @throws VException if there was an error upgrading the schema
+     * @return            a new {@link ListenableFuture} whose result is {@code true} iff the
+     *                    database schema had to be upgraded, i.e., if the current database schema
+     *                    version was lower than the schema version with which the database was
+     *                    created
      */
-    boolean upgradeIfOutdated(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #upgradeIfOutdated(VContext)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void upgradeIfOutdated(VContext ctx, Callback<Boolean> callback) throws VException;
+    ListenableFuture<Boolean> upgradeIfOutdated(VContext ctx);
 }

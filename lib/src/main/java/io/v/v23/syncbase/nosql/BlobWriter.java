@@ -4,6 +4,8 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.verror.VException;
@@ -20,7 +22,8 @@ public interface BlobWriter {
     BlobRef getRef();
 
     /**
-     * Creates a new {@link OutputStream} for writing data to this blob.
+     * Creates a new {@link ListenableFuture} whose result is an {@link OutputStream} for writing
+     * data to this blob.
      * <p>
      * You should be aware of the following constraints on the returned {@link OutputStream}:
      * <p><ul>
@@ -50,19 +53,17 @@ public interface BlobWriter {
      * a mistake (see comments about the {@link OutputStream#write write} constraints above).
      *
      * @param  ctx        vanadium context
-     * @return            {@link OutputStream} used for writing data to this blob
-     * @throws VException if the {@link OutputStream} couldn't be created
+     * @return            a new {@link ListenableFuture} whose result is the {@link OutputStream}
+     *                    used for writing data to this blob
      */
-    OutputStream stream(VContext ctx) throws VException;
+    ListenableFuture<OutputStream> stream(VContext ctx);
 
     /**
      * Marks the blob as immutable.
      *
      * @param  ctx        vanadium context
-     * @throws VException if the blob couldn't be marked immutable (e.g, it's already been
-     *                    marked as such)
      */
-    void commit(VContext ctx) throws VException;
+    ListenableFuture<Void> commit(VContext ctx);
 
     /**
      * Deletes the blob locally (committed or uncommitted).
@@ -70,12 +71,11 @@ public interface BlobWriter {
      * NOT YET IMPLEMENTED.
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob couldn't be deleted
      */
-    void delete(VContext ctx) throws VException;
+    ListenableFuture<Void> delete(VContext ctx);
 
     /**
-     * Returns the size of the blob.
+     * Returns the {@link ListenableFuture} whose result is the size of the blob.
      * <p>
      * If the blob hasn't yet been {@link #commit commit}ed, returns the number of bytes
      * written so far.
@@ -85,7 +85,6 @@ public interface BlobWriter {
      * on {@link #stream}).
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob size couldn't be determined
      */
-    long size(VContext ctx) throws VException;
+    ListenableFuture<Long> size(VContext ctx);
 }

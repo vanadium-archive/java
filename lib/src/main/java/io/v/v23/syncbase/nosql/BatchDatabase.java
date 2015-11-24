@@ -3,8 +3,9 @@
 // license that can be found in the LICENSE file.
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
 
 /**
@@ -19,15 +20,7 @@ public interface BatchDatabase extends DatabaseCore {
      * @param  ctx        Vanadium context
      * @throws VException if there was an error committing the changes
      */
-    void commit(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #commit(VContext)}.
-     *
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void commit(VContext ctx, Callback<Void> callback) throws VException;
+    ListenableFuture<Void> commit(VContext ctx);
 
     /**
      * Notifies the server that any pending changes can be discarded.
@@ -38,12 +31,5 @@ public interface BatchDatabase extends DatabaseCore {
      * @param  ctx        Vanadium context
      * @throws VException if there was an error discarding the changes
      */
-    void abort(VContext ctx) throws VException;
-
-    /**
-     * Asynchronous version of {@link #abort(VContext)}.
-     * @throws VException if there was an error creating the asynchronous call. In this case, no
-     *                    methods on {@code callback} will be called.
-     */
-    void abort(VContext ctx, Callback<Void> callback) throws VException;
+     ListenableFuture<Void> abort(VContext ctx);
 }

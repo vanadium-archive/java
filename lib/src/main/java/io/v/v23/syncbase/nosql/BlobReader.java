@@ -4,6 +4,8 @@
 
 package io.v.v23.syncbase.nosql;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
@@ -22,16 +24,16 @@ public interface BlobReader {
     BlobRef getRef();
 
     /**
-     * Returns the size of the blob.
+     * Returns a new {@link ListenableFuture} whose result is the size of the blob.
      *
      * @param ctx         vanadium context
      * @throws VException if the blob size couldn't be determined
      */
-    long size(VContext ctx) throws VException;
+    ListenableFuture<Long> size(VContext ctx);
 
     /**
-     * Returns the {@link InputStream} used for reading the contents of the blob, starting at the
-     * given offset.
+     * Returns a new {@link ListenableFuture} whose result is the {@link InputStream} used for
+     * reading the contents of the blob, starting at the given offset.
      * <p>
      * You should be aware of the following constraints on the returned {@link InputStream}:
      * <p><ul>
@@ -44,10 +46,10 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      * @param offset      offset at which to read the contents of the blob
-     * @return            {@link InputStream} used for reading the contents of the blob
-     * @throws VException if the stream couldn't be created (e.g., blob doesn't exist)
+     * @return            a new {@link ListenableFuture} whose result {@link InputStream} used for
+     *                    reading the contents of the blob
      */
-    InputStream stream(VContext ctx, long offset) throws VException;
+    ListenableFuture<InputStream> stream(VContext ctx, long offset);
 
     /**
      * Initiates a blob prefetch, i.e., copying the blob to a local cache.
@@ -56,21 +58,19 @@ public interface BlobReader {
      * priority blobs are prefetched before the lower priority ones.  However an ongoing blob
      * transfer is not interrupted.
      * <p>
-     * The returned iterator can be used to track the progress of the prefetch.  When the
-     * iterator exhausts all of the iterable elements, the blob is guaranteed to have
-     * been entirely copied to a local cache.
+     * Returns a new {@link ListenableFuture} whose result is the iterator that can be used to track
+     * the progress of the prefetch.  When the iterator exhausts all of the iterable elements, the
+     * blob is guaranteed to have been entirely copied to a local cache.
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
      * stop the prefetch and terminate the iterator early.
-     * <p>
-     * This method doesn't block.
      *
      * @param ctx         vanadium context
      * @param priority    prefetch priority
-     * @return            a stream used for tracking the progress of the prefetch
-     * @throws VException if the blob couldn't be prefetched
+     * @return            a {@link ListenableFuture} whose result is an iterator used for tracking
+     *                    the progress of the prefetch
      */
-    VIterable<BlobFetchStatus> prefetch(VContext ctx, long priority) throws VException;
+    ListenableFuture<VIterable<BlobFetchStatus>> prefetch(VContext ctx, long priority);
 
     /**
      * Deletes the blob's local cached copy.
@@ -78,9 +78,8 @@ public interface BlobReader {
      * NOT YET IMPLEMENTED.
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob couldn't be deleted
      */
-    void delete(VContext ctx) throws VException;
+    ListenableFuture<Void> delete(VContext ctx);
 
     /**
      * Pins the blob to a local cache so that it is not evicted.
@@ -88,9 +87,8 @@ public interface BlobReader {
      * NOT YET IMPLEMENTED.
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob couldn't be pinned
      */
-    void pin(VContext ctx) throws VException;
+    ListenableFuture<Void> pin(VContext ctx);
 
     /**
      * Unpins the blob from the local cache so that it can be evicted if needed.
@@ -98,9 +96,8 @@ public interface BlobReader {
      * NOT YET IMPLEMENTED.
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob couldn't be un-pinned
      */
-    void unpin(VContext ctx) throws VException;
+    ListenableFuture<Void> unpin(VContext ctx);
 
     /**
      * Sets the eviction rank for the blob in the local cache.  Lower-ranked blobs are more eagerly
@@ -110,7 +107,6 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      * @param rank        eviction rank
-     * @throws VException if the blob's local cache rank couldn't be set
      */
-    void keep(VContext ctx, long rank) throws VException;
+    ListenableFuture<Void> keep(VContext ctx, long rank);
 }

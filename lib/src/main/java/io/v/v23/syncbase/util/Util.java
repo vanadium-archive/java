@@ -6,23 +6,20 @@ package io.v.v23.syncbase.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Ordering;
-import com.google.common.util.concurrent.SettableFuture;
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.V;
 import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
-import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.GlobReply;
-import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
 
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Various NoSQL utility methods.
@@ -84,51 +81,29 @@ public class Util {
     }
 
     /**
-     * Returns the relative names of all children of parentFullName.
+     * Returns a new {@link ListenableFuture} whose result are the relative names of all children
+     * of {@code parentFullName}.
      *
      * @param  ctx            Vanadium context
-     * @param  parentFullName Object name of parent component
-     * @throws VException     if a glob error occurred
+     * @param  parentFullName object name of parent component
      */
-    public static List<String> listChildren(VContext ctx, String parentFullName) throws VException {
-        final SettableFuture<List<String>> future = SettableFuture.create();
-        Callback<List<String>> callback = new Callback<List<String>>() {
+    public static ListenableFuture<List<String>> listChildren(VContext ctx, String parentFullName) {
+        final ListenableFuture<VIterable<GlobReply>> it =
+                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*"));
+        return Futures.transform(it, new AsyncFunction<VIterable<GlobReply>, List<String>>() {
             @Override
-            public void onSuccess(List<String> result) {
-                future.set(result);
-            }
-
-            @Override
-            public void onFailure(VException error) {
-                future.setException(error);
-            }
-        };
-        listChildren(ctx, parentFullName, callback);
-        try {
-            return Uninterruptibles.getUninterruptibly(future);
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof VException) {
-                throw (VException) e.getCause();
-            } else {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public static void listChildren(VContext ctx, String parentFullName,
-                                    final Callback<List<String>> callback) throws VException {
-        Callback<VIterable<GlobReply>> globCallback = new Callback<VIterable<GlobReply>>() {
-            @Override
-            public void onSuccess(VIterable<GlobReply> result) {
+            public ListenableFuture<List<String>> apply(VIterable<GlobReply> result) throws
+                    Exception {
+                // NOTE(spetrovic): This code should change once we handle the streaming RPC
+                // in a truly asynchronous way.  What's the point of returning an iterator
+                // that will immediately block?
                 List<String> names = new ArrayList<>();
                 for (GlobReply reply : result) {
                     if (reply instanceof GlobReply.Entry) {
                         String fullName = ((GlobReply.Entry) reply).getElem().getName();
                         int idx = fullName.lastIndexOf('/');
                         if (idx == -1) {
-                            callback.onFailure(new VException("Unexpected glob() reply name: "
-                                    + "" + fullName));
-                            return;
+                            throw new VException("Unexpected glob() reply name: " + fullName);
                         }
                         String escName = fullName.substring(idx + 1, fullName.length());
                         // Component names within object names are always escaped.
@@ -142,31 +117,19 @@ public class Util {
                         // want to throw an exception, since some names may simply
                         // be hidden to this client.)
                     } else if (reply == null) {
-                        callback.onFailure(new VException("null glob() reply"));
-                        return;
+                        throw new VException("null glob() reply");
                     } else {
-                        callback.onFailure(new VException("Unrecognized glob() reply type: "
-                                + reply.getClass()));
-                        return;
+                        throw new VException("Unrecognized glob() reply type: " + reply.getClass());
                     }
                 }
                 if (result.error() != null) {
                     // Error during iteration.
-                    callback.onFailure((VException) result.error());
-                    return;
+                    throw result.error();
                 }
-                callback.onSuccess(
+                return Futures.immediateFuture((List<String>)
                         Ordering.from(Collator.getInstance()).immutableSortedCopy(names));
             }
-
-            @Override
-            public void onFailure(VException error) {
-                callback.onFailure(error);
-            }
-        };
-
-        Namespace n = V.getNamespace(ctx);
-        n.glob(ctx, NamingUtil.join(parentFullName, "*"), globCallback);
+        });
     }
 
     /**
