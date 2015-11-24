@@ -15,9 +15,6 @@ apply plugin: 'wrapper'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'http://srdjan.mtv:8081/nexus/content/repositories/test_repo'
-    }
 }
 
 android {
@@ -36,7 +33,7 @@ android {
 }
 
 dependencies {
-    compile 'io.v:vanadium-android:0.1-SNAPSHOT'
+    compile 'io.v:vanadium-android:0.1'
 }
 
 wrapper {
