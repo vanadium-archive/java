@@ -9,9 +9,12 @@ import android.content.Context;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.Joiner;
+
 import io.v.android.apps.syncslides.db.VPerson;
 import io.v.android.apps.syncslides.model.DeckFactory;
 import io.v.android.apps.syncslides.model.Participant;
+import io.v.v23.security.Constants;
 
 public class ParticipantScannerFake implements ParticipantScanner {
     private static final String TAG = "ParticipantScannerFake";
@@ -31,8 +34,12 @@ public class ParticipantScannerFake implements ParticipantScanner {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
                             new VPerson(
-                                    "dev.v.io/u/liz.lemon@gmail.com/android/io.v" +
-                                            ".android.apps.syncslides",
+                                    Joiner.on(Constants.CHAIN_SEPARATOR).join(
+                                            "dev.v.io",
+                                            "u",
+                                            "liz.lemon@gmail.com",
+                                            "android",
+                                            "io.v.android.apps.syncslides"),
                                     "Liz Lemon"),
                             mDeckFactory.make(
                                     "Kale - Just eat it.",
@@ -43,8 +50,12 @@ public class ParticipantScannerFake implements ParticipantScanner {
             participants.add(
                     ParticipantPeer.makeWithKnownDeck(
                             new VPerson(
-                                    "dev.v.io/u/jack.donaghy@gmail.com/android/io.v" +
-                                            ".android.apps.syncslides",
+                                    Joiner.on(Constants.CHAIN_SEPARATOR).join(
+                                            "dev.v.io",
+                                            "u",
+                                            "jack.donaghy@gmail.com",
+                                            "android",
+                                            "io.v.android.apps.syncslides"),
                                     "Jack Donaghy"),
                             mDeckFactory.make(
                                     "Java - Object deluge.",

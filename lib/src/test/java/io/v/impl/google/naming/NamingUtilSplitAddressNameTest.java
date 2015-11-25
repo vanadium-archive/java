@@ -55,23 +55,21 @@ public class NamingUtilSplitAddressNameTest {
                 {"/12.3.4.5//foo", "12.3.4.5", "foo"},
                 {"/12.3.4.5/foo//bar", "12.3.4.5", "foo/bar"},
                 {"/user@domain.com@host:1234/foo/bar", "user@domain.com@host:1234", "foo/bar"},
-                {"/(dev.v.io/services/mounttabled)@host:1234/foo/bar",
-                        "(dev.v.io/services/mounttabled)@host:1234", "foo/bar"},
-                {"/(dev.v.io/services/mounttabled)@host:1234/", "(dev.v.io/services/mounttabled)@host:1234", ""},
-                {"/(dev.v.io/services/mounttabled)@host:1234", "(dev.v.io/services/mounttabled)@host:1234", ""},
-                // malformed endpoint, doesn't end in a @@
-                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io/", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io", ""},
+                {"/(dev.v.io:services:mounttabled)@host:1234/foo/bar",
+                        "(dev.v.io:services:mounttabled)@host:1234", "foo/bar"},
+                {"/(dev.v.io:services:mounttabled)@host:1234/", "(dev.v.io:services:mounttabled)@host:1234", ""},
+                {"/(dev.v.io:services:mounttabled)@host:1234", "(dev.v.io:services:mounttabled)@host:1234", ""},
                 // malformed endpoint, doesn't end in a @@
                 {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io", ""},
-                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/mounttabled@@/foo/bar",
-                        "@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/mounttabled@@", "foo/bar"},
-                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/mounttabled,staging.v.io/services/" +
-                        "nsroot@@/foo/bar", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/" +
-                        "mounttabled,staging.v.io/services/nsroot@@", "foo/bar"},
+                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:mounttabled@@/foo/bar",
+                        "@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:mounttabled@@", "foo/bar"},
+                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:mounttabled,staging.v.io:services:" +
+                        "nsroot@@/foo/bar", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:" +
+                        "mounttabled,staging.v.io:services:nsroot@@", "foo/bar"},
                 {"/@@@127.0.0.1:22@@@@/foo/bar", "@@@127.0.0.1:22@@@@", "foo/bar"},
-                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/mounttabled,staging.v.io/services/" +
-                        "nsroot@@", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io/services/mounttabled" +
-                        ",staging.v.io/services/nsroot@@", ""},
+                {"/@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:mounttabled,staging.v.io:services:" +
+                        "nsroot@@", "@4@tcp@127.0.0.1:22@@@@s@dev.v.io:services:mounttabled" +
+                        ",staging.v.io:services:nsroot@@", ""},
         });
     }
 

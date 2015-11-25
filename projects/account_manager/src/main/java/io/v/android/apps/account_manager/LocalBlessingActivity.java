@@ -16,6 +16,7 @@ import io.v.android.v23.services.blessing.BlessingService;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Constants;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -95,7 +96,8 @@ public class LocalBlessingActivity extends Activity {
 
     private void handleWithBlessings(boolean postCreation) {
         // Attempt to find the blessing matching the specified google account name.
-        String blessingName = "dev.v.io/u/" + mGoogleAccount + "/android";
+        String blessingName = Joiner.on(Constants.CHAIN_SEPARATOR).join(
+                        "dev.v.io", "u", mGoogleAccount, "android")
         Map<BlessingPattern, Blessings> allBlessings =
                 V.getPrincipal(mBaseContext).blessingStore().peerBlessings();
         Blessings blessings = allBlessings.get(new BlessingPattern(blessingName));

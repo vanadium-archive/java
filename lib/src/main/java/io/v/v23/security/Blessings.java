@@ -167,9 +167,13 @@ public final class Blessings implements Serializable {
             List<String> certificateNames =
                     new ArrayList<String>(certificateChain.size());
             for (VCertificate certificate : certificateChain) {
-                certificateNames.add(certificate.getExtension());
+                // TODO(ashankar): Remove once
+                // https://github.com/vanadium/issues/issues/739
+                // has been resolved.
+                String e = certificate.getExtension().replaceAll("/", Constants.CHAIN_SEPARATOR);
+                certificateNames.add(e);
             }
-            chains.add(Joiner.on("/").join(certificateNames));
+            chains.add(Joiner.on(Constants.CHAIN_SEPARATOR).join(certificateNames));
         }
         return Joiner.on(",").join(chains);
     }
