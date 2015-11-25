@@ -4,7 +4,6 @@
 
 package io.v.v23.rpc;
 
-import com.google.common.collect.Lists;
 import io.v.impl.google.naming.EndpointImpl;
 import io.v.v23.naming.Endpoint;
 

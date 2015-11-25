@@ -6,17 +6,6 @@ package io.v.v23.vdl;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-
-import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingPatternNativeConverter;
 import io.v.v23.security.Blessings;
@@ -32,6 +21,20 @@ import io.v.v23.vdl.VdlType.Builder;
 import io.v.v23.vdl.VdlType.PendingType;
 import io.v.v23.verror.VException;
 import io.v.v23.verror.VExceptionVdlConverter;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Types provides helpers to create VDL types.

@@ -4,20 +4,17 @@
 
 package io.v.impl.google.lib.discovery;
 
-import junit.framework.TestCase;
-
-import org.joda.time.DateTimeUtils;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import io.v.v23.discovery.Service;
 import io.v.x.ref.lib.discovery.Advertisement;
 import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
 import io.v.x.ref.lib.discovery.Uuid;
+import junit.framework.TestCase;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.Duration;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Tests for {@link DeviceCache}.

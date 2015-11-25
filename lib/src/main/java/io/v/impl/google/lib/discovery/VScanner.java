@@ -6,8 +6,6 @@ package io.v.impl.google.lib.discovery;
 
 import java.util.UUID;
 
-import io.v.impl.google.lib.discovery.ScanHandler;
-
 /**
  * Stores a {@link UUID} and a {@link ScanHandler}.
  */

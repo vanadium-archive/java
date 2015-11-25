@@ -4,7 +4,6 @@
 
 package io.v.v23.vom;
 
-import io.v.v23.vdl.AbstractVdlStruct;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlComplex128;
 import io.v.v23.vdl.VdlComplex64;
@@ -25,7 +24,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * ReflectUtil provides helpers to get object properties and create class instances from reflection.

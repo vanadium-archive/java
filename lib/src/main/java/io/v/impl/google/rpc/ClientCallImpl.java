@@ -6,7 +6,6 @@ package io.v.impl.google.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import com.google.common.util.concurrent.Uninterruptibles;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Stream;
@@ -15,8 +14,6 @@ import io.v.v23.vom.VomUtil;
 
 import java.io.EOFException;
 import java.lang.reflect.Type;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientCallImpl implements ClientCall {
     private final long nativePtr;

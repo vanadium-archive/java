@@ -4,8 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import io.v.v23.syncbase.util.Util;
-
 /**
  * Represents all rows with keys in {@code [start, limit)}.  If limit is {@code ""}, all rows with
  * keys &ge; {@code start} are included.

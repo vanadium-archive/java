@@ -6,7 +6,6 @@ package io.v.v23.vom;
 
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
-
 import io.v.v23.vdl.GeneratedFromVdl;
 import io.v.v23.vdl.Kind;
 import io.v.v23.vdl.NativeTypes;
@@ -29,7 +28,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -7,28 +7,11 @@ package io.v.x.jni.test.fortune;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
-import com.google.common.util.concurrent.Uninterruptibles;
-
-import junit.framework.TestCase;
-
-import org.joda.time.Duration;
-
-import java.io.EOFException;
-import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
-import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Dispatcher;
@@ -44,10 +27,14 @@ import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
+import junit.framework.TestCase;
+import org.joda.time.Duration;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.v.v23.VFutures.sync;
-
 import static io.v.v23.VFutures.sync;
 
 public class FortuneTest extends TestCase {
