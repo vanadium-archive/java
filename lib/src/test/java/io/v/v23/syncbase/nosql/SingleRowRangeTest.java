@@ -4,7 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import io.v.v23.syncbase.nosql.RowRange;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

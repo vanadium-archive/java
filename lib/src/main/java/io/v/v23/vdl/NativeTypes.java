@@ -14,7 +14,7 @@ public class NativeTypes {
     /**
      * Converts java native values to VDL wire representation.
      */
-    public static abstract class Converter {
+    public abstract static class Converter {
         private final Type wireType;
 
         public Converter(Type wireType) {

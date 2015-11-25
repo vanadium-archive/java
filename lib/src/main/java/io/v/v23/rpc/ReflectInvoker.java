@@ -112,14 +112,14 @@ public final class ReflectInvoker implements Invoker {
     private static Map<Class<?>, ClassInfo> serverWrapperClasses =
         new HashMap<Class<?>, ClassInfo>();
 
-    private final static class ServerMethod {
+    private static final class ServerMethod {
         private final Object wrappedServer;
         private final Method method;
         private final VdlValue[] tags;
         private final Type[] argTypes;
         private final Type[] resultTypes;
 
-        public ServerMethod(Object wrappedServer, Method method, VdlValue[] tags)
+        ServerMethod(Object wrappedServer, Method method, VdlValue[] tags)
                 throws VException {
             this.wrappedServer = wrappedServer;
             this.method = method;

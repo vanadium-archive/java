@@ -7,11 +7,9 @@ package io.v.v23;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 
-import java.io.EOFException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 /**

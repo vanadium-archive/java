@@ -7,7 +7,6 @@ package io.v.v23.security;
 import io.v.v23.verror.VException;
 
 import java.security.interfaces.ECPublicKey;
-import java.util.Map;
 
 /**
  * An entity capable of making or receiving RPCs.  {@link VPrincipal}s have a unique

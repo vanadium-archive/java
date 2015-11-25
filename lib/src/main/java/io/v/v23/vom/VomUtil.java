@@ -7,9 +7,6 @@ package io.v.v23.vom;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.BinaryDecoder;
-import io.v.v23.vom.BinaryEncoder;
-import io.v.v23.vom.ConversionException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

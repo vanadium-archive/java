@@ -11,6 +11,7 @@ buildscript {
     }
 }
 
+apply plugin: 'checkstyle'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'io.v.vdl'
@@ -362,3 +363,6 @@ bintray {
     publications = ['mavenJava', 'mavenNoNatives', 'mavenNatives']
 }
 
+checkstyle {
+    configFile = file('checkstyle_config.xml')
+}

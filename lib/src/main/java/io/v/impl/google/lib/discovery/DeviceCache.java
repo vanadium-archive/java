@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,18 +31,16 @@ import io.v.x.ref.lib.discovery.Advertisement;
  * so we only refetch the data if it hash changed.
  */
 public class DeviceCache {
-    final private Map<Long, CacheEntry> cachedDevices = new HashMap<>();
-    final private Map<String, CacheEntry> knownIds = new HashMap<>();
+    private final Map<Long, CacheEntry> cachedDevices = new HashMap<>();
+    private final Map<String, CacheEntry> knownIds = new HashMap<>();
 
-
-    final AtomicInteger nextScanner = new AtomicInteger(0);
-    final private SetMultimap<UUID, Advertisement> knownServices = HashMultimap.create();
-    final private Map<Integer, VScanner> scannersById = new HashMap<>();
-    final private SetMultimap<UUID, VScanner> scannersByUUID = HashMultimap.create();
+    private final AtomicInteger nextScanner = new AtomicInteger(0);
+    private final SetMultimap<UUID, Advertisement> knownServices = HashMultimap.create();
+    private final Map<Integer, VScanner> scannersById = new HashMap<>();
+    private final SetMultimap<UUID, VScanner> scannersByUUID = HashMultimap.create();
     ScheduledExecutorService timer;
 
-
-    final private Duration maxAge;
+    private final Duration maxAge;
 
 
     public DeviceCache(final Duration maxAge) {

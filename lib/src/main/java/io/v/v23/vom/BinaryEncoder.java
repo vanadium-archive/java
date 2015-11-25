@@ -4,7 +4,6 @@
 
 package io.v.v23.vom;
 
-import io.v.v23.vdl.AbstractVdlStruct;
 import io.v.v23.vdl.Kind;
 import io.v.v23.vdl.NativeTypes;
 import io.v.v23.vdl.Types;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;

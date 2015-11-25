@@ -6,8 +6,6 @@ package io.v.v23.syncbase.nosql;
 
 import io.v.v23.services.watch.ResumeMarker;
 
-import java.util.Arrays;
-
 /**
  * Represents a new value for an entity watched using {@link Database#watch}.
  */

@@ -5,7 +5,6 @@
 package io.v.v23.security;
 
 import io.v.v23.verror.VException;
-import io.v.v23.security.VSignature;
 
 import java.security.interfaces.ECPublicKey;
 

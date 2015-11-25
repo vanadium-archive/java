@@ -4,7 +4,6 @@
 
 package io.v.impl.google.rpc;
 
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.v.v23.OptionDefs;
