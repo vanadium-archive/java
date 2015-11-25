@@ -11,8 +11,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
-import com.google.common.util.concurrent.Uninterruptibles;
 
 import io.v.v23.VIterable;
 import junit.framework.TestCase;
@@ -21,9 +19,6 @@ import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import io.v.impl.google.services.mounttable.MountTableServer;
 import io.v.v23.V;
@@ -33,7 +28,6 @@ import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
-import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;

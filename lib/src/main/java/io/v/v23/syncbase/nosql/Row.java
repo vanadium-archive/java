@@ -8,7 +8,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.lang.reflect.Type;
 
 import io.v.v23.context.VContext;
-import io.v.v23.verror.VException;
 
 /**
  * A handle for a single row in a {@link Table}.
@@ -42,7 +41,7 @@ public interface Row {
     /**
      * Returns the value for this row.
      * <p>
-     * Throws a {@link VException} if the row doesn't exist.
+     * The returned {@link ListenableFuture} will fail if the row doesn't exist.
      *
      * @param  ctx        Vanadium context
      */

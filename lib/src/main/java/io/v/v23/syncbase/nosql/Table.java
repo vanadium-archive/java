@@ -14,7 +14,6 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
-import io.v.v23.verror.VException;
 
 /**
  * Interface for a database table, i.e., a collection of {@link Row}s.

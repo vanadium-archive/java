@@ -6,7 +6,6 @@ package io.v.v23.syncbase.nosql;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.context.VContext;
-import io.v.v23.verror.VException;
 
 /**
  * A handle to a set of reads and writes to the database that should be considered an atomic unit.
@@ -18,7 +17,6 @@ public interface BatchDatabase extends DatabaseCore {
      * Persists the pending changes to the database.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if there was an error committing the changes
      */
     ListenableFuture<Void> commit(VContext ctx);
 
@@ -29,7 +27,6 @@ public interface BatchDatabase extends DatabaseCore {
      * or other resources sooner than if it was not called.
      *
      * @param  ctx        Vanadium context
-     * @throws VException if there was an error discarding the changes
      */
      ListenableFuture<Void> abort(VContext ctx);
 }

@@ -7,7 +7,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.context.VContext;
 import io.v.v23.syncbase.util.AccessController;
-import io.v.v23.verror.VException;
 
 import java.util.List;
 

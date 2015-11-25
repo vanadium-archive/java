@@ -10,7 +10,6 @@ import java.util.Map;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
-import io.v.v23.verror.VException;
 
 /**
  * A handle for a {@link Database} synchronization group.

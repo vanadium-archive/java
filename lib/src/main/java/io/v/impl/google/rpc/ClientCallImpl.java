@@ -34,7 +34,7 @@ public class ClientCallImpl implements ClientCall {
         nativeCloseSend(nativePtr);
     }
     @Override
-    public ListenableFuture<Object[]> finish(final Type[] types) throws VException {
+    public ListenableFuture<Object[]> finish(final Type[] types) {
         final SettableFuture<Object[]> future = SettableFuture.create();
         nativeFinish(nativePtr, types.length, new Callback<byte[][]>() {
             @Override

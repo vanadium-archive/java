@@ -6,7 +6,6 @@ package io.v.v23.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.v.v23.Options;
-import io.v.v23.verror.VException;
 import io.v.v23.context.VContext;
 
 import java.lang.reflect.Type;
@@ -17,26 +16,8 @@ import java.lang.reflect.Type;
  */
 public interface Client {
     /**
-     * Starts an asynchronous call of the method on the server instance identified by name
-     * with the given input args (of any arity).  The returned {@link ClientCall} object manages
-     * streaming args and results and finishes the call.
-     *
-     * @param  context         client context
-     * @param  name            name of the server
-     * @param  method          name of the server's method to be invoked
-     * @param  args            arguments to the server method
-     * @param  argTypes        types of the provided arguments
-     * @return                 call object that manages streaming args and results
-     * @throws VException      if the call cannot be started
-     */
-    ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
-                                           Object[] args, Type[] argTypes)
-            throws VException;
-
-    /**
      * Starts an asynchronous call of the method on the server instance identified by name with the
-     * given input args (of any arity) and provided options. The returned {@link ClientCall} object
-     * manages streaming args and results and finishes the call.
+     * given input args (of any arity) and provided options.
      * <p>
      * A particular implementation of this interface chooses which options to support,
      * but at the minimum it must handle the following pre-defined options:
@@ -44,18 +25,24 @@ public interface Client {
      *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
      * </ul>
      *
-     * @param  context         client context
-     * @param  name            name of the server
-     * @param  method          name of the server's method to be invoked
-     * @param  args            arguments to the server method.
-     * @param  argTypes        types of the provided arguments
-     * @param  opts            call options
-     * @return                 call object that manages streaming args and results
-     * @throws VException      if the call cannot be started
+     * @param  context   client context
+     * @param  name      name of the server
+     * @param  method    name of the server's method to be invoked
+     * @param  args      arguments to the server method.
+     * @param  argTypes  types of the provided arguments
+     * @param  opts      call options
+     * @return           a new {@link ListenableFuture} whose result is the call object that
+     *                   manages streaming args and results
      */
     ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
-                                           Object[] args, Type[] argTypes, Options opts)
-            throws VException;
+                                           Object[] args, Type[] argTypes, Options opts);
+
+    /**
+     * Same as {@link #startCall(VContext, String, String, Object[], Type[], Options)} but with
+     * {@code null} options.
+     */
+    ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
+                                           Object[] args, Type[] argTypes);
 
     /**
      * Discards the state associated with this client.  In-flight calls may be terminated with

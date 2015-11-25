@@ -10,7 +10,6 @@ import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
-import io.v.v23.verror.VException;
 
 import java.io.InputStream;
 
@@ -27,7 +26,6 @@ public interface BlobReader {
      * Returns a new {@link ListenableFuture} whose result is the size of the blob.
      *
      * @param ctx         vanadium context
-     * @throws VException if the blob size couldn't be determined
      */
     ListenableFuture<Long> size(VContext ctx);
 

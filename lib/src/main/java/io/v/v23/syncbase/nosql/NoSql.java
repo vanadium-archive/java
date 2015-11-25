@@ -4,10 +4,8 @@
 
 package io.v.v23.syncbase.nosql;
 
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.FutureFallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -15,7 +13,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
-import io.v.v23.verror.VException;
 
 /**
  * Various utility methods for the NoSql database.
@@ -33,8 +30,6 @@ public class NoSql {
          * Performs the batch operation.
          *
          * @param  db         batch database on which the operation is performed
-         * @throws VException if there was an error performing the operation;  if thrown, the
-         *                    batch operation is aborted
          */
         ListenableFuture<Void> run(BatchDatabase db);
     }

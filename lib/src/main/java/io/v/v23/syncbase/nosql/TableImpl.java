@@ -21,7 +21,6 @@ import io.v.v23.syncbase.util.Util;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.vdl.ClientRecvStream;
-import io.v.v23.verror.VException;
 
 class TableImpl implements Table {
     private final String fullName;

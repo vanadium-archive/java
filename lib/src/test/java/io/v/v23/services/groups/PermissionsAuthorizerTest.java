@@ -13,6 +13,7 @@ import com.google.common.collect.Multimap;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.groups.GroupServer;
 import io.v.v23.V;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
@@ -82,14 +83,14 @@ public class PermissionsAuthorizerTest {
             // Populate the group server.
             {
                 GroupClient client = GroupClientFactory.getGroupClient(groupNameReaders);
-                client.create(CONTEXT, allowAll, ImmutableList.of(
+                VFutures.sync(client.create(CONTEXT, allowAll, ImmutableList.of(
                         new BlessingPatternChunk("root:alice"),
-                        new BlessingPatternChunk("root:bob")));
+                        new BlessingPatternChunk("root:bob"))));
             }
             {
                 GroupClient client = GroupClientFactory.getGroupClient(groupNameWriters);
-                client.create(CONTEXT, allowAll, ImmutableList.of(
-                        new BlessingPatternChunk("root:alice")));
+                VFutures.sync(client.create(CONTEXT, allowAll, ImmutableList.of(
+                        new BlessingPatternChunk("root:alice"))));
             }
 
             AUTHORIZER = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(

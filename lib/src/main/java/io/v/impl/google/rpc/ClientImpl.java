@@ -24,16 +24,10 @@ import java.lang.reflect.Type;
 public class ClientImpl implements Client {
     private final long nativePtr;
 
-    private native ClientCall nativeStartCall(long nativePtr, VContext context,
-                                              String name, String method, byte[][] vomArgs,
-                                              boolean skipServerAuth)
-            throws VException;
-
-    private native void nativeStartCallAsync(long nativePtr, VContext context,
-                                             String name, String method, byte[][] vomArgs,
-                                             boolean skipServerAuth,
-                                             Callback<ClientCall> callback)
-            throws VException;
+    private native void nativeStartCall(long nativePtr, VContext context,
+                                        String name, String method, byte[][] vomArgs,
+                                        boolean skipServerAuth,
+                                        Callback<ClientCall> callback);
     private native void nativeClose(long nativePtr);
     private native void nativeFinalize(long nativePtr);
 
@@ -50,30 +44,34 @@ public class ClientImpl implements Client {
     // Implement io.v.v23.rpc.Client.
     @Override
     public ListenableFuture<ClientCall> startCall(
-            VContext context, String name, String method, Object[] args, Type[] argTypes) throws VException {
+            VContext context, String name, String method, Object[] args, Type[] argTypes) {
         return startCall(context, name, method, args, argTypes, null);
     }
     @Override
-    public ListenableFuture<ClientCall> startCall(VContext context, String name, String method, Object[] args, Type[]
-            argTypes, Options opts) throws VException {
+    public ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
+                                                  Object[] args, Type[] argTypes, Options opts) {
         final SettableFuture<ClientCall> future = SettableFuture.create();
         if (opts == null) {
             opts = new Options();
         }
-        checkStartCallArgs(name, method, args, argTypes);
-        Callback<ClientCall> callback = new Callback<ClientCall>() {
-            @Override
-            public void onSuccess(ClientCall result) {
-                future.set(result);
-            }
-
-            @Override
-            public void onFailure(VException error) {
-                future.setException(error);
-            }
-        };
-        nativeStartCallAsync(this.nativePtr, context, name, getMethodName(method),
-            getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts), callback);
+        try {
+            checkStartCallArgs(name, method, args, argTypes);
+            nativeStartCall(nativePtr, context, name, getMethodName(method),
+                    getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts),
+                    new Callback<ClientCall>() {
+                        @Override
+                        public void onSuccess(ClientCall result) {
+                            future.set(result);
+                        }
+                        @Override
+                        public void onFailure(VException error) {
+                            future.setException(error);
+                        }
+                    }
+            );
+        } catch (VException e) {
+            future.setException(e);
+        }
         return future;
     }
 
@@ -108,22 +106,22 @@ public class ClientImpl implements Client {
 
     @Override
     public void close() {
-        nativeClose(this.nativePtr);
+        nativeClose(nativePtr);
     }
     // Implement java.lang.Object.
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
         if (other == null) return false;
-        if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((ClientImpl) other).nativePtr;
+        if (getClass() != other.getClass()) return false;
+        return nativePtr == ((ClientImpl) other).nativePtr;
     }
     @Override
     public int hashCode() {
-        return Long.valueOf(this.nativePtr).hashCode();
+        return Long.valueOf(nativePtr).hashCode();
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(nativePtr);
     }
 }

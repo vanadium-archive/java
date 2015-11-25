@@ -9,7 +9,6 @@ import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.vdl.VdlAny;
-import io.v.v23.verror.VException;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ package io.v.v23.namespace;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.VIterable;
-import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
 import java.util.List;

@@ -34,5 +34,5 @@ public interface ClientCall extends Stream {
      * @return                 an array of output arguments
      * @throws VException      if there was an error executing the call
      */
-    ListenableFuture<Object[]> finish(Type[] types) throws VException;
+    ListenableFuture<Object[]> finish(Type[] types);
 }

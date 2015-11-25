@@ -8,7 +8,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobRef;
-import io.v.v23.verror.VException;
 
 import java.io.OutputStream;
 
