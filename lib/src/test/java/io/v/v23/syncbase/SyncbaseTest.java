@@ -324,7 +324,7 @@ public class SyncbaseTest extends TestCase {
             ImmutableList.of(new TableRow(TABLE_NAME, "")),
             ImmutableList.<String>of(), false);
         SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
-	memberInfo.setSyncPriority((byte) 1);
+        memberInfo.setSyncPriority((byte) 1);
         Syncgroup group = db.getSyncgroup(groupName);
         {
             sync(group.create(ctx, spec, memberInfo));

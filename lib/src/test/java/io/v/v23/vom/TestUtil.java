@@ -64,14 +64,14 @@ public class TestUtil {
     }
 
     static void assertEqual(String message, Object expected, Object actual) {
-	if (expected == null) {
-	    TestCase.assertNull(message, actual);
-	    return;
-	}
-	if (actual == null) {
-	    TestCase.assertNull(message, expected);
-	    return;
-	}
+        if (expected == null) {
+            TestCase.assertNull(message, actual);
+            return;
+        }
+        if (actual == null) {
+            TestCase.assertNull(message, expected);
+            return;
+        }
         if (expected.getClass().isArray()) {
             Class<?> component = expected.getClass().getComponentType();
             if (component == Boolean.TYPE) {

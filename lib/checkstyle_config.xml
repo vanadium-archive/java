@@ -4,6 +4,14 @@
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <module name="Checker">
+    <module name="SuppressionFilter">
+        <property name="file" value="${checkstyle_ignore_path}"/>
+    </module>
+
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
     <module name="TreeWalker">
         <!-- required for SuppressWarningsFilter (and other Suppress* rules not used here) -->
         <!-- see http://checkstyle.sourceforge.net/config_annotation.html#SuppressWarningsHolder -->

@@ -365,4 +365,5 @@ bintray {
 
 checkstyle {
     configFile = file('checkstyle_config.xml')
+    configProperties.put('checkstyle_ignore_path', file('checkstyle_ignore.xml').getAbsolutePath())
 }
