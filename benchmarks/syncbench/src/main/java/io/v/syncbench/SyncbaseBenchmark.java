@@ -14,6 +14,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.V;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -33,6 +34,8 @@ import io.v.v23.verror.VException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import static io.v.v23.VFutures.sync;
 
 /**
  * To run these benchmarks:
@@ -62,15 +65,17 @@ public class SyncbaseBenchmark {
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
 
-        baseContext = SyncbaseServer.withNewServer(baseContext, new SyncbaseServer.Params().withPermissions(permissions).withStorageRootDir("/tmp/foo-" + System.currentTimeMillis()));
+        baseContext = SyncbaseServer.withNewServer(baseContext, new SyncbaseServer.Params()
+                .withPermissions(permissions).withStorageRootDir("/tmp/foo-" + System
+                        .currentTimeMillis()));
         syncbaseServer = V.getServer(baseContext);
         SyncbaseService service = Syncbase.newService("/" + syncbaseServer.getStatus().getEndpoints()[0]);
         SyncbaseApp app = service.getApp("someApp");
-        app.create(baseContext, null);
+        sync(app.create(baseContext, null));
         database = app.getNoSqlDatabase("foo", null);
-        database.create(baseContext, null);
-        database.getTable("someTable").create(baseContext, null);
-        database.getTable("someTable").put(baseContext, "testKey", imageBytes, byte[].class);
+        sync(database.create(baseContext, null));
+        sync(database.getTable("someTable").create(baseContext, null));
+        sync(database.getTable("someTable").put(baseContext, "testKey", imageBytes, byte[].class));
     }
 
     @AfterExperiment
@@ -82,7 +87,7 @@ public class SyncbaseBenchmark {
     public void benchmarkImageFetchingByLookup(int reps) throws VException {
         Table table = database.getTable("someTable");
         for (int i = 0; i < reps; i++) {
-            byte[] fetchedBytes = (byte[]) table.getRow("testKey").get(baseContext, byte[].class);
+            byte[] fetchedBytes = (byte[]) sync(table.getRow("testKey").get(baseContext, byte[].class));
             if (!Arrays.equals(fetchedBytes, imageBytes)) {
                 throw new IllegalStateException("fetched bytes do not match");
             }
@@ -92,7 +97,7 @@ public class SyncbaseBenchmark {
     @Benchmark
     public void benchmarkImageFetchingByQuery(int reps) throws VException {
         for (int i = 0; i < reps; i++) {
-            DatabaseCore.QueryResults stream = database.exec(baseContext, "select v from someTable");
+            DatabaseCore.QueryResults stream = sync(database.exec(baseContext, "select v from someTable"));
             for (List<VdlAny> result : stream) {
                 byte[] fetchedBytes = (byte[]) result.get(0).getElem();
                 if (!Arrays.equals(fetchedBytes, imageBytes)) {
