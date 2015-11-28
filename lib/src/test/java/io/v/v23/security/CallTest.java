@@ -7,6 +7,7 @@ package io.v.v23.security;
 import junit.framework.TestCase;
 
 import org.joda.time.DateTime;
+import org.junit.Assert;
 
 import io.v.v23.V;
 import io.v.v23.context.VContext;
@@ -44,7 +45,7 @@ public class CallTest extends TestCase {
         Call call = VSecurity.newCall(params);
         assertEquals(timestamp, call.timestamp());
         assertEquals(method, call.method());
-        assertEquals(methodTags, call.methodTags());
+        Assert.assertArrayEquals(methodTags, call.methodTags());
         assertEquals(suffix, call.suffix());
         assertEquals(principal, call.localPrincipal());
         assertEquals(localBlessings, call.localBlessings());

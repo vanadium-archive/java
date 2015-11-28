@@ -1,0 +1,6 @@
+<!-- A findbugs filter that only reports 'scariest' bugs (i.e. rank 1-4) -->
+<FindBugsFilter>
+	<Match>
+		<Rank value="4"/>
+	</Match>
+</FindBugsFilter>

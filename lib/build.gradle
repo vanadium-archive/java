@@ -12,6 +12,7 @@ buildscript {
 }
 
 apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'io.v.vdl'
@@ -366,4 +367,30 @@ bintray {
 checkstyle {
     configFile = file('checkstyle_config.xml')
     configProperties.put('checkstyle_ignore_path', file('checkstyle_ignore.xml').getAbsolutePath())
+}
+
+findbugs {
+    excludeFilter = file('findbugs/findbugs_filter.xml')
+}
+
+tasks.withType(FindBugs) { findbugsTask ->
+    reports {
+        xml {
+            withMessages = true
+        }
+    }
+
+    // For each findbugs task, add a task to dump the findbugs report in plain
+    // text. For this, we translate the findbugs report XML to text using a
+    // custom XSLT template.
+    def reportTask = task "${findbugsTask.name}-report" << {
+        ant.xslt(in: findbugsTask.reports.xml.destination,
+                 out: findbugsTask.reports.xml.destination.path + '.txt',
+                 style: 'findbugs/findbugs_report.xsl')
+        println file(findbugsTask.reports.xml.destination.path + '.txt').text
+    }
+
+    // run the report task even if the findbugs check failed
+    findbugsTask.finalizedBy(reportTask)
+    tasks.check.dependsOn(reportTask)
 }
