@@ -1,0 +1,165 @@
+// You should change this after releasing a new version of the Baku Toolkit. See the
+// list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
+version = '0.1.2'
+group = 'io.v'
+
+def artifactId = 'baku-toolkit'
+def siteUrl = 'https://github.com/vanadium/java'
+def gitUrl = 'https://github.com/vanadium/java.git'
+def pkgDesc = 'Utilities for writing applications with distributed user interfaces'
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+/*
+You might have to download JDK8 and set JAVA8_HOME (or set the jdk to Java 8 via Project Structure).
+For detailed instructions, see https://github.com/evant/gradle-retrolambda
+ */
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+}
+
+dependencies {
+    provided(
+            /* If the application wishes to use support libraries, it should include them as compile
+            dependencies in its own build.gradle. */
+            'com.android.support:appcompat-v7:23.0.1',
+
+            'org.glassfish:javax.annotation:10.0-b28',
+            /*
+            https://projectlombok.org/setup/android.html
+            Follow Android Studio instructions at the bottom of the page to install the Lombok
+            Plugin.
+             */
+            'org.projectlombok:lombok:1.16.6',
+            'org.slf4j:slf4j-api:1.7.12'
+    )
+
+
+    testCompile(
+            'org.mockito:mockito-core:1.10.19',
+            'org.powermock:powermock-module-junit4:1.6.3',
+            'org.slf4j:slf4j-simple:1.7.12'
+    )
+
+    testCompile('org.powermock:powermock-api-mockito:1.6.3') {
+        exclude module: 'mockito-all'
+    }
+
+    compile(
+            'com.jakewharton.rxbinding:rxbinding:0.3.0',
+            'io.reactivex:rxandroid:1.0.1',
+            'io.reactivex:rxjava:1.0.16',
+            'io.reactivex:rxjava-async-util:0.21.0',
+            'io.v:vanadium:0.1',
+            'io.v:vanadium-android:0.1',
+            'net.sourceforge.streamsupport:streamsupport:1.3.2'
+    )
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    /*
+    Word of caution: for local unit tests, Android log statements fail with
+    UnsatisfiedLinkError (hence the slf4j-simple implementation for testCompile).
+
+    Applications should include a suitable runtime binding, such as
+    apk ('org.slf4j:slf4j-android:1.7.12')
+    */
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+
+                name 'Baku Toolkit'
+                description pkgDesc
+                url siteUrl
+
+                licenses {
+                    license {
+                        name 'New BSD License'
+                        url 'https://github.com/vanadium/java/blob/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    url siteUrl
+                }
+                developers {
+                    developer {
+                        id 'vanadium'
+                        name 'The Vanadium Contributors'
+                        email 'vanadium-discuss@v.io'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc (type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+    if (JavaVersion.current().isJava8Compatible()) {
+        // TODO(rosswang): Can we get rid of this?
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from tasks.javadoc
+    classifier = 'javadoc'
+}
+
+archivesBaseName = artifactId
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = project.properties.bintrayUsername
+    key = project.properties.bintrayApiKey
+
+    configurations = ['archives']
+    pkg {
+        desc = pkgDesc
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        repo = group
+        name = rootProject.name
+        licenses = ['BSD New']
+        userOrg = 'vanadium'
+        publish = true
+
+        version {
+            name = project.version
+            gpg {
+                sign = true
+            }
+        }
+    }
+}
