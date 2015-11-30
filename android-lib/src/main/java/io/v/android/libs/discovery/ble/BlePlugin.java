@@ -131,6 +131,10 @@ public class BlePlugin {
         }
     }
 
+    private boolean hasPermission(String perm) {
+        return ContextCompat.checkSelfPermission(androidContext, perm) ==
+                PackageManager.PERMISSION_GRANTED;
+    }
     public BlePlugin(Context androidContext) {
         this.androidContext = androidContext;
         cachedDevices = new DeviceCache(Duration.standardMinutes(1));
@@ -139,8 +143,8 @@ public class BlePlugin {
             return;
         }
 
-        if (ContextCompat.checkSelfPermission(androidContext,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION) &&
+                !hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             return;
         }
         isEnabled = true;
