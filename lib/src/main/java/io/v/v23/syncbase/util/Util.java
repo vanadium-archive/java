@@ -5,20 +5,21 @@
 package io.v.v23.syncbase.util;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.InputChannel;
+import io.v.v23.InputChannels;
 import io.v.v23.V;
-import io.v.v23.VIterable;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.verror.VException;
 
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -88,48 +89,53 @@ public class Util {
      * @param  parentFullName object name of parent component
      */
     public static ListenableFuture<List<String>> listChildren(VContext ctx, String parentFullName) {
-        final ListenableFuture<VIterable<GlobReply>> it =
-                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*"));
-        return Futures.transform(it, new AsyncFunction<VIterable<GlobReply>, List<String>>() {
-            @Override
-            public ListenableFuture<List<String>> apply(VIterable<GlobReply> result) throws
-                    Exception {
-                // NOTE(spetrovic): This code should change once we handle the streaming RPC
-                // in a truly asynchronous way.  What's the point of returning an iterator
-                // that will immediately block?
-                List<String> names = new ArrayList<>();
-                for (GlobReply reply : result) {
-                    if (reply instanceof GlobReply.Entry) {
-                        String fullName = ((GlobReply.Entry) reply).getElem().getName();
-                        int idx = fullName.lastIndexOf('/');
-                        if (idx == -1) {
-                            throw new VException("Unexpected glob() reply name: " + fullName);
-                        }
-                        String escName = fullName.substring(idx + 1, fullName.length());
-                        // Component names within object names are always escaped.
-                        // See comment in server/nosql/dispatcher.go for
-                        // explanation. If unescape throws an exception, there's a
-                        // bug in the Syncbase server. Glob should return names with
-                        // escaped components.
-                        names.add(unescape(escName));
-                    } else if (reply instanceof GlobReply.Error) {
-                        // TODO(sadovsky): Surface these errors somehow. (We don't
-                        // want to throw an exception, since some names may simply
-                        // be hidden to this client.)
-                    } else if (reply == null) {
-                        throw new VException("null glob() reply");
-                    } else {
-                        throw new VException("Unrecognized glob() reply type: " + reply.getClass());
+        return Futures.transform(
+                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*")),
+                new AsyncFunction<InputChannel<GlobReply>, List<String>>() {
+                    @Override
+                    public ListenableFuture<List<String>> apply(InputChannel<GlobReply> input) {
+                        return Futures.transform(
+                                InputChannels.asList(InputChannels.transform(input,
+                                        new InputChannels.TransformFunction<GlobReply, String>() {
+                                            @Override
+                                            public String apply(GlobReply from) throws VException {
+                                                return nameFromGlobReply(from);
+                                            }
+                                        })), new Function<List<String>, List<String>>() {
+                                    @Override
+                                    public List<String> apply(List<String> input) {
+                                        return Ordering.from(Collator.getInstance())
+                                                .immutableSortedCopy(input);
+                                    }
+                                });
                     }
-                }
-                if (result.error() != null) {
-                    // Error during iteration.
-                    throw result.error();
-                }
-                return Futures.immediateFuture((List<String>)
-                        Ordering.from(Collator.getInstance()).immutableSortedCopy(names));
+                });
+    }
+
+    private static String nameFromGlobReply(GlobReply reply) throws VException {
+        if (reply instanceof GlobReply.Entry) {
+            String fullName = ((GlobReply.Entry) reply).getElem().getName();
+            int idx = fullName.lastIndexOf('/');
+            if (idx == -1) {
+                throw new VException("Unexpected glob() reply name: " + fullName);
             }
-        });
+            String escName = fullName.substring(idx + 1, fullName.length());
+            // Component names within object names are always escaped.
+            // See comment in server/nosql/dispatcher.go for
+            // explanation. If unescape throws an exception, there's a
+            // bug in the Syncbase server. Glob should return names with
+            // escaped components.
+            return unescape(escName);
+        } else if (reply instanceof GlobReply.Error) {
+            // TODO(sadovsky): Surface these errors somehow. (We don't
+            // want to throw an exception, since some names may simply
+            // be hidden to this client.)
+            return null;
+        } else if (reply == null) {
+            throw new VException("null glob() reply");
+        } else {
+            throw new VException("Unrecognized glob() reply type: " + reply.getClass());
+        }
     }
 
     /**

@@ -7,12 +7,13 @@ package io.v.v23.rpc;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 
-import java.io.EOFException;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 
+import io.v.v23.VFutures;
 import io.v.v23.VIterable;
 import io.v.v23.verror.CanceledException;
+import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
 
 /**
@@ -37,8 +38,8 @@ public class StreamIterable<T> implements VIterable<T> {
             @Override
             protected T computeNext() {
                 try {
-                    return (T) stream.recv(type);
-                } catch (EOFException e) {  // legitimate end of stream
+                    return (T) VFutures.sync(stream.recv(type));
+                } catch (EndOfFileException e) {  // legitimate end of stream
                     return endOfData();
                 } catch (CanceledException e) {  // context canceled
                     return endOfData();

@@ -4,33 +4,50 @@
 
 package io.v.impl.google.rpc;
 
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Stream;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
-import java.io.EOFException;
 import java.lang.reflect.Type;
 
 public class StreamImpl implements Stream {
     private final long nativePtr;
 
-    private native void nativeSend(long nativePtr, byte[] vomItem) throws VException;
-    private native byte[] nativeRecv(long nativePtr) throws EOFException, VException;
+    private native void nativeSend(long nativePtr, byte[] vomItem, Callback<Void> callback);
+    private native void nativeRecv(long nativePtr, Callback<byte[]> callback);
     private native void nativeFinalize(long nativePtr);
 
     private StreamImpl(long nativePtr) {
         this.nativePtr = nativePtr;
     }
-    @Override
-    public void send(Object item, Type type) throws VException {
-        byte[] vomItem = VomUtil.encode(item, type);
-        nativeSend(nativePtr, vomItem);
-    }
 
     @Override
-    public Object recv(Type type) throws EOFException, VException {
-        byte[] result = nativeRecv(nativePtr);
-        return VomUtil.decode(result, type);
+    public ListenableFuture<Void> send(Object item, Type type) {
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+        try {
+            byte[] vomItem = VomUtil.encode(item, type);
+            nativeSend(nativePtr, vomItem, callback);
+        } catch (VException e) {
+            callback.onFailure(e);
+        }
+        return callback.getFuture();
+    }
+    @Override
+    public ListenableFuture<Object> recv(final Type type) {
+        ListenableFutureCallback<byte[]> callback = new ListenableFutureCallback<>();
+        nativeRecv(nativePtr, callback);
+        return Futures.transform(callback.getFuture(), new AsyncFunction<byte[], Object>() {
+            @Override
+            public ListenableFuture<Object> apply(byte[] result) throws Exception {
+                return Futures.immediateFuture(VomUtil.decode(result, type));
+            }
+        });
     }
     @Override
     protected void finalize() {

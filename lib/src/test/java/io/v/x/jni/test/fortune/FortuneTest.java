@@ -4,9 +4,10 @@
 
 package io.v.x.jni.test.fortune;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.v23.InputChannels;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.CancelableVContext;
@@ -118,11 +119,11 @@ public class FortuneTest extends TestCase {
         String msg = "The only fortune";
         sync(client.add(ctxT, msg));
         for (int i = 0; i < 5; ++i) {
-            stream.send(true);
+            sync(stream.send(true));
         }
-        stream.close();
-        assertThat(stream).containsExactly(msg, msg, msg, msg, msg);
-        int result = stream.finish();
+        sync(stream.close());
+        assertThat(sync(InputChannels.asList(stream))).containsExactly(msg, msg, msg, msg, msg);
+        int result = sync(stream.finish());
         assertEquals(5, result);
     }
 
@@ -138,6 +139,26 @@ public class FortuneTest extends TestCase {
         FortuneClient.MultipleGetOut ret = sync(client.multipleGet(ctxT));
         assertEquals(firstMessage, ret.fortune);
         assertEquals(firstMessage, ret.another);
+    }
+
+    public void testMultipleStreaming() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        ClientStream<Boolean, String, FortuneClient.MultipleStreamingGetOut> stream =
+                sync(client.multipleStreamingGet(ctxT));
+        String msg = "The only fortune";
+        sync(client.add(ctxT, msg));
+        for (int i = 0; i < 5; ++i) {
+            sync(stream.send(true));
+        }
+        sync(stream.close());
+        assertThat(sync(InputChannels.asList(stream))).containsExactly(msg, msg, msg, msg, msg);
+        FortuneClient.MultipleStreamingGetOut result = sync(stream.finish());
+        assertEquals(5, result.total);
+        assertEquals(5, result.another);
     }
 
     public void testComplexError() throws Exception {
@@ -197,8 +218,8 @@ public class FortuneTest extends TestCase {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
 
-        List<GlobReply> globResult
-                = ImmutableList.copyOf(sync(V.getNamespace(ctx).glob(ctx, name() + "/*")));
+        List<GlobReply> globResult = sync(InputChannels.asList(
+                sync(V.getNamespace(ctx).glob(ctx, name() + "/*"))));
         assertThat(globResult).hasSize(2);
         assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
         assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())

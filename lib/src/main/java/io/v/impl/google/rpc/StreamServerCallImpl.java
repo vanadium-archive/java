@@ -5,6 +5,8 @@
 package io.v.impl.google.rpc;
 
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
@@ -12,9 +14,7 @@ import io.v.v23.rpc.Stream;
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Call;
-import io.v.v23.verror.VException;
 
-import java.io.EOFException;
 import java.lang.reflect.Type;
 
 public class StreamServerCallImpl implements StreamServerCall {
@@ -31,12 +31,12 @@ public class StreamServerCallImpl implements StreamServerCall {
     }
     // Implements io.v.v23.rpc.Stream.
     @Override
-    public void send(Object item, Type type) throws VException {
-        this.stream.send(item, type);
+    public ListenableFuture<Void> send(Object item, Type type) {
+        return stream.send(item, type);
     }
     @Override
-    public Object recv(Type type) throws EOFException, VException {
-        return this.stream.recv(type);
+    public ListenableFuture<Object> recv(Type type) {
+        return stream.recv(type);
     }
     // Implements io.v.v23.rpc.ServerCall.
     @Override

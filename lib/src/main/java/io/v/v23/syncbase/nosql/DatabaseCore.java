@@ -5,7 +5,7 @@ package io.v.v23.syncbase.nosql;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.vdl.VdlAny;
@@ -73,10 +73,10 @@ public interface DatabaseCore {
      * An interface for iterating through rows resulting from a
      * {@link DatabaseCore#exec DatabaseCore.exec()}.
      */
-    interface QueryResults extends VIterable<List<VdlAny>> {
+    interface QueryResults extends InputChannel<List<VdlAny>> {
         /**
          * Returns an array of column names that matched the query.  The size of the {@link VdlAny}
-         * list returned in every iteration will match the size of this array.
+         * list returned in every {@link #recv} iteration will match the size of this list.
          */
         List<String> columnNames();
     }

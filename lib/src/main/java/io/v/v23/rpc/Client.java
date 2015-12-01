@@ -38,8 +38,8 @@ public interface Client {
                                            Object[] args, Type[] argTypes, Options opts);
 
     /**
-     * Same as {@link #startCall(VContext, String, String, Object[], Type[], Options)} but with
-     * {@code null} options.
+     * A shortcut for {@link #startCall(VContext, String, String, Object[], Type[], Options)} with
+     * a {@code null} options parameter.
      */
     ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
                                            Object[] args, Type[] argTypes);

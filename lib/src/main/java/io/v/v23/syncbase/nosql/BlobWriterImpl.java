@@ -18,6 +18,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static io.v.v23.VFutures.sync;
+
 public class BlobWriterImpl implements BlobWriter {
     private final DatabaseClient client;
     private final BlobRef ref;
@@ -67,7 +69,7 @@ public class BlobWriterImpl implements BlobWriter {
                 return;
             }
             try {
-                this.stream.finish();
+                sync(stream.finish());
                 closed = true;
             } catch (VException e) {
                 throw new IOException(e);
@@ -85,7 +87,7 @@ public class BlobWriterImpl implements BlobWriter {
         @Override
         public void write(byte[] b) throws IOException {
             try {
-                stream.send(b);
+                sync(stream.send(b));
             } catch (VException e) {
                 throw new IOException(e);
             }

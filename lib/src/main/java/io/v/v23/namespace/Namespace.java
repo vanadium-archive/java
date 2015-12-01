@@ -6,12 +6,12 @@ package io.v.v23.namespace;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.v23.VIterable;
 import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.Map;
 
+import io.v.v23.InputChannel;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
@@ -173,19 +173,11 @@ public interface Namespace {
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern);
+    ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern);
 
     /**
-     * Returns a new {@link ListenableFuture} whose result is the iterator over all names
-     * matching the provided pattern. Note that due to the inherently asynchronous nature of
-     * Vanadium's glob API, you should assume that calls to the returned iterator's {@code next}
-     * method may block.
-     * <p>
-     * You should be aware that the iterator:
-     * <p><ul>
-     *     <li>can be created <strong>only</strong> once</li>
-     *     <li>does not support {@link java.util.Iterator#remove remove}</li>
-     * </ul>
+     * Returns a new {@link ListenableFuture} whose result is a channel over all names
+     * matching the provided pattern.
      * <p>
      * A particular implementation of this interface chooses which options to support, but at the
      * minimum it must handle the following pre-defined options:
@@ -194,15 +186,17 @@ public interface Namespace {
      * </ul>
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
-     * stop the glob operation and terminate the iterator early.
+     * stop the glob operation and cause the channel to stop producing elements. Note that to avoid
+     * memory leaks, the caller should drain the channel after cancelling the context.
      *
      * @param context a client context
      * @param pattern a pattern that should be matched
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return        a new {@link ListenableFuture} whose result an iterator over {@link GlobReply}
-     *                objects matching the provided pattern
+     * @return        a new {@link ListenableFuture} whose result is an {@link InputChannel} of
+     *                {@link GlobReply} objects matching the provided pattern
      */
-    ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern, Options options);
+    ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern,
+                                                   Options options);
 
     /**
      * Sets the roots that the local namespace is relative to.

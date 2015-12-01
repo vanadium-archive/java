@@ -4,9 +4,8 @@
 
 package io.v.v23.rpc;
 
-import io.v.v23.verror.VException;
+import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.EOFException;
 import java.lang.reflect.Type;
 
 /**
@@ -14,22 +13,21 @@ import java.lang.reflect.Type;
  */
 public interface Stream {
     /**
-     * Places the item onto the output stream, blocking if there is no bufferspace available.
+     * Places the item onto the output stream.
      *
-     * @param  item            an item to be sent
-     * @param  type            type of the provided item
-     * @throws VException      if there was an error sending the item
+     * @param  item  an item to be sent
+     * @param  type  type of the provided item
      */
-    void send(Object item, Type type) throws VException;
+    ListenableFuture<Void> send(Object item, Type type);
 
     /**
-     * Returns the next item in the input stream, blocking until an item is available.
-     * An {@link java.io.EOFException} will be thrown if a graceful end of input has been reached.
+     * Returns a new {@link ListenableFuture} whose result is the next item in the stream.
+     * <p>
+     * The returned {@link ListenableFuture} will fail if there was an error fetching the next
+     * item;  {@link io.v.v23.verror.EndOfFileException} means that a graceful end of input has been
+     * reached.
      *
-     * @param  type            type of the returned item
-     * @return                 the returned item
-     * @throws EOFException    if a graceful end of input has been reached
-     * @throws VException      if there was an error receving an item
+     * @param  type type of the returned item
      */
-    Object recv(Type type) throws EOFException, VException;
+    ListenableFuture<Object> recv(Type type);
 }

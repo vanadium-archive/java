@@ -6,7 +6,7 @@ package io.v.v23.syncbase.nosql;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -54,21 +54,22 @@ public interface BlobReader {
      * <p>
      * The provided {@code priority} value controls the network priority of the blob.  Higher
      * priority blobs are prefetched before the lower priority ones.  However an ongoing blob
-     * transfer is not interrupted.
+     * transferg is not interrupted.
      * <p>
-     * Returns a new {@link ListenableFuture} whose result is the iterator that can be used to track
-     * the progress of the prefetch.  When the iterator exhausts all of the iterable elements, the
-     * blob is guaranteed to have been entirely copied to a local cache.
+     * Returns a new {@link ListenableFuture} whose result is an {@link InputChannel} that can be
+     * used to track the progress of the prefetch.  When the iterator exhausts all of the iterable
+     * elements, the blob is guaranteed to have been entirely copied to a local cache.
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
-     * stop the prefetch and terminate the iterator early.
+     * stop the prefetch and cause the channel to stop producing elements.  Note that to avoid
+     * memory leaks, the caller should drain the channel after cancelling the context.
      *
      * @param ctx         vanadium context
      * @param priority    prefetch priority
-     * @return            a {@link ListenableFuture} whose result is an iterator used for tracking
-     *                    the progress of the prefetch
+     * @return            a new {@link ListenableFuture} whose result is an
+     *                    {@link InputChannel} that can be used to
      */
-    ListenableFuture<VIterable<BlobFetchStatus>> prefetch(VContext ctx, long priority);
+    ListenableFuture<InputChannel<BlobFetchStatus>> prefetch(VContext ctx, long priority);
 
     /**
      * Deletes the blob's local cached copy.

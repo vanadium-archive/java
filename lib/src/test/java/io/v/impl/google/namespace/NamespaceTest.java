@@ -1,7 +1,6 @@
 // Copyright 2015 The Vanadium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-//
 
 package io.v.impl.google.namespace;
 
@@ -12,7 +11,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
+import io.v.v23.InputChannels;
 import junit.framework.TestCase;
 
 import org.joda.time.Duration;
@@ -20,23 +20,20 @@ import org.joda.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import io.v.impl.google.services.mounttable.MountTableServer;
 import io.v.v23.V;
+import io.v.v23.V23TestUtil;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
+import io.v.v23.naming.GlobError;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
-import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
-import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.VSecurity;
 import io.v.v23.security.access.AccessList;
-import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.services.permissions.ObjectServer;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -54,31 +51,10 @@ public class NamespaceTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
-        ctx = V.withListenSpec(ctx, V.getListenSpec(ctx).withAddress(
-                new ListenSpec.Address("tcp", "localhost:0")));
-        dummyServerCtx = V.withNewServer(ctx, "", new DummyServer(),
-                VSecurity.newAllowEveryoneAuthorizer());
-        Server dummyServer = V.getServer(dummyServerCtx);
-        assertThat(dummyServer).isNotNull();
-        assertThat(dummyServer.getStatus()).isNotNull();
-        assertThat(dummyServer.getStatus().getEndpoints()).isNotEmpty();
-        dummyServerEndpoint = dummyServer.getStatus().getEndpoints()[0];
-        AccessList acl = new AccessList(
-                ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
-        Permissions allowAll = new Permissions(ImmutableMap.of(
-                Constants.READ.getValue(), acl,
-                Constants.WRITE.getValue(), acl,
-                Constants.ADMIN.getValue(), acl));
-        ctx = MountTableServer.withNewServer(ctx, new MountTableServer.Params()
-                .withPermissions(ImmutableMap.of("test", allowAll))
-                .withStatsPrefix("test"));
-        Server mtServer = V.getServer(ctx);
-        assertThat(mtServer).isNotNull();
-        assertThat(mtServer.getStatus()).isNotNull();
-        assertThat(mtServer.getStatus().getEndpoints()).isNotEmpty();
-        mountTableEndpoint = mtServer.getStatus().getEndpoints()[0];
-        Namespace n = V.getNamespace(ctx);
-        n.setRoots(ImmutableList.of(mountTableEndpoint.name()));
+        dummyServerCtx = V23TestUtil.withDummyServer(ctx);
+        dummyServerEndpoint = V23TestUtil.getServerEndpoint(dummyServerCtx);
+        ctx = NamespaceTestUtil.withTestMountServer(ctx);
+        mountTableEndpoint = V23TestUtil.getServerEndpoint(ctx);
     }
 
     @Override
@@ -93,8 +69,9 @@ public class NamespaceTest extends TestCase {
         }
     }
 
-    private Iterable<String> globNames(Iterable<GlobReply> globReplies) {
-        return Iterables.transform(globReplies, new Function<GlobReply, String>() {
+    private Iterable<String> globNames(InputChannel<GlobReply> globReplies) {
+        return Iterables.transform(InputChannels.asIterable(globReplies),
+                new Function<GlobReply, String>() {
             @Override
             public String apply(GlobReply reply) {
                 if (reply instanceof GlobReply.Entry) {
@@ -136,7 +113,8 @@ public class NamespaceTest extends TestCase {
     public void testGlob() throws Exception {
         Namespace n = V.getNamespace(ctx);
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
-        List<GlobReply> result = Lists.newArrayList(sync(n.glob(ctx, "test/*")));
+        List<GlobReply> result = Lists.newArrayList(
+                InputChannels.asIterable(sync(n.glob(ctx, "test/*"))));
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getElem()).isInstanceOf(MountEntry.class);
         assertThat(((MountEntry) (result.get(0).getElem())).getName()).isEqualTo("test/test");
@@ -147,10 +125,13 @@ public class NamespaceTest extends TestCase {
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
 
         CancelableVContext cancelContext = ctx.withCancel();
-        ListenableFuture<VIterable<GlobReply>> result = n.glob(cancelContext, "test/*");
+        ListenableFuture<InputChannel<GlobReply>> future = n.glob(cancelContext, "test/*");
         cancelContext.cancel();
-        List<GlobReply> replies = Lists.newArrayList(result.get());
-        assertThat(replies).isEmpty();
+        List<GlobReply> result = sync(InputChannels.asList(sync(future)));
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getElem()).isInstanceOf(GlobError.class);
+        assertThat(((GlobError) result.get(0).getElem()).getError()).isInstanceOf(
+                CanceledException.class);
     }
 
     public void testResolve() throws Exception {
@@ -184,17 +165,5 @@ public class NamespaceTest extends TestCase {
         assertThat(permissions).hasSize(1);
         // TODO(sjr): figure out what is actually in this map
         assertThat(permissions).containsKey("2");
-    }
-
-    private static class DummyServer implements ObjectServer {
-        @Override
-        public void setPermissions(VContext ctx, ServerCall call, Permissions permissions,
-                                   String version) throws VException {
-            throw new VException("Unimplemented!");
-        }
-        @Override
-        public GetPermissionsOut getPermissions(VContext ctx, ServerCall call) throws VException {
-            throw new VException("Unimplemented!");
-        }
     }
 }

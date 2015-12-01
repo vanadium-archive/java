@@ -4,27 +4,23 @@
 
 package io.v.v23;
 
-import io.v.v23.verror.VException;
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
- * The write-end of a channel of {@code T}. Calls to {@link #writeValue writeValue} may block until
- * the receiver has read the value.
+ * The write-end of a channel of {@code T}.
  */
-public interface OutputChannel<T> extends AutoCloseable {
+public interface OutputChannel<T> {
     /**
      * Writes the given value to the channel.
-     * <p>
-     * Implementations of this method may block until the receiver has read the value.
      *
-     * @param value the value to write
-     * @throws VException if there was an error writing to the channel
+     * @param item        an item to be sent
      */
-    void writeValue(T value) throws VException;
+    ListenableFuture<Void> send(T item);
 
     /**
-     * Closes the output channel. No more values may be written to it after this call returns.
-     *
-     * @throws VException if there was an error closing the channel
+     * Indicates to the receiver that no more items will be sent.
+     * <p>
+     * This is an optional call intended to signal the receiver that no more items will be sent.
      */
-    void close() throws VException;
+    ListenableFuture<Void> close();
 }

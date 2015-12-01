@@ -112,7 +112,7 @@ public class ReflectInvokerTest extends TestCase {
         ReflectInvoker invoker = new ReflectInvoker(new FortuneServerImpl());
         Interface[] serverInterface = invoker.getSignature(null, null);
         assertThat(serverInterface).hasLength(1);
-        assertThat(serverInterface[0].getMethods()).hasSize(7);
+        assertThat(serverInterface[0].getMethods()).hasSize(8);
         Function<Method, String> methodNameFunction = new Function<Method, String>() {
             @Override
             public String apply(Method input) {
@@ -121,8 +121,8 @@ public class ReflectInvokerTest extends TestCase {
         };
         assertThat(Lists.transform(
                 serverInterface[0].getMethods(), methodNameFunction)).containsAllOf(
-                "get", "add", "streamingGet", "multipleGet", "getComplexError",
-                "noTags", "testServerCall");
+                "get", "add", "streamingGet", "multipleGet", "multipleStreamingGet",
+                "getComplexError", "noTags", "testServerCall");
         assertThat(serverInterface[0].getName()).isEqualTo("Fortune");
     }
 }

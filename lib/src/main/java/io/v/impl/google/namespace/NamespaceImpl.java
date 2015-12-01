@@ -5,9 +5,9 @@
 package io.v.impl.google.namespace;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 
-import io.v.v23.VIterable;
+import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.InputChannel;
 import io.v.v23.rpc.Callback;
 import org.joda.time.Duration;
 
@@ -29,8 +29,9 @@ import io.v.v23.verror.VException;
 public class NamespaceImpl implements Namespace {
     private final long nativePtr;
 
-    private static native void nativeGlob(long nativePtr, VContext context, String pattern,
-                                          Options options, Callback<VIterable<GlobReply>> callback);
+    private static native void nativeGlob(long nativePtr, VContext context,
+                                          String pattern, Options options,
+                                          Callback<InputChannel<GlobReply>> callback);
     private static native void nativeMount(long nativePtr, VContext context, String name,
                                            String server, Duration ttl, Options options,
                                            Callback<Void> callback);
@@ -69,7 +70,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl,
                                         Options options) {
-        FutureCallback<Void> callback = new FutureCallback<>();
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeMount(nativePtr, context, name, server, ttl, options, callback);
         return callback.getFuture();
     }
@@ -82,7 +83,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<Void> unmount(VContext context, String name, String server,
                                           Options options) {
-        FutureCallback<Void> callback = new FutureCallback<>();
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeUnmount(nativePtr, context, name, server, options, callback);
         return callback.getFuture();
     }
@@ -95,7 +96,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree,
                                          Options options) {
-        FutureCallback<Void> callback = new FutureCallback<>();
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeDelete(nativePtr, context, name, deleteSubtree, options, callback);
         return callback.getFuture();
     }
@@ -107,7 +108,7 @@ public class NamespaceImpl implements Namespace {
 
     @Override
     public ListenableFuture<MountEntry> resolve(VContext context, String name, Options options) {
-        FutureCallback<MountEntry> callback = new FutureCallback<>();
+        ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
         nativeResolve(nativePtr, context, name, options, callback);
         return callback.getFuture();
     }
@@ -120,7 +121,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name,
                                                             Options options) {
-        FutureCallback<MountEntry> callback = new FutureCallback<>();
+        ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
         nativeResolveToMountTable(nativePtr, context, name, options, callback);
         return callback.getFuture();
     }
@@ -131,14 +132,15 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern) {
+    public ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern) {
         return glob(context, pattern, null);
     }
 
     @Override
-    public ListenableFuture<VIterable<GlobReply>> glob(VContext context, String pattern,
-                                                       Options options) {
-        FutureCallback<VIterable<GlobReply>> callback = new FutureCallback<>();
+    public ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern,
+                                                          Options options) {
+        ListenableFutureCallback<InputChannel<GlobReply>> callback =
+                new ListenableFutureCallback<>();
         nativeGlob(nativePtr, context, pattern, options, callback);
         return callback.getFuture();
     }
@@ -158,7 +160,7 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<Void> setPermissions(VContext context, String name,
                                                  Permissions permissions, String version,
                                                  Options options) {
-        FutureCallback<Void> callback = new FutureCallback<>();
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeSetPermissions(nativePtr, context, name, permissions, version, options, callback);
         return callback.getFuture();
     }
@@ -172,7 +174,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name,
                                                                      Options options) {
-        final FutureCallback<Map<String, Permissions>> callback = new FutureCallback<>();
+        final ListenableFutureCallback<Map<String, Permissions>> callback = new ListenableFutureCallback<>();
         nativeGetPermissions(nativePtr, context, name, options, callback);
         return callback.getFuture();
     }
@@ -199,20 +201,5 @@ public class NamespaceImpl implements Namespace {
     @Override
     protected void finalize() {
         nativeFinalize(this.nativePtr);
-    }
-
-    private static class FutureCallback<T> implements Callback<T> {
-        private final SettableFuture<T> future = SettableFuture.create();
-        public ListenableFuture<T> getFuture() {
-            return future;
-        }
-        @Override
-        public void onSuccess(T result) {
-            future.set(result);
-        }
-        @Override
-        public void onFailure(VException error) {
-            future.setException(error);
-        }
     }
 }

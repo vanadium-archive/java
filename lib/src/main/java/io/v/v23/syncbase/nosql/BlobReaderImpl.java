@@ -8,19 +8,20 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.vdl.ClientRecvStream;
 import io.v.v23.vdl.VdlUint64;
+import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
+import static io.v.v23.VFutures.sync;
 
 class BlobReaderImpl implements BlobReader {
     private final DatabaseClient client;
@@ -46,12 +47,12 @@ class BlobReaderImpl implements BlobReader {
         });
     }
     @Override
-    public ListenableFuture<VIterable<BlobFetchStatus>> prefetch(VContext ctx, long priority) {
+    public ListenableFuture<InputChannel<BlobFetchStatus>> prefetch(VContext ctx, long priority) {
         return Futures.transform(client.fetchBlob(ctx, ref, new VdlUint64(priority)),
-                new Function<ClientRecvStream<BlobFetchStatus, Void>, VIterable<BlobFetchStatus>>()
-                {
+                new Function<ClientRecvStream<BlobFetchStatus, Void>,
+                        InputChannel<BlobFetchStatus>>() {
                     @Override
-                    public VIterable<BlobFetchStatus> apply(
+                    public InputChannel<BlobFetchStatus> apply(
                             ClientRecvStream<BlobFetchStatus, Void> result) {
                         return result;
                     }
@@ -81,7 +82,6 @@ class BlobReaderImpl implements BlobReader {
 
     private static class BlobInputStream extends InputStream {
         private final ClientRecvStream<byte[], Void> stream;
-        private final Iterator<byte[]> streamIt;
         private boolean closed = false;
         private byte[] lastRecv = null;
         private int lastRecvRemaining = 0;
@@ -89,7 +89,6 @@ class BlobReaderImpl implements BlobReader {
 
         BlobInputStream(ClientRecvStream<byte[], Void> stream) {
             this.stream = stream;
-            this.streamIt = stream.iterator();
         }
 
         @Override
@@ -102,7 +101,7 @@ class BlobReaderImpl implements BlobReader {
                 return;
             }
             try {
-                stream.finish();
+                sync(stream.finish());
                 closed = true;
             } catch (VException e) {
                 throw new IOException(e);
@@ -141,14 +140,13 @@ class BlobReaderImpl implements BlobReader {
             while (need > 0) {
                 if (lastRecvRemaining <= 0) {
                     try {
-                        lastRecv = streamIt.next();
+                        lastRecv = sync(stream.recv());
                         lastRecvRemaining = lastRecv.length;
-                    } catch (NoSuchElementException e) {
+                    } catch (EndOfFileException e) {
                         eof = true;
                         break;
-                    }
-                    if (stream.error() != null) {
-                        throw new IOException(stream.error());
+                    } catch (VException e) {
+                        throw new IOException(e);
                     }
                 }
                 int copyLen = len > lastRecvRemaining ? lastRecvRemaining : len;

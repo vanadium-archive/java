@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import io.v.impl.google.naming.NamingUtil;
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.PrefixPermissions;
 import io.v.v23.services.syncbase.nosql.TableClient;
@@ -89,12 +89,12 @@ class TableImpl implements Table {
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override
-    public ListenableFuture<VIterable<KeyValue>> scan(VContext ctx, RowRange range) {
+    public ListenableFuture<InputChannel<KeyValue>> scan(VContext ctx, RowRange range) {
         return Futures.transform(client.scan(ctx, schemaVersion,
                         Util.getBytes(range.getStart()), Util.getBytes(range.getLimit())),
-                new Function<ClientRecvStream<KeyValue, Void>, VIterable<KeyValue>>() {
+                new Function<ClientRecvStream<KeyValue, Void>, InputChannel<KeyValue>>() {
                     @Override
-                    public VIterable<KeyValue> apply(ClientRecvStream<KeyValue, Void> input) {
+                    public InputChannel<KeyValue> apply(ClientRecvStream<KeyValue, Void> input) {
                         return input;
                     }
                 });

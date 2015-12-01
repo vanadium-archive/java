@@ -19,6 +19,8 @@ import io.v.v23.verror.VException;
 
 import java.util.concurrent.CountDownLatch;
 
+import static io.v.v23.VFutures.sync;
+
 public class FortuneServerImpl implements FortuneServer, Globber {
     private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
             "StrVal",
@@ -94,6 +96,29 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     }
 
     @Override
+    public MultipleStreamingGetOut multipleStreamingGet(VContext context, ServerCall call,
+                                                        ServerStream<String, Boolean> stream)
+            throws VException {
+        int numSent = 0;
+        for (Boolean val : stream) {
+            try {
+                stream.send(get(context, call));
+            } catch (VException e) {
+                throw new VException(
+                        "Server couldn't send a string item: " + e.getMessage());
+            }
+            ++numSent;
+        }
+        if (stream.error() != null) {
+            throw stream.error();
+        }
+        MultipleStreamingGetOut ret = new MultipleStreamingGetOut();
+        ret.total = numSent;
+        ret.another = numSent;
+        return ret;
+    }
+
+        @Override
     public void getComplexError(VContext context, ServerCall call) throws VException {
         throw COMPLEX_ERROR;
     }
@@ -125,10 +150,10 @@ public class FortuneServerImpl implements FortuneServer, Globber {
             throws VException {
         GlobReply.Entry entry = new GlobReply.Entry(
                 new MountEntry("helloworld", ImmutableList.<MountedServer>of(), false, false));
-        response.writeValue(entry);
+        sync(response.send(entry));
         GlobReply.Error error = new GlobReply.Error(
                 new GlobError("Hello, world!", new VException("Some error")));
-        response.writeValue(error);
-        response.close();
+        sync(response.send(error));
+        sync(response.close());
     }
 }

@@ -6,20 +6,21 @@ package io.v.impl.google.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+
+import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.ClientCall;
 import io.v.v23.rpc.Stream;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
-import java.io.EOFException;
 import java.lang.reflect.Type;
 
 public class ClientCallImpl implements ClientCall {
     private final long nativePtr;
     private final Stream stream;
 
-    private native void nativeCloseSend(long nativePtr) throws VException;
+    private native void nativeCloseSend(long nativePtr, Callback<Void> callback);
     private native void nativeFinish(long nativePtr, int numResults, Callback<byte[][]> callback);
     private native void nativeFinalize(long nativePtr);
 
@@ -28,10 +29,19 @@ public class ClientCallImpl implements ClientCall {
         this.stream = stream;
     }
 
-    // Implements io.v.v23.rpc.ClientCall.
     @Override
-    public void closeSend() throws VException {
-        nativeCloseSend(nativePtr);
+    public ListenableFuture<Void> send(Object item, Type type) {
+        return stream.send(item, type);
+    }
+    @Override
+    public ListenableFuture<Object> recv(Type type) {
+        return stream.recv(type);
+    }
+    @Override
+    public ListenableFuture<Void> closeSend() {
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+        nativeCloseSend(nativePtr, callback);
+        return callback.getFuture();
     }
     @Override
     public ListenableFuture<Object[]> finish(final Type[] types) {
@@ -65,18 +75,8 @@ public class ClientCallImpl implements ClientCall {
         });
         return future;
     }
-    // Implements io.v.v23.rpc.Stream.
-    @Override
-    public void send(Object item, Type type) throws VException {
-        this.stream.send(item, type);
-    }
-    @Override
-    public Object recv(Type type) throws EOFException, VException {
-        return this.stream.recv(type);
-    }
-    // Implements java.lang.Object.
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(nativePtr);
     }
 }

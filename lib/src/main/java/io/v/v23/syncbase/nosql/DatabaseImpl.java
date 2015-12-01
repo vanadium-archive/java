@@ -5,7 +5,6 @@
 package io.v.v23.syncbase.nosql;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -16,8 +15,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
 import io.v.impl.google.naming.NamingUtil;
-import io.v.v23.VIterable;
-import io.v.v23.VIterables;
+import io.v.v23.InputChannel;
+import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectClient;
@@ -44,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 class DatabaseImpl implements Database, BatchDatabase {
     private final String parentFullName;
@@ -90,8 +88,16 @@ class DatabaseImpl implements Database, BatchDatabase {
                 new AsyncFunction<ClientRecvStream<List<VdlAny>, Void>, QueryResults>() {
                     @Override
                     public ListenableFuture<QueryResults> apply(
-                            ClientRecvStream<List<VdlAny>, Void> stream) throws Exception {
-                        return Futures.<QueryResults>immediateFuture(new QueryResultsImpl(stream));
+                            final ClientRecvStream<List<VdlAny>, Void> stream) throws Exception {
+                        return Futures.transform(stream.recv(),
+                                new AsyncFunction<List<VdlAny>, QueryResults>() {
+                            @Override
+                            public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
+                                    throws Exception {
+                                return Futures.immediateFuture(
+                                        (QueryResults) new QueryResultsImpl(columnNames, stream));
+                            }
+                        });
                     }
                 });
     }
@@ -139,20 +145,20 @@ class DatabaseImpl implements Database, BatchDatabase {
                 });
     }
     @Override
-    public ListenableFuture<VIterable<WatchChange>> watch(VContext ctx, String tableRelativeName,
-                                                          String rowPrefix,
-                                                          ResumeMarker resumeMarker) {
+    public ListenableFuture<InputChannel<WatchChange>> watch(VContext ctx, String tableRelativeName,
+                                                             String rowPrefix,
+                                                             ResumeMarker resumeMarker) {
         return Futures.transform(client.watchGlob(ctx,
                         new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
                                 resumeMarker)),
-                new Function<ClientRecvStream<Change, Void>, VIterable<WatchChange>>() {
+                new Function<InputChannel<Change>, InputChannel<WatchChange>>() {
                     @Override
-                    public VIterable<WatchChange> apply(ClientRecvStream<Change, Void> stream) {
-                        return VIterables.transform(stream,
-                                new VIterables.TransformFunction<Change, WatchChange>() {
+                    public InputChannel<WatchChange> apply(InputChannel<Change> input) {
+                        return InputChannels.transform(input,
+                                new InputChannels.TransformFunction<Change, WatchChange>() {
                                     @Override
-                                    public WatchChange apply(Change input) throws VException {
-                                        return convertToWatchChange(input);
+                                    public WatchChange apply(Change change) throws VException {
+                                        return convertToWatchChange(change);
                                     }
                                 });
                     }
@@ -281,29 +287,17 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
 
     private static class QueryResultsImpl implements QueryResults {
-        private final VIterable<List<VdlAny>> iterable;
-        private final Iterator<List<VdlAny>> it;
-        private boolean calledIterator;
+        private final InputChannel<List<VdlAny>> input;
         private final List<String> columnNames;
 
-        private QueryResultsImpl(VIterable<List<VdlAny>> iterable) throws VException {
-            this.iterable = iterable;
-            // Iterator can be created only once, so cache the iterator here as we need
-            // to use it just below.
-            it = iterable.iterator();
-
-            // The first row should contain column names, pull them off the stream.
-            List<VdlAny> row;
-            try {
-                row = it.next();
-            } catch (NoSuchElementException e) {
-                throw new VException("Got empty exec() stream.");
-            }
-            columnNames = new ArrayList<String>(row.size());
-            for (int i = 0; i < row.size(); ++i) {
-                Serializable elem = row.get(i).getElem();
+        private QueryResultsImpl(List<VdlAny> columnNames,
+                                 InputChannel<List<VdlAny>> input) throws VException {
+            this.input = input;
+            this.columnNames = new ArrayList<>(columnNames.size());
+            for (int i = 0; i < columnNames.size(); ++i) {
+                Serializable elem = columnNames.get(i).getElem();
                 if (elem instanceof String) {
-                    columnNames.add((String) elem);
+                    this.columnNames.add((String) elem);
                 } else {
                     throw new VException("Expected first row in exec() stream to contain column " +
                             "names (of type String), got type: " + elem.getClass());
@@ -311,14 +305,8 @@ class DatabaseImpl implements Database, BatchDatabase {
             }
         }
         @Override
-        public Iterator<List<VdlAny>> iterator() {
-            Preconditions.checkState(!calledIterator, "Can only create one iterator.");
-            calledIterator = true;
-            return it;
-        }
-        @Override
-        public VException error() {
-            return iterable.error();
+        public ListenableFuture<List<VdlAny>> recv() {
+            return input.recv();
         }
         @Override
         public List<String> columnNames() {

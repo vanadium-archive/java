@@ -4,7 +4,9 @@
 
 package io.v.v23.vdl;
 
-import io.v.v23.verror.VException;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.v23.OutputChannel;
 
 /**
  * Represents the send side of the client bidirectional stream.
@@ -12,44 +14,21 @@ import io.v.v23.verror.VException;
  * @param <SendT>   type of values that the client is sending to the server
  * @param <FinishT> type of the final return value from the server
  */
-public interface ClientSendStream<SendT, FinishT> {
+public interface ClientSendStream<SendT, FinishT> extends OutputChannel<SendT> {
     /**
-     * Places the item onto the output stream, blocking if there is no buffer space available.
-     *
-     * @param  item            an item to be sent
-     * @throws VException      if there was an error sending the item
-     */
-    void send(SendT item) throws VException;
-
-    /**
-     * Indicates to the server that no more items will be sent;  server's receiver iterator
-     * will gracefully terminate after receiving all sent items.
+     * Returns a new {@link ListenableFuture} that performs the equivalent of {@link #close},
+     * then waits until the server is done and returns the call return value.
      * <p>
-     * This is an optional call - e.g. a client might call {@link #close} if it needs to continue
-     * receiving items from the server after it's done sending.
+     * If the call context has been canceled, depending on the timing, the returned
+     * {@link ListenableFuture} may either fail with {@link io.v.v23.verror.CanceledException} or
+     * return a valid call return value.
      * <p>
-     * Like {@link #send}, blocks if there is no buffer space available.
-     *
-     * @throws VException if there was an error encountered while closing, or if this method is
-     *                    called after the stream has been canceled
-     */
-    void close() throws VException;
-
-    /**
-     * Performs the equivalent of {@link #close}, then blocks until the server is
-     * done and returns the return value for the call.
-     * <p>
-     * Doesn't block if the call has been canceled; depending on the timing, {@link #finish} may
-     * either throw an exception signaling cancellation or return the valid return value from the
-     * server.
-     * <p>
-     * Calling {@link #finish} is mandatory for releasing stream resources, unless the call
-     * has been canceled or any of the other methods throw an exception.
+     * Calling {@link #finish} is mandatory for releasing stream resources, unless the call context
+     * has been canceled or any of the other methods threw an exception.
      * <p>
      * Must be called at most once.
      *
-     * @return FinishT         the final stream result
-     * @throws VException      if there was an error closing the stream
+     * @return a new {@link ListenableFuture} whose result is the call return value
      */
-    FinishT finish() throws VException;
+    ListenableFuture<FinishT> finish();
 }

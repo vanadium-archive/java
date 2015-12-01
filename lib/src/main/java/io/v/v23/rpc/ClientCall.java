@@ -5,7 +5,6 @@
 package io.v.v23.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.v.v23.verror.VException;
 
 import java.lang.reflect.Type;
 
@@ -15,24 +14,22 @@ import java.lang.reflect.Type;
  */
 public interface ClientCall extends Stream {
     /**
-     * Indicates to the server that no more items will be sent; server's
-     * {@link StreamServerCall#recv recv} calls will throw {@link java.io.EOFException} after
-     * all sent items.  Subsequent calls to {@link Stream#send send} will fail.
+     * Indicates to the server that no further items will be sent.
      * <p>
-     * This is an optional call - it's used by streaming clients that need the server to throw
-     * {@link java.io.EOFException}.
-     *
-     * @throws VException      if there was an error closing
+     * This method will cause the server's {@link StreamServerCall#recv recv} call to eventually
+     * fail with {@link io.v.v23.verror.EndOfFileException} (i.e., after all sent items have been
+     * received).
+     * <p>
+     * Completion of this method will cause all client's future {@link Stream#send send} calls
+     * to fail.
      */
-    void closeSend() throws VException;
+    ListenableFuture<Void> closeSend();
 
     /**
-     * Blocks until the server has finished the call and returns the positional output arguments
-     * (of any arity).
+     * Returns a new {@link ListenableFuture} whose result are the positional output arguments
+     * (of any arity) for the call.
      *
-     * @param  types           types for all the output arguments
-     * @return                 an array of output arguments
-     * @throws VException      if there was an error executing the call
+     * @param  types types for all the output arguments
      */
     ListenableFuture<Object[]> finish(Type[] types);
 }

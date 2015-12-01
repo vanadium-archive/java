@@ -4,8 +4,9 @@
 
 package io.v.v23.vdl;
 
-import io.v.v23.VIterable;
-import io.v.v23.verror.VException;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.v23.InputChannel;
 
 /**
  * Represents the receiving side of the client bidirectional stream.
@@ -13,21 +14,21 @@ import io.v.v23.verror.VException;
  * @param <RecvT>   type of values that the client is receiving from the server
  * @param <FinishT> type of the final return value from the server
  */
-public interface ClientRecvStream<RecvT, FinishT> extends VIterable<RecvT> {
+public interface ClientRecvStream<RecvT, FinishT> extends InputChannel<RecvT> {
     /**
-     * Blocks until the server is done and returns the call return value.
+     * Returns a new {@link ListenableFuture} that waits until the server is done and then returns
+     * the call return value.
      * <p>
-     * Doesn't block if the call has been canceled; depending on the timing, {@link #finish} may
-     * either throw an exception signaling cancellation or return the valid return value from the
-     * server.
+     * If the call context has been canceled, depending on the timing, the returned
+     * {@link ListenableFuture} may either fail with {@link io.v.v23.verror.CanceledException} or
+     * return a valid call return value.
      * <p>
-     * Calling {@link #finish} is mandatory for releasing stream resources, unless the call
-     * has been canceled or any of the other methods throw an exception.
+     * Calling {@link #finish} is mandatory for releasing stream resources, unless the call context
+     * has been canceled or any of the other methods threw an exception.
      * <p>
      * Must be called at most once.
      *
-     * @return FinishT         the final stream result
-     * @throws VException      if there was an error closing the stream
+     * @return a new {@link ListenableFuture} whose result is the call return value
      */
-    FinishT finish() throws VException;
+    ListenableFuture<FinishT> finish();
 }

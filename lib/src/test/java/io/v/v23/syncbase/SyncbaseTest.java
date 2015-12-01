@@ -10,11 +10,11 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
+import io.v.v23.InputChannels;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
-import io.v.v23.services.syncbase.nosql.BlobFetchStatus;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
@@ -41,6 +41,7 @@ import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 import junit.framework.TestCase;
@@ -50,7 +51,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.v23.VFutures.sync;
@@ -168,7 +168,8 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(table.getRow("row2").exists(ctx))).isTrue();
         assertThat(sync(table.get(ctx, "row1", String.class))).isEqualTo("value1");
         assertThat(sync(table.get(ctx, "row2", String.class))).isEqualTo("value2");
-        assertThat(sync(table.scan(ctx, RowRange.range("row1", "row3")))).containsExactly(
+        assertThat(sync(InputChannels.asList(
+                sync(table.scan(ctx, RowRange.range("row1", "row3")))))).containsExactly(
                 new KeyValue("row1", VomUtil.encode("value1", String.class)),
                 new KeyValue("row2", VomUtil.encode("value2", String.class)));
         sync(table.deleteRange(ctx, RowRange.range("row1", "row3")));
@@ -216,14 +217,14 @@ public class SyncbaseTest extends TestCase {
             DatabaseCore.QueryResults results = sync(db.exec(ctx,
                     "select k, v.Name from " + TABLE_NAME + " where Type(v) like \"%Baz\""));
             assertThat(results.columnNames()).containsExactly("k", "v.Name");
-            assertThat(results).containsExactly(ImmutableList.of(
+            assertThat(sync(InputChannels.asList(results))).containsExactly(ImmutableList.of(
                     new VdlAny(String.class, "baz"), new VdlAny(String.class, baz.name)));
         }
         {
             DatabaseCore.QueryResults results =
                     sync(db.exec(ctx, "select k, v from " + TABLE_NAME));
             assertThat(results.columnNames()).containsExactly("k", "v");
-            assertThat(results).containsExactly(
+            assertThat(sync(InputChannels.asList(results))).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "bar"), new VdlAny(Bar.class, bar)),
                     ImmutableList.of(new VdlAny(String.class, "baz"), new VdlAny(Baz.class, baz)),
                     ImmutableList.of(new VdlAny(String.class, "foo"), new VdlAny(Foo.class, foo))
@@ -250,9 +251,10 @@ public class SyncbaseTest extends TestCase {
                 new WatchChange(TABLE_NAME, "baz", ChangeType.PUT_CHANGE,
                         VomUtil.encode(baz, Baz.class), null, false, false),
                 new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
-                        new byte[0], null, false, false ));
+                        new byte[0], null, false, false));
         CancelableVContext ctxC = ctx.withCancel();
-        Iterator<WatchChange> it = sync(db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
+        Iterator<WatchChange> it = InputChannels.asIterable(
+                sync(db.watch(ctxC, TABLE_NAME, "b", marker))).iterator();
         for (WatchChange expected : expectedChanges) {
             assertThat(it.hasNext());
             WatchChange actual = it.next();
@@ -271,7 +273,7 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createApp(createService()));
         createTable(db);
 
-        VIterable<WatchChange> it = sync(db.watch(
+        InputChannel<WatchChange> channel = sync(db.watch(
                 cancelCtx, TABLE_NAME, "b", sync(db.getResumeMarker(ctx))));
         new Thread(new Runnable() {
             @Override
@@ -279,13 +281,18 @@ public class SyncbaseTest extends TestCase {
                 cancelCtx.cancel();
             }
         }).start();
-        assertThat(it).isEmpty();
+        try {
+            sync(InputChannels.asList(channel));
+        } catch (CanceledException e) {
+            // OK
+        }
     }
 
     public void testBatch() throws Exception {
         Database db = createDatabase(createApp(createService()));
         Table table = createTable(db);
-        assertThat(sync(table.scan(ctx, RowRange.prefix("")))).isEmpty();
+        assertThat(sync(InputChannels.asList(
+                sync(table.scan(ctx, RowRange.prefix("")))))).isEmpty();
 
         BatchDatabase batchFoo = sync(db.beginBatch(ctx, null));
         Table batchFooTable = batchFoo.getTable(TABLE_NAME);
@@ -488,8 +495,8 @@ public class SyncbaseTest extends TestCase {
             // OK
         }
         try {
-            sync(reader.prefetch(ctx, 0)).iterator().next();
-        } catch (VException | NoSuchElementException e) {
+            sync(reader.prefetch(ctx, 0)).recv();
+        } catch (VException e) {
             // OK
         }
     }
@@ -506,7 +513,7 @@ public class SyncbaseTest extends TestCase {
 
         // Prefetch
         BlobReader reader = db.readBlob(ctx, ref);
-        for (BlobFetchStatus status : sync(reader.prefetch(ctx, 0))) {}
+        sync(InputChannels.asDone(sync(reader.prefetch(ctx, 0))));
         // Read
         byte[] actual = new byte[data.length];
         ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);

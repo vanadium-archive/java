@@ -9,7 +9,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.nosql.KeyValue;
@@ -121,23 +121,24 @@ public interface Table {
     ListenableFuture<Void> deleteRange(VContext ctx, RowRange range);
 
     /**
-     * Returns a new {@link ListenableFuture} whose result is the iterator over all rows in the
-     * given half-open range {@code [start, limit)}. If {@code limit} is {@code ""}, all rows with
-     * keys &ge; {@code start} are included.
+     * Returns a new {@link ListenableFuture} whose result is an {@link InputChannel} over all rows
+     * in the given half-open range {@code [start, limit)}. If {@code limit} is {@code ""}, all rows
+     * with keys &ge; {@code start} are included.
      * <p>
-     * It is legal to perform writes concurrently with {@link #scan scan()}. The returned stream
+     * It is legal to perform writes concurrently with {@link #scan scan()}. The returned channel
      * reads from a consistent snapshot taken at the time of the method and will not reflect
      * subsequent writes to keys not yet reached by the stream.
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
-     * stop the scan and terminate the iterator early.
+     * stop the scan and cause the channel to stop producing elements.  Note that to
+     * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *
      * @param  ctx         Vanadium context
      * @param  range       range of rows to be read
-     * @return             a new {@link ListenableFuture} whose result is the iterator over all
-     *                     rows in the given half-open range {@code [start, limit)}
+     * @return             a new {@link ListenableFuture} whose result is an {@link InputChannel}
+     *                     over all rows in the given half-open range {@code [start, limit)}
      */
-    ListenableFuture<VIterable<KeyValue>> scan(VContext ctx, RowRange range);
+    ListenableFuture<InputChannel<KeyValue>> scan(VContext ctx, RowRange range);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the list of {@link PrefixPermissions}
