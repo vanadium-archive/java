@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="err_app_clear">Unable to clear app data</string>
+    <string name="err_blessings_assume">Unable to assume blessings</string>
+    <string name="err_blessings_decode">Unable to decode blessings</string>
+    <string name="err_blessings_misc">Unexpected error while attaining blessings</string>
+    <string name="err_blessings_required">Blessings required</string>
+    <string name="err_blessings_store">Unable to store blessings</string>
+    <string name="err_sync">Unable to sync state</string>
+    <string name="err_syncgroup_join">Unable to join syncgroup</string>
+    <string name="err_misc">Unknown error</string>
+    <string name="err_vinit_options">Invalid Vanadium options</string>
+</resources>

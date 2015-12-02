@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Baku Toolkit</string>
+    <string name="clear_app_data">Clear app data</string>
+    <string name="debug">Debug</string>
+    <string name="kill_process">Kill process</string>
+    <string name="logging">Logging</string>
+    <string name="vlevel">V23 log verbosity</string>
+    <string name="vmodule">V23 module log verbosity</string>
+
+    <string name="reset">Reset</string>
+    <string name="restart">Restart app</string>
+</resources>
