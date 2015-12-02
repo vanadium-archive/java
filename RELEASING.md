@@ -72,7 +72,7 @@ New releaser
 
 ## Gradle plugin
 
-The steps to release the Gradle plugin are:
+The steps to release the [Gradle plugin] are:
 
 * determine the release number to use. To determine the current release number,
   go to the [JCenter Gradle plugin] page. If this is a major release, increment the
@@ -83,13 +83,13 @@ The steps to release the Gradle plugin are:
 * run the following commands:
 
 ```sh
-cd $JIRI_ROOT/release
-./gradlew clean uploadBintray
+cd $JIRI_ROOT/release/java/gradle-plugin
+./gradlew clean bintrayUpload
 ```
 
 This command will build and upload the VDL plugin to Bintray.
 
-* go to the [Gradle plugin Bintray] page
+* go to the [Gradle plugin Bintray] page and make sure you're signed in
 * click on the version number of the version you just uploaded
 * you should see a notice such as "You have 4 unpublished item(s) for this
   version", click on the associated "Publish" button
@@ -110,7 +110,79 @@ appears in the list, the plugin has been published.
 
 ## Java and Android libraries
 
-Coming soon
+Releasing these libraries is similar to releasing the Gradle plugin with one
+notable exception: it must be performed once on Linux and once on Darwin. This
+is due to the fact that, at this point in time, the Vanadium Java libraries
+cannot be cross-compiled between the two platforms.
+
+### Building
+
+On either Linux or Darwin, perform the following steps:
+
+* determine the release number to use. To determine the current release number,
+  go to the [JCenter Vanadium library] page. If this is a major release,
+  increment the major release number and set the minor number to zero. If it's a
+  minor release, increment the minor number and leave the major number unchanged
+* edit `$JIRI_ROOT/release/java/lib/build.gradle` and change the
+  `releaseVersion` variable to the new release number
+* edit `$JIRI_ROOT/release/java/android-lib/build.gradle` and change the
+  `releaseVersion` variable to the same release number
+* run the following commands:
+
+```sh
+cd $JIRI_ROOT/release/java
+./gradlew :lib:clean :lib:bintrayUpload
+./gradlew :android-lib:clean :android-lib:bintrayUpload
+```
+
+Now, switch to the other platform (i.e. not the one you used for the above
+steps) and:
+
+* edit the `$JIRI_ROOT/release/java/lib/build.gradle` file
+* change the `releaseVersion` variable to match the same variable from the
+  previous steps
+* find the line that reads
+
+```groovy
+    publications = ['mavenJava', 'mavenNoNatives', 'mavenNatives']
+```
+
+* we've already published `mavenJava` and `mavenNoNatives`, remove those
+  entries. Do not check in your changes. The line should now read
+
+```groovy
+    publications = ['mavenNatives']
+```
+
+* run the following commands:
+
+```sh
+cd $JIRI_ROOT/release/java
+./gradlew :lib:clean :lib:bintrayUpload
+```
+
+### Publishing
+
+The binaries for the Vanadium and Vanadium Android libraries are now uploaded
+to Bintray. Time to publish them to JCenter and Maven Central.
+
+* go to the [Vanadium library Bintray] page and make sure you're signed in
+* click on the version number of the version you just uploaded
+* you should see a notice such as "You have 8 unpublished item(s) for this
+  version", click on the associated "Publish" button
+
+The new Vanadium library version is now published to JCenter. For Maven
+Central, follow these additional steps:
+
+* click on the "Maven Central" link
+* enter your JIRA username and password that you created in the [Maven
+  Central account](#maven-central-account) prerequisite step
+* ensure the "Close and release repository when done" check box is checked
+* click the "Sync" button
+
+The Vanadium library will now be pushed out to Maven Central in a few minutes.
+Now go to the [Vanadium Android library Bintray] page and repeat the publishing
+steps.
 
 [core vanadium Java]: https://github.com/vanadium/java/tree/master/lib
 [Vanadium Android]: https://github.com/vanadium/java/tree/master/android-lib
@@ -121,5 +193,8 @@ Coming soon
 [JIRA account creation]: https://issues.sonatype.org/secure/Signup!default.jspa
 [vanadium-discuss mailing list]: mailto:vanadium-discuss@v.io
 [JCenter Gradle plugin]: https://jcenter.bintray.com/io/v/gradle-plugin/
+[JCenter Vanadium library]: https://jcenter.bintray.com/io/v/vanadium/
 [Gradle plugin Bintray]: https://bintray.com/vanadium/io.v/gradle-plugin/view
+[Vanadium library Bintray]: https://bintray.com/vanadium/io.v/vanadium/view
+[Vanadium Android library Bintray]: https://bintray.com/vanadium/io.v/vanadium-android/view
 [Maven Central page]: https://repo1.maven.org/maven2/io/v/gradle-plugin/
