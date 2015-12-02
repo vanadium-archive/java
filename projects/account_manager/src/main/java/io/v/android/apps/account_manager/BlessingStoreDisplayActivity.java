@@ -16,15 +16,14 @@ import android.widget.Toast;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import io.v.android.v23.V;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.Constants;
 import io.v.v23.security.VCertificate;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.WireBlessings;
@@ -33,7 +32,7 @@ import io.v.v23.vom.VomUtil;
 /**
  * Displays all the blessings in account manager's blessing store.
  */
-public class BlessingStoreDisplayActivity extends PreferenceActivity  {
+public class BlessingStoreDisplayActivity extends PreferenceActivity {
     public static final String TAG = "BlessingStoreDisplay";
 
     private static final String SIGNING_BLESSINGS_TITLE = "Identity Blessings";
@@ -58,21 +57,22 @@ public class BlessingStoreDisplayActivity extends PreferenceActivity  {
         nonSigningCat.setTitle(AUTHORIZATION_BLESSINGS_TITLE);
         prefScreen.addPreference(nonSigningCat);
 
-        for (Map.Entry<BlessingPattern, Blessings> entry: blessingStore.peerBlessings().entrySet()) {
+        for (Map.Entry<BlessingPattern, Blessings> entry : blessingStore.peerBlessings().entrySet()) {
             Blessings blessings = entry.getValue();
-            for (List<VCertificate> certChain: blessings.getCertificateChains()) {
+            for (List<VCertificate> certChain : blessings.getCertificateChains()) {
                 String name = "";
                 int size = certChain.size();
                 for (int i = 0; i < (size - 1); i++) {
-                    name += certChain.get(i).getExtension() + "/";
+                    name += certChain.get(i).getExtension() + Constants.CHAIN_SEPARATOR;
                 }
                 name += certChain.get(size - 1).getExtension();
 
                 byte[] certChainVom = null;
                 try {
                     certChainVom = VomUtil.encode(certChain,
-                            new TypeToken<List<VCertificate>>(){}.getType());
-                } catch(Exception e) {
+                            new TypeToken<List<VCertificate>>() {
+                            }.getType());
+                } catch (Exception e) {
                     String msg = "Couldn't serialize certificate chain: " + e;
                     android.util.Log.e(TAG, msg);
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
