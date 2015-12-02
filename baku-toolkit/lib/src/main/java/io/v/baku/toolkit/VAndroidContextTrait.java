@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import io.v.android.v23.V;
-import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;

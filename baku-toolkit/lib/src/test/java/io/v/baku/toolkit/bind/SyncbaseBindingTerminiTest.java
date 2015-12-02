@@ -4,6 +4,9 @@
 
 package io.v.baku.toolkit.bind;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.junit.Test;
 
 import io.v.rx.RxTestCase;
@@ -12,7 +15,9 @@ import io.v.v23.syncbase.nosql.Table;
 import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -39,6 +44,8 @@ public class SyncbaseBindingTerminiTest extends RxTestCase {
         Thread.sleep(BLOCKING_DELAY_MS);
 
         final Table t1 = mock(Table.class);
+        when(t1.put(any(), any(), any(), any())).thenReturn(Futures.immediateFuture(null));
+
         mockTables.onNext(t1);
         Thread.sleep(BLOCKING_DELAY_MS);
         verify(t1).put(null, key, 2, Integer.class);
@@ -50,6 +57,9 @@ public class SyncbaseBindingTerminiTest extends RxTestCase {
         verifyNoMoreInteractions(t1);
 
         final Table t2 = mock(Table.class);
+        final SettableFuture<Void> putComplete = SettableFuture.create();
+        when(t2.put(any(), any(), any(), any())).thenReturn(putComplete);
+
         mockTables.onNext(t2);
         Thread.sleep(BLOCKING_DELAY_MS);
         verifyZeroInteractions(t2);
@@ -57,5 +67,16 @@ public class SyncbaseBindingTerminiTest extends RxTestCase {
         rxData.onNext(4);
         Thread.sleep(BLOCKING_DELAY_MS);
         verify(t2).put(null, key, 4, Integer.class);
+
+        rxData.onNext(5);
+        Thread.sleep(BLOCKING_DELAY_MS);
+
+        rxData.onNext(6);
+        Thread.sleep(BLOCKING_DELAY_MS);
+        putComplete.set(null);
+        Thread.sleep(BLOCKING_DELAY_MS);
+
+        verify(t2, never()).put(null, key, 5, Integer.class);
+        verify(t2).put(null, key, 6, Integer.class);
     }
 }

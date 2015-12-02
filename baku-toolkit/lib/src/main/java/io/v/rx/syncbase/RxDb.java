@@ -4,14 +4,14 @@
 
 package io.v.rx.syncbase;
 
-import io.v.rx.VFn;
 import io.v.v23.context.VContext;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.verror.VException;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import rx.Observable;
+
+import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
 @Accessors(prefix = "m")
 @Getter
@@ -27,14 +27,15 @@ public class RxDb extends RxEntity<Database, SyncbaseApp> {
         mName = name;
         mRxApp = rxApp;
 
-        mObservable = rxApp.getObservable().map(VFn.unchecked(this::mapFrom));
+        mObservable = rxApp.getObservable().flatMap(this::mapFrom);
     }
 
     @Override
-    public Database mapFrom(final SyncbaseApp app) throws VException {
+    public Observable<Database> mapFrom(final SyncbaseApp app) {
         final Database db = app.getNoSqlDatabase(mName, null);
-        SyncbaseEntity.compose(db::exists, db::create).ensureExists(mVContext, null);
-        return db;
+        return toObservable(SyncbaseEntity.compose(db::exists, db::create)
+                .ensureExists(mVContext, null))
+                .map(x -> db);
     }
 
     public RxTable rxTable(final String name) {

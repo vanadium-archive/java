@@ -18,18 +18,16 @@ import java8.util.stream.Collectors;
 import java8.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 @UtilityClass
 public class RxMountState {
     /**
-     * Millisecond interval for mount status polling.
+     * Time interval for mount status polling.
      */
     public static final Duration DEFAULT_POLLING_INTERVAL = Duration.standardSeconds(1);
 
     public static Observable<Stream<MountStatus>> poll(final Server s, final Duration interval) {
-        return Observable.interval(0, interval.getMillis(), TimeUnit.MILLISECONDS,
-                Schedulers.io())
+        return Observable.interval(0, interval.getMillis(), TimeUnit.MILLISECONDS)
                 .map(i -> J8Arrays.stream(s.getStatus().getMounts()));
     }
 

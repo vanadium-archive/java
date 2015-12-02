@@ -4,11 +4,12 @@
 
 package io.v.rx.syncbase;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
-import io.v.v23.verror.VException;
 import java8.lang.FunctionalInterface;
 
 @FunctionalInterface
 interface ExistenceAware {
-    boolean exists(VContext vContext) throws VException;
+    ListenableFuture<Boolean> exists(VContext vContext);
 }

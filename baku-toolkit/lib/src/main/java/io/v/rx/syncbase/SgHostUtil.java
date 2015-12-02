@@ -12,11 +12,11 @@ import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.verror.TimeoutException;
-import io.v.v23.verror.VException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
-import rx.schedulers.Schedulers;
+
+import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
 /**
  * This utility class is a short-term solution until a better solution for distributed syncgroup
@@ -28,26 +28,20 @@ public class SgHostUtil {
     public static final Duration SYNCBASE_PING_TIMEOUT = Duration.standardSeconds(5);
 
     /**
-     * This method blocks while it pings Syncbase at the given name.
-     *
-     * @throws InterruptedException if the thread is interrupted while waiting for the ping
-     *                              response. The default implementation does not throw this.
-     *                              TODO(rosswang): pick this out from the VException, if possible.
+     * @return an observable that emits a single boolean indicating whether a Syncbase instance
+     * mounted at {@code name} is responsive within {@link #SYNCBASE_PING_TIMEOUT}.
      */
-    public static boolean isSyncbaseOnline(final VContext vContext, final String name)
-            throws InterruptedException {
+    public static Observable<Boolean> isSyncbaseOnline(final VContext vContext, final String name) {
         final VContext pingContext = vContext.withTimeout(SYNCBASE_PING_TIMEOUT);
-        try {
-            /* It would be nice if there were a more straightforward ping. We can't just query the
-            mount table because the server might not have shut down cleanly. */
-            Syncbase.newService(name).getApp("ping").exists(pingContext);
-            return true;
-        } catch (final TimeoutException e) {
-            return false;
-        } catch (final VException e) {
-            log.error("Unexpected error while attempting to ping Syncgroup host at " + name, e);
-            return false;
-        }
+        /*
+        It would be nice if there were a more straightforward ping. We can't just query the mount
+        table because the server might not have shut down cleanly.
+        TODO(rosswang): I think sadovsky@ has added this, but it doesn't appear exposed yet.
+        */
+        return toObservable(Syncbase.newService(name).getApp("ping").exists(pingContext))
+                .map(e -> true)
+                .onErrorResumeNext(t -> t instanceof TimeoutException ?
+                        Observable.just(false) : Observable.error(t));
     }
 
     /**
@@ -90,17 +84,7 @@ public class SgHostUtil {
      */
     public static Observable<Object> ensureSyncgroupHost(
             final VContext vContext, final Observable<Server> rxServer, final String name) {
-        return rxServer.observeOn(Schedulers.io())
-        .switchMap(s -> {
-            try {
-                if (isSyncbaseOnline(vContext, name)) {
-                    return Observable.just(0);
-                } else {
-                    return mountSgHost(rxServer, name);
-                }
-            } catch (final InterruptedException e) {
-                return Observable.error(e);
-            }
-        });
+        return rxServer.switchMap(s -> isSyncbaseOnline(vContext, name)
+                .flatMap(online -> online ? Observable.just(0) : mountSgHost(rxServer, name)));
     }
 }

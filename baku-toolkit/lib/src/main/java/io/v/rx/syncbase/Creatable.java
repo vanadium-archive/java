@@ -4,12 +4,13 @@
 
 package io.v.rx.syncbase;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.verror.VException;
 import java8.lang.FunctionalInterface;
 
 @FunctionalInterface
 interface Creatable {
-    void create(VContext vContext, Permissions permissions) throws VException;
+    ListenableFuture<Void> create(VContext vContext, Permissions permissions);
 }

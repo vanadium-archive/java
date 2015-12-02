@@ -4,13 +4,12 @@
 
 package io.v.rx.syncbase;
 
-import io.v.v23.verror.VException;
 import rx.Observable;
 
 public abstract class RxEntity<T, P> {
     public abstract String getName();
     public abstract Observable<T> getObservable();
-    public abstract T mapFrom(P parent) throws VException;
+    public abstract Observable<T> mapFrom(P parent);
 
     /**
      * This is a shortcut for {@code getObservable().first()}, to reduce the likelihood of

@@ -4,27 +4,29 @@
 
 package io.v.rx.syncbase;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.rx.RxVIterable;
 import io.v.rx.VFn;
 import io.v.v23.VIterable;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
-import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.nosql.BatchDatabase;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.verror.NoExistException;
-import io.v.v23.verror.VException;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscriber;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
+
+import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
 @Accessors(prefix = "m")
 @Getter
@@ -41,26 +43,25 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
         mName = name;
         mRxDb = rxDb;
 
-        mObservable = rxDb.getObservable().map(VFn.unchecked(this::mapFrom));
+        mObservable = rxDb.getObservable().flatMap(this::mapFrom);
     }
 
     @Override
-    public Table mapFrom(final DatabaseCore db) throws VException {
+    public Observable<Table> mapFrom(final DatabaseCore db) {
         final Table t = db.getTable(mName);
-        SyncbaseEntity.compose(t::exists, t::create).ensureExists(mVContext, null);
-        return t;
+        return toObservable(SyncbaseEntity.compose(t::exists, t::create)
+                .ensureExists(mVContext, null))
+                .map(x -> t);
     }
 
-    private <T> T getInitial(final BatchDatabase db, final String tableName, final String key,
-                             final Class<T> type, final T defaultValue) throws VException {
-        try {
-            @SuppressWarnings("unchecked")
-            final T fromGet = (T) db.getTable(tableName).get(
-                    mVContext, key, type);
-            return fromGet;
-        } catch (final NoExistException e) {
-            return defaultValue;
-        }
+    private <T> ListenableFuture<T> getInitial(
+            final BatchDatabase db, final String tableName, final String key, final Class<T> type,
+            final T defaultValue) {
+        @SuppressWarnings("unchecked")
+        final ListenableFuture<T> fromGet = (ListenableFuture<T>) db.getTable(tableName).get(
+                mVContext, key, type);
+        return Futures.withFallback(fromGet, t -> t instanceof NoExistException ?
+                Futures.immediateFuture(defaultValue) : Futures.immediateFailedFuture(t));
     }
 
     /**
@@ -100,44 +101,41 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
 
     private <T> void subscribeWatch(final Subscriber<? super WatchEvent<T>> subscriber,
                                     final Database db, final String key, final Class<T> type,
-                                    final T defaultValue) throws VException {
+                                    final T defaultValue) {
         /*
         Watch will not work properly unless the table exists (sync will not create the table),
         and table creation must happen outside the batch.
         https://github.com/vanadium/issues/issues/857
         */
-        mapFrom(db);
-
-        final BatchDatabase batch = db.beginBatch(mVContext, new BatchOptions("", true));
-        final T initial = getInitial(batch, mName, key, type, defaultValue);
-        final ResumeMarker r = batch.getResumeMarker(mVContext);
-        subscriber.onNext(new WatchEvent<>(initial, r, false));
-        batch.abort(mVContext);
-
-        final CancelableVContext cancelable = mVContext.withCancel();
-        final VIterable<WatchChange> s = db.watch(cancelable, mName, key, r);
-        log.debug("Watching {}: {}", mName, key);
-        cancelContextOnDisconnect(subscriber, cancelable, key);
-        observeWatchStream(s, key, defaultValue).subscribe(subscriber);
+        mapFrom(db)
+                .flatMap(t -> toObservable(db.beginBatch(mVContext, new BatchOptions("", true))))
+                .flatMap(batch -> Observable.combineLatest(
+                        toObservable(getInitial(batch, mName, key, type, defaultValue)),
+                        toObservable(batch.getResumeMarker(mVContext)),
+                        (initial, r) -> new WatchEvent<>(initial, r, false))
+                        .doOnTerminate(() -> toObservable(batch.abort(mVContext))
+                                .subscribe(v -> {
+                                }, t -> log.warn("Unable to abort watch initial read query", t))))
+                .flatMap(e -> {
+                    final CancelableVContext cancelable = mVContext.withCancel();
+                    cancelContextOnDisconnect(subscriber, cancelable, key);
+                    return toObservable(db.watch(cancelable, mName, key, e.getResumeMarker()))
+                            .doOnNext(s -> log.debug("Watching {}: {}", mName, key))
+                            .flatMap(s -> observeWatchStream(s, key, defaultValue))
+                            .startWith(e);
+                }).subscribe(subscriber);
     }
 
     /**
      * Watches a specific Syncbase row for changes.
-     *
+     * <p>
      * TODO(rosswang): Cache this by args.
      */
     public <T> Observable<WatchEvent<T>> watch(final String key, final Class<T> type,
                                                final T defaultValue) {
         return Observable.<WatchEvent<T>>create(subscriber -> mRxDb.getObservable()
-                .observeOn(Schedulers.io())
                 .subscribe(
-                        VFn.unchecked(db -> {
-                            /*
-                            Could be an expression lambda, but that confuses both RetroLambda and
-                            AndroidStudio.
-                            */
-                            subscribeWatch(subscriber, db, key, type, defaultValue);
-                        }),
+                        db -> subscribeWatch(subscriber, db, key, type, defaultValue),
                         subscriber::onError
                         //onComplete is connected by subscribeWatch/observeWatchStream.subscribe
                 ))

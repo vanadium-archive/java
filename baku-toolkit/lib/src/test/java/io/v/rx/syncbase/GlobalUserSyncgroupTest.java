@@ -5,7 +5,10 @@
 package io.v.rx.syncbase;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.Futures;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +34,7 @@ import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Syncgroup;
 import java8.util.stream.RefStreams;
+import rx.Observable;
 import rx.Subscription;
 import rx.subjects.ReplaySubject;
 
@@ -77,6 +81,11 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
         when(mClient.getApp("app")).thenReturn(app);
         when(app.getNoSqlDatabase(eq("db"), any())).thenReturn(mDb);
 
+        when(app.exists(any())).thenReturn(Futures.immediateFuture(true));
+        when(mDb.exists(any())).thenReturn(Futures.immediateFuture(true));
+
+        when(mSg.join(any(), any())).thenReturn(Futures.immediateFuture(null));
+
         mSb = new RxSyncbase(null, sbClient);
 
         PowerMockito.spy(SgHostUtil.class);
@@ -116,7 +125,7 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
 
     @Test
     public void testJoinAlreadyMounted() throws Exception {
-        PowerMockito.doReturn(true)
+        PowerMockito.doReturn(Observable.just(true))
                 .when(SgHostUtil.class, "isSyncbaseOnline", any(), any());
         joinMockSyncgroup();
         mRxBlessings.onNext(null);
@@ -129,17 +138,17 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
 
     @Test
     public void testJoinMountLifecycle() throws Exception {
-        PowerMockito.doReturn(false)
+        PowerMockito.doReturn(Observable.just(false))
                 .when(SgHostUtil.class, "isSyncbaseOnline", any(), any());
         final Subscription subscription = joinMockSyncgroup();
 
         final AtomicInteger statusPolls = new AtomicInteger();
-        final ServerStatus serverStatus = mock(ServerStatus.class);
-        when(serverStatus.getMounts()).then(i -> {
+        final ServerStatus statusNone = mock(ServerStatus.class);
+        when(statusNone.getMounts()).then(i -> {
             statusPolls.incrementAndGet();
             return new MountStatus[0];
         });
-        when(mServer.getStatus()).thenReturn(serverStatus);
+        when(mServer.getStatus()).thenReturn(statusNone);
 
         Thread.sleep(STATUS_POLLING_DELAY_MS);
         verify(mServer, never()).addName(any());
@@ -147,14 +156,29 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
 
         mRxBlessings.onNext(null);
         //Verify 3 polls + initial to ensure polling loop is working.
-        Thread.sleep(4 * RxMountState.DEFAULT_POLLING_INTERVAL.getMillis() +
+        Thread.sleep(RxMountState.DEFAULT_POLLING_INTERVAL.getMillis() +
                 SgHostUtil.SYNCBASE_PING_TIMEOUT.getMillis());
-        verify(mServer).addName("users/foo@bar.com/app/sghost");
+        verify(mSg, never()).join(any(), any());
+        final String name = "users/foo@bar.com/app/sghost";
+        verify(mServer).addName(name);
+
+        final MountStatus mountedMountStatus = new MountStatus(name, "foo", new DateTime(), null,
+                        Duration.standardMinutes(5), new DateTime(0), null);
+        final ServerStatus statusMounted = mock(ServerStatus.class);
+        when(statusMounted.getMounts()).then(i -> {
+            statusPolls.incrementAndGet();
+            return new MountStatus[]{mountedMountStatus};
+        });
+        when(mServer.getStatus()).thenReturn(statusMounted);
+
+        Thread.sleep(3 * RxMountState.DEFAULT_POLLING_INTERVAL.getMillis());
         final int nPolls = statusPolls.get();
         if (nPolls < 4) {
             fail("Polling should start and continue after blessings are resolved (" + nPolls +
                     "/4-5 expected polls)");
         }
+
+        verify(mSg).join(any(), any());
 
         try {
             subscription.unsubscribe();

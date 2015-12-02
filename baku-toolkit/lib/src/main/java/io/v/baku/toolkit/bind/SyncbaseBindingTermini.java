@@ -4,18 +4,21 @@
 
 package io.v.baku.toolkit.bind;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.Objects;
 
-import io.v.rx.VFn;
 import io.v.rx.syncbase.RxTable;
 import io.v.rx.syncbase.WatchEvent;
 import io.v.v23.syncbase.nosql.Table;
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
 import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 @UtilityClass
 public class SyncbaseBindingTermini {
@@ -34,16 +37,41 @@ public class SyncbaseBindingTermini {
             final RxTable rxTable, final Observable<T> rxData, final String key,
             final Class<T> type, final T deleteValue, final Action1<Throwable> onError) {
         return rxData
-                .onBackpressureLatest()
-                .observeOn(Schedulers.io())
                 .switchMap(data -> rxTable.once().map(t -> new WriteData<>(t, data)))
-                .subscribe(VFn.unchecked(w -> {
-                    if (Objects.equals(w.data, deleteValue)) {
-                        w.t.delete(rxTable.getVContext(), key);
-                    } else {
-                        w.t.put(rxTable.getVContext(), key, w.data, type);
+                .onBackpressureLatest()
+                .subscribe(new Subscriber<WriteData<T>>() {
+                    @Override
+                    public void onStart() {
+                        request(1);
                     }
-                }), onError);
+
+                    @Override
+                    public void onNext(WriteData<T> w) {
+                        final ListenableFuture<Void> op = Objects.equals(w.data, deleteValue) ?
+                                w.t.delete(rxTable.getVContext(), key) :
+                                w.t.put(rxTable.getVContext(), key, w.data, type);
+                        Futures.addCallback(op, new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                request(1);
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                onError(t);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(final Throwable t) {
+                        onError.call(t);
+                    }
+                });
     }
 
     public static <T> TwoWayBinding<T> bind(

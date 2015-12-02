@@ -26,7 +26,6 @@ import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.verror.NoExistException;
-import io.v.v23.verror.VException;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -37,6 +36,8 @@ import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action2;
 import rx.schedulers.Schedulers;
+
+import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
 @Accessors(prefix = "m")
 @AllArgsConstructor
@@ -158,28 +159,16 @@ public class GlobalUserSyncgroup {
                 mSyncHostLevel.getRendezvousTableNames(username), false);
     }
 
-    private Observable<Object> createOrJoinSyncgroup(final Database db, final String sgName,
-                                                     final SyncgroupSpec spec) {
-        return Observable.create(s -> {
-            final Syncgroup sg = db.getSyncgroup(sgName);
-            try {
-                sg.join(mVContext, mMemberInfo);
-                log.info("Joined syncgroup " + sgName);
-            } catch (final NoExistException e) {
-                try {
-                    sg.create(mVContext, spec, mMemberInfo);
-                    log.info("Created syncgroup " + sgName);
-                } catch (final VException e2) {
-                    s.onError(e2);
-                    return;
-                }
-            } catch (final VException e) {
-                s.onError(e);
-                return;
-            }
-            s.onNext(null);
-            s.onCompleted();
-        });
+    private Observable<SyncgroupSpec> createOrJoinSyncgroup(final Database db, final String sgName,
+                                                            final SyncgroupSpec spec) {
+        final Syncgroup sg = db.getSyncgroup(sgName);
+        return Observable.defer(() -> toObservable(sg.join(mVContext, mMemberInfo)))
+                .doOnCompleted(() -> log.info("Joined syncgroup " + sgName))
+                .onErrorResumeNext(t -> t instanceof NoExistException ?
+                        toObservable(sg.create(mVContext, spec, mMemberInfo))
+                                .doOnCompleted(() -> log.info("Created syncgroup " + sgName))
+                                .map(x -> spec) :
+                        Observable.error(t));
     }
 
     private Observable<Object> createOrJoinSyncgroup(final String username, final AccessList acl) {
@@ -191,7 +180,6 @@ public class GlobalUserSyncgroup {
                 mVContext, mSyncbase.getRxServer(), sgHost).share();
 
         return mDb.getObservable()
-                .observeOn(Schedulers.io())
                 .switchMap(db -> Observable.merge(mount.first().ignoreElements().concatWith(
                         createOrJoinSyncgroup(db, sgName, spec)), mount));
     }

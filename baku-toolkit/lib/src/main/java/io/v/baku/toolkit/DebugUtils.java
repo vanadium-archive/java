@@ -13,6 +13,7 @@ import android.content.pm.ServiceInfo;
 
 import java.io.IOException;
 
+import io.v.android.v23.V;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,6 +77,7 @@ public class DebugUtils {
      */
     public static void killProcess(final Context context) {
         stopPackageServices(context);
+        V.shutdown();
         System.exit(0);
     }
 
