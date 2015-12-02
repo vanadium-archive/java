@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import org.joda.time.Duration;
 import org.json.JSONArray;
@@ -36,6 +37,7 @@ import java.net.URL;
 import java.security.interfaces.ECPublicKey;
 
 import io.v.android.v23.V;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.BlessingStore;
@@ -201,10 +203,10 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 OAuthBlesserClient blesser =
                         OAuthBlesserClientFactory.getOAuthBlesserClient(Constants.IDENTITY_DEV_V_IO_U_GOOGLE);
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
-                OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
+                ListenableFuture<OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut> reply =
                         blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0],
                                 ImmutableList.<Caveat>of(VSecurity.newUnconstrainedUseCaveat()));
-                Blessings blessing = reply.blessing;
+                Blessings blessing = VFutures.sync(reply).blessing;
                 if (blessing == null || blessing.getCertificateChains() == null ||
                         blessing.getCertificateChains().size() <= 0) {
                     errorMsg = "Received empty blessing from Vanadium identity servers.";

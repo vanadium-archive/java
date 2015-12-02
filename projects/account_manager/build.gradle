@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    compile 'io.v:vanadium-android:0.1'
+    compile 'io.v:vanadium-android:0.2'
 }
 
 wrapper {
