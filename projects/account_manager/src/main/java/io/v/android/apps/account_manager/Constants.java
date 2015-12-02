@@ -19,4 +19,6 @@ public class Constants {
     // For activities that are started for result.
     public static final String REPLY = "REPLY";
     public static final String ERROR = "ERROR";
+
+    public static final String IDENTITY_DEV_V_IO_U_GOOGLE = "identity/dev.v.io:u/google";
 }

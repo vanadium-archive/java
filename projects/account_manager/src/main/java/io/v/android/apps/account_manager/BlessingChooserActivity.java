@@ -115,7 +115,7 @@ public class BlessingChooserActivity extends Activity {
 
             Map<BlessingPattern, Blessings> peerMap = mBlessingStore.peerBlessings();
 
-            for (BlessingPattern pattern: peerMap.keySet()) {
+            for (BlessingPattern pattern : peerMap.keySet()) {
                 List<List<VCertificate>> chains = null;
                 switch (mBlessingSet) {
                     case ALL_BLESSINGS:
@@ -129,7 +129,7 @@ public class BlessingChooserActivity extends Activity {
                         break;
                 }
 
-                for (List<VCertificate> certChain: chains) {
+                for (List<VCertificate> certChain : chains) {
                     Blessings blessing = Blessings.create(new WireBlessings(ImmutableList.of(certChain)));
                     mBlessings.put(blessingsView.getChildCount(), blessing);
 
@@ -211,8 +211,9 @@ public class BlessingChooserActivity extends Activity {
 
     private static String name(List<VCertificate> certChain) {
         String name = "";
-        for (VCertificate certificate: certChain) {
-            name += certificate.getExtension() + "/";
+        for (VCertificate certificate : certChain) {
+            name += certificate.getExtension() +
+                    io.v.v23.security.Constants.CHAIN_SEPARATOR;
         }
         return name;
     }

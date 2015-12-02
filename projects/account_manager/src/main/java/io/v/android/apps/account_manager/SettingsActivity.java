@@ -9,10 +9,6 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
-import android.widget.EditText;
-
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 public class SettingsActivity extends PreferenceActivity {
     public static final String IDENTITY_SERVICE_NAME = "IDENTITY_SERVICE_NAME";
@@ -20,12 +16,12 @@ public class SettingsActivity extends PreferenceActivity {
     EditTextPreference mIdServicePref;
     Preference.OnPreferenceChangeListener mPrefChangeListener =
             new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            mIdServicePref.setSummary((String) newValue);
-            return true;
-        }
-    };
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    mIdServicePref.setSummary((String) newValue);
+                    return true;
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity {
         mIdServicePref = new EditTextPreference(this);
         mIdServicePref.setKey(IDENTITY_SERVICE_NAME);
         mIdServicePref.setOnPreferenceChangeListener(mPrefChangeListener);
-        mIdServicePref.setDefaultValue("identity/dev.v.io:u/google");
+        mIdServicePref.setDefaultValue(Constants.IDENTITY_DEV_V_IO_U_GOOGLE);
         mIdServicePref.setTitle("Vanadium Identity Service Name");
         mIdServicePref.setDialogTitle(mIdServicePref.getTitle());
         mIdServicePref.setSummary(mIdServicePref.getText());

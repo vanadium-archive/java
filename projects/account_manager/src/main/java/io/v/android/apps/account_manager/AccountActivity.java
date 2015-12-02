@@ -24,7 +24,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
 
-import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,8 +34,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.interfaces.ECPublicKey;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.v.android.v23.V;
 import io.v.v23.context.VContext;
@@ -52,7 +49,8 @@ import io.v.x.ref.services.identity.OAuthBlesserClient;
 import io.v.x.ref.services.identity.OAuthBlesserClientFactory;
 
 /**
- * Creates a new Vanadium account, using the Google accounts present on the device.
+ * Creates a new Vanadium account, using the Google accounts present on the
+ * device.
  */
 // TODO: Change to BlessingCreationActivity.
 public class AccountActivity extends AccountAuthenticatorActivity {
@@ -111,6 +109,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
     private void getIdentity() {
         if (mAccountName == null || mAccountName.isEmpty()) {
             replyWithError("Empty account name.");
@@ -141,6 +140,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                     }
                 }));
     }
+
     class OnTokenAcquired implements AccountManagerCallback<Bundle> {
         @Override
         public void run(AccountManagerFuture<Bundle> result) {
@@ -166,14 +166,17 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             }
         }
     }
+
     private class BlessingFetcher extends AsyncTask<String, Void, Blessings> {
         ProgressDialog progressDialog = new ProgressDialog(AccountActivity.this);
         String errorMsg = null;
+
         @Override
         protected void onPreExecute() {
             progressDialog.setMessage("Fetching Vanadium Identity...");
             progressDialog.show();
         }
+
         @Override
         protected Blessings doInBackground(String... tokens) {
             if (tokens.length != 1) {
@@ -196,7 +199,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                             .add(ecPublicKey, new BlessingPattern(name));
                 }
                 OAuthBlesserClient blesser =
-                        OAuthBlesserClientFactory.getOAuthBlesserClient("identity/dev.v.io:u/google");
+                        OAuthBlesserClientFactory.getOAuthBlesserClient(Constants.IDENTITY_DEV_V_IO_U_GOOGLE);
                 VContext ctx = mBaseContext.withTimeout(new Duration(20000));  // 20s
                 OAuthBlesserClient.BlessUsingAccessTokenWithCaveatsOut reply =
                         blesser.blessUsingAccessTokenWithCaveats(ctx, tokens[0],
@@ -226,6 +229,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
                 return null;
             }
         }
+
         @Override
         protected void onPostExecute(Blessings blessing) {
             progressDialog.dismiss();
@@ -236,6 +240,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
             replyWithSuccess(blessing);
         }
     }
+
     private void replyWithError(String error) {
         android.util.Log.e(TAG, "Error creating account: " + error);
         setResult(RESULT_CANCELED);
@@ -243,6 +248,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         finish();
     }
+
     private void replyWithSuccess(Blessings blessing) {
         enforceAccountExists();
         // Store the obtained blessing from identity server.
@@ -259,7 +265,7 @@ public class AccountActivity extends AccountAuthenticatorActivity {
     }
 
     private void enforceAccountExists() {
-        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length <= 0){
+        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length <= 0) {
             String name = "Vanadium";
             Account account = new Account(name, getResources().getString(
                     R.string.authenticator_account_type));

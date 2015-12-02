@@ -45,21 +45,20 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
         PreferenceScreen prefScreen = getPreferenceManager().createPreferenceScreen(this);
         int n = blessingsLog.getInt(principalPublicKey, 0);
 
-        for (int i = Math.max(0, n - BlessActivity.MAX_BLESSINGS_FOR_PRINCIPAL); i < n; i++)
-        {
+        for (int i = Math.max(0, n - BlessActivity.MAX_BLESSINGS_FOR_PRINCIPAL); i < n; i++) {
             String key = principalPublicKey + "_" + i;
             String encoded = blessingsLog.getString(key, "");
             try {
                 // Recover the certificate chains that were given out.
                 List<List<VCertificate>> certChains =
                         blessingsFromEvent(BlessingEvent.decode(encoded));
-                for (List<VCertificate> certChain: certChains) {
+                for (List<VCertificate> certChain : certChains) {
                     String name = certificateChainName(certChain);
                     byte[] certChainVom = null;
                     try {
                         certChainVom = VomUtil.encode(certChain,
-                                new TypeToken<List<VCertificate>>(){}.getType());
-                    } catch(VException e) {
+                                new TypeToken<List<VCertificate>>() {}.getType());
+                    } catch (VException e) {
                         String msg = "Couldn't serialize certificate chain: " + e;
                         android.util.Log.e(TAG, msg);
                         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -100,7 +99,7 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
         cert.setCaveats(event.getCaveats());
 
         // Recreate the blessing that was given to the remote end.
-        for (List<VCertificate> certChain: certChains) {
+        for (List<VCertificate> certChain : certChains) {
             certChain.add(cert);
         }
         return certChains;
@@ -110,7 +109,8 @@ public class BlessingEventsDisplayActivity extends PreferenceActivity {
         String name = "";
         int size = certChain.size();
         for (int j = 0; j < (size - 1); j++) {
-            name += certChain.get(j).getExtension() + "/";
+            name += certChain.get(j).getExtension() +
+                    io.v.v23.security.Constants.CHAIN_SEPARATOR;
         }
         name += certChain.get(size - 1).getExtension();
         return name;
