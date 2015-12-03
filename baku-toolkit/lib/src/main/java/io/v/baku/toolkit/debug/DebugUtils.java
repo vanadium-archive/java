@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.debug;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,8 @@ import android.content.pm.ServiceInfo;
 import java.io.IOException;
 
 import io.v.android.v23.V;
+import io.v.baku.toolkit.R;
+import io.v.baku.toolkit.VAndroidContextMixin;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 

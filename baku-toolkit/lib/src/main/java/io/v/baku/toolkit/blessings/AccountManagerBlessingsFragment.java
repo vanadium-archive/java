@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.blessings;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import io.v.android.v23.services.blessing.BlessingService;
+import io.v.baku.toolkit.ErrorReporters;
 import io.v.v23.security.Blessings;
 import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.debug;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import io.v.baku.toolkit.R;
+import io.v.baku.toolkit.VAndroidContextTrait;
+import io.v.baku.toolkit.VOptionPreferenceUtils;
 import io.v.v23.OptionDefs;
 
 /**

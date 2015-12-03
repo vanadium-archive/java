@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.debug;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import io.v.baku.toolkit.R;
 
 /**
  * A {@link DialogFragment} surfacing logging options via a {@link DebugLogPreferenceFragment},

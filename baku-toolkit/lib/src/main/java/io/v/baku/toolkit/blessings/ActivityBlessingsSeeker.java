@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.blessings;
 
 import android.app.Activity;
 
@@ -14,6 +14,8 @@ import net.javacrumbs.futureconverter.guavarx.FutureConverter;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.services.blessing.BlessingCreationException;
+import io.v.baku.toolkit.ErrorReporter;
+import io.v.baku.toolkit.R;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 import lombok.Getter;

@@ -20,7 +20,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.v.baku.toolkit.BlessingsUtils;
+import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.debug.SyncbaseClient;
 import io.v.rx.RxMountState;
 import io.v.rx.RxTestCase;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("io.v.baku.toolkit.BlessingsUtils")
+@SuppressStaticInitializationFor("io.v.baku.toolkit.blessings.BlessingsUtils")
 @PrepareForTest({BlessingsUtils.class, SgHostUtil.class})
 public class GlobalUserSyncgroupTest extends RxTestCase {
     private static final long STATUS_POLLING_DELAY_MS = verificationDelay(

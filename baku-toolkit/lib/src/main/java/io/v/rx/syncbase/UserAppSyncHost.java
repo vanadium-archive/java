@@ -9,7 +9,7 @@ import android.content.Context;
 import java.util.Arrays;
 import java.util.List;
 
-import io.v.baku.toolkit.BlessingsUtils;
+import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.impl.google.naming.NamingUtil;
 import lombok.RequiredArgsConstructor;
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.debug;
 
 import android.app.ListFragment;
 import android.os.Bundle;
@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import io.v.baku.toolkit.R;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscription;

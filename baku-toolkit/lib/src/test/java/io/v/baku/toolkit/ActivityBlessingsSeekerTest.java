@@ -14,6 +14,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import io.v.android.libs.security.BlessingsManager;
+import io.v.baku.toolkit.blessings.ActivityBlessingsSeeker;
 import io.v.v23.security.Blessings;
 import rx.functions.Action1;
 

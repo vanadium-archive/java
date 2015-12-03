@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.v.android.v23.V;
-import io.v.baku.toolkit.BlessingsUtils;
+import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.rx.VFn;
 import io.v.v23.context.VContext;

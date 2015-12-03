@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 
 import io.v.baku.toolkit.BakuActivityMixin;
 import io.v.baku.toolkit.BakuActivityTrait;
-import io.v.baku.toolkit.BlessingsUtils;
+import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.baku.toolkit.R;
 import io.v.baku.toolkit.VAndroidContextMixin;
 import io.v.baku.toolkit.VAndroidContextTrait;
@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action2;
-import rx.schedulers.Schedulers;
 
 import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
