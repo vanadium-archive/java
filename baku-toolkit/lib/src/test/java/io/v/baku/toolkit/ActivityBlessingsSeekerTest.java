@@ -13,16 +13,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.v.android.libs.security.BlessingsManager;
 import io.v.v23.security.Blessings;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import rx.Observable;
 import rx.functions.Action1;
-import rx.subjects.PublishSubject;
 
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -33,30 +26,14 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Blessings.class, BlessingsManager.class})
-public class BlessedActivityTraitTest {
-    private static class MockBlessedActivityTrait extends BlessedActivityTrait {
-        @RequiredArgsConstructor
-        @ToString
-        private static class ErrorEntry {
-            public final String summary;
-            public final Throwable t;
-        }
-
-        private final List<ErrorEntry> mErrors = new ArrayList<>();
-        private final PublishSubject<Blessings> mBlessingsSubject = PublishSubject.create();
-
-        public MockBlessedActivityTrait(final Activity activity,
-                                        final ErrorReporter errorReporter) {
-            super(activity, errorReporter);
+public class ActivityBlessingsSeekerTest {
+    private static class MockActivityBlessingsSeeker extends ActivityBlessingsSeeker {
+        public MockActivityBlessingsSeeker(final Activity activity) {
+            super(activity, null, false);
         }
 
         @Override
-        protected Observable<Blessings> seekBlessings() {
-            return mBlessingsSubject;
-        }
-
-        public void offerBlessings(final Blessings blessings) {
-            mBlessingsSubject.onNext(blessings);
+        protected void seekBlessings() {
         }
     }
 
@@ -68,7 +45,7 @@ public class BlessedActivityTraitTest {
     @Test
     public void testColdPassive() {
         // would NPE if it tries to do anytyhing
-        new MockBlessedActivityTrait(null, null)
+        new MockActivityBlessingsSeeker(null)
                 .getPassiveRxBlessings()
                 .subscribe(b -> fail("Unexpected blessings " + b));
     }
@@ -86,7 +63,7 @@ public class BlessedActivityTraitTest {
 
         PowerMockito.when(BlessingsManager.getBlessings(any())).thenReturn(b1, b2);
 
-        final MockBlessedActivityTrait t = new MockBlessedActivityTrait(activity, null);
+        final MockActivityBlessingsSeeker t = new MockActivityBlessingsSeeker(activity);
         t.getPassiveRxBlessings().subscribe(cold);
 
         t.getRxBlessings().subscribe(hot);
@@ -108,16 +85,16 @@ public class BlessedActivityTraitTest {
                 b1 = PowerMockito.mock(Blessings.class),
                 b2 = PowerMockito.mock(Blessings.class);
 
-        final MockBlessedActivityTrait t = new MockBlessedActivityTrait(activity, null);
+        final MockActivityBlessingsSeeker t = new MockActivityBlessingsSeeker(activity);
         t.getRxBlessings().subscribe(s);
         verify(s, never()).call(any());
 
-        t.offerBlessings(b1);
+        t.setBlessings(b1);
         verify(s).call(b1);
 
         t.refreshBlessings();
         // The mock BlessingsManager will default to null, so it will seek blessings again.
-        t.offerBlessings(b2);
+        t.setBlessings(b2);
         verify(s).call(b2);
     }
 
@@ -137,14 +114,14 @@ public class BlessedActivityTraitTest {
                 b1 = PowerMockito.mock(Blessings.class),
                 b2 = PowerMockito.mock(Blessings.class);
 
-        final MockBlessedActivityTrait t = new MockBlessedActivityTrait(activity, null);
+        final MockActivityBlessingsSeeker t = new MockActivityBlessingsSeeker(activity);
         t.getRxBlessings().subscribe(s1);
-        t.offerBlessings(b1);
+        t.setBlessings(b1);
 
         t.getRxBlessings().subscribe(s2);
         verify(s2, never()).call(any());
 
-        t.offerBlessings(b2);
+        t.setBlessings(b2);
         verify(s1).call(b2);
         verify(s2).call(b2);
     }

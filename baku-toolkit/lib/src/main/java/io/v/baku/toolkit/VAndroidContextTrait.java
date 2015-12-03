@@ -5,6 +5,8 @@
 package io.v.baku.toolkit;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -79,7 +81,7 @@ public class VAndroidContextTrait<T extends Context> {
             if (mVanadiumPreferences.getAll().isEmpty()) {
                 throw e;
             } else {
-                mErrorReporter.reportError(R.string.err_vinit_options, e);
+                mErrorReporter.onError(R.string.err_vinit_options, e);
                 // Don't actually clear/fix options here; leave that to the user
                 return V.init(mAndroidContext);
             }
@@ -110,15 +112,27 @@ public class VAndroidContextTrait<T extends Context> {
 
     public static <T extends Activity> VAndroidContextTrait<T> withDefaults(
             final T activity, final Bundle savedInstanceState) {
-        if (DebugUtils.isApkDebug(activity) && savedInstanceState == null) {
-            log.info("Debug menu enabled");
-            activity.getFragmentManager().beginTransaction()
-                    .add(new DebugFragment(), null)
-                    .commit();
+        final FragmentManager mgr = activity.getFragmentManager();
+        final AccountManagerBlessingsFragment blessingsProvider;
+        final ErrorReporterFragment errorReporter;
+
+        if (savedInstanceState == null) {
+            blessingsProvider = new AccountManagerBlessingsFragment();
+            errorReporter = new ErrorReporterFragment();
+
+            final FragmentTransaction t = mgr.beginTransaction()
+                    .add(blessingsProvider, AccountManagerBlessingsFragment.TAG)
+                    .add(errorReporter, ErrorReporterFragment.TAG);
+
+            if (DebugUtils.isApkDebug(activity)) {
+                log.info("Debug menu enabled");
+                t.add(new DebugFragment(), null);
+            }
+            t.commit();
+        } else {
+            blessingsProvider = AccountManagerBlessingsFragment.find(mgr);
+            errorReporter = ErrorReporterFragment.find(mgr);
         }
-        final ErrorReporter errorReporter = new ErrorReporter(activity);
-        final BlessingsProvider blessingsProvider =
-                new BlessedActivityTrait(activity, errorReporter);
         return new VAndroidContextTrait<>(activity, blessingsProvider, errorReporter);
     }
 }
