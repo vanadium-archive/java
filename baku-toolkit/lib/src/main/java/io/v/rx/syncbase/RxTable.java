@@ -7,9 +7,9 @@ package io.v.rx.syncbase;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import io.v.rx.RxVIterable;
+import io.v.rx.RxInputChannel;
 import io.v.rx.VFn;
-import io.v.v23.VIterable;
+import io.v.v23.InputChannel;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
@@ -76,8 +76,9 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
      * once, as we can only iterate over the underlying stream once.
      */
     private static <T> Observable<WatchEvent<T>> observeWatchStream(
-            final VIterable<WatchChange> s, final String key, final T defaultValue) {
-        return RxVIterable.wrap(s)
+            final InputChannel<WatchChange> s, final String key, final T defaultValue) {
+        return RxInputChannel.wrap(s)
+                .autoConnect()
                 .filter(c -> c.getRowName().equals(key))
                 /*
                 About the Vfn.unchecked, on error, the wrapping replay will disconnect, calling
