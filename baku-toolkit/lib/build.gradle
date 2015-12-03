@@ -3,7 +3,6 @@
 version = '0.2.0'
 group = 'io.v'
 
-def artifactId = 'baku-toolkit'
 def siteUrl = 'https://github.com/vanadium/java'
 def gitUrl = 'https://github.com/vanadium/java.git'
 def pkgDesc = 'Utilities for writing applications with distributed user interfaces'
@@ -17,6 +16,8 @@ You might have to download JDK8 and set JAVA8_HOME (or set the jdk to Java 8 via
 For detailed instructions, see https://github.com/evant/gradle-retrolambda
  */
 apply plugin: 'me.tatarka.retrolambda'
+
+archivesBaseName = 'baku-toolkit'
 
 android {
     compileOptions {
@@ -131,24 +132,33 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
 }
 
-archivesBaseName = artifactId
-
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
 
+def artifactPrefix = archivesBaseName + '-' + version
+
 bintray {
     user = project.properties.bintrayUsername
     key = project.properties.bintrayApiKey
 
-    configurations = ['archives']
+    // TODO(rosswang): use - https://github.com/bintray/gradle-bintray-plugin/issues/81
+    //configurations = ['archives']
+    // TODO(rosswang): remove - https://github.com/bintray/gradle-bintray-plugin/issues/81
+    filesSpec {
+        from 'build/libs', 'build/outputs/aar', 'build/poms'
+        rename '.+\\.aar', artifactPrefix + '.aar'
+        rename 'pom-default\\.xml', artifactPrefix + '.pom'
+        into 'io/v/baku-toolkit/' + version
+    }
+
     pkg {
         desc = pkgDesc
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         repo = group
-        name = rootProject.name
+        name = archivesBaseName
         licenses = ['BSD New']
         userOrg = 'vanadium'
         publish = true
