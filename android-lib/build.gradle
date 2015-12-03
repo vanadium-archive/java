@@ -19,7 +19,7 @@ apply plugin: 'com.jfrog.bintray'
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
-def releaseVersion = '0.1'
+def releaseVersion = '0.3'
 
 android {
     buildToolsVersion '23.0.1'
@@ -167,13 +167,13 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumSyncbaseEnvironment)
 // Copy the shared library to its ultimate destination.
 task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
     from jiriRoot + '/release/go/pkg/android_arm_shared_shared/v.io/x/jni'
-    into 'src/main/jniLibs/armeabi-v7a'
+    into 'src/main/resources/lib/armeabi-v7a'
     include 'main.a'
     rename 'main.a', 'libv23.so'
 }
 
 clean {
-    delete 'src/main/jniLibs/armeabi-v7a/libv23.so'
+    delete 'src/main/resources/lib/armeabi-v7a/libv23.so'
 }
 
 task sourceJar(type: Jar) {
