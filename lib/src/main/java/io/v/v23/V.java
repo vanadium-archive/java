@@ -169,7 +169,11 @@ public class V {
      * <p><ul>
      *     <li>{@link OptionDefs#RUNTIME}</li>
      * </ul><p>
-     * If this option isn't provided, the default runtime implementation is used.
+     * If this option isn't provided, the default runtime implementation is used, which supports
+     * the following options:
+     * <p><ul>
+     *     <li>{@link OptionDefs#SERVER_THREAD_EXECUTOR}</li>
+     * </ul></p>
      *
      * @param  opts options
      * @return      base context
