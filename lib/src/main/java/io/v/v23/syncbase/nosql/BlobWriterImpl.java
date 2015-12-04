@@ -4,8 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.context.VContext;
@@ -34,14 +32,8 @@ public class BlobWriterImpl implements BlobWriter {
         return ref;
     }
     @Override
-    public ListenableFuture<OutputStream> stream(VContext ctx) {
-        return Futures.transform(client.putBlob(ctx, ref),
-                new Function<ClientSendStream<byte[], Void>, OutputStream>() {
-                    @Override
-                    public OutputStream apply(ClientSendStream<byte[], Void> result) {
-                        return new BufferedOutputStream(new BlobOutputStream(result), 1 << 14);
-                    }
-                });
+    public OutputStream stream(VContext ctx) {
+        return new BufferedOutputStream(new BlobOutputStream(client.putBlob(ctx, ref)), 1 << 14);
     }
     @Override
     public ListenableFuture<Void> commit(VContext ctx) {

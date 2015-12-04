@@ -21,8 +21,7 @@ public interface BlobWriter {
     BlobRef getRef();
 
     /**
-     * Creates a new {@link ListenableFuture} whose result is an {@link OutputStream} for writing
-     * data to this blob.
+     * Returns an {@link OutputStream} for writing data to this blob.
      * <p>
      * You should be aware of the following constraints on the returned {@link OutputStream}:
      * <p><ul>
@@ -50,12 +49,13 @@ public interface BlobWriter {
      * failed write, the most accurate measure of write progress is obtained by calling
      * {@link #size}: relying on a write progress of the returned {@link OutputStream} would be
      * a mistake (see comments about the {@link OutputStream#write write} constraints above).
+     * <p>
+     * Please be aware that {@link OutputStream} operations are blocking.
      *
      * @param  ctx        vanadium context
-     * @return            a new {@link ListenableFuture} whose result is the {@link OutputStream}
-     *                    used for writing data to this blob
+     * @return            an {@link OutputStream} used for writing data to this blob
      */
-    ListenableFuture<OutputStream> stream(VContext ctx);
+    OutputStream stream(VContext ctx);
 
     /**
      * Marks the blob as immutable.

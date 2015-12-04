@@ -106,11 +106,10 @@ public interface Database extends DatabaseCore, AccessController {
      * @param tableRelativeName   relative name of the table to watch
      * @param rowPrefix           prefix of the rows to watch
      * @param resumeMarker        {@link ResumeMarker} from which the changes will be monitored
-     * @return                    a new {@link ListenableFuture} whose result is an
-     *                            (potentially-infinite) {@link InputChannel} of changes
+     * @return                    a (potentially-infinite) {@link InputChannel} of changes
      */
-    ListenableFuture<InputChannel<WatchChange>> watch(VContext ctx, String tableRelativeName,
-                                                      String rowPrefix, ResumeMarker resumeMarker);
+    InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
+                                    String rowPrefix, ResumeMarker resumeMarker);
 
     /**
      * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.

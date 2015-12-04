@@ -30,8 +30,8 @@ public interface BlobReader {
     ListenableFuture<Long> size(VContext ctx);
 
     /**
-     * Returns a new {@link ListenableFuture} whose result is the {@link InputStream} used for
-     * reading the contents of the blob, starting at the given offset.
+     * Returns an {@link InputStream} used for reading the contents of the blob, starting at the
+     * given offset.
      * <p>
      * You should be aware of the following constraints on the returned {@link InputStream}:
      * <p><ul>
@@ -41,24 +41,24 @@ public interface BlobReader {
      *          values.  In fact, there is no hard guarantees that <strong>any</strong> subsequent
      *          reads will fail.
      * </ul><p>
+     * Please be aware that {@link InputStream} operations are blocking.
      *
      * @param ctx         vanadium context
      * @param offset      offset at which to read the contents of the blob
-     * @return            a new {@link ListenableFuture} whose result {@link InputStream} used for
-     *                    reading the contents of the blob
+     * @return            an {@link InputStream} used for reading the contents of the blob
      */
-    ListenableFuture<InputStream> stream(VContext ctx, long offset);
+    InputStream stream(VContext ctx, long offset);
 
     /**
      * Initiates a blob prefetch, i.e., copying the blob to a local cache.
      * <p>
      * The provided {@code priority} value controls the network priority of the blob.  Higher
      * priority blobs are prefetched before the lower priority ones.  However an ongoing blob
-     * transferg is not interrupted.
+     * transfer is not interrupted.
      * <p>
-     * Returns a new {@link ListenableFuture} whose result is an {@link InputChannel} that can be
-     * used to track the progress of the prefetch.  When the iterator exhausts all of the iterable
-     * elements, the blob is guaranteed to have been entirely copied to a local cache.
+     * Returns an {@link InputChannel} that can be used to track the progress of the prefetch.
+     * When the iterator exhausts all of the iterable elements, the blob is guaranteed to have been
+     * entirely copied to a local cache.
      * <p>
      * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
      * stop the prefetch and cause the channel to stop producing elements.  Note that to avoid
@@ -66,10 +66,10 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      * @param priority    prefetch priority
-     * @return            a new {@link ListenableFuture} whose result is an
-     *                    {@link InputChannel} that can be used to
+     * @return            an {@link InputChannel} that can be used to track the progress of the
+     *                    prefetch
      */
-    ListenableFuture<InputChannel<BlobFetchStatus>> prefetch(VContext ctx, long priority);
+    InputChannel<BlobFetchStatus> prefetch(VContext ctx, long priority);
 
     /**
      * Deletes the blob's local cached copy.

@@ -4,8 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.lang.reflect.Type;
@@ -20,7 +18,6 @@ import io.v.v23.services.syncbase.nosql.TableClientFactory;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.vdl.ClientRecvStream;
 
 class TableImpl implements Table {
     private final String fullName;
@@ -89,15 +86,9 @@ class TableImpl implements Table {
                 Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override
-    public ListenableFuture<InputChannel<KeyValue>> scan(VContext ctx, RowRange range) {
-        return Futures.transform(client.scan(ctx, schemaVersion,
-                        Util.getBytes(range.getStart()), Util.getBytes(range.getLimit())),
-                new Function<ClientRecvStream<KeyValue, Void>, InputChannel<KeyValue>>() {
-                    @Override
-                    public InputChannel<KeyValue> apply(ClientRecvStream<KeyValue, Void> input) {
-                        return input;
-                    }
-                });
+    public InputChannel<KeyValue> scan(VContext ctx, RowRange range) {
+        return client.scan(ctx, schemaVersion,
+                Util.getBytes(range.getStart()), Util.getBytes(range.getLimit()));
     }
     @Override
     public ListenableFuture<List<PrefixPermissions>> getPrefixPermissions(VContext ctx, String key) {
