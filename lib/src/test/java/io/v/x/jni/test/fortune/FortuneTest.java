@@ -115,7 +115,7 @@ public class FortuneTest extends TestCase {
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
-        ClientStream<Boolean, String, Integer> stream = sync(client.streamingGet(ctxT));
+        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
         sync(client.add(ctxT, msg));
         for (int i = 0; i < 5; ++i) {
@@ -148,7 +148,7 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, FortuneClient.MultipleStreamingGetOut> stream =
-                sync(client.multipleStreamingGet(ctxT));
+                client.multipleStreamingGet(ctxT);
         String msg = "The only fortune";
         sync(client.add(ctxT, msg));
         for (int i = 0; i < 5; ++i) {

@@ -84,20 +84,15 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public ListenableFuture<QueryResults> exec(VContext ctx, String query) {
-        return Futures.transform(client.exec(ctx, getSchemaVersion(), query),
-                new AsyncFunction<ClientRecvStream<List<VdlAny>, Void>, QueryResults>() {
+        final ClientRecvStream<List<VdlAny>, Void> stream =
+                client.exec(ctx, getSchemaVersion(), query);
+        return Futures.transform(stream.recv(),
+                new AsyncFunction<List<VdlAny>, QueryResults>() {
                     @Override
-                    public ListenableFuture<QueryResults> apply(
-                            final ClientRecvStream<List<VdlAny>, Void> stream) throws Exception {
-                        return Futures.transform(stream.recv(),
-                                new AsyncFunction<List<VdlAny>, QueryResults>() {
-                            @Override
-                            public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
-                                    throws Exception {
-                                return Futures.immediateFuture(
-                                        (QueryResults) new QueryResultsImpl(columnNames, stream));
-                            }
-                        });
+                    public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
+                            throws Exception {
+                        return Futures.immediateFuture(
+                                (QueryResults) new QueryResultsImpl(columnNames, stream));
                     }
                 });
     }
@@ -145,22 +140,15 @@ class DatabaseImpl implements Database, BatchDatabase {
                 });
     }
     @Override
-    public ListenableFuture<InputChannel<WatchChange>> watch(VContext ctx, String tableRelativeName,
-                                                             String rowPrefix,
-                                                             ResumeMarker resumeMarker) {
-        return Futures.transform(client.watchGlob(ctx,
-                        new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
-                                resumeMarker)),
-                new Function<InputChannel<Change>, InputChannel<WatchChange>>() {
+    public InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
+                                           String rowPrefix, ResumeMarker resumeMarker) {
+        return InputChannels.transform(client.watchGlob(ctx,
+                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
+                        resumeMarker)),
+                new InputChannels.TransformFunction<Change, WatchChange>() {
                     @Override
-                    public InputChannel<WatchChange> apply(InputChannel<Change> input) {
-                        return InputChannels.transform(input,
-                                new InputChannels.TransformFunction<Change, WatchChange>() {
-                                    @Override
-                                    public WatchChange apply(Change change) throws VException {
-                                        return convertToWatchChange(change);
-                                    }
-                                });
+                    public WatchChange apply(Change change) throws VException {
+                        return convertToWatchChange(change);
                     }
                 });
     }

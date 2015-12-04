@@ -4,8 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import com.google.common.base.Function;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.InputChannel;
@@ -37,26 +35,12 @@ class BlobReaderImpl implements BlobReader {
         return ref;
     }
     @Override
-    public ListenableFuture<InputStream> stream(VContext ctx, long offset) {
-        return Futures.transform(client.getBlob(ctx, ref, offset),
-                new Function<ClientRecvStream<byte[], Void>, InputStream>() {
-            @Override
-            public InputStream apply(ClientRecvStream<byte[], Void> stream) {
-                return new BlobInputStream(stream);
-            }
-        });
+    public InputStream stream(VContext ctx, long offset) {
+        return new BlobInputStream(client.getBlob(ctx, ref, offset));
     }
     @Override
-    public ListenableFuture<InputChannel<BlobFetchStatus>> prefetch(VContext ctx, long priority) {
-        return Futures.transform(client.fetchBlob(ctx, ref, new VdlUint64(priority)),
-                new Function<ClientRecvStream<BlobFetchStatus, Void>,
-                        InputChannel<BlobFetchStatus>>() {
-                    @Override
-                    public InputChannel<BlobFetchStatus> apply(
-                            ClientRecvStream<BlobFetchStatus, Void> result) {
-                        return result;
-                    }
-                });
+    public InputChannel<BlobFetchStatus> prefetch(VContext ctx, long priority) {
+        return client.fetchBlob(ctx, ref, new VdlUint64(priority));
     }
 
     @Override

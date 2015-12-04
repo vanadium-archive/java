@@ -169,7 +169,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(table.get(ctx, "row1", String.class))).isEqualTo("value1");
         assertThat(sync(table.get(ctx, "row2", String.class))).isEqualTo("value2");
         assertThat(sync(InputChannels.asList(
-                sync(table.scan(ctx, RowRange.range("row1", "row3")))))).containsExactly(
+                table.scan(ctx, RowRange.range("row1", "row3"))))).containsExactly(
                 new KeyValue("row1", VomUtil.encode("value1", String.class)),
                 new KeyValue("row2", VomUtil.encode("value2", String.class)));
         sync(table.deleteRange(ctx, RowRange.range("row1", "row3")));
@@ -254,7 +254,7 @@ public class SyncbaseTest extends TestCase {
                         new byte[0], null, false, false));
         CancelableVContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
-                sync(db.watch(ctxC, TABLE_NAME, "b", marker))).iterator();
+                db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
         for (WatchChange expected : expectedChanges) {
             assertThat(it.hasNext());
             WatchChange actual = it.next();
@@ -273,8 +273,8 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createApp(createService()));
         createTable(db);
 
-        InputChannel<WatchChange> channel = sync(db.watch(
-                cancelCtx, TABLE_NAME, "b", sync(db.getResumeMarker(ctx))));
+        InputChannel<WatchChange> channel = db.watch(
+                cancelCtx, TABLE_NAME, "b", sync(db.getResumeMarker(ctx)));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -291,8 +291,7 @@ public class SyncbaseTest extends TestCase {
     public void testBatch() throws Exception {
         Database db = createDatabase(createApp(createService()));
         Table table = createTable(db);
-        assertThat(sync(InputChannels.asList(
-                sync(table.scan(ctx, RowRange.prefix("")))))).isEmpty();
+        assertThat(sync(InputChannels.asList(table.scan(ctx, RowRange.prefix(""))))).isEmpty();
 
         BatchDatabase batchFoo = sync(db.beginBatch(ctx, null));
         Table batchFooTable = batchFoo.getTable(TABLE_NAME);
@@ -362,7 +361,7 @@ public class SyncbaseTest extends TestCase {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
         Database db = createDatabase(createApp(createService()));
         BlobWriter writer = sync(db.writeBlob(ctx, null));
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data);
         out.close();
         assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
@@ -371,7 +370,7 @@ public class SyncbaseTest extends TestCase {
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -382,7 +381,7 @@ public class SyncbaseTest extends TestCase {
         }
         Database db = createDatabase(createApp(createService()));
         BlobWriter writer = sync(db.writeBlob(ctx, null));
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data);
         out.close();
         assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
@@ -391,7 +390,7 @@ public class SyncbaseTest extends TestCase {
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -402,7 +401,7 @@ public class SyncbaseTest extends TestCase {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         {
             // Write, part 1.
-            OutputStream out = sync(writer.stream(ctx));
+            OutputStream out = writer.stream(ctx);
             out.write(data, 0, data.length / 2);
             out.close();
             assertThat(sync(writer.size(ctx))).isEqualTo(data.length / 2);
@@ -411,7 +410,7 @@ public class SyncbaseTest extends TestCase {
             // Write, part 2.
             writer = sync(db.writeBlob(ctx, ref));
             assertThat(sync(writer.size(ctx))).isEqualTo(5);
-            OutputStream out = sync(writer.stream(ctx));
+            OutputStream out = writer.stream(ctx);
             out.write(data, data.length / 2, data.length / 2);
             out.close();
             assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
@@ -420,7 +419,7 @@ public class SyncbaseTest extends TestCase {
         // Read.
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -429,14 +428,14 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createApp(createService()));
         BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data);
         out.close();
         assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
         sync(writer.commit(ctx));
 
         try {
-            out = sync(writer.stream(ctx));
+            out = writer.stream(ctx);
             out.write(data);
             out.close();
             fail("write of a committed blob should fail");
@@ -452,7 +451,7 @@ public class SyncbaseTest extends TestCase {
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -464,7 +463,7 @@ public class SyncbaseTest extends TestCase {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
         // Write 1st chunk.
-        OutputStream out = sync(writer.stream(ctxC));
+        OutputStream out = writer.stream(ctxC);
         out.write(data, 0, data.length / 2);
         ctxC.cancel();
         // Write 2nd chunk.
@@ -482,20 +481,20 @@ public class SyncbaseTest extends TestCase {
         BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data, 0, data.length);
         out.close();
 
         BlobReader reader = db.readBlob(ctx, ref);
         try {
             byte[] actual = new byte[data.length];
-            ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+            ByteStreams.readFully(reader.stream(ctx, 0), actual);
             fail("read of an uncommitted blob should fail");
-        } catch (VException | IOException e) {
+        } catch (IOException e) {
             // OK
         }
         try {
-            sync(reader.prefetch(ctx, 0)).recv();
+            sync(reader.prefetch(ctx, 0).recv());
         } catch (VException e) {
             // OK
         }
@@ -506,17 +505,17 @@ public class SyncbaseTest extends TestCase {
         BlobWriter writer = sync(db.writeBlob(ctx, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data, 0, data.length);
         out.close();
         sync(writer.commit(ctx));
 
         // Prefetch
         BlobReader reader = db.readBlob(ctx, ref);
-        sync(InputChannels.asDone(sync(reader.prefetch(ctx, 0))));
+        sync(InputChannels.asDone(reader.prefetch(ctx, 0)));
         // Read
         byte[] actual = new byte[data.length];
-        ByteStreams.readFully(sync(reader.stream(ctx, 0)), actual);
+        ByteStreams.readFully(reader.stream(ctx, 0), actual);
         assertThat(actual).isEqualTo(data);
     }
 
@@ -524,7 +523,7 @@ public class SyncbaseTest extends TestCase {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         Database db = createDatabase(createApp(createService()));
         BlobWriter writer = sync(db.writeBlob(ctx, null));
-        OutputStream out = sync(writer.stream(ctx));
+        OutputStream out = writer.stream(ctx);
         out.write(data);
         out.close();
         assertThat(sync(writer.size(ctx))).isEqualTo(data.length);
@@ -533,7 +532,7 @@ public class SyncbaseTest extends TestCase {
 
         BlobReader reader = db.readBlob(ctx, ref);
         byte[] actual = new byte[data.length / 2];
-        InputStream in = sync(reader.stream(ctx, 0));
+        InputStream in = reader.stream(ctx, 0);
         // Read 1st chunk.
         ByteStreams.readFully(in, actual);
         assertThat(actual).isEqualTo(new byte[]{1, 2, 3, 4, 5});
