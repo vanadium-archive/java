@@ -5,6 +5,7 @@
 package io.v.impl.google.rpc;
 
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
@@ -15,14 +16,14 @@ import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Executor;
 
 /**
- * Util provides a set of helper functions that move the Java-related computation out of
- * the native code.  The overall goal is to reduce the number of native->Java calls, as each
- * such call is exceedingly expensive (upto 500 cycles).
+ * ServerRPCHelper provides a set of helper functions for RPC handling on the server side.
  */
-class Util {
-    private static native long nativeGoInvoker(Object serviceObject) throws VException;
+class ServerRPCHelper {
+    private static native long nativeGoInvoker(Object serviceObject, Executor executor)
+            throws VException;
     private static native long nativeGoAuthorizer(Object authorizer) throws VException;
 
     // Helper function for getting tags from the provided invoker.
@@ -36,28 +37,41 @@ class Util {
     }
 
     // Helper function for invoking a method on the provided invoker.
-    static byte[][] invoke(Invoker invoker, VContext ctx, StreamServerCall call,
-            String method, byte[][] vomArgs) throws VException {
+    static void invoke(final Invoker invoker, final VContext ctx, final StreamServerCall call,
+            final String method, byte[][] vomArgs, final Callback callback, Executor executor) throws VException {
         Type[] argTypes = invoker.getArgumentTypes(method);
         if (argTypes.length != vomArgs.length) {
             throw new VException(String.format(
                     "Wrong number of args, want %d, got %d", argTypes.length, vomArgs.length));
         }
-        Object[] args = new Object[argTypes.length];
+        final Object[] args = new Object[argTypes.length];
         for (int i = 0; i < argTypes.length; ++i) {
             args[i] = VomUtil.decode(vomArgs[i], argTypes[i]);
         }
-        Object[] results = invoker.invoke(ctx, call, method, args);
-        Type[] resultTypes = invoker.getResultTypes(method);
-        if (resultTypes.length != results.length) {
-            throw new VException(String.format(
-                    "Wrong number of results, want %d, got %d", resultTypes.length, results.length));
-        }
-        byte[][] vomResults = new byte[resultTypes.length][];
-        for (int i = 0; i < resultTypes.length; ++i) {
-            vomResults[i] = VomUtil.encode(results[i], resultTypes[i]);
-        }
-        return vomResults;
+
+        // We need to return control to the Go thread immediately, otherwise if the invoked method
+        // blocks, it will block the Go thread which will prevent any goroutine from getting
+        // scheduled on it.
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Object[] results = invoker.invoke(ctx, call, method, args);
+                    Type[] resultTypes = invoker.getResultTypes(method);
+                    if (resultTypes.length != results.length) {
+                        throw new VException(String.format(
+                                "Wrong number of results, want %d, got %d", resultTypes.length, results.length));
+                    }
+                    byte[][] vomResults = new byte[resultTypes.length][];
+                    for (int i = 0; i < resultTypes.length; ++i) {
+                        vomResults[i] = VomUtil.encode(results[i], resultTypes[i]);
+                    }
+                    callback.onSuccess(vomResults);
+                } catch (VException e) {
+                    callback.onFailure(e);
+                }
+            }
+        });
     }
 
     // Helper function for invoking a lookup method on the provided dispatcher.
@@ -66,7 +80,7 @@ class Util {
     //    (2) an array containing:
     //        - pointer to the appropriate Go invoker,
     //        - pointer to the appropriate Go authorizer.
-    static long[] lookup(Dispatcher d, String suffix) throws VException {
+    static long[] lookup(Dispatcher d, String suffix, Executor executor) throws VException {
         ServiceObjectWithAuthorizer result = d.lookup(suffix);
         if (result == null) {  // object not handled
             return null;
@@ -76,6 +90,8 @@ class Util {
             throw new VException("Null service object returned by Java's dispatcher");
         }
         Authorizer auth = result.getAuthorizer();
-        return new long[] { nativeGoInvoker(obj), auth == null ? 0 : nativeGoAuthorizer(auth) };
+        return new long[] { nativeGoInvoker(obj, executor), auth == null ? 0 : nativeGoAuthorizer(auth) };
     }
+
+    private ServerRPCHelper() {}
 }

@@ -75,7 +75,7 @@ public interface VRuntime {
      * A particular runtime implementation chooses which options to support,
      * but at the minimum it must handle the following options:
      * <p><ul>
-     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     *     <li>{@link OptionDefs#SERVER_THREAD_EXECUTOR}</li>
      * </ul>
      *
      * @param  ctx             current context
@@ -112,7 +112,7 @@ public interface VRuntime {
      * A particular runtime implementation chooses which options to support,
      * but at the minimum it must handle the following options:
      * <p><ul>
-     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
+     *     <li>{@link OptionDefs#SERVER_THREAD_EXECUTOR}</li>
      * </ul>
      *
      * @param  ctx             current context

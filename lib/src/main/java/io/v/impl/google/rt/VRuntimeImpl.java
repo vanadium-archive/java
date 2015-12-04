@@ -4,6 +4,10 @@
 
 package io.v.impl.google.rt;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
@@ -31,7 +35,8 @@ public class VRuntimeImpl implements VRuntime {
             throws VException;
     private static native Client nativeGetClient(VContext ctx) throws VException;
     private static native VContext nativeWithNewServer(VContext ctx, String name,
-                                                       Dispatcher dispatcher) throws VException;
+                                                       Dispatcher dispatcher,
+                                                       Executor executor) throws VException;
     private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
@@ -54,13 +59,19 @@ public class VRuntimeImpl implements VRuntime {
      * Returns a new runtime instance.
      */
     public static VRuntimeImpl create(Options opts) throws VException {
-        return new VRuntimeImpl(nativeInit());
+        Executor executor = executorFromOptions(opts);
+        if (executor == null) {
+            executor = Executors.newCachedThreadPool();
+        }
+        return new VRuntimeImpl(nativeInit(), executor);
     }
 
     private final VContext ctx;  // non-null
+    private final Executor executor;  // non-null
 
-    private VRuntimeImpl(VContext ctx) {
+    private VRuntimeImpl(VContext ctx, Executor executor) {
         this.ctx = ctx;
+        this.executor = executor;
     }
     @Override
     public VContext withNewClient(VContext ctx, Options opts) throws VException {
@@ -77,7 +88,11 @@ public class VRuntimeImpl implements VRuntime {
     @Override
     public VContext withNewServer(VContext ctx, String name, Dispatcher disp, Options opts)
             throws VException {
-        return nativeWithNewServer(ctx, name, disp);
+        Executor executor = executorFromOptions(opts);
+        if (executor == null) {
+            executor = this.executor;
+        }
+        return nativeWithNewServer(ctx, name, disp, executor);
     }
     @Override
     public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
@@ -129,7 +144,6 @@ public class VRuntimeImpl implements VRuntime {
             throw new RuntimeException("Couldn't get listen spec: ", e);
         }
     }
-
     @Override
     public VDiscovery getDiscovery(VContext ctx) {
         try {
@@ -166,5 +180,17 @@ public class VRuntimeImpl implements VRuntime {
         public int hashCode() {
             return 0;
         }
+    }
+
+    private static Executor executorFromOptions(Options opts) {
+        if (!opts.has(OptionDefs.SERVER_THREAD_EXECUTOR)) {
+            return null;
+        }
+        Object executorOpt = opts.get(OptionDefs.SERVER_THREAD_EXECUTOR);
+        if (!(executorOpt instanceof Executor)) {
+            throw new RuntimeException("SERVER_THREAD_EXECUTOR option, if specified, must " +
+                    "contain an object of type java.util.concurrent.Executor.");
+        }
+        return (Executor) executorOpt;
     }
 }
