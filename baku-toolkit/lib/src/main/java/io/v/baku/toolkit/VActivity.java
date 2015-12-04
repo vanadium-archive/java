@@ -8,19 +8,17 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.experimental.Delegate;
 
 /**
  * A default application of {@link VAndroidContextTrait} extending {@link Activity}.
  */
-@Accessors(prefix = "m")
-public abstract class VActivity extends Activity implements VAndroidContextMixin {
-    @Getter
+public abstract class VActivity extends Activity implements VAndroidContextTrait<Activity> {
+    @Delegate
     private VAndroidContextTrait<Activity> mVAndroidContextTrait;
 
     protected VAndroidContextTrait<Activity> createVActivityTrait(final Bundle savedInstanceState) {
-        return VAndroidContextTrait.withDefaults(this, savedInstanceState);
+        return VAndroidContextMixin.withDefaults(this, savedInstanceState);
     }
 
     @Override

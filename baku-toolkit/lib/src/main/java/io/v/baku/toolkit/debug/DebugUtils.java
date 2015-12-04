@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import io.v.android.v23.V;
 import io.v.baku.toolkit.R;
-import io.v.baku.toolkit.VAndroidContextMixin;
+import io.v.baku.toolkit.VAndroidContextTrait;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,8 +41,8 @@ public class DebugUtils {
         try {
             Runtime.getRuntime().exec("pm clear " + context.getPackageName());
         } catch (final IOException e) {
-            if (context instanceof VAndroidContextMixin) {
-                ((VAndroidContextMixin) context).getVAndroidContextTrait()
+            if (context instanceof VAndroidContextTrait) {
+                ((VAndroidContextTrait) context)
                         .getErrorReporter()
                         .onError(R.string.err_app_clear, e);
             } else {

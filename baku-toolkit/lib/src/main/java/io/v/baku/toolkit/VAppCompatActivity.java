@@ -8,23 +8,22 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A default application of {@link VAndroidContextTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
  */
-@Accessors(prefix = "m")
 @Slf4j
-public abstract class VAppCompatActivity extends AppCompatActivity implements VAndroidContextMixin {
-    @Getter
+public abstract class VAppCompatActivity extends AppCompatActivity
+        implements VAndroidContextTrait<AppCompatActivity> {
+    @Delegate
     private VAndroidContextTrait<AppCompatActivity> mVAndroidContextTrait;
 
     protected VAndroidContextTrait<AppCompatActivity> createVActivityTrait(
             final Bundle savedInstanceState) {
-        return VAndroidContextTrait.withDefaults(this, savedInstanceState);
+        return VAndroidContextMixin.withDefaults(this, savedInstanceState);
     }
 
     @Override

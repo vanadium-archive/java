@@ -24,6 +24,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 import rx.subscriptions.Subscriptions;
 
 import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
@@ -146,5 +147,28 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                  */
                 .replay(1)
                 .refCount();
+    }
+
+    public <T> Observable<T> exec(final Func1<Table, ListenableFuture<T>> op) {
+        return once()
+                .flatMap(t -> toObservable(op.call(t)))
+                .replay().autoConnect(0);
+    }
+
+    public <T> Observable<Void> put(final String key, final T value,
+                                    final Class<? extends T> type) {
+        return exec(t -> t.put(mVContext, key, value, type));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Observable<T> get(final String key, final Class<? extends T> type) {
+        return exec(t -> t.get(mVContext, key, type))
+                .map(x -> (T) x);
+    }
+
+    public <T> Observable<T> get(final String key, final Class<? extends T> type,
+                                 final T defaultValue) {
+        return get(key, type).onErrorResumeNext(t -> t instanceof NoExistException ?
+                Observable.just(defaultValue) : Observable.error(t));
     }
 }

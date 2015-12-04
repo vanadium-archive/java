@@ -4,26 +4,24 @@
 
 package io.v.baku.toolkit;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
-import io.v.baku.toolkit.bind.SyncbaseBinding;
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A default application of {@link BakuActivityTrait} extending {@link android.app.Activity}. Most
  * activities with distributed state should inherit from this.
  */
-@Accessors(prefix = "m")
 @Slf4j
-public abstract class BakuActivity extends VActivity implements BakuActivityMixin {
-    @Getter
+public abstract class BakuActivity extends VActivity implements BakuActivityTrait<Activity> {
+    @Delegate
     private BakuActivityTrait mBakuActivityTrait;
 
     protected BakuActivityTrait createBakuActivityTrait() {
-        return new BakuActivityTrait(getVAndroidContextTrait());
+        return new BakuActivityMixin(this);
     }
 
     @Override
@@ -42,9 +40,5 @@ public abstract class BakuActivity extends VActivity implements BakuActivityMixi
     protected void onDestroy() {
         mBakuActivityTrait.close();
         super.onDestroy();
-    }
-
-    public <T> SyncbaseBinding.Builder<T> binder() {
-        return getBakuActivityTrait().binder();
     }
 }

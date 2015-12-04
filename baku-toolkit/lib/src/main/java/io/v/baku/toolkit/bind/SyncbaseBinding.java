@@ -48,7 +48,7 @@ public abstract class SyncbaseBinding {
             return this;
         }
 
-        public Builder<T> bakuActivity(final BakuActivityTrait trait) {
+        public Builder<T> bakuActivity(final BakuActivityTrait<?> trait) {
             return activity(trait.getVAndroidContextTrait().getAndroidContext())
                     .rxTable(trait.getSyncbaseTable())
                     .subscriptionParent(trait.getSubscriptions())

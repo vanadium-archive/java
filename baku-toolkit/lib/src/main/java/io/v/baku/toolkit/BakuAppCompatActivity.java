@@ -6,25 +6,23 @@ package io.v.baku.toolkit;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v7.app.AppCompatActivity;
 
-import io.v.baku.toolkit.bind.SyncbaseBinding;
-import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A default application of {@link BakuActivityTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
  */
-@Accessors(prefix = "m")
 @Slf4j
 public abstract class BakuAppCompatActivity
-        extends VAppCompatActivity implements BakuActivityMixin {
-    @Getter
+        extends VAppCompatActivity implements BakuActivityTrait<AppCompatActivity> {
+    @Delegate
     private BakuActivityTrait mBakuActivityTrait;
 
     protected BakuActivityTrait createBakuActivityTrait() {
-        return new BakuActivityTrait(getVAndroidContextTrait());
+        return new BakuActivityMixin(this);
     }
 
     @Override
@@ -43,9 +41,5 @@ public abstract class BakuAppCompatActivity
     protected void onDestroy() {
         mBakuActivityTrait.close();
         super.onDestroy();
-    }
-
-    public <T> SyncbaseBinding.Builder<T> binder() {
-        return getBakuActivityTrait().binder();
     }
 }

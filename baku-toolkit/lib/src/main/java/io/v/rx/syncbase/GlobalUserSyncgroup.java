@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import io.v.baku.toolkit.BakuActivityMixin;
 import io.v.baku.toolkit.BakuActivityTrait;
+import io.v.baku.toolkit.BakuActivityMixin;
 import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.baku.toolkit.R;
-import io.v.baku.toolkit.VAndroidContextMixin;
 import io.v.baku.toolkit.VAndroidContextTrait;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
@@ -51,11 +50,7 @@ public class GlobalUserSyncgroup {
             DEFAULT_SYNCGROUP_MEMBER_INFO = new SyncgroupMemberInfo();
 
     public static GlobalUserSyncgroup forActivity(final BakuActivityTrait t) {
-        return builder().bakuActivityTrait(t).build();
-    }
-
-    public static GlobalUserSyncgroup forActivity(final BakuActivityMixin m) {
-        return forActivity(m.getBakuActivityTrait());
+        return builder().activity(t).build();
     }
 
     /*
@@ -105,7 +100,7 @@ public class GlobalUserSyncgroup {
          * </ul>
          * and should be called prior to any overrides for those fields.
          */
-        public Builder vActivityTrait(final VAndroidContextTrait<?> t) {
+        public Builder activity(final VAndroidContextTrait<?> t) {
             return vContext(t.getVContext())
                     .rxBlessings(t.getBlessingsProvider().getRxBlessings())
                     .syncHostLevel(new UserAppSyncHost(t.getAndroidContext()))
@@ -113,7 +108,7 @@ public class GlobalUserSyncgroup {
         }
 
         /**
-         * In addition to those fields in {@link #vActivityTrait(VAndroidContextTrait)}, this
+         * In addition to those fields in {@link #activity(VAndroidContextTrait)}, this
          * additionally sets:
          * <ul>
          * <li>{@code syncbase}</li>
@@ -121,19 +116,11 @@ public class GlobalUserSyncgroup {
          * <li>and adds to {@code prefixes}</li>
          * </ul>
          */
-        public Builder bakuActivityTrait(final BakuActivityTrait t) {
-            return vActivityTrait(t.getVAndroidContextTrait())
+        public Builder activity(final BakuActivityTrait<?> t) {
+            return activity(t.getVAndroidContextTrait())
                     .syncbase(t.getSyncbase())
                     .db(t.getSyncbaseDb())
                     .prefix(t.getSyncbaseTableName());
-        }
-
-        /**
-         * A convenience setter for {@link #bakuActivityTrait(BakuActivityTrait)} via
-         * {@link VAndroidContextMixin}.
-         */
-        public Builder activity(final BakuActivityMixin activity) {
-            return bakuActivityTrait(activity.getBakuActivityTrait());
         }
     }
 
