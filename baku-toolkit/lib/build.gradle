@@ -137,6 +137,8 @@ artifacts {
     archives sourcesJar
 }
 
+tasks.bintrayUpload.dependsOn(tasks.install)
+
 def artifactPrefix = archivesBaseName + '-' + version
 
 bintray {
