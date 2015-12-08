@@ -19,7 +19,7 @@ apply plugin: 'com.jfrog.bintray'
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
-def releaseVersion = '0.3'
+def releaseVersion = '0.6'
 
 android {
     buildToolsVersion '23.0.1'

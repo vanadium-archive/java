@@ -17,14 +17,14 @@ import android.widget.TextView;
 import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
-import io.v.v23.discovery.VDiscovery;
+import io.v.v23.rpc.Callback;
+import io.v.v23.verror.VException;
 
-public class ScanHandlerAdapter extends BaseAdapter implements VDiscovery.ScanCallback {
+public class ScanHandlerAdapter extends BaseAdapter implements Callback<Update> {
     List<Service> knownAdvertisements;
 
     List<DataSetObserver> observers;
@@ -94,24 +94,23 @@ public class ScanHandlerAdapter extends BaseAdapter implements VDiscovery.ScanCa
     }
 
     @Override
-    public void handleUpdate(Update update) {
+    public void onSuccess(Update update) {  // executed on UI thread
         if (update instanceof Update.Found) {
             Update.Found found = (Update.Found) update;
             knownAdvertisements.add(found.getElem().getService());
         } else {
             Update.Lost lost = (Update.Lost) update;
             for (int i = 0; i < knownAdvertisements.size(); i++) {
-                if (lost.getElem().getInstanceId().equals(knownAdvertisements.get(i).getInstanceId())) {
+                if (lost.getElem().getInstanceId().equals(
+                        knownAdvertisements.get(i).getInstanceId())) {
                     knownAdvertisements.remove(i);
                     break;
                 }
             }
         }
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
+        notifyDataSetChanged();
     }
+
+    @Override
+    public void onFailure(VException e) {}  // never invoked.
 }

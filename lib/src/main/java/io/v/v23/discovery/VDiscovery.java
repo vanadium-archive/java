@@ -4,8 +4,11 @@
 
 package io.v.v23.discovery;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.List;
 
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
 
@@ -14,52 +17,40 @@ import io.v.v23.security.BlessingPattern;
  */
 public interface VDiscovery {
     /**
-     * Callback invoked when the {@link #advertise advertisement} finishes.
-     */
-    interface AdvertiseDoneCallback {
-        /**
-         * Called when the {@link #advertise advertisement} finishes.
-         */
-        void done();
-    }
-
-    /**
-     * Callback invoked with a {@link #scan scan} update.
-     */
-    interface ScanCallback {
-        /**
-         * Called with an update that matched the {@link #scan scan} query.
-         */
-        void handleUpdate(Update update);
-    }
-
-    /**
      * Advertises the service to be discovered by {@link #scan scan} implementations.
+     * <p>
+     * Returns a new {@link ListenableFuture} that completes once advertising starts.  The result
+     * of this future is a new {@link ListenableFuture} that completes once advertising stops.
+     * Once successfully started, advertising will continue until the context is canceled or
+     * exceeds its deadline.  Note that the future signaling a completion of advertising can
+     * never fail.
      * <p>
      * Visibility is used to limit the principals that can see the advertisement. An
      * empty list means that there are no restrictions on visibility (i.e, equivalent
      * to {@link io.v.v23.security.Constants#ALL_PRINCIPALS}).
      * <p>
-     * Advertising will continue until the context is canceled or exceeds its deadline;  the
-     * provided callback will be invoked when advertising stops.
+     * If {@link Service#instanceId} is not specified, a random 128 bit (16 byte) {@code UUID} will
+     * be assigned to it once advertising starts.  Any change to service will not be applied after
+     * advertising starts.
      * <p>
      * It is an error to have simultaneously active advertisements for two identical
      * instances (i.e., {@link Service#instanceId}s).
      *
-     * @param ctx a context that will be used to stop the advertisement; the advertisement will end
-     *            when the context is cancelled or timed out
-     * @param service the service with the attributes to advertises; this may be update with
-     *            a random unique identifier if service.instanceId is not specified.
+     * @param ctx        a context that will be used to stop the advertisement; the advertisement
+     *                   will end when the context is cancelled or timed out
+     * @param service    the service with the attributes to advertises; this may be update with
+     *                   a random unique identifier if service.instanceId is not specified.
      * @param visibility a set of blessing patterns for whom this advertisement is meant; any entity
      *                   not matching a pattern here won't know what the advertisement is
-     * @param cb a callback that is notified when the advertisement is done (either because
-     *           context has expired or there was an error)
+     * @return           a new {@link ListenableFuture} that completes once advertising starts;
+     *                   the result of this future is a second {@link ListenableFuture} that
+     *                   completes once advertising stops
      */
-    void advertise(VContext ctx, Service service, List<BlessingPattern> visibility,
-                   AdvertiseDoneCallback cb);
+    ListenableFuture<ListenableFuture<Void>> advertise(
+            VContext ctx, Service service, List<BlessingPattern> visibility);
 
     /**
-     * Scans services that match the query and invokes the provided callback with updates.
+     * Scans services that match the query and returns an {@link InputChannel} of updates.
      * <p>
      * Scanning will continue until the context is canceled or exceeds its deadline.
      * <p>
@@ -75,11 +66,10 @@ public interface VDiscovery {
      * You can find the {@code SyncQL} tutorial at:
      *     https://github.com/vanadium/docs/blob/master/tutorials/syncql-tutorial.md
      *
-     * @param ctx a context that will be used to stop the scan;  scan will end when the context
-     *            is cancelled or timed out
-     * @param query a WHERE expression of {@code syncQL query} against scanned services
-     * @param updateCb the callback that will be called when a new advertisement is found or
-     *                 when it is lost
+     * @param ctx    a context that will be used to stop the scan;  scan will end when the context
+     *               is cancelled or timed out
+     * @param query  a WHERE expression of {@code syncQL query} against scanned services
+     * @return       a (potentially-infite) {@link InputChannel} of updates
      */
-    void scan(VContext ctx, String query, ScanCallback updateCb);
+    InputChannel<Update> scan(VContext ctx, String query);
 }

@@ -7,7 +7,6 @@ package io.v.v23.syncbase.util;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
@@ -89,27 +88,21 @@ public class Util {
      * @param  parentFullName object name of parent component
      */
     public static ListenableFuture<List<String>> listChildren(VContext ctx, String parentFullName) {
-        return Futures.transform(
-                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*")),
-                new AsyncFunction<InputChannel<GlobReply>, List<String>>() {
+        InputChannel<GlobReply> input =
+                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*"));
+        return Futures.transform(InputChannels.asList(InputChannels.transform(input,
+                new InputChannels.TransformFunction<GlobReply, String>() {
                     @Override
-                    public ListenableFuture<List<String>> apply(InputChannel<GlobReply> input) {
-                        return Futures.transform(
-                                InputChannels.asList(InputChannels.transform(input,
-                                        new InputChannels.TransformFunction<GlobReply, String>() {
-                                            @Override
-                                            public String apply(GlobReply from) throws VException {
-                                                return nameFromGlobReply(from);
-                                            }
-                                        })), new Function<List<String>, List<String>>() {
-                                    @Override
-                                    public List<String> apply(List<String> input) {
-                                        return Ordering.from(Collator.getInstance())
-                                                .immutableSortedCopy(input);
-                                    }
-                                });
+                    public String apply(GlobReply from) throws VException {
+                        return nameFromGlobReply(from);
                     }
-                });
+                })), new Function<List<String>, List<String>>() {
+            @Override
+            public List<String> apply(List<String> input) {
+                return Ordering.from(Collator.getInstance())
+                        .immutableSortedCopy(input);
+            }
+        });
     }
 
     private static String nameFromGlobReply(GlobReply reply) throws VException {

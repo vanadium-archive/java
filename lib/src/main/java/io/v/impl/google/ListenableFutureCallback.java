@@ -19,7 +19,7 @@ public class ListenableFutureCallback<T> implements Callback<T> {
 
     /**
      * Returns a {@link ListenableFuture} whose success/failure depends on success/failure of this
-     * {@klink Callback}.
+     * {@link Callback}.
      */
     public ListenableFuture<T> getFuture() {
         return future;

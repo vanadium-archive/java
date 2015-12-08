@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
@@ -86,16 +85,16 @@ public class NamespaceTest extends TestCase {
     public void testMountAndUnmount() throws Exception {
         Namespace n = V.getNamespace(ctx);
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
-        assertThat(globNames(sync(n.glob(ctx, "test/*")))).containsExactly("test/test");
+        assertThat(globNames(n.glob(ctx, "test/*"))).containsExactly("test/test");
         sync(n.unmount(ctx, "test/test", ""));
-        assertThat(globNames(sync(n.glob(ctx, "test/*")))).isEmpty();
+        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
     }
 
     public void testDelete() throws Exception {
         Namespace n = V.getNamespace(ctx);
         sync(n.mount(ctx, "test/test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
         sync(n.mount(ctx, "test/test/test2", dummyServerEndpoint.name(), Duration.standardDays(1)));
-        assertThat(globNames(sync(n.glob(ctx, "test/*/*")))).containsExactly(
+        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
                 "test/test/test", "test/test/test2");
         // Shouldn't delete anything since the dir contains children.
         try {
@@ -104,17 +103,17 @@ public class NamespaceTest extends TestCase {
         } catch (VException e) {
             // OK
         }
-        assertThat(globNames(sync(n.glob(ctx, "test/*/*")))).containsExactly(
+        assertThat(globNames(n.glob(ctx, "test/*/*"))).containsExactly(
                 "test/test/test", "test/test/test2");
         sync(n.delete(ctx, "test/test", true));
-        assertThat(globNames(sync(n.glob(ctx, "test/*")))).isEmpty();
+        assertThat(globNames(n.glob(ctx, "test/*"))).isEmpty();
     }
 
     public void testGlob() throws Exception {
         Namespace n = V.getNamespace(ctx);
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
         List<GlobReply> result = Lists.newArrayList(
-                InputChannels.asIterable(sync(n.glob(ctx, "test/*"))));
+                InputChannels.asIterable(n.glob(ctx, "test/*")));
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getElem()).isInstanceOf(MountEntry.class);
         assertThat(((MountEntry) (result.get(0).getElem())).getName()).isEqualTo("test/test");
@@ -125,9 +124,9 @@ public class NamespaceTest extends TestCase {
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
 
         CancelableVContext cancelContext = ctx.withCancel();
-        ListenableFuture<InputChannel<GlobReply>> future = n.glob(cancelContext, "test/*");
+        InputChannel<GlobReply> channel = n.glob(cancelContext, "test/*");
         cancelContext.cancel();
-        List<GlobReply> result = sync(InputChannels.asList(sync(future)));
+        List<GlobReply> result = sync(InputChannels.asList(channel));
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getElem()).isInstanceOf(GlobError.class);
         assertThat(((GlobError) result.get(0).getElem()).getError()).isInstanceOf(

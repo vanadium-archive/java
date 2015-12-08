@@ -7,14 +7,18 @@ package io.v.v23;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.util.concurrent.AsyncFunction;
-import com.google.common.util.concurrent.FutureFallback;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executor;
 
+import io.v.v23.rpc.Callback;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
 
@@ -49,57 +53,88 @@ public class InputChannels {
     /**
      * Returns a new {@link ListenableFuture} whose result is the list of all elements received
      * from the provided {@link InputChannel}.
+     * <p>
+     * The returned future will be executed on a
+     * {@link MoreExecutors#directExecutor() direct executor}.
      */
-    public static <T> ListenableFuture<List<T>> asList(InputChannel<T> channel) {
-        return nextListFuture(channel, new ArrayList<T>());
+    public static <T> ListenableFuture<List<T>> asList(final InputChannel<T> channel) {
+        return asList(channel, MoreExecutors.directExecutor());
     }
 
-    private static <T> ListenableFuture<List<T>> nextListFuture(final InputChannel<T> channel,
-                                                                   final List<T> list) {
-        return Futures.withFallback(
-                Futures.transform(channel.recv(), new AsyncFunction<T, List<T>>() {
-                    @Override
-                    public ListenableFuture<List<T>> apply(T input) throws Exception {
-                        list.add(input);
-                        return nextListFuture(channel, list);
-                    }
-                }),
-                new FutureFallback<List<T>>() {
-                    @Override
-                    public ListenableFuture<List<T>> create(Throwable t) throws Exception {
-                        if (t instanceof EndOfFileException) {
-                            return Futures.immediateFuture(list);
-                        }
-                        return Futures.immediateFailedFuture(t);
-                    }
-                });
+    /**
+     * Returns a new {@link ListenableFuture} whose result is the list of all elements received
+     * from the provided {@link InputChannel}.
+     * <p>
+     * The returned future will be executed on the provided {@code executor}.
+     */
+    public static <T> ListenableFuture<List<T>> asList(final InputChannel<T> channel,
+                                                       Executor executor) {
+        final SettableFuture<List<T>> future = SettableFuture.create();
+        Futures.addCallback(channel.recv(), newCallbackForList(
+                channel, new ArrayList<T>(), future), executor);
+        return future;
+    }
+
+    private static <T> FutureCallback<T> newCallbackForList(
+            final InputChannel<T> channel, final List<T> list,
+            final SettableFuture<List<T>> future) {
+        return new FutureCallback<T>() {
+            @Override
+            public void onSuccess(T result) {
+                list.add(result);
+                Futures.addCallback(channel.recv(), newCallbackForList(channel, list, future));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                if (t instanceof EndOfFileException) {
+                    future.set(list);
+                } else {
+                    future.setException(t);
+                }
+            }
+        };
     }
 
     /**
      * Returns a new {@link ListenableFuture} whose result is available when the provided
      * {@link InputChannel} has exhausted all of its elements.
+     * <p>
+     * The returned future will be executed on a
+     * {@link MoreExecutors#directExecutor() direct executor}.
      */
-    public static ListenableFuture<Void> asDone(final InputChannel<?> channel) {
-        return nextDoneFuture(channel);
+    public static <T> ListenableFuture<Void> asDone(final InputChannel<T> channel) {
+        return asDone(channel, MoreExecutors.directExecutor());
     }
 
-    private static <T> ListenableFuture<Void> nextDoneFuture(final InputChannel<T> channel) {
-        return Futures.withFallback(
-                Futures.transform(channel.recv(), new AsyncFunction<T, Void>() {
-                    @Override
-                    public ListenableFuture<Void> apply(T input) throws Exception {
-                        return nextDoneFuture(channel);
-                    }
-                }),
-                new FutureFallback<Void>() {
-                    @Override
-                    public ListenableFuture<Void> create(Throwable t) throws Exception {
-                        if (t instanceof EndOfFileException) {
-                            return Futures.immediateFuture(null);
-                        }
-                        return Futures.immediateFailedFuture(t);
-                    }
-                });
+    /**
+     * Returns a new {@link ListenableFuture} whose result is available when the provided
+     * {@link InputChannel} has exhausted all of its elements.
+     * <p>
+     * The returned future will be executed on the provided {@code executor}.
+     */
+    public static <T> ListenableFuture<Void> asDone(final InputChannel<T> channel,
+                                                    Executor executor) {
+        final SettableFuture<Void> future = SettableFuture.create();
+        Futures.addCallback(channel.recv(), newCallbackForDone(channel, future), executor);
+        return future;
+    }
+
+    private static <T> FutureCallback<T> newCallbackForDone(final InputChannel<T> channel,
+                                                            final SettableFuture<Void> future) {
+        return new FutureCallback<T>() {
+            @Override
+            public void onSuccess(T result) {
+                Futures.addCallback(channel.recv(), newCallbackForDone(channel, future));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                if (t instanceof EndOfFileException) {
+                    future.set(null);
+                } else {
+                    future.setException(t);
+                }
+            }
+        };
     }
 
     /**
@@ -111,6 +146,61 @@ public class InputChannels {
      */
     public static <T> VIterable<T> asIterable(InputChannel<? extends T> channel) {
         return new ChannelIterable<>(channel);
+    }
+
+    /**
+     * Iterates over all elements in {@code channel}, invoking the {@link Callback#onSuccess}
+     * method on the provided callback for each element.  Note that the {@link Callback#onFailure}
+     * on the provided callback is never invoked.
+     * <p>
+     * Returns a new {@link ListenableFuture} that completes when the provided {@link InputChannel}
+     * has exhausted all of its elements or has encountered an error.
+     * <p>
+     * The returned future and all the callbacks will be executed on a
+     * {@link MoreExecutors#directExecutor() direct executor}.
+     */
+    public static <T> ListenableFuture<Void> withCallback(
+            InputChannel<? extends T> channel, Callback<T> callback) {
+        return withCallback(channel, callback, MoreExecutors.directExecutor());
+    }
+
+    /**
+     * Iterates over all elements in {@code channel}, invoking the {@link Callback#onSuccess}
+     * method on the provided callback for each element.  Note that the {@link Callback#onFailure}
+     * on the provided callback is never invoked.
+     * <p>
+     * Returns a new {@link ListenableFuture} that completes when the provided {@link InputChannel}
+     * has exhausted all of its elements or has encountered an error.
+     * <p>
+     * The returned future and all the callbacks will be executed on the provided {@code executor}.
+     */
+    public static <T> ListenableFuture<Void> withCallback(
+            InputChannel<? extends T> channel, Callback<T> callback, Executor executor) {
+        final SettableFuture<Void> future = SettableFuture.create();
+        Futures.addCallback(channel.recv(),
+                newCallbackForCallback(channel, future, callback, executor), executor);
+        return future;
+    }
+
+    private static <T> FutureCallback<T> newCallbackForCallback(
+            final InputChannel<? extends T> channel, final SettableFuture<Void> future,
+            final Callback<T> callback, final Executor executor) {
+        return new FutureCallback<T>() {
+            @Override
+            public void onSuccess(T result) {
+                callback.onSuccess(result);
+                Futures.addCallback(channel.recv(),
+                        newCallbackForCallback(channel, future, callback, executor), executor);
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                if (t instanceof EndOfFileException) {
+                    future.set(null);
+                    return;
+                }
+                future.setException(t);
+            }
+        };
     }
 
     private static class TransformedChannel<F, T> implements InputChannel<T> {

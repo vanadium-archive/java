@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'io.v:gradle-plugin:1.0'
+        classpath 'io.v:gradle-plugin:1.1'
     }
 }
 
@@ -23,7 +23,7 @@ targetCompatibility = 1.7
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium.
-def releaseVersion = '0.3'
+def releaseVersion = '0.6'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.7'

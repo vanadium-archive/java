@@ -29,9 +29,8 @@ import io.v.v23.verror.VException;
 public class NamespaceImpl implements Namespace {
     private final long nativePtr;
 
-    private static native void nativeGlob(long nativePtr, VContext context,
-                                          String pattern, Options options,
-                                          Callback<InputChannel<GlobReply>> callback);
+    private static native InputChannel<GlobReply> nativeGlob(
+            long nativePtr, VContext context, String pattern, Options options) throws VException;
     private static native void nativeMount(long nativePtr, VContext context, String name,
                                            String server, Duration ttl, Options options,
                                            Callback<Void> callback);
@@ -132,17 +131,17 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern) {
+    public InputChannel<GlobReply> glob(VContext context, String pattern) {
         return glob(context, pattern, null);
     }
 
     @Override
-    public ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern,
-                                                          Options options) {
-        ListenableFutureCallback<InputChannel<GlobReply>> callback =
-                new ListenableFutureCallback<>();
-        nativeGlob(nativePtr, context, pattern, options, callback);
-        return callback.getFuture();
+    public InputChannel<GlobReply> glob(VContext context, String pattern, Options options) {
+        try {
+            return nativeGlob(nativePtr, context, pattern, options);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create glob InputChannel.", e);
+        }
     }
 
     @Override

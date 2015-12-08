@@ -173,11 +173,10 @@ public interface Namespace {
      * A shortcut for {@link #glob(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
-    ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern);
+    InputChannel<GlobReply> glob(VContext context, String pattern);
 
     /**
-     * Returns a new {@link ListenableFuture} whose result is a channel over all names
-     * matching the provided pattern.
+     * Returns a channel over all names matching the provided pattern.
      * <p>
      * A particular implementation of this interface chooses which options to support, but at the
      * minimum it must handle the following pre-defined options:
@@ -192,11 +191,10 @@ public interface Namespace {
      * @param context a client context
      * @param pattern a pattern that should be matched
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return        a new {@link ListenableFuture} whose result is an {@link InputChannel} of
-     *                {@link GlobReply} objects matching the provided pattern
+     * @return        an {@link InputChannel} of {@link GlobReply} objects matching the provided
+     *                pattern
      */
-    ListenableFuture<InputChannel<GlobReply>> glob(VContext context, String pattern,
-                                                   Options options);
+    InputChannel<GlobReply> glob(VContext context, String pattern, Options options);
 
     /**
      * Sets the roots that the local namespace is relative to.

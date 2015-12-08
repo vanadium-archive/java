@@ -219,7 +219,7 @@ public class FortuneTest extends TestCase {
         ctx = V.withNewServer(ctx, "", server, null);
 
         List<GlobReply> globResult = sync(InputChannels.asList(
-                sync(V.getNamespace(ctx).glob(ctx, name() + "/*"))));
+                V.getNamespace(ctx).glob(ctx, name() + "/*")));
         assertThat(globResult).hasSize(2);
         assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
         assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())

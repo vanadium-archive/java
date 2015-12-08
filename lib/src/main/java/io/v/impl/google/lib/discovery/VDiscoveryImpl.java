@@ -4,38 +4,56 @@
 
 package io.v.impl.google.lib.discovery;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.List;
 
+import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Update;
 import io.v.v23.discovery.VDiscovery;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.verror.VException;
 
-/**
- * Implements the {@link VDiscovery} interface.  The VDiscovery interface allows a vanadium service
- * to advertise itself and clients to scan for these advertisements.
- */
-public class VDiscoveryImpl implements VDiscovery {
-    private long nativeDiscovery;
-    private long nativeTrigger;
+class VDiscoveryImpl implements VDiscovery {
+    private long nativeDiscoveryPtr;
+    private long nativeTriggerPtr;
 
-    private native void nativeFinalize(long discovery, long trigger);
+    private native void nativeAdvertise(
+            long nativeDiscoveryPtr, long nativeTriggerPtr, VContext ctx, Service service,
+            List<BlessingPattern> visibility,
+            ListenableFutureCallback<ListenableFuture<Void>> startCallback,
+            ListenableFutureCallback<Void> doneCallback);
+    private native InputChannel<Update> nativeScan(
+            long nativeDiscoveryPtr, VContext ctx, String query) throws VException;
+    private native void nativeFinalize(long nativeDiscoveryPtr, long nativeTriggerPtr);
 
-    private VDiscoveryImpl(long nativeDiscovery, long nativeTrigger) {
-        this.nativeDiscovery = nativeDiscovery;
-        this.nativeTrigger = nativeTrigger;
+    private VDiscoveryImpl(long nativeDiscoveryPtr, long nativeTriggerPtr) {
+        this.nativeDiscoveryPtr = nativeDiscoveryPtr;
+        this.nativeTriggerPtr = nativeTriggerPtr;
     }
-
+    @Override
+    public ListenableFuture<ListenableFuture<Void>> advertise(VContext ctx, Service service,
+                                                              List<BlessingPattern> visibility) {
+        ListenableFutureCallback<ListenableFuture<Void>> startCallback = new ListenableFutureCallback<>();
+        ListenableFutureCallback<Void> doneCallback = new ListenableFutureCallback<>();
+        nativeAdvertise(nativeDiscoveryPtr, nativeTriggerPtr, ctx, service, visibility,
+                startCallback, doneCallback);
+        return startCallback.getFuture();
+    }
+    @Override
+    public InputChannel<Update> scan(VContext ctx, String query) {
+        try {
+            return nativeScan(nativeDiscoveryPtr, ctx, query);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't start discovery scan()", e);
+        }
+    }
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        nativeFinalize(nativeDiscovery, nativeTrigger);
+        nativeFinalize(nativeDiscoveryPtr, nativeTriggerPtr);
     }
-
-    @Override
-    public native void advertise(VContext ctx, Service service, List<BlessingPattern> patterns,
-                                 AdvertiseDoneCallback cb);
-
-    @Override
-    public native void scan(VContext ctx, String query, ScanCallback scanCallback);
 }

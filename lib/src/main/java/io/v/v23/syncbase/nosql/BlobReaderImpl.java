@@ -42,7 +42,6 @@ class BlobReaderImpl implements BlobReader {
     public InputChannel<BlobFetchStatus> prefetch(VContext ctx, long priority) {
         return client.fetchBlob(ctx, ref, new VdlUint64(priority));
     }
-
     @Override
     public ListenableFuture<Long> size(VContext ctx) {
         return client.getBlobSize(ctx, ref);

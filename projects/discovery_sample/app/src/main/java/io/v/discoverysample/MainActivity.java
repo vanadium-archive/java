@@ -13,14 +13,21 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
+import io.v.android.v23.UiThreadExecutor;
 import io.v.android.v23.V;
 import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.android.v23.services.blessing.BlessingService;
+import io.v.v23.InputChannels;
 import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attributes;
@@ -28,6 +35,7 @@ import io.v.v23.discovery.Service;
 import io.v.v23.discovery.VDiscovery;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -91,37 +99,75 @@ public class MainActivity extends Activity {
     }
 
     private void flipAdvertise() {
-        if (advCtx == null) {
+        advertiseButton.setEnabled(false);
+        if (advCtx == null) {  // not advertising
             advCtx = rootCtx.withCancel();
-            final Button advButton = advertiseButton;
-            discovery.advertise(
-                    advCtx, SERVICE_TO_ADVERTISE, NO_PATTERNS,
-                    new VDiscovery.AdvertiseDoneCallback() {
+            Futures.addCallback(discovery.advertise(advCtx, SERVICE_TO_ADVERTISE, NO_PATTERNS),
+                    new FutureCallback<ListenableFuture<Void>>() {
                         @Override
-                        public void done() {
-                            MainActivity.this.runOnUiThread(new Runnable() {
+                        public void onSuccess(ListenableFuture<Void> result) {
+                            // Advertising started.
+                            advertiseButton.setText("Stop advertising");
+                            advertiseButton.setEnabled(true);
+                            Futures.transform(result, new Function<Void, Void>() {
                                 @Override
-                                public void run() {
-                                    advButton.setText("Advertise");
+                                public Void apply(Void input) {
+                                    // Advertising done.
+                                    advertiseButton.setText("Advertise");
+                                    advertiseButton.setEnabled(true);
+                                    return null;
                                 }
-                            });
+                            }, UiThreadExecutor.INSTANCE);
                         }
-                    });
-            advertiseButton.setText("Stop Advertisement");
-        } else {
+                        @Override
+                        public void onFailure(final Throwable t) {
+                            if (!(t instanceof CanceledException)) {
+                                // advertising wasn't stopped via advCtx.cancel()
+                                String msg = "Couldn't start advertising: " + t.getMessage();
+                                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                            }
+                            advertiseButton.setText("Advertise");
+                            advertiseButton.setEnabled(true);
+                        }
+                    }, UiThreadExecutor.INSTANCE);
+        } else {  // advertising
             advCtx.cancel();
             advCtx = null;
         }
     }
 
     private void flipScan() {
-        if (scanCtx == null) {
+        if (scanCtx == null) {  // not scanning
+            scanButton.setText("Stop scan");
             scanCtx = rootCtx.withCancel();
-            discovery.scan(scanCtx, ServiceAdvert.QUERY, adapter);
-            scanButton.setText("Stop scanning");
-        } else {
+            Futures.addCallback(InputChannels.withCallback(
+                            discovery.scan(scanCtx, ServiceAdvert.QUERY), adapter,
+                            UiThreadExecutor.INSTANCE),
+                    new FutureCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scanButton.setText("Start scan");
+                                    scanButton.setEnabled(true);
+                                }
+                            });
+                        }
+                        @Override
+                        public void onFailure(Throwable t) {
+                            if (!(t instanceof CanceledException)) {
+                                // scanning wasn't stopped via scanCtx.cancel()
+                                String msg = "Scan failed with error: " + t.getMessage();
+                                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                            }
+                            scanButton.setText("Start scan");
+                            scanButton.setEnabled(true);
+                        }
+                    }, UiThreadExecutor.INSTANCE);
+        } else {  // scanning
+            scanButton.setEnabled(false);
             scanCtx.cancel();
-            scanButton.setText("Start Scan");
             scanCtx = null;
         }
     }
@@ -167,7 +213,7 @@ public class MainActivity extends Activity {
 
         // Optional universally unique identifier of the service.
         // If omitted, the discovery service will invent a value.
-        private static final byte[] INSTANCE_UUID = {0, 1, 2};
+        private static final String INSTANCE_UUID = "012";
 
         // Optional service name intended for humans.
         private static final String INSTANCE_NAME = "livingRoomThermostat";
