@@ -27,7 +27,7 @@ public class RxDb extends RxEntity<Database, SyncbaseApp> {
         mName = name;
         mRxApp = rxApp;
 
-        mObservable = rxApp.getObservable().flatMap(this::mapFrom);
+        mObservable = rxApp.getObservable().switchMap(this::mapFrom);
     }
 
     @Override

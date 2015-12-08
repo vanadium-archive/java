@@ -18,7 +18,6 @@ import io.v.v23.rpc.MountStatus;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import java8.util.function.Predicate;
-import lombok.experimental.Accessors;
 import rx.Observable;
 import rx.Subscriber;
 import rx.subjects.ReplaySubject;
@@ -39,7 +38,6 @@ public class RxNamespaceTest extends RxTestCase {
     private static final long STATUS_POLLING_DELAY_MS = verificationDelay(
             RxMountState.DEFAULT_POLLING_INTERVAL);
 
-    @Accessors(prefix = "m")
     private class TestSubscriber extends Subscriber<MountEvent> {
         public boolean mayComplete;
         /**
