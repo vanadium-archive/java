@@ -19,7 +19,7 @@ import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
  */
 public class NoSql {
     public static Database newDatabase(String parentFullName, String relativeName, Schema schema) {
-        return new DatabaseImpl(parentFullName, relativeName, "", schema);
+        return DatabaseImpl.create(parentFullName, relativeName, schema);
     }
 
     /**

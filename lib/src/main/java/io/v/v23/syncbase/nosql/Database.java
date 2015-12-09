@@ -170,6 +170,8 @@ public interface Database extends DatabaseCore, AccessController {
      * {@link SchemaUpgrader} associated with the schema is called. If {@link SchemaUpgrader} is
      * successful, this method stores the new schema metadata in database.
      * <p>
+     * This method also registers a conflict resolver with syncbase to receive conflicts.
+     * <p>
      * Note: this database handle may have been created with a {@code null} schema, in which case
      * this method skips schema check and the caller is responsible for maintaining schema sanity.
      *
@@ -179,5 +181,5 @@ public interface Database extends DatabaseCore, AccessController {
      *                    version was lower than the schema version with which the database was
      *                    created
      */
-    ListenableFuture<Boolean> upgradeIfOutdated(VContext ctx);
+    ListenableFuture<Void> enforceSchema(VContext ctx);
 }

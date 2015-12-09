@@ -355,7 +355,7 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specOverwrite);
     }
 
-    // TODO(spetrovic): Test Database.upgradeIfOutdated().
+    // TODO(spetrovic): Test Database.enforceSchema().
 
     public void testBlobSmall() throws Exception {
         byte[] data = new byte[]{ 1, 2, 3, 4, 5 };
