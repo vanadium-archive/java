@@ -84,8 +84,11 @@ public class BluetoothGattClientCallback extends BluetoothGattCallback {
     }
 
     @Override
-    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic,
+                                     int status) {
         UUID serviceUUID = characteristic.getService().getUuid();
+        Log.d("vanadium", "Got characteristic [" + serviceUUID + "]"
+                + characteristic.getUuid() + "=" + characteristic.getValue());
         services.get(serviceUUID).put(characteristic.getUuid(), characteristic.getValue());
         maybeReadNextCharacteristic();
     }

@@ -153,6 +153,8 @@ public class DeviceCache {
 
     private void handleUpdate(Advertisement adv) {
         UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
+        System.out.println("Saw an update for " + adv.getService().getInstanceId() + "["
+                + adv.getService().getInterfaceName());
         Set<VScanner> scanners = scannersByUUID.get(uuid);
         if (scanners == null) {
             return;
