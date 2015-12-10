@@ -23,12 +23,12 @@ targetCompatibility = 1.7
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium.
-def releaseVersion = '0.7'
+def releaseVersion = '0.8'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.7'
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
-    compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'com.google.truth', name: 'truth', version: '0.25'
     testCompile 'org.reflections:reflections:0.9.9-RC1'
