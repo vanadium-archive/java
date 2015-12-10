@@ -9,15 +9,15 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.AsyncFunction;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 
+import io.v.impl.google.ListenableFutureCallback;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
@@ -29,13 +29,10 @@ import io.v.v23.services.syncbase.nosql.StoreChange;
 import io.v.v23.services.watch.Change;
 import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
-import io.v.v23.syncbase.util.Util;
 import io.v.v23.vdl.ClientRecvStream;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
-import io.v.v23.verror.BadStateException;
-import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
 
 import java.io.Serializable;
@@ -45,19 +42,35 @@ import java.util.List;
 import java.util.Map;
 
 class DatabaseImpl implements Database, BatchDatabase {
+    private static native DatabaseImpl nativeCreate(String parentFullName, String relativeName,
+                                                    Schema schema) throws VException;
+
+    static DatabaseImpl create(String parentFullName, String relativeName, Schema schema) {
+        try {
+            return nativeCreate(parentFullName, relativeName, schema);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't create database.", e);
+        }
+    }
+
+    private native void nativeEnforceSchema(long nativePtr, VContext ctx, Callback<Void> callback);
+    private native void nativeBeginBatch(long nativePtr, VContext ctx, BatchOptions opts,
+                                         Callback<BatchDatabase> callback);
+    private native void nativeFinalize(long nativePtr);
+
+    private final long nativePtr;  // can be 0 (e.g., for BatchDatabase)
     private final String parentFullName;
     private final String fullName;
     private final String name;
     private final Schema schema;
+
     private final DatabaseClient client;
 
-    DatabaseImpl(String parentFullName, String relativeName, String batchSuffix, Schema schema) {
+    private DatabaseImpl(long nativePtr, String parentFullName, String fullName,
+                         String relativeName, Schema schema) {
+        this.nativePtr = nativePtr;
         this.parentFullName = parentFullName;
-        // Escape relativeName so that any forward slashes get dropped, thus
-        // ensuring that the server will interpret fullName as referring to a
-        // database object. Note that the server will still reject this name if
-        // util.ValidDatabaseName returns false.
-        this.fullName = NamingUtil.join(parentFullName, Util.escape(relativeName) + batchSuffix);
+        this.fullName = fullName;
         this.name = relativeName;
         this.schema = schema;
         this.client = DatabaseClientFactory.getDatabaseClient(this.fullName);
@@ -131,20 +144,20 @@ class DatabaseImpl implements Database, BatchDatabase {
         return client.destroy(ctx, getSchemaVersion());
     }
     public ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts) {
-        return Futures.transform(client.beginBatch(ctx, getSchemaVersion(), opts),
-                new Function<String, BatchDatabase>() {
-                    @Override
-                    public BatchDatabase apply(String batchSuffix) {
-                        return new DatabaseImpl(parentFullName, name, batchSuffix, schema);
-                    }
-                });
+        ListenableFutureCallback<BatchDatabase> callback = new ListenableFutureCallback<>();
+        if (nativePtr == 0) {
+            throw new RuntimeException("beginBatch() called with zero nativePtr - is it called " +
+                    "from within BatchDatabase?");
+        }
+        nativeBeginBatch(nativePtr, ctx, opts, callback);
+        return callback.getFuture();
     }
     @Override
     public InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
                                            String rowPrefix, ResumeMarker resumeMarker) {
         return InputChannels.transform(client.watchGlob(ctx,
-                new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
-                        resumeMarker)),
+                        new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
+                                resumeMarker)),
                 new InputChannels.TransformFunction<Change, WatchChange>() {
                     @Override
                     public WatchChange apply(Change change) throws VException {
@@ -184,77 +197,14 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new BlobReaderImpl(client, ref);
     }
     @Override
-    public ListenableFuture<Boolean> upgradeIfOutdated(final VContext ctx) {
-        if (schema == null) {
-            Futures.immediateFailedFuture(new BadStateException(ctx));
+    public ListenableFuture<Void> enforceSchema(final VContext ctx) {
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+        if (nativePtr == 0) {
+            throw new RuntimeException("enforceSchema() called with zero nativePtr - is it " +
+                    "called from within BatchDatabase?");
         }
-        if (schema.getMetadata().getVersion() < 0) {
-            Futures.immediateFailedFuture(new BadStateException(ctx));
-        }
-        final SchemaManager schemaManager = new SchemaManager(fullName);
-        final SettableFuture<Boolean> ret = SettableFuture.create();
-        Futures.addCallback(schemaManager.getSchemaMetadata(ctx),
-                new FutureCallback<SchemaMetadata>() {
-            @Override
-            public void onFailure(Throwable t) {
-                if (t instanceof NoExistException) {
-                    // If the client app did not set a schema as part of database creation,
-                    // getSchemaMetadata() will throw NoExistException. In this case, we set the
-                    // schema here.
-                    Futures.addCallback(schemaManager.setSchemaMetadata(ctx, schema.getMetadata()),
-                            new FutureCallback<Void>() {
-                                @Override
-                                public void onSuccess(Void result) {
-                                    ret.set(false);
-                                }
-                                @Override
-                                public void onFailure(Throwable t) {
-                                    // The database may not yet exist. If so, setSchemaMetadata
-                                    // will throw NoExistException, and here we return set the
-                                    // return value of 'false'; otherwise, we fail the
-                                    // return future.
-                                    if (t instanceof NoExistException) {
-                                        ret.set(false);
-                                    } else {
-                                        ret.setException(t);
-                                    }
-                                }
-                            }
-                    );
-                } else {
-                    ret.setException(t);
-                }
-            }
-            @Override
-            public void onSuccess(SchemaMetadata currMetadata) {
-                // Call the Upgrader provided by the app to upgrade the schema.
-                //
-                // TODO(jlodhia): disable sync before running Upgrader and reenable
-                // once Upgrader is finished.
-                //
-                // TODO(jlodhia): prevent other processes (local/remote) from accessing
-                // the database while upgrade is in progress.
-                try {
-                    schema.getUpgrader().run(DatabaseImpl.this,
-                            currMetadata.getVersion(), schema.getMetadata().getVersion());
-                    // Update the schema metadata in db to the latest version.
-                    Futures.addCallback(schemaManager.setSchemaMetadata(ctx, schema.getMetadata()),
-                            new FutureCallback<Void>() {
-                                @Override
-                                public void onSuccess(Void result) {
-                                    ret.set(true);
-                                }
-                                @Override
-                                public void onFailure(Throwable t) {
-                                    ret.setException(t);
-                                }
-                            });
-                } catch (VException e) {
-                    ret.setException(e);
-                }
-            }
-        });
-        return ret;
+        nativeEnforceSchema(nativePtr, ctx, callback);
+        return callback.getFuture();
     }
 
     // Implements BatchDatabase.
@@ -265,6 +215,12 @@ class DatabaseImpl implements Database, BatchDatabase {
     @Override
     public ListenableFuture<Void> abort(VContext ctx) {
         return client.abort(ctx, getSchemaVersion());
+    }
+    @Override
+    protected void finalize() {
+        if (nativePtr != 0) {
+            nativeFinalize(nativePtr);
+        }
     }
 
     private int getSchemaVersion() {

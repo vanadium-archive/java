@@ -4,8 +4,6 @@
 
 package io.v.v23.syncbase.nosql;
 
-import com.google.common.base.Preconditions;
-
 import io.v.v23.services.syncbase.nosql.SchemaMetadata;
 
 /**
@@ -21,17 +19,17 @@ import io.v.v23.services.syncbase.nosql.SchemaMetadata;
 public class Schema {
     private final SchemaMetadata metadata;
     private final SchemaUpgrader upgrader;
+    private final ConflictResolver resolver;
 
     /**
      * Creates a new database schema with the specified metadata and schema upgrader.
      * <p>
      * Note: {@link SchemaUpgrader} is purely local and is not persisted.
      */
-    public Schema(SchemaMetadata metadata, SchemaUpgrader upgrader) {
-        Preconditions.checkNotNull(metadata);
-        Preconditions.checkNotNull(upgrader);
+    public Schema(SchemaMetadata metadata, SchemaUpgrader upgrader, ConflictResolver resolver) {
         this.metadata = metadata;
         this.upgrader = upgrader;
+        this.resolver = resolver;
     }
 
     /**
@@ -44,4 +42,9 @@ public class Schema {
      * from the database's schema version.
      */
     public SchemaUpgrader getUpgrader() { return this.upgrader; }
+
+    /**
+     * Returns a resolver that is used for conflict resolution.
+     */
+    public ConflictResolver getResolver() { return this.resolver; }
 }
