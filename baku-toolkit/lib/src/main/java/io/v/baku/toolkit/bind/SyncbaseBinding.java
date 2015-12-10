@@ -4,7 +4,6 @@
 
 package io.v.baku.toolkit.bind;
 
-import android.app.Activity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,12 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.v.baku.toolkit.BakuActivityTrait;
-import io.v.rx.syncbase.RxTable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 
 public abstract class SyncbaseBinding {
     /**
@@ -28,32 +22,11 @@ public abstract class SyncbaseBinding {
      * typesafe, but keeping this builder simple is preferable, and the absence of rigorous static
      * type checking here is acceptable.
      */
-    public static class Builder<T> {
-        private Activity mActivity;
-        private RxTable mRxTable;
+    public static class Builder<T> extends BaseBuilder<Builder<T>> {
         private String mKey;
         private boolean mExplicitDefaultValue;
         private T mDeleteValue, mDefaultValue;
         private final List<CoordinatorChain<T>> mCoordinators = new ArrayList<>();
-        private CompositeSubscription mSubscriptionParent;
-        private Action1<Throwable> mOnError;
-
-        public Builder<T> activity(final Activity activity) {
-            mActivity = activity;
-            return this;
-        }
-
-        public Builder<T> rxTable(final RxTable rxTable) {
-            mRxTable = rxTable;
-            return this;
-        }
-
-        public Builder<T> bakuActivity(final BakuActivityTrait<?> trait) {
-            return activity(trait.getVAndroidContextTrait().getAndroidContext())
-                    .rxTable(trait.getSyncbaseTable())
-                    .subscriptionParent(trait.getSubscriptions())
-                    .onError(trait::onSyncError);
-        }
 
         public Builder<T> key(final String key) {
             mKey = key;
@@ -114,23 +87,6 @@ public abstract class SyncbaseBinding {
 
         public Builder<T> chain(final Iterable<CoordinatorChain<T>> coordinators) {
             Iterables.addAll(mCoordinators, coordinators);
-            return this;
-        }
-
-        public Builder<T> subscriptionParent(final CompositeSubscription subscriptionParent) {
-            mSubscriptionParent = subscriptionParent;
-            return this;
-        }
-
-        private Subscription subscribe(final Subscription subscription) {
-            if (mSubscriptionParent != null) {
-                mSubscriptionParent.add(subscription);
-            }
-            return subscription;
-        }
-
-        public Builder<T> onError(final Action1<Throwable> onError) {
-            mOnError = onError;
             return this;
         }
 
@@ -208,16 +164,13 @@ public abstract class SyncbaseBinding {
             return bindTwoWay(editText);
         }
 
+        @Override
         public Builder<T> bindTo(final View view) {
             if (view instanceof TextView) {
                 return bindTo((TextView) view);
             } else {
                 throw new IllegalArgumentException("No default binding for view " + view);
             }
-        }
-
-        public Builder<T> bindTo(final int viewId) {
-            return bindTo(mActivity.findViewById(viewId));
         }
     }
 

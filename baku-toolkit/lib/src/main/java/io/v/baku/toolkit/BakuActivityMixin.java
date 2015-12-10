@@ -7,6 +7,7 @@ package io.v.baku.toolkit;
 import android.app.Activity;
 
 import io.v.baku.toolkit.bind.SyncbaseBinding;
+import io.v.baku.toolkit.bind.SyncbaseRangeAdapter;
 import io.v.rx.syncbase.GlobalUserSyncgroup;
 import io.v.rx.syncbase.RxDb;
 import io.v.rx.syncbase.RxSyncbase;
@@ -81,8 +82,13 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         mVAndroidContextTrait.getErrorReporter().onError(R.string.err_sync, t);
     }
 
-    public <T> SyncbaseBinding.Builder<T> binder() {
-        return SyncbaseBinding.<T>builder()
+    public <U> SyncbaseBinding.Builder<U> binder() {
+        return SyncbaseBinding.<U>builder()
+                .bakuActivity(this);
+    }
+
+    public <U> SyncbaseRangeAdapter.Builder<U> collectionBinder() {
+        return SyncbaseRangeAdapter.<U>builder()
                 .bakuActivity(this);
     }
 }
