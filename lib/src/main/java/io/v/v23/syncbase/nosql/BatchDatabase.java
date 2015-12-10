@@ -5,6 +5,8 @@ package io.v.v23.syncbase.nosql;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 
 /**
@@ -18,6 +20,7 @@ public interface BatchDatabase extends DatabaseCore {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> commit(VContext ctx);
 
     /**
@@ -28,5 +31,6 @@ public interface BatchDatabase extends DatabaseCore {
      *
      * @param  ctx        Vanadium context
      */
-     ListenableFuture<Void> abort(VContext ctx);
+    @CheckReturnValue
+    ListenableFuture<Void> abort(VContext ctx);
 }

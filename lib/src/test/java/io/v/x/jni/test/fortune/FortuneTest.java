@@ -311,7 +311,7 @@ public class FortuneTest extends TestCase {
         @Override
         public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)
                 throws VException {
-            responseChannel.close();
+            sync(responseChannel.close());
         }
     }
 }

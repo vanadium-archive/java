@@ -256,7 +256,7 @@ public class SyncbaseTest extends TestCase {
         Iterator<WatchChange> it = InputChannels.asIterable(
                 db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
         for (WatchChange expected : expectedChanges) {
-            assertThat(it.hasNext());
+            assertThat(it.hasNext()).isTrue();
             WatchChange actual = it.next();
             assertThat(actual.getTableName()).isEqualTo(expected.getTableName());
             assertThat(actual.getRowName()).isEqualTo(expected.getRowName());

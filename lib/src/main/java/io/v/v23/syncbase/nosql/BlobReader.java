@@ -13,6 +13,8 @@ import io.v.v23.services.syncbase.nosql.BlobRef;
 
 import java.io.InputStream;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Interface for reading an (immutable) data blob.
  */
@@ -27,6 +29,7 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Long> size(VContext ctx);
 
     /**
@@ -78,6 +81,7 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext ctx);
 
     /**
@@ -87,6 +91,7 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> pin(VContext ctx);
 
     /**
@@ -96,6 +101,7 @@ public interface BlobReader {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> unpin(VContext ctx);
 
     /**
@@ -107,5 +113,6 @@ public interface BlobReader {
      * @param ctx         vanadium context
      * @param rank        eviction rank
      */
+    @CheckReturnValue
     ListenableFuture<Void> keep(VContext ctx, long rank);
 }

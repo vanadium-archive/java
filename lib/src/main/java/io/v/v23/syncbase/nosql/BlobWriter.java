@@ -11,6 +11,8 @@ import io.v.v23.services.syncbase.nosql.BlobRef;
 
 import java.io.OutputStream;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Interface for writing data blobs.
  */
@@ -62,6 +64,7 @@ public interface BlobWriter {
      *
      * @param  ctx        vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> commit(VContext ctx);
 
     /**
@@ -71,6 +74,7 @@ public interface BlobWriter {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext ctx);
 
     /**
@@ -85,5 +89,6 @@ public interface BlobWriter {
      *
      * @param ctx         vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Long> size(VContext ctx);
 }

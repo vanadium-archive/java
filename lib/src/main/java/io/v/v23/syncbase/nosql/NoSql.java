@@ -10,6 +10,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
@@ -31,6 +33,7 @@ public class NoSql {
          *
          * @param  db         batch database on which the operation is performed
          */
+        @CheckReturnValue
         ListenableFuture<Void> run(BatchDatabase db);
     }
 
@@ -43,6 +46,7 @@ public class NoSql {
      * @param  opts       batch configuration
      * @param  op         batch operation
      */
+    @CheckReturnValue
     public static ListenableFuture<Void> runInBatch(VContext ctx, Database db,
                                                     BatchOptions opts, BatchOperation op) {
         return Futures.transform(Futures.immediateFuture(false), getRetryFn(ctx, db, opts, op, 0));
@@ -68,6 +72,7 @@ public class NoSql {
         };
     }
 
+    @CheckReturnValue
     private static ListenableFuture<Boolean> tryBatch(final VContext ctx,
                                                       final Database db,
                                                       final BatchOptions opts,

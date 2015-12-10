@@ -6,6 +6,8 @@ package io.v.v23;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * The read-end of a channel of {@code T}.
 */
@@ -17,5 +19,6 @@ public interface InputChannel<T> {
      * item;  {@link io.v.v23.verror.EndOfFileException} means that a graceful end of input has been
      * reached.
      */
+    @CheckReturnValue
     ListenableFuture<T> recv();
 }

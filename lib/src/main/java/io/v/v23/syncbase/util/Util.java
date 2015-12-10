@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.Collator;
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Various NoSQL utility methods.
  */
@@ -87,6 +89,7 @@ public class Util {
      * @param  ctx            Vanadium context
      * @param  parentFullName object name of parent component
      */
+    @CheckReturnValue
     public static ListenableFuture<List<String>> listChildren(VContext ctx, String parentFullName) {
         InputChannel<GlobReply> input =
                 V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*"));

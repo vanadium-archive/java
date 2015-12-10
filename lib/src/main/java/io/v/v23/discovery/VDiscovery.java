@@ -8,6 +8,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
@@ -46,6 +48,7 @@ public interface VDiscovery {
      *                   the result of this future is a second {@link ListenableFuture} that
      *                   completes once advertising stops
      */
+    @CheckReturnValue
     ListenableFuture<ListenableFuture<Void>> advertise(
             VContext ctx, Service service, List<BlessingPattern> visibility);
 
@@ -71,5 +74,6 @@ public interface VDiscovery {
      * @param query  a WHERE expression of {@code syncQL query} against scanned services
      * @return       a (potentially-infite) {@link InputChannel} of updates
      */
+    @CheckReturnValue
     InputChannel<Update> scan(VContext ctx, String query);
 }

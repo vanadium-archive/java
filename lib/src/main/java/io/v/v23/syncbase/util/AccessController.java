@@ -7,6 +7,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Map;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 
@@ -27,6 +29,7 @@ public interface AccessController {
      *                    {@link #getPermissions getPermissions()}.  If empty,
      *                    {@link #setPermissions setPermissions()} performs an unconditional update.
      */
+    @CheckReturnValue
     ListenableFuture<Void> setPermissions(VContext ctx, Permissions perms, String version);
 
     /**
@@ -41,5 +44,6 @@ public interface AccessController {
      *                    with its version number;  the result map is guaranteed to be
      *                    non-{@code null} and contain exactly one element
      */
+    @CheckReturnValue
     ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx);
 }

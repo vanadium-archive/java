@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.rpc.Callback;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
@@ -57,6 +59,7 @@ public class InputChannels {
      * The returned future will be executed on a
      * {@link MoreExecutors#directExecutor() direct executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<List<T>> asList(final InputChannel<T> channel) {
         return asList(channel, MoreExecutors.directExecutor());
     }
@@ -67,6 +70,7 @@ public class InputChannels {
      * <p>
      * The returned future will be executed on the provided {@code executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<List<T>> asList(final InputChannel<T> channel,
                                                        Executor executor) {
         final SettableFuture<List<T>> future = SettableFuture.create();
@@ -102,6 +106,7 @@ public class InputChannels {
      * The returned future will be executed on a
      * {@link MoreExecutors#directExecutor() direct executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<Void> asDone(final InputChannel<T> channel) {
         return asDone(channel, MoreExecutors.directExecutor());
     }
@@ -112,6 +117,7 @@ public class InputChannels {
      * <p>
      * The returned future will be executed on the provided {@code executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<Void> asDone(final InputChannel<T> channel,
                                                     Executor executor) {
         final SettableFuture<Void> future = SettableFuture.create();
@@ -159,6 +165,7 @@ public class InputChannels {
      * The returned future and all the callbacks will be executed on a
      * {@link MoreExecutors#directExecutor() direct executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<Void> withCallback(
             InputChannel<? extends T> channel, Callback<T> callback) {
         return withCallback(channel, callback, MoreExecutors.directExecutor());
@@ -174,6 +181,7 @@ public class InputChannels {
      * <p>
      * The returned future and all the callbacks will be executed on the provided {@code executor}.
      */
+    @CheckReturnValue
     public static <T> ListenableFuture<Void> withCallback(
             InputChannel<? extends T> channel, Callback<T> callback, Executor executor) {
         final SettableFuture<Void> future = SettableFuture.create();

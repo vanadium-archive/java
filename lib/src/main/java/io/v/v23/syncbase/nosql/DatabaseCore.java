@@ -12,6 +12,8 @@ import io.v.v23.vdl.VdlAny;
 
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Base interface for {@link Database} and {@link BatchDatabase}, allowing clients to pass the
  * handle to helper methods that are batch-agnostic.
@@ -42,6 +44,7 @@ public interface DatabaseCore {
      * @param  ctx        Vanadium context
      * @return            a list of all table names
      */
+    @CheckReturnValue
     ListenableFuture<List<String>> listTables(VContext ctx);
 
     /**
@@ -61,12 +64,14 @@ public interface DatabaseCore {
      *                    that allows the caller to iterate over arrays of values for each row that
      *                    matches the query
      */
+    @CheckReturnValue
     ListenableFuture<QueryResults> exec(VContext ctx, String query);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the {@link ResumeMarker} that points
      * to the current state of the database.
      */
+    @CheckReturnValue
     ListenableFuture<ResumeMarker> getResumeMarker(VContext ctx);
 
     /**

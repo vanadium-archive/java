@@ -11,6 +11,8 @@ import org.joda.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.InputChannel;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
@@ -28,6 +30,7 @@ public interface Namespace {
      * A shortcut for {@link #mount(VContext, String, String, Duration, Options)} with a {@code
      * null} options parameter.
      */
+    @CheckReturnValue
     ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl);
 
     /**
@@ -49,6 +52,7 @@ public interface Namespace {
      * @param ttl the duration for which the mount should live
      * @param options options to pass to the implementation as described above, or {@code null}
      */
+    @CheckReturnValue
     ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl,
                                  Options options);
 
@@ -56,6 +60,7 @@ public interface Namespace {
      * A shortcut for {@link #unmount(VContext, String, String, Options)} with a {@code null}
      * options parameter.
      */
+    @CheckReturnValue
     ListenableFuture<Void> unmount(VContext context, String name, String server);
 
     /**
@@ -76,12 +81,14 @@ public interface Namespace {
      *               section of the Naming Concepts document
      * @param options options to pass to the implementation as described above, or {@code null}
      */
+    @CheckReturnValue
     ListenableFuture<Void> unmount(VContext context, String name, String server, Options options);
 
     /**
      * A shortcut for {@link #delete(VContext, String, boolean, Options)} with a {@code null}
      * options parameter.
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree);
 
     /**
@@ -101,6 +108,7 @@ public interface Namespace {
      * @param deleteSubtree whether the entire tree rooted at {@code name} should be deleted
      * @param options options to pass to the implementation as described above, or {@code null}
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree,
                                   Options options);
 
@@ -108,6 +116,7 @@ public interface Namespace {
      * A shortcut for {@link #resolve(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
+    @CheckReturnValue
     ListenableFuture<MountEntry> resolve(VContext context, String name);
 
     /**
@@ -127,12 +136,14 @@ public interface Namespace {
      * @return a new {@link ListenableFuture} whose result is the {@link MountEntry} to which the
      *         name resolves, or {@code null} if it does not resolve
      */
+    @CheckReturnValue
     ListenableFuture<MountEntry> resolve(VContext context, String name, Options options);
 
     /**
      * A shortcut for {@link #resolveToMountTable(VContext, String, Options)} with a {@code null}
      * options parameter.
      */
+    @CheckReturnValue
     ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name);
 
     /**
@@ -153,6 +164,7 @@ public interface Namespace {
      *         mounttable server directly responsible for {@code name}, or {@code null} if
      *         {@code name} does not resolve
      */
+    @CheckReturnValue
     ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name,
                                                      Options options);
 
@@ -218,6 +230,7 @@ public interface Namespace {
      * A shortcut for {@link #setPermissions(VContext, String, Permissions, String, Options)} with a
      * {@code null} options parameter.
      */
+    @CheckReturnValue
     ListenableFuture<Void> setPermissions(VContext context, String name, Permissions permissions,
                                           String version);
 
@@ -241,6 +254,7 @@ public interface Namespace {
      *                version number is not specified, no version check is performed
      * @param options options to pass to the implementation as described above, or {@code null}
      */
+    @CheckReturnValue
     ListenableFuture<Void> setPermissions(VContext context, String name, Permissions permissions,
                                           String version, Options options);
 
@@ -248,6 +262,7 @@ public interface Namespace {
      * A shortcut for {@link #getPermissions(VContext, String, Options)} with a {@code null} options
      * parameter.
      */
+    @CheckReturnValue
     ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name);
 
     /**
@@ -267,6 +282,7 @@ public interface Namespace {
      * @param options options to pass to the implementation as described above, or {@code null}
      * @return a single-entry map from permissions version to permissions for the named object
      */
+    @CheckReturnValue
     ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name,
                                                               Options options);
 }

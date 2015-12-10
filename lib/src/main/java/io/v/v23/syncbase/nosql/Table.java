@@ -9,6 +9,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
@@ -38,6 +40,7 @@ public interface Table {
      * @param  perms      table permissions; if {@code null}, {@link Database}'s
      *                    permissions are used
      */
+    @CheckReturnValue
     ListenableFuture<Void> create(VContext ctx, Permissions perms);
 
     /**
@@ -47,6 +50,7 @@ public interface Table {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> destroy(VContext ctx);
 
     /**
@@ -55,6 +59,7 @@ public interface Table {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
@@ -63,6 +68,7 @@ public interface Table {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Permissions> getPermissions(VContext ctx);
 
     /**
@@ -71,6 +77,7 @@ public interface Table {
      * @param  ctx        Vanadium context
      * @param  perms      new permissions for the table
      */
+    @CheckReturnValue
     ListenableFuture<Void> setPermissions(VContext ctx, Permissions perms);
 
     /**
@@ -91,6 +98,7 @@ public interface Table {
      * @param  key        the primary key for a row
      * @param  type       type of the value to be returned (needed for de-serialization)
      */
+    @CheckReturnValue
     ListenableFuture<Object> get(VContext ctx, String key, Type type);
 
     /**
@@ -101,6 +109,7 @@ public interface Table {
      * @param  type       type of the value to be returned (needed for serialization)
      * @param  value      value to be written
      */
+    @CheckReturnValue
     ListenableFuture<Void> put(VContext ctx, String key, Object value, Type type);
 
     /**
@@ -109,6 +118,7 @@ public interface Table {
      * @param  ctx        Vanadium context
      * @param  key        primary key for the row to be deleted
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext ctx, String key);
 
     /**
@@ -118,6 +128,7 @@ public interface Table {
      * @param  ctx        Vanadium context
      * @param  range      range of rows to be deleted
      */
+    @CheckReturnValue
     ListenableFuture<Void> deleteRange(VContext ctx, RowRange range);
 
     /**
@@ -156,6 +167,7 @@ public interface Table {
      * @return            a new {@link ListenableFuture} whose result is the list of prefix
      *                    permissions for the given row
      */
+    @CheckReturnValue
     ListenableFuture<List<PrefixPermissions>> getPrefixPermissions(VContext ctx, String key);
 
     /**
@@ -173,6 +185,7 @@ public interface Table {
      * @param  prefix     prefix to which to apply the new permissions
      * @param  perms      permissions to apply
      */
+    @CheckReturnValue
     ListenableFuture<Void> setPrefixPermissions(VContext ctx, PrefixRange prefix, Permissions perms);
 
     /**
@@ -183,5 +196,6 @@ public interface Table {
      * @param  ctx        Vanadium context
      * @param  prefix     prefix for which the permissions are to be deleted
      */
+    @CheckReturnValue
     ListenableFuture<Void> deletePrefixPermissions(VContext ctx, PrefixRange prefix);
 }

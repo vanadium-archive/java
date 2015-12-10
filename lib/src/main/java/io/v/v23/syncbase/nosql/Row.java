@@ -7,6 +7,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.lang.reflect.Type;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 
 /**
@@ -29,6 +31,7 @@ public interface Row {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
@@ -36,6 +39,7 @@ public interface Row {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> delete(VContext ctx);
 
     /**
@@ -45,6 +49,7 @@ public interface Row {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Object> get(VContext ctx, Type type);
 
     /**
@@ -53,5 +58,6 @@ public interface Row {
      * @param  ctx        Vanadium context
      * @param  value      value to write
      */
+    @CheckReturnValue
     ListenableFuture<Void> put(VContext ctx, Object value, Type type);
 }

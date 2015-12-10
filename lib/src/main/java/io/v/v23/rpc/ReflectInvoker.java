@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static io.v.v23.VFutures.sync;
+
 /**
  * An {@link Invoker} that uses reflection to make each compatible exported method in the provided
  * object available.
@@ -309,7 +311,7 @@ public final class ReflectInvoker implements Invoker {
         if (server instanceof Globber) {
             ((Globber) server).glob(call, pattern, responseChannel);
         } else {
-            responseChannel.close();
+            sync(responseChannel.close());
         }
     }
 

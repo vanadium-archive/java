@@ -6,6 +6,8 @@ package io.v.v23.vdl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.InputChannel;
 
 /**
@@ -30,5 +32,6 @@ public interface ClientRecvStream<RecvT, FinishT> extends InputChannel<RecvT> {
      *
      * @return a new {@link ListenableFuture} whose result is the call return value
      */
+    @CheckReturnValue
     ListenableFuture<FinishT> finish();
 }

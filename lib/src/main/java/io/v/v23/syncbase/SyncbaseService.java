@@ -10,6 +10,8 @@ import io.v.v23.syncbase.util.AccessController;
 
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * The interface for a Vanadium Syncbase service.
  */
@@ -37,5 +39,6 @@ public interface SyncbaseService extends AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<List<String>> listApps(VContext ctx);
 }

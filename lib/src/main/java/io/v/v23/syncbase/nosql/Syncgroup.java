@@ -7,6 +7,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Map;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
@@ -28,6 +30,7 @@ public interface Syncgroup {
      * @param  spec       syncgroup specification
      * @param  info       creator's membership information
      */
+    @CheckReturnValue
     ListenableFuture<Void> create(VContext ctx, SyncgroupSpec spec, SyncgroupMemberInfo info);
 
     /**
@@ -42,6 +45,7 @@ public interface Syncgroup {
      * @param  info       joiner's membership information
      * @return            a new {@link ListenableFuture} whose result is the syncgroup specification
      */
+    @CheckReturnValue
     ListenableFuture<SyncgroupSpec> join(VContext ctx, SyncgroupMemberInfo info);
 
     /**
@@ -53,6 +57,7 @@ public interface Syncgroup {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> leave(VContext ctx);
 
     /**
@@ -66,6 +71,7 @@ public interface Syncgroup {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> destroy(VContext ctx);
 
     /**
@@ -80,6 +86,7 @@ public interface Syncgroup {
      * @param  ctx        Vanadium context
      * @param  member     member to be ejected
      */
+    @CheckReturnValue
     ListenableFuture<Void> eject(VContext ctx, String member);
 
     /**
@@ -97,6 +104,7 @@ public interface Syncgroup {
      *                    along with its version number; the returned map is guaranteed to be
      *                    non-{@code null} and contain exactly one element
      */
+    @CheckReturnValue
     ListenableFuture<Map<String, SyncgroupSpec>> getSpec(VContext ctx);
 
     /**
@@ -115,6 +123,7 @@ public interface Syncgroup {
      *                    method will only succeed if the current syncgroup's version matches
      *                    this value
      */
+    @CheckReturnValue
     ListenableFuture<Void> setSpec(VContext ctx, SyncgroupSpec spec, String version);
 
     /**
@@ -128,5 +137,6 @@ public interface Syncgroup {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Map<String, SyncgroupMemberInfo>> getMembers(VContext ctx);
 }

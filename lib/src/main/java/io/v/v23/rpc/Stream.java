@@ -8,6 +8,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.lang.reflect.Type;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * The interface for a bidirectional FIFO stream of typed values.
  */
@@ -18,6 +20,7 @@ public interface Stream {
      * @param  item  an item to be sent
      * @param  type  type of the provided item
      */
+    @CheckReturnValue
     ListenableFuture<Void> send(Object item, Type type);
 
     /**
@@ -29,5 +32,6 @@ public interface Stream {
      *
      * @param  type type of the returned item
      */
+    @CheckReturnValue
     ListenableFuture<Object> recv(Type type);
 }

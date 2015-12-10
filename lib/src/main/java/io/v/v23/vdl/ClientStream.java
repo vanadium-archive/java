@@ -6,6 +6,8 @@ package io.v.v23.vdl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Represents the clients side of the established bidirectional stream.
  *
@@ -30,5 +32,6 @@ public interface ClientStream<SendT, RecvT, FinishT>
      *
      * @return a new {@link ListenableFuture} whose result is the call return value
      */
+    @CheckReturnValue
     ListenableFuture<FinishT> finish();
 }

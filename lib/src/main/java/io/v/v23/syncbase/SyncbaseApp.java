@@ -14,6 +14,8 @@ import io.v.v23.security.access.Permissions;
 
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * A handle for an app running as part of a {@link SyncbaseService}.
  */
@@ -34,6 +36,7 @@ public interface SyncbaseApp extends AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
@@ -57,6 +60,7 @@ public interface SyncbaseApp extends AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<List<String>> listDatabases(VContext ctx);
 
     /**
@@ -66,6 +70,7 @@ public interface SyncbaseApp extends AccessController {
      * @param  perms      app permissions; if {@code null}, {@link SyncbaseService}'s
      *                    permissions are used
      */
+    @CheckReturnValue
     ListenableFuture<Void> create(VContext ctx, Permissions perms);
 
     /**
@@ -73,5 +78,6 @@ public interface SyncbaseApp extends AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> destroy(VContext ctx);
 }

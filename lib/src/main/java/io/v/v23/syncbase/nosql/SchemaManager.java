@@ -6,6 +6,8 @@ package io.v.v23.syncbase.nosql;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import javax.annotation.CheckReturnValue;
+
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
@@ -18,10 +20,12 @@ class SchemaManager {
         client = DatabaseClientFactory.getDatabaseClient(dbFullName);
     }
 
+    @CheckReturnValue
     ListenableFuture<SchemaMetadata> getSchemaMetadata(VContext ctx) {
         return client.getSchemaMetadata(ctx);
     }
 
+    @CheckReturnValue
     ListenableFuture<Void> setSchemaMetadata(VContext ctx, SchemaMetadata metadata) {
         return client.setSchemaMetadata(ctx, metadata);
     }

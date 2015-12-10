@@ -8,6 +8,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.lang.reflect.Type;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * The interface for each in-flight call on the {@link Client}.  Method {@link #finish finish}
  * must be called to finish the call; all other methods are optional.
@@ -23,6 +25,7 @@ public interface ClientCall extends Stream {
      * Completion of this method will cause all client's future {@link Stream#send send} calls
      * to fail.
      */
+    @CheckReturnValue
     ListenableFuture<Void> closeSend();
 
     /**
@@ -31,5 +34,6 @@ public interface ClientCall extends Stream {
      *
      * @param  types types for all the output arguments
      */
+    @CheckReturnValue
     ListenableFuture<Object[]> finish(Type[] types);
 }

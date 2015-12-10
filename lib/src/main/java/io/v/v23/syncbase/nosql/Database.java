@@ -16,6 +16,8 @@ import io.v.v23.verror.VException;
 
 import java.util.List;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * A database interface, which is logically a collection of {@link Table}s.
  */
@@ -28,6 +30,7 @@ public interface Database extends DatabaseCore, AccessController {
      * @return            {@code true} iff this database exists and the user has sufficient
      *                    permissions to access it
      */
+    @CheckReturnValue
     ListenableFuture<Boolean> exists(VContext ctx);
 
     /**
@@ -38,6 +41,7 @@ public interface Database extends DatabaseCore, AccessController {
      *                    {@link io.v.v23.syncbase.SyncbaseApp}'s
      *                    permissions are used
      */
+    @CheckReturnValue
     ListenableFuture<Void> create(VContext ctx, Permissions perms);
 
     /**
@@ -45,6 +49,7 @@ public interface Database extends DatabaseCore, AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<Void> destroy(VContext ctx);
 
     /**
@@ -79,6 +84,7 @@ public interface Database extends DatabaseCore, AccessController {
      * @return            a new {@link ListenableFuture} whose result is a handle to a set of reads
      *                    and writes to the database that should be considered an atomic unit
      */
+    @CheckReturnValue
     ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts);
 
     /**
@@ -124,6 +130,7 @@ public interface Database extends DatabaseCore, AccessController {
      *
      * @param  ctx        Vanadium context
      */
+    @CheckReturnValue
     ListenableFuture<List<String>> listSyncgroupNames(VContext ctx);
 
     /**
@@ -145,6 +152,7 @@ public interface Database extends DatabaseCore, AccessController {
      * @return            a {@link ListenableFuture} whose result is a writer used for writing to
      *                    the blob
      */
+    @CheckReturnValue
     ListenableFuture<BlobWriter> writeBlob(VContext ctx, BlobRef ref);
 
     /**
@@ -181,5 +189,6 @@ public interface Database extends DatabaseCore, AccessController {
      *                    version was lower than the schema version with which the database was
      *                    created
      */
+    @CheckReturnValue
     ListenableFuture<Void> enforceSchema(VContext ctx);
 }
