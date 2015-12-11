@@ -19,6 +19,8 @@ import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServerStatus;
+import io.v.v23.rpc.ServerState;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
@@ -264,6 +266,20 @@ public class FortuneTest extends TestCase {
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(sync(client.get(ctxT))).isEqualTo(TEST_INVOKER_FORTUNE);
+    }
+
+    public void testServerStatus() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        Server s = V.getServer(ctx);
+        ServerStatus status = s.getStatus();
+        assertThat(status.getState()).isEqualTo(ServerState.SERVER_ACTIVE);
+        assertThat(status.getEndpoints()).isNotEmpty();
+        // We should have one successful entry in listenErrors.
+        assertThat(status.getListenErrors()).isNotEmpty();
+        assertThat(status.getProxyErrors()).isEmpty();
+        // TODO(suharshs,sjr): Add a test for proxy errors, and listenErrors
+        // that actually is populated with errors.
     }
 
     private static class TestInvoker implements Invoker {

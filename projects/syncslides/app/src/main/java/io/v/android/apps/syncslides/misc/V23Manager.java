@@ -15,7 +15,6 @@ import android.widget.Toast;
 import org.joda.time.Duration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -322,9 +321,7 @@ public class V23Manager {
                         "\" at table " + Config.MT_ADDRESS);
                 try {
                     mLiveServer = makeServer(mountName, server);
-                    Log.d(TAG, "  Server status proxies: " +
-                            Arrays.deepToString(
-                                    mLiveServer.getStatus().getProxies()));
+                    Log.d(TAG, " Server status: " + mLiveServer.getStatus());
                     Endpoint[] points = mLiveServer.getStatus().getEndpoints();
                     for (Endpoint point : points) {
                         Log.d(TAG, "  Listening on: " + point);

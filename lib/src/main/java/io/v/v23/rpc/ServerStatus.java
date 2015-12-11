@@ -6,8 +6,13 @@ package io.v.v23.rpc;
 
 import io.v.impl.google.naming.EndpointImpl;
 import io.v.v23.naming.Endpoint;
+import io.v.v23.verror.VException;
+import io.v.v23.rpc.ListenSpec.Address;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+
 
 /**
  * The current status of the server.
@@ -17,7 +22,8 @@ public class ServerStatus {
     private final boolean servesMountTable;
     private final MountStatus[] mounts;
     private final String[] endpoints;
-    private final ProxyStatus[] proxies;
+    private final Map<Address, VException> lnErrors;
+    private final Map<String, VException> proxyErrors;
 
     /**
      * Creates a new {@link ServerStatus} object.
@@ -27,17 +33,18 @@ public class ServerStatus {
      * @param  mounts           status of the last mount or unmount operation for every combination
      *                          of name and server address being published by this server
      * @param  endpoints        set of endpoints currently registered with the mount table
-     * @param  proxies          status of all proxy connections maintained by this server
+     * @param  lnErrors         set of errors currently encountered from listening
+     * @param  proxyErrors      set of errors currently encountered from listening on proxies
      */
     public ServerStatus(ServerState state, boolean servesMountTable, MountStatus[] mounts,
-            String[] endpoints, ProxyStatus[] proxies) {
+            String[] endpoints, Map<Address, VException> lnErrors, Map<String, VException> proxyErrors) {
         this.state = state;
         this.servesMountTable = servesMountTable;
         this.mounts = mounts == null ? new MountStatus[0] : Arrays.copyOf(mounts, mounts.length);
         this.endpoints = endpoints == null ?
                 new String[0] : Arrays.copyOf(endpoints, endpoints.length);
-        this.proxies = proxies == null ?
-                 new ProxyStatus[0] : Arrays.copyOf(proxies, proxies.length);
+        this.lnErrors = lnErrors;
+        this.proxyErrors = proxyErrors;
     }
 
     /**
@@ -75,16 +82,25 @@ public class ServerStatus {
     }
 
     /**
-     * Returns the status of all proxy connections maintained by this server.
+     * Returns the map of errors encountered when listening on the network. The returned
+     * map is keyed by the {@link Addresses addresses} in the {@link ListenSpec}.
      */
-    public ProxyStatus[] getProxies() {
-        return Arrays.copyOf(this.proxies, this.proxies.length);
+    public Map<Address,VException> getListenErrors() {
+       return new HashMap<Address, VException>(this.lnErrors);
+    }
+
+    /**
+     * Returns the map of errors encountered when listening on the network. The returned
+     * map is keyed by the Addresses in the ListenSpec.
+     */
+    public Map<String,VException> getProxyErrors() {
+       return new HashMap<String, VException>(this.proxyErrors);
     }
 
     @Override
     public String toString() {
-        return String.format("State: %s, MountTable: %s, Mounts: %s, Endpoints: %s, Proxies: %s",
+        return String.format("State: %s, MountTable: %s, Mounts: %s, Endpoints: %s, ListenErrors: %s, ProxyErrors: %s",
             this.state, this.servesMountTable, Arrays.toString(this.mounts),
-            Arrays.toString(this.endpoints), Arrays.toString(this.proxies));
+            Arrays.toString(this.endpoints), this.lnErrors.toString());
     }
 }
