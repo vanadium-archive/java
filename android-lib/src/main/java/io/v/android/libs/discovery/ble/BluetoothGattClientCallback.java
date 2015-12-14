@@ -51,6 +51,7 @@ public class BluetoothGattClientCallback extends BluetoothGattCallback {
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         for (BluetoothGattService service : gatt.getServices()) {
+            Log.d("vanadium", "Saw service" + service.getUuid().toString());
             // Skip the GATT AND GAP Services.
             if (service.getUuid().toString().startsWith(GATT_AND_GAP_PREFIX)) {
                 continue;
@@ -60,6 +61,8 @@ public class BluetoothGattClientCallback extends BluetoothGattCallback {
             for (BluetoothGattCharacteristic ch : service.getCharacteristics()) {
                 if ((ch.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
                     chars.add(ch);
+                } else {
+                    Log.d("vanadium", "skipping non read property");
                 }
             }
         }

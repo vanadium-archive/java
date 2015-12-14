@@ -190,7 +190,8 @@ public class BlePlugin {
         BluetoothGattService service = new BluetoothGattService(
                 UUIDUtil.UuidToUUID(adv.getServiceUuid()), BluetoothGattService.SERVICE_TYPE_PRIMARY);
         for (Map.Entry<UUID, byte[]> entry : attributes.entrySet()) {
-            BluetoothGattCharacteristic ch = new BluetoothGattCharacteristic(entry.getKey(), 0,
+            BluetoothGattCharacteristic ch = new BluetoothGattCharacteristic(entry.getKey(),
+                    BluetoothGattCharacteristic.PROPERTY_READ,
                     BluetoothGattCharacteristic.PERMISSION_READ);
             ch.setValue(entry.getValue());
             service.addCharacteristic(ch);
