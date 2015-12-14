@@ -4,7 +4,7 @@
 
 package io.v.baku.toolkit.bind;
 
-import io.v.rx.syncbase.WatchEvent;
+import io.v.rx.syncbase.SingleWatchEvent;
 import rx.Observable;
 import rx.Subscription;
 
@@ -18,7 +18,7 @@ public interface TwoWayBinding<T> {
      * This method should be called at most once per instance, and the observable should have at
      * most one subscriber.
      */
-    Observable<WatchEvent<T>> downlink();
+    Observable<SingleWatchEvent<T>> downlink();
 
     /**
      * This method should be called at most once per instance, and the observable should have at

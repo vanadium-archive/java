@@ -5,12 +5,22 @@
 package io.v.baku.toolkit.blessings;
 
 import android.content.Intent;
+import android.util.Base64;
+import android.util.JsonReader;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +31,9 @@ import io.v.android.v23.services.blessing.BlessingService;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.BlessingRoots;
 import io.v.v23.security.Blessings;
+import io.v.v23.security.CryptoUtil;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
 import io.v.v23.security.access.AccessList;
@@ -43,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @UtilityClass
 public class BlessingsUtils {
+    public static final String GLOBAL_BLESSING_ROOT_URL = "https://dev.v.io/auth/blessing-root";
     public static final Pattern DEV_V_IO_USER = Pattern.compile("dev\\.v\\.io:u:([^:]+).*");
 
     public static final AccessList OPEN_ACL = new AccessList(
@@ -141,5 +154,50 @@ public class BlessingsUtils {
         principal.blessingStore().setDefaultBlessings(blessings);
         principal.blessingStore().set(blessings, new BlessingPattern("..."));
         VSecurity.addToRoots(principal, blessings);
+    }
+
+    public static void addGlobalBlessingRoots(final VContext vContext)
+            throws IOException, VException {
+        final URL url;
+        try {
+            url = new URL(GLOBAL_BLESSING_ROOT_URL);
+        } catch (final MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        ECPublicKey publicKey = null;
+        final List<BlessingPattern> names = new ArrayList<>();
+
+        try (final JsonReader json = new JsonReader(
+                new InputStreamReader(url.openStream(), StandardCharsets.US_ASCII))) {
+            json.beginObject();
+            while (json.hasNext()) {
+                final String name = json.nextName();
+                if ("publicKey".equals(name)) {
+                    final String strKey = json.nextString();
+                    final byte[] binKey = Base64.decode(strKey.getBytes(StandardCharsets.US_ASCII),
+                            Base64.URL_SAFE);
+                    publicKey = CryptoUtil.decodeECPublicKey(binKey);
+                } else if ("names".equals(name)) {
+                    json.beginArray();
+                    while (json.hasNext()) {
+                        names.add(new BlessingPattern(json.nextString()));
+                    }
+                    json.endArray();
+                } else {
+                    json.skipValue();
+                }
+            }
+        }
+
+        if (publicKey != null) {
+            final BlessingRoots roots = V.getPrincipal(vContext).roots();
+            for (final BlessingPattern name : names) {
+                log.info("Adding global blessing root " + name);
+                roots.add(publicKey, name);
+            }
+        } else {
+            log.warn("No global blessing roots found");
+        }
     }
 }

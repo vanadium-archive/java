@@ -10,7 +10,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 
 import java.util.Objects;
 
-import io.v.rx.syncbase.WatchEvent;
+import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.experimental.UtilityClass;
 import rx.Observable;
 import rx.Subscription;
@@ -20,10 +20,10 @@ import rx.subscriptions.CompositeSubscription;
 @UtilityClass
 public class TextViewBindingTermini {
     public static Subscription bindRead(final TextView textView,
-                                        final Observable<WatchEvent<String>> downlink,
+                                        final Observable<SingleWatchEvent<String>> downlink,
                                         final Action1<Throwable> onError) {
         return downlink
-                .map(WatchEvent::getValue)
+                .map(SingleWatchEvent::getValue)
                 .filter(s -> !Objects.equals(s, Objects.toString(textView.getText(), null)))
                 .subscribe(textView::setTextKeepState, onError);
     }

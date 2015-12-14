@@ -72,9 +72,10 @@ public class RxNamespace {
 
     /**
      * @return an {@code Observable} of {@code MountEvent}s. Events including servers come from
-     * polling, may be mount or unmount events, and may or may not include an error. Events with
-     * {@code isMount = true} are from {@link Server#addName(String)} and may or may not include an
-     * error. If a server is already mounted, a backdated mount event is included.
+     * polling and may or may not include an error. Events without servers are from
+     * {@link Server#addName(String)} and may or may not include an error. If a server is already
+     * mounted, a backdated mount event is included. The observable completes if and when the server
+     * is unmounted.
      */
     public static Observable<MountEvent> mount(final Observable<Server> rxServer,
                                                           final String name) {

@@ -4,7 +4,7 @@
 
 package io.v.baku.toolkit.bind;
 
-import io.v.rx.syncbase.WatchEvent;
+import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.RequiredArgsConstructor;
 import rx.Observable;
 import rx.Subscription;
@@ -21,8 +21,8 @@ public class SuppressWriteOnReadCoordinator<T> implements TwoWayBinding<T> {
     private boolean mSuppressWrites;
 
     @Override
-    public Observable<WatchEvent<T>> downlink() {
-        final Observable<WatchEvent<T>> childDownlink = mChild.downlink();
+    public Observable<SingleWatchEvent<T>> downlink() {
+        final Observable<SingleWatchEvent<T>> childDownlink = mChild.downlink();
         return Observable.create(s -> s.add(childDownlink.subscribe(x -> {
             mSuppressWrites = true;
             s.onNext(x);

@@ -7,6 +7,7 @@ package io.v.baku.toolkit;
 import android.app.Activity;
 
 import io.v.baku.toolkit.bind.SyncbaseBinding;
+import io.v.baku.toolkit.bind.SyncbaseRangeAdapter;
 import io.v.rx.syncbase.RxDb;
 import io.v.rx.syncbase.RxSyncbase;
 import io.v.rx.syncbase.RxTable;
@@ -21,5 +22,6 @@ public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     String getSyncbaseTableName();
     void onSyncError(Throwable t);
     <U> SyncbaseBinding.Builder<U> binder();
+    <U> SyncbaseRangeAdapter.Builder<U> collectionBinder();
     void close();
 }

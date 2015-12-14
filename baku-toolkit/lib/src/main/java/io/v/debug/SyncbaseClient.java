@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import org.joda.time.Duration;
+
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
 import io.v.v23.syncbase.Syncbase;
@@ -98,7 +100,8 @@ public class SyncbaseClient implements AutoCloseable {
      *                    will not be started until blessings are available.
      *                    TODO(rosswang): this should either handle blessings changes or not care.
      */
-    public SyncbaseClient(final Context androidContext, final Observable<Blessings> rxBlessings) {
+    public SyncbaseClient(final Context androidContext, final Observable<Blessings> rxBlessings,
+                          final boolean cleanStart, final Duration keepAlive) {
         mAndroidContext = androidContext;
 
         /*
@@ -107,6 +110,10 @@ public class SyncbaseClient implements AutoCloseable {
         (through androidContext).
          */
         final Intent intent = new Intent(androidContext, SyncbaseAndroidService.class);
+
+        intent.putExtra(SyncbaseAndroidService.EXTRA_CLEAN_START, cleanStart);
+        intent.putExtra(SyncbaseAndroidService.EXTRA_KEEP_ALIVE, keepAlive);
+
         final ReplaySubject<ServerClient> rpl = ReplaySubject.createWithSize(1);
         mConnection = new SyncbaseServiceConnection(rpl);
 
@@ -120,6 +127,10 @@ public class SyncbaseClient implements AutoCloseable {
         }
 
         mObservable = rpl.filter(s -> s != null);
+    }
+
+    public SyncbaseClient(final Context androidContext, final Observable<Blessings> rxBlessings) {
+        this(androidContext, rxBlessings, false, null);
     }
 
     @Override

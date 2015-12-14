@@ -8,7 +8,7 @@ import org.joda.time.Duration;
 
 import java.util.concurrent.TimeUnit;
 
-import io.v.rx.syncbase.WatchEvent;
+import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.RequiredArgsConstructor;
 import rx.Observable;
 import rx.Subscription;
@@ -57,7 +57,7 @@ public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
     }
 
     @Override
-    public Observable<WatchEvent<T>> downlink() {
+    public Observable<SingleWatchEvent<T>> downlink() {
         return mChild.downlink().debounce(s -> getDebounceWindow());
     }
 

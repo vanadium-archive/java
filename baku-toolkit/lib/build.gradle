@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.3.0'
+version = '0.4.0'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -30,6 +30,11 @@ android {
     defaultConfig {
         minSdkVersion 21
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -37,8 +42,6 @@ dependencies {
             /* If the application wishes to use support libraries, it should include them as compile
             dependencies in its own build.gradle. */
             'com.android.support:appcompat-v7:23.0.1',
-
-            'org.glassfish:javax.annotation:10.0-b28',
             /*
             https://projectlombok.org/setup/android.html
             Follow Android Studio instructions at the bottom of the page to install the Lombok
@@ -48,6 +51,7 @@ dependencies {
             'org.slf4j:slf4j-api:1.7.12'
     )
 
+    androidTestCompile('org.slf4j:slf4j-android:1.7.12')
 
     testCompile(
             'org.mockito:mockito-core:1.10.19',
@@ -61,13 +65,15 @@ dependencies {
 
     compile(
             'com.jakewharton.rxbinding:rxbinding:0.3.0',
+            'commons-io:commons-io:2.4',
             'io.reactivex:rxandroid:1.0.1',
             'io.reactivex:rxjava:1.0.16',
             'io.reactivex:rxjava-async-util:0.21.0',
-            'io.v:vanadium-android:0.3',
+            'io.v:vanadium-android:0.8',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
             'net.sourceforge.streamsupport:streamsupport:1.3.2'
     )
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     /*

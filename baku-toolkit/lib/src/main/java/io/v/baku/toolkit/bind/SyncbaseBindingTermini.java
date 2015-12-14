@@ -11,7 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Objects;
 
 import io.v.rx.syncbase.RxTable;
-import io.v.rx.syncbase.WatchEvent;
+import io.v.rx.syncbase.SingleWatchEvent;
 import io.v.v23.syncbase.nosql.Table;
 import lombok.AllArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -28,7 +28,7 @@ public class SyncbaseBindingTermini {
         public final T data;
     }
 
-    public static <T> Observable<WatchEvent<T>> bindRead(
+    public static <T> Observable<SingleWatchEvent<T>> bindRead(
             final RxTable rxTable, final String key, final Class<T> type, final T defaultValue) {
         return rxTable.watch(key, type, defaultValue);
     }
@@ -79,7 +79,7 @@ public class SyncbaseBindingTermini {
             final T deleteValue, final Action1<Throwable> onError) {
         return new TwoWayBinding<T>() {
             @Override
-            public Observable<WatchEvent<T>> downlink() {
+            public Observable<SingleWatchEvent<T>> downlink() {
                 return bindRead(rxTable, key, type, defaultValue);
             }
 

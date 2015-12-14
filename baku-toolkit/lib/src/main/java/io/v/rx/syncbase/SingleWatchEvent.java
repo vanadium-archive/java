@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 @Value
-public class WatchEvent<T> {
+public class SingleWatchEvent<T> {
     T mValue;
     ResumeMarker mResumeMarker;
     boolean mFromSync;
@@ -29,9 +29,9 @@ public class WatchEvent<T> {
         }
     }
 
-    public static <T> WatchEvent<T> fromWatchChange(final WatchChange c, final T defaultValue)
+    public static <T> SingleWatchEvent<T> fromWatchChange(final WatchChange c, final T defaultValue)
             throws VException {
-        return new WatchEvent<>(getWatchValue(c, defaultValue),
+        return new SingleWatchEvent<>(getWatchValue(c, defaultValue),
                 c.getResumeMarker(), c.isFromSync());
     }
 }

@@ -27,7 +27,7 @@ public class RxApp extends RxEntity<SyncbaseApp, SyncbaseService> {
         mName = name;
         mRxSyncbase = rxSb;
 
-        mObservable = rxSb.getRxClient().flatMap(this::mapFrom);
+        mObservable = rxSb.getRxClient().switchMap(this::mapFrom);
     }
 
     @Override
