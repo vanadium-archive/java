@@ -57,7 +57,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         mSyncbaseDb = mSyncbase.rxApp(app).rxDb(db);
         mSyncbaseTable = mSyncbaseDb.rxTable(t);
 
-        GlobalUserSyncgroup.forActivity(this).join();
+        joinInitialSyncGroup();
     }
 
     @Override
@@ -76,6 +76,10 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
 
     public String getSyncbaseTableName() {
         return "ui";
+    }
+
+    protected void joinInitialSyncGroup() {
+        GlobalUserSyncgroup.forActivity(this).join();
     }
 
     public void onSyncError(final Throwable t) {

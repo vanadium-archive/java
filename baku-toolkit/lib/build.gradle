@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.4.0'
+version = '0.4.1'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
