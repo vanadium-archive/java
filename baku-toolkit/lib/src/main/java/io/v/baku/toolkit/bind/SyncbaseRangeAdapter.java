@@ -134,7 +134,7 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
             return mViewAdapterContext == null ? mActivity : mViewAdapterContext;
         }
 
-        public Builder<T> bindTo(final ListView listView) {
+        public SyncbaseRangeAdapter<T> build() {
             if (mType == null) {
                 throw new IllegalStateException("Missing required type property");
             }
@@ -149,7 +149,11 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
 
             mAdapter = new SyncbaseRangeAdapter<>(watch, ordering, viewAdapter, mOnError);
             subscribe(mAdapter.getSubscription());
-            listView.setAdapter(mAdapter);
+            return mAdapter;
+        }
+
+        public Builder<T> bindTo(final ListView listView) {
+            listView.setAdapter(build());
             return this;
         }
 
@@ -261,20 +265,24 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
     }
 
     @Override
-    public T getItem(int position) {
+    public T getItem(final int position) {
         return mSorted.get(position).getValue();
+    }
+
+    public T getItem(final String rowName) {
+        return mRows.get(rowName);
     }
 
     /**
      * @return a dummy row ID for the item at the requested position.
      */
     @Override
-    public long getItemId(int position) {
+    public long getItemId(final int position) {
         return position;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, final ViewGroup parent) {
         final RxTable.Row<T> entry = mSorted.get(position);
         return mViewAdapter.getView(position, entry, convertView, parent);
     }
@@ -286,5 +294,9 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
     public int getRowIndex(final String rowName) {
         return Collections.binarySearch(mSorted, new RxTable.Row<>(rowName, mRows.get(rowName)),
                 mOrdering);
+    }
+
+    public boolean containsRow(final String rowName) {
+        return mRows.containsKey(rowName);
     }
 }

@@ -20,7 +20,8 @@ import rx.subjects.PublishSubject;
 
 @Accessors(prefix = "m")
 @Slf4j
-public class AccountManagerBlessingsFragment extends Fragment implements BlessingsProvider {
+public class AccountManagerBlessingsFragment extends Fragment
+        implements RefreshableBlessingsProvider {
     public static final String TAG = AccountManagerBlessingsFragment.class.getName();
 
     private static final int BLESSING_REQUEST = 0;

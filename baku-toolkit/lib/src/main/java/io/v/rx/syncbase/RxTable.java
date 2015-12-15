@@ -4,6 +4,7 @@
 
 package io.v.rx.syncbase;
 
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -287,18 +288,20 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
         return watch((db, s) -> subscribeWatch(s, db, prefix, keyFilter, type));
     }
 
-    @CheckReturnValue
+    @CheckResult @CheckReturnValue
     public <T> Observable<T> exec(final Func1<Table, ListenableFuture<T>> op) {
         return once()
                 .flatMap(t -> toObservable(op.call(t)))
                 .replay().autoConnect();
     }
 
+    @CheckResult @CheckReturnValue
     public <T> Observable<Void> put(final String key, final T value,
                                     final Class<T> type) {
         return exec(t -> t.put(mVContext, key, value, type));
     }
 
+    @CheckResult @CheckReturnValue
     @SuppressWarnings("unchecked")
     public <T> Observable<Void> put(final String key, @NonNull final T value) {
         return put(key, value, (Class<T>) value.getClass());
@@ -316,10 +319,12 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                 Observable.just(defaultValue) : Observable.error(t));
     }
 
+    @CheckResult @CheckReturnValue
     public Observable<Void> delete(final String key) {
         return exec(t -> t.delete(mVContext, key));
     }
 
+    @CheckResult @CheckReturnValue
     public Observable<Void> destroy() {
         return exec(t -> t.destroy(mVContext));
     }
