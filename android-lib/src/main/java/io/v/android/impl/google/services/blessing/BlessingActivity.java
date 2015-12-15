@@ -14,11 +14,13 @@ import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
@@ -42,10 +44,33 @@ import io.v.v23.vom.VomUtil;
  * <p>
  * The provided email address must be already present on the phone.
  */
-public class BlessingActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class BlessingActivity extends Activity
+        implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String TAG = "BlessingActivity";
     private static final int REQUEST_CODE_USER_APPROVAL = 1000;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1001;
+
+    /**
+     * Serialized {@link ECPublicKey} of the invoking activity.
+     */
+    public static final String EXTRA_PUBLIC_KEY = "PUBLIC_KEY";
+    /**
+     * If non-{@code null} and non-empty in the invoking intent, the activity will generate
+     * blessings based on the provided account, instead of prompting the user to choose
+     * an account.
+     */
+    public static final String EXTRA_GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
+    /**
+     * If non-{@code null} and non-empty in the invoking intent, this activity will store the
+     * generated blessings in its default {@link SharedPreferences}, under the provided key.
+     */
+    public static final String EXTRA_PREF_KEY = "PREF_KEY";
+    /**
+     * If {@link #EXTRA_PREF_KEY} option is used, any blessing errors will be stored in
+     * default {@link SharedPreferences} under key: {@code <PREF_ERROR_KEY_PREFIX><EXTRA_PREF_KEY>}
+     */
+    public static final String PREF_ERROR_KEY_PREFIX =
+            "io.v.android.impl.google.services.blessing.BlessingActivity.PREF_ERROR_KEY:";
 
     private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
     private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
@@ -54,6 +79,7 @@ public class BlessingActivity extends Activity implements ActivityCompat.OnReque
 
     private String mGoogleAccount = "";
     private ECPublicKey mPublicKey = null;
+    private String mPrefKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +92,18 @@ public class BlessingActivity extends Activity implements ActivityCompat.OnReque
             return;
         }
         // Get the public key of the application invoking this activity.
-        mPublicKey = (ECPublicKey) intent.getSerializableExtra(BlessingService.EXTRA_PUBLIC_KEY);
+        mPublicKey = (ECPublicKey) intent.getSerializableExtra(EXTRA_PUBLIC_KEY);
         if (mPublicKey == null) {
             replyWithError("Empty blesee public key.");
             return;
         }
+        // Get the preferences key where the blessings are to be stored.  If empty, blessings
+        // aren't stored in preferences.
+        if (intent.hasExtra(EXTRA_PREF_KEY)) {
+            mPrefKey = intent.getStringExtra(EXTRA_PREF_KEY);
+        }
         // Get the google email address (if any).
-        mGoogleAccount = intent.getStringExtra(BlessingService.EXTRA_GOOGLE_ACCOUNT);
+        mGoogleAccount = intent.getStringExtra(EXTRA_GOOGLE_ACCOUNT);
         if (mGoogleAccount == null || mGoogleAccount.isEmpty()) {
             // Prompt the user to choose the google account to use (if more than one).
             Intent accountIntent = AccountManager.newChooseAccountIntent(
@@ -124,9 +155,11 @@ public class BlessingActivity extends Activity implements ActivityCompat.OnReque
     }
 
     private void getBlessing() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
+        int permissionCheck = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.GET_ACCOUNTS);
         if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_CODE_USER_APPROVAL);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_CODE_USER_APPROVAL);
             return;
         }
         Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
@@ -239,16 +272,33 @@ public class BlessingActivity extends Activity implements ActivityCompat.OnReque
 
     private void replyWithError(String error) {
         Log.e(TAG, "Error while blessing: " + error);
+        // Prepare the return intent.
         Intent intent = new Intent();
         intent.putExtra(BlessingService.EXTRA_ERROR, error);
         setResult(RESULT_CANCELED, intent);
+        // Store the error in preferences, if the caller asked for it.
+        if (!mPrefKey.isEmpty()) {
+            SharedPreferences.Editor editor =
+                    PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putString(PREF_ERROR_KEY_PREFIX + mPrefKey, error);
+            editor.commit();
+        }
         finish();
     }
 
     private void replyWithSuccess(byte[] blessingVom) {
+        // Prepare the return intent.
         Intent intent = new Intent();
         intent.putExtra(BlessingService.EXTRA_REPLY, blessingVom);
         setResult(RESULT_OK, intent);
+        // Store the result in preferences, if the caller asked for it.
+        if (!mPrefKey.isEmpty()) {
+            String hexBlessingsVom = VomUtil.bytesToHexString(blessingVom);
+            SharedPreferences.Editor editor =
+                    PreferenceManager.getDefaultSharedPreferences(this).edit();
+            editor.putString(mPrefKey, hexBlessingsVom);
+            editor.commit();
+        }
         finish();
     }
 }
