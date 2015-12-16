@@ -11,12 +11,23 @@ import java8.util.function.Function;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TransformingViewAdapter<T, U> extends AbstractViewAdapter<T> {
-    private final ViewAdapter<U> mBase;
+public class TransformingViewAdapter<T, U, VH extends ViewHolder>
+        extends AbstractViewAdapter<T, VH> {
+    private final ViewAdapter<U, VH> mBase;
     private final Function<T, U> mFn;
 
     @Override
-    public View getView(int position, T value, View convertView, ViewGroup parent) {
-        return mBase.getView(position, mFn.apply(value), convertView, parent);
+    public View createView(final ViewGroup parent) {
+        return mBase.createView(parent);
+    }
+
+    @Override
+    public VH createViewHolder(final View view) {
+        return mBase.createViewHolder(view);
+    }
+
+    @Override
+    public void bindViewHolder(final VH viewHolder, final int position, final T value) {
+        mBase.bindViewHolder(viewHolder, position, mFn.apply(value));
     }
 }

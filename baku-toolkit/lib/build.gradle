@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.4.1'
+version = '0.5.0'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -42,6 +42,7 @@ dependencies {
             /* If the application wishes to use support libraries, it should include them as compile
             dependencies in its own build.gradle. */
             'com.android.support:appcompat-v7:23.0.1',
+            'com.android.support:recyclerview-v7:23.0.1',
             /*
             https://projectlombok.org/setup/android.html
             Follow Android Studio instructions at the bottom of the page to install the Lombok

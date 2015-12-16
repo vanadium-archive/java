@@ -37,7 +37,7 @@ public class SyncbaseRangeAdapterTest extends VAndroidTestCase {
                 mTable.put("Good morning", "starshine")));
 
         final ListView listView = new ListView(getContext());
-        try (final SyncbaseRangeAdapter<String> adapter = SyncbaseRangeAdapter.builder()
+        try (final SyncbaseListAdapter<String> adapter = SyncbaseRangeAdapter.builder()
                 .onError(t -> fail(Throwables.getStackTraceAsString(t)))
                 .viewAdapterContext(getContext())
                 .rxTable(mTable)
@@ -49,15 +49,15 @@ public class SyncbaseRangeAdapterTest extends VAndroidTestCase {
             pause();
 
             assertEquals(2, listView.getCount());
-            assertEquals("Goodnight", adapter.getRowName(0));
+            assertEquals("Goodnight", adapter.getRowAt(0).getRowName());
             assertEquals("moon", adapter.getItem(0));
-            assertEquals("Good morning", adapter.getRowName(1));
+            assertEquals("Good morning", adapter.getRowAt(1).getRowName());
             assertEquals("starshine", adapter.getItem(1));
 
             start(mTable.put("Goodbye", "Mr. Bond"));
             pause();
 
-            assertEquals("Goodbye", adapter.getRowName(0));
+            assertEquals("Goodbye", adapter.getRowAt(0).getRowName());
             assertEquals("Mr. Bond", adapter.getItem(0));
 
             start(mTable.delete("Good morning"));

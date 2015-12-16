@@ -22,6 +22,6 @@ public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     String getSyncbaseTableName();
     void onSyncError(Throwable t);
     <U> SyncbaseBinding.Builder<U> binder();
-    <U> SyncbaseRangeAdapter.Builder<U> collectionBinder();
+    <U> SyncbaseRangeAdapter.Builder<U, ?> collectionBinder();
     void close();
 }

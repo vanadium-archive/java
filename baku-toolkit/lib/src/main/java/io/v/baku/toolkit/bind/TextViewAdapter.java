@@ -14,12 +14,40 @@ import android.widget.TextView;
 
 import java.util.Objects;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
-public class TextViewAdapter<T> extends AbstractViewAdapter<T> {
+public class TextViewAdapter<T> extends AbstractViewAdapter<T, TextViewAdapter.ViewHolder> {
+    @Accessors(prefix = "m")
+    @Getter
+    @RequiredArgsConstructor
+    public static class ViewHolder implements io.v.baku.toolkit.bind.ViewHolder {
+        private final View mView;
+        private final TextView mTextView;
+
+        public ViewHolder(final View itemView, @IdRes final int textFieldId) {
+            mView = itemView;
+            try {
+                mTextView = (TextView) itemView.findViewById(textFieldId);
+            } catch (final ClassCastException e) {
+                throw new IllegalArgumentException(
+                        "TextViewAdapter.ViewHolder requires the resource ID to be a TextView", e);
+            }
+        }
+
+        public ViewHolder(final TextView view) {
+            mView = mTextView = view;
+        }
+
+        public void setText(final CharSequence text) {
+            mTextView.setText(text);
+        }
+    }
+
     private final LayoutInflater mInflater;
     @LayoutRes
     private final int mResource;
@@ -39,31 +67,28 @@ public class TextViewAdapter<T> extends AbstractViewAdapter<T> {
         this(LayoutInflater.from(context), resource, textViewResourceId);
     }
 
-    /**
-     * This is a reimplementation of
-     * {@link android.widget.ArrayAdapter#getView(int, View, ViewGroup)}
-     */
     @Override
-    public View getView(final int position, final T value,
-                        View view, final ViewGroup parent) {
-        if (view == null) {
-            view = mInflater.inflate(mResource, parent, false);
-        }
-        final TextView text;
-        try {
-            if (mFieldId == 0) {
-                text = (TextView) view;
-            } else {
-                text = (TextView) view.findViewById(mFieldId);
+    public View createView(final ViewGroup parent) {
+        return mInflater.inflate(mResource, parent, false);
+    }
+
+    @Override
+    public ViewHolder createViewHolder(final View view) {
+        if (mFieldId == 0) {
+            try {
+                return new ViewHolder((TextView) view);
+            } catch (final ClassCastException e) {
+                throw new IllegalStateException("TextViewAdapter requires the resource ID to be " +
+                        "a TextView or a nonzero field ID for a text view within the resource");
             }
-        } catch (final ClassCastException e) {
-            throw new IllegalStateException(
-                    "TextViewAdapter requires the resource ID to be a TextView", e);
+        } else {
+            return new ViewHolder(view, mFieldId);
         }
+    }
 
-        text.setText(format(position, value));
-
-        return view;
+    @Override
+    public void bindViewHolder(final ViewHolder viewHolder, final int position, final T value) {
+        viewHolder.setText(format(position, value));
     }
 
     /**

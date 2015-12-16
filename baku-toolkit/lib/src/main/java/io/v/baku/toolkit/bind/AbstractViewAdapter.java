@@ -5,10 +5,17 @@
 package io.v.baku.toolkit.bind;
 
 
+import android.view.View;
+
 import java8.util.function.Function;
 
-public abstract class AbstractViewAdapter<T> implements  ViewAdapter<T> {
-    public <U> AbstractViewAdapter<U> map(final Function<U, T> fn) {
+public abstract class AbstractViewAdapter<T, VH extends ViewHolder> implements ViewAdapter<T, VH> {
+    public <U> AbstractViewAdapter<U, VH> map(final Function<U, T> fn) {
         return new TransformingViewAdapter<>(this, fn);
+    }
+
+    @Override
+    public void bindView(final View view, final int position, final T value) {
+        bindViewHolder(createViewHolder(view), position, value);
     }
 }

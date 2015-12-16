@@ -5,14 +5,14 @@
 package io.v.baku.toolkit.bind;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.google.common.collect.Ordering;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 @Accessors(prefix = "m")
-public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseable {
+public class SyncbaseRangeAdapter<T> implements RangeAdapter {
     private static final String ERR_INCONSISTENT = "Sorted data are inconsistent with map data";
 
     /**
@@ -43,23 +43,24 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
      * values. Otherwise, the default is natural ordering on row names.
      */
     @Accessors(prefix = "m")
-    public static class Builder<T> extends BaseBuilder<Builder<T>> {
+    public static class Builder<T, A extends RangeAdapter>
+            extends BaseBuilder<Builder<T, ? extends RangeAdapter>> {
         private PrefixRange mPrefix = RowRange.prefix("");
         private Class<T> mType;
         private Ordering<? super RxTable.Row<T>> mOrdering;
         private Func1<String, Boolean> mKeyFilter;
-        private ViewAdapter<? super RxTable.Row<T>> mViewAdapter;
+        private ViewAdapter<? super RxTable.Row<T>, ?> mViewAdapter;
         private Context mViewAdapterContext;
 
         @Getter
-        private SyncbaseRangeAdapter<T> mAdapter;
+        private A mAdapter;
 
-        public Builder<T> prefix(final PrefixRange prefix) {
+        public Builder<T, A> prefix(final PrefixRange prefix) {
             mPrefix = prefix;
             return this;
         }
 
-        public Builder<T> prefix(final String prefix) {
+        public Builder<T, A> prefix(final String prefix) {
             return prefix(RowRange.prefix(prefix));
         }
 
@@ -67,19 +68,20 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
          * This setter is minimally typesafe; after setting the {@code type}, clients should
          * probably also update {@code ordering} and {@code viewAdapter}.
          */
-        public <U> Builder<U> type(final Class<U> type) {
+        public <U> Builder<U, SyncbaseRangeAdapter<U>> type(final Class<U> type) {
             @SuppressWarnings("unchecked")
-            final Builder<U> casted = (Builder<U>) this;
+            final Builder<U, SyncbaseRangeAdapter<U>> casted =
+                    (Builder<U, SyncbaseRangeAdapter<U>>) this;
             casted.mType = type;
             return casted;
         }
 
-        public Builder<T> ordering(final Ordering<? super RxTable.Row<? extends T>> ordering) {
+        public Builder<T, A> ordering(final Ordering<? super RxTable.Row<? extends T>> ordering) {
             mOrdering = ordering;
             return this;
         }
 
-        public Builder<T> valueOrdering(final Ordering<? super T> ordering) {
+        public Builder<T, A> valueOrdering(final Ordering<? super T> ordering) {
             return ordering(ordering.onResultOf(RxTable.Row::getValue));
         }
 
@@ -95,25 +97,25 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
             }
         }
 
-        public Builder<T> keyFilter(final Func1<String, Boolean> keyFilter) {
+        public Builder<T, A> keyFilter(final Func1<String, Boolean> keyFilter) {
             mKeyFilter = keyFilter;
             return this;
         }
 
-        public Builder<T> viewAdapter(final ViewAdapter<? super RxTable.Row<T>> viewAdapter) {
+        public Builder<T, A> viewAdapter(final ViewAdapter<? super RxTable.Row<T>, ?> viewAdapter) {
             mViewAdapter = viewAdapter;
             return this;
         }
 
-        public <U> Builder<T> textViewAdapter(final Function<RxTable.Row<T>, U> fn) {
+        public <U> Builder<T, A> textViewAdapter(final Function<RxTable.Row<T>, U> fn) {
             return viewAdapter(getDefaultViewAdapter(fn));
         }
 
-        public Builder<T> valueAdapter(final ViewAdapter<T> viewAdapter) {
+        public Builder<T, A> valueAdapter(final ViewAdapter<T, ?> viewAdapter) {
             return viewAdapter(new TransformingViewAdapter<>(viewAdapter, RxTable.Row::getValue));
         }
 
-        private <U> ViewAdapter<? super RxTable.Row<T>> getDefaultViewAdapter(
+        private <U> ViewAdapter<? super RxTable.Row<T>, ?> getDefaultViewAdapter(
                 final Function<RxTable.Row<T>, U> fn) {
             return new TextViewAdapter<U>(getDefaultViewAdapterContext()).map(fn);
         }
@@ -121,11 +123,11 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
         /**
          * The default view adapter stringizes values.
          */
-        private ViewAdapter<? super RxTable.Row<T>> getDefaultViewAdapter() {
+        private ViewAdapter<? super RxTable.Row<T>, ?> getDefaultViewAdapter() {
             return getDefaultViewAdapter(RxTable.Row::getValue);
         }
 
-        public Builder<T> viewAdapterContext(final Context context) {
+        public Builder<T, A> viewAdapterContext(final Context context) {
             mViewAdapterContext = context;
             return this;
         }
@@ -134,58 +136,83 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
             return mViewAdapterContext == null ? mActivity : mViewAdapterContext;
         }
 
-        public SyncbaseRangeAdapter<T> build() {
+        public Observable<RangeWatchBatch<T>> buildWatch() {
             if (mType == null) {
                 throw new IllegalStateException("Missing required type property");
             }
-
-            final Ordering<? super RxTable.Row<T>> ordering = mOrdering == null ?
-                    getDefaultOrdering() : mOrdering;
-            final ViewAdapter<? super RxTable.Row<T>> viewAdapter = mViewAdapter == null ?
-                    getDefaultViewAdapter() : mViewAdapter;
-
-            final Observable<RangeWatchBatch<T>> watch =
-                    mRxTable.watch(mPrefix, mKeyFilter, mType);
-
-            mAdapter = new SyncbaseRangeAdapter<>(watch, ordering, viewAdapter, mOnError);
-            subscribe(mAdapter.getSubscription());
-            return mAdapter;
+            return mRxTable.watch(mPrefix, mKeyFilter, mType);
         }
 
-        public Builder<T> bindTo(final ListView listView) {
-            listView.setAdapter(build());
-            return this;
+        private Ordering<? super RxTable.Row<T>> getOrdering() {
+            return mOrdering == null ? getDefaultOrdering() : mOrdering;
+        }
+
+        private ViewAdapter<? super RxTable.Row<T>, ?> getViewAdapter() {
+            return mViewAdapter == null ? getDefaultViewAdapter() : mViewAdapter;
+        }
+
+        private <U extends RangeAdapter> U subscribeAdapter(final U adapter) {
+            subscribe(adapter.getSubscription());
+            mAdapter = null;
+            return adapter;
+        }
+
+        public SyncbaseListAdapter<T> buildListAdapter() {
+            return subscribeAdapter(new SyncbaseListAdapter<>(
+                    buildWatch(), getOrdering(), getViewAdapter(), mOnError));
+        }
+
+        public SyncbaseRecyclerAdapter<T, ?> buildRecyclerAdapter() {
+            return subscribeAdapter(new SyncbaseRecyclerAdapter<>(
+                    buildWatch(), getOrdering(), getViewAdapter(), mOnError));
+        }
+
+        public Builder<T, SyncbaseListAdapter<T>> bindTo(final ListView listView) {
+            @SuppressWarnings("unchecked")
+            final Builder<T, SyncbaseListAdapter<T>> casted =
+                    (Builder<T, SyncbaseListAdapter<T>>) this;
+            casted.mAdapter = buildListAdapter();
+            listView.setAdapter(casted.mAdapter);
+            return casted;
+        }
+
+        public Builder<T, SyncbaseRecyclerAdapter<T, ?>> bindTo(final RecyclerView recyclerView) {
+            @SuppressWarnings("unchecked")
+            final Builder<T, SyncbaseRecyclerAdapter<T, ?>> casted =
+                    (Builder<T, SyncbaseRecyclerAdapter<T, ?>>) this;
+            casted.mAdapter = buildRecyclerAdapter();
+            recyclerView.setAdapter(casted.mAdapter);
+            return casted;
         }
 
         @Override
-        public Builder<T> bindTo(final View view) {
+        public Builder<T, ?> bindTo(final View view) {
             if (view instanceof ListView) {
                 return bindTo((ListView) view);
+            } else if (view instanceof RecyclerView) {
+                return bindTo((RecyclerView) view);
             } else {
                 throw new IllegalArgumentException("No default binding for view " + view);
             }
         }
     }
 
-    public static <T> Builder<T> builder() {
+    public static <T, A extends RangeAdapter> Builder<T, A> builder() {
         return new Builder<>();
     }
 
     private final Map<String, T> mRows = new HashMap<>();
     private List<RxTable.Row<T>> mSorted = new ArrayList<>();
     private final Ordering<? super RxTable.Row<T>> mOrdering;
-    private final ViewAdapter<? super RxTable.Row<T>> mViewAdapter;
     private final Action1<Throwable> mOnError;
     @Getter
     private final Subscription mSubscription;
 
     public SyncbaseRangeAdapter(final Observable<RangeWatchBatch<T>> watch,
                                 final Ordering<? super RxTable.Row<T>> ordering,
-                                final ViewAdapter<? super RxTable.Row<T>> viewAdapter,
                                 final Action1<Throwable> onError) {
         // ensure deterministic ordering by always applying secondary order on row name
         mOrdering = ordering.compound(Ordering.natural().onResultOf(RxTable.Row::getRowName));
-        mViewAdapter = viewAdapter;
         mOnError = onError;
 
         mSubscription = subscribeTo(watch);
@@ -200,19 +227,7 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
         return watch
                 .concatMap(RangeWatchBatch::collectChanges)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(events -> {
-                            // TODO(rosswang): more efficient updates for larger batches
-                            for (final RangeWatchEvent<T> e : events) {
-                                if (e.getChangeType() == ChangeType.DELETE_CHANGE) {
-                                    removeOne(e.getRow());
-                                } else {
-                                    updateOne(e.getRow());
-                                }
-                            }
-                            notifyDataSetChanged();
-                        },
-                        mOnError
-                );
+                .subscribe(this::processEvents, mOnError);
     }
 
     private int findRowForEdit(final String rowName, final T oldValue) {
@@ -225,7 +240,18 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
         }
     }
 
-    private void removeOne(final RxTable.Row<T> entry) {
+    protected void processEvents(final Collection<RangeWatchEvent<T>> events) {
+        // TODO(rosswang): more efficient updates for larger batches
+        for (final RangeWatchEvent<T> e : events) {
+            if (e.getChangeType() == ChangeType.DELETE_CHANGE) {
+                removeOne(e.getRow());
+            } else {
+                updateOne(e.getRow());
+            }
+        }
+    }
+
+    protected void removeOne(final RxTable.Row<T> entry) {
         final T old = mRows.remove(entry.getRowName());
         if (old != null) {
             mSorted.remove(findRowForEdit(entry.getRowName(), old));
@@ -237,7 +263,7 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
         return bs < 0 ? ~bs : bs;
     }
 
-    private void updateOne(final RxTable.Row<T> entry) {
+    protected void updateOne(final RxTable.Row<T> entry) {
         final T old = mRows.put(entry.getRowName(), entry.getValue());
         if (old == null) {
             mSorted.add(insertionIndex(entry), entry);
@@ -259,36 +285,16 @@ public class SyncbaseRangeAdapter<T> extends BaseAdapter implements AutoCloseabl
         }
     }
 
-    @Override
     public int getCount() {
         return mRows.size();
     }
 
-    @Override
-    public T getItem(final int position) {
-        return mSorted.get(position).getValue();
+    public RxTable.Row<T> getRowAt(final int position) {
+        return mSorted.get(position);
     }
 
-    public T getItem(final String rowName) {
+    public T getValue(final String rowName) {
         return mRows.get(rowName);
-    }
-
-    /**
-     * @return a dummy row ID for the item at the requested position.
-     */
-    @Override
-    public long getItemId(final int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
-        final RxTable.Row<T> entry = mSorted.get(position);
-        return mViewAdapter.getView(position, entry, convertView, parent);
-    }
-
-    public String getRowName(final int position) {
-        return mSorted.get(position).getRowName();
     }
 
     public int getRowIndex(final String rowName) {

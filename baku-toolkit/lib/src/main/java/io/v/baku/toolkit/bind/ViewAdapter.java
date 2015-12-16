@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import java8.lang.FunctionalInterface;
 
 @FunctionalInterface
-public interface ViewAdapter<T> {
-    View getView(int position, T value, View convertView, ViewGroup parent);
+public interface ViewAdapter<T, VH extends ViewHolder> {
+    View createView(ViewGroup parent);
+    VH createViewHolder(View view);
+    void bindViewHolder(VH viewHolder, int position, T value);
+    void bindView(View view, int position, T value);
 }
