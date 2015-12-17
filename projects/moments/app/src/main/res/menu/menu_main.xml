@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".DiscoveryActivity">
+    <item
+        android:id="@+id/action_scan"
+        android:orderInCategory="101"
+        android:textOff="Off"
+        android:textOn="On"
+        android:title="@string/app_name"
+        app:actionViewClass="android.support.v7.widget.SwitchCompat"
+        app:showAsAction="always"
+        app:showText="true"/>
+</menu>

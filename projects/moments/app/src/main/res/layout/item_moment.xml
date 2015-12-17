@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal"
+              android:paddingBottom="@dimen/padding_bottom"
+              android:paddingTop="@dimen/padding_top"
+    >
+
+    <ImageView
+        android:id="@+id/moment_image"
+        android:layout_width="@dimen/moment_image_width"
+        android:layout_height="@dimen/moment_image_width"
+        android:paddingLeft="@dimen/padding_fat"
+        android:scaleType="centerCrop"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="fill_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical"
+                  android:paddingBottom="@dimen/padding_bottom"
+                  android:paddingLeft="@dimen/padding_left"
+                  android:paddingTop="@dimen/no_padding"
+        >
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/advertise_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/padding_top"
+            android:paddingBottom="@dimen/padding_bottom"
+            android:showAsAction="always"
+            />
+
+        <TextView
+            android:id="@+id/moment_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+
+        <TextView
+            android:id="@+id/moment_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Moments</string>
+    <string name="photo_dir_name">momentsharing</string>
+    <string name="photo_file_prefix">momento_</string>
+    <string name="need_permissions">Must have permissions to store and share photos.</string>
+    <string name="title_activity_show_photo">ShowPhotoActivity</string>
+</resources>
