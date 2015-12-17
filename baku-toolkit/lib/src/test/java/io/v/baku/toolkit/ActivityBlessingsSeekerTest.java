@@ -11,10 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import io.v.android.libs.security.BlessingsManager;
 import io.v.baku.toolkit.blessings.ActivityBlessingsSeeker;
+import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.v23.security.Blessings;
 import rx.functions.Action1;
 
@@ -26,7 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Blessings.class, BlessingsManager.class})
+@SuppressStaticInitializationFor("io.v.baku.toolkit.blessings.BlessingsUtils")
+@PrepareForTest({Blessings.class, BlessingsUtils.class})
 public class ActivityBlessingsSeekerTest {
     private static class MockActivityBlessingsSeeker extends ActivityBlessingsSeeker {
         public MockActivityBlessingsSeeker(final Activity activity) {
@@ -40,7 +42,7 @@ public class ActivityBlessingsSeekerTest {
 
     @Before
     public void setUp() {
-        mockStatic(BlessingsManager.class);
+        mockStatic(BlessingsUtils.class);
     }
 
     @Test
@@ -62,7 +64,7 @@ public class ActivityBlessingsSeekerTest {
                 b1 = PowerMockito.mock(Blessings.class),
                 b2 = PowerMockito.mock(Blessings.class);
 
-        PowerMockito.when(BlessingsManager.getBlessings(any())).thenReturn(b1, b2);
+        PowerMockito.when(BlessingsUtils.readSharedPrefs(any())).thenReturn(b1, b2);
 
         final MockActivityBlessingsSeeker t = new MockActivityBlessingsSeeker(activity);
         t.getPassiveRxBlessings().subscribe(cold);

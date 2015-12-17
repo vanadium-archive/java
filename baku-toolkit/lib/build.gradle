@@ -70,7 +70,7 @@ dependencies {
             'io.reactivex:rxandroid:1.0.1',
             'io.reactivex:rxjava:1.0.16',
             'io.reactivex:rxjava-async-util:0.21.0',
-            'io.v:vanadium-android:0.8',
+            'io.v:vanadium-android:0.9',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
             'net.sourceforge.streamsupport:streamsupport:1.3.2'
     )

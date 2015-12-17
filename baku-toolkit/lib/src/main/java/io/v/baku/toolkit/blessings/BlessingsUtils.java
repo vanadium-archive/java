@@ -4,10 +4,14 @@
 
 package io.v.baku.toolkit.blessings;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.JsonReader;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -55,7 +59,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @UtilityClass
 public class BlessingsUtils {
-    public static final String GLOBAL_BLESSING_ROOT_URL = "https://dev.v.io/auth/blessing-root";
+    public static final String
+            PREF_BLESSINGS = "VanadiumBlessings",
+            GLOBAL_BLESSING_ROOT_URL = "https://dev.v.io/auth/blessing-root";
     public static final Pattern DEV_V_IO_USER = Pattern.compile("dev\\.v\\.io:u:([^:]+).*");
 
     public static final AccessList OPEN_ACL = new AccessList(
@@ -77,8 +83,34 @@ public class BlessingsUtils {
         return decodeBlessings(BlessingService.extractBlessingReply(resultCode, data));
     }
 
+    public static void writeSharedPrefs(final Context context, final Blessings blessings)
+            throws VException {
+        writeSharedPrefs(PreferenceManager.getDefaultSharedPreferences(context), PREF_BLESSINGS,
+                blessings);
+    }
+
+    public static void writeSharedPrefs(final SharedPreferences prefs, final String key,
+                                        final Blessings blessings) throws VException {
+        prefs.edit().putString(key, VomUtil.encodeToString(blessings, Blessings.class)).apply();
+    }
+
+    public static Blessings readSharedPrefs(final Context context) throws VException {
+        return readSharedPrefs(PreferenceManager.getDefaultSharedPreferences(context),
+                PREF_BLESSINGS);
+    }
+
+    public static Blessings readSharedPrefs(final SharedPreferences prefs, final String key)
+            throws VException {
+        final String blessingsVom = prefs.getString(key, "");
+        return Strings.isNullOrEmpty(blessingsVom) ? null : decodeBlessings(blessingsVom);
+    }
+
+    public static Blessings decodeBlessings(final String blessings) throws VException {
+        return (Blessings) VomUtil.decodeFromString(blessings, Blessings.class);
+    }
+
     public static Blessings decodeBlessings(final byte[] blessings) throws VException {
-        return (Blessings)VomUtil.decode(blessings, Blessings.class);
+        return (Blessings) VomUtil.decode(blessings, Blessings.class);
     }
 
     public static Set<String> getBlessingNames(final VContext ctx, final Blessings blessings) {
@@ -141,10 +173,10 @@ public class BlessingsUtils {
     /**
      * Standard blessing handling for Vanadium applications:
      * <ul>
-     *     <li>Provide the given blessings when anybody connects to us.</li>
-     *     <li>Provide these blessings when we connect to other services (for example, when we talk
-     *     to the mounttable).</li>
-     *     <li>Trust these blessings and all the "parent" blessings.</li>
+     * <li>Provide the given blessings when anybody connects to us.</li>
+     * <li>Provide these blessings when we connect to other services (for example, when we talk
+     * to the mounttable).</li>
+     * <li>Trust these blessings and all the "parent" blessings.</li>
      * </ul>
      */
     public static void assumeBlessings(final VContext vContext, final Blessings blessings)

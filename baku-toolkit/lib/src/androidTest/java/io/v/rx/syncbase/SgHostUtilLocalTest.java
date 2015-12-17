@@ -26,12 +26,7 @@ public class SgHostUtilLocalTest extends VAndroidTestCase {
     private Namespace mNamespace;
     private Server mMountTable;
 
-    private interface Ignore {
-        // Known failure in io.v:vanadium-android:0.8
-        void testEnsureSgHost();
-    }
-
-    @Delegate(excludes = Ignore.class)
+    @Delegate
     private SgHostUtilTestCases mTestCases;
 
     @Override
