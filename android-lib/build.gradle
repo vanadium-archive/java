@@ -178,7 +178,7 @@ clean {
 
 task sourceJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier "source"
+    classifier "sources"
 }
 
 // Adds XML nodes representing fields required for publication to Maven central to the given node.
