@@ -13,8 +13,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
+import io.v.v23.InputChannels;
 import io.v.v23.V;
-import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -28,7 +28,6 @@ import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.vdl.VdlAny;
-import io.v.v23.vdl.VdlList;
 import io.v.v23.verror.VException;
 
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class SyncbaseBenchmark {
     public void benchmarkImageFetchingByQuery(int reps) throws VException {
         for (int i = 0; i < reps; i++) {
             DatabaseCore.QueryResults stream = sync(database.exec(baseContext, "select v from someTable"));
-            for (List<VdlAny> result : stream) {
+            for (List<VdlAny> result : InputChannels.asIterable(stream)) {
                 byte[] fetchedBytes = (byte[]) result.get(0).getElem();
                 if (!Arrays.equals(fetchedBytes, imageBytes)) {
                     throw new IllegalStateException("fetched bytes do not match");
