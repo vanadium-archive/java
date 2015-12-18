@@ -8,9 +8,10 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.robotninjas.concurrent.FluentFutures;
 
 import javax.annotation.CheckReturnValue;
 
@@ -226,20 +227,10 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                 .switchMap(batch -> {
                     final Observable<I> initial = getInitial.call(batch);
 
-                    return toObservable(batch.getResumeMarker(mVContext))
-                            .map(r -> new InitialArtifacts<>(initial.doOnTerminate(() ->
-                                    Futures.addCallback(batch.abort(mVContext),
-                                            new FutureCallback<Void>() {
-                                                @Override
-                                                public void onSuccess(final @Nullable Void result) {
-                                                }
-
-                                                @Override
-                                                public void onFailure(final Throwable t) {
-                                                    log.warn("Unable to abort watch initial read " +
-                                                            "query", t);
-                                                }
-                                            })), r));
+                    return toObservable(batch.getResumeMarker(mVContext)).map(r ->
+                            new InitialArtifacts<>(initial.doOnTerminate(() -> FluentFutures.from(
+                                    batch.abort(mVContext)).onFailure(t -> log.warn(
+                                    "Unable to abort watch initial read query", t))), r));
                 })
                 .switchMap(i -> {
                     final CancelableVContext cancelable = mVContext.withCancel();

@@ -75,7 +75,8 @@ dependencies {
             'io.reactivex:rxjava-async-util:0.21.0',
             'io.v:vanadium-android:0.9',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
-            'net.sourceforge.streamsupport:streamsupport:1.3.2'
+            'net.sourceforge.streamsupport:streamsupport:1.3.2',
+            'org.robotninjas:fluent-futures:1.0'
     )
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
