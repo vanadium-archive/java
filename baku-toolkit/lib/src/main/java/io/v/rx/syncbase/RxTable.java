@@ -264,11 +264,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     private <T> Observable<T> watch(final Action2<Database, Subscriber<? super T>> subscribeWatch) {
         return Observable.<T>create(s -> mRxDb.getObservable()
                 //onComplete is connected by subscribeWatch/observeWatchStream.subscribe
-                .subscribe(db -> subscribeWatch.call(db, s), s::onError))
-                // Don't create new watch streams for subsequent subscribers, but do cancel the
-                // stream if no subscribers are listening (and restart if new subscriptions happen).
-                .replay(1)
-                .refCount();
+                .subscribe(db -> subscribeWatch.call(db, s), s::onError));
     }
 
     /**
@@ -276,7 +272,12 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
      */
     public <T> Observable<SingleWatchEvent<T>> watch(final String key, final Class<T> type,
                                                      final T defaultValue) {
-        return watch((db, s) -> subscribeWatch(s, db, key, type, defaultValue));
+        return this.<SingleWatchEvent<T>>watch((db, s) ->
+                subscribeWatch(s, db, key, type, defaultValue))
+                // Don't create new watch streams for subsequent subscribers, but do cancel the
+                // stream if no subscribers are listening (and restart if new subscriptions happen).
+                .replay(1)
+                .refCount();
     }
 
     /**
@@ -288,20 +289,23 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
         return watch((db, s) -> subscribeWatch(s, db, prefix, keyFilter, type));
     }
 
-    @CheckResult @CheckReturnValue
+    @CheckResult
+    @CheckReturnValue
     public <T> Observable<T> exec(final Func1<Table, ListenableFuture<T>> op) {
         return once()
                 .flatMap(t -> toObservable(op.call(t)))
                 .replay().autoConnect();
     }
 
-    @CheckResult @CheckReturnValue
+    @CheckResult
+    @CheckReturnValue
     public <T> Observable<Void> put(final String key, final T value,
                                     final Class<T> type) {
         return exec(t -> t.put(mVContext, key, value, type));
     }
 
-    @CheckResult @CheckReturnValue
+    @CheckResult
+    @CheckReturnValue
     @SuppressWarnings("unchecked")
     public <T> Observable<Void> put(final String key, @NonNull final T value) {
         return put(key, value, (Class<T>) value.getClass());
@@ -319,12 +323,14 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                 Observable.just(defaultValue) : Observable.error(t));
     }
 
-    @CheckResult @CheckReturnValue
+    @CheckResult
+    @CheckReturnValue
     public Observable<Void> delete(final String key) {
         return exec(t -> t.delete(mVContext, key));
     }
 
-    @CheckResult @CheckReturnValue
+    @CheckResult
+    @CheckReturnValue
     public Observable<Void> destroy() {
         return exec(t -> t.destroy(mVContext));
     }
