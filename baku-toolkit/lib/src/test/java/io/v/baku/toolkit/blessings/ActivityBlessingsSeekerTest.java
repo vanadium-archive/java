@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.baku.toolkit;
+package io.v.baku.toolkit.blessings;
 
 import android.app.Activity;
 
@@ -14,8 +14,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import io.v.baku.toolkit.blessings.ActivityBlessingsSeeker;
-import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.v23.security.Blessings;
 import rx.functions.Action1;
 

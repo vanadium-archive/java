@@ -56,7 +56,10 @@ dependencies {
 
     testCompile(
             'org.mockito:mockito-core:1.10.19',
+            'org.powermock:powermock-classloading-xstream:1.6.3',
             'org.powermock:powermock-module-junit4:1.6.3',
+            'org.powermock:powermock-module-junit4-rule:1.6.3',
+            'org.robolectric:robolectric:3.0',
             'org.slf4j:slf4j-simple:1.7.12'
     )
 

@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.subjects.ReplaySubject;
 
 @Accessors(prefix = "m")
 @Slf4j
@@ -34,7 +34,7 @@ public class AccountManagerBlessingsFragment extends Fragment
 
     @Delegate(types = RefreshableBlessingsProvider.class, excludes = BlessingsProvider.class)
     private ActivityBlessingsSeeker mSeeker;
-    private PublishSubject<ActivityBlessingsSeeker> mSeekers = PublishSubject.create();
+    private ReplaySubject<ActivityBlessingsSeeker> mSeekers = ReplaySubject.createWithSize(1);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
