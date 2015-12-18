@@ -8,6 +8,7 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -53,7 +54,7 @@ import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservabl
 public class RxTable extends RxEntity<Table, DatabaseCore> {
     @AllArgsConstructor
     private static class InitialArtifacts<T> {
-        public final T initial;
+        public final Observable<T> initial;
         public final ResumeMarker resumeMarker;
     }
 
@@ -85,14 +86,14 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                 .map(x -> t);
     }
 
-    private <T> ListenableFuture<T> getInitial(
+    private <T> Observable<T> getInitial(
             final BatchDatabase db, final String tableName, final String key, final Class<T> type,
             final T defaultValue) {
         @SuppressWarnings("unchecked")
         final ListenableFuture<T> fromGet = (ListenableFuture<T>) db.getTable(tableName).get(
                 mVContext, key, type);
-        return Futures.withFallback(fromGet, t -> t instanceof NoExistException ?
-                Futures.immediateFuture(defaultValue) : Futures.immediateFailedFuture(t));
+        return toObservable(Futures.withFallback(fromGet, t -> t instanceof NoExistException ?
+                Futures.immediateFuture(defaultValue) : Futures.immediateFailedFuture(t)));
     }
 
     @SuppressWarnings("unchecked")
@@ -101,7 +102,6 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
             @Nullable final Func1<String, Boolean> keyFilter, final Class<T> type) {
         Observable<KeyValue> untyped = RxInputChannel.wrap(
                 db.getTable(tableName).scan(mVContext, keys)).autoConnect();
-
         if (keyFilter != null) {
             untyped = untyped.filter(kv -> keyFilter.call(kv.getKey()));
         }
@@ -182,7 +182,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
 
         return Observable.create(subscriber -> {
                     final RangeWatchBatchWindower<T> windower =
-                            new RangeWatchBatchWindower<T>(subscriber);
+                            new RangeWatchBatchWindower<>(subscriber);
 
                     subscriber.add(raw.subscribe(c -> {
                                 if (prefixFilter == null || prefixFilter.call(c.getRowName())) {
@@ -215,7 +215,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
 
     private <T, I, C> void subscribeWatch(
             final Subscriber<T> subscriber, final Database db,
-            final String prefix, final Func1<BatchDatabase, ListenableFuture<I>> getInitial,
+            final String prefix, final Func1<BatchDatabase, Observable<I>> getInitial,
             final Func1<InputChannel<WatchChange>, Observable<C>> observeWatchStream,
             final Func2<InitialArtifacts<I>, Observable<C>, Observable<? extends T>> mergeInitial) {
         // Watch will not work properly unless the table exists (sync will not create the table),
@@ -223,13 +223,24 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
         // https://github.com/vanadium/issues/issues/857
         mapFrom(db)
                 .switchMap(t -> toObservable(db.beginBatch(mVContext, new BatchOptions("", true))))
-                .switchMap(batch -> Observable.<I, ResumeMarker, InitialArtifacts<I>>combineLatest(
-                        toObservable(getInitial.call(batch)),
-                        toObservable(batch.getResumeMarker(mVContext)),
-                        InitialArtifacts::new)
-                        .doOnTerminate(() -> toObservable(batch.abort(mVContext))
-                                .subscribe(v -> {
-                                }, t -> log.warn("Unable to abort watch initial read query", t))))
+                .switchMap(batch -> {
+                    final Observable<I> initial = getInitial.call(batch);
+
+                    return toObservable(batch.getResumeMarker(mVContext))
+                            .map(r -> new InitialArtifacts<>(initial.doOnTerminate(() ->
+                                    Futures.addCallback(batch.abort(mVContext),
+                                            new FutureCallback<Void>() {
+                                                @Override
+                                                public void onSuccess(final @Nullable Void result) {
+                                                }
+
+                                                @Override
+                                                public void onFailure(final Throwable t) {
+                                                    log.warn("Unable to abort watch initial read " +
+                                                            "query", t);
+                                                }
+                                            })), r));
+                })
                 .switchMap(i -> {
                     final CancelableVContext cancelable = mVContext.withCancel();
                     cancelContextOnDisconnect(subscriber, cancelable, prefix);
@@ -245,7 +256,8 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
         subscribeWatch(subscriber, db, key,
                 b -> getInitial(b, mName, key, type, defaultValue),
                 s -> observeWatchStream(s, key, defaultValue),
-                (i, s) -> s.startWith(new SingleWatchEvent<>(i.initial, i.resumeMarker, false)));
+                (i, s) -> s.startWith(i.initial.map(iv ->
+                        new SingleWatchEvent<>(iv, i.resumeMarker, false))));
     }
 
     private <T> void subscribeWatch(
@@ -253,7 +265,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
             final PrefixRange prefix, @Nullable final Func1<String, Boolean> keyFilter,
             final Class<T> type) {
         subscribeWatch(subscriber, db, prefix.getPrefix(),
-                b -> Futures.immediateFuture(getInitial(b, mName, prefix, keyFilter, type)),
+                b -> getInitial(b, mName, prefix, keyFilter, type),
                 s -> RxTable.observeWatchStream(s, keyFilter, type),
                 (i, s) -> s.startWith(new RangeWatchBatch<>(i.resumeMarker, i.initial.map(r ->
                         new RangeWatchEvent<>(r, ChangeType.PUT_CHANGE, false)))));

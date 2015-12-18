@@ -113,4 +113,21 @@ public class RxSyncbaseTest extends VAndroidTestCase {
         final Iterator<? extends Map<String, String>> w2 = wrapWatch(watch);
         assertEquals(ImmutableMap.of("Good morning", "America"), w2.next());
     }
+
+    public void testManyInitialRangeWatch() {
+        final int count = 50;
+        final Observable<?>[] puts = new Observable[count];
+        final ImmutableMap.Builder<String, String> expected = ImmutableMap.builder();
+        for (int i = 0; i < count; i++) {
+            final String si = Integer.toString(i);
+            puts[i] = mTable.put(si, si);
+            expected.put(si, si);
+        }
+        await(parallel(puts));
+
+        final Observable<RangeWatchBatch<String>> watch =
+                mTable.watch(RowRange.prefix(""), null, String.class);
+        final Iterator<? extends Map<String, String>> w = wrapWatch(watch);
+        assertEquals(expected.build(), w.next());
+    }
 }
