@@ -8,16 +8,16 @@ import android.app.Activity;
 
 import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.bind.SyncbaseRangeAdapter;
-import io.v.rx.syncbase.RxDb;
-import io.v.rx.syncbase.RxSyncbase;
-import io.v.rx.syncbase.RxTable;
+import io.v.baku.toolkit.syncbase.BakuDb;
+import io.v.baku.toolkit.syncbase.BakuSyncbase;
+import io.v.baku.toolkit.syncbase.BakuTable;
 import rx.subscriptions.CompositeSubscription;
 
 public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     VAndroidContextTrait<T> getVAndroidContextTrait();
-    RxSyncbase getSyncbase();
-    RxDb getSyncbaseDb();
-    RxTable getSyncbaseTable();
+    BakuSyncbase getSyncbase();
+    BakuDb getSyncbaseDb();
+    BakuTable getSyncbaseTable();
     CompositeSubscription getSubscriptions();
     String getSyncbaseTableName();
     void onSyncError(Throwable t);

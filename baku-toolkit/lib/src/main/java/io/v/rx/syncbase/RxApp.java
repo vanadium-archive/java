@@ -30,6 +30,13 @@ public class RxApp extends RxEntity<SyncbaseApp, SyncbaseService> {
         mObservable = rxSb.getRxClient().switchMap(this::mapFrom);
     }
 
+    protected RxApp(final RxApp other) {
+        mVContext = other.mVContext;
+        mName = other.mName;
+        mRxSyncbase = other.mRxSyncbase;
+        mObservable = other.mObservable;
+    }
+
     @Override
     public Observable<SyncbaseApp> mapFrom(final SyncbaseService sb) {
         final SyncbaseApp app = sb.getApp(mName);
