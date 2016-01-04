@@ -84,6 +84,15 @@ public class ListenSpec {
     }
 
     /**
+     * Same as {@link #ListenSpec(Address[],String,AddressChooser)}, only with a
+     * single listening {@link Address} that will be created using the given {@code protocol}
+     * and {@code address}.
+     */
+    public ListenSpec(String protocol, String address) {
+        this(new Address[]{ new Address(protocol, address)}, "", null);
+    }
+
+    /**
      * Returns a new copy of this {@link ListenSpec} with the {@link AddressChooser} replaced with
      * the given address chooser.
      */

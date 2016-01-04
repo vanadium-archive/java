@@ -26,6 +26,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 
 import java.io.IOException;
@@ -47,8 +48,18 @@ import io.v.v23.vom.VomUtil;
 public class BlessingActivity extends Activity
         implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String TAG = "BlessingActivity";
+
     private static final int REQUEST_CODE_USER_APPROVAL = 1000;
     private static final int REQUEST_CODE_PICK_ACCOUNT = 1001;
+
+    private static final String STATE_GOOGLE_ACCOUNT = "STATE_GOOGLE_ACCOUNT";
+    private static final String STATE_PUBLIC_KEY = "STATE_PUBLIC_KEY";
+    private static final String STATE_PREF_KEY = "STATE_PREF_KEY";
+
+    private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
+    private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
+
+    private static final int BASE64_FLAGS = Base64.URL_SAFE | Base64.NO_WRAP;
 
     /**
      * Serialized {@link ECPublicKey} of the invoking activity.
@@ -60,22 +71,24 @@ public class BlessingActivity extends Activity
      * an account.
      */
     public static final String EXTRA_GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
+
     /**
      * If non-{@code null} and non-empty in the invoking intent, this activity will store the
-     * generated blessings in its default {@link SharedPreferences}, under the provided key.
+     * generated blessings in default {@link SharedPreferences} under this key.
      */
     public static final String EXTRA_PREF_KEY = "PREF_KEY";
+
     /**
-     * If {@link #EXTRA_PREF_KEY} option is used, any blessing errors will be stored in
-     * default {@link SharedPreferences} under key: {@code <PREF_ERROR_KEY_PREFIX><EXTRA_PREF_KEY>}
+     * If successful, VOM-encoded blessings will be stored (in byte array format) in the returned
+     * intent under the given key.
      */
-    public static final String PREF_ERROR_KEY_PREFIX =
-            "io.v.android.impl.google.services.blessing.BlessingActivity.PREF_ERROR_KEY:";
+    public static final String EXTRA_REPLY = "REPLY";
 
-    private static final String OAUTH_PROFILE = "https://www.googleapis.com/auth/userinfo.email";
-    private static final String OAUTH_SCOPE = "oauth2:" + OAUTH_PROFILE;
-
-    private static final int BASE64_FLAGS = Base64.URL_SAFE | Base64.NO_WRAP;
+    /**
+     * If an error is encountered, the error string will be stored in the returned intent
+     * under the given key.
+     */
+    public static final String EXTRA_ERROR = "ERROR";
 
     private String mGoogleAccount = "";
     private ECPublicKey mPublicKey = null;
@@ -84,7 +97,14 @@ public class BlessingActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setFinishOnTouchOutside(false);
         V.init(this);
+        if (savedInstanceState != null) {
+            mGoogleAccount = savedInstanceState.getString(STATE_GOOGLE_ACCOUNT);
+            mPublicKey = (ECPublicKey) savedInstanceState.getSerializable(STATE_PUBLIC_KEY);
+            mPrefKey = savedInstanceState.getString(STATE_PREF_KEY);
+            return;
+        }
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -97,7 +117,7 @@ public class BlessingActivity extends Activity
             replyWithError("Empty blesee public key.");
             return;
         }
-        // Get the preferences key where the blessings are to be stored.  If empty, blessings
+        // Get the SharedPreferences key where the blessings are to be stored.  If empty, blessings
         // aren't stored in preferences.
         if (intent.hasExtra(EXTRA_PREF_KEY)) {
             mPrefKey = intent.getStringExtra(EXTRA_PREF_KEY);
@@ -112,6 +132,14 @@ public class BlessingActivity extends Activity
             return;
         }
         getBlessing();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString(STATE_GOOGLE_ACCOUNT, mGoogleAccount);
+        savedInstanceState.putSerializable(STATE_PUBLIC_KEY, mPublicKey);
+        savedInstanceState.putString(STATE_PREF_KEY, mPrefKey);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -262,7 +290,7 @@ public class BlessingActivity extends Activity
         @Override
         protected void onPostExecute(byte[] blessingVom) {
             progressDialog.dismiss();
-            if (blessingVom == null) {  // Indicates an error
+            if (blessingVom == null || blessingVom.length == 0) {
                 replyWithError("Couldn't get identity from Vanadium identity servers: " + errorMsg);
                 return;
             }
@@ -270,35 +298,33 @@ public class BlessingActivity extends Activity
         }
     }
 
+    private void updatePrefs(String key, String value) {
+        SharedPreferences.Editor editor =
+                PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
     private void replyWithError(String error) {
+        Preconditions.checkArgument(error != null && !error.isEmpty());
         Log.e(TAG, "Error while blessing: " + error);
-        // Prepare the return intent.
         Intent intent = new Intent();
         intent.putExtra(BlessingService.EXTRA_ERROR, error);
         setResult(RESULT_CANCELED, intent);
-        // Store the error in preferences, if the caller asked for it.
-        if (!mPrefKey.isEmpty()) {
-            SharedPreferences.Editor editor =
-                    PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putString(PREF_ERROR_KEY_PREFIX + mPrefKey, error);
-            editor.commit();
-        }
         finish();
     }
 
     private void replyWithSuccess(byte[] blessingVom) {
+        Preconditions.checkArgument(blessingVom != null && blessingVom.length > 0);
+        // Store the result in preferences, if the caller asked for it.
+        if (!mPrefKey.isEmpty()) {
+            String hexBlessingsVom = VomUtil.bytesToHexString(blessingVom);
+            updatePrefs(mPrefKey, hexBlessingsVom);
+        }
         // Prepare the return intent.
         Intent intent = new Intent();
         intent.putExtra(BlessingService.EXTRA_REPLY, blessingVom);
         setResult(RESULT_OK, intent);
-        // Store the result in preferences, if the caller asked for it.
-        if (!mPrefKey.isEmpty()) {
-            String hexBlessingsVom = VomUtil.bytesToHexString(blessingVom);
-            SharedPreferences.Editor editor =
-                    PreferenceManager.getDefaultSharedPreferences(this).edit();
-            editor.putString(mPrefKey, hexBlessingsVom);
-            editor.commit();
-        }
         finish();
     }
 }

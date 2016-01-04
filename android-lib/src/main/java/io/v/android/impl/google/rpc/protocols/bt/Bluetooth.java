@@ -198,6 +198,7 @@ class Bluetooth {
         private final BluetoothSocket socket;
         private final String localAddress;
         private final String remoteAddress;
+        private final byte[] buf = new byte[8096];
 
         Connection(BluetoothSocket socket, String localAddress, String remoteAddress) {
             this.socket = socket;
@@ -205,8 +206,7 @@ class Bluetooth {
             this.remoteAddress = remoteAddress;
         }
 
-        byte[] read(int n) throws IOException {
-            byte[] buf = new byte[n];
+        synchronized byte[] read() throws IOException {
             int num = socket.getInputStream().read(buf);
             return num == buf.length ? buf : Arrays.copyOf(buf, num);
         }

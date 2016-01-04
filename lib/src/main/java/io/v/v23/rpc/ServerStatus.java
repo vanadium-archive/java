@@ -51,14 +51,14 @@ public class ServerStatus {
      * Returns the current state of the server.
      */
     public ServerState getState() {
-        return this.state;
+        return state;
     }
 
     /**
      * Returns true iff this server serves a mount table.
      */
     public boolean servesMountTable() {
-        return this.servesMountTable;
+        return servesMountTable;
     }
 
     /**
@@ -66,7 +66,7 @@ public class ServerStatus {
      * server address being published by this server.
      */
     public MountStatus[] getMounts() {
-        return Arrays.copyOf(this.mounts, this.mounts.length);
+        return Arrays.copyOf(mounts, mounts.length);
     }
 
     /**
@@ -83,24 +83,25 @@ public class ServerStatus {
 
     /**
      * Returns the map of errors encountered when listening on the network. The returned
-     * map is keyed by the {@link Addresses addresses} in the {@link ListenSpec}.
+     * map is keyed by {@link Address addresses} in the {@link ListenSpec}.
      */
     public Map<Address,VException> getListenErrors() {
-       return new HashMap<Address, VException>(this.lnErrors);
+       return new HashMap<>(lnErrors);
     }
 
     /**
      * Returns the map of errors encountered when listening on the network. The returned
-     * map is keyed by the Addresses in the ListenSpec.
+     * map is keyed by {@link Address addresses} in the ListenSpec.
      */
     public Map<String,VException> getProxyErrors() {
-       return new HashMap<String, VException>(this.proxyErrors);
+       return new HashMap<>(proxyErrors);
     }
 
     @Override
     public String toString() {
-        return String.format("State: %s, MountTable: %s, Mounts: %s, Endpoints: %s, ListenErrors: %s, ProxyErrors: %s",
-            this.state, this.servesMountTable, Arrays.toString(this.mounts),
-            Arrays.toString(this.endpoints), this.lnErrors.toString());
+        return String.format("State: %s, MountTable: %s, Mounts: %s, Endpoints: %s," +
+                        " ListenErrors: %s, ProxyErrors: %s",
+            state, servesMountTable, Arrays.toString(mounts),
+            Arrays.toString(endpoints), lnErrors.toString(), proxyErrors.toString());
     }
 }
