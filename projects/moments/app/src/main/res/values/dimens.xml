@@ -1,0 +1,18 @@
+<resources>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="moment_image_width">98dp</dimen>
+
+    <dimen name="text_weight">10dp</dimen>
+    <dimen name="padding_left">20dp</dimen>
+    <dimen name="padding_right">10dp</dimen>
+    <dimen name="padding_fat">56dp</dimen>
+    <dimen name="padding_top">10dp</dimen>
+    <dimen name="padding_bottom">10dp</dimen>
+    <dimen name="no_padding">0dp</dimen>
+
+</resources>
