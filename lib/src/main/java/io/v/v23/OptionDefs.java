@@ -29,13 +29,6 @@ public class OptionDefs {
             "io.v.v23.SKIP_SERVER_ENDPOINT_AUTHORIZATION";
 
     /**
-     * A key for an option of type {@link java.util.concurrent.Executor} that specifies
-     * a thread executor for invoking server methods asynchronously.  If not specified, a
-     * {@link java.util.concurrent.Executors#newCachedThreadPool default} executor will be used.
-     */
-    public static final String SERVER_THREAD_EXECUTOR = "io.v.v23.THREAD_EXECUTOR";
-
-    /**
      * A key for an option of type {@link String} that specifies the directory that should be
      * used for storing the log files.  If not present, logs will be written into the system's
      * temporary directory.

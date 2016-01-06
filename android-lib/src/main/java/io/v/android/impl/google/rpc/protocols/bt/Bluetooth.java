@@ -22,7 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
 
+import io.v.v23.V;
+import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
 
 /**
@@ -35,7 +39,7 @@ class Bluetooth {
     private static final List<Integer> BLUETOOTH_PORTS = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 
-    static Listener listen(String btAddr) throws VException {
+    static Listener listen(VContext ctx, String btAddr) throws VException {
         String macAddr = getMACAddress(btAddr);
         int port = getPortNumber(btAddr);
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -51,11 +55,16 @@ class Bluetooth {
         } else {  // listen on a specific port only
             ports = ImmutableList.of(port);
         }
+        Executor executor = V.getExecutor(ctx);
+        if (executor == null) {
+            throw new VException("NULL executor in context: did you derive this context from " +
+                    "the context returned by V.init()?");
+        }
         VException lastError = null;
         for (int portNum : ports) {
             try {
                 BluetoothServerSocket socket = listenOnPort(portNum);
-                return new Listener(socket, String.format("%s/%d", macAddr, portNum));
+                return new Listener(executor, socket, String.format("%s/%d", macAddr, portNum));
             } catch (VException e) {
                 // OK, try the next one
                 lastError = e;
@@ -64,47 +73,65 @@ class Bluetooth {
         throw lastError;
     }
 
-    static Connection dial(String btAddr, Duration timeout) throws VException {
-        String macAddr = getMACAddress(btAddr);
-        int port = getPortNumber(btAddr);
-        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddr);
-        try {
-            // Create a socket to the remote device.
-            // NOTE(spetrovic): Android's public methods currently only allow connection to a
-            // UUID, which goes through SDP.  Since we already have a remote port number, we
-            // connect to it directly.
-            Method m = device.getClass().getMethod("createInsecureRfcommSocket",
-                    new Class[]{int.class});
-            final BluetoothSocket socket = (BluetoothSocket) m.invoke(device, port);
-            // Connect.
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        System.err.println("Couldn't close BluetoothSocket.");
-                    }
-                }
-            }, timeout.getMillis());
-            try {
-                socket.connect();
-            } catch (IOException e) {
-                throw new VException("Couldn't connect: " + e.getMessage());
-            } finally {
-                timer.cancel();
-            }
-            // There is no way currently to retrieve the local port number for the connection,
-            // but that's probably OK.
-            String localAddr = String.format("%s/%d",
-                    BluetoothAdapter.getDefaultAdapter().getAddress(), 0);
-            String remoteAddr = String.format("%s/%d", macAddr, port);
-            return new Connection(socket, localAddr, remoteAddr);
-        } catch (Exception e) {
-            throw new VException("Couldn't invoke createInsecureRfcommSocket: "
-                    + e.getMessage());
+    static void dial(VContext ctx, String btAddr, final Duration timeout,
+                     final Callback<Stream> callback) throws VException {
+        final String macAddr = getMACAddress(btAddr);
+        final int port = getPortNumber(btAddr);
+        final Executor executor = V.getExecutor(ctx);
+        if (executor == null) {
+            throw new VException("NULL executor in context: did you derive this context from " +
+                    "the context returned by V.init()?");
         }
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final BluetoothDevice device =
+                        BluetoothAdapter.getDefaultAdapter().getRemoteDevice(macAddr);
+                try {
+                    // Create a socket to the remote device.
+                    // NOTE(spetrovic): Android's public methods currently only allow connection to
+                    // a UUID, which goes through SDP.  Since we already have a remote port number,
+                    // we connect to it directly, invoking a hidden method using reflection.
+                    Method m = device.getClass().getMethod("createInsecureRfcommSocket",
+                            new Class[]{int.class});
+                    final BluetoothSocket socket = (BluetoothSocket) m.invoke(device, port);
+                    // Connect.
+                    Timer timer = null;
+                    if (timeout.getMillis() != 0) {
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                try {
+                                    socket.close();
+                                } catch (IOException e) {
+                                    System.err.println("Couldn't close BluetoothSocket.");
+                                }
+                            }
+                        }, timeout.getMillis());
+                    }
+                    try {
+                        socket.connect();
+                    } catch (IOException e) {
+                        callback.onFailure(new VException("Couldn't connect: " + e.getMessage()));
+                    } finally {
+                        if (timer != null) {
+                            timer.cancel();
+                        }
+                    }
+                    // There is no way currently to retrieve the local port number for the
+                    // connection, but that's probably OK.
+                    String localAddr = String.format("%s/%d",
+                            BluetoothAdapter.getDefaultAdapter().getAddress(), 0);
+                    String remoteAddr = String.format("%s/%d", macAddr, port);
+                    callback.onSuccess(new Stream(executor, socket, localAddr, remoteAddr));
+                } catch (Exception e) {
+                    callback.onFailure(new VException("Couldn't invoke createInsecureRfcommSocket: "
+                            + e.getMessage()));
+                }
+
+            }
+        });
     }
 
     private static BluetoothServerSocket listenOnPort(int port) throws VException {
@@ -169,20 +196,33 @@ class Bluetooth {
     }
 
     static class Listener {
+        private final Executor executor;
         private final BluetoothServerSocket serverSocket;
         private final String localAddress;
 
-        Listener(BluetoothServerSocket serverSocket, String address) {
+        Listener(Executor executor, BluetoothServerSocket serverSocket, String address) {
+            this.executor = executor;
             this.serverSocket = serverSocket;
             this.localAddress = address;
         }
 
-        Connection accept() throws IOException {
-            BluetoothSocket socket = serverSocket.accept();
-            // There is no way currently to retrieve the remote end's channel number, but that's
-            // probably OK.
-            String remoteAddress = String.format("%s/%d", socket.getRemoteDevice().getAddress(), 0);
-            return new Connection(socket, localAddress, remoteAddress);
+        void accept(final Callback<Stream> callback) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        BluetoothSocket socket = serverSocket.accept();
+                        // There is no way currently to retrieve the remote end's channel number,
+                        // but that's probably OK.
+                        String remoteAddress =
+                                String.format("%s/%d", socket.getRemoteDevice().getAddress(), 0);
+                        callback.onSuccess(new Stream(
+                                executor, socket, localAddress, remoteAddress));
+                    } catch (IOException e) {
+                        callback.onFailure(new VException(e.getMessage()));
+                    }
+                }
+            });
         }
 
         void close() throws IOException {
@@ -194,25 +234,48 @@ class Bluetooth {
         }
     }
 
-    static class Connection {
+    static class Stream {
+        private final Executor executor;
         private final BluetoothSocket socket;
         private final String localAddress;
         private final String remoteAddress;
         private final byte[] buf = new byte[8096];
 
-        Connection(BluetoothSocket socket, String localAddress, String remoteAddress) {
+        Stream(Executor executor, BluetoothSocket socket, String localAddress,
+               String remoteAddress) {
+            this.executor = executor;
             this.socket = socket;
             this.localAddress = localAddress;
             this.remoteAddress = remoteAddress;
         }
 
-        synchronized byte[] read() throws IOException {
-            int num = socket.getInputStream().read(buf);
-            return num == buf.length ? buf : Arrays.copyOf(buf, num);
+        void read(final int n, final Callback<byte[]> callback) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        byte[] buf = new byte[n];
+                        int num = socket.getInputStream().read(buf);
+                        callback.onSuccess(num == buf.length ? buf : Arrays.copyOf(buf, num));
+                    } catch (IOException e) {
+                        callback.onFailure(new VException(e.getMessage()));
+                    }
+                }
+            });
         }
 
-        synchronized void write(byte[] data) throws IOException {
-            socket.getOutputStream().write(data);
+        void write(final byte[] data, final Callback<Void> callback) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        socket.getOutputStream().write(data);
+                        callback.onSuccess(null);
+                    } catch (IOException e) {
+                        callback.onFailure(new VException(e.getMessage()));
+                    }
+                }
+            });
         }
 
         void close() throws IOException {

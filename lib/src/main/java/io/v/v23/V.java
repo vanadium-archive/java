@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.context.VContext;
@@ -172,7 +173,7 @@ public class V {
      * If this option isn't provided, the default runtime implementation is used, which supports
      * the following options:
      * <p><ul>
-     *     <li>{@link OptionDefs#SERVER_THREAD_EXECUTOR}</li>
+     *     <li>(CURRENTLY NO OPTIONS ARE MANDATED)</li>
      * </ul></p>
      *
      * @param  opts options
@@ -446,19 +447,19 @@ public class V {
     }
 
     /**
-     * Attaches the given {@code ListenSpec} to a new context (which is derived from the given
+     * Attaches the given {@link ListenSpec} to a new context (which is derived from the given
      * context).
      *
      * @param ctx        current context
-     * @param spec       the {@code ListenSpec} to attach
-     * @return           child context to which the {@code ListenSpec} is attached.
+     * @param spec       the {@link ListenSpec} to attach
+     * @return           child context to which the {@link ListenSpec} is attached.
      */
     public static VContext withListenSpec(VContext ctx, ListenSpec spec) throws VException {
         return getRuntime().withListenSpec(ctx, spec);
     }
 
     /**
-     * Returns the {@code ListenSpec} attached to the given context, or {@code null} if no spec
+     * Returns the {@link ListenSpec} attached to the given context, or {@code null} if no spec
      * is attached.
      * <p>
      * If the passed-in context is derived from the context returned by {@link #init}, the returned
@@ -469,7 +470,7 @@ public class V {
     }
 
     /**
-     * Returns the {@code VDiscovery} attached to the given context, or {@code null} if no discovery
+     * Returns the {@link VDiscovery} attached to the given context, or {@code null} if no discovery
      * instance is attached.
      * <p>
      * If the passed-in context is derived from the context returned by {@link #init}, the returned
@@ -479,6 +480,16 @@ public class V {
         return getRuntime().getDiscovery(ctx);
     }
 
+    /**
+     * Returns the {@link Executor} attached to the given context, or {@code null} if no
+     * {@link Executor} is attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * instance will never be {@code null}.
+     */
+    public static Executor getExecutor(VContext ctx) {
+        return getRuntime().getExecutor(ctx);
+    }
     private static VRuntime getRuntime() {
         if (runtime == null) {
             throw new RuntimeException("Vanadium runtime is null: did you call V.init()?");

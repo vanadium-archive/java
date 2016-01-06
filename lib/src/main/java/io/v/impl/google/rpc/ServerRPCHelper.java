@@ -4,6 +4,7 @@
 
 package io.v.impl.google.rpc;
 
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Dispatcher;
@@ -22,8 +23,7 @@ import java.util.concurrent.Executor;
  * ServerRPCHelper provides a set of helper functions for RPC handling on the server side.
  */
 class ServerRPCHelper {
-    private static native long nativeGoInvoker(Object serviceObject, Executor executor)
-            throws VException;
+    private static native long nativeGoInvoker(Object serviceObject) throws VException;
     private static native long nativeGoAuthorizer(Object authorizer) throws VException;
 
     // Helper function for getting tags from the provided invoker.
@@ -38,7 +38,7 @@ class ServerRPCHelper {
 
     // Helper function for invoking a method on the provided invoker.
     static void invoke(final Invoker invoker, final VContext ctx, final StreamServerCall call,
-            final String method, byte[][] vomArgs, final Callback callback, Executor executor) throws VException {
+            final String method, byte[][] vomArgs, final Callback callback) throws VException {
         Type[] argTypes = invoker.getArgumentTypes(method);
         if (argTypes.length != vomArgs.length) {
             throw new VException(String.format(
@@ -48,10 +48,14 @@ class ServerRPCHelper {
         for (int i = 0; i < argTypes.length; ++i) {
             args[i] = VomUtil.decode(vomArgs[i], argTypes[i]);
         }
-
         // We need to return control to the Go thread immediately, otherwise if the invoked method
-        // blocks, it will block the Go thread which will prevent any goroutine from getting
-        // scheduled on it.
+        // blocks, it will block the Go thread which will prevent any go-routine from getting
+        // scheduled on it.  So, we invoke the server method on an executor.
+        Executor executor = V.getExecutor(ctx);
+        if (executor == null) {
+            throw new VException("NULL executor in context: did you derive this context from " +
+                    "the context returned by V.init()?");
+        }
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -80,7 +84,7 @@ class ServerRPCHelper {
     //    (2) an array containing:
     //        - pointer to the appropriate Go invoker,
     //        - pointer to the appropriate Go authorizer.
-    static long[] lookup(Dispatcher d, String suffix, Executor executor) throws VException {
+    static long[] lookup(Dispatcher d, String suffix) throws VException {
         ServiceObjectWithAuthorizer result = d.lookup(suffix);
         if (result == null) {  // object not handled
             return null;
@@ -90,7 +94,7 @@ class ServerRPCHelper {
             throw new VException("Null service object returned by Java's dispatcher");
         }
         Authorizer auth = result.getAuthorizer();
-        return new long[] { nativeGoInvoker(obj, executor), auth == null ? 0 : nativeGoAuthorizer(auth) };
+        return new long[] { nativeGoInvoker(obj), auth == null ? 0 : nativeGoAuthorizer(auth) };
     }
 
     private ServerRPCHelper() {}

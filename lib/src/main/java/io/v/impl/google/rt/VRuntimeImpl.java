@@ -38,7 +38,6 @@ public class VRuntimeImpl implements VRuntime {
     private static native Client nativeGetClient(VContext ctx) throws VException;
     private static native VContext nativeWithNewServer(VContext ctx, String name,
                                                        Dispatcher dispatcher,
-                                                       Executor executor,
                                                        Duration lameDuckTimeout) throws VException;
     private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
@@ -62,19 +61,15 @@ public class VRuntimeImpl implements VRuntime {
      * Returns a new runtime instance.
      */
     public static VRuntimeImpl create(Options opts) throws VException {
-        Executor executor = executorFromOptions(opts);
-        if (executor == null) {
-            executor = Executors.newCachedThreadPool();
-        }
-        return new VRuntimeImpl(nativeInit(), executor);
+        VContext ctx = nativeInit();
+        ctx = ctx.withValue(new ExecutorKey(), Executors.newCachedThreadPool());
+        return new VRuntimeImpl(ctx);
     }
 
     private final VContext ctx;  // non-null
-    private final Executor executor;  // non-null
 
-    private VRuntimeImpl(VContext ctx, Executor executor) {
+    private VRuntimeImpl(VContext ctx) {
         this.ctx = ctx;
-        this.executor = executor;
     }
     @Override
     public VContext withNewClient(VContext ctx, Options opts) throws VException {
@@ -91,11 +86,7 @@ public class VRuntimeImpl implements VRuntime {
     @Override
     public VContext withNewServer(VContext ctx, String name, Dispatcher disp, Options opts)
             throws VException {
-        Executor executor = executorFromOptions(opts);
-        if (executor == null) {
-            executor = this.executor;
-        }
-        return nativeWithNewServer(ctx, name, disp, executor, lameDuckTimeoutFromOptions(opts));
+        return nativeWithNewServer(ctx, name, disp, lameDuckTimeoutFromOptions(opts));
     }
     @Override
     public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
@@ -156,6 +147,10 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
+    public Executor getExecutor(VContext ctx) {
+        return (Executor) ctx.value(new ExecutorKey());
+    }
+    @Override
     public VContext getContext() {
         return this.ctx;
     }
@@ -185,25 +180,18 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
 
-    private static Executor executorFromOptions(Options opts) {
-        if (!opts.has(OptionDefs.SERVER_THREAD_EXECUTOR)) {
-            return null;
+    private static class ExecutorKey {
+        @Override
+        public int hashCode() {
+            return 0;
         }
-        Object executorOpt = opts.get(OptionDefs.SERVER_THREAD_EXECUTOR);
-        if (!(executorOpt instanceof Executor)) {
-            throw new RuntimeException("SERVER_THREAD_EXECUTOR option, if specified, must " +
-                    "contain an object of type java.util.concurrent.Executor.");
-        }
-        return (Executor) executorOpt;
     }
 
     private static Duration lameDuckTimeoutFromOptions(Options opts) {
         if (!opts.has(OptionDefs.SERVER_LAME_DUCK_TIMEOUT)) {
             return Duration.standardSeconds(5);
         }
-
         Object timeout = opts.get(OptionDefs.SERVER_LAME_DUCK_TIMEOUT);
-
         if (!(timeout instanceof Duration)) {
             throw new RuntimeException("SERVER_LAME_DUCK_TIMEOUT option if specified must " +
                         "contain an object of type org.joda.time.Duration");
