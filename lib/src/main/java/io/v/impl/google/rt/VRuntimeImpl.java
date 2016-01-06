@@ -4,6 +4,8 @@
 
 package io.v.impl.google.rt;
 
+import org.joda.time.Duration;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -36,7 +38,8 @@ public class VRuntimeImpl implements VRuntime {
     private static native Client nativeGetClient(VContext ctx) throws VException;
     private static native VContext nativeWithNewServer(VContext ctx, String name,
                                                        Dispatcher dispatcher,
-                                                       Executor executor) throws VException;
+                                                       Executor executor,
+                                                       Duration lameDuckTimeout) throws VException;
     private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
@@ -92,7 +95,7 @@ public class VRuntimeImpl implements VRuntime {
         if (executor == null) {
             executor = this.executor;
         }
-        return nativeWithNewServer(ctx, name, disp, executor);
+        return nativeWithNewServer(ctx, name, disp, executor, lameDuckTimeoutFromOptions(opts));
     }
     @Override
     public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
@@ -192,5 +195,19 @@ public class VRuntimeImpl implements VRuntime {
                     "contain an object of type java.util.concurrent.Executor.");
         }
         return (Executor) executorOpt;
+    }
+
+    private static Duration lameDuckTimeoutFromOptions(Options opts) {
+        if (!opts.has(OptionDefs.SERVER_LAME_DUCK_TIMEOUT)) {
+            return Duration.standardSeconds(5);
+        }
+
+        Object timeout = opts.get(OptionDefs.SERVER_LAME_DUCK_TIMEOUT);
+
+        if (!(timeout instanceof Duration)) {
+            throw new RuntimeException("SERVER_LAME_DUCK_TIMEOUT option if specified must " +
+                        "contain an object of type org.joda.time.Duration");
+        }
+        return (Duration) timeout;
     }
 }

@@ -64,4 +64,10 @@ public class OptionDefs {
      * </pre></blockquote><p>
      */
     public static final String LOG_VMODULE = "io.v.v23.LOG_VMODULE";
+
+    /**
+     * A key for the option of type {@link org.joda.time.Duration} that specifies the time to
+     * wait for outstanding server operations to complete when shutting down a server.
+     */
+    public static final String SERVER_LAME_DUCK_TIMEOUT = "io.v.v23.SERVER_LAME_DUCK_TIMEOUT";
 }
