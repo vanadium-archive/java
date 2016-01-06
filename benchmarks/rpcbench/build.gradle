@@ -1,0 +1,46 @@
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.v:gradle-plugin:1.3'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'io.v.vdl'
+
+mainClassName = 'io.v.rpcbench.RpcBenchmark'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+dependencies {
+    compile 'com.google.guava:guava:18'
+    compile project(':lib')
+    compile 'com.google.caliper:caliper:1.0-beta-2'
+}
+
+task copyLib(type: Copy) {
+    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
+    destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
+}
+
+tasks.'processResources'.dependsOn(copyLib)
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
+
+clean {
+    delete 'src/main/resources/libv23.so'
+}
+
+vdl {
+    inputPaths += ['src/main/java']
+}
