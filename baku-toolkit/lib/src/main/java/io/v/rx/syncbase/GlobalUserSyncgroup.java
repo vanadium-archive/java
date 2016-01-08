@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action2;
+import rx.subscriptions.CompositeSubscription;
 
 import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
@@ -169,7 +170,7 @@ public class GlobalUserSyncgroup {
                         createOrJoinSyncgroup(db, sgName, spec)), mount));
     }
 
-    public Subscription join() {
+    public Observable<?> rxJoin() {
         return Observable.switchOnNext(mRxBlessings
                 .map(b -> {
                     final AccessList acl = BlessingsUtils.blessingsToAcl(mVContext, b);
@@ -183,8 +184,15 @@ public class GlobalUserSyncgroup {
                                 "username; no username blessings found. Blessings: " + b);
                     }
                     return Observable.merge(createOrJoins);
-                }))
-                .subscribe(x -> {
-                }, t -> mOnError.call(R.string.err_syncgroup_join, t));
+                }));
+    }
+
+    /**
+     * It is not generally necessary to unsubscribe explicitly from this subscription since the
+     * lifecycle of the Syncbase client is generally tied to  Baku Activity.
+     */
+    public Subscription join() {
+        return rxJoin().subscribe(x -> {
+        }, t -> mOnError.call(R.string.err_syncgroup_join, t));
     }
 }

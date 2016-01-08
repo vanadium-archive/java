@@ -17,8 +17,12 @@ import lombok.RequiredArgsConstructor;
 public class UserAppSyncHost implements SyncHostLevel {
     private final String mAppName, mSgHostSuffix, mRendezvousSuffix;
 
+    public UserAppSyncHost(final String appName) {
+        this(appName, DEFAULT_SG_HOST_SUFFIX, DEFAULT_RENDEZVOUS_SUFFIX);
+    }
+
     public UserAppSyncHost(final Context androidContext) {
-        this(androidContext.getPackageName(), DEFAULT_SG_HOST_SUFFIX, DEFAULT_RENDEZVOUS_SUFFIX);
+        this(androidContext.getPackageName());
     }
 
     @Override
