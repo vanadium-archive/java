@@ -18,12 +18,12 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.SyncgroupJoinFailedException;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Syncgroup;
-import io.v.v23.verror.NoExistException;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action2;
-import rx.subscriptions.CompositeSubscription;
 
 import static net.javacrumbs.futureconverter.guavarx.FutureConverter.toObservable;
 
@@ -150,7 +149,7 @@ public class GlobalUserSyncgroup {
         final Syncgroup sg = db.getSyncgroup(sgName);
         return Observable.defer(() -> toObservable(sg.join(mVContext, mMemberInfo)))
                 .doOnCompleted(() -> log.info("Joined syncgroup " + sgName))
-                .onErrorResumeNext(t -> t instanceof NoExistException ?
+                .onErrorResumeNext(t -> t instanceof SyncgroupJoinFailedException ?
                         toObservable(sg.create(mVContext, spec, mMemberInfo))
                                 .doOnCompleted(() -> log.info("Created syncgroup " + sgName))
                                 .map(x -> spec) :
@@ -189,7 +188,7 @@ public class GlobalUserSyncgroup {
 
     /**
      * It is not generally necessary to unsubscribe explicitly from this subscription since the
-     * lifecycle of the Syncbase client is generally tied to  Baku Activity.
+     * lifecycle of the Syncbase client is generally tied to a Baku Activity.
      */
     public Subscription join() {
         return rxJoin().subscribe(x -> {

@@ -5,7 +5,6 @@
 package io.v.debug;
 
 import io.v.baku.toolkit.VAndroidTestCase;
-import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.verror.ExistException;
