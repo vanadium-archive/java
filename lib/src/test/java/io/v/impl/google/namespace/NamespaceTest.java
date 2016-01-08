@@ -21,14 +21,12 @@ import java.util.Map;
 
 import io.v.v23.V;
 import io.v.v23.V23TestUtil;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.naming.GlobError;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
-import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Permissions;
@@ -58,14 +56,7 @@ public class NamespaceTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Server mtServer = V.getServer(ctx);
-        if (mtServer != null) {
-            mtServer.stop();
-        }
-        Server dummyServer = V.getServer(dummyServerCtx);
-        if (dummyServer != null) {
-            dummyServer.stop();
-        }
+        ctx.cancel();
     }
 
     private Iterable<String> globNames(InputChannel<GlobReply> globReplies) {
@@ -123,9 +114,9 @@ public class NamespaceTest extends TestCase {
         Namespace n = V.getNamespace(ctx);
         sync(n.mount(ctx, "test/test", dummyServerEndpoint.name(), Duration.standardDays(1)));
 
-        CancelableVContext cancelContext = ctx.withCancel();
-        InputChannel<GlobReply> channel = n.glob(cancelContext, "test/*");
-        cancelContext.cancel();
+        VContext ctxC = ctx.withCancel();
+        InputChannel<GlobReply> channel = n.glob(ctxC, "test/*");
+        ctxC.cancel();
         List<GlobReply> result = sync(InputChannels.asList(channel));
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getElem()).isInstanceOf(GlobError.class);

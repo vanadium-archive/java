@@ -30,8 +30,6 @@ import android.Manifest;
 
 import org.joda.time.Duration;
 
-import com.google.common.util.concurrent.Uninterruptibles;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -41,7 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import io.v.impl.google.lib.discovery.DeviceCache;
@@ -50,12 +47,16 @@ import io.v.impl.google.lib.discovery.VScanner;
 import io.v.impl.google.lib.discovery.ble.BleAdvertisementConverter;
 import io.v.v23.context.VContext;
 import io.v.impl.google.lib.discovery.ScanHandler;
+import io.v.v23.verror.VException;
 import io.v.x.ref.lib.discovery.Advertisement;
 
+import static io.v.v23.VFutures.sync;
 /**
  * The discovery plugin interface for Bluetooth.
  */
 public class BlePlugin {
+    private static final String TAG = "BlePlugin";
+
     // We are using a constant for the MTU because Android and paypal/gatt don't get along
     // when the paypal gatt client sends a setMTU message.  The Android server seems to send
     // a malformed L2CAP message.
@@ -109,8 +110,15 @@ public class BlePlugin {
 
         @Override
         public void run() {
-            Uninterruptibles.awaitUninterruptibly(ctx.done());
-            BlePlugin.this.removeAdvertisement(id);
+            // TODO(spetrovic): Remove this thread and replace with a callback on ctx.done().
+            try {
+                sync(ctx.done());
+            } catch (VException e) {
+                Log.e(TAG, "Error waiting for context to be done: " + e);
+            }
+            finally {
+                BlePlugin.this.removeAdvertisement(id);
+            }
         }
     }
 
@@ -126,8 +134,15 @@ public class BlePlugin {
 
         @Override
         public void run() {
-            Uninterruptibles.awaitUninterruptibly(ctx.done());
-            BlePlugin.this.removeScanner(id);
+            // TODO(spetrovic): Remove this thread and replace with a callback on ctx.done().
+            try {
+                sync(ctx.done());
+            } catch (VException e) {
+                Log.e(TAG, "Error waiting for context to be done: " + e);
+            }
+            finally {
+                BlePlugin.this.removeScanner(id);
+            }
         }
     }
 

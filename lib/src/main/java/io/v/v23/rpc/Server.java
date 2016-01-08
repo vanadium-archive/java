@@ -30,13 +30,4 @@ public interface Server {
      * Returns the current {@link ServerStatus} of the server.
      */
     ServerStatus getStatus();
-
-    /**
-     * Gracefully stops all services on this server.  New calls are rejected, but any in-flight
-     * calls are allowed to complete.  All published mountpoints are unmounted.  This call waits for
-     * this process to complete and returns once the server has been shut down.
-     *
-     * @throws VException      if there was an error stopping the server
-     */
-    void stop() throws VException;
 }

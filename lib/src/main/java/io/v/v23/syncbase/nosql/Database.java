@@ -104,7 +104,7 @@ public interface Database extends DatabaseCore, AccessController {
      * <li>abort the batch,</li>
      * <li>start watching for changes to the data using the {@link ResumeMarker}.</li>
      * </ol><p>
-     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
      * stop the watch operation and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *

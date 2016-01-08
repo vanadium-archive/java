@@ -140,7 +140,7 @@ public interface Table {
      * reads from a consistent snapshot taken at the time of the method and will not reflect
      * subsequent writes to keys not yet reached by the stream.
      * <p>
-     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
      * stop the scan and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *

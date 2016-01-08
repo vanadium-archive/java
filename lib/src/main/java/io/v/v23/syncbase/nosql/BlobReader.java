@@ -39,7 +39,7 @@ public interface BlobReader {
      * You should be aware of the following constraints on the returned {@link InputStream}:
      * <p><ul>
      *     <li> if the context used to create the {@link InputStream} is
-     *          {@link io.v.v23.context.CancelableVContext#cancel canceled}, some of the
+     *          {@link io.v.v23.context.VContext#cancel canceled}, some of the
      *          subsequent {@link InputStream} {@link InputStream#read reads} may return valid
      *          values.  In fact, there is no hard guarantees that <strong>any</strong> subsequent
      *          reads will fail.
@@ -63,7 +63,7 @@ public interface BlobReader {
      * When the iterator exhausts all of the iterable elements, the blob is guaranteed to have been
      * entirely copied to a local cache.
      * <p>
-     * {@link io.v.v23.context.CancelableVContext#cancel Canceling} the provided context will
+     * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
      * stop the prefetch and cause the channel to stop producing elements.  Note that to avoid
      * memory leaks, the caller should drain the channel after cancelling the context.
      *

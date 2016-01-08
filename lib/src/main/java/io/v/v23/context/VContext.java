@@ -4,6 +4,11 @@
 
 package io.v.v23.context;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -94,23 +99,74 @@ public class VContext {
     }
 
     private long nativePtr;
+    private long nativeCancelPtr;  // may be 0
+
     // Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.
     private volatile CountDownLatch doneLatch = null;
 
+    private native void nativeCancel(long nativeCancelPtr);
+    private native boolean nativeIsCanceled(long nativePtr);
     private native DateTime nativeDeadline(long nativePtr) throws VException;
-    private native CountDownLatch nativeDone(long nativePtr) throws VException;
+    private native void nativeDone(long nativePtr, Callback<Void> callback);
     private native Object nativeValue(long nativePtr, Object key) throws VException;
-    private native CancelableVContext nativeWithCancel(long nativePtr) throws VException;
-    private native CancelableVContext nativeWithDeadline(long nativePtr, DateTime deadline)
+    private native VContext nativeWithCancel(long nativePtr) throws VException;
+    private native VContext nativeWithDeadline(long nativePtr, DateTime deadline) throws VException;
+    private native VContext nativeWithTimeout(long nativePtr, Duration timeout) throws VException;
+    private native VContext nativeWithValue(long nativePtr, long nativeCancelPtr, Object key, Object value)
             throws VException;
-    private native CancelableVContext nativeWithTimeout(long nativePtr, Duration timeout)
-            throws VException;
-    private native VContext nativeWithValue(long nativePtr, Object key, Object value)
-            throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativePtr, long nativeCancelPtr);
 
-    protected VContext(long nativePtr) {
+    protected VContext(long nativePtr, long nativeCancelPtr) {
         this.nativePtr = nativePtr;
+        this.nativeCancelPtr = nativeCancelPtr;
+    }
+
+    /**
+     * Returns {@code true} iff this context is cancelable.
+     */
+    public boolean isCancelable() {
+        return nativeCancelPtr != 0;
+    }
+
+    /**
+     * Returns {@code true} iff the context has been canceled.
+     * <p>
+     * It is illegal to invoke this method on a context that isn't
+     * {@link #isCancelable() cancelable}.
+     */
+    public boolean isCanceled() {
+        if (!isCancelable()) {
+            throw new RuntimeException("Context isn't cancelable.");
+        }
+        return nativeIsCanceled(nativePtr);
+    }
+
+    /**
+     * Cancels the context.  After this method is invoked, all {@link ListenableFuture}s
+     * returned by {@link VContext#done done} will get a chance to complete.
+     * <p>
+     * It is illegal to invoke this method on a context that isn't cancelable.
+     */
+    public void cancel() {
+        if (!isCancelable()) {
+            throw new RuntimeException("Context isn't cancelable.");
+        }
+        nativeCancel(nativeCancelPtr);
+    }
+
+    /**
+     * Returns a new {@link ListenableFuture} that completes when this context is canceled (either
+     * explicitly or via an expired deadline).
+     * <p>
+     * It is illegal to invoke this method on a context that isn't cancelable.
+     */
+    public ListenableFuture<Void> done() {
+        if (!isCancelable()) {
+            return Futures.immediateFailedFuture(new VException("Context isn't cancelable"));
+        }
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+        nativeDone(nativePtr, callback);
+        return callback.getFuture();
     }
 
     /**
@@ -122,32 +178,6 @@ public class VContext {
             return nativeDeadline(nativePtr);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get deadline", e);
-        }
-    }
-
-    /**
-     * Returns a counter that will reach the count of zero when this context is canceled (either
-     * explicitly or via an expired deadline).  Callers may block on this counter or periodically
-     * poll it.  When the counter reaches value zero, any blocked threads are released.
-     * <p>
-     * Successive calls to this method must always return the same value.  Implementations may
-     * return {@code null} if they can never be canceled.
-     *
-     * @return a counter that reaches the count of zero when this context is canceled or exceeds
-     *         its deadline, or {@code null} if the counter can never be canceled.
-     */
-    public CountDownLatch done() {
-        // NOTE(spetrovic): We may have to lock needlessly if nativeDone() returns a null
-        // CountDownLatch, but that's OK for now.
-        if (doneLatch != null) return doneLatch;
-        synchronized (this) {
-            if (doneLatch != null) return doneLatch;
-            try {
-                doneLatch = nativeDone(nativePtr);
-                return doneLatch;
-            } catch (VException e) {
-                throw new RuntimeException("Couldn't invoke done", e);
-            }
         }
     }
 
@@ -167,19 +197,13 @@ public class VContext {
     }
 
     /**
-     * Returns a child of the current context that can be canceled.  After
-     * {@link CancelableVContext#cancel cancel} is invoked on the new context, the counter returned
-     * by its {@link #done done} method (and all contexts further derived from it) will be set to
-     * zero.
+     * Returns a child of the current context that can be canceled.  If the current context
+     * is already cancelable, this method will be a no-op.
      * <p>
-     * It is expected that the new context will be canceled only by the caller that created it.
-     * This is the reason that the extended interface {@link CancelableVContext} exists:
-     * to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody other
-     * than the creator.
-     *
-     * @return a child of the current context that can be canceled.
+     * Canceling the returned child context will not affect the current context (unlike
+     * {@link #withValue}).
      */
-    public CancelableVContext withCancel() {
+    public VContext withCancel() {
         try {
             return nativeWithCancel(nativePtr);
         } catch (VException e) {
@@ -192,16 +216,14 @@ public class VContext {
      * deadline is reached.  The returned context can also be canceled manually; this is in fact
      * encouraged when the context is no longer needed in order to free up the timer resources.
      * <p>
-     * It is expected that the new context will be (explicitly) canceled only by the caller that
-     * created it.  This is the reason that the extended interface {@link CancelableVContext}
-     * exists: to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody
-     * other than the creator.
+     * Canceling the returned child context will not affect the current context (unlike
+     * {@link #withValue}).
      *
      * @param  deadline an absolute time after which the context will be canceled.
      * @return          a child of the current context that is automatically canceled after the
-     *                  provided deadline is reached.
+     *                  provided deadline is reached
      */
-    public CancelableVContext withDeadline(DateTime deadline) {
+    public VContext withDeadline(DateTime deadline) {
         try {
             return nativeWithDeadline(nativePtr, deadline);
         } catch (VException e) {
@@ -214,16 +236,14 @@ public class VContext {
      * duration of time.  The returned context can also be canceled manually; this is in fact
      * encouraged when the context is no longer needed in order to free up the timer resources.
      * <p>
-     * It is expected that the new context will be (explicitly) canceled only by the caller that
-     * created it.  This is the reason that the extended interface {@link CancelableVContext}
-     * exists: to discourage {@link CancelableVContext#cancel cancel} from being invoked by anybody
-     * other than the creator.
+     * Canceling the returned child context will not affect the current context (unlike
+     * {@link #withValue}).
      *
      * @param  timeout a duration of time after which the context will be canceled.
      * @return         a child of the current context that is automatically canceled after the
-     *                 provided duration of time.
+     *                 provided duration of time
      */
-    public CancelableVContext withTimeout(Duration timeout) {
+    public VContext withTimeout(Duration timeout) {
         try {
             return nativeWithTimeout(nativePtr, timeout);
         } catch (VException e) {
@@ -237,11 +257,15 @@ public class VContext {
      * value.  This method should be used only for data that is relevant across multiple API
      * boundaries and not for passing extra parameters to functions and methods.
      * <p>
-     * Any type can be used as a key but the caller should preferrably use a private or protected
+     * Any type can be used as a key but the caller should preferably use a private or protected
      * type to prevent collisions (i.e., to prevent somebody else instantiating a key of the
      * same type).  Keys are tested for equality by comparing their value pairs:
      * {@code (getClass(), hashCode())}.  The caller shouldn't count on implementation
      * maintaining a reference to the provided key.
+     * <p>
+     * If the current context is {@link #isCancelable() cancelable}, its child will also be
+     * cancelable.  Canceling the child will also cancel the current context (in addition to all
+     * the children of that context).
      *
      * @param  key   a key value is associated with.
      * @param  value a value associated with the key.
@@ -250,18 +274,22 @@ public class VContext {
      */
     public VContext withValue(Object key, Object value) {
         try {
-            return nativeWithValue(nativePtr, key, value);
+            return nativeWithValue(nativePtr, nativeCancelPtr, key, value);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create context with data:", e);
         }
     }
 
-    protected long nativePtr() {
+    private long nativePtr() {
         return nativePtr;
+    }
+
+    private long nativeCancelPtr() {
+        return nativeCancelPtr;
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativePtr, nativeCancelPtr);
     }
 }

@@ -34,8 +34,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.interfaces.ECPublicKey;
 
-import io.v.android.v23.services.blessing.BlessingService;
 import io.v.android.v23.V;
+import io.v.v23.context.VContext;
 import io.v.v23.security.Caveat;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -90,6 +90,7 @@ public class BlessingActivity extends Activity
      */
     public static final String EXTRA_ERROR = "ERROR";
 
+    private VContext mBaseContext;
     private String mGoogleAccount = "";
     private ECPublicKey mPublicKey = null;
     private String mPrefKey = "";
@@ -97,8 +98,8 @@ public class BlessingActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBaseContext = V.init(this);
         setFinishOnTouchOutside(false);
-        V.init(this);
         if (savedInstanceState != null) {
             mGoogleAccount = savedInstanceState.getString(STATE_GOOGLE_ACCOUNT);
             mPublicKey = (ECPublicKey) savedInstanceState.getSerializable(STATE_PUBLIC_KEY);
@@ -132,6 +133,12 @@ public class BlessingActivity extends Activity
             return;
         }
         getBlessing();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBaseContext.cancel();
     }
 
     @Override
@@ -309,7 +316,7 @@ public class BlessingActivity extends Activity
         Preconditions.checkArgument(error != null && !error.isEmpty());
         Log.e(TAG, "Error while blessing: " + error);
         Intent intent = new Intent();
-        intent.putExtra(BlessingService.EXTRA_ERROR, error);
+        intent.putExtra(EXTRA_ERROR, error);
         setResult(RESULT_CANCELED, intent);
         finish();
     }
@@ -323,7 +330,7 @@ public class BlessingActivity extends Activity
         }
         // Prepare the return intent.
         Intent intent = new Intent();
-        intent.putExtra(BlessingService.EXTRA_REPLY, blessingVom);
+        intent.putExtra(EXTRA_REPLY, blessingVom);
         setResult(RESULT_OK, intent);
         finish();
     }

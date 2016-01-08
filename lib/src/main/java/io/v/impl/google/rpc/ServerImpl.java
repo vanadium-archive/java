@@ -14,7 +14,6 @@ public class ServerImpl implements Server {
     private native void nativeAddName(long nativePtr, String name) throws VException;
     private native void nativeRemoveName(long nativePtr, String name);
     private native ServerStatus nativeGetStatus(long nativePtr) throws VException;
-    private native void nativeStop(long nativePtr) throws VException;
     private native void nativeFinalize(long nativePtr);
 
     private ServerImpl(long nativePtr) {
@@ -36,10 +35,6 @@ public class ServerImpl implements Server {
         } catch (VException e) {
             throw new RuntimeException("Couldn't get status", e);
         }
-    }
-    @Override
-    public void stop() throws VException {
-        nativeStop(this.nativePtr);
     }
     // Implement java.lang.Object.
     @Override

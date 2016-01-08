@@ -46,9 +46,10 @@ public class BlessingsManager extends Fragment {
 
     private static SettableFuture<Blessings> mintFuture;
 
-    private boolean wasDestroyed = false;
-    private String prefKey;                   // may be null if wasDestroyed == true
-    private String googleAccount;             // may be null if wasDestroyed == true
+    private VContext mBaseContext;
+    private boolean mWasDestroyed = false;
+    private String mPrefKey;                   // may be null if wasDestroyed == true
+    private String mGoogleAccount;             // may be null if wasDestroyed == true
 
     /**
      * Returns a new {@link ListenableFuture} whose result are the {@link Blessings} found in
@@ -74,7 +75,7 @@ public class BlessingsManager extends Fragment {
      * @return             a new {@link ListenableFuture} whose result are the blessings
      *                     persisted under the given key
      */
-    public static ListenableFuture<Blessings> getBlessings(
+    public static ListenableFuture<Blessings> getBlessings(VContext ctx,
             final Activity activity, String key, boolean setAsDefault) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             return Futures.immediateFailedFuture(new VException("getBlessings() must be invoked " +
@@ -85,23 +86,23 @@ public class BlessingsManager extends Fragment {
             if (blessings != null) {
                 // TODO(spetrovic): validate the blessings and mint if they aren't valid.
                 ListenableFuture<Blessings> ret = Futures.immediateFuture(blessings);
-                return setAsDefault ? wrapWithSetAsDefault(activity, ret) : ret;
+                return setAsDefault ? wrapWithSetAsDefault(ctx, activity, ret) : ret;
             }
         } catch (VException e) {
             Log.e(TAG, "Malformed blessings in SharedPreferences. Minting new blessings: " +
                     e.getMessage());
         }
-        return mintBlessings(activity, key, setAsDefault);
+        return mintBlessings(ctx, activity, key, setAsDefault);
     }
 
     /**
-     * A shortcut for {@link #mintBlessings(Activity, String, String, boolean)}} with empty
-     * Google account, causing the user to be prompted to pick one of the installed Google
+     * A shortcut for {@link #mintBlessings(VContext, Activity, String, String, boolean)}} with
+     * empty Google account, causing the user to be prompted to pick one of the installed Google
      * accounts (if there is more than one installed).
      */
-    public static ListenableFuture<Blessings> mintBlessings(
+    public static ListenableFuture<Blessings> mintBlessings(VContext ctx,
             Activity activity, final String key, boolean setAsDefault) {
-        return mintBlessings(activity, key, "", setAsDefault);
+        return mintBlessings(ctx, activity, key, "", setAsDefault);
     }
 
     /**
@@ -132,7 +133,7 @@ public class BlessingsManager extends Fragment {
      * @return              a new {@link ListenableFuture} whose result are the newly minted
      *                      {@link Blessings}
      */
-    public static ListenableFuture<Blessings> mintBlessings(
+    public static ListenableFuture<Blessings> mintBlessings(VContext ctx,
             final Activity activity, String key, String googleAccount, boolean setAsDefault) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             return Futures.immediateFailedFuture(new VException("mintBlessings() must be invoked " +
@@ -144,16 +145,16 @@ public class BlessingsManager extends Fragment {
             // of that mint.  Note that it is safe and desirable to override the old future
             // as it's invocation would be handled by a destroyed activity.
             mintFuture = SettableFuture.create();
-            return setAsDefault ? wrapWithSetAsDefault(activity, mintFuture) : mintFuture;
+            return setAsDefault ? wrapWithSetAsDefault(ctx, activity, mintFuture) : mintFuture;
         }
         mintFuture = SettableFuture.create();
         FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
         BlessingsManager fragment = new BlessingsManager();
-        fragment.prefKey = key;
-        fragment.googleAccount = googleAccount;
+        fragment.mPrefKey = key;
+        fragment.mGoogleAccount = googleAccount;
         transaction.add(fragment, UUID.randomUUID().toString());
         transaction.commit();  // this will invoke the fragment's onCreate() immediately.
-        return setAsDefault ? wrapWithSetAsDefault(activity, mintFuture) : mintFuture;
+        return setAsDefault ? wrapWithSetAsDefault(ctx, activity, mintFuture) : mintFuture;
     }
 
     public BlessingsManager() {}
@@ -161,22 +162,28 @@ public class BlessingsManager extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBaseContext = V.init(getActivity());
         // onCreate() being called with non-null savedInstanceState is an indicator that the
         // fragment (and the containing activity) have been destroyed since originally
         // created, as onCreate() wouldn't be called again, otherwise.
-        wasDestroyed = savedInstanceState != null;
-        if (!wasDestroyed) {
+        mWasDestroyed = savedInstanceState != null;
+        if (!mWasDestroyed) {
             // Start the intent to fetch the blessings.
-            VContext vCtx = V.init(getActivity());
-            ECPublicKey pubKey = V.getPrincipal(vCtx).publicKey();
+            ECPublicKey pubKey = V.getPrincipal(mBaseContext).publicKey();
             Intent intent = new Intent(getActivity(), BlessingActivity.class);
             intent.putExtra(BlessingActivity.EXTRA_PUBLIC_KEY, pubKey);
-            if (googleAccount != null && !googleAccount.isEmpty()) {
-                intent.putExtra(BlessingActivity.EXTRA_GOOGLE_ACCOUNT, googleAccount);
+            if (mGoogleAccount != null && !mGoogleAccount.isEmpty()) {
+                intent.putExtra(BlessingActivity.EXTRA_GOOGLE_ACCOUNT, mGoogleAccount);
             }
-            intent.putExtra(BlessingActivity.EXTRA_PREF_KEY, prefKey);
+            intent.putExtra(BlessingActivity.EXTRA_PREF_KEY, mPrefKey);
             startActivityForResult(intent, REQUEST_CODE_MINT_BLESSINGS);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBaseContext.cancel();
     }
 
     @Override
@@ -195,7 +202,6 @@ public class BlessingsManager extends Fragment {
                 }
                 SettableFuture<Blessings> future = mintFuture;
                 mintFuture = null;
-                V.init(getActivity());
                 // Extract VOM-encoded blessings.
                 if (data == null) {
                     future.setException(new VException("NULL blessing response"));
@@ -239,15 +245,18 @@ public class BlessingsManager extends Fragment {
         return (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
     }
 
-    private static ListenableFuture<Blessings> wrapWithSetAsDefault(
+    private static ListenableFuture<Blessings> wrapWithSetAsDefault(final VContext ctx,
             final Context context, ListenableFuture<Blessings> future) {
         return Futures.transform(future, new AsyncFunction<Blessings, Blessings>() {
             @Override
             public ListenableFuture<Blessings> apply(Blessings blessings) throws Exception {
+                if (ctx.isCanceled()) {
+                    return Futures.immediateFailedFuture(
+                            new VException("Vanadium context canceled"));
+                }
+                // Update local state with the new blessings.
                 try {
-                    // Update local state with the new blessings.
-                    VContext vCtx = V.init(context);
-                    VPrincipal p = V.getPrincipal(vCtx);
+                    VPrincipal p = V.getPrincipal(ctx);
                     p.blessingStore().setDefaultBlessings(blessings);
                     p.blessingStore().set(blessings, Constants.ALL_PRINCIPALS);
                     VSecurity.addToRoots(p, blessings);

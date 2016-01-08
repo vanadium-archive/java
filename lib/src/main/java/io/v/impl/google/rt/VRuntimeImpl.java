@@ -4,6 +4,9 @@
 
 package io.v.impl.google.rt;
 
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
+
 import org.joda.time.Duration;
 
 import java.util.concurrent.Executor;
@@ -63,7 +66,15 @@ public class VRuntimeImpl implements VRuntime {
     public static VRuntimeImpl create(Options opts) throws VException {
         VContext ctx = nativeInit();
         ctx = ctx.withValue(new ExecutorKey(), Executors.newCachedThreadPool());
-        return new VRuntimeImpl(ctx);
+        final VContext ctxC = ctx.withCancel();
+        Futures.transform(ctxC.done(), new Function<Void, Void>() {
+            @Override
+            public Void apply(Void input) {
+                nativeShutdown(ctxC);
+                return null;
+            }
+        });
+        return new VRuntimeImpl(ctxC);
     }
 
     private final VContext ctx;  // non-null
@@ -99,8 +110,7 @@ public class VRuntimeImpl implements VRuntime {
     }
     @Override
     public Server getServer(VContext ctx) {
-        Server server = (Server) ctx.value(new ServerKey());
-        return server;
+        return (Server) ctx.value(new ServerKey());
     }
     @Override
     public VContext withPrincipal(VContext ctx, VPrincipal principal) throws VException {
@@ -154,11 +164,6 @@ public class VRuntimeImpl implements VRuntime {
     public VContext getContext() {
         return this.ctx;
     }
-    @Override
-    public void shutdown() {
-        nativeShutdown(ctx);
-    }
-
     private static class DefaultDispatcher implements Dispatcher {
         private final Invoker invoker;
         private final Authorizer auth;

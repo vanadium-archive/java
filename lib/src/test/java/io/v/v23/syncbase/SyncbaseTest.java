@@ -12,7 +12,7 @@ import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
-import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.services.syncbase.nosql.BlobRef;
@@ -33,7 +33,6 @@ import io.v.v23.syncbase.nosql.Syncgroup;
 import io.v.v23.syncbase.nosql.Table;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.V;
-import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.access.AccessList;
@@ -92,11 +91,7 @@ public class SyncbaseTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Server server = V.getServer(ctx);
-        if (server != null) {
-            server.stop();
-        }
-        V.shutdown();
+        ctx.cancel();
     }
 
     public void testService() throws Exception {
@@ -252,7 +247,7 @@ public class SyncbaseTest extends TestCase {
                         VomUtil.encode(baz, Baz.class), null, false, false),
                 new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
                         new byte[0], null, false, false));
-        CancelableVContext ctxC = ctx.withCancel();
+        VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
                 db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
         for (WatchChange expected : expectedChanges) {
@@ -269,16 +264,16 @@ public class SyncbaseTest extends TestCase {
     }
 
     public void testDatabaseWatchWithContextCancel() throws Exception {
-        final CancelableVContext cancelCtx = ctx.withCancel();
+        final VContext ctxC = ctx.withCancel();
         Database db = createDatabase(createApp(createService()));
         createTable(db);
 
         InputChannel<WatchChange> channel = db.watch(
-                cancelCtx, TABLE_NAME, "b", sync(db.getResumeMarker(ctx)));
+                ctxC, TABLE_NAME, "b", sync(db.getResumeMarker(ctx)));
         new Thread(new Runnable() {
             @Override
             public void run() {
-                cancelCtx.cancel();
+                ctxC.cancel();
             }
         }).start();
         try {
@@ -457,7 +452,7 @@ public class SyncbaseTest extends TestCase {
 
     public void testBlobWriteCancelable() throws Exception {
         Database db = createDatabase(createApp(createService()));
-        CancelableVContext ctxC = ctx.withCancel();
+        VContext ctxC = ctx.withCancel();
         BlobWriter writer = sync(db.writeBlob(ctxC, null));
         BlobRef ref = writer.getRef();
         byte[] data = new byte[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };

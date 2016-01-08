@@ -10,7 +10,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.v.v23.InputChannels;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Client;
@@ -54,11 +53,7 @@ public class FortuneTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Server s = V.getServer(ctx);
-        if (s != null) {
-            s.stop();
-        }
-        V.shutdown();
+        ctx.cancel();
     }
 
     private String name() {
@@ -92,14 +87,14 @@ public class FortuneTest extends TestCase {
         CountDownLatch callLatch = new CountDownLatch(1);
         FortuneServer server = new FortuneServerImpl(callLatch);
         ctx = V.withNewServer(ctx, "", server, null);
-        CancelableVContext cancelCtx = ctx.withCancel();
+        VContext ctxC = ctx.withCancel();
 
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         sync(client.add(ctxT, "Hello world"));
-        ListenableFuture<String> result = client.get(cancelCtx);
+        ListenableFuture<String> result = client.get(ctxC);
         // Cancel the RPC.
-        cancelCtx.cancel();
+        ctxC.cancel();
         // Allow the server RPC impl to finish.
         callLatch.countDown();
         // The call should have failed, it was canceled before it completed.
