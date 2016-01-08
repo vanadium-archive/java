@@ -15,6 +15,7 @@ import java.util.UUID;
 import io.v.impl.google.lib.discovery.EncodingUtil;
 import io.v.impl.google.lib.discovery.UUIDUtil;
 import io.v.x.ref.lib.discovery.Advertisement;
+import io.v.v23.discovery.Attachments;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
 import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
@@ -23,6 +24,8 @@ import io.v.x.ref.lib.discovery.plugins.ble.Constants;
 
 /**
  * Converts from {@link Advertisement} to the gatt services and vice-versa.
+ *
+ * TODO(jhahn): Handle Attachments.
  */
 public class BleAdvertisementConverter {
     private static Charset enc = Charset.forName("UTF-8");
@@ -108,7 +111,7 @@ public class BleAdvertisementConverter {
             }
         }
         return new Advertisement(
-                new Service(instanceId, instanceName, interfaceName, new Attributes(cleanAttrs), addrs),
+                new Service(instanceId, instanceName, interfaceName, new Attributes(cleanAttrs), addrs, new Attachments()),
                 UUIDUtil.UUIDToUuid(UUIDUtil.UUIDForInterfaceName(interfaceName)),
                 new EncryptionAlgorithm(encryptionAlgo),
                 encryptionKeys,
