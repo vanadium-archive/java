@@ -41,7 +41,7 @@ public class MomentFactoryImpl implements MomentFactory {
     @Override
     public Moment make(Id id, int index, String author, String caption) {
         return new MomentImpl(
-                mBitMapper, id, index, author, caption, DateTime.now());
+                mBitMapper, id, index, author, caption, DateTime.now(), false);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MomentFactoryImpl implements MomentFactory {
                 mBitMapper, id, ordinal,
                 attr.get(F.AUTHOR.toString()),
                 attr.get(F.CAPTION.toString()),
-                FMT.parseDateTime(attr.get(F.DATE.toString())));
+                FMT.parseDateTime(attr.get(F.DATE.toString())), false);
     }
 
     @Override
@@ -73,7 +73,8 @@ public class MomentFactoryImpl implements MomentFactory {
                 b.getInt(km.get(F.ORDINAL), 0),
                 b.getString(km.get(F.AUTHOR), ""),
                 b.getString(km.get(F.CAPTION), ""),
-                new DateTime(b.getLong(km.get(F.DATE), 0)));
+                new DateTime(b.getLong(km.get(F.DATE), 0)),
+                b.getBoolean(km.get(F.ADVERTISING)));
     }
 
     @Override
@@ -90,13 +91,18 @@ public class MomentFactoryImpl implements MomentFactory {
     @Override
     public Moment fromPrefs(SharedPreferences p, String prefix) {
         KeyMaker km = new KeyMaker(prefix);
+        String idString = p.getString(km.get(F.ID), "");
+        if (idString.isEmpty()) {
+            throw new IllegalStateException("Empty id from prefs.");
+        }
         return new MomentImpl(
                 mBitMapper,
-                Id.fromString(p.getString(km.get(F.ID), "")),
+                Id.fromString(idString),
                 p.getInt(km.get(F.ORDINAL), 0),
                 p.getString(km.get(F.AUTHOR), ""),
                 p.getString(km.get(F.CAPTION), ""),
-                new DateTime(p.getLong(km.get(F.DATE), 0)));
+                new DateTime(p.getLong(km.get(F.DATE), 0)),
+                p.getBoolean(km.get(F.ADVERTISING), false));
     }
 
     private class KeyMaker {

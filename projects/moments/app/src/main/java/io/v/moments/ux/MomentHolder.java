@@ -85,7 +85,7 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             advertiseButton.setEnabled(true);
             advertiseButton.setChecked(advertiser.shouldBeAdvertising());
             advertiseButton.setOnCheckedChangeListener(
-                    toggleAdvertising(advertiser));
+                    toggleAdvertising(moment, advertiser));
         }
     }
 
@@ -108,11 +108,16 @@ public class MomentHolder extends RecyclerView.ViewHolder {
     }
 
     private CompoundButton.OnCheckedChangeListener toggleAdvertising(
-            final Advertiser advertiser) {
+            final Moment moment, final Advertiser advertiser) {
         return new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
                 if (isChecked) {
+                    // TODO(jregan): eliminate this redundancy.
+                    // The moment is persisted in prefs, the advertiser isn't.
+                    // That wasn't done because remote moments never
+                    // need an advertiser.
+                    moment.setShouldBeAdvertising(true);
                     advertiser.setShouldBeAdvertising(true);
                     mExecutor.submit(new Runnable() {
                         @Override
@@ -127,6 +132,7 @@ public class MomentHolder extends RecyclerView.ViewHolder {
                         }
                     });
                 } else {
+                    moment.setShouldBeAdvertising(false);
                     advertiser.setShouldBeAdvertising(false);
                     mExecutor.submit(new Runnable() {
                         @Override

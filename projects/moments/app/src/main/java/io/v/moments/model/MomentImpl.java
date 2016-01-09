@@ -26,20 +26,23 @@ public class MomentImpl implements Moment {
 
     public MomentImpl(
             BitMapper bitMapper, Id id, int ordinal,
-            String author, String caption, DateTime dt) {
+            String author, String caption, DateTime dt,
+            boolean shouldBeAdvertising) {
         mBitMapper = bitMapper;
         mOrdinal = ordinal;
         mAuthor = author;
         mCaption = caption;
         mCreationTime = dt;
         mId = id;
+        mShouldBeAdvertising = shouldBeAdvertising;
     }
 
-    /**
-     * Never advertise basic moments.
-     */
     public boolean shouldBeAdvertising() {
         return mShouldBeAdvertising;
+    }
+
+    public void setShouldBeAdvertising(boolean value) {
+        mShouldBeAdvertising = value;
     }
 
     public boolean hasPhoto(Kind kind, Style style) {

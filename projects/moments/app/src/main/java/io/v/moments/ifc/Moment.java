@@ -55,6 +55,11 @@ public interface Moment extends HasId {
     boolean shouldBeAdvertising();
 
     /**
+     * Should the moment be advertised?
+     */
+    void setShouldBeAdvertising(boolean value);
+
+    /**
      * Is the specified photo available?
      */
     boolean hasPhoto(Kind kind, Style style);

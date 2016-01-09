@@ -134,18 +134,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         logState("onCreate");
 
         setContentView(R.layout.activity_main);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
         wireItUp();
 
         initializeOrRestore(savedInstanceState);
 
-        setFabClickHandler(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                takePhoto();
-            }
-        });
 
         // This might leave to start a new activity.
         // Will trigger onActivityResult as expected.
@@ -214,6 +207,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         RecyclerView view = configureRecyclerView();
         view.setAdapter(adapter);
         adapter.beginObserving();
+
+        // Expose the scan switch on the action bar.
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+
+        // Expose the camera button.
+        setFabClickHandler(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                takePhoto();
+            }
+        });
     }
 
     private void setFabClickHandler(View.OnClickListener listener) {
@@ -315,24 +319,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     protected void onStart() {
         super.onStart();
         logState("onStart");
-        rebuildLocalMoments();
+        if (mLocalMoments.isEmpty()) {
+            Log.d(TAG, "Loading moments from prefs.");
+            mStateStore.prefsLoad(mLocalMoments);
+        }
+        for (Moment moment : mLocalMoments) {
+            if (moment.shouldBeAdvertising()) {
+                Log.d(TAG, "on start - found a moment that should be advertising");
+            }
+        }
         if (mShouldBeScanning && !isScanning()) {
             startScanning();
         }
-    }
-
-    private String localStatus() {
-        return "list = " + mLocalMoments.size();
-    }
-
-    private void rebuildLocalMoments() {
-        if (mLocalMoments.size() != 0) {
-            Log.d(TAG, "rebuild not necessary");
-            return;
-        }
-        Log.d(TAG, "rebuild start: " + localStatus());
-        mStateStore.prefsLoad(mLocalMoments);
-        Log.d(TAG, "rebuild   end: " + localStatus());
     }
 
     @Override
