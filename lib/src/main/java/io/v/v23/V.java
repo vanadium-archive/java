@@ -4,7 +4,6 @@
 
 package io.v.v23;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 
@@ -47,14 +46,10 @@ import io.v.v23.verror.VException;
  * </pre></blockquote><p>
  */
 public class V {
-    private static native void nativeInitGlobal() throws VException;
-    private static native void nativeInitJava(Options opts) throws VException;
-    private static native void nativeShutdown(VContext context);
+    private static native void nativeInitGlobalShared() throws VException;
+    private static native void nativeInitGlobalJava(Options opts) throws VException;
 
-    protected static volatile VContext context = null;
-    protected static volatile boolean initDone = false;
-    protected static volatile boolean initGlobalDone = false;
-    private static volatile VRuntime runtime = null;
+    private static volatile VContext globalContext;
 
     private static boolean isDarwin() {
         return System.getProperty("os.name").toLowerCase().contains("os x");
@@ -64,12 +59,10 @@ public class V {
         return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
-    // Initializes the global (i.e., static) state.  Any code that should survive the sequence
-    // of V.init()/V.shutdown()/V.init()/... should go here.
-    protected static void initGlobalShared() {
-        if (initGlobalDone) {
-            return;
-        }
+    // Initializes the Vanadium global state, i.e., state that needs to be cleaned up only
+    // before the process is about to terminate.  This method is shared between Java and Android
+    // implementations.
+    protected static VContext initGlobalShared(Options opts) {
         List<Throwable> errors = new ArrayList<Throwable>();
         try {
             // First, attempt to find the library in java.library.path.
@@ -106,7 +99,7 @@ public class V {
             }
         }
         try {
-            nativeInitGlobal();
+            nativeInitGlobalShared();
         } catch (VException e) {
             throw new RuntimeException("Could not initialize v23 native library", e);
         }
@@ -124,11 +117,8 @@ public class V {
         } catch (VException e) {
             throw new RuntimeException("Couldn't register caveat validators", e);
         }
-        initGlobalDone = true;
-    }
-
-    protected static void initShared(Options opts) {
         // See if a runtime was provided as an option.
+        VRuntime runtime;
         if (opts.get(OptionDefs.RUNTIME) != null) {
             runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
         } else {
@@ -139,32 +129,49 @@ public class V {
                 throw new RuntimeException("Couldn't initialize Google Vanadium Runtime", e);
             }
         }
-        context = runtime.getContext();
+        VContext ctx = runtime.getContext();
+        if (!ctx.isCancelable()) {
+            throw new RuntimeException("Context returned by the runtime must be cancelable");
+        }
+        ctx = ctx.withValue(new RuntimeKey(), runtime);
+        return ctx;
     }
 
-    private static void initJava(Options opts) {
+    // Initializes the Vanadium Java-specific global state.
+    private static void initGlobalJava(Options opts) {
         try {
-            nativeInitJava(opts);
+            nativeInitGlobalJava(opts);
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize Java", e);
         }
     }
 
+    // Initializes the Vanadium global state
+    private static VContext initGlobal(Options opts) {
+        if (globalContext != null) {
+            return globalContext;
+        }
+        synchronized (V.class) {
+            if (globalContext != null) {
+                return globalContext;
+            }
+            if (opts == null) opts = new Options();
+            VContext ctx = initGlobalShared(opts);
+            initGlobalJava(opts);
+            // Set the VException component name to this binary name.
+            ctx = VException.contextWithComponentName(ctx, System.getProperty("program.name", ""));
+            globalContext = ctx;
+            return ctx;
+        }
+    }
+
     /**
-     * Initializes the Vanadium environment, returning the base context.  Calling this method
-     * multiple times will always return the result of the first call to {@link #init init},
-     * ignoring subsequently provided options, unless you first call {@link #shutdown}.
+     * Initializes the Vanadium environment, returning the base context.  This method may be
+     * called multiple times: in each invocation, a different base context will be returned.
      * <p>
-     * This method loads the native Vanadium implementation if it has not already been loaded. It
-     * searches for the native Vanadium library using {@link java.lang.System#loadLibrary}.
-     * If that throws, then the method will look for the library in the root of the classpath.
-     * If it is found, the bytes of the library are extracted to a temporary file and loaded with
-     * {@link java.lang.System#load}.
-     * <p>
-     * If the above procedure fails to load the native implementation, a {@link RuntimeException}
-     * will be thrown. The {@link RuntimeException#getCause cause} of the exception will be a
-     * {@link VLoaderException} indicating the exceptions that occurred while attempting to load
-     * the library.
+     * {@link VContext#cancel() Canceling} the returned context will release all the Vanadium
+     * resources and shut down all services associated with the context.  Forgetting to cancel
+     * the context will therefore result in memory leaks of those resources.
      * <p>
      * A caller may pass the following option that specifies the runtime implementation to be used:
      * <p><ul>
@@ -179,20 +186,9 @@ public class V {
      * @param  opts options
      * @return      base context
      */
-    public static VContext init(Options opts) {
-        if (initDone) return context;
-        synchronized (V.class) {
-            if (initDone) return context;
-            if (opts == null) opts = new Options();
-            initGlobalShared();
-            initShared(opts);
-            initJava(opts);
-            // Set the VException component name to this binary name.
-            context = VException.contextWithComponentName(
-                    context, System.getProperty("program.name", ""));
-            initDone = true;
-            return context;
-        }
+    private static synchronized VContext init(Options opts) {
+        VContext ctx = initGlobal(opts);
+        return ctx.withCancel();
     }
 
     /**
@@ -203,23 +199,6 @@ public class V {
      */
     public static VContext init() {
         return V.init(null);
-    }
-
-    /**
-     * Shuts down the Vanadium environment. It is an error to call this method before calling
-     * {@link #init}, or more than once per call to {@link #init}.
-     *
-     * <p>After this call, you may initialize a new environment again by calling {@link #init}.
-     */
-    public static void shutdown() {
-        synchronized (V.class) {
-            Preconditions.checkState(context != null,
-                    "no context to shutdown, did you call init()?");
-            initDone = false;
-            runtime.shutdown();
-            context = null;
-            runtime = null;
-        }
     }
 
     /**
@@ -251,7 +230,7 @@ public class V {
      */
     public static VContext withNewClient(VContext ctx, Options opts) throws VException {
         if (opts == null) opts = new Options();
-        return getRuntime().withNewClient(ctx, opts);
+        return getRuntime(ctx).withNewClient(ctx, opts);
     }
 
     /**
@@ -261,7 +240,7 @@ public class V {
      * client will never be {@code null}.
      */
     public static Client getClient(VContext ctx) {
-        return getRuntime().getClient(ctx);
+        return getRuntime(ctx).getClient(ctx);
     }
 
     /**
@@ -328,7 +307,7 @@ public class V {
         if (opts == null) {
             opts = new Options();
         }
-        return getRuntime().withNewServer(ctx, name, object, authorizer, opts);
+        return getRuntime(ctx).withNewServer(ctx, name, object, authorizer, opts);
     }
 
     /**
@@ -388,14 +367,14 @@ public class V {
         if (opts == null) {
             opts = new Options();
         }
-        return getRuntime().withNewServer(ctx, name, dispatcher, opts);
+        return getRuntime(ctx).withNewServer(ctx, name, dispatcher, opts);
     }
 
     /**
      * Returns the server attached to the given context, or {@code null} if no server is attached.
      */
     public static Server getServer(VContext ctx) {
-        return getRuntime().getServer(ctx);
+        return getRuntime(ctx).getServer(ctx);
     }
 
     /**
@@ -407,7 +386,7 @@ public class V {
      * @throws VException      if the principal couldn't be attached
      */
     public static VContext withPrincipal(VContext ctx, VPrincipal principal) throws VException {
-        return getRuntime().withPrincipal(ctx, principal);
+        return getRuntime(ctx).withPrincipal(ctx, principal);
     }
 
     /**
@@ -416,10 +395,9 @@ public class V {
      * <p>
      * If the passed-in context is derived from the context returned by {@link #init}, the returned
      * principal will never be {@code null}.
-
      */
     public static VPrincipal getPrincipal(VContext ctx) {
-        return getRuntime().getPrincipal(ctx);
+        return getRuntime(ctx).getPrincipal(ctx);
     }
 
     /**
@@ -432,7 +410,7 @@ public class V {
      * @throws VException      if the namespace couldn't be created
      */
     public static VContext withNewNamespace(VContext ctx, String... roots) throws VException {
-        return getRuntime().withNewNamespace(ctx, roots);
+        return getRuntime(ctx).withNewNamespace(ctx, roots);
     }
 
     /**
@@ -443,7 +421,7 @@ public class V {
      * namespace will never be {@code null}.
      */
     public static Namespace getNamespace(VContext ctx) {
-        return getRuntime().getNamespace(ctx);
+        return getRuntime(ctx).getNamespace(ctx);
     }
 
     /**
@@ -455,7 +433,7 @@ public class V {
      * @return           child context to which the {@link ListenSpec} is attached.
      */
     public static VContext withListenSpec(VContext ctx, ListenSpec spec) throws VException {
-        return getRuntime().withListenSpec(ctx, spec);
+        return getRuntime(ctx).withListenSpec(ctx, spec);
     }
 
     /**
@@ -466,7 +444,7 @@ public class V {
      * spec will never be {@code null}.
      */
     public static ListenSpec getListenSpec(VContext ctx) {
-        return getRuntime().getListenSpec(ctx);
+        return getRuntime(ctx).getListenSpec(ctx);
     }
 
     /**
@@ -477,7 +455,7 @@ public class V {
      * instance will never be {@code null}.
      */
     public static VDiscovery getDiscovery(VContext ctx) {
-        return getRuntime().getDiscovery(ctx);
+        return getRuntime(ctx).getDiscovery(ctx);
     }
 
     /**
@@ -488,13 +466,22 @@ public class V {
      * instance will never be {@code null}.
      */
     public static Executor getExecutor(VContext ctx) {
-        return getRuntime().getExecutor(ctx);
+        return getRuntime(ctx).getExecutor(ctx);
     }
-    private static VRuntime getRuntime() {
+
+    private static VRuntime getRuntime(VContext ctx) {
+        VRuntime runtime = (VRuntime) ctx.value(new RuntimeKey());
         if (runtime == null) {
             throw new RuntimeException("Vanadium runtime is null: did you call V.init()?");
         }
         return runtime;
+    }
+
+    private static class RuntimeKey {
+        @Override
+        public int hashCode() {
+            return 0;
+        }
     }
 
     protected V() {}

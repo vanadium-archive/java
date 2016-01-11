@@ -35,7 +35,7 @@ public interface BlobWriter {
      *          {@link java.io.IOException}.  Any subsequent {@link OutputStream#close} operation
      *          on the {@link OutputStream} are guaranteed to fail immediately.
      *     <li> likewise, if the context used to create the {@link OutputStream} is
-     *          {@link io.v.v23.context.CancelableVContext#cancel canceled}, subsequent
+     *          {@link io.v.v23.context.VContext#cancel canceled}, subsequent
      *          {@link OutputStream} {@link OutputStream#write writes} are guaranteed
      *          <strong>NOT</strong> to be applied to the blob;  however, they might "succeed",
      *          i.e., they may not throw an {@link java.io.IOException}.  Any subsequent

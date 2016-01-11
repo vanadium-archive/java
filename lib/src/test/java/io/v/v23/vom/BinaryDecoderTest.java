@@ -9,13 +9,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
-import static com.google.common.truth.Truth.assertThat;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 import io.v.v23.V;
+import io.v.v23.context.VContext;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
@@ -29,16 +29,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class BinaryDecoderTest extends TestCase {
+import static com.google.common.truth.Truth.assertThat;
 
+public class BinaryDecoderTest extends TestCase {
+    private VContext ctx;
     @Override
     protected void setUp() throws Exception {
-        V.init();
+        ctx = V.init();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        V.shutdown();
+        ctx.cancel();
     }
 
     public void testDecode() throws Exception {

@@ -193,6 +193,9 @@ public interface VRuntime {
 
     /**
      * Returns the base context associated with the runtime.
+     * <p>
+     * {@link VContext#cancel() Canceling} this context will shut down the runtime,
+     * allowing it to to release resources, shutdown services, and the like.
      */
     VContext getContext();
 
@@ -213,10 +216,4 @@ public interface VRuntime {
      * returned instance will never be {@code null}.
      */
     Executor getExecutor(VContext ctx);
-
-    /**
-     * Shuts down the runtime, allowing the runtime to release resources, shutdown services and
-     * the like.
-     */
-    void shutdown();
 }

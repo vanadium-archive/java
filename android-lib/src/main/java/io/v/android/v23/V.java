@@ -6,8 +6,11 @@ package io.v.android.v23;
 
 import android.content.Context;
 
+import com.google.common.base.Preconditions;
+
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Constants;
@@ -23,32 +26,77 @@ import java.security.interfaces.ECPublicKey;
  * The local android environment allowing clients and servers to communicate with one another.
  * The expected usage pattern of this class goes something like this:
  * <p><blockquote><pre>
- *    final VContext ctx = V.init(getApplicationContext(), opts);
- *    ...
- *    final Server s = V.newServer(ctx);
- *    ...
- *    final Client c = V.getClient(ctx);
- *    ...
+ * private VContext mBaseContext;
+ *
+ * @Override
+ * protected void onCreate(Bundle savedInstanceState) {
+ *     super.onCreate(savedInstanceState);
+ *     mBaseContext = V.init(getContext(), opts);
+ * }
+ *
+ * @Override
+ * protected void onDestroy() {
+ *     super.onDestroy();
+ *     mBaseContext.cancel();
+ * }
  * </pre></blockquote><p>
- * This class is a convenience wrapper for android users.  It provides Android-related setup
- * and then delegates to the Java {@link io.v.v23.V} methods.
  */
 public class V extends io.v.v23.V {
-    private static native void nativeInitAndroid(Context androidContext, Options opts)
+    private static native void nativeInitGlobalAndroid(Context androidContext, Options opts)
             throws VException;
 
-    private static void initAndroid(Context androidContext, Options opts) {
+    private static volatile VContext globalContext;
+
+    // Initializes the Vanadium Android-specific global state.
+    private static void initGlobalAndroid(Context androidContext, Options opts) {
         try {
-            nativeInitAndroid(androidContext, opts);
+            nativeInitGlobalAndroid(androidContext, opts);
         } catch (VException e) {
-            throw new RuntimeException("Couldn't initialize Android", e);
+            throw new RuntimeException("Couldn't initialize global Android state", e);
         }
     }
 
+    // Initializes the Vanadium Android global state, i.e., state that is shared across all
+    // the activities/fragments/services in the process.
+    private static VContext initGlobal(Context androidCtx, Options opts) {
+        if (globalContext != null) {
+            return globalContext;
+        }
+        synchronized (V.class) {
+            if (globalContext != null) {
+                return globalContext;
+            }
+            if (opts == null) opts = new Options();
+            VContext ctx = initGlobalShared(opts);
+            initGlobalAndroid(androidCtx, opts);
+            // Set the VException component name to the Android context package name.
+            ctx = VException.contextWithComponentName(ctx, androidCtx.getPackageName());
+            try {
+                // Initialize the principal.
+                ctx = V.withPrincipal(ctx, createPrincipal(androidCtx));
+            } catch (VException e) {
+                throw new RuntimeException("Couldn't setup Vanadium principal", e);
+            }
+            globalContext = ctx;
+            return ctx;
+        }
+    }
+
+    // Inializes Vanadium state that's local to the invoking activity/service.
+    private static VContext initAndroidLocal(VContext ctx, Context androidCtx, Options opts) {
+        return ctx.withValue(new AndroidContextKey(), androidCtx);
+    }
+
     /**
-     * Initializes the Vanadium environment, returning the base context.  Calling this method
-     * multiple times will always return the result of the first call to {@link #init init},
-     * ignoring subsequently provided options.
+     * Initializes the Vanadium environment and creates a new base Vanadium context for the given
+     * Android context and the given options.  This method may be called multiple times for
+     * an Android context: in each invocation, a different base context will be returned.
+     * <p>
+     * {@link VContext#cancel() Canceling} the returned context will release all the Vanadium
+     * resources associated with the Android context.  Forgetting to cancel the context will
+     * therefore result in memory leaks of those resources.
+     * <p>
+     * See class docs for the expected usage pattern.
      * <p>
      * A caller may pass the following option that specifies the runtime implementation to be used:
      * <p><ul>
@@ -62,28 +110,10 @@ public class V extends io.v.v23.V {
      * @return             base context
      */
     public static VContext init(Context androidCtx, Options opts) {
-        if (initDone) return context;
-        synchronized (V.class) {
-            if (initDone) return context;
-            if (androidCtx == null) {
-                throw new RuntimeException("Android context must be non-null.");
-            }
-
-            if (opts == null) opts = new Options();
-            initGlobalShared();
-            initShared(opts);
-            initAndroid(androidCtx, opts);
-            // Set the VException component name to the Android context package name.
-            context = VException.contextWithComponentName(context, androidCtx.getPackageName());
-            try {
-                // Initialize the principal.
-                context = V.withPrincipal(context, createPrincipal(androidCtx));
-            } catch (VException e) {
-                throw new RuntimeException("Couldn't setup Vanadium principal", e);
-            }
-            initDone = true;
-            return context;
-        }
+        Preconditions.checkArgument(androidCtx != null);
+        VContext ctx = initGlobal(androidCtx, opts);
+        ctx = initAndroidLocal(ctx, androidCtx, opts);
+        return ctx.withCancel();
     }
 
     /**
@@ -121,6 +151,24 @@ public class V extends io.v.v23.V {
             VSecurity.addToRoots(principal, self);
         }
         return principal;
+    }
+
+    /**
+     * Returns the Android context attached to the given Vanadium context or {@code null} if no
+     * Android context is attached.
+     * <p>
+     * If the passed-in context is derived from the context returned by {@link #init}, the returned
+     * Android context will never be {@code null}.
+     */
+    public static Context getAndroidContext(VContext ctx) {
+        return (Context) ctx.value(new AndroidContextKey());
+    }
+
+    private static class AndroidContextKey {
+        @Override
+        public int hashCode() {
+            return 0;
+        }
     }
 
     private V() {}

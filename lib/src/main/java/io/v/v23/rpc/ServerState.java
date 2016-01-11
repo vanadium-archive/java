@@ -17,7 +17,7 @@ public enum ServerState {
      */
     SERVER_ACTIVE,
     /**
-     * Server has been asked to {@link Server#stop stop} and is in the process of doing so.
+     * Server has been asked to stop and is in the process of doing so.
      */
     SERVER_STOPPING,
     /**
