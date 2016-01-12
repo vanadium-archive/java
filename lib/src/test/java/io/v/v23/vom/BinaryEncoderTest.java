@@ -25,9 +25,9 @@ import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlUint64;
 import io.v.v23.vdl.VdlUnion;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.vom.testdata.data80.Constants;
 import io.v.v23.vom.testdata.types.NStruct;
 
+import java.util.List;
 import java.util.Map;
 
 public class BinaryEncoderTest extends TestCase {
@@ -61,25 +61,32 @@ public class BinaryEncoderTest extends TestCase {
             .put(Types.UINT64, new VdlUint64(0L))
             .build();
 
-    public void testEncode() throws Exception {
-        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
+    public void testVersion80Encode() throws Exception {
+        encodeTest(Version.Version80, io.v.v23.vom.testdata.data80.Constants.TESTS);
+    }
+    public void testVersion81Encode() throws Exception {
+        encodeTest(Version.Version81, io.v.v23.vom.testdata.data81.Constants.TESTS);
+    }
+
+    public void encodeTest(Version version, List<io.v.v23.vom.testdata.types.TestCase> tests) throws Exception {
+        for (io.v.v23.vom.testdata.types.TestCase test : tests) {
             VdlAny value = test.getValue();
             if (value.getElemType() == null) {
-              assertEquals(test.getHex(), TestUtil.encode(VdlAny.VDL_TYPE, null));
+              assertEquals(test.getName(), test.getHex(), TestUtil.encode(version, VdlAny.VDL_TYPE, null));
             } else {
-              assertEquals(test.getHex(), TestUtil.encode(value.getElemType(), value.getElem()));
+              assertEquals(test.getName(), test.getHex(), TestUtil.encode(version, value.getElemType(), value.getElem()));
             }
         }
 
         VdlType testsType = Types.getVdlTypeFromReflect(
-                Constants.class.getDeclaredField("TESTS").getGenericType());
-        assertNotNull(TestUtil.encode(testsType, Constants.TESTS));
+                io.v.v23.vom.testdata.data80.Constants.class.getDeclaredField("TESTS").getGenericType());
+        assertNotNull("test type", TestUtil.encode(version, testsType, tests));
     }
 
     public void testZeroValue() throws Exception {
         for (Map.Entry<VdlType, Object> entry : zeroValues.entrySet()) {
-            assertEquals(TestUtil.encode(entry.getKey(), entry.getValue()),
-                    TestUtil.encode(entry.getKey(), null));
+            assertEquals(TestUtil.encode(Version.DefaultVersion, entry.getKey(), entry.getValue()),
+                    TestUtil.encode(Version.DefaultVersion, entry.getKey(), null));
         }
     }
 }

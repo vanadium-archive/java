@@ -5,24 +5,19 @@
 package io.v.v23.vom;
 
 import io.v.v23.vdl.Kind;
+import io.v.v23.vdl.VdlField;
 import io.v.v23.vdl.VdlType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 
 /**
  * Binary encoding and decoding routines.
  */
 public final class BinaryUtil {
-    /**
-     * Every binary stream starts with this magic byte, to distinguish the binary encoding from
-     * the JSON encoding. Note that every valid JSON encoding must start with an ASCII character,or
-     * the BOM U+FEFF, and this magic byte is unambiguous regardless of the endianness of the JSON
-     * encoding.
-     */
-    public static final byte BINARY_MAGIC_BYTE = (byte) 0x80;
     static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     private static final String END_OF_STREAM_MESSAGE = "End of stream prematurely reached.";
 
@@ -69,7 +64,7 @@ public final class BinaryUtil {
         }
         int len = -(byte) firstByte;
         if (len > 8) {
-            throw new CorruptVomStreamException("Invalid long byte length");
+            throw new CorruptVomStreamException("Invalid long byte length " + len);
         }
         long value = 0;
         while (len > 0) {
@@ -115,15 +110,6 @@ public final class BinaryUtil {
 
     public static double decodeDouble(InputStream in) throws IOException {
         return Double.longBitsToDouble(Long.reverseBytes(decodeUint(in)));
-    }
-
-    /**
-     * Booleans are encoded as a byte where 0 = false and anything else is true.
-     * Returns the encoded value.
-     */
-    public static boolean encodeBoolean(OutputStream out, final boolean value) throws IOException {
-        out.write(value ? 1 : 0);
-        return value;
     }
 
     public static boolean decodeBoolean(InputStream in) throws IOException {
@@ -181,6 +167,42 @@ public final class BinaryUtil {
             case STRUCT:
             case UNION:
                 return true;
+            default:
+                return false;
+        }
+    }
+
+    static boolean hasAnyOrTypeObject(VdlType t) {
+        return hasAnyOrTypeObjectInternal(t, new HashSet<VdlType>());
+    }
+
+    private static boolean hasAnyOrTypeObjectInternal(VdlType t, HashSet<VdlType> seen) {
+        if (seen.contains(t)) {
+            return false;
+        }
+        seen.add(t);
+
+        switch (t.getKind()) {
+            case ANY:
+            case TYPEOBJECT:
+                return true;
+            case OPTIONAL:
+            case LIST:
+            case ARRAY:
+                return hasAnyOrTypeObjectInternal(t.getElem(), seen);
+            case SET:
+                return hasAnyOrTypeObjectInternal(t.getKey(), seen);
+            case MAP:
+                return hasAnyOrTypeObjectInternal(t.getKey(), seen) ||
+                        hasAnyOrTypeObjectInternal(t.getElem(), seen);
+            case STRUCT:
+            case UNION:
+                for (VdlField fld : t.getFields()) {
+                    if (hasAnyOrTypeObjectInternal(fld.getType(), seen)) {
+                        return true;
+                    }
+                }
+                return false;
             default:
                 return false;
         }

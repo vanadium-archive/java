@@ -202,6 +202,8 @@ public final class Types {
                 return UINT32;
             case UINT64:
                 return UINT64;
+            case INT8:
+                return INT8;
             case INT16:
                 return INT16;
             case INT32:
@@ -390,6 +392,8 @@ public final class Types {
                 return Float.class;
             case FLOAT64:
                 return Double.class;
+            case INT8:
+                return VdlInt8.class;
             case INT16:
                 return Short.class;
             case INT32:

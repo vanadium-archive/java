@@ -5,7 +5,6 @@
 package io.v.v23.vom;
 
 import com.google.common.reflect.TypeToken;
-
 import io.v.v23.vdl.Kind;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
@@ -20,6 +19,7 @@ import io.v.v23.vdl.VdlFloat64;
 import io.v.v23.vdl.VdlInt16;
 import io.v.v23.vdl.VdlInt32;
 import io.v.v23.vdl.VdlInt64;
+import io.v.v23.vdl.VdlInt8;
 import io.v.v23.vdl.VdlList;
 import io.v.v23.vdl.VdlMap;
 import io.v.v23.vdl.VdlOptional;
@@ -55,6 +55,7 @@ public class ConversionTarget {
             case ENUM: return VdlEnum.class;
             case FLOAT32: return VdlFloat32.class;
             case FLOAT64: return VdlFloat64.class;
+            case INT8: return VdlInt8.class;
             case INT16: return VdlInt16.class;
             case INT32: return VdlInt32.class;
             case INT64: return VdlInt64.class;

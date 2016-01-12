@@ -41,14 +41,15 @@ public class ConversionTest extends TestCase {
             .put(new VdlUint32(), VdlAny.class)
             .build();
 
-    private static Object convert(VdlValue value, Type targetType) throws Exception {
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value));
+    private static Object convert(Version version, VdlValue value, Type targetType) throws Exception {
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(version, value));
         return TestUtil.decode(encoded, targetType);
     }
 
     public void testConversion() throws Exception {
+        Version version = Version.DefaultVersion;
         for (Map.Entry<VdlValue, Type> test : tests.entries()) {
-            final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(test.getKey()));
+            final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(version, test.getKey()));
             final Object decoded = TestUtil.decode(encoded, test.getValue());
             Class<?> targetClass = ReflectUtil.getRawClass(test.getValue());
             assertEquals(targetClass, decoded.getClass());
@@ -66,7 +67,7 @@ public class ConversionTest extends TestCase {
                         } else {
                             targetType = Types.getReflectTypeForVdl(value.getElemType());
                         }
-                        TestUtil.assertEqual(String.format("convert %s -> %s == %s", otherValue, targetType, value.getElem()), value.getElem(), convert(otherValue, targetType));
+                        TestUtil.assertEqual(String.format("convert %s -> %s == %s", otherValue, targetType, value.getElem()), value.getElem(), convert(version, otherValue, targetType));
                     }
                     // Element of one convert group can't be converted to primary type of
                     // previous groups.
@@ -74,7 +75,7 @@ public class ConversionTest extends TestCase {
                         Type targetType = Types.getReflectTypeForVdl(
                                 test.get(j).getPrimaryType().getTypeObject());
                         try {
-                            convert(value, targetType);
+                            convert(version, value, targetType);
                             fail("Converted " + value + " -> " + targetType);
                         } catch (Exception expected) {
                         }

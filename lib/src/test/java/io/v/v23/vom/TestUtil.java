@@ -45,20 +45,20 @@ public class TestUtil {
         return decoder.decodeValue();
     }
 
-    static String encode(VdlType type, Object value) throws Exception {
+    static String encode(Version version, VdlType type, Object value) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        BinaryEncoder encoder = new BinaryEncoder(out);
+        BinaryEncoder encoder = new BinaryEncoder(out, version);
         encoder.encodeValue(type, value);
         return TestUtil.bytesToHexString(out.toByteArray());
     }
 
-    static String encode(VdlValue value) throws Exception {
-        return encode(value.vdlType(), value);
+    static String encode(Version version, VdlValue value) throws Exception {
+        return encode(version, value.vdlType(), value);
     }
 
-    static String encode(Type type, Object value) throws Exception {
+    static String encode(Version version, Type type, Object value) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        BinaryEncoder encoder = new BinaryEncoder(out);
+        BinaryEncoder encoder = new BinaryEncoder(out, version);
         encoder.encodeValue(type, value);
         return TestUtil.bytesToHexString(out.toByteArray());
     }

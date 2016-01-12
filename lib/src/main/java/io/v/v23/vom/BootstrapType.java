@@ -28,6 +28,7 @@ public final class BootstrapType {
                 .put(Types.UINT16, Constants.WIRE_ID_UINT_16)
                 .put(Types.UINT32, Constants.WIRE_ID_UINT_32)
                 .put(Types.UINT64, Constants.WIRE_ID_UINT_64)
+                .put(Types.INT8, Constants.WIRE_ID_INT_8)
                 .put(Types.INT16, Constants.WIRE_ID_INT_16)
                 .put(Types.INT32, Constants.WIRE_ID_INT_32)
                 .put(Types.INT64, Constants.WIRE_ID_INT_64)

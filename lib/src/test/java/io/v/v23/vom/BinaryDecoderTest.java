@@ -9,19 +9,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import junit.framework.TestCase;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 import io.v.v23.V;
-import io.v.v23.context.VContext;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.testdata.data80.Constants;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -29,22 +28,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.truth.Truth.assertThat;
-
 public class BinaryDecoderTest extends TestCase {
-    private VContext ctx;
-    @Override
-    protected void setUp() throws Exception {
-        ctx = V.init();
+    static {
+        V.init();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        ctx.cancel();
+    public void testDecode80() throws Exception {
+        decodeTest(Version.Version80, io.v.v23.vom.testdata.data80.Constants.TESTS);
+    }
+    public void testDecode81() throws Exception {
+        decodeTest(Version.Version81, io.v.v23.vom.testdata.data81.Constants.TESTS);
     }
 
-    public void testDecode() throws Exception {
-        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
+    void decodeTest(Version version, List<io.v.v23.vom.testdata.types.TestCase> tests) throws Exception {
+        for (io.v.v23.vom.testdata.types.TestCase test : tests) {
           byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
           Serializable targetVal = test.getValue();
           if (test.getValue().getElem() != null) {
@@ -56,28 +53,34 @@ public class BinaryDecoderTest extends TestCase {
           } else {
               value = TestUtil.decode(bytes);
           }
-          TestUtil.assertEqual(String.format("decode(%s) -> %s == %s", test.getName(), targetVal, value), targetVal, value);
+          TestUtil.assertEqual(String.format("%s decode(%s) -> %s == %s", version, test.getName(), targetVal, value), targetVal, value);
         }
     }
 
-    public void testDecodeEncode() throws Exception {
-        for (io.v.v23.vom.testdata.types.TestCase test : Constants.TESTS) {
+    public void testDecodeEncode80() throws Exception {
+        decodeEncodeTest(Version.Version80, io.v.v23.vom.testdata.data80.Constants.TESTS);
+    }
+    public void testDecodeEncode81() throws Exception {
+        decodeEncodeTest(Version.Version81, io.v.v23.vom.testdata.data81.Constants.TESTS);
+    }
+    public void decodeEncodeTest(Version version, List<io.v.v23.vom.testdata.types.TestCase> tests) throws Exception {
+        for (io.v.v23.vom.testdata.types.TestCase test : tests) {
           byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
           VdlValue value = (VdlValue) TestUtil.decode(bytes, VdlValue.class);
-          assertEquals(String.format("encode(%s) == %s", test.getName(), test.getHex()), test.getHex(), TestUtil.encode(value.vdlType(), value));
+          assertEquals(String.format("encode(%s) == %s", test.getName(), test.getHex()), test.getHex(), TestUtil.encode(version, value.vdlType(), value));
         }
 
         VdlType testsType = Types.getVdlTypeFromReflect(
-                Constants.class.getDeclaredField("TESTS").getGenericType());
-        String encoded = TestUtil.encode(testsType, Constants.TESTS);
+                io.v.v23.vom.testdata.data80.Constants.class.getDeclaredField("TESTS").getGenericType());
+        String encoded = TestUtil.encode(version, testsType, tests);
         VdlValue decoded = (VdlValue) TestUtil.decode(
                 TestUtil.hexStringToBytes(encoded));
-        assertEquals(encoded, TestUtil.encode(decoded.vdlType(), decoded));
+        assertEquals(encoded, TestUtil.encode(version, decoded.vdlType(), decoded));
     }
 
     public void testDecodeVdlArray() throws Exception {
         VdlArray<Byte> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, v));
         Object decoded = TestUtil.decode(encoded, VdlValue.class);
         assertNotNull(decoded);
     }
@@ -99,7 +102,7 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         if (!v.deepEquals(decoded)) {
             fail(String.format("Expected error %s, got %s", v, decoded));
@@ -119,7 +122,7 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVExceptionBadParams",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         VException expected = new VException(id, "en", "test", "test");
         if (!expected.deepEquals(decoded)) {
@@ -144,20 +147,20 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeEncodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         if (!(decoded instanceof VException)) {
             fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
         }
         VException decodedV = (VException) decoded;
         byte[] reEncoded = TestUtil.hexStringToBytes(
-                TestUtil.encode(VException.class, decodedV));
+                TestUtil.encode(Version.DefaultVersion, VException.class, decodedV));
         assertEquals(Arrays.toString(encoded), Arrays.toString(reEncoded));
     }
 
     public void testDecodeSubVException() throws Exception {
         SubVException v = new SubVException();
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(SubVException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, SubVException.class, v));
         Object decoded = TestUtil.decode(encoded);
         VException expected = new SubVException();
         assertThat(decoded).isInstanceOf(SubVException.class);
@@ -181,20 +184,22 @@ public class BinaryDecoderTest extends TestCase {
         }
     }
 
-    private void assertDecodeEncode(Object value) throws Exception {
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(value.getClass(), value));
+    private void assertDecodeEncode(Object value, Version version) throws Exception {
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(version, value.getClass(), value));
         Object decoded = TestUtil.decode(encoded);
         assertEquals(value, decoded);
     }
 
     public void testDecodeEncodeTime() throws Exception {
-        assertDecodeEncode(new DateTime(2015, 2, 18, 20, 34, 35, 997, DateTimeZone.UTC));
-        assertDecodeEncode(new Duration(239017));
+        Version version = Version.DefaultVersion;
+        assertDecodeEncode(new DateTime(2015, 2, 18, 20, 34, 35, 997, DateTimeZone.UTC), version);
+        assertDecodeEncode(new Duration(239017), version);
     }
 
     public void testDecodeEncodeJavaObject() throws Exception {
+        Version version = Version.DefaultVersion;
         assertDecodeEncode(new JavaObject(
-                5, "boo", ImmutableList.of(new JavaObject(7, "foo", null))));
+                5, "boo", ImmutableList.of(new JavaObject(7, "foo", null))), version);
     }
 
     private static class JavaObject  {

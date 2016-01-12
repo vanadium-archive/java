@@ -6,10 +6,13 @@ package io.v.v23.vom;
 
 import io.v.v23.vdl.Kind;
 import io.v.v23.vdl.VdlArray;
+import io.v.v23.vdl.VdlByte;
 import io.v.v23.vdl.VdlEnum;
 import io.v.v23.vdl.VdlString;
+import io.v.v23.vdl.VdlValue;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +139,11 @@ final class ConvertUtil {
     private static Object convertInt(long value, ConversionTarget target)
             throws ConversionException {
         switch (target.getKind()) {
+            case INT8:
+                if (!hasOverflowInt(value, 8)) {
+                    return ReflectUtil.createPrimitive(target, (byte) value, Byte.TYPE);
+                }
+                break;
             case INT16:
                 if (!hasOverflowInt(value, 16)) {
                     return ReflectUtil.createPrimitive(target, (short) value, Short.TYPE);
@@ -268,8 +276,11 @@ final class ConvertUtil {
             len = target.getVdlType().getLength();
         }
 
-        ConversionTarget element = new ConversionTarget(
-                ReflectUtil.getElementType(target.getTargetType(), 0));
+        Type elemType = ReflectUtil.getElementType(target.getTargetType(), 0);
+        if (elemType == VdlValue.class) {
+            elemType = VdlByte.class;
+        }
+        ConversionTarget element = new ConversionTarget(elemType);
         if (targetClass.isArray() || VdlArray.class.isAssignableFrom(targetClass)) {
             Object data = Array.newInstance(element.getTargetClass(), len);
             for (int i = 0; i < bytes.length; i++) {

@@ -46,6 +46,9 @@ public class BinaryDecoder {
     private final Map<TypeId, VdlType> decodedTypes;
     private final Map<TypeId, WireType> wireTypes;
     private boolean binaryMagicByteRead;
+    private Version version;
+    private long[] typeIds;
+    private static Version[] allowedVersions = {Version.Version80, Version.Version81};
 
     public BinaryDecoder(InputStream in) {
         this.in = new BufferedInputStream(in);
@@ -64,11 +67,7 @@ public class BinaryDecoder {
      */
     public Object decodeValue(Type targetType) throws IOException, ConversionException {
         if (!binaryMagicByteRead) {
-            if ((byte) in.read() != BinaryUtil.BINARY_MAGIC_BYTE) {
-                throw new CorruptVomStreamException(
-                        String.format("The input stream should start with byte %02x",
-                        BinaryUtil.BINARY_MAGIC_BYTE));
-            }
+            version = Version.FromByte((byte)in.read());
             binaryMagicByteRead = true;
         }
         VdlType actualType = decodeType();
@@ -109,6 +108,13 @@ public class BinaryDecoder {
 
     private Object readValueMessage(VdlType actualType, Type targetType) throws IOException,
             ConversionException {
+        if (version != Version.Version80 && BinaryUtil.hasAnyOrTypeObject(actualType)) {
+            long len = BinaryUtil.decodeUint(in);
+            typeIds = new long[(int)len];
+            for (int i = 0; i < len; i++) {
+                typeIds[i] = BinaryUtil.decodeUint(in);
+            }
+        }
         if (BinaryUtil.hasBinaryMsgLen(actualType)) {
             // Do nothing with this information for now.
             BinaryUtil.decodeUint(in);
@@ -118,6 +124,14 @@ public class BinaryDecoder {
 
     private VdlType decodeType() throws IOException, ConversionException {
         while (true) {
+            in.mark(1);
+            int firstByte = in.read();
+            if ((byte)firstByte == Constants.WIRE_CTRL_TYPE_INCOMPLETE) {
+                // skip for now, it isn't needed because types are built when used as opposed
+                // to building when they are received in go.
+            } else {
+                in.reset();
+            }
             long typeId = BinaryUtil.decodeInt(in);
             if (typeId == 0) {
                 throw new CorruptVomStreamException("Unexpected zero type ID");
@@ -205,6 +219,11 @@ public class BinaryDecoder {
             case FLOAT32:
             case FLOAT64:
                 return readVdlFloat(target);
+            case INT8:
+                if (version == Version.Version80) {
+                    throw new RuntimeException("int8 is unsupported in VOM version 0x80");
+                }
+                // fallthrough
             case INT16:
             case INT32:
             case INT64:
@@ -246,7 +265,13 @@ public class BinaryDecoder {
             ByteStreams.skipFully(in, 1);
             return createNullValue(target);
         }
-        VdlType actualType = getType(new TypeId(BinaryUtil.decodeUint(in)));
+        long typeId;
+        if (version == Version.Version80) {
+            typeId = BinaryUtil.decodeUint(in);
+        } else {
+            typeId = typeIds[(int)BinaryUtil.decodeUint(in)];
+        }
+        VdlType actualType = getType(new TypeId(typeId));
         if (target.getKind() == Kind.ANY) {
             return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
         } else {
@@ -254,6 +279,22 @@ public class BinaryDecoder {
             assertTypesCompatible(actualType, targetType);
             return readValue(actualType, targetType);
         }
+    }
+
+    private Object readVdlBytes(int len, ConversionTarget target) throws IOException, ConversionException {
+        byte[] buf = new byte[len];
+        int numRead = 0;
+        while (numRead < len) {
+            int result = in.read(buf, numRead, buf.length - numRead);
+            if (result == -1) {
+                throw new CorruptVomStreamException("stream ended before full vdl bytes received");
+            }
+            numRead += result;
+        }
+        if (numRead > len) {
+            throw new RuntimeException("too many bytes returned from read()");
+        }
+        return ConvertUtil.convertFromBytes(buf, target);
     }
 
     private Object readVdlArrayOrVdlList(VdlType actualType, ConversionTarget target)
@@ -268,6 +309,9 @@ public class BinaryDecoder {
                         "Array length should be encoded as 0, but it is " + uint);
             }
             len = actualType.getLength();
+        }
+        if (actualType.getElem().getKind() == Kind.BYTE) {
+            return readVdlBytes(len, target);
         }
 
         Class<?> targetClass = target.getTargetClass();
@@ -292,8 +336,7 @@ public class BinaryDecoder {
             Class<?> elementClass = ReflectUtil.getRawClass(elementType);
             Object array = Array.newInstance(elementClass, targetLen);
             for (int i = 0; i < len; i++) {
-                ReflectUtil.setArrayValue(array, i, readValue(actualType.getElem(), elementType),
-                        elementClass);
+                ReflectUtil.setArrayValue(array, i, readValue(actualType.getElem(), elementType), elementClass);
             }
             return ReflectUtil.createGeneric(target, array);
         } else {
@@ -306,11 +349,23 @@ public class BinaryDecoder {
     }
 
     private Object readVdlBool(ConversionTarget target) throws IOException, ConversionException {
-        return ReflectUtil.createPrimitive(target, BinaryUtil.decodeBoolean(in), Boolean.TYPE);
+        byte b;
+        if (version == Version.Version80) {
+           b = BinaryUtil.decodeBytes(in, 1)[0];
+        } else {
+           b = (byte)BinaryUtil.decodeUint(in);
+        }
+        return ReflectUtil.createPrimitive(target, b != 0, Boolean.TYPE);
     }
 
     private Object readVdlByte(ConversionTarget target) throws IOException, ConversionException {
-        return ConvertUtil.convertFromByte(BinaryUtil.decodeBytes(in, 1)[0], target);
+        byte b;
+        if (version == Version.Version80) {
+            b = BinaryUtil.decodeBytes(in, 1)[0];
+        } else {
+            b = (byte)BinaryUtil.decodeUint(in);
+        }
+        return ConvertUtil.convertFromByte(b, target);
     }
 
     private Object readVdlComplex(ConversionTarget target) throws IOException, ConversionException {
@@ -549,7 +604,13 @@ public class BinaryDecoder {
     }
 
     private Object readVdlTypeObject() throws IOException {
-        return new VdlTypeObject(getType(new TypeId(BinaryUtil.decodeUint(in))));
+        long typeId;
+        if (version == Version.Version80) {
+            typeId = BinaryUtil.decodeUint(in);
+        } else {
+            typeId = typeIds[(int)BinaryUtil.decodeUint(in)];
+        }
+        return new VdlTypeObject(getType(new TypeId(typeId)));
     }
 
     private byte peekFlag() throws IOException {
