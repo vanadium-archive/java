@@ -6,6 +6,7 @@ package io.v.v23;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 
 import junit.framework.TestCase;
 
@@ -16,7 +17,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
 
@@ -27,15 +30,22 @@ import static io.v.v23.VFutures.sync;
  * Tests for static methods in {@link InputChannels} class.
  */
 public class InputChannelsTest extends TestCase {
+    private VContext ctx;
+
     @Override
     protected void setUp() throws Exception {
-        V.init();
+        ctx = V.init();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        ctx.cancel();
     }
 
     public void testTransform() throws Exception {
         {
-            InputChannel<Long> chan = InputChannels.transform(
-                    new ListInputChannel<>(null, 1, 2, 3, 4, 5),
+            InputChannel<Long> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5),
                     new InputChannels.TransformFunction<Integer, Long>() {
                         @Override
                         public Long apply(Integer from) throws VException {
@@ -48,8 +58,8 @@ public class InputChannelsTest extends TestCase {
         }
         {
             VException error = new VException("boo");
-            InputChannel<Long> chan = InputChannels.transform(
-                    new ListInputChannel<>(error, 1, 2, 3, 4, 5),
+            InputChannel<Long> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5),
                     new InputChannels.TransformFunction<Integer, Long>() {
                         @Override
                         public Long apply(Integer from) throws VException {
@@ -62,8 +72,8 @@ public class InputChannelsTest extends TestCase {
         }
         {
             final VException error = new VException("boo");
-            InputChannel<Long> chan = InputChannels.transform(
-                    new ListInputChannel<>(error, 1, 2, 3, 4, 5),
+            InputChannel<Long> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5),
                     new InputChannels.TransformFunction<Integer, Long>() {
                         @Override
                         public Long apply(Integer from) throws VException {
@@ -78,8 +88,8 @@ public class InputChannelsTest extends TestCase {
             assertThat(it.error()).isEqualTo(error);
         }
         {
-            InputChannel<Integer> chan = InputChannels.transform(
-                    new ListInputChannel<>(null, 1, 2, 3, 4, 5),
+            InputChannel<Integer> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5),
                     new InputChannels.TransformFunction<Integer, Integer>() {
                         @Override
                         public Integer apply(Integer from) throws VException {
@@ -91,14 +101,28 @@ public class InputChannelsTest extends TestCase {
             assertThat(it.error()).isNull();
         }
         {
+            // Test cancellation
+            InputChannel<Long> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(null, 3, 1, 2, 3, 4, 5),
+                    new InputChannels.TransformFunction<Integer, Long>() {
+                        @Override
+                        public Long apply(Integer from) throws VException {
+                            return (long) from + 1;
+                        }
+                    });
+            VIterable<Long> it = InputChannels.asIterable(chan);
+            assertThat(it).containsExactly(2l, 3l, 4l);
+            assertThat(it.error()).isEqualTo(new CanceledException(null));
+        }
+        {
             // Make sure a channel with lots of elements is handled correctly.
             final int numElems = 10000;
             Integer[] elems = new Integer[numElems];
             for (int i = 0; i < numElems; ++i) {
                 elems[i] = i;
             }
-            InputChannel<Integer> chan = InputChannels.transform(
-                    new ListInputChannel<>(null, elems),
+            InputChannel<Integer> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(null, -1, elems),
                     new InputChannels.TransformFunction<Integer, Integer>() {
                         @Override
                         public Integer apply(Integer from) throws VException {
@@ -113,12 +137,12 @@ public class InputChannelsTest extends TestCase {
 
     public void testAsList() throws Exception {
         {
-            InputChannel<Integer> chan = new ListInputChannel<>(null, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
             assertThat(sync(InputChannels.asList(chan))).containsExactly(1, 2, 3, 4, 5);
         }
         {
             VException error = new VException("boo");
-            InputChannel<Integer> chan = new ListInputChannel<>(error, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5);
             try {
                 sync(InputChannels.asList(chan));
                 fail("Expected InputChannels.asList() to fail");
@@ -128,8 +152,8 @@ public class InputChannelsTest extends TestCase {
         }
         {
             final VException error = new VException("boo");
-            InputChannel<Integer> chan = InputChannels.transform(
-                    new ListInputChannel<>(error, 1, 2, 3, 4, 5),
+            InputChannel<Integer> chan = InputChannels.transform(ctx,
+                    new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5),
                     new InputChannels.TransformFunction<Integer, Integer>() {
                         @Override
                         public Integer apply(Integer from) throws VException {
@@ -147,21 +171,32 @@ public class InputChannelsTest extends TestCase {
             }
         }
         {
+            // Test cancellation.
+            InputChannel<Integer> chan = new ListInputChannel<>(null, 3, 1, 2, 3, 4, 5);
+            try {
+                sync(InputChannels.asList(chan));
+                fail("Expected InputChannels.asList() to fail");
+            } catch (VException e) {
+                assertThat(e).isEqualTo(new CanceledException(null));
+            }
+        }
+        {
             // Make sure a channel with lots of elements is handled correctly.
             final int numElems = 10000;
             Integer[] elems = new Integer[numElems];
             for (int i = 0; i < numElems; ++i) {
                 elems[i] = i;
             }
-            InputChannel<Integer> chan = new ListInputChannel<>(null, elems);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, elems);
             assertThat(sync(InputChannels.asList(chan))).isEqualTo(Arrays.asList(elems));
         }
     }
 
     public void testWithCallback() throws Exception {
         {
-            InputChannel<Integer> chan = new ListInputChannel<>(null, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
             final AtomicInteger sum = new AtomicInteger(0);
+            final SettableFuture<VException> failFuture = SettableFuture.create();
             sync(InputChannels.withCallback(chan, new Callback<Integer>() {
                 @Override
                 public void onSuccess(Integer result) {
@@ -169,15 +204,18 @@ public class InputChannelsTest extends TestCase {
                 }
                 @Override
                 public void onFailure(VException error) {
-                    fail("Should never be called.");
+                    // Should never be called.
+                    failFuture.set(error);
                 }
             }));
+            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(15);
         }
         {
             final VException error = new VException("boo");
-            InputChannel<Integer> chan = new ListInputChannel<>(error, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5);
             final AtomicInteger sum = new AtomicInteger(0);
+            final SettableFuture<VException> failFuture = SettableFuture.create();
             try {
                 sync(InputChannels.withCallback(chan, new Callback<Integer>() {
                     @Override
@@ -186,23 +224,52 @@ public class InputChannelsTest extends TestCase {
                     }
                     @Override
                     public void onFailure(VException e) {
-                        fail("Should never be called.");
+                        // Should never be called.
+                        failFuture.set(error);
                     }
                 }));
                 fail("Expected InputChannels.withCallback() to fail");
             } catch (VException e) {
                 assertThat(e).isEqualTo(error);
             }
+            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(15);
         }
         {
+            // Test cancellation.
+            InputChannel<Integer> chan = new ListInputChannel<>(null, 3, 1, 2, 3, 4, 5);
+            final AtomicInteger sum = new AtomicInteger(0);
+            final SettableFuture<VException> failFuture = SettableFuture.create();
+            try {
+                sync(InputChannels.withCallback(chan, new Callback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer result) {
+                        sum.addAndGet(result);
+                    }
+
+                    @Override
+                    public void onFailure(VException error) {
+                        // Should never be called.
+                        failFuture.set(error);
+                    }
+                }));
+                fail("Expected InputChannels.withCallback() to fail");
+            } catch (VException e) {
+                assertThat(e).isEqualTo(new CanceledException(null));
+            }
+            assertThat(failFuture.isDone()).isFalse();
+            assertThat(sum.get()).isEqualTo(6);
+        }
+        {
+            // Large number of callbacks
             final int numElems = 10000;
             Integer[] elems = new Integer[numElems];
             for (int i = 0; i < numElems; ++i) {
                 elems[i] = i;
             }
-            InputChannel<Integer> chan = new ListInputChannel<>(null, elems);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, elems);
             final AtomicInteger sum = new AtomicInteger(0);
+            final SettableFuture<VException> failFuture = SettableFuture.create();
             sync(InputChannels.withCallback(chan, new Callback<Integer>() {
                 @Override
                 public void onSuccess(Integer result) {
@@ -210,26 +277,37 @@ public class InputChannelsTest extends TestCase {
                 }
                 @Override
                 public void onFailure(VException error) {
-                    fail("Callback error: " + error);
+                    // Should never be called.
+                    failFuture.set(error);
                 }
             }));
+            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(numElems * (numElems - 1) / 2);
         }
     }
 
     public void testAsDone() throws Exception {
         {
-            InputChannel<Integer> chan = new ListInputChannel<>(null, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
             sync(InputChannels.asDone(chan));
         }
         {
             VException error = new VException("boo");
-            InputChannel<Integer> chan = new ListInputChannel<>(error, 1, 2, 3, 4, 5);
+            InputChannel<Integer> chan = new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5);
             try {
                 sync(InputChannels.asDone(chan));
                 fail("Expected InputChannels.asDone() to fail");
             } catch (VException e) {
                 assertThat(e).isEqualTo(error);
+            }
+        }
+        {
+            try {
+                InputChannel<Integer> chan = new ListInputChannel<>(null, 3, 1, 2, 3, 4, 5);
+                sync(InputChannels.asDone(chan));
+                fail("Expected InputChannels.asDone() to fail");
+            } catch (VException e) {
+                assertThat(e).isEqualTo(new CanceledException(null));
             }
         }
         {
@@ -239,7 +317,7 @@ public class InputChannelsTest extends TestCase {
             for (int i = 0; i < numElems; ++i) {
                 elems[i] = i;
             }
-            InputChannel<Integer> chan = new ListInputChannel<>(null, elems);
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, elems);
             sync(InputChannels.asDone(chan));
         }
     }
@@ -247,20 +325,25 @@ public class InputChannelsTest extends TestCase {
     private static class ListInputChannel<T> implements InputChannel<T> {
         private static ExecutorService pool = Executors.newSingleThreadExecutor();
         private final List<T> input;
+        private int cancelAtIndex;
         private int index;
         private final VException error;
 
         @SafeVarargs
-        ListInputChannel(VException error, T... elems) {
+        ListInputChannel(VException error, int cancelAtIndex, T... elems) {
             this.input = Arrays.asList(elems);
-            this.index = 0;
             this.error = error;
+            this.cancelAtIndex = cancelAtIndex;
+            this.index = 0;
         }
         @Override
         public ListenableFuture<T> recv() {
             if (index >= input.size()) {
                 return Futures.immediateFailedFuture(
                         error != null ? error : new EndOfFileException(null));
+            }
+            if (cancelAtIndex != -1 && index >= cancelAtIndex) {
+                return Futures.immediateCancelledFuture();
             }
             // We run the callback in a separate thread to make sure it's handled correctly.
             final ListenableFutureCallback<T> callback = new ListenableFutureCallback<>();
@@ -270,7 +353,7 @@ public class InputChannelsTest extends TestCase {
                     callback.onSuccess(input.get(index++));
                 }
             });
-            return callback.getFuture();
+            return callback.getVanillaFuture();
         }
     }
 }

@@ -16,6 +16,7 @@ import io.v.impl.google.ListenableFutureCallback;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 import io.v.v23.security.access.Permissions;
@@ -99,7 +100,7 @@ class DatabaseImpl implements Database, BatchDatabase {
     public ListenableFuture<QueryResults> exec(VContext ctx, String query) {
         final ClientRecvStream<List<VdlAny>, Void> stream =
                 client.exec(ctx, getSchemaVersion(), query);
-        return Futures.transform(stream.recv(),
+        return VFutures.withUserLandChecks(ctx, Futures.transform(stream.recv(),
                 new AsyncFunction<List<VdlAny>, QueryResults>() {
                     @Override
                     public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
@@ -107,7 +108,7 @@ class DatabaseImpl implements Database, BatchDatabase {
                         return Futures.immediateFuture(
                                 (QueryResults) new QueryResultsImpl(columnNames, stream));
                     }
-                });
+                }));
     }
 
     // Implements AccessController interface.
@@ -118,13 +119,13 @@ class DatabaseImpl implements Database, BatchDatabase {
 
     @Override
     public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx) {
-        return Futures.transform(client.getPermissions(ctx),
+        return VFutures.withUserLandChecks(ctx, Futures.transform(client.getPermissions(ctx),
                 new Function<ObjectClient.GetPermissionsOut, Map<String, Permissions>>() {
                     @Override
                     public Map<String, Permissions> apply(ObjectClient.GetPermissionsOut perms) {
                         return ImmutableMap.of(perms.version, perms.perms);
                     }
-                });
+                }));
     }
 
     // Implements Database interface.
@@ -150,12 +151,12 @@ class DatabaseImpl implements Database, BatchDatabase {
                     "from within BatchDatabase?");
         }
         nativeBeginBatch(nativePtr, ctx, opts, callback);
-        return callback.getFuture();
+        return callback.getFuture(ctx);
     }
     @Override
     public InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
                                            String rowPrefix, ResumeMarker resumeMarker) {
-        return InputChannels.transform(client.watchGlob(ctx,
+        return InputChannels.transform(ctx, client.watchGlob(ctx,
                         new GlobRequest(NamingUtil.join(tableRelativeName, rowPrefix + "*"),
                                 resumeMarker)),
                 new InputChannels.TransformFunction<Change, WatchChange>() {
@@ -182,12 +183,13 @@ class DatabaseImpl implements Database, BatchDatabase {
         ListenableFuture<BlobRef> refFuture = ref == null
                                             ? client.createBlob(ctx)
                                             : Futures.immediateFuture(ref);
-        return Futures.transform(refFuture, new Function<BlobRef, BlobWriter>() {
+        return VFutures.withUserLandChecks(ctx,
+                Futures.transform(refFuture, new Function<BlobRef, BlobWriter>() {
             @Override
             public BlobWriter apply(BlobRef ref) {
                 return new BlobWriterImpl(client, ref);
             }
-        });
+        }));
     }
     @Override
     public BlobReader readBlob(VContext ctx, BlobRef ref) throws VException{
@@ -204,7 +206,7 @@ class DatabaseImpl implements Database, BatchDatabase {
                     "called from within BatchDatabase?");
         }
         nativeEnforceSchema(nativePtr, ctx, callback);
-        return callback.getFuture();
+        return callback.getFuture(ctx);
     }
 
     // Implements BatchDatabase.

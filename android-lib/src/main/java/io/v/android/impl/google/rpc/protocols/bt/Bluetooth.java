@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executor;
 
+import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
@@ -55,7 +56,7 @@ class Bluetooth {
         } else {  // listen on a specific port only
             ports = ImmutableList.of(port);
         }
-        Executor executor = V.getExecutor(ctx);
+        Executor executor = VRuntimeImpl.getRuntimeExecutor(ctx);
         if (executor == null) {
             throw new VException("NULL executor in context: did you derive this context from " +
                     "the context returned by V.init()?");
@@ -77,7 +78,7 @@ class Bluetooth {
                      final Callback<Stream> callback) throws VException {
         final String macAddr = getMACAddress(btAddr);
         final int port = getPortNumber(btAddr);
-        final Executor executor = V.getExecutor(ctx);
+        final Executor executor = VRuntimeImpl.getRuntimeExecutor(ctx);
         if (executor == null) {
             throw new VException("NULL executor in context: did you derive this context from " +
                     "the context returned by V.init()?");
@@ -239,7 +240,6 @@ class Bluetooth {
         private final BluetoothSocket socket;
         private final String localAddress;
         private final String remoteAddress;
-        private final byte[] buf = new byte[8096];
 
         Stream(Executor executor, BluetoothSocket socket, String localAddress,
                String remoteAddress) {

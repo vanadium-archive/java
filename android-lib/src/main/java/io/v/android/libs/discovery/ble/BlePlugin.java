@@ -97,8 +97,8 @@ public class BlePlugin {
     // be false if the ble hardware is inaccessible.
     private boolean isEnabled = false;
 
-    // A thread to wait for the cancellation of a particular advertisement.  VContext.done().await()
-    // is blocking so have to spin up a thread per outstanding advertisement.
+    // A thread to wait for the cancellation of a particular advertisement.
+    // TODO(spetrovic): remove this thread and replace with a callback on ctx.onDone().
     private class AdvertisementCancellationRunner implements Runnable{
         private final VContext ctx;
 
@@ -110,9 +110,8 @@ public class BlePlugin {
 
         @Override
         public void run() {
-            // TODO(spetrovic): Remove this thread and replace with a callback on ctx.done().
             try {
-                sync(ctx.done());
+                sync(ctx.onDone());
             } catch (VException e) {
                 Log.e(TAG, "Error waiting for context to be done: " + e);
             }
@@ -123,6 +122,7 @@ public class BlePlugin {
     }
 
     // Similar to AdvertisementCancellationRunner except for scanning.
+    // TODO(spetrovic): Remove this thread and replace with a callback on ctx.onDone().
     private class ScannerCancellationRunner implements Runnable{
         private VContext ctx;
 
@@ -134,9 +134,8 @@ public class BlePlugin {
 
         @Override
         public void run() {
-            // TODO(spetrovic): Remove this thread and replace with a callback on ctx.done().
             try {
-                sync(ctx.done());
+                sync(ctx.onDone());
             } catch (VException e) {
                 Log.e(TAG, "Error waiting for context to be done: " + e);
             }

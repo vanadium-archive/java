@@ -6,10 +6,13 @@ package io.v.x.jni.test.fortune;
 
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 import io.v.v23.InputChannels;
 import io.v.v23.OutputChannel;
 import io.v.v23.V;
+import io.v.v23.V23TestUtil;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Client;
@@ -35,6 +38,9 @@ import org.joda.time.Duration;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.v23.VFutures.sync;
@@ -106,6 +112,19 @@ public class FortuneTest extends TestCase {
         }
     }
 
+    public void testFortuneWithExecutor() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        Executor executor = Executors.newSingleThreadExecutor();
+        Thread executorThread = getThread(executor);
+        ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        String firstMessage = "First fortune";
+        V23TestUtil.assertRunsOnThread(client.add(ctxT, firstMessage), executorThread);
+        V23TestUtil.assertRunsOnThread(client.get(ctxT), executorThread);
+    }
+
     public void testStreaming() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
@@ -122,6 +141,51 @@ public class FortuneTest extends TestCase {
         assertThat(sync(InputChannels.asList(stream))).containsExactly(msg, msg, msg, msg, msg);
         int result = sync(stream.finish());
         assertEquals(5, result);
+    }
+
+    public void testStreamingWithExecutor() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        Executor executor = Executors.newSingleThreadExecutor();
+        Thread executorThread = getThread(executor);
+        ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
+        String msg = "The only fortune";
+        sync(client.add(ctxT, msg));
+        for (int i = 0; i < 5; ++i) {
+            V23TestUtil.assertRunsOnThread(stream.send(true), executorThread);
+        }
+        V23TestUtil.assertRunsOnThread(stream.close(), executorThread);
+        for (int i = 0; i < 5; ++i) {
+            V23TestUtil.assertRunsOnThread(stream.recv(), executorThread);
+        }
+        V23TestUtil.assertRunsOnThread(stream.finish(), executorThread);
+    }
+
+    public void testStreamingWithCancel() throws Exception {
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
+        String msg = "The only fortune";
+        sync(client.add(ctxT, msg));
+        for (int i = 0; i < 5; ++i) {
+            sync(stream.send(true));
+        }
+        sync(stream.close());
+        for (int i = 0; i < 3; ++i) {
+            assertThat(sync(stream.recv())).isEqualTo(msg);
+        }
+        ctxT.cancel();
+        try {
+            sync(stream.recv());
+            fail("stream.recv() should fail after context has been canceled");
+        } catch (CanceledException e) {
+            // OK
+        }
     }
 
     public void testMultiple() throws Exception {
@@ -204,7 +268,8 @@ public class FortuneTest extends TestCase {
         ClientCall call = sync(
                 c.startCall(ctxT, name(), "__Signature", new Object[0], new Type[0]));
         Object[] results = sync(
-                call.finish(new Type[] { new TypeToken<Interface[]>() {}.getType() }));
+                call.finish(new Type[]{new TypeToken<Interface[]>() {
+                }.getType()}));
         assertThat(results.length == 1).isTrue();
         Interface[] signature = (Interface[]) results[0];
         assertThat(signature.length >= 1).isTrue();
@@ -323,6 +388,38 @@ public class FortuneTest extends TestCase {
         public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)
                 throws VException {
             sync(responseChannel.close());
+        }
+    }
+
+    private static Thread getThread(Executor executor) throws Exception {
+        final SettableFuture<Thread> threadFuture =
+                com.google.common.util.concurrent.SettableFuture.create();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                threadFuture.set(Thread.currentThread());
+            }
+        });
+        return threadFuture.get();
+    }
+
+    private static class DelayedExecutor implements Executor {
+        private final Executor executor;
+        private final int delayMs;
+
+        DelayedExecutor(Executor executor, int delayMs) {
+            this.executor = executor;
+            this.delayMs = delayMs;
+        }
+        @Override
+        public void execute(final Runnable runnable) {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Uninterruptibles.sleepUninterruptibly(delayMs, TimeUnit.MILLISECONDS);
+                    runnable.run();
+                }
+            });
         }
     }
 }

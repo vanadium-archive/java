@@ -8,25 +8,28 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.InputChannel;
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 
 /**
  * An implementation of {@link InputChannel} that reads data using Go recv function.
  */
 class InputChannelImpl<T> implements InputChannel<T> {
+    private final VContext ctx;
     private final long nativeRecvPtr;
 
     private native void nativeRecv(long nativeRecvPtr, Callback<T> callback);
     private native void nativeFinalize(long nativeRecvPtr);
 
-    private InputChannelImpl(long nativeRecvPtr) {
+    private InputChannelImpl(VContext ctx, long nativeRecvPtr) {
+        this.ctx = ctx;
         this.nativeRecvPtr = nativeRecvPtr;
     }
     @Override
     public ListenableFuture<T> recv() {
         ListenableFutureCallback<T> callback = new ListenableFutureCallback<>();
         nativeRecv(nativeRecvPtr, callback);
-        return callback.getFuture();
+        return callback.getFuture(ctx);
     }
     @Override
     protected void finalize() {

@@ -37,8 +37,14 @@ public interface VDiscovery {
      * <p>
      * It is an error to have simultaneously active advertisements for two identical
      * instances (i.e., {@link Service#instanceId}s).
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param ctx        a context that will be used to stop the advertisement; the advertisement
+     * @param context    a context that will be used to stop the advertisement; the advertisement
      *                   will end when the context is cancelled or timed out
      * @param service    the service with the attributes to advertises; this may be update with
      *                   a random unique identifier if service.instanceId is not specified.
@@ -50,7 +56,7 @@ public interface VDiscovery {
      */
     @CheckReturnValue
     ListenableFuture<ListenableFuture<Void>> advertise(
-            VContext ctx, Service service, List<BlessingPattern> visibility);
+            VContext context, Service service, List<BlessingPattern> visibility);
 
     /**
      * Scans services that match the query and returns an {@link InputChannel} of updates.
@@ -69,11 +75,11 @@ public interface VDiscovery {
      * You can find the {@code SyncQL} tutorial at:
      *     https://github.com/vanadium/docs/blob/master/tutorials/syncql-tutorial.md
      *
-     * @param ctx    a context that will be used to stop the scan;  scan will end when the context
-     *               is cancelled or timed out
-     * @param query  a WHERE expression of {@code syncQL query} against scanned services
-     * @return       a (potentially-infite) {@link InputChannel} of updates
+     * @param context  a context that will be used to stop the scan;  scan will end when the context
+     *                 is cancelled or timed out
+     * @param query    a WHERE expression of {@code syncQL query} against scanned services
+     * @return         a (potentially-infite) {@link InputChannel} of updates
      */
     @CheckReturnValue
-    InputChannel<Update> scan(VContext ctx, String query);
+    InputChannel<Update> scan(VContext context, String query);
 }

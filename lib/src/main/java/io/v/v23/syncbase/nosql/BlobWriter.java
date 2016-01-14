@@ -61,6 +61,12 @@ public interface BlobWriter {
 
     /**
      * Marks the blob as immutable.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
      * @param  ctx        vanadium context
      */
@@ -69,6 +75,12 @@ public interface BlobWriter {
 
     /**
      * Deletes the blob locally (committed or uncommitted).
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      * <p>
      * NOT YET IMPLEMENTED.
      *
@@ -86,6 +98,12 @@ public interface BlobWriter {
      * This is the only accurate measure of a write progress: relying on a write progress of
      * {@link OutputStream} returned by {@link #stream} would be a mistake (see comments
      * on {@link #stream}).
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
      * @param ctx         vanadium context
      */

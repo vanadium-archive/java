@@ -20,6 +20,7 @@ import java.util.concurrent.Executor;
 
 import javax.annotation.CheckReturnValue;
 
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
@@ -48,8 +49,9 @@ public class InputChannels {
      * of {@code fromChannel}.
      */
     public static <F,T> InputChannel<T> transform(
-            InputChannel<F> fromChannel, TransformFunction<? super F, ? extends T> function) {
-        return new TransformedChannel<>(fromChannel, function);
+            VContext ctx, InputChannel<F> fromChannel,
+            TransformFunction<? super F, ? extends T> function) {
+        return new TransformedChannel<>(ctx, fromChannel, function);
     }
 
     /**
@@ -75,18 +77,20 @@ public class InputChannels {
                                                        Executor executor) {
         final SettableFuture<List<T>> future = SettableFuture.create();
         Futures.addCallback(channel.recv(), newCallbackForList(
-                channel, new ArrayList<T>(), future), executor);
+                channel, new ArrayList<T>(), future, executor), executor);
         return future;
     }
 
     private static <T> FutureCallback<T> newCallbackForList(
             final InputChannel<T> channel, final List<T> list,
-            final SettableFuture<List<T>> future) {
+            final SettableFuture<List<T>> future,
+            final Executor executor) {
         return new FutureCallback<T>() {
             @Override
             public void onSuccess(T result) {
                 list.add(result);
-                Futures.addCallback(channel.recv(), newCallbackForList(channel, list, future));
+                Futures.addCallback(channel.recv(),
+                        newCallbackForList(channel, list, future, executor), executor);
             }
             @Override
             public void onFailure(Throwable t) {
@@ -121,16 +125,19 @@ public class InputChannels {
     public static <T> ListenableFuture<Void> asDone(final InputChannel<T> channel,
                                                     Executor executor) {
         final SettableFuture<Void> future = SettableFuture.create();
-        Futures.addCallback(channel.recv(), newCallbackForDone(channel, future), executor);
+        Futures.addCallback(channel.recv(),
+                newCallbackForDone(channel, future, executor), executor);
         return future;
     }
 
     private static <T> FutureCallback<T> newCallbackForDone(final InputChannel<T> channel,
-                                                            final SettableFuture<Void> future) {
+                                                            final SettableFuture<Void> future,
+                                                            final Executor executor) {
         return new FutureCallback<T>() {
             @Override
             public void onSuccess(T result) {
-                Futures.addCallback(channel.recv(), newCallbackForDone(channel, future));
+                Futures.addCallback(channel.recv(),
+                        newCallbackForDone(channel, future, executor), executor);
             }
             @Override
             public void onFailure(Throwable t) {
@@ -212,17 +219,21 @@ public class InputChannels {
     }
 
     private static class TransformedChannel<F, T> implements InputChannel<T> {
+        private final VContext ctx;
         private final InputChannel<F> fromChannel;
         private final TransformFunction<? super F, ? extends T> function;
 
-        private TransformedChannel(InputChannel<F> fromChannel,
+        private TransformedChannel(VContext ctx,
+                                   InputChannel<F> fromChannel,
                                    TransformFunction<? super F, ? extends T> function) {
+            this.ctx = ctx;
             this.fromChannel = fromChannel;
             this.function = function;
         }
         @Override
         public ListenableFuture<T> recv() {
-            return Futures.transform(fromChannel.recv(), new AsyncFunction<F, T>() {
+            return VFutures.withUserLandChecks(ctx,
+                    Futures.transform(fromChannel.recv(), new AsyncFunction<F, T>() {
                 @Override
                 public ListenableFuture<T> apply(F input) throws Exception {
                     T output = function.apply(input);
@@ -231,7 +242,7 @@ public class InputChannels {
                     }
                     return Futures.immediateFuture(output);
                 }
-            });
+            }));
         }
     }
 

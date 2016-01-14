@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import io.v.v23.VFutures;
 import io.v.v23.services.syncbase.nosql.DatabaseClient;
 import io.v.v23.services.syncbase.nosql.DatabaseClientFactory;
 import io.v.v23.services.syncbase.nosql.SyncgroupManagerClient;
@@ -51,14 +52,15 @@ class SyncgroupImpl implements Syncgroup {
     }
     @Override
     public ListenableFuture<Map<String, SyncgroupSpec>> getSpec(VContext ctx) {
-        return Futures.transform(dbClient.getSyncgroupSpec(ctx, name), new Function<
+        return VFutures.withUserLandChecks(ctx,
+                Futures.transform(dbClient.getSyncgroupSpec(ctx, name), new Function<
                 SyncgroupManagerClient.GetSyncgroupSpecOut, Map<String, SyncgroupSpec>>() {
             @Override
             public Map<String, SyncgroupSpec> apply(
                     SyncgroupManagerClient.GetSyncgroupSpecOut spec) {
                 return ImmutableMap.of(spec.version, spec.spec);
             }
-        });
+        }));
     }
     @Override
     public ListenableFuture<Void> setSpec(VContext ctx, SyncgroupSpec spec, String version) {

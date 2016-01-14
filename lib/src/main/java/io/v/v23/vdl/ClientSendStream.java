@@ -21,14 +21,16 @@ public interface ClientSendStream<SendT, FinishT> extends OutputChannel<SendT> {
      * Returns a new {@link ListenableFuture} that performs the equivalent of {@link #close},
      * then waits until the server is done and returns the call return value.
      * <p>
-     * If the call context has been canceled, depending on the timing, the returned
-     * {@link ListenableFuture} may either fail with {@link io.v.v23.verror.CanceledException} or
-     * return a valid call return value.
-     * <p>
      * Calling {@link #finish} is mandatory for releasing stream resources, unless the call context
      * has been canceled or any of the other methods threw an exception.
      * <p>
      * Must be called at most once.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this stream (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if the
+     * context used for creating this stream has been canceled.
      *
      * @return a new {@link ListenableFuture} whose result is the call return value
      */

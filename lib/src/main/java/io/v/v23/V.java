@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.context.VContext;
@@ -49,6 +50,7 @@ public class V {
     private static native void nativeInitGlobalShared() throws VException;
     private static native void nativeInitGlobalJava(Options opts) throws VException;
 
+    private static volatile VRuntime runtime;
     private static volatile VContext globalContext;
 
     private static boolean isDarwin() {
@@ -118,7 +120,6 @@ public class V {
             throw new RuntimeException("Couldn't register caveat validators", e);
         }
         // See if a runtime was provided as an option.
-        VRuntime runtime;
         if (opts.get(OptionDefs.RUNTIME) != null) {
             runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
         } else {
@@ -133,14 +134,15 @@ public class V {
         if (!ctx.isCancelable()) {
             throw new RuntimeException("Context returned by the runtime must be cancelable");
         }
-        ctx = ctx.withValue(new RuntimeKey(), runtime);
         return ctx;
     }
 
     // Initializes the Vanadium Java-specific global state.
-    private static void initGlobalJava(Options opts) {
+    private static VContext initGlobalJava(VContext ctx, Options opts) {
         try {
             nativeInitGlobalJava(opts);
+            ctx = V.withExecutor(ctx, Executors.newCachedThreadPool());
+            return ctx;
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize Java", e);
         }
@@ -157,7 +159,7 @@ public class V {
             }
             if (opts == null) opts = new Options();
             VContext ctx = initGlobalShared(opts);
-            initGlobalJava(opts);
+            ctx = initGlobalJava(ctx, opts);
             // Set the VException component name to this binary name.
             ctx = VException.contextWithComponentName(ctx, System.getProperty("program.name", ""));
             globalContext = ctx;
@@ -459,6 +461,16 @@ public class V {
     }
 
     /**
+     * Attaches the given {@link Executor} to a new context (which is derived from the given
+     * context).  This executor will be used for all callbacks into the user code.
+     * <p>
+     * If this method is never invoked, a default executor for the platform will be used.
+     */
+    public static VContext withExecutor(VContext ctx, Executor executor) {
+        return ctx.withValue(new ExecutorKey(), executor);
+    }
+
+    /**
      * Returns the {@link Executor} attached to the given context, or {@code null} if no
      * {@link Executor} is attached.
      * <p>
@@ -466,18 +478,17 @@ public class V {
      * instance will never be {@code null}.
      */
     public static Executor getExecutor(VContext ctx) {
-        return getRuntime(ctx).getExecutor(ctx);
+        return (Executor) ctx.value(new ExecutorKey());
     }
 
     private static VRuntime getRuntime(VContext ctx) {
-        VRuntime runtime = (VRuntime) ctx.value(new RuntimeKey());
         if (runtime == null) {
             throw new RuntimeException("Vanadium runtime is null: did you call V.init()?");
         }
         return runtime;
     }
 
-    private static class RuntimeKey {
+    private static class ExecutorKey {
         @Override
         public int hashCode() {
             return 0;

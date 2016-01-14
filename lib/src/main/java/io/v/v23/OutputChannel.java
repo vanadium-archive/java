@@ -14,6 +14,12 @@ import javax.annotation.CheckReturnValue;
 public interface OutputChannel<T> {
     /**
      * Writes the given value to the channel.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this channel (see {@link V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if the
+     * context used for creating this channel has been canceled.
      *
      * @param item        an item to be sent
      */
@@ -24,6 +30,12 @@ public interface OutputChannel<T> {
      * Indicates to the receiver that no more items will be sent.
      * <p>
      * This is an optional call intended to signal the receiver that no more items will be sent.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this channel (see {@link V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if the
+     * context used for creating this channel has been canceled.
      */
     @CheckReturnValue
     ListenableFuture<Void> close();

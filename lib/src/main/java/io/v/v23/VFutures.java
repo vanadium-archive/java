@@ -4,11 +4,19 @@
 
 package io.v.v23;
 
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import io.v.v23.context.VContext;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 /**
@@ -22,12 +30,16 @@ public class VFutures {
      * This method requires that {@code future}'s computation may only throw a {@link VException} -
      * any other exception type will result in a {@link RuntimeException}.
      * <p>
-     * Likewise, if the {@code future}'s execution raises an {@link InterruptedException}, this
+     * If the {@code future}'s execution raises an {@link CancellationException}, this method
+     * will throw a {@link CanceledException} (which is a {@link VException}).
+     * <p>
+     * If the {@code future}'s execution raises an {@link InterruptedException}, this
      * method will raise a {@link RuntimeException}.
      *
      * @param future the future being executed
      * @return the computed result of the future
      * @throws VException if the computation embodied by the future threw a {@link VException}
+     * @throws CanceledException if the future's execution raised an {@link CancellationException}
      * @throws RuntimeException if the computation embodied by the future threw an exception
      *                          other than {@link VException}, or if the future's executions raised
      *                          an {@link InterruptedException}
@@ -38,6 +50,8 @@ public class VFutures {
         } catch (ExecutionException e) {
             if (e.getCause() instanceof VException) {
                 throw (VException) e.getCause();
+            } else if (e.getCause() instanceof CancellationException) {
+                throw new CanceledException(null);
             } else if (e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();
             }
@@ -46,6 +60,8 @@ public class VFutures {
                     e.getCause());
         } catch (InterruptedException e) {
             throw new RuntimeException("Vanadium future may not raise an InterruptedException.", e);
+        } catch (CancellationException e) {
+            throw new CanceledException(null);
         }
     }
 
@@ -56,7 +72,10 @@ public class VFutures {
      * This method requires that {@code future}'s computation may only throw a {@link VException} -
      * any other exception type will result in a {@link RuntimeException}.
      * <p>
-     * Likewise, if the {@code future}'s execution results in an {@link InterruptedException}, this
+     * If the {@code future}'s execution raises an {@link CancellationException}, this method
+     * will throw a {@link CanceledException} (which is a {@link VException}).
+     * <p>
+     * If the {@code future}'s execution results in an {@link InterruptedException}, this
      * method will raise a {@link RuntimeException}.
      *
      * @param future the future being executed
@@ -64,6 +83,7 @@ public class VFutures {
      * @param unit the time unit of the timeout argument
      * @return the computed result of the future
      * @throws VException if the computation embodied by the future threw a {@link VException}
+     * @throws CanceledException if the future's execution raised an {@link CancellationException}
      * @throws RuntimeException if the computation embodied by the future threw an exception
      *                          other than {@link VException}, or if the future's executions raised
      *                          an {@link InterruptedException}
@@ -76,6 +96,8 @@ public class VFutures {
         } catch (ExecutionException e) {
             if (e.getCause() instanceof VException) {
                 throw (VException) e.getCause();
+            } else if (e.getCause() instanceof CancellationException) {
+                throw new CanceledException(null);
             } else if (e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();
             }
@@ -84,6 +106,52 @@ public class VFutures {
                     e.getCause());
         } catch (InterruptedException e) {
             throw new RuntimeException("Vanadium future may not raise an InterruptedException.", e);
+        } catch (CancellationException e) {
+            throw new CanceledException(null);
         }
+    }
+
+    /**
+     * Returns a new {@link ListenableFuture} whose result is the same as the result of the
+     * given {@code future} and is executed on an {@link Executor} specified in the given
+     * {@code context}.
+     * <p>
+     * If no executor is specified in the context, the future may be executed on an arbitrary
+     * thread.
+     */
+    public static <T> ListenableFuture<T> onExecutor(
+            final VContext context, final ListenableFuture<T> future) {
+        Executor executor = V.getExecutor(context);
+        if (executor == null) {
+            return future;
+        }
+        return Futures.transform(future, new AsyncFunction<T, T>() {
+            @Override
+            public ListenableFuture<T> apply(T input) throws Exception {
+                return Futures.immediateFuture(input);
+            }
+        }, executor);
+    }
+
+    /**
+     * Returns a new {@link ListenableFuture} that runs on an {@link Executor} specified in the
+     * given {@code context} and is canceled iff the given {@code context} has been canceled.
+     */
+    public static <T> ListenableFuture<T> withUserLandChecks(
+            final VContext context, final ListenableFuture<T> future) {
+        Executor executor = V.getExecutor(context);
+        if (executor == null) {
+            throw new RuntimeException("NULL executor in context: did you derive this context " +
+                    "from the context returned by V.init()?");
+        }
+        return Futures.transform(future, new AsyncFunction<T, T>() {
+            @Override
+            public ListenableFuture<T> apply(T input) throws Exception {
+                if (context.isCanceled()) {
+                    return Futures.immediateCancelledFuture();
+                }
+                return Futures.immediateFuture(input);
+            }
+        }, executor);
     }
 }

@@ -26,6 +26,12 @@ public interface Client {
      * <ul>
      *     <li>{@link io.v.v23.OptionDefs#SKIP_SERVER_ENDPOINT_AUTHORIZATION}</li>
      * </ul>
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
      * @param  context   client context
      * @param  name      name of the server

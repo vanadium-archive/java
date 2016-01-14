@@ -4,8 +4,6 @@
 
 package io.v.v23;
 
-import java.util.concurrent.Executor;
-
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.VDiscovery;
 import io.v.v23.namespace.Namespace;
@@ -207,13 +205,4 @@ public interface VRuntime {
      * the returned discovery instance will never be {@code null}.
      */
     VDiscovery getDiscovery(VContext ctx);
-
-    /**
-     * Returns the {@link Executor} attached to the given context, or {@code null} if no
-     * {@link Executor} is attached.
-     * <p>
-     * If the passed-in context is derived from the context returned by {@link #getContext}, the
-     * returned instance will never be {@code null}.
-     */
-    Executor getExecutor(VContext ctx);
 }

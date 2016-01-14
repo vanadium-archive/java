@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import javax.annotation.CheckReturnValue;
 
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
@@ -20,6 +21,9 @@ import io.v.v23.services.syncbase.nosql.ConcurrentBatchException;
  * Various utility methods for the NoSql database.
  */
 public class NoSql {
+    /**
+     * Creates a new nosql database given the parent name, database relative name, and a schema.
+     */
     public static Database newDatabase(String parentFullName, String relativeName, Schema schema) {
         return DatabaseImpl.create(parentFullName, relativeName, schema);
     }
@@ -40,16 +44,24 @@ public class NoSql {
     /**
      * Runs the given batch operation, managing retries and
      * {@link BatchDatabase#commit commit()}/{@link BatchDatabase#abort abort()}s.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  db         database on which the batch operation is to be performed
      * @param  opts       batch configuration
      * @param  op         batch operation
      */
     @CheckReturnValue
-    public static ListenableFuture<Void> runInBatch(VContext ctx, Database db,
+    public static ListenableFuture<Void> runInBatch(VContext context, Database db,
                                                     BatchOptions opts, BatchOperation op) {
-        return Futures.transform(Futures.immediateFuture(false), getRetryFn(ctx, db, opts, op, 0));
+        return VFutures.withUserLandChecks(context,
+                Futures.transform(Futures.immediateFuture(false),
+                        getRetryFn(context, db, opts, op, 0)));
     }
 
     private static AsyncFunction<Boolean, Void> getRetryFn(final VContext ctx,

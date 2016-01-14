@@ -61,84 +61,84 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public ListenableFuture<Void> mount(VContext context, String name, String server,
+    public ListenableFuture<Void> mount(VContext ctx, String name, String server,
                                         Duration ttl) {
-        return mount(context, name, server, ttl, null);
+        return mount(ctx, name, server, ttl, null);
     }
 
     @Override
-    public ListenableFuture<Void> mount(VContext context, String name, String server, Duration ttl,
+    public ListenableFuture<Void> mount(VContext ctx, String name, String server, Duration ttl,
                                         Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeMount(nativePtr, context, name, server, ttl, options, callback);
-        return callback.getFuture();
+        nativeMount(nativePtr, ctx, name, server, ttl, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public ListenableFuture<Void> unmount(VContext context, String name, String server) {
-        return unmount(context, name, server, null);
+    public ListenableFuture<Void> unmount(VContext ctx, String name, String server) {
+        return unmount(ctx, name, server, null);
     }
 
     @Override
-    public ListenableFuture<Void> unmount(VContext context, String name, String server,
+    public ListenableFuture<Void> unmount(VContext ctx, String name, String server,
                                           Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeUnmount(nativePtr, context, name, server, options, callback);
-        return callback.getFuture();
+        nativeUnmount(nativePtr, ctx, name, server, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree) {
-        return delete(context, name, deleteSubtree, null);
+    public ListenableFuture<Void> delete(VContext ctx, String name, boolean deleteSubtree) {
+        return delete(ctx, name, deleteSubtree, null);
     }
 
     @Override
-    public ListenableFuture<Void> delete(VContext context, String name, boolean deleteSubtree,
+    public ListenableFuture<Void> delete(VContext ctx, String name, boolean deleteSubtree,
                                          Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeDelete(nativePtr, context, name, deleteSubtree, options, callback);
-        return callback.getFuture();
+        nativeDelete(nativePtr, ctx, name, deleteSubtree, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public ListenableFuture<MountEntry> resolve(VContext context, String name) {
-        return resolve(context, name, null);
+    public ListenableFuture<MountEntry> resolve(VContext ctx, String name) {
+        return resolve(ctx, name, null);
     }
 
     @Override
-    public ListenableFuture<MountEntry> resolve(VContext context, String name, Options options) {
+    public ListenableFuture<MountEntry> resolve(VContext ctx, String name, Options options) {
         ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
-        nativeResolve(nativePtr, context, name, options, callback);
-        return callback.getFuture();
+        nativeResolve(nativePtr, ctx, name, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name) {
-        return resolveToMountTable(context, name, null);
+    public ListenableFuture<MountEntry> resolveToMountTable(VContext ctx, String name) {
+        return resolveToMountTable(ctx, name, null);
     }
 
     @Override
-    public ListenableFuture<MountEntry> resolveToMountTable(VContext context, String name,
+    public ListenableFuture<MountEntry> resolveToMountTable(VContext ctx, String name,
                                                             Options options) {
         ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
-        nativeResolveToMountTable(nativePtr, context, name, options, callback);
-        return callback.getFuture();
+        nativeResolveToMountTable(nativePtr, ctx, name, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public boolean flushCacheEntry(VContext context, String name) {
-        return nativeFlushCacheEntry(nativePtr, context, name);
+    public boolean flushCacheEntry(VContext ctx, String name) {
+        return nativeFlushCacheEntry(nativePtr, ctx, name);
     }
 
     @Override
-    public InputChannel<GlobReply> glob(VContext context, String pattern) {
-        return glob(context, pattern, null);
+    public InputChannel<GlobReply> glob(VContext ctx, String pattern) {
+        return glob(ctx, pattern, null);
     }
 
     @Override
-    public InputChannel<GlobReply> glob(VContext context, String pattern, Options options) {
+    public InputChannel<GlobReply> glob(VContext ctx, String pattern, Options options) {
         try {
-            return nativeGlob(nativePtr, context, pattern, options);
+            return nativeGlob(nativePtr, ctx, pattern, options);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create glob InputChannel.", e);
         }
@@ -150,32 +150,32 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
-    public ListenableFuture<Void> setPermissions(VContext context, String name,
+    public ListenableFuture<Void> setPermissions(VContext ctx, String name,
                                                  Permissions permissions, String version) {
-        return setPermissions(context, name, permissions, version, null);
+        return setPermissions(ctx, name, permissions, version, null);
     }
 
     @Override
-    public ListenableFuture<Void> setPermissions(VContext context, String name,
+    public ListenableFuture<Void> setPermissions(VContext ctx, String name,
                                                  Permissions permissions, String version,
                                                  Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeSetPermissions(nativePtr, context, name, permissions, version, options, callback);
-        return callback.getFuture();
+        nativeSetPermissions(nativePtr, ctx, name, permissions, version, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override
-    public ListenableFuture<Map<String, Permissions>> getPermissions(VContext context,
+    public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx,
                                                                      String name) {
-        return getPermissions(context, name, null);
+        return getPermissions(ctx, name, null);
     }
 
     @Override
-    public ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name,
+    public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx, String name,
                                                                      Options options) {
         final ListenableFutureCallback<Map<String, Permissions>> callback = new ListenableFutureCallback<>();
-        nativeGetPermissions(nativePtr, context, name, options, callback);
-        return callback.getFuture();
+        nativeGetPermissions(nativePtr, ctx, name, options, callback);
+        return callback.getFuture(ctx);
     }
 
     @Override

@@ -13,6 +13,7 @@ import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
 import io.v.v23.V;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.verror.VException;
@@ -85,15 +86,23 @@ public class Util {
     /**
      * Returns a new {@link ListenableFuture} whose result are the relative names of all children
      * of {@code parentFullName}.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx            Vanadium context
+     * @param  context        Vanadium context
      * @param  parentFullName object name of parent component
      */
     @CheckReturnValue
-    public static ListenableFuture<List<String>> listChildren(VContext ctx, String parentFullName) {
+    public static ListenableFuture<List<String>> listChildren(
+            VContext context, String parentFullName) {
         InputChannel<GlobReply> input =
-                V.getNamespace(ctx).glob(ctx, NamingUtil.join(parentFullName, "*"));
-        return Futures.transform(InputChannels.asList(InputChannels.transform(input,
+                V.getNamespace(context).glob(context, NamingUtil.join(parentFullName, "*"));
+        return VFutures.withUserLandChecks(context,
+                Futures.transform(InputChannels.asList(InputChannels.transform(context, input,
                 new InputChannels.TransformFunction<GlobReply, String>() {
                     @Override
                     public String apply(GlobReply from) throws VException {
@@ -105,7 +114,7 @@ public class Util {
                 return Ordering.from(Collator.getInstance())
                         .immutableSortedCopy(input);
             }
-        });
+        }));
     }
 
     private static String nameFromGlobReply(GlobReply reply) throws VException {

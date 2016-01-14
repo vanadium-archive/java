@@ -24,7 +24,6 @@ import io.v.v23.V23TestUtil;
 import io.v.v23.context.VContext;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.naming.Endpoint;
-import io.v.v23.naming.GlobError;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
 import io.v.v23.security.BlessingPattern;
@@ -117,11 +116,12 @@ public class NamespaceTest extends TestCase {
         VContext ctxC = ctx.withCancel();
         InputChannel<GlobReply> channel = n.glob(ctxC, "test/*");
         ctxC.cancel();
-        List<GlobReply> result = sync(InputChannels.asList(channel));
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getElem()).isInstanceOf(GlobError.class);
-        assertThat(((GlobError) result.get(0).getElem()).getError()).isInstanceOf(
-                CanceledException.class);
+        try {
+            sync(channel.recv());
+            fail("Expected a cancellation exception");
+        } catch (CanceledException e) {
+            // OK
+        }
     }
 
     public void testResolve() throws Exception {

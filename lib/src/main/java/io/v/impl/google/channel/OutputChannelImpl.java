@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.OutputChannel;
+import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 
 /**
@@ -15,6 +16,7 @@ import io.v.v23.rpc.Callback;
  * functions.
  */
 class OutputChannelImpl<T> implements OutputChannel<T> {
+    private final VContext ctx;
     private final long nativeConvertPtr;
     private final long nativeSendPtr;
     private final long nativeClosePtr;
@@ -24,7 +26,8 @@ class OutputChannelImpl<T> implements OutputChannel<T> {
     private static native void nativeClose(long nativeClosePtr, Callback<Void> callback);
     private static native void nativeFinalize(long nativeConvertPtr, long nativeSendPtr, long nativeClosePtr);
 
-    private OutputChannelImpl(long convertPtr, long sendPtr, long closePtr) {
+    private OutputChannelImpl(VContext ctx, long convertPtr, long sendPtr, long closePtr) {
+        this.ctx = ctx;
         this.nativeConvertPtr = convertPtr;
         this.nativeSendPtr = sendPtr;
         this.nativeClosePtr = closePtr;
@@ -33,13 +36,13 @@ class OutputChannelImpl<T> implements OutputChannel<T> {
     public ListenableFuture<Void> send(T item) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeSend(nativeConvertPtr, nativeSendPtr, item, callback);
-        return callback.getFuture();
+        return callback.getFuture(ctx);
     }
     @Override
     public ListenableFuture<Void> close() {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
         nativeClose(nativeClosePtr, callback);
-        return callback.getFuture();
+        return callback.getFuture(ctx);
     }
     @Override
     protected void finalize() throws Throwable {

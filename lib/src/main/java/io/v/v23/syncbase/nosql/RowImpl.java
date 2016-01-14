@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.lang.reflect.Type;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.RowClient;
 import io.v.v23.services.syncbase.nosql.RowClientFactory;
@@ -50,13 +51,13 @@ class RowImpl implements Row {
     }
     @Override
     public ListenableFuture<Object> get(VContext ctx, final Type type) {
-        return Futures.transform(client.get(ctx, schemaVersion),
+        return VFutures.withUserLandChecks(ctx, Futures.transform(client.get(ctx, schemaVersion),
                 new AsyncFunction<byte[], Object>() {
                     @Override
                     public ListenableFuture<Object> apply(byte[] data) throws Exception {
                         return Futures.immediateFuture(VomUtil.decode(data, type));
                     }
-                });
+                }));
     }
     @Override
     public ListenableFuture<Void> put(VContext ctx, Object value, Type type) {
@@ -64,7 +65,7 @@ class RowImpl implements Row {
             byte[] data = VomUtil.encode(value, type);
             return client.put(ctx, schemaVersion, data);
         } catch (VException e) {
-            return Futures.immediateFailedFuture(e);
+            return VFutures.withUserLandChecks(ctx, Futures.<Void>immediateFailedFuture(e));
         }
     }
 }

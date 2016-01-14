@@ -33,11 +33,17 @@ public interface SyncbaseApp extends AccessController {
     /**
      * Returns a new {@link ListenableFuture} whose result is {@code true} iff this app exists
      * and the user has sufficient permissions to access it.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Boolean> exists(VContext ctx);
+    ListenableFuture<Boolean> exists(VContext context);
 
     /**
      * Returns a handle for a NoSQL database with the provided name.
@@ -57,27 +63,45 @@ public interface SyncbaseApp extends AccessController {
     /**
      * Returns a new {@link ListenableFuture} whose result is a list of all (relative) database
      * names.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<List<String>> listDatabases(VContext ctx);
+    ListenableFuture<List<String>> listDatabases(VContext context);
 
     /**
      * Creates the app.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  perms      app permissions; if {@code null}, {@link SyncbaseService}'s
      *                    permissions are used
      */
     @CheckReturnValue
-    ListenableFuture<Void> create(VContext ctx, Permissions perms);
+    ListenableFuture<Void> create(VContext context, Permissions perms);
 
     /**
      * Destroys the app.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> destroy(VContext ctx);
+    ListenableFuture<Void> destroy(VContext context);
 }

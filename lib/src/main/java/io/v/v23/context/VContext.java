@@ -4,7 +4,7 @@
 
 package io.v.v23.context;
 
-import com.google.common.util.concurrent.Futures;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.impl.google.ListenableFutureCallback;
@@ -12,8 +12,6 @@ import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * The mechanism for carrying deadlines, cancellation, as well as other arbitrary values.
@@ -75,13 +73,27 @@ import java.util.concurrent.CountDownLatch;
  *        }
  *    }
  * </pre></blockquote><p>
- * Note that any type can be used as a key but the caller should preferrably use a private or
+ * Note that any type can be used as a key but the caller should preferably use a private or
  * protected type to prevent collisions (i.e., to prevent somebody else instantiating a key of the
  * same type).  Keys are tested for equality by comparing their value pairs
  * {@code (getClass(), hashCode())}.
  */
 public class VContext {
     private static native VContext nativeCreate() throws VException;
+
+    /**
+     * The context cancellation reason.
+     */
+    public enum DoneReason {
+        /**
+         * Context was explicitly canceled by the user.
+         */
+        CANCELED,
+        /**
+         * Context has had its deadline exceeded.
+         */
+        DEADLINE_EXCEEDED,
+    }
 
     /** Creates a new context with no data attached.
      * <p>
@@ -101,13 +113,10 @@ public class VContext {
     private long nativePtr;
     private long nativeCancelPtr;  // may be 0
 
-    // Cached "done()" CountDownLatch, as we're supposed to return the same object on every call.
-    private volatile CountDownLatch doneLatch = null;
-
     private native void nativeCancel(long nativeCancelPtr);
     private native boolean nativeIsCanceled(long nativePtr);
     private native DateTime nativeDeadline(long nativePtr) throws VException;
-    private native void nativeDone(long nativePtr, Callback<Void> callback);
+    private native void nativeOnDone(long nativePtr, Callback<DoneReason> callback);
     private native Object nativeValue(long nativePtr, Object key) throws VException;
     private native VContext nativeWithCancel(long nativePtr) throws VException;
     private native VContext nativeWithDeadline(long nativePtr, DateTime deadline) throws VException;
@@ -135,22 +144,17 @@ public class VContext {
      * {@link #isCancelable() cancelable}.
      */
     public boolean isCanceled() {
-        if (!isCancelable()) {
-            throw new RuntimeException("Context isn't cancelable.");
-        }
         return nativeIsCanceled(nativePtr);
     }
 
     /**
      * Cancels the context.  After this method is invoked, all {@link ListenableFuture}s
-     * returned by {@link VContext#done done} will get a chance to complete.
+     * returned by {@link VContext#onDone done} will get a chance to complete.
      * <p>
      * It is illegal to invoke this method on a context that isn't cancelable.
      */
     public void cancel() {
-        if (!isCancelable()) {
-            throw new RuntimeException("Context isn't cancelable.");
-        }
+        Preconditions.checkState(isCancelable(), "Context isn't cancelable.");
         nativeCancel(nativeCancelPtr);
     }
 
@@ -159,14 +163,14 @@ public class VContext {
      * explicitly or via an expired deadline).
      * <p>
      * It is illegal to invoke this method on a context that isn't cancelable.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in this context (see {@link io.v.v23.V#withExecutor}).
      */
-    public ListenableFuture<Void> done() {
-        if (!isCancelable()) {
-            return Futures.immediateFailedFuture(new VException("Context isn't cancelable"));
-        }
-        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeDone(nativePtr, callback);
-        return callback.getFuture();
+    public ListenableFuture<DoneReason> onDone() {
+        ListenableFutureCallback<DoneReason> callback = new ListenableFutureCallback<>();
+        nativeOnDone(nativePtr, callback);
+        return callback.getFutureOnExecutor(this);
     }
 
     /**

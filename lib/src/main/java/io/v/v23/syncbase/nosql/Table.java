@@ -35,50 +35,80 @@ public interface Table {
      * Creates this table.
      * <p>
      * Must not be called from within a batch.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  perms      table permissions; if {@code null}, {@link Database}'s
      *                    permissions are used
      */
     @CheckReturnValue
-    ListenableFuture<Void> create(VContext ctx, Permissions perms);
+    ListenableFuture<Void> create(VContext context, Permissions perms);
 
     /**
      * Destroys this table, permanently removing all of its data.
      * <p>
      * This method must not be called from within a batch.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> destroy(VContext ctx);
+    ListenableFuture<Void> destroy(VContext context);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is {@code true} iff this table exists
      * and the caller has sufficient permissions to access it.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Boolean> exists(VContext ctx);
+    ListenableFuture<Boolean> exists(VContext context);
 
     /**
      * Returns a new {@link ListenableFuture} whose result are the current permissions for the
      * table.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Permissions> getPermissions(VContext ctx);
+    ListenableFuture<Permissions> getPermissions(VContext context);
 
     /**
      * Replaces the current permissions for the table.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  perms      new permissions for the table
      */
     @CheckReturnValue
-    ListenableFuture<Void> setPermissions(VContext ctx, Permissions perms);
+    ListenableFuture<Void> setPermissions(VContext context, Permissions perms);
 
     /**
      * Returns the row with the given primary key.
@@ -93,43 +123,67 @@ public interface Table {
      * Returns a new {@link ListenableFuture} whose result is the value for the given primary key.
      * <p>
      * The returned future will fail if the row doesn't exist.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  key        the primary key for a row
      * @param  type       type of the value to be returned (needed for de-serialization)
      */
     @CheckReturnValue
-    ListenableFuture<Object> get(VContext ctx, String key, Type type);
+    ListenableFuture<Object> get(VContext context, String key, Type type);
 
     /**
      * Writes the value to the table under the provided primary key.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  key        primary key under which the value is to be written
      * @param  type       type of the value to be returned (needed for serialization)
      * @param  value      value to be written
      */
     @CheckReturnValue
-    ListenableFuture<Void> put(VContext ctx, String key, Object value, Type type);
+    ListenableFuture<Void> put(VContext context, String key, Object value, Type type);
 
     /**
      * Deletes the value for the given primary key.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  key        primary key for the row to be deleted
      */
     @CheckReturnValue
-    ListenableFuture<Void> delete(VContext ctx, String key);
+    ListenableFuture<Void> delete(VContext context, String key);
 
     /**
      * Deletes all rows in the given half-open range {@code [start, limit)}. If {@code limit} is
      * {@code ""}, all rows with keys &ge; {@code start} are deleted.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  range      range of rows to be deleted
      */
     @CheckReturnValue
-    ListenableFuture<Void> deleteRange(VContext ctx, RowRange range);
+    ListenableFuture<Void> deleteRange(VContext context, RowRange range);
 
     /**
      * Returns an {@link InputChannel} over all rows in the given half-open range
@@ -144,12 +198,12 @@ public interface Table {
      * stop the scan and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *
-     * @param  ctx         Vanadium context
+     * @param  context     Vanadium context
      * @param  range       range of rows to be read
      * @return             an {@link InputChannel} over all rows in the given half-open range
      *                     {@code [start, limit)}
      */
-    InputChannel<KeyValue> scan(VContext ctx, RowRange range);
+    InputChannel<KeyValue> scan(VContext context, RowRange range);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the list of {@link PrefixPermissions}
@@ -159,16 +213,22 @@ public interface Table {
      * applies to the row with the given key. The last element is always the prefix {@code ""}
      * which represents the table's permissions -- the array will always have at least one element.
      * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
+     * <p>
      * TODO(spetrovic): Make a change to VDL so that PrefixPermissions.prefix decodes into a
      * PrefixRange.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  key        key of the row whose permission prefixes are to be retrieved
      * @return            a new {@link ListenableFuture} whose result is the list of prefix
      *                    permissions for the given row
      */
     @CheckReturnValue
-    ListenableFuture<List<PrefixPermissions>> getPrefixPermissions(VContext ctx, String key);
+    ListenableFuture<List<PrefixPermissions>> getPrefixPermissions(VContext context, String key);
 
     /**
      * Sets the permissions for all current and future rows with the given prefix. If the prefix
@@ -180,22 +240,35 @@ public interface Table {
      * </pre></blockquote><p>
      * The permissions for row {@code "a/b/1"} are {@code perms1}, and the permissions for row
      * {@code "a/b/c/1"} are {@code perms2}.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  prefix     prefix to which to apply the new permissions
      * @param  perms      permissions to apply
      */
     @CheckReturnValue
-    ListenableFuture<Void> setPrefixPermissions(VContext ctx, PrefixRange prefix, Permissions perms);
+    ListenableFuture<Void> setPrefixPermissions(
+            VContext context, PrefixRange prefix, Permissions perms);
 
     /**
      * Deletes permissions for the specified prefix.  Any rows covered by this prefix will use the
      * next longest prefix's permissions.  (See the array returned by
      * {@link #getPrefixPermissions getPrefixPermissions()}).
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  prefix     prefix for which the permissions are to be deleted
      */
     @CheckReturnValue
-    ListenableFuture<Void> deletePrefixPermissions(VContext ctx, PrefixRange prefix);
+    ListenableFuture<Void> deletePrefixPermissions(VContext context, PrefixRange prefix);
 }

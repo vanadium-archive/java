@@ -38,7 +38,8 @@ class ServerRPCHelper {
 
     // Helper function for invoking a method on the provided invoker.
     static void invoke(final Invoker invoker, final VContext ctx, final StreamServerCall call,
-            final String method, byte[][] vomArgs, final Callback callback) throws VException {
+            final String method, byte[][] vomArgs, final Callback<Object[]> callback)
+            throws VException {
         Type[] argTypes = invoker.getArgumentTypes(method);
         if (argTypes.length != vomArgs.length) {
             throw new VException(String.format(

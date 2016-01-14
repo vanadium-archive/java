@@ -5,7 +5,8 @@
 package io.v.impl.google.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
+
+import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
@@ -44,35 +45,25 @@ public class ClientImpl implements Client {
     // Implement io.v.v23.rpc.Client.
     @Override
     public ListenableFuture<ClientCall> startCall(
-            VContext context, String name, String method, Object[] args, Type[] argTypes) {
-        return startCall(context, name, method, args, argTypes, null);
+            VContext ctx, String name, String method, Object[] args, Type[] argTypes) {
+        return startCall(ctx, name, method, args, argTypes, null);
     }
     @Override
-    public ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
+    public ListenableFuture<ClientCall> startCall(VContext ctx, String name, String method,
                                                   Object[] args, Type[] argTypes, Options opts) {
-        final SettableFuture<ClientCall> future = SettableFuture.create();
+        ListenableFutureCallback<ClientCall> callback = new ListenableFutureCallback<>();
         if (opts == null) {
             opts = new Options();
         }
         try {
             checkStartCallArgs(name, method, args, argTypes);
-            nativeStartCall(nativePtr, context, name, getMethodName(method),
-                    getEncodedVomArgs(args, argTypes), shouldSkipServerAuth(opts),
-                    new Callback<ClientCall>() {
-                        @Override
-                        public void onSuccess(ClientCall result) {
-                            future.set(result);
-                        }
-                        @Override
-                        public void onFailure(VException error) {
-                            future.setException(error);
-                        }
-                    }
-            );
+            nativeStartCall(nativePtr, ctx, name, getMethodName(method),
+                    getEncodedVomArgs(args, argTypes),
+                    shouldSkipServerAuth(opts), callback);
         } catch (VException e) {
-            future.setException(e);
+            callback.onFailure(e);
         }
-        return future;
+        return callback.getFuture(ctx);
     }
 
     private String getMethodName(String method) {

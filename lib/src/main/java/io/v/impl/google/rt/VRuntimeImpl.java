@@ -4,20 +4,23 @@
 
 package io.v.impl.google.rt;
 
-import com.google.common.base.Function;
+import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import org.joda.time.Duration;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.VDiscovery;
 import io.v.v23.namespace.Namespace;
+import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
@@ -35,7 +38,8 @@ import io.v.v23.verror.VException;
  */
 public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeInit() throws VException;
-    private static native void nativeShutdown(VContext context);
+    private static native ListenableFuture<Void> nativeShutdown(VContext context,
+                                                                Callback<Void> callback);
     private static native VContext nativeWithNewClient(VContext ctx, Options opts)
             throws VException;
     private static native Client nativeGetClient(VContext ctx) throws VException;
@@ -61,17 +65,25 @@ public class VRuntimeImpl implements VRuntime {
     }
 
     /**
+     * Returns the executor used by this runtime, for its various asynchronous tasks.
+     */
+    public static Executor getRuntimeExecutor(VContext ctx) {
+        return (Executor) ctx.value(new RuntimeExecutorKey());
+    }
+
+    /**
      * Returns a new runtime instance.
      */
     public static VRuntimeImpl create(Options opts) throws VException {
         VContext ctx = nativeInit();
-        ctx = ctx.withValue(new ExecutorKey(), Executors.newCachedThreadPool());
+        ctx = ctx.withValue(new RuntimeExecutorKey(), Executors.newCachedThreadPool());
         final VContext ctxC = ctx.withCancel();
-        Futures.transform(ctxC.done(), new Function<Void, Void>() {
+        Futures.transform(ctxC.onDone(), new AsyncFunction<VContext.DoneReason, Void>() {
             @Override
-            public Void apply(Void input) {
-                nativeShutdown(ctxC);
-                return null;
+            public ListenableFuture<Void> apply(VContext.DoneReason reason) {
+                ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+                nativeShutdown(ctxC, callback);
+                return callback.getVanillaFuture();
             }
         });
         return new VRuntimeImpl(ctxC);
@@ -157,10 +169,6 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public Executor getExecutor(VContext ctx) {
-        return (Executor) ctx.value(new ExecutorKey());
-    }
-    @Override
     public VContext getContext() {
         return this.ctx;
     }
@@ -185,7 +193,7 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
 
-    private static class ExecutorKey {
+    private static class RuntimeExecutorKey {
         @Override
         public int hashCode() {
             return 0;

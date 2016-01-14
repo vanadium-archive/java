@@ -40,12 +40,18 @@ public interface DatabaseCore {
 
     /**
      * Returns a new {@link ListenableFuture} whose result is a list of all table names.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @return            a list of all table names
      */
     @CheckReturnValue
-    ListenableFuture<List<String>> listTables(VContext ctx);
+    ListenableFuture<List<String>> listTables(VContext context);
 
     /**
      * Executes a SyncQL query, returning a {@link QueryResults} object that allows the caller to
@@ -55,24 +61,33 @@ public interface DatabaseCore {
      * from a consistent snapshot taken at the time of the method and will not reflect subsequent
      * writes to keys not yet reached by the stream.
      * <p>
-     * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
-     * stop the query execution and terminate the returned iterator early.
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  query      a SyncQL query
      * @return            a {@link ListenableFuture} whose result is a {@link QueryResults} object
      *                    that allows the caller to iterate over arrays of values for each row that
      *                    matches the query
      */
     @CheckReturnValue
-    ListenableFuture<QueryResults> exec(VContext ctx, String query);
+    ListenableFuture<QueryResults> exec(VContext context, String query);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the {@link ResumeMarker} that points
      * to the current state of the database.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      */
     @CheckReturnValue
-    ListenableFuture<ResumeMarker> getResumeMarker(VContext ctx);
+    ListenableFuture<ResumeMarker> getResumeMarker(VContext context);
 
     /**
      * An interface for iterating through rows resulting from a

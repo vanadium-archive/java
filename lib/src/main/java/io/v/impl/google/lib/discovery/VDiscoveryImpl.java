@@ -41,7 +41,7 @@ class VDiscoveryImpl implements VDiscovery {
         ListenableFutureCallback<Void> doneCallback = new ListenableFutureCallback<>();
         nativeAdvertise(nativeDiscoveryPtr, nativeTriggerPtr, ctx, service, visibility,
                 startCallback, doneCallback);
-        return startCallback.getFuture();
+        return startCallback.getFuture(ctx);
     }
     @Override
     public InputChannel<Update> scan(VContext ctx, String query) {

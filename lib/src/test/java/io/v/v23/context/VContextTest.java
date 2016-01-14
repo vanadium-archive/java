@@ -55,7 +55,7 @@ public class VContextTest extends TestCase {
         assertThat(ctxC.isCanceled()).isFalse();
         ctxC.cancel();
         assertThat(ctxC.isCanceled()).isTrue();
-        sync(ctxC.done());
+        sync(ctxC.onDone());
         assertThat(ctxC.isCanceled()).isTrue();
     }
 
@@ -63,7 +63,7 @@ public class VContextTest extends TestCase {
         {
             VContext ctxD = ctx.withDeadline(DateTime.now().plus(500));
             assertThat(ctxD.isCanceled()).isFalse();
-            sync(ctxD.done());
+            sync(ctxD.onDone());
             assertThat(ctxD.isCanceled()).isTrue();
         }
         {
@@ -71,7 +71,7 @@ public class VContextTest extends TestCase {
             assertThat(ctxD.isCanceled()).isFalse();
             ctxD.cancel();
             assertThat(ctxD.isCanceled()).isTrue();
-            sync(ctxD.done());
+            sync(ctxD.onDone());
             assertThat(ctxD.isCanceled()).isTrue();
         }
     }
@@ -80,7 +80,7 @@ public class VContextTest extends TestCase {
         {
             VContext ctxT = ctx.withTimeout(new Duration(500));
             assertThat(ctxT.isCanceled()).isFalse();
-            sync(ctxT.done());
+            sync(ctxT.onDone());
             assertThat(ctxT.isCanceled()).isTrue();
         }
         {
@@ -88,7 +88,7 @@ public class VContextTest extends TestCase {
             assertThat(ctxT.isCanceled()).isFalse();
             ctxT.cancel();
             assertThat(ctxT.isCanceled()).isTrue();
-            sync(ctxT.done());
+            sync(ctxT.onDone());
             assertThat(ctxT.isCanceled()).isTrue();
         }
     }

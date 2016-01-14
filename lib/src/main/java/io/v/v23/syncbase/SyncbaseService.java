@@ -36,6 +36,12 @@ public interface SyncbaseService extends AccessController {
 
     /**
      * Returns a {@link ListenableFuture} whose result is a list of all relative app names.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
      * @param  ctx        Vanadium context
      */

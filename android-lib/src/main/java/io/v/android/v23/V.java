@@ -48,9 +48,11 @@ public class V extends io.v.v23.V {
     private static volatile VContext globalContext;
 
     // Initializes the Vanadium Android-specific global state.
-    private static void initGlobalAndroid(Context androidContext, Options opts) {
+    private static VContext initGlobalAndroid(VContext ctx, Context androidContext, Options opts) {
         try {
             nativeInitGlobalAndroid(androidContext, opts);
+            ctx = V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
+            return ctx;
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize global Android state", e);
         }
@@ -68,7 +70,7 @@ public class V extends io.v.v23.V {
             }
             if (opts == null) opts = new Options();
             VContext ctx = initGlobalShared(opts);
-            initGlobalAndroid(androidCtx, opts);
+            ctx = initGlobalAndroid(ctx, androidCtx, opts);
             // Set the VException component name to the Android context package name.
             ctx = VException.contextWithComponentName(ctx, androidCtx.getPackageName());
             try {

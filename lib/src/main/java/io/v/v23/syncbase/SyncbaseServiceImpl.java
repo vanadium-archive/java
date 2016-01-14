@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import io.v.v23.VFutures;
 import io.v.v23.services.syncbase.ServiceClient;
 import io.v.v23.services.syncbase.ServiceClientFactory;
 import io.v.v23.syncbase.util.Util;
@@ -46,12 +47,12 @@ class SyncbaseServiceImpl implements SyncbaseService {
     @Override
     public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx) {
         ListenableFuture<ServiceClient.GetPermissionsOut> perms = client.getPermissions(ctx);
-        return Futures.transform(perms, new Function<ServiceClient.GetPermissionsOut,
+        return VFutures.withUserLandChecks(ctx, Futures.transform(perms, new Function<ServiceClient.GetPermissionsOut,
                 Map<String, Permissions>>() {
             @Override
             public Map<String, Permissions> apply(ServiceClient.GetPermissionsOut perms) {
                 return ImmutableMap.of(perms.version, perms.perms);
             }
-        });
+        }));
     }
 }

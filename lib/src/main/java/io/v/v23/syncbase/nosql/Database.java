@@ -25,32 +25,50 @@ public interface Database extends DatabaseCore, AccessController {
     /**
      * Returns a new {@link ListenableFuture} whose result is {@code true} iff this database exists
      * and the user has sufficient permissions to access it.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @return            {@code true} iff this database exists and the user has sufficient
      *                    permissions to access it
      */
     @CheckReturnValue
-    ListenableFuture<Boolean> exists(VContext ctx);
+    ListenableFuture<Boolean> exists(VContext context);
 
     /**
      * Creates this database.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  perms      database permissions; if {@code null},
      *                    {@link io.v.v23.syncbase.SyncbaseApp}'s
      *                    permissions are used
      */
     @CheckReturnValue
-    ListenableFuture<Void> create(VContext ctx, Permissions perms);
+    ListenableFuture<Void> create(VContext context, Permissions perms);
 
     /**
      * Destroys this database.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> destroy(VContext ctx);
+    ListenableFuture<Void> destroy(VContext context);
 
     /**
      * Creates a new "batch", i.e., a handle to a set of reads and writes to the database that
@@ -78,14 +96,20 @@ public interface Database extends DatabaseCore, AccessController {
      * fail with no effect.
      * <p>
      * Concurrency semantics can be configured using BatchOptions.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @param  opts       batch options
      * @return            a new {@link ListenableFuture} whose result is a handle to a set of reads
      *                    and writes to the database that should be considered an atomic unit
      */
     @CheckReturnValue
-    ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts);
+    ListenableFuture<BatchDatabase> beginBatch(VContext context, BatchOptions opts);
 
     /**
      * Allows a client to watch for updates to the database. For each watch request, the client will
@@ -108,13 +132,13 @@ public interface Database extends DatabaseCore, AccessController {
      * stop the watch operation and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *
-     * @param ctx                 vanadium context
+     * @param context             vanadium context
      * @param tableRelativeName   relative name of the table to watch
      * @param rowPrefix           prefix of the rows to watch
      * @param resumeMarker        {@link ResumeMarker} from which the changes will be monitored
      * @return                    a (potentially-infinite) {@link InputChannel} of changes
      */
-    InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
+    InputChannel<WatchChange> watch(VContext context, String tableRelativeName,
                                     String rowPrefix, ResumeMarker resumeMarker);
 
     /**
@@ -127,11 +151,17 @@ public interface Database extends DatabaseCore, AccessController {
     /**
      * Returns a {@link ListenableFuture} whose result are the global names of all
      * {@link Syncgroup}s attached to this database.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context        Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<List<String>> listSyncgroupNames(VContext ctx);
+    ListenableFuture<List<String>> listSyncgroupNames(VContext context);
 
     /**
      * Opens a blob for writing.
@@ -146,14 +176,20 @@ public interface Database extends DatabaseCore, AccessController {
      * still return a valid {@link BlobWriter} and some of the writes on that writer may
      * <strong>appear</strong> to succeed, though it is not so (see comments on
      * {@link BlobWriter#stream}.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param ctx         vanadium context
+     * @param context     vanadium context
      * @param ref         blob reference
      * @return            a {@link ListenableFuture} whose result is a writer used for writing to
      *                    the blob
      */
     @CheckReturnValue
-    ListenableFuture<BlobWriter> writeBlob(VContext ctx, BlobRef ref);
+    ListenableFuture<BlobWriter> writeBlob(VContext context, BlobRef ref);
 
     /**
      * Opens a blob for reading.
@@ -164,13 +200,13 @@ public interface Database extends DatabaseCore, AccessController {
      * <p>
      * This is a non-blocking method.
      *
-     * @param ctx         vanadium context
+     * @param context     vanadium context
      * @param ref         blob reference
      * @return            a {@link ListenableFuture} whose result is a reader used for reading from
      *                    the blob
      * @throws VException if the blob couldn't be opened for reading
      */
-    BlobReader readBlob(VContext ctx, BlobRef ref) throws VException;
+    BlobReader readBlob(VContext context, BlobRef ref) throws VException;
 
     /**
      * Compares the current schema version of the database with the schema version provided while
@@ -182,13 +218,19 @@ public interface Database extends DatabaseCore, AccessController {
      * <p>
      * Note: this database handle may have been created with a {@code null} schema, in which case
      * this method skips schema check and the caller is responsible for maintaining schema sanity.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param  ctx        Vanadium context
+     * @param  context    Vanadium context
      * @return            a new {@link ListenableFuture} whose result is {@code true} iff the
      *                    database schema had to be upgraded, i.e., if the current database schema
      *                    version was lower than the schema version with which the database was
      *                    created
      */
     @CheckReturnValue
-    ListenableFuture<Void> enforceSchema(VContext ctx);
+    ListenableFuture<Void> enforceSchema(VContext context);
 }

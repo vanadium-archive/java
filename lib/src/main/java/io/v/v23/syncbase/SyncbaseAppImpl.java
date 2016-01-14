@@ -13,6 +13,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.impl.google.naming.NamingUtil;
+import io.v.v23.VFutures;
 import io.v.v23.services.syncbase.AppClient;
 import io.v.v23.services.syncbase.AppClientFactory;
 import io.v.v23.syncbase.nosql.Database;
@@ -67,12 +68,12 @@ class SyncbaseAppImpl implements SyncbaseApp {
     }
     @Override
     public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx) {
-        return Futures.transform(client.getPermissions(ctx),
+        return VFutures.withUserLandChecks(ctx, Futures.transform(client.getPermissions(ctx),
                 new Function<AppClient.GetPermissionsOut, Map<String, Permissions>>() {
                     @Override
                     public Map<String, Permissions> apply(AppClient.GetPermissionsOut perms) {
                         return ImmutableMap.of(perms.version, perms.perms);
                     }
-                });
+                }));
     }
 }

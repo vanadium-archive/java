@@ -26,11 +26,15 @@ public interface BlobReader {
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the size of the blob.
-     *
-     * @param ctx         vanadium context
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      */
     @CheckReturnValue
-    ListenableFuture<Long> size(VContext ctx);
+    ListenableFuture<Long> size(VContext context);
 
     /**
      * Returns an {@link InputStream} used for reading the contents of the blob, starting at the
@@ -46,11 +50,11 @@ public interface BlobReader {
      * </ul><p>
      * Please be aware that {@link InputStream} operations are blocking.
      *
-     * @param ctx         vanadium context
+     * @param context     vanadium context
      * @param offset      offset at which to read the contents of the blob
      * @return            an {@link InputStream} used for reading the contents of the blob
      */
-    InputStream stream(VContext ctx, long offset);
+    InputStream stream(VContext context, long offset);
 
     /**
      * Initiates a blob prefetch, i.e., copying the blob to a local cache.
@@ -66,53 +70,83 @@ public interface BlobReader {
      * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
      * stop the prefetch and cause the channel to stop producing elements.  Note that to avoid
      * memory leaks, the caller should drain the channel after cancelling the context.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
      *
-     * @param ctx         vanadium context
+     * @param context     vanadium context
      * @param priority    prefetch priority
      * @return            an {@link InputChannel} that can be used to track the progress of the
      *                    prefetch
      */
-    InputChannel<BlobFetchStatus> prefetch(VContext ctx, long priority);
+    InputChannel<BlobFetchStatus> prefetch(VContext context, long priority);
 
     /**
      * Deletes the blob's local cached copy.
      * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
+     * <p>
      * NOT YET IMPLEMENTED.
      *
-     * @param ctx         vanadium context
+     * @param context         vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> delete(VContext ctx);
+    ListenableFuture<Void> delete(VContext context);
 
     /**
      * Pins the blob to a local cache so that it is not evicted.
      * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
+     * <p>
      * NOT YET IMPLEMENTED.
      *
-     * @param ctx         vanadium context
+     * @param context         vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> pin(VContext ctx);
+    ListenableFuture<Void> pin(VContext context);
 
     /**
      * Unpins the blob from the local cache so that it can be evicted if needed.
      * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
+     * <p>
      * NOT YET IMPLEMENTED.
      *
-     * @param ctx         vanadium context
+     * @param context         vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<Void> unpin(VContext ctx);
+    ListenableFuture<Void> unpin(VContext context);
 
     /**
      * Sets the eviction rank for the blob in the local cache.  Lower-ranked blobs are more eagerly
      * evicted.
      * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
+     * {@code context} gets canceled.
+     * <p>
      * NOT YET IMPLEMENTED.
      *
-     * @param ctx         vanadium context
+     * @param context     vanadium context
      * @param rank        eviction rank
      */
     @CheckReturnValue
-    ListenableFuture<Void> keep(VContext ctx, long rank);
+    ListenableFuture<Void> keep(VContext context, long rank);
 }

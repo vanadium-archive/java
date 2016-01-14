@@ -16,6 +16,12 @@ import javax.annotation.CheckReturnValue;
 public interface Stream {
     /**
      * Places the item onto the output stream.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this stream (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if the
+     * context used for creating this stream has been canceled.
      *
      * @param  item  an item to be sent
      * @param  type  type of the provided item
@@ -28,7 +34,11 @@ public interface Stream {
      * <p>
      * The returned {@link ListenableFuture} will fail if there was an error fetching the next
      * item;  {@link io.v.v23.verror.EndOfFileException} means that a graceful end of input has been
-     * reached.
+     * reached;  {@link java.util.concurrent.CancellationException} means that the context used
+     * for creating this stream has been canceled.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this stream (see {@link io.v.v23.V#withExecutor}).
      *
      * @param  type type of the returned item
      */
