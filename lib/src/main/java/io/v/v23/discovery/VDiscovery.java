@@ -63,7 +63,7 @@ public interface VDiscovery {
      * <p>
      * Scanning will continue until the context is canceled or exceeds its deadline.
      * <p>
-     * The query is a {@code WHERE} expression of {@code syncQL} query against scanned services,
+     * The query is a {@code WHERE} expression of a {@code syncQL} query against advertised services,
      * where keys are {@link Service#instanceId}s and values are {@link Service}s.
      * <p>
      * Examples:
