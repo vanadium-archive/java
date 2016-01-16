@@ -49,21 +49,21 @@ public class SyncbaseRangeAdapterTest extends VAndroidTestCase {
             pause();
 
             assertEquals(2, listView.getCount());
-            assertEquals("Goodnight", adapter.getRowAt(0).getRowName());
+            assertEquals("Goodnight", adapter.getLatestState().getRowAt(0).getRowName());
             assertEquals("moon", adapter.getItem(0));
-            assertEquals("Good morning", adapter.getRowAt(1).getRowName());
+            assertEquals("Good morning", adapter.getLatestState().getRowAt(1).getRowName());
             assertEquals("starshine", adapter.getItem(1));
 
             start(mTable.put("Goodbye", "Mr. Bond"));
             pause();
 
-            assertEquals("Goodbye", adapter.getRowAt(0).getRowName());
+            assertEquals("Goodbye", adapter.getLatestState().getRowAt(0).getRowName());
             assertEquals("Mr. Bond", adapter.getItem(0));
 
             start(mTable.delete("Good morning"));
             pause();
 
-            assertEquals(1, adapter.getRowIndex("Goodnight"));
+            assertEquals(1, adapter.getLatestState().getRowIndex("Goodnight"));
             assertEquals("moon", adapter.getItem(1));
         }
     }

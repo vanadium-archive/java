@@ -8,9 +8,6 @@ package io.v.baku.toolkit.bind;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java8.lang.FunctionalInterface;
-
-@FunctionalInterface
 public interface ViewAdapter<T, VH extends ViewHolder> {
     View createView(ViewGroup parent);
     VH createViewHolder(View view);
