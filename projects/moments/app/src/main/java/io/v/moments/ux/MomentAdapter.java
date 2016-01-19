@@ -89,11 +89,9 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
     @Override
     public void onBindViewHolder(MomentHolder holder, int position) {
         Moment moment = getMoment(position);
-        if (isRemote(position)) {
-            holder.bind(moment, Kind.REMOTE, null);
-        } else {
-            holder.bind(moment, Kind.LOCAL, mAdvertiserFactory.make(moment));
-        }
+        holder.bind(
+                moment,
+                isRemote(position) ? null : mAdvertiserFactory.getOrMake(moment));
     }
 
     @Override

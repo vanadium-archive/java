@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import io.v.moments.R;
 import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
+import static io.v.moments.ifc.Moment.AdState;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
 
@@ -53,14 +54,9 @@ public class MomentHolder extends RecyclerView.ViewHolder {
     /**
      * Modifies the view to reflect the state of moment.
      */
-    public void bind(Moment moment, Kind kind, Advertiser advertiser) {
+    public void bind(Moment moment, Advertiser advertiser) {
+        final Kind kind = advertiser == null ? Kind.REMOTE : Kind.LOCAL;
         Log.d(TAG, "Holder: binding " + kind + " " + moment);
-        if (kind.equals(Kind.LOCAL)) {
-            if (advertiser == null) {
-                throw new IllegalStateException("Null advertiser with local moment.");
-            }
-        }
-        // No advertiser means the moment is remote and should not be advertised.
         authorTextView.setText(moment.getAuthor());
         captionTextView.setText(moment.getCaption());
         if (moment.hasPhoto(kind, Style.THUMB)) {
@@ -83,7 +79,7 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             advertiseButton.setText("");
             advertiseButton.setVisibility(View.VISIBLE);
             advertiseButton.setEnabled(true);
-            advertiseButton.setChecked(advertiser.shouldBeAdvertising());
+            advertiseButton.setChecked(moment.getDesiredAdState().equals(AdState.ON));
             advertiseButton.setOnCheckedChangeListener(
                     toggleAdvertising(moment, advertiser));
         }
@@ -113,18 +109,13 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
                 if (isChecked) {
-                    // TODO(jregan): eliminate this redundancy.
-                    // The moment is persisted in prefs, the advertiser isn't.
-                    // That wasn't done because remote moments never
-                    // need an advertiser.
-                    moment.setShouldBeAdvertising(true);
-                    advertiser.setShouldBeAdvertising(true);
+                    moment.setDesiredAdState(Moment.AdState.ON);
                     mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 advertiser.advertiseStart();
-                                toast("Started advertising.");
+                                toast("Started advertising " + moment.getCaption());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 toast("Had problem starting advertising.");
@@ -132,14 +123,13 @@ public class MomentHolder extends RecyclerView.ViewHolder {
                         }
                     });
                 } else {
-                    moment.setShouldBeAdvertising(false);
-                    advertiser.setShouldBeAdvertising(false);
+                    moment.setDesiredAdState(Moment.AdState.OFF);
                     mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 advertiser.advertiseStop();
-                                toast("Stopped advertising.");
+                                toast("Stopped advertising " + moment.getCaption());
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 toast("Had problem stopping advertising.");

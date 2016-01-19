@@ -8,8 +8,11 @@ import android.graphics.Bitmap;
 
 import org.joda.time.DateTime;
 
+import io.v.moments.ifc.Advertiser;
+import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.ifc.Moment;
+import io.v.v23.discovery.Attributes;
 
 /**
  * A photo and ancillary information.
@@ -22,27 +25,36 @@ public class MomentImpl implements Moment {
     private final String mCaption;
     private final Id mId;
     private final int mOrdinal;
-    private boolean mShouldBeAdvertising = false;
+    private AdState mDesiredAdState = AdState.OFF;
 
     public MomentImpl(
             BitMapper bitMapper, Id id, int ordinal,
             String author, String caption, DateTime dt,
-            boolean shouldBeAdvertising) {
+            AdState desiredAdState) {
         mBitMapper = bitMapper;
         mOrdinal = ordinal;
         mAuthor = author;
         mCaption = caption;
         mCreationTime = dt;
         mId = id;
-        mShouldBeAdvertising = shouldBeAdvertising;
+        mDesiredAdState = desiredAdState;
     }
 
-    public boolean shouldBeAdvertising() {
-        return mShouldBeAdvertising;
+    public AdState getDesiredAdState() {
+        return mDesiredAdState;
     }
 
-    public void setShouldBeAdvertising(boolean value) {
-        mShouldBeAdvertising = value;
+    public void setDesiredAdState(AdState value) {
+        mDesiredAdState = value;
+    }
+
+    @Override
+    public Attributes makeAttributes() {
+        Attributes attr = new Attributes();
+        attr.put(MomentFactory.F.AUTHOR.toString(), getAuthor());
+        attr.put(MomentFactory.F.CAPTION.toString(), getCaption());
+        attr.put(MomentFactory.F.DATE.toString(), FMT.print(getCreationTime()));
+        return attr;
     }
 
     public boolean hasPhoto(Kind kind, Style style) {

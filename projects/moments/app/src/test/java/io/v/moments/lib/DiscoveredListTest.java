@@ -75,21 +75,21 @@ public class DiscoveredListTest {
 
     @Test
     public void constructorFailsWithNoConverter() throws Exception {
-        mThrown.expect(IllegalStateException.class);
+        mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null converter");
         mList = new DiscoveredList<>(null, mRejects, mHandler);
     }
 
     @Test
     public void constructorFailsWithNoIdSet() throws Exception {
-        mThrown.expect(IllegalStateException.class);
+        mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null rejects");
         mList = new DiscoveredList<>(mConverter, null, mHandler);
     }
 
     @Test
     public void constructorFailsWithNoHandler() throws Exception {
-        mThrown.expect(IllegalStateException.class);
+        mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null handler");
         mList = new DiscoveredList<>(mConverter, mRejects, null);
     }

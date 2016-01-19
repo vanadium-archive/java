@@ -8,40 +8,29 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.v23.discovery.Attributes;
 
+import static io.v.moments.ifc.Moment.AdState;
+
 public class MomentFactoryImpl implements MomentFactory {
-    private static final DateTimeFormatter FMT =
-            DateTimeFormat.forPattern("yyyyMMdd_HHmmss");
 
     private final BitMapper mBitMapper;
 
     public MomentFactoryImpl(BitMapper bitMapper) {
         if (bitMapper == null) {
-            throw new IllegalStateException("Null bitMapper");
+            throw new IllegalArgumentException("Null bitMapper");
         }
         mBitMapper = bitMapper;
     }
 
     @Override
-    public Attributes makeAttributes(Moment moment) {
-        Attributes attr = new Attributes();
-        attr.put(F.AUTHOR.toString(), moment.getAuthor());
-        attr.put(F.CAPTION.toString(), moment.getCaption());
-        attr.put(F.DATE.toString(), FMT.print(moment.getCreationTime()));
-        return attr;
-    }
-
-    @Override
     public Moment make(Id id, int index, String author, String caption) {
         return new MomentImpl(
-                mBitMapper, id, index, author, caption, DateTime.now(), false);
+                mBitMapper, id, index, author, caption, DateTime.now(), AdState.OFF);
     }
 
     @Override
@@ -50,7 +39,8 @@ public class MomentFactoryImpl implements MomentFactory {
                 mBitMapper, id, ordinal,
                 attr.get(F.AUTHOR.toString()),
                 attr.get(F.CAPTION.toString()),
-                FMT.parseDateTime(attr.get(F.DATE.toString())), false);
+                Moment.FMT.parseDateTime(attr.get(F.DATE.toString())),
+                AdState.OFF);
     }
 
     @Override
@@ -61,7 +51,7 @@ public class MomentFactoryImpl implements MomentFactory {
         b.putString(km.get(F.AUTHOR), m.getAuthor());
         b.putString(km.get(F.CAPTION), m.getCaption());
         b.putLong(km.get(F.DATE), m.getCreationTime().getMillis());
-        b.putBoolean(km.get(F.ADVERTISING), m.shouldBeAdvertising());
+        b.putBoolean(km.get(F.ADVERTISING), m.getDesiredAdState().equals(AdState.ON));
     }
 
     @Override
@@ -74,7 +64,7 @@ public class MomentFactoryImpl implements MomentFactory {
                 b.getString(km.get(F.AUTHOR), ""),
                 b.getString(km.get(F.CAPTION), ""),
                 new DateTime(b.getLong(km.get(F.DATE), 0)),
-                b.getBoolean(km.get(F.ADVERTISING)));
+                b.getBoolean(km.get(F.ADVERTISING)) ? AdState.ON : AdState.OFF);
     }
 
     @Override
@@ -85,7 +75,7 @@ public class MomentFactoryImpl implements MomentFactory {
         editor.putString(km.get(F.AUTHOR), m.getAuthor());
         editor.putString(km.get(F.CAPTION), m.getCaption());
         editor.putLong(km.get(F.DATE), m.getCreationTime().getMillis());
-        editor.putBoolean(km.get(F.ADVERTISING), m.shouldBeAdvertising());
+        editor.putBoolean(km.get(F.ADVERTISING), m.getDesiredAdState().equals(AdState.ON));
     }
 
     @Override
@@ -102,7 +92,7 @@ public class MomentFactoryImpl implements MomentFactory {
                 p.getString(km.get(F.AUTHOR), ""),
                 p.getString(km.get(F.CAPTION), ""),
                 new DateTime(p.getLong(km.get(F.DATE), 0)),
-                p.getBoolean(km.get(F.ADVERTISING), false));
+                p.getBoolean(km.get(F.ADVERTISING), false) ? AdState.ON : AdState.OFF);
     }
 
     private class KeyMaker {

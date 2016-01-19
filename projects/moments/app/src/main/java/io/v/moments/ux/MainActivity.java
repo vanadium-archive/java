@@ -60,18 +60,20 @@ import io.v.v23.context.CancelableVContext;
  * A photo and its ancillary data (id, author, caption, date, ordinal number,
  * etc.) are called a Moment.  There are _local_ moments, created locally, and
  * _remote_ moments, found via discovery.  Local moments can be advertised so
- * that remote devices can discover and request them.  Remote moments cannot be
+ * that remote devices can discover and request them.  Remote moments are not
  * re-advertised.
  *
  * Local moments are persistent, in that the user must delete them to get rid of
  * them.  Remote moments are pulled in over the network, and not officially
- * retained between runs, though remote photo data may be left on disc between
- * runs as a simple cache. The moment's id is used to invalidate the cache.
+ * retained between runs, though remote photo data may be left in local storage
+ * as a simple cache. The moment's id is used to invalidate the cache.
  *
  * Every local moment is served by its own service.  This egregious use of
  * services allows for easy creation of multiple scan targets to exercise
- * discovery code. The involvement of a photo forces use of RPC since a photo is
- * too large to send as an advertisement attribute.
+ * discovery code. The involvement of a photo encourages the use of an RPC since
+ * adding a (very large) photo to an advertisement as an attribute noticeably
+ * increases the time taken between clicking 'advertise' on one device and
+ * seeing any evidence of the advertisement on another device.
  */
 public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "MainActivity";
@@ -139,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         initializeOrRestore(savedInstanceState);
 
-
         // This might leave to start a new activity.
         // Will trigger onActivityResult as expected.
         mV23Manager.init(getApplicationContext(), this);
@@ -158,15 +159,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         // Compresses byte data, converts byte[] to bitmap, manages file storage.
         mBitMapper = Config.makeBitmapper(this);
 
+        // Makes advertisers.  Needs v23Manager to do advertising.
+        mAdvertiserFactory = new AdvertiserFactory(mV23Manager);
+
         // Makes moments.  Each moment needs a bitmapper to read its BitMaps.
         mMomentFactory = new MomentFactoryImpl(mBitMapper);
 
         // Local moments, with photos taken by the local device.
         mLocalMoments = new ObservedList<>();
-
-        // Makes advertisers.  Needs v23Manager to do advertising, needs
-        // mMomentFactory to create advertisements from Moments.
-        mAdvertiserFactory = new AdvertiserFactory(mV23Manager, mMomentFactory);
 
         // Converts advertisements to 'remote' moments.  Needs v23Manager to
         // make RPCs, needs mMomentFactory to make moments, needs a thread pool
@@ -323,9 +323,24 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             Log.d(TAG, "Loading moments from prefs.");
             mStateStore.prefsLoad(mLocalMoments);
         }
-        for (Moment moment : mLocalMoments) {
-            if (moment.shouldBeAdvertising()) {
-                Log.d(TAG, "on start - found a moment that should be advertising");
+        for (final Moment moment : mLocalMoments) {
+            if (moment.getDesiredAdState().equals(Moment.AdState.ON)) {
+                mSerialExecutor.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mAdvertiserFactory.getOrMake(moment).advertiseStart();
+                            // This toast noisy if not debugging.
+                            // toast("Started advertising " + moment.getCaption());
+                            Log.d(TAG, "Started advertising " + moment.getCaption());
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            toast("Had problem starting advertising.");
+                        }
+                    }
+                });
+
             }
         }
         if (mShouldBeScanning && !isScanning()) {
@@ -340,24 +355,30 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         if (isScanning()) {
             stopScanning();
         }
-        // A better impl would save advertising state for restoration.
         stopAllAdvertising();
         Log.d(TAG, "Destruction complete.");
     }
 
     private void stopAllAdvertising() {
+        int count = 0;
         for (Advertiser advertiser : mAdvertiserFactory.allAdvertisers()) {
             if (advertiser.isAdvertising()) {
                 try {
                     advertiser.advertiseStop();
+                    count++;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "A moment has stopped advertising");
+                Log.d(TAG, "Stopped advertising " + advertiser.toString());
             } else {
                 Log.d(TAG, "A moment was not advertising");
             }
         }
+        if (count > 0) {
+            // This toast noisy if not debugging.
+            // toast("Stopped " + count + " advertisements.");
+        }
+        Log.d(TAG, "Stopped " + count + " advertisements.");
     }
 
     private RecyclerView configureRecyclerView() {
@@ -400,7 +421,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     private void toast(final String msg) {
-        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void startScanning() {

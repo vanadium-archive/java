@@ -22,8 +22,6 @@ public interface MomentFactory {
 
     Moment make(Id id, int index, String author, String caption);
 
-    Attributes makeAttributes(Moment moment);
-
     Moment makeFromAttributes(Id id, int ordinal, Attributes attr);
 
     Moment fromPrefs(SharedPreferences p, String prefix);

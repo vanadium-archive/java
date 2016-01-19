@@ -7,8 +7,11 @@ package io.v.moments.ifc;
 import android.graphics.Bitmap;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import io.v.moments.lib.Id;
+import io.v.v23.discovery.Attributes;
 
 /**
  * A photo with ancillary information.
@@ -50,19 +53,28 @@ public interface Moment extends HasId {
     DateTime getCreationTime();
 
     /**
-     * Should the moment be advertised?
+     * An advertiser can be scheduled to start advertising, but not actually be
+     * advertising yet.  There's also a lag to stop advertising.  This member
+     * tracks the desired eventual state, to maintain sensible UX, through
+     * phone rotations and whatnot.
      */
-    boolean shouldBeAdvertising();
+    AdState getDesiredAdState();
 
     /**
-     * Should the moment be advertised?
+     * Changes the value returned by getDesiredAdState.
      */
-    void setShouldBeAdvertising(boolean value);
+    void setDesiredAdState(AdState value);
 
     /**
      * Is the specified photo available?
      */
     boolean hasPhoto(Kind kind, Style style);
+
+
+    /**
+     * From this, make a set of discovery 'attributes'.
+     */
+    Attributes makeAttributes();
 
     /**
      * Get the specified photo.
@@ -91,4 +103,8 @@ public interface Moment extends HasId {
     enum Style {
         HUGE, FULL, THUMB
     }
+
+    enum AdState { ON, OFF }
+
+    DateTimeFormatter FMT = DateTimeFormat.forPattern("yyyyMMdd_HHmmss");
 }

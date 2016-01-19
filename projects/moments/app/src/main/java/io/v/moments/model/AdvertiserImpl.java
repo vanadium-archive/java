@@ -28,7 +28,7 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.verror.VException;
 
 /**
- * Vanadium advertisements.
+ * Handles the advertising of a moment.
  */
 public class AdvertiserImpl implements Advertiser {
     private static final String TAG = "AdvertiserImpl";
@@ -36,48 +36,29 @@ public class AdvertiserImpl implements Advertiser {
     static final String NO_MOUNT_NAME = "";
     private final V23Manager mV23Manager;
     private final Moment mMoment;
-    private final MomentFactory mMomentFactory;
 
-    /**
-     * An advertiser can be scheduled to start advertising, but not actually be
-     * advertising yet.  There's also a lag to stop advertising.  This boolean
-     * tracks the desired eventual state, to maintain sensible UX.
-     */
-    private boolean mShouldBeAdvertising = false;
     private CancelableVContext mAdvCtx;
     private Server mServer;
 
-    public AdvertiserImpl(
-            V23Manager v23Manager,
-            MomentFactory momentFactory,
-            Moment moment,
-            boolean shouldBeAdvertising) {
+    public AdvertiserImpl(V23Manager v23Manager, Moment moment) {
         if (v23Manager == null) {
             throw new IllegalArgumentException("Null v23Manager");
-        }
-        if (momentFactory == null) {
-            throw new IllegalArgumentException("Null momentFactoryImpl");
         }
         if (moment == null) {
             throw new IllegalArgumentException("Null moment");
         }
         mV23Manager = v23Manager;
-        mMomentFactory = momentFactory;
         mMoment = moment;
-        mShouldBeAdvertising = shouldBeAdvertising;
-    }
-
-    public boolean shouldBeAdvertising() {
-        return mShouldBeAdvertising;
-    }
-
-    public void setShouldBeAdvertising(boolean value) {
-        this.mShouldBeAdvertising = value;
     }
 
     @Override
     public boolean isAdvertising() {
         return mAdvCtx != null;
+    }
+
+    @Override
+    public String toString() {
+        return mMoment.getCaption();
     }
 
     @Override
@@ -95,7 +76,7 @@ public class AdvertiserImpl implements Advertiser {
         for (Endpoint point : points) {
             addresses.add(point.toString());
         }
-        Attributes attrs = mMomentFactory.makeAttributes(mMoment);
+        Attributes attrs = mMoment.makeAttributes();
         mAdvCtx = mV23Manager.advertise(
                 makeAdvertisement(attrs, addresses),
                 NO_PATTERNS,

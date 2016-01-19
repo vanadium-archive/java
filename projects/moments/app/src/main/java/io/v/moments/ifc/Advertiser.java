@@ -14,18 +14,6 @@ public interface Advertiser {
     void advertiseStart();
 
     /**
-     * This state is persisted.  This can be true when isAdvertising is false,
-     * and vice-versa.  E.g., phone rotates, restores state, and uses this value
-     * to decide if a call to  advertiseStart is warranted.
-     */
-    boolean shouldBeAdvertising();
-
-    /**
-     * Changes the value returned by shouldBeAdvertising.
-     */
-    void setShouldBeAdvertising(boolean value);
-
-    /**
      * True if advertiseStop could usefully be called.
      */
     boolean isAdvertising();

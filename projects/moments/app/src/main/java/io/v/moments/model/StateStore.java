@@ -76,7 +76,7 @@ public class StateStore {
 
     private void loadMomentsFromPrefs(ObservedList<Moment> moments) {
         int size = mPrefs.getInt(Field.NUM_MOMENTS.toString(), 0);
-        for (int i = 1; i <= size; i++) {
+        for (int i = size; i >= 1; i--) {
             moments.push(mMomentFactory.fromPrefs(mPrefs, makeMomentPrefix(i)));
         }
     }

@@ -39,21 +39,18 @@ public class AdvertiserFactoryTest {
     V23Manager mV23Manager;
     @Mock
     Moment mMoment;
-    @Mock
-    MomentFactory mMomentFactory;
-
     AdvertiserFactory mFactory;
 
     @Before
     public void setup() throws Exception {
-        mFactory = new AdvertiserFactory(mV23Manager, mMomentFactory);
+        mFactory = new AdvertiserFactory(mV23Manager);
     }
 
     @Test
     public void makeOne() throws Exception {
         when(mMoment.getId()).thenReturn(ID0);
 
-        Advertiser a0 = mFactory.make(mMoment);
+        Advertiser a0 = mFactory.getOrMake(mMoment);
         assertTrue(mFactory.contains(ID0));
 
         Iterator<Advertiser> iter = mFactory.allAdvertisers().iterator();
@@ -64,9 +61,9 @@ public class AdvertiserFactoryTest {
     @Test
     public void makeTwo() throws Exception {
         when(mMoment.getId()).thenReturn(ID0);
-        Advertiser a0 = mFactory.make(mMoment);
+        Advertiser a0 = mFactory.getOrMake(mMoment);
         when(mMoment.getId()).thenReturn(ID1);
-        Advertiser a1 = mFactory.make(mMoment);
+        Advertiser a1 = mFactory.getOrMake(mMoment);
 
         assertTrue(mFactory.contains(ID0));
         assertTrue(mFactory.contains(ID1));

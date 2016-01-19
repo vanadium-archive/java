@@ -16,26 +16,22 @@ import io.v.moments.lib.V23Manager;
 
 /**
  * Makes advertisers.  Keeps a record of all of them for the life of the app.
- * Can use this record to reject local advertisements when scanning.
+ * Can use this record to reject local advertisements when scanning, or to
+ * shut down all advertising.
  */
 public class AdvertiserFactory implements IdSet {
     private final V23Manager mV23Manager;
-    private final MomentFactory mMomentFactory;
     private final Map<Id, Advertiser> mLocalAds = new HashMap<>();
 
-    public AdvertiserFactory(V23Manager v23Manager,
-                             MomentFactory momentFactory) {
+    public AdvertiserFactory(V23Manager v23Manager) {
         mV23Manager = v23Manager;
-        mMomentFactory = momentFactory;
     }
 
-    public Advertiser make(Moment moment) {
+    public Advertiser getOrMake(Moment moment) {
         if (contains(moment.getId())) {
             return mLocalAds.get(moment.getId());
         }
-        Advertiser result = new AdvertiserImpl(
-                mV23Manager, mMomentFactory,
-                moment, moment.shouldBeAdvertising());
+        Advertiser result = new AdvertiserImpl(mV23Manager, moment);
         mLocalAds.put(moment.getId(), result);
         return result;
     }

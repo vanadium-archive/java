@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.v.moments.ifc.Moment;
-import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.V23Manager;
 import io.v.v23.context.CancelableVContext;
@@ -33,6 +32,7 @@ import io.v.v23.security.BlessingPattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -50,8 +50,6 @@ public class AdvertiserImplTest {
 
     @Mock
     V23Manager mV23Manager;
-    @Mock
-    MomentFactory mMomentFactory;
     @Mock
     Server mServer;
     @Mock
@@ -86,9 +84,9 @@ public class AdvertiserImplTest {
 
         when(mServerStatus.getEndpoints()).thenReturn(endpoints);
 
-        when(mMomentFactory.makeAttributes(mMoment)).thenReturn(mAttrs);
         when(mMoment.getId()).thenReturn(ID);
         when(mMoment.toString()).thenReturn(MOMENT_NAME);
+        when(mMoment.makeAttributes()).thenReturn(mAttrs);
 
         List<BlessingPattern> list = any();
         when(mV23Manager.advertise(
@@ -96,32 +94,21 @@ public class AdvertiserImplTest {
                 list,
                 any(VDiscovery.AdvertiseDoneCallback.class))).thenReturn(mContext);
 
-        mAdvertiser = new AdvertiserImpl(
-                mV23Manager, mMomentFactory, mMoment, false);
+        mAdvertiser = new AdvertiserImpl(mV23Manager, mMoment);
     }
 
     @Test
     public void construction1() {
         mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null v23Manager");
-        mAdvertiser = new AdvertiserImpl(
-                null, mMomentFactory, mMoment, false);
+        mAdvertiser = new AdvertiserImpl(null, mMoment);
     }
 
     @Test
     public void construction2() {
         mThrown.expect(IllegalArgumentException.class);
-        mThrown.expectMessage("Null momentFactoryImpl");
-        mAdvertiser = new AdvertiserImpl(
-                mV23Manager, null, mMoment, false);
-    }
-
-    @Test
-    public void construction3() {
-        mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null moment");
-        mAdvertiser = new AdvertiserImpl(
-                mV23Manager, mMomentFactory, null, false);
+        mAdvertiser = new AdvertiserImpl(mV23Manager, null);
     }
 
     @Test
@@ -140,7 +127,7 @@ public class AdvertiserImplTest {
         assertEquals(ID.toString(), service.getInstanceId());
         assertEquals(MOMENT_NAME, service.getInstanceName());
         assertEquals(Config.INTERFACE_NAME, service.getInterfaceName());
-        assertEquals(mAttrs, service.getAttrs());
+        assertSame(mAttrs, service.getAttrs());
 
         List<String> addresses = service.getAddrs();
         assertTrue(addresses.contains(ADDRESS));
