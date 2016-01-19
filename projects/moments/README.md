@@ -22,12 +22,13 @@ see the impact on the UX of the devices involved.
 
 ## Build and install
 
-Connect developer enabled device via USB.
+Connect a developer-enabled device via USB to your workstation.
 
 Then, for example:
+
 ```
 cd ~/vanadium/release/java/projects/moments
-./gradlew installDebug
+./gradlew assembleDebug
+adb install app/build/outputs/apk/app-debug.apk
+adb shell am start -n io.v.moments/io.v.moments.ux.MainActivity
 ```
-
-Click on __Moments__ to launch.
