@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     // For discovery, serving and behaving as a client.
     private final V23Manager mV23Manager = V23Manager.Singleton.get();
 
-    // See wireItUp for discussion of the following.
+    // See wireUxToDataModel for discussion of the following.
     private StateStore mStateStore;
     private AdvertiserFactory mAdvertiserFactory;
     private MomentFactory mMomentFactory;
@@ -137,13 +137,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         setContentView(R.layout.activity_main);
 
-        wireItUp();
+        // This call might leave this activity to get a Vanadium blessing.
+        // On return, should trigger onActivityResult as expected.
+        mV23Manager.init(getApplicationContext(), this);
+
+        wireUxToDataModel();
+
+        // Fail fast if no permissions to read/write storage.
+        mBitMapper.checkIoPermissions();
 
         initializeOrRestore(savedInstanceState);
-
-        // This might leave to start a new activity.
-        // Will trigger onActivityResult as expected.
-        mV23Manager.init(getApplicationContext(), this);
     }
 
     /**
@@ -152,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
      * bundle. State is loaded after the wiring is complete, to make phone
      * rotation easy.
      */
-    private void wireItUp() {
+    private void wireUxToDataModel() {
         // Stores remote moments by Id to avoid having to wait for re-discovery.
         mRemoteMomentCache = new HashMap<>();
 

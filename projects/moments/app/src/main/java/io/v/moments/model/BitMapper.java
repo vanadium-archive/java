@@ -34,18 +34,21 @@ public class BitMapper {
     private final File mWorkingDir;
 
     public BitMapper(File dir, Handler handler, Point displaySize, int thumbWidth) {
-        if (!dir.exists()) {
-            throw new IllegalArgumentException("Unable to see dir " + dir);
-        }
-        if (!FileUtil.isUsableDirectory(dir)) {
-            throw new IllegalArgumentException("Unable to use dir " + dir);
-        }
         mDisplaySize = displaySize;
         mHandler = handler;
         mThumbWidth = thumbWidth;
         mPlaceholderBitmap = Bitmap.createBitmap(
                 mThumbWidth, mThumbWidth, Bitmap.Config.ALPHA_8);
         mWorkingDir = dir;
+    }
+
+    public void checkIoPermissions() {
+        if (!mWorkingDir.exists()) {
+            throw new IllegalArgumentException("Unable to see dir " + mWorkingDir);
+        }
+        if (!FileUtil.isUsableDirectory(mWorkingDir)) {
+            throw new IllegalArgumentException("Unable to use dir " + mWorkingDir);
+        }
     }
 
     static String inZeroes(int index) {

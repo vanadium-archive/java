@@ -148,7 +148,11 @@ public class AdConverterMoment implements AdConverter<Moment> {
     }
 
     static class Deadline {
-        final static Duration FULL = Duration.standardSeconds(90);
+        // Images can be slow to transfer when multiple images in flight, so
+        // being generous with the deadline.  The impact of a timeout is just
+        // a log message / stack trace, eventually giving something to
+        // investigate if photos fail to appear.
+        final static Duration FULL = Duration.standardSeconds(120);
         final static Duration THUMB = Duration.standardSeconds(30);
     }
 }
