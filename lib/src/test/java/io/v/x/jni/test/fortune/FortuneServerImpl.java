@@ -4,7 +4,16 @@
 
 package io.v.x.jni.test.fortune;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
+import io.v.v23.InputChannelCallback;
+import io.v.v23.InputChannels;
 import io.v.v23.OutputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobError;
@@ -17,7 +26,9 @@ import io.v.v23.vdl.ServerStream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
 
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.v.v23.VFutures.sync;
 
@@ -46,104 +57,158 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     }
 
     @Override
-    public String get(VContext context, ServerCall call) throws VException {
-        if (latch != null) {
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new VException(e.getMessage());
+    public ListenableFuture<String> get(final VContext context, ServerCall call) {
+        final SettableFuture<String> future = SettableFuture.create();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (latch != null) {
+                    try {
+                        latch.await();
+                    } catch (InterruptedException e) {
+                        future.setException(new VException(e.getMessage()));
+                    }
+                }
+                if (lastAddedFortune == null) {
+                    future.setException(new NoFortunesException(context));
+                } else {
+                    future.set(lastAddedFortune);
+                }
             }
-        }
-        if (lastAddedFortune == null) {
-            throw new NoFortunesException(context);
-        }
-        return lastAddedFortune;
+        }).start();
+        return future;
     }
 
     @Override
-    public void add(VContext context, ServerCall call, String fortune) throws VException {
+    public ListenableFuture<Map<String, String>> parameterizedGet(
+            VContext context, ServerCall call) {
+        if (lastAddedFortune == null) {
+            return Futures.immediateFailedFuture(new NoFortunesException(context));
+        }
+        return Futures.immediateFuture(
+                (Map<String, String>) ImmutableMap.of(lastAddedFortune, lastAddedFortune));
+    }
+
+    @Override
+    public ListenableFuture<Void> add(VContext context, ServerCall call, String fortune) {
         lastAddedFortune = fortune;
+        return Futures.immediateFuture(null);
     }
 
     @Override
-    public int streamingGet(VContext context, ServerCall call, ServerStream<String, Boolean> stream)
-            throws VException {
-        int numSent = 0;
-        for (Boolean val : stream) {
-            try {
-                stream.send(get(context, call));
-            } catch (VException e) {
-                throw new VException(
-                        "Server couldn't send a string item: " + e.getMessage());
+    public ListenableFuture<Integer> streamingGet(
+            final VContext context, ServerCall call, final ServerStream<String, Boolean> stream) {
+        final SettableFuture<Integer> future = SettableFuture.create();
+        final AtomicInteger numSent = new AtomicInteger(0);
+        Futures.addCallback(InputChannels.withCallback(stream, new InputChannelCallback<Boolean>() {
+            @Override
+            public ListenableFuture<Void> onNext(Boolean result) {
+                if (lastAddedFortune == null) {
+                    return Futures.immediateFailedFuture(new NoFortunesException(context));
+                }
+                return Futures.transform(stream.send(lastAddedFortune),
+                        new Function<Void, Void>() {
+                            @Override
+                            public Void apply(Void input) {
+                                numSent.incrementAndGet();
+                                return null;
+                            }
+                        });
             }
-            ++numSent;
-        }
-        if (stream.error() != null) {
-            throw stream.error();
-        }
-        return numSent;
+        }), new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                future.set(numSent.get());
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                future.setException(t);
+            }
+        });
+        return future;
     }
 
     @Override
-    public MultipleGetOut multipleGet(VContext context, ServerCall call) throws VException {
+    public ListenableFuture<MultipleGetOut> multipleGet(VContext context, ServerCall call) {
         if (lastAddedFortune == null) {
-            throw new NoFortunesException(context);
+            return Futures.immediateFailedFuture(new NoFortunesException(context));
         }
         MultipleGetOut ret = new MultipleGetOut();
         ret.fortune = lastAddedFortune;
         ret.another = lastAddedFortune;
-        return ret;
+        return Futures.immediateFuture(ret);
     }
 
     @Override
-    public MultipleStreamingGetOut multipleStreamingGet(VContext context, ServerCall call,
-                                                        ServerStream<String, Boolean> stream)
-            throws VException {
-        int numSent = 0;
-        for (Boolean val : stream) {
-            try {
-                stream.send(get(context, call));
-            } catch (VException e) {
-                throw new VException(
-                        "Server couldn't send a string item: " + e.getMessage());
+    public ListenableFuture<MultipleStreamingGetOut> multipleStreamingGet(
+            final VContext context, ServerCall call, final ServerStream<String, Boolean> stream) {
+        final SettableFuture<MultipleStreamingGetOut> future = SettableFuture.create();
+        final AtomicInteger numSent = new AtomicInteger(0);
+        Futures.addCallback(InputChannels.withCallback(stream, new InputChannelCallback<Boolean>() {
+            @Override
+            public ListenableFuture<Void> onNext(Boolean result) {
+                if (lastAddedFortune == null) {
+                    return Futures.immediateFailedFuture(new NoFortunesException(context));
+                }
+                return Futures.transform(stream.send(lastAddedFortune),
+                        new Function<Void, Void>() {
+                            @Override
+                            public Void apply(Void input) {
+                                numSent.incrementAndGet();
+                                return null;
+                            }
+                        });
             }
-            ++numSent;
-        }
-        if (stream.error() != null) {
-            throw stream.error();
-        }
-        MultipleStreamingGetOut ret = new MultipleStreamingGetOut();
-        ret.total = numSent;
-        ret.another = numSent;
-        return ret;
-    }
-
-        @Override
-    public void getComplexError(VContext context, ServerCall call) throws VException {
-        throw COMPLEX_ERROR;
+        }), new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                MultipleStreamingGetOut ret = new MultipleStreamingGetOut();
+                ret.total = numSent.get();
+                ret.another = numSent.get();
+                future.set(ret);
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                future.setException(t);
+            }
+        });
+        return future;
     }
 
     @Override
-    public void testServerCall(VContext context, ServerCall call) throws VException {
+    public ListenableFuture<Void> getComplexError(VContext context, ServerCall call) {
+        return Futures.immediateFailedFuture(COMPLEX_ERROR);
+    }
+
+    @Override
+    public ListenableFuture<Void> testServerCall(VContext context, ServerCall call) {
         if (call == null) {
-            throw new VException("ServerCall is null");
+            return Futures.immediateFailedFuture(new VException("ServerCall is null"));
         }
         if (call.suffix() == null) {
-            throw new VException("Suffix is null");
+            return Futures.immediateFailedFuture(new VException("Suffix is null"));
         }
         if (call.localEndpoint() == null) {
-            throw new VException("Local endpoint is null");
+            return Futures.immediateFailedFuture(new VException("Local endpoint is null"));
         }
         if (call.remoteEndpoint() == null) {
-            throw new VException("Remote endpoint is null");
+            return Futures.immediateFailedFuture(new VException("Remote endpoint is null"));
         }
         if (context == null) {
-            throw new VException("Vanadium context is null");
+            return Futures.immediateFailedFuture(new VException("Vanadium context is null"));
         }
+        return Futures.immediateFuture(null);
     }
 
     @Override
-    public void noTags(VContext context, ServerCall call) throws VException {}
+    public ListenableFuture<String> getServerThread(VContext context, ServerCall call) {
+        return Futures.immediateFuture(Thread.currentThread().toString());
+    }
+
+    @Override
+    public ListenableFuture<Void> noTags(VContext context, ServerCall call) {
+        return Futures.immediateFuture(null);
+    }
 
     @Override
     public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)

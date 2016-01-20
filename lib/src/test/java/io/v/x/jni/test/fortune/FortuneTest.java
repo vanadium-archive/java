@@ -5,6 +5,7 @@
 package io.v.x.jni.test.fortune;
 
 import com.google.common.reflect.TypeToken;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -73,7 +74,6 @@ public class FortuneTest extends TestCase {
     public void testFortune() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
@@ -112,12 +112,12 @@ public class FortuneTest extends TestCase {
         }
     }
 
-    public void testFortuneWithExecutor() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
+    public void testFortuneClientWithExecutor() throws Exception {
         Executor executor = Executors.newSingleThreadExecutor();
         Thread executorThread = getThread(executor);
         ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
@@ -125,12 +125,23 @@ public class FortuneTest extends TestCase {
         V23TestUtil.assertRunsOnThread(client.get(ctxT), executorThread);
     }
 
+    public void testFortuneServerWithExecutor() throws Exception {
+        Executor executor = Executors.newSingleThreadExecutor();
+        Thread executorThread = getThread(executor);
+        ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        String serverThreadName = sync(client.getServerThread(ctxT));
+        assertThat(serverThreadName).isEqualTo(executorThread.toString());
+    }
+
     public void testStreaming() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
-        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
+        VContext ctxT = ctx.withTimeout(new Duration(2000000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
         sync(client.add(ctxT, msg));
@@ -144,11 +155,11 @@ public class FortuneTest extends TestCase {
     }
 
     public void testStreamingWithExecutor() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
         Executor executor = Executors.newSingleThreadExecutor();
         Thread executorThread = getThread(executor);
         ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
+        FortuneServer server = new FortuneServerImpl();
+        ctx = V.withNewServer(ctx, "", server, null);
         FortuneClient client = FortuneClientFactory.getFortuneClient(name());
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
@@ -344,45 +355,47 @@ public class FortuneTest extends TestCase {
 
     private static class TestInvoker implements Invoker {
         @Override
-        public Object[] invoke(VContext ctx, StreamServerCall call, String method, Object[] args)
-                throws VException {
+        public ListenableFuture<Object[]> invoke(
+                VContext ctx, StreamServerCall call, String method, Object[] args) {
             if (call.security() == null) {
-                throw new VException("Expected call.security() to return non-null");
+                return Futures.immediateFailedFuture(
+                        new VException("Expected call.security() to return non-null"));
             }
             if (call.remoteEndpoint() == null) {
-                throw new VException("Expected remoteEndpoint() to return non-null");
+                return Futures.immediateFailedFuture(
+                        new VException("Expected remoteEndpoint() to return non-null"));
             }
             if (method.equals("get")) {
-                return new Object[] { TEST_INVOKER_FORTUNE };
+                return Futures.immediateFuture(new Object[] { TEST_INVOKER_FORTUNE });
             }
-            throw new VException("Unsupported method: " + method);
+            return Futures.immediateFailedFuture(new VException("Unsupported method: " + method));
         }
         @Override
-        public Interface[] getSignature(VContext ctx, ServerCall call) throws VException {
-            throw new VException("getSignature() unimplemented");
+        public ListenableFuture<Interface[]> getSignature(VContext ctx) {
+            return Futures.immediateFailedFuture(new VException("getSignature() unimplemented"));
         }
         @Override
-        public Method getMethodSignature(VContext ctx, ServerCall call, String method)
-                throws VException {
-            throw new VException("getMethodSignature() unimplemented");
+        public ListenableFuture<Method> getMethodSignature(VContext ctx, String method) {
+            return Futures.immediateFailedFuture(
+                    new VException("getMethodSignature() unimplemented"));
         }
         @Override
-        public Type[] getArgumentTypes(String method) throws VException {
+        public ListenableFuture<Type[]> getArgumentTypes(VContext ctx, String method) {
             if (method.equals("get")) {
-                return new Type[] {};
+                return Futures.immediateFuture(new Type[] {});
             }
-            throw new VException("Unsupported method: " + method);
+            return Futures.immediateFailedFuture(new VException("Unsupported method: " + method));
         }
         @Override
-        public Type[] getResultTypes(String method) throws VException {
+        public ListenableFuture<Type[]> getResultTypes(VContext ctx, String method) {
             if (method.equals("get")) {
-                return new Type[] { String.class };
+                return Futures.immediateFuture(new Type[] { String.class });
             }
-            throw new VException("Unsupported method: " + method);
+            return Futures.immediateFailedFuture(new VException("Unsupported method: " + method));
         }
         @Override
-        public VdlValue[] getMethodTags(String method) throws VException {
-            return new VdlValue[] {};
+        public ListenableFuture<VdlValue[]> getMethodTags(VContext ctx, String method) {
+            return Futures.immediateFuture(new VdlValue[] {});
         }
         @Override
         public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)

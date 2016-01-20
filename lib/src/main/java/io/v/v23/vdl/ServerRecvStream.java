@@ -4,11 +4,12 @@
 
 package io.v.v23.vdl;
 
+import io.v.v23.InputChannel;
+
 /**
- * Represents the server side of the established bidirectional stream.
+ * Represents the receiving side of the server bidirectional stream.
  *
- * @param <SendT>   type of values that the server is sending to the client
  * @param <RecvT>   type of values that the server is receiving from the client
  */
-public interface ServerStream<SendT, RecvT>
-        extends ServerSendStream<SendT>, ServerRecvStream<RecvT> {}
+public interface ServerRecvStream<RecvT> extends InputChannel<RecvT> {
+}

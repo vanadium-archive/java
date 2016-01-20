@@ -5,6 +5,7 @@
 package io.v.v23;
 
 import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.FutureFallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -144,13 +145,21 @@ public class VFutures {
             throw new RuntimeException("NULL executor in context: did you derive this context " +
                     "from the context returned by V.init()?");
         }
-        return Futures.transform(future, new AsyncFunction<T, T>() {
+        return Futures.withFallback(Futures.transform(future, new AsyncFunction<T, T>() {
             @Override
             public ListenableFuture<T> apply(T input) throws Exception {
                 if (context.isCanceled()) {
                     return Futures.immediateCancelledFuture();
                 }
                 return Futures.immediateFuture(input);
+            }
+        }, executor), new FutureFallback<T>() {
+            @Override
+            public ListenableFuture<T> create(Throwable t) throws Exception {
+                if (context.isCanceled()) {
+                    return Futures.immediateCancelledFuture();
+                }
+                return Futures.immediateFailedFuture(t);
             }
         }, executor);
     }

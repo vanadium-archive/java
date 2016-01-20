@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.v.impl.google.ListenableFutureCallback;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
@@ -194,70 +193,89 @@ public class InputChannelsTest extends TestCase {
 
     public void testWithCallback() throws Exception {
         {
+            // Test success.
             InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
             final AtomicInteger sum = new AtomicInteger(0);
-            final SettableFuture<VException> failFuture = SettableFuture.create();
-            sync(InputChannels.withCallback(chan, new Callback<Integer>() {
+            sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
                 @Override
-                public void onSuccess(Integer result) {
+                public ListenableFuture<Void> onNext(Integer result) {
                     sum.addAndGet(result);
-                }
-                @Override
-                public void onFailure(VException error) {
-                    // Should never be called.
-                    failFuture.set(error);
+                    return null;
                 }
             }));
-            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(15);
         }
         {
+            // Test success future.
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
+            final AtomicInteger sum = new AtomicInteger(0);
+            sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
+                @Override
+                public ListenableFuture<Void> onNext(final Integer result) {
+                    final SettableFuture<Void> future = SettableFuture.create();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sum.addAndGet(result);
+                            future.set(null);
+                        }
+                    }).start();
+                    return future;
+                }
+            }));
+            assertThat(sum.get()).isEqualTo(15);
+        }
+        {
+            // Test iteration error.
             final VException error = new VException("boo");
             InputChannel<Integer> chan = new ListInputChannel<>(error, -1, 1, 2, 3, 4, 5);
             final AtomicInteger sum = new AtomicInteger(0);
-            final SettableFuture<VException> failFuture = SettableFuture.create();
             try {
-                sync(InputChannels.withCallback(chan, new Callback<Integer>() {
+                sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
                     @Override
-                    public void onSuccess(Integer result) {
+                    public ListenableFuture<Void> onNext(Integer result) {
                         sum.addAndGet(result);
-                    }
-                    @Override
-                    public void onFailure(VException e) {
-                        // Should never be called.
-                        failFuture.set(error);
+                        return null;
                     }
                 }));
                 fail("Expected InputChannels.withCallback() to fail");
             } catch (VException e) {
                 assertThat(e).isEqualTo(error);
             }
-            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(15);
+        }
+        {
+            // Test callback error.
+            final VException error = new VException("boo");
+            InputChannel<Integer> chan = new ListInputChannel<>(null, -1, 1, 2, 3, 4, 5);
+            try {
+                sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
+                    @Override
+                    public ListenableFuture<Void> onNext(Integer result) {
+                        return Futures.immediateFailedFuture(error);
+                    }
+                }));
+                fail("Expected InputChannels.withCallback() to fail");
+            } catch (VException e) {
+                assertThat(e).isEqualTo(error);
+            }
         }
         {
             // Test cancellation.
             InputChannel<Integer> chan = new ListInputChannel<>(null, 3, 1, 2, 3, 4, 5);
             final AtomicInteger sum = new AtomicInteger(0);
-            final SettableFuture<VException> failFuture = SettableFuture.create();
             try {
-                sync(InputChannels.withCallback(chan, new Callback<Integer>() {
+                sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
                     @Override
-                    public void onSuccess(Integer result) {
+                    public ListenableFuture<Void> onNext(Integer result) {
                         sum.addAndGet(result);
-                    }
-
-                    @Override
-                    public void onFailure(VException error) {
-                        // Should never be called.
-                        failFuture.set(error);
+                        return null;
                     }
                 }));
                 fail("Expected InputChannels.withCallback() to fail");
             } catch (VException e) {
                 assertThat(e).isEqualTo(new CanceledException(null));
             }
-            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(6);
         }
         {
@@ -269,19 +287,13 @@ public class InputChannelsTest extends TestCase {
             }
             InputChannel<Integer> chan = new ListInputChannel<>(null, -1, elems);
             final AtomicInteger sum = new AtomicInteger(0);
-            final SettableFuture<VException> failFuture = SettableFuture.create();
-            sync(InputChannels.withCallback(chan, new Callback<Integer>() {
+            sync(InputChannels.withCallback(chan, new InputChannelCallback<Integer>() {
                 @Override
-                public void onSuccess(Integer result) {
+                public ListenableFuture<Void> onNext(Integer result) {
                     sum.addAndGet(result);
-                }
-                @Override
-                public void onFailure(VException error) {
-                    // Should never be called.
-                    failFuture.set(error);
+                    return null;
                 }
             }));
-            assertThat(failFuture.isDone()).isFalse();
             assertThat(sum.get()).isEqualTo(numElems * (numElems - 1) / 2);
         }
     }

@@ -30,15 +30,15 @@ public class V23TestUtil {
                 new ListenSpec.Address("tcp", "localhost:0")));
         return V.withNewServer(ctx, "", new ObjectServer() {
                     @Override
-                    public void setPermissions(VContext ctx, ServerCall call,
-                                               Permissions permissions, String version)
-                            throws VException {
-                        throw new VException("Unimplemented!");
+                    public ListenableFuture<Void> setPermissions(VContext ctx, ServerCall call,
+                                                                 Permissions permissions,
+                                                                 String version) {
+                        return Futures.immediateFailedFuture(new VException("Unimplemented!"));
                     }
                     @Override
-                    public ObjectServer.GetPermissionsOut getPermissions(
-                            VContext ctx, ServerCall call) throws VException {
-                        throw new VException("Unimplemented!");
+                    public ListenableFuture<ObjectServer.GetPermissionsOut> getPermissions(
+                            VContext ctx, ServerCall call) {
+                        return Futures.immediateFailedFuture(new VException("Unimplemented!"));
                     }
                 },
                 VSecurity.newAllowEveryoneAuthorizer());

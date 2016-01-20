@@ -4,7 +4,9 @@
 
 package io.v.v23.vdl;
 
-import io.v.v23.verror.VException;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import javax.annotation.CheckReturnValue;
 
 /**
  * Represents the send side of the server bidirectional stream.
@@ -13,10 +15,17 @@ import io.v.v23.verror.VException;
  */
 public interface ServerSendStream<SendT> {
     /**
-     * Places the item onto the output stream, blocking if there is no buffer space available.
+     * Writes the given value to the stream.
+     * <p>
+     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
+     * specified in the context used for creating this channel
+     * (see {@link io.v.v23.V#withExecutor}).
+     * <p>
+     * The returned future will fail with {@link java.util.concurrent.CancellationException} if the
+     * context used for creating this channel has been canceled.
      *
-     * @param  item            an item to be sent
-     * @throws VException      if there was an error sending the item
+     * @param item        an item to be sent
      */
-    void send(SendT item) throws VException;
+    @CheckReturnValue
+    ListenableFuture<Void> send(SendT item);
 }

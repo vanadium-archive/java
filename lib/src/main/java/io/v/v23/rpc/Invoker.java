@@ -4,74 +4,94 @@
 
 package io.v.v23.rpc;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
-import io.v.v23.verror.VException;
 
 import java.lang.reflect.Type;
 
+import javax.annotation.CheckReturnValue;
+
 /**
- * Interface used by the server for invoking methods on named objects. Typically
+ * Interface used by the server for invoking methods on named objects. Typically,
  * {@link ReflectInvoker} is used, which makes all public methods on the given
  * object invokable.
  */
 public interface Invoker extends Globber {
     /**
-     * Invokes the given method with the provided arguments.  Returns the results of the invocation.
+     * Returns a new {@link ListenableFuture} whose result is the result of invoking the given
+     * method with the provided arguments.
      *
-     * @param  ctx        context of the call
-     * @param  call       call
-     * @param  method     invoked method
+     * @param  context    server context
+     * @param  call       call state
+     * @param  method     name of the invoked method
      * @param  args       method arguments
-     * @return            results of the invocation
-     * @throws VException if there was an error invoking the method
+     * @return            a new {@link ListenableFuture} whose result is the result of invoking the
+     *                    given method with the provided arguments
      */
-    Object[] invoke(VContext ctx, StreamServerCall call, String method, Object[] args)
-            throws VException;
+    @CheckReturnValue
+    ListenableFuture<Object[]> invoke(
+            VContext context, StreamServerCall call, String method, Object[] args);
 
     /**
-     * Returns the signatures of the interfaces that the underlying object implements.
+     * Returns a new {@link ListenableFuture} whose result are the signatures of the interfaces
+     * that the underlying object implements.
      *
-     * @param  ctx        context of the call
-     * @param  call       call
-     * @throws VException if the signatures couldn't be generated
+     * @param  context    server context
+     * @return            a new {@link ListenableFuture} whose result are the signatures of the
+     *                    interfaces that the underlying object implements
      */
-    Interface[] getSignature(VContext ctx, ServerCall call) throws VException;
+    @CheckReturnValue
+    ListenableFuture<Interface[]> getSignature(VContext context);
 
     /**
-     * Returns the signature of the given method.
+     * Returns a new {@link ListenableFuture} whose result is the signature of the given method.
      *
-     * @param  ctx        context of the call
-     * @param  call       call
+     * @param  context    server context
      * @param  method     method name
-     * @throws VException if the method signature couldn't be generated
+     * @return            a new {@link ListenableFuture} whose result is the signature of the
+     *                    given method
      */
-    Method getMethodSignature(VContext ctx, ServerCall call, String method) throws VException;
+    @CheckReturnValue
+    ListenableFuture<Method> getMethodSignature(VContext context, String method);
 
     /**
-     * Returns the argument types for the given method.
+     * Returns a new {@link ListenableFuture} whose result are the argument types for the given
+     * method.
      *
+     * @param  context    server context
      * @param  method     method name
-     * @throws VException if the argument types couldn't be retrieved
+     * @return            a new {@link ListenableFuture} whose result are the argument types for
+     *                    the given method
      */
-    Type[] getArgumentTypes(String method) throws VException;
+    @CheckReturnValue
+    ListenableFuture<Type[]> getArgumentTypes(VContext context, String method);
 
     /**
-     * Returns the result types for the given method.
+     * Returns a new {@link ListenableFuture} whose result are the result types for the given
+     * method.
      *
+     * @param  context    server context
      * @param  method     method name
-     * @throws VException if the result types couldn't be retrieved
+     * @return            a new {@link ListenableFuture} whose result are the result types for the
+     *                    given method
      */
-    Type[] getResultTypes(String method) throws VException;
+    @CheckReturnValue
+    ListenableFuture<Type[]> getResultTypes(VContext context, String method);
 
     /**
-     * Returns all the tags associated with the provided method or an empty array if no tags have
-     * been associated with it.
+     * Returns a new {@link ListenableFuture} whose result are all the tags associated with the
+     * provided method, or an empty array if no tags have been associated with it.
      *
+     * @param  context    server context
      * @param  method     method name
-     * @throws VException if the method doesn't exist
+     * @return            a new {@link ListenableFuture} whose result are all the tags associated
+     *                    with the provided method or an empty array if no tags have been associated
+     *                    with it
      */
-    VdlValue[] getMethodTags(String method) throws VException;
+    @CheckReturnValue
+    ListenableFuture<VdlValue[]> getMethodTags(VContext context, String method);
 }

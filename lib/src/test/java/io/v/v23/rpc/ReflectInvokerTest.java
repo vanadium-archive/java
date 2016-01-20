@@ -25,33 +25,42 @@ import io.v.x.jni.test.fortune.FortuneServerImpl;
 import java.util.Arrays;
 import java.util.Map;
 
+import static io.v.v23.VFutures.sync;
+
 public class ReflectInvokerTest extends TestCase {
-    static {
-        V.init();
+    private VContext ctx;
+
+    @Override
+    protected void setUp() throws Exception {
+        ctx = V.init();
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        ctx.cancel();
     }
 
     public void testInvoke() throws Exception {
-        VContext context = V.init();
         ReflectInvoker invoker = new ReflectInvoker(new FortuneServerImpl());
         StreamServerCall call = null;
         {
             Object[] results =
-                    invoker.invoke(context, call, "add", new Object[] { "test fortune" });
+                    sync(invoker.invoke(ctx, call, "add", new Object[]{"test fortune"}));
             assertThat(Arrays.asList(results)).containsExactly();
         }
         {
-            Object[] results = invoker.invoke(context, call, "get", new Object[] {});
+            Object[] results = sync(invoker.invoke(ctx, call, "get", new Object[]{}));
             assertEquals(1, results.length);
             assertThat(Arrays.asList(results)).containsExactly("test fortune");
         }
         {
-            Object[] results = invoker.invoke(context, call, "multipleGet", new Object[] {});
+            Object[] results = sync(invoker.invoke(ctx, call, "multipleGet", new Object[]{}));
             assertThat(Arrays.asList(results)).containsExactly("test fortune", "test fortune");
         }
         {
             // Test error.
             try {
-                invoker.invoke(context, call, "getComplexError", new Object[] {});
+                sync(invoker.invoke(ctx, call, "getComplexError", new Object[]{}));
                 fail("invocation of getComplexError() should raies an exception");
             } catch (VException e) {
                 assert_().withFailureMessage(String.format(
@@ -63,10 +72,11 @@ public class ReflectInvokerTest extends TestCase {
 
     public void testGetArgumentTypes() throws Exception {
         ReflectInvoker invoker = new ReflectInvoker(new FortuneServerImpl());
-        assertThat(Arrays.asList(invoker.getArgumentTypes("add"))).containsExactly(String.class);
-        assertThat(Arrays.asList(invoker.getArgumentTypes("get"))).containsExactly();
+        assertThat(Arrays.asList(
+                sync(invoker.getArgumentTypes(ctx, "add")))).containsExactly(String.class);
+        assertThat(Arrays.asList(sync(invoker.getArgumentTypes(ctx, "get")))).containsExactly();
         try {
-            invoker.getArgumentTypes("none");
+            sync(invoker.getArgumentTypes(ctx, "none"));
             fail("getArgumentTypes() call with a non-existent method should raise an exception.");
         } catch (VException e) {
             // OK
@@ -75,10 +85,11 @@ public class ReflectInvokerTest extends TestCase {
 
     public void testGetResultTypes() throws Exception {
         ReflectInvoker invoker = new ReflectInvoker(new FortuneServerImpl());
-        assertThat(Arrays.asList(invoker.getResultTypes("get"))).containsExactly(String.class);
-        assertThat(Arrays.asList(invoker.getResultTypes("add"))).containsExactly();
+        assertThat(Arrays.asList(
+                sync(invoker.getResultTypes(ctx, "get")))).containsExactly(String.class);
+        assertThat(Arrays.asList(sync(invoker.getResultTypes(ctx, "add")))).containsExactly();
         try {
-            invoker.getResultTypes("none");
+            sync(invoker.getResultTypes(ctx, "none"));
             fail("getResultTypes() call with a non-existent method should raise an exception.");
         } catch (VException e) {
             // OK
@@ -97,11 +108,11 @@ public class ReflectInvokerTest extends TestCase {
         for (Map.Entry<String, VdlValue[]> testCase : testCases.entrySet()) {
             String method = testCase.getKey();
             VdlValue[] expected = testCase.getValue();
-            VdlValue[] actual = invoker.getMethodTags(method);
+            VdlValue[] actual = sync(invoker.getMethodTags(ctx, method));
             assertThat(Arrays.asList(actual)).containsExactlyElementsIn(Arrays.asList(expected));
         }
         try {
-            invoker.getMethodTags("none");
+            sync(invoker.getMethodTags(ctx, "none"));
             fail("getMethodTags() call with a non-existent method should raise an exception.");
         } catch (VException e) {
             // OK
@@ -110,9 +121,9 @@ public class ReflectInvokerTest extends TestCase {
 
     public void testGetSignature() throws Exception {
         ReflectInvoker invoker = new ReflectInvoker(new FortuneServerImpl());
-        Interface[] serverInterface = invoker.getSignature(null, null);
+        Interface[] serverInterface = sync(invoker.getSignature(ctx));
         assertThat(serverInterface).hasLength(1);
-        assertThat(serverInterface[0].getMethods()).hasSize(8);
+        assertThat(serverInterface[0].getMethods()).hasSize(10);
         Function<Method, String> methodNameFunction = new Function<Method, String>() {
             @Override
             public String apply(Method input) {
@@ -121,8 +132,9 @@ public class ReflectInvokerTest extends TestCase {
         };
         assertThat(Lists.transform(
                 serverInterface[0].getMethods(), methodNameFunction)).containsAllOf(
-                "get", "add", "streamingGet", "multipleGet", "multipleStreamingGet",
-                "getComplexError", "noTags", "testServerCall");
+                "get", "add", "parameterizedGet", "streamingGet", "multipleGet",
+                "multipleStreamingGet", "getComplexError", "noTags", "testServerCall",
+                "getServerThread");
         assertThat(serverInterface[0].getName()).isEqualTo("Fortune");
     }
 }

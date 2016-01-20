@@ -4,9 +4,11 @@
 
 package io.v.impl.google.rpc;
 
-import io.v.v23.V;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
@@ -17,7 +19,7 @@ import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
 import java.lang.reflect.Type;
-import java.util.concurrent.Executor;
+import java.util.List;
 
 /**
  * ServerRPCHelper provides a set of helper functions for RPC handling on the server side.
@@ -27,56 +29,61 @@ class ServerRPCHelper {
     private static native long nativeGoAuthorizer(Object authorizer) throws VException;
 
     // Helper function for getting tags from the provided invoker.
-    static byte[][] getMethodTags(Invoker invoker, String method) throws VException {
-        VdlValue[] tags = invoker.getMethodTags(method);
-        byte[][] vomTags = new byte[tags.length][];
-        for (int i = 0; i < tags.length; ++i) {
-            vomTags[i] = VomUtil.encode(tags[i]);
-        }
-        return vomTags;
+    static ListenableFuture<byte[][]> prepare(Invoker invoker, VContext ctx, String method) {
+        return Futures.transform(invoker.getMethodTags(ctx, method),
+                new AsyncFunction<VdlValue[], byte[][]>() {
+                    @Override
+                    public ListenableFuture<byte[][]> apply(VdlValue[] tags) throws Exception {
+                        byte[][] vomTags = new byte[tags.length][];
+                        for (int i = 0; i < tags.length; ++i) {
+                            vomTags[i] = VomUtil.encode(tags[i]);
+                        }
+                        return Futures.immediateFuture(vomTags);
+                    }
+                });
     }
 
     // Helper function for invoking a method on the provided invoker.
-    static void invoke(final Invoker invoker, final VContext ctx, final StreamServerCall call,
-            final String method, byte[][] vomArgs, final Callback<Object[]> callback)
-            throws VException {
-        Type[] argTypes = invoker.getArgumentTypes(method);
-        if (argTypes.length != vomArgs.length) {
-            throw new VException(String.format(
-                    "Wrong number of args, want %d, got %d", argTypes.length, vomArgs.length));
-        }
-        final Object[] args = new Object[argTypes.length];
-        for (int i = 0; i < argTypes.length; ++i) {
-            args[i] = VomUtil.decode(vomArgs[i], argTypes[i]);
-        }
-        // We need to return control to the Go thread immediately, otherwise if the invoked method
-        // blocks, it will block the Go thread which will prevent any go-routine from getting
-        // scheduled on it.  So, we invoke the server method on an executor.
-        Executor executor = V.getExecutor(ctx);
-        if (executor == null) {
-            throw new VException("NULL executor in context: did you derive this context from " +
-                    "the context returned by V.init()?");
-        }
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Object[] results = invoker.invoke(ctx, call, method, args);
-                    Type[] resultTypes = invoker.getResultTypes(method);
-                    if (resultTypes.length != results.length) {
-                        throw new VException(String.format(
-                                "Wrong number of results, want %d, got %d", resultTypes.length, results.length));
+    static ListenableFuture<byte[][]> invoke(final Invoker invoker, final VContext ctx,
+                                             final StreamServerCall call,
+                                             final String method, final byte[][] vomArgs) {
+        return Futures.transform(invoker.getArgumentTypes(ctx, method),
+                new AsyncFunction<Type[], byte[][]>() {
+                    @Override
+                    public ListenableFuture<byte[][]> apply(Type[] argTypes) throws Exception {
+                        if (argTypes.length != vomArgs.length) {
+                            throw new VException(String.format(
+                                    "Wrong number of args, want %d, got %d",
+                                    argTypes.length, vomArgs.length));
+                        }
+                        final Object[] args = new Object[argTypes.length];
+                        for (int i = 0; i < argTypes.length; ++i) {
+                            args[i] = VomUtil.decode(vomArgs[i], argTypes[i]);
+                        }
+                        return Futures.transform(Futures.<Object>allAsList(
+                                        invoker.getResultTypes(ctx, method),
+                                        invoker.invoke(ctx, call, method, args)),
+                                new AsyncFunction<List<Object>, byte[][]>() {
+                                    @Override
+                                    public ListenableFuture<byte[][]> apply(List<Object> input)
+                                            throws Exception {
+                                        Type[] resultTypes = (Type[]) input.get(0);
+                                        Object[] results = (Object[]) input.get(1);
+                                        if (resultTypes.length != results.length) {
+                                            throw new VException(String.format(
+                                                    "Wrong number of results, want %d, got %d",
+                                                    resultTypes.length, results.length));
+                                        }
+                                        byte[][] vomResults = new byte[resultTypes.length][];
+                                        for (int i = 0; i < resultTypes.length; ++i) {
+                                            vomResults[i] =
+                                                    VomUtil.encode(results[i], resultTypes[i]);
+                                        }
+                                        return Futures.immediateFuture(vomResults);
+                                    }
+                                });
                     }
-                    byte[][] vomResults = new byte[resultTypes.length][];
-                    for (int i = 0; i < resultTypes.length; ++i) {
-                        vomResults[i] = VomUtil.encode(results[i], resultTypes[i]);
-                    }
-                    callback.onSuccess(vomResults);
-                } catch (VException e) {
-                    callback.onFailure(e);
-                }
-            }
-        });
+                });
     }
 
     // Helper function for invoking a lookup method on the provided dispatcher.

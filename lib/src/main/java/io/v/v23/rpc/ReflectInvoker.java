@@ -4,19 +4,27 @@
 
 package io.v.v23.rpc;
 
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+
 import io.v.v23.OutputChannel;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.vdl.MultiReturn;
 import io.v.v23.vdl.VServer;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
+import io.v.v23.verror.CanceledException;
 import io.v.v23.verror.VException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executor;
 
 import static io.v.v23.VFutures.sync;
 
@@ -120,26 +129,40 @@ public final class ReflectInvoker implements Invoker {
         private final VdlValue[] tags;
         private final Type[] argTypes;
         private final Type[] resultTypes;
+        private final Type returnType;
 
-        ServerMethod(Object wrappedServer, Method method, VdlValue[] tags)
-                throws VException {
+        ServerMethod(Object wrappedServer, Method method, VdlValue[] tags) throws VException {
             this.wrappedServer = wrappedServer;
             this.method = method;
             this.tags = tags != null ? Arrays.copyOf(tags, tags.length) : new VdlValue[0];
             Type[] args = method.getGenericParameterTypes();
             this.argTypes = Arrays.copyOfRange(args, 2, args.length);
-            Class<?> returnType = method.getReturnType();
-            if (returnType == void.class) {
+            Type returnFutureType = method.getGenericReturnType();
+            if (!(returnFutureType instanceof ParameterizedType)) {
+                throw new VException(
+                        "Couldn't get return parameter type for method: " + method.getName());
+            }
+            if (((ParameterizedType) returnFutureType).getRawType() != ListenableFuture.class) {
+                throw new VException("Server wrapper method must return a ListenableFuture: " +
+                        method.getName());
+            }
+            Type[] returnArgTypes = ((ParameterizedType) returnFutureType).getActualTypeArguments();
+            if (returnArgTypes.length != 1) {
+                throw new VException("Multiple return parameters for method: " + method.getName());
+            }
+            this.returnType = returnArgTypes[0];
+            if (returnType == Void.class) {
                 this.resultTypes = new Type[0];
-            } else if (returnType.getAnnotation(MultiReturn.class) != null) {
+            } else if (returnType instanceof Class &&
+                    ((Class<?>) returnType).getAnnotation(MultiReturn.class) != null) {
                 // Multiple return values.
-                Field[] fields = returnType.getFields();
+                Field[] fields = ((Class<?>) returnType).getFields();
                 this.resultTypes = new Type[fields.length];
                 for (int i = 0; i < fields.length; ++i) {
                     this.resultTypes[i] = fields[i].getGenericType();
                 }
             } else {
-                this.resultTypes = new Type[] { method.getGenericReturnType() };
+                this.resultTypes = new Type[] { returnType };
             }
         }
         public Method getReflectMethod() {
@@ -153,6 +176,9 @@ public final class ReflectInvoker implements Invoker {
         }
         public Type[] getResultTypes() {
             return Arrays.copyOf(this.resultTypes, this.resultTypes.length);
+        }
+        public Type getReturnType() {
+            return returnType;
         }
         public Object invoke(Object... args) throws IllegalAccessException,
                 IllegalArgumentException, InvocationTargetException {
@@ -229,80 +255,151 @@ public final class ReflectInvoker implements Invoker {
     }
 
     @Override
-    public Object[] invoke(VContext context, StreamServerCall call, String method, Object[] args)
-            throws VException {
-        ServerMethod m = findMethod(method);
+    public ListenableFuture<Object[]> invoke(
+            final VContext ctx, final StreamServerCall call, final String method, final Object[] args) {
+        Executor executor = V.getExecutor(ctx);
+        if (executor == null) {
+            return Futures.immediateFailedFuture(new VException("NULL executor in context: did " +
+                    "you derive server context from the context returned by V.init()?"));
+        }
         try {
-            // Invoke the method and process results.
-            Object[] allArgs = new Object[2 + args.length];
-            allArgs[0] = context;
-            allArgs[1] = call;
-            System.arraycopy(args, 0, allArgs, 2, args.length);
-            Object result = m.invoke(allArgs);
-            return prepareReply(m, result);
-        } catch (InvocationTargetException e) { // The underlying method threw an exception.
-            if ((e.getCause() instanceof VException)) {
-                throw (VException) e.getCause();
-            } else {
-                // Dump the stack trace locally.
-                e.getTargetException().printStackTrace();
-                throw new VException(String.format(
-                    "Remote invocations of java methods may only throw VException, but call " +
-                    "to %s threw %s", method, e.getTargetException().getClass()));
-            }
-        } catch (IllegalAccessException e) {
-            throw new VException(
-                String.format("Couldn't invoke method %s: %s", method, e.getMessage()));
+            final ServerMethod m = findMethod(method);
+            final SettableFuture<ListenableFuture<Object[]>> ret = SettableFuture.create();
+            // Invoke the method.
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (ctx.isCanceled()) {
+                            ret.setException(new CanceledException(ctx));
+                            return;
+                        }
+                        // Invoke the method and process results.
+                        Object[] allArgs = new Object[2 + args.length];
+                        allArgs[0] = ctx;
+                        allArgs[1] = call;
+                        System.arraycopy(args, 0, allArgs, 2, args.length);
+                        Object result = m.invoke(allArgs);
+                        ret.set(prepareReply(m, result));
+                    } catch (InvocationTargetException | IllegalAccessException e) {
+                        ret.setException(new VException(String.format(
+                                "Error invoking method %s: %s",
+                                method, e.getCause().getMessage())));
+                    }
+                }
+            });
+            return Futures.dereference(ret);
+        } catch (VException e) {
+            return Futures.immediateFailedFuture(e);
         }
     }
 
+    private static ListenableFuture<Object[]> prepareReply(
+            final ServerMethod m, Object resultFuture) {
+        if (resultFuture == null) {
+            return Futures.immediateFailedFuture(new VException(String.format(
+                    "Server method %s returned NULL ListenableFuture.",
+                    m.getReflectMethod().getName())));
+        }
+        if (!(resultFuture instanceof ListenableFuture)) {
+            return Futures.immediateFailedFuture(new VException(String.format(
+                    "Server method %s didn't return a ListenableFuture.",
+                    m.getReflectMethod().getName())));
+        }
+        return Futures.transform((ListenableFuture<?>) resultFuture,
+                new AsyncFunction<Object, Object[]>() {
+                    @Override
+                    public ListenableFuture<Object[]> apply(Object result) throws Exception {
+                        Type[] resultTypes = m.getResultTypes();
+                        switch (resultTypes.length) {
+                            case 0:
+                                return Futures.immediateFuture(new Object[0]);  // Void
+                            case 1:
+                                return Futures.immediateFuture(new Object[]{result});
+                            default: {  // Multiple return values.
+                                Class<?> returnType = (Class<?>) m.getReturnType();
+                                Field[] fields = returnType.getFields();
+                                Object[] reply = new Object[fields.length];
+                                for (int i = 0; i < fields.length; i++) {
+                                    try {
+                                        reply[i] = result != null ? fields[i].get(result) : null;
+                                    } catch (IllegalAccessException e) {
+                                        throw new VException(
+                                                "Couldn't get field: " + e.getMessage());
+                                    }
+                                }
+                                return Futures.immediateFuture(reply);
+                            }
+                        }
+                    }
+                });
+    }
+
     @Override
-    public Interface[] getSignature(VContext ctx, ServerCall call) throws VException {
+    public ListenableFuture<Interface[]> getSignature(VContext ctx) {
         List<Interface> interfaces = new ArrayList<Interface>();
         for (Map.Entry<Object, Method> entry : signatureMethods.entrySet()) {
             try {
                 interfaces.add((Interface) entry.getValue().invoke(entry.getKey()));
             } catch (IllegalAccessException e) {
-                throw new VException(String.format(
+                return Futures.immediateFailedFuture(new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
-                        server.getClass().getName(), e.toString()));
+                        server.getClass().getName(), e.toString())));
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
-                throw new VException(String.format(
+                return Futures.immediateFailedFuture(new VException(String.format(
                         "Could not invoke signature method for server class %s: %s",
-                        server.getClass().getName(), e.toString()));
+                        server.getClass().getName(), e.toString())));
             }
         }
-        return interfaces.toArray(new Interface[interfaces.size()]);
+        return Futures.immediateFuture(interfaces.toArray(new Interface[interfaces.size()]));
     }
 
     @Override
-    public io.v.v23.vdlroot.signature.Method getMethodSignature(
-            VContext ctx, ServerCall call, String methodName) throws VException {
-        Interface[] interfaces = getSignature(ctx, call);
-        for (Interface iface : interfaces) {
-            for (io.v.v23.vdlroot.signature.Method method : iface.getMethods()) {
-                if (method.getName().equals(methodName)) {
-                    return method;
-                }
-            }
+    public ListenableFuture<io.v.v23.vdlroot.signature.Method> getMethodSignature(
+            VContext ctx, final String methodName) {
+        return Futures.transform(getSignature(ctx),
+                new AsyncFunction<Interface[], io.v.v23.vdlroot.signature.Method>() {
+                    @Override
+                    public ListenableFuture<io.v.v23.vdlroot.signature.Method> apply(
+                            Interface[] interfaces) throws Exception {
+                        for (Interface iface : interfaces) {
+                            for (io.v.v23.vdlroot.signature.Method method : iface.getMethods()) {
+                                if (method.getName().equals(methodName)) {
+                                    return Futures.immediateFuture(method);
+                                }
+                            }
+                        }
+                        throw new VException(String.format("Could not find method %s", methodName));
+                    }
+                });
+    }
+
+    @Override
+    public ListenableFuture<Type[]> getArgumentTypes(VContext ctx, String method) {
+        try {
+            return Futures.immediateFuture(findMethod(method).getArgumentTypes());
+        } catch (VException e) {
+            return Futures.immediateFailedFuture(e);
         }
-        throw new VException(String.format("Could not find method %s", methodName));
     }
 
     @Override
-    public Type[] getArgumentTypes(String method) throws VException {
-        return findMethod(method).getArgumentTypes();
+    public ListenableFuture<Type[]> getResultTypes(VContext ctx, String method) {
+        try {
+            return Futures.immediateFuture(findMethod(method).getResultTypes());
+        } catch (VException e) {
+            return Futures.immediateFailedFuture(e);
+        }
     }
 
     @Override
-    public Type[] getResultTypes(String method) throws VException {
-        return findMethod(method).getResultTypes();
-    }
-
-    @Override
-    public VdlValue[] getMethodTags(String method) throws VException {
-        return findMethod(method).getTags();
+    public ListenableFuture<VdlValue[]> getMethodTags(VContext ctx, String method) {
+        try {
+            return Futures.immediateFuture(findMethod(method).getTags());
+        } catch (VException e) {
+            return Futures.immediateFailedFuture(e);
+        }
     }
 
     @Override
@@ -322,27 +419,6 @@ public final class ReflectInvoker implements Invoker {
                     method, server.getClass().getCanonicalName()));
         }
         return m;
-    }
-
-    private static Object[] prepareReply(ServerMethod m, Object result) throws VException {
-        Class<?> returnType = m.getReflectMethod().getReturnType();
-        if (returnType == void.class) {
-            return new Object[0];
-        }
-        if (returnType.getAnnotation(MultiReturn.class) != null) {
-            // Multiple return values.
-            Field[] fields = returnType.getFields();
-            Object[] reply = new Object[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                try {
-                    reply[i] = result != null ? fields[i].get(result) : null;
-                } catch (IllegalAccessException e) {
-                    throw new VException("Couldn't get field: " + e.getMessage());
-                }
-            }
-            return reply;
-        }
-        return new Object[] { result };
     }
 
     /**

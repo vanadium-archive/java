@@ -21,7 +21,6 @@ import java.util.concurrent.Executor;
 import javax.annotation.CheckReturnValue;
 
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Callback;
 import io.v.v23.verror.EndOfFileException;
 import io.v.v23.verror.VException;
 
@@ -162,9 +161,8 @@ public class InputChannels {
     }
 
     /**
-     * Iterates over all elements in {@code channel}, invoking the {@link Callback#onSuccess}
-     * method on the provided callback for each element.  Note that the {@link Callback#onFailure}
-     * on the provided callback is never invoked.
+     * Iterates over all elements in {@code channel}, invoking {@link InputChannelCallback#onNext}
+     * method on the provided callback for each element.
      * <p>
      * Returns a new {@link ListenableFuture} that completes when the provided {@link InputChannel}
      * has exhausted all of its elements or has encountered an error.
@@ -174,14 +172,13 @@ public class InputChannels {
      */
     @CheckReturnValue
     public static <T> ListenableFuture<Void> withCallback(
-            InputChannel<? extends T> channel, Callback<T> callback) {
+            InputChannel<T> channel, InputChannelCallback<? super T> callback) {
         return withCallback(channel, callback, MoreExecutors.directExecutor());
     }
 
     /**
-     * Iterates over all elements in {@code channel}, invoking the {@link Callback#onSuccess}
-     * method on the provided callback for each element.  Note that the {@link Callback#onFailure}
-     * on the provided callback is never invoked.
+     * Iterates over all elements in {@code channel}, invoking {@link InputChannelCallback#onNext}
+     * method on the provided callback for each element.
      * <p>
      * Returns a new {@link ListenableFuture} that completes when the provided {@link InputChannel}
      * has exhausted all of its elements or has encountered an error.
@@ -190,7 +187,9 @@ public class InputChannels {
      */
     @CheckReturnValue
     public static <T> ListenableFuture<Void> withCallback(
-            InputChannel<? extends T> channel, Callback<T> callback, Executor executor) {
+            InputChannel<T> channel,
+            InputChannelCallback<? super T> callback,
+            Executor executor) {
         final SettableFuture<Void> future = SettableFuture.create();
         Futures.addCallback(channel.recv(),
                 newCallbackForCallback(channel, future, callback, executor), executor);
@@ -198,13 +197,21 @@ public class InputChannels {
     }
 
     private static <T> FutureCallback<T> newCallbackForCallback(
-            final InputChannel<? extends T> channel, final SettableFuture<Void> future,
-            final Callback<T> callback, final Executor executor) {
+            final InputChannel<T> channel, final SettableFuture<Void> future,
+            final InputChannelCallback<? super T> callback, final Executor executor) {
         return new FutureCallback<T>() {
             @Override
             public void onSuccess(T result) {
-                callback.onSuccess(result);
-                Futures.addCallback(channel.recv(),
+                ListenableFuture<Void> done = callback.onNext(result);
+                if (done == null) {
+                    done = Futures.immediateFuture(null);
+                }
+                Futures.addCallback(Futures.transform(done, new AsyncFunction<Void, T>() {
+                            @Override
+                            public ListenableFuture<T> apply(Void input) throws Exception {
+                                return channel.recv();
+                            }
+                        }),
                         newCallbackForCallback(channel, future, callback, executor), executor);
             }
             @Override
