@@ -9,11 +9,11 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 
-import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.vdl.MultiReturn;
+import io.v.v23.vdl.ServerSendStream;
 import io.v.v23.vdl.VServer;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executor;
-
-import static io.v.v23.VFutures.sync;
 
 /**
  * An {@link Invoker} that uses reflection to make each compatible exported method in the provided
@@ -403,13 +401,12 @@ public final class ReflectInvoker implements Invoker {
     }
 
     @Override
-    public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)
-            throws VException {
+    public ListenableFuture<Void> glob(VContext ctx, ServerCall call, String pattern,
+                                       ServerSendStream<GlobReply> stream) {
         if (server instanceof Globber) {
-            ((Globber) server).glob(call, pattern, responseChannel);
-        } else {
-            sync(responseChannel.close());
+            return ((Globber) server).glob(ctx, call, pattern, stream);
         }
+        return Futures.immediateFuture(null);
     }
 
     private ServerMethod findMethod(String method) throws VException {

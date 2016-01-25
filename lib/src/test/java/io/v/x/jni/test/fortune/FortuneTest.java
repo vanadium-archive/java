@@ -11,7 +11,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import io.v.v23.InputChannels;
-import io.v.v23.OutputChannel;
 import io.v.v23.V;
 import io.v.v23.V23TestUtil;
 import io.v.v23.context.VContext;
@@ -28,6 +27,7 @@ import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.vdl.ClientStream;
+import io.v.v23.vdl.ServerSendStream;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
@@ -398,9 +398,9 @@ public class FortuneTest extends TestCase {
             return Futures.immediateFuture(new VdlValue[] {});
         }
         @Override
-        public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> responseChannel)
-                throws VException {
-            sync(responseChannel.close());
+        public ListenableFuture<Void> glob(VContext ctx, ServerCall call, String pattern,
+                                           ServerSendStream<GlobReply> responseChannel) {
+            return Futures.immediateFuture(null);
         }
     }
 

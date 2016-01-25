@@ -4,9 +4,11 @@
 
 package io.v.v23.rpc;
 
-import io.v.v23.OutputChannel;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
-import io.v.v23.verror.VException;
+import io.v.v23.vdl.ServerSendStream;
 
 /**
  * Interface that allows the object to enumerate the the entire namespace below the receiver object.
@@ -17,14 +19,15 @@ import io.v.v23.verror.VException;
 public interface Globber {
     /**
      * Handles a glob request. The implementing class may respond by writing zero or more
-     * {@link GlobReply} instances to the given {@code response} channel. Once the replies are
-     * written, the implementing class <strong>must</strong>
-     * {@link io.v.v23.OutputChannel#close close} the response channel.
+     * {@link GlobReply} instances to the given {@code stream}. Once the replies are
+     * written, the returned future should complete.
      *
      * @param call         in-flight call information
      * @param pattern      the glob pattern from the client
-     * @param response     the channel to which the responses must be written
-     * @throws VException  if any errors occur while writing the responses to the response channel
+     * @param stream       the stream to which the responses must be written
+     * @return             a new {@link ListenableFuture} that completes when the server is
+     *                     done writing responses on the provided {@code stream}
      */
-    void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response) throws VException;
+    ListenableFuture<Void> glob(VContext ctx, ServerCall call, String pattern,
+                                ServerSendStream<GlobReply> stream);
 }

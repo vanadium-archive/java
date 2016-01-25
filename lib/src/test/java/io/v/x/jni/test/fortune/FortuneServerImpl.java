@@ -7,6 +7,7 @@ package io.v.x.jni.test.fortune;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -14,7 +15,6 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
-import io.v.v23.OutputChannel;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobError;
 import io.v.v23.naming.GlobReply;
@@ -22,6 +22,7 @@ import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.rpc.Globber;
 import io.v.v23.rpc.ServerCall;
+import io.v.v23.vdl.ServerSendStream;
 import io.v.v23.vdl.ServerStream;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.verror.VException;
@@ -29,8 +30,6 @@ import io.v.v23.verror.VException;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static io.v.v23.VFutures.sync;
 
 public class FortuneServerImpl implements FortuneServer, Globber {
     private static final ComplexErrorParam COMPLEX_PARAM = new ComplexErrorParam(
@@ -211,14 +210,17 @@ public class FortuneServerImpl implements FortuneServer, Globber {
     }
 
     @Override
-    public void glob(ServerCall call, String pattern, OutputChannel<GlobReply> response)
-            throws VException {
-        GlobReply.Entry entry = new GlobReply.Entry(
+    public ListenableFuture<Void> glob(VContext context, ServerCall call,
+                                       String pattern, final ServerSendStream<GlobReply> stream) {
+        final GlobReply.Entry entry = new GlobReply.Entry(
                 new MountEntry("helloworld", ImmutableList.<MountedServer>of(), false, false));
-        sync(response.send(entry));
-        GlobReply.Error error = new GlobReply.Error(
+        final GlobReply.Error error = new GlobReply.Error(
                 new GlobError("Hello, world!", new VException("Some error")));
-        sync(response.send(error));
-        sync(response.close());
+        return Futures.transform(stream.send(entry), new AsyncFunction<Void, Void>() {
+                    @Override
+                    public ListenableFuture<Void> apply(Void input) throws Exception {
+                        return stream.send(error);
+                    }
+                });
     }
 }

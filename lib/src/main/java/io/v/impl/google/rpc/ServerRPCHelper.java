@@ -8,12 +8,16 @@ import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import io.v.v23.OutputChannel;
 import io.v.v23.context.VContext;
+import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
+import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
 import io.v.v23.security.Authorizer;
+import io.v.v23.vdl.ServerSendStream;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -84,6 +88,17 @@ class ServerRPCHelper {
                                 });
                     }
                 });
+    }
+
+    // Helper function for invoking a glob method on the provided invoker.
+    static ListenableFuture<Void> glob(Invoker invoker, VContext ctx, ServerCall call,
+                                       String pattern, final OutputChannel<GlobReply> channel) {
+        return invoker.glob(ctx, call, pattern, new ServerSendStream<GlobReply>() {
+            @Override
+            public ListenableFuture<Void> send(GlobReply item) {
+                return channel.send(item);
+            }
+        });
     }
 
     // Helper function for invoking a lookup method on the provided dispatcher.
