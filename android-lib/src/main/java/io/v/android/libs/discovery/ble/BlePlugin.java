@@ -31,7 +31,9 @@ import android.Manifest;
 import org.joda.time.Duration;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,6 +66,10 @@ public class BlePlugin {
 
     // Object used to lock advertisement objects.
     private final Object advertisementLock = new Object();
+
+    // Random generator for stamp.
+    private SecureRandom random = new SecureRandom();
+
     // The id to assign to the next advertisment.
     private int nextAdv;
     // A map of advertisement ids to the advertisement that corresponds to them.
@@ -202,9 +208,11 @@ public class BlePlugin {
     private BluetoothGattService convertToService(Advertisement adv) throws IOException {
         Map<UUID, byte[]> attributes = BleAdvertisementConverter.vAdvertismentToBleAttr(adv);
         BluetoothGattService service = new BluetoothGattService(
-                UUIDUtil.UuidToUUID(adv.getServiceUuid()), BluetoothGattService.SERVICE_TYPE_PRIMARY);
+                UUIDUtil.UUIDForInterfaceName(adv.getService().getInterfaceName()),
+                BluetoothGattService.SERVICE_TYPE_PRIMARY);
         for (Map.Entry<UUID, byte[]> entry : attributes.entrySet()) {
-            BluetoothGattCharacteristic ch = new BluetoothGattCharacteristic(entry.getKey(),
+            BluetoothGattCharacteristic ch = new BluetoothGattCharacteristic(
+                    entry.getKey(),
                     BluetoothGattCharacteristic.PROPERTY_READ,
                     BluetoothGattCharacteristic.PERMISSION_READ);
             ch.setValue(entry.getValue());
@@ -241,11 +249,11 @@ public class BlePlugin {
         }
     }
 
-    public void addScanner(VContext ctx, UUID serviceUUID,  ScanHandler handler) {
+    public void addScanner(VContext ctx, String interfaceName,  ScanHandler handler) {
         if (!isEnabled) {
             return;
         }
-        VScanner scanner = new VScanner(serviceUUID, handler);
+        VScanner scanner = new VScanner(interfaceName, handler);
         int currentId = cachedDevices.addScanner(scanner);
         synchronized (scannerLock) {
             Thread t = new Thread(new ScannerCancellationRunner(ctx, currentId));
@@ -291,9 +299,9 @@ public class BlePlugin {
                     // currently not in use.
                     byte[] data = record.getManufacturerSpecificData(1001);
                     ByteBuffer buffer = ByteBuffer.wrap(data);
-                    final long hash = buffer.getLong();
+                    final long stamp = buffer.getLong();
                     final String deviceId = result.getDevice().getAddress();
-                    if (cachedDevices.haveSeenHash(hash, deviceId)) {
+                    if (cachedDevices.haveSeenStamp(stamp, deviceId)) {
                         return;
                     }
                     synchronized (scannerLock) {
@@ -317,7 +325,7 @@ public class BlePlugin {
                                     Log.e("vanadium","Failed to convert advertisement" + e);
                                 }
                             }
-                            cachedDevices.saveDevice(hash, advs, deviceId);
+                            cachedDevices.saveDevice(stamp, advs, deviceId);
                             synchronized (scannerLock) {
                                 pendingCalls.remove(deviceId);
                             }
@@ -344,6 +352,15 @@ public class BlePlugin {
         }
     }
 
+    private long genStamp() {
+        // We use 8-byte stamp to reflect the current services of the current device.
+        //
+        // TODO(bjornick): 8-byte random number might not be good enough for
+        // global uniqueness. We might want to consider a better way to generate
+        // stamp like using a unique device id with sequence number.
+        return new BigInteger(64, random).longValue();
+    }
+
     private void readvertise() {
         if (advertiseCallback != null) {
             bluetoothLeAdvertise.stopAdvertising(advertiseCallback);
@@ -353,12 +370,10 @@ public class BlePlugin {
             return;
         }
 
-        int hash = advertisements.hashCode();
-
         AdvertiseData.Builder builder = new AdvertiseData.Builder();
         ByteBuffer buf = ByteBuffer.allocate(9);
-        buf.put((byte) 8);
-        buf.putLong(hash);
+        buf.put((byte)8);
+        buf.putLong(genStamp());
         builder.addManufacturerData(1001, buf.array());
         AdvertiseSettings.Builder settingsBuilder = new AdvertiseSettings.Builder();
         settingsBuilder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);

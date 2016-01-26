@@ -4,29 +4,25 @@
 
 package io.v.impl.google.lib.discovery;
 
-import java.util.UUID;
-
 /**
- * Stores a {@link UUID} and a {@link ScanHandler}.
+ * Stores an interfance name and a {@link ScanHandler}.
  */
 public class VScanner {
-    private UUID serviceUUID;
-
+    private String interfaceName;
     private ScanHandler handler;
 
-    public VScanner(UUID serviceUUID, ScanHandler handler) {
-        this.serviceUUID = serviceUUID;
+    public VScanner(String interfaceName, ScanHandler handler) {
+        this.interfaceName = interfaceName;
         this.handler = handler;
     }
 
-    /** Returns the {@link UUID} */
-    public UUID getServiceUUID() {
-        return serviceUUID;
+    /** Returns the interface name */
+    public String getInterfaceName() {
+        return interfaceName;
     }
 
     /** Returns the {@link ScanHandler} */
     public ScanHandler getHandler() {
         return handler;
     }
-
 }

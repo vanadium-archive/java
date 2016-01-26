@@ -9,19 +9,48 @@ import com.google.common.primitives.Bytes;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.InputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.v.v23.vom.BinaryUtil;
 import io.v.x.ref.lib.discovery.EncryptionKey;
 
 /**
  * A utility to encode and decode fields in io.v.v23.Service fields for use in discovery.
+ *
+ * TODO(bjornick,jhahn): Consider to share v.io/x/ref/lib/discovery/encoding.go through jni.
  */
 public class EncodingUtil {
     static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+
+    private static void writeUint(OutputStream out, int x) throws IOException {
+        while ((x & 0xffffff80) != 0) {
+            out.write((x & 0x7f) | 0x80);
+            x >>>= 7;
+        }
+        out.write(x);
+    }
+
+    private static int readUint(InputStream in) throws IOException {
+        for (int x = 0, s = 0; ;) {
+            int b = in.read();
+            if (b == -1) {
+                throw new EOFException();
+            }
+            if ((b & 0x80) == 0) {
+                return x | (b << s);
+            }
+            x |= (b & 0x7f) << s;
+            s += 7;
+            if (s > 35) {
+                throw new IOException("overflow");
+            }
+        }
+    }
 
     /**
      * Encodes the addresses passed in.
@@ -33,7 +62,7 @@ public class EncodingUtil {
     public static byte[] packAddresses(List<String> addrs) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         for (String addr : addrs) {
-            BinaryUtil.encodeUint(stream, addr.length());
+            writeUint(stream, addr.length());
             stream.write(addr.getBytes(UTF8_CHARSET));
         }
         return stream.toByteArray();
@@ -50,11 +79,11 @@ public class EncodingUtil {
         ByteArrayInputStream stream = new ByteArrayInputStream(input);
         List<String> output = new ArrayList<>();
         while (stream.available() > 0) {
-            int stringSize = (int)BinaryUtil.decodeUint(stream);
-            byte[] data = new byte[stringSize];
+            int size = readUint(stream);
+            byte[] data = new byte[size];
             int read = stream.read(data);
-            if (read != stringSize) {
-                throw new IOException("Unexpected end of stream while reading address");
+            if (read != size) {
+                throw new EOFException();
             }
             output.add(new String(data, UTF8_CHARSET));
         }
@@ -73,15 +102,14 @@ public class EncodingUtil {
     public static byte[] packEncryptionKeys(int encryptionAlgorithm, List<EncryptionKey> keys)
             throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        BinaryUtil.encodeUint(stream, encryptionAlgorithm);
+        writeUint(stream, encryptionAlgorithm);
         for (EncryptionKey key : keys) {
             byte[] byteKey = Bytes.toArray(key);
-            BinaryUtil.encodeUint(stream, byteKey.length);
+            writeUint(stream, byteKey.length);
             stream.write(byteKey);
         }
         return stream.toByteArray();
     }
-
 
     /**
      * Decodes the encryption algorithm and keys that was encoded by packEncryptionKeys.
@@ -92,14 +120,14 @@ public class EncodingUtil {
      */
     public static KeysAndAlgorithm unpackEncryptionKeys(byte[] input) throws IOException {
         ByteArrayInputStream stream = new ByteArrayInputStream(input);
-        int algo = (int) BinaryUtil.decodeUint(stream);
+        int algo = readUint(stream);
         List<EncryptionKey> keys = new ArrayList<>();
         while (stream.available() > 0) {
-            int size = (int) BinaryUtil.decodeUint(stream);
+            int size = readUint(stream);
             byte[] key = new byte[size];
             int read = stream.read(key);
             if (read != size) {
-                throw new IOException("Unexpected end of file reading keys");
+                throw new EOFException();
             }
             keys.add(new EncryptionKey(Bytes.asList(key)));
         }
@@ -132,5 +160,4 @@ public class EncodingUtil {
             this.keys = keys;
         }
     }
-
 }

@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,16 +27,16 @@ import io.v.x.ref.lib.discovery.Advertisement;
 /**
  * A cache of ble devices that were seen recently.  The current Vanadium BLE protocol requires
  * connecting to the advertiser to grab the attributes and the addrs.  This can be expensive
- * so we only refetch the data if it hash changed.
+ * so we only refetch the data if its stamp changed.
  */
 public class DeviceCache {
     private final Map<Long, CacheEntry> cachedDevices = new HashMap<>();
     private final Map<String, CacheEntry> knownIds = new HashMap<>();
 
     private final AtomicInteger nextScanner = new AtomicInteger(0);
-    private final SetMultimap<UUID, Advertisement> knownServices = HashMultimap.create();
+    private final SetMultimap<String, Advertisement> knownServices = HashMultimap.create();
     private final Map<Integer, VScanner> scannersById = new HashMap<>();
-    private final SetMultimap<UUID, VScanner> scannersByUUID = HashMultimap.create();
+    private final SetMultimap<String, VScanner> scannersByInterfaceName = HashMultimap.create();
     ScheduledExecutorService timer;
 
     private final Duration maxAge;
@@ -66,8 +65,7 @@ public class DeviceCache {
                     it.remove();
                     knownIds.remove(entry.deviceId);
                     for (Advertisement adv : entry.advertisements) {
-                        UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
-                        knownServices.remove(uuid, adv);
+                        knownServices.remove(adv.getService().getInterfaceName(), adv);
                         adv.setLost(true);
                         handleUpdate(adv);
                     }
@@ -85,15 +83,15 @@ public class DeviceCache {
     }
 
     /**
-     * Returns whether this hash has been seen before.
+     * Returns whether this stamp has been seen before.
      *
-     * @param hash the hash of the advertisement
+     * @param stamp the stamp of the advertisement
      * @param deviceId the deviceId of the advertisement (used to handle rotating ids).
-     * @return true iff this hash is in the cache.
+     * @return true iff this stamp is in the cache.
      */
-    public boolean haveSeenHash(long hash, String deviceId) {
+    public boolean haveSeenStamp(long stamp, String deviceId) {
         synchronized (this) {
-            CacheEntry entry = cachedDevices.get(hash);
+            CacheEntry entry = cachedDevices.get(stamp);
             if (entry != null) {
                 entry.lastSeen = new Instant();
                 if (!entry.deviceId.equals(deviceId)) {
@@ -109,19 +107,19 @@ public class DeviceCache {
     }
 
     /**
-     * Saves the set of advertisements for this deviceId and hash
+     * Saves the set of advertisements and stamp for this device.
      *
-     * @param hash the hash provided by the advertisement.
+     * @param stamp the stamp provided by the device.
      * @param advs the advertisements exposed by the device.
      * @param deviceId the id of the device.
      */
-    public void saveDevice(long hash, Set<Advertisement> advs, String deviceId) {
-        CacheEntry entry = new CacheEntry(advs, hash, deviceId);
+    public void saveDevice(long stamp, Set<Advertisement> advs, String deviceId) {
+        CacheEntry entry = new CacheEntry(advs, stamp, deviceId);
         synchronized (this) {
             CacheEntry oldEntry = knownIds.get(deviceId);
             Set<Advertisement> oldValues = null;
             if (oldEntry != null) {
-                cachedDevices.remove(oldEntry.hash);
+                cachedDevices.remove(oldEntry.stamp);
                 knownIds.remove(oldEntry.deviceId);
                 oldValues = oldEntry.advertisements;
             } else {
@@ -129,33 +127,28 @@ public class DeviceCache {
             }
             Set<Advertisement> removed = Sets.difference(oldValues, advs);
             for (Advertisement adv : removed) {
-                UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
+                knownServices.remove(adv.getService().getInterfaceName(), adv);
                 adv.setLost(true);
-                knownServices.remove(uuid, adv);
                 handleUpdate(adv);
             }
 
             Set<Advertisement> added = Sets.difference(advs, oldValues);
             for (Advertisement adv: added) {
-                UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
-                knownServices.put(uuid, adv);
+                knownServices.put(adv.getService().getInterfaceName(), adv);
                 handleUpdate(adv);
             }
-            cachedDevices.put(hash, entry);
+            cachedDevices.put(stamp, entry);
             CacheEntry oldDeviceEntry = knownIds.get(deviceId);
             if (oldDeviceEntry != null) {
-                // Delete the old hash value.
-                cachedDevices.remove(hash);
+                // Delete the old stamp value.
+                cachedDevices.remove(stamp);
             }
             knownIds.put(deviceId, entry);
         }
     }
 
     private void handleUpdate(Advertisement adv) {
-        UUID uuid = UUIDUtil.UuidToUUID(adv.getServiceUuid());
-        System.out.println("Saw an update for " + adv.getService().getInstanceId() + "["
-                + adv.getService().getInterfaceName());
-        Set<VScanner> scanners = scannersByUUID.get(uuid);
+        Set<VScanner> scanners = scannersByInterfaceName.get(adv.getService().getInterfaceName());
         if (scanners == null) {
             return;
         }
@@ -173,8 +166,8 @@ public class DeviceCache {
         synchronized (this) {
             int id = nextScanner.addAndGet(1);
             scannersById.put(id, scanner);
-            scannersByUUID.put(scanner.getServiceUUID(), scanner);
-            Set<Advertisement> knownAdvs = knownServices.get(scanner.getServiceUUID());
+            scannersByInterfaceName.put(scanner.getInterfaceName(), scanner);
+            Set<Advertisement> knownAdvs = knownServices.get(scanner.getInterfaceName());
             if (knownAdvs != null) {
                 for (Advertisement adv : knownAdvs) {
                     scanner.getHandler().handleUpdate(adv);
@@ -191,7 +184,7 @@ public class DeviceCache {
         synchronized (this) {
             VScanner scanner = scannersById.get(id);
             if (scanner != null) {
-                scannersByUUID.remove(scanner.getServiceUUID(), scanner);
+                scannersByInterfaceName.remove(scanner.getInterfaceName(), scanner);
                 scannersById.remove(id);
             }
         }
@@ -200,15 +193,15 @@ public class DeviceCache {
     private class CacheEntry {
         Set<Advertisement> advertisements;
 
-        long hash;
+        long stamp;
 
         Instant lastSeen;
 
         String deviceId;
 
-        CacheEntry(Set<Advertisement> advs, long hash, String deviceId) {
+        CacheEntry(Set<Advertisement> advs, long stamp, String deviceId) {
             advertisements = advs;
-            this.hash = hash;
+            this.stamp = stamp;
             lastSeen = new Instant();
             this.deviceId = deviceId;
         }
