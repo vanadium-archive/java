@@ -30,7 +30,7 @@ import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
 import io.v.moments.lib.V23Manager;
-import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
@@ -68,7 +68,7 @@ public class AdConverterMomentTest {
     @Mock
     Moment mMoment;
     @Mock
-    CancelableVContext mContext;
+    VContext mContext;
     @Mock
     MomentIfcClient mClient;
     @Mock
@@ -90,7 +90,7 @@ public class AdConverterMomentTest {
         when(mMomentFactory.makeFromAttributes(
                 eq(ID), anyInt(), eq(mAttributes))).thenReturn(mMoment);
         when(mClientFactory.makeClient(eq("/" + ADDRESS0))).thenReturn(mClient);
-        when(mV23Manager.getCancellableContext(
+        when(mV23Manager.contextWithTimeout(
                 AdConverterMoment.Deadline.THUMB)).thenReturn(mContext);
         when(mClient.getThumbImage(mContext)).thenReturn(mFutureBytes);
         when(mFutureBytes.get()).thenReturn(MOCK_PHOTO_BYTES);

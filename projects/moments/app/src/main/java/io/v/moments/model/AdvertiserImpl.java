@@ -14,15 +14,12 @@ import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
-import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.V23Manager;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.Attachments;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
-import io.v.v23.discovery.VDiscovery;
 import io.v.v23.naming.Endpoint;
-import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.verror.VException;
@@ -37,8 +34,8 @@ public class AdvertiserImpl implements Advertiser {
     private final V23Manager mV23Manager;
     private final Moment mMoment;
 
-    private CancelableVContext mAdvCtx;
-    private Server mServer;
+    private VContext mAdvCtx;
+    private VContext mServerCtx;
 
     public AdvertiserImpl(V23Manager v23Manager, Moment moment) {
         if (v23Manager == null) {
@@ -67,25 +64,19 @@ public class AdvertiserImpl implements Advertiser {
             throw new IllegalStateException("Already advertising.");
         }
         try {
-            mServer = mV23Manager.makeServer(NO_MOUNT_NAME, new MomentServer());
+            mServerCtx = mV23Manager.makeServer(NO_MOUNT_NAME, new MomentServer());
         } catch (VException e) {
             throw new IllegalStateException("Unable to start service.", e);
         }
         List<String> addresses = new ArrayList<>();
-        Endpoint[] points = mServer.getStatus().getEndpoints();
+        Endpoint[] points = mV23Manager.getServer(mServerCtx).getStatus().getEndpoints();
         for (Endpoint point : points) {
             addresses.add(point.toString());
         }
         Attributes attrs = mMoment.makeAttributes();
         mAdvCtx = mV23Manager.advertise(
                 makeAdvertisement(attrs, addresses),
-                NO_PATTERNS,
-                new VDiscovery.AdvertiseDoneCallback() {
-                    @Override
-                    public void done() {
-                        // Nothing in particular to do here.
-                    }
-                });
+                NO_PATTERNS);
     }
 
     @Override
@@ -94,13 +85,9 @@ public class AdvertiserImpl implements Advertiser {
             throw new IllegalStateException("Not advertising.");
         }
         mAdvCtx.cancel();
-        try {
-            mServer.stop();
-        } catch (VException e) {
-            throw new IllegalStateException("Unable to stop service.", e);
-        }
+        mServerCtx.cancel();
         mAdvCtx = null;
-        mServer = null;
+        mServerCtx = null;
     }
 
     /**
@@ -114,7 +101,8 @@ public class AdvertiserImpl implements Advertiser {
                 mMoment.toString(),
                 Config.INTERFACE_NAME,
                 attrs,
-                addresses);
+                addresses,
+                new Attachments());
     }
 
     /**

@@ -9,14 +9,14 @@ import android.os.Handler;
 import io.v.moments.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
+import io.v.moments.ifc.ScanListener;
 import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
-import io.v.v23.discovery.VDiscovery;
 
 /**
  * List that updates itself in response to found or lost advertisements.
  */
-public class DiscoveredList<T extends HasId> extends ObservedList<T> implements VDiscovery.ScanCallback {
+public class DiscoveredList<T extends HasId> extends ObservedList<T> implements ScanListener {
     private final String TAG = "DiscoveredList";
 
     private final Handler mHandler;
@@ -44,7 +44,7 @@ public class DiscoveredList<T extends HasId> extends ObservedList<T> implements 
     }
 
     @Override
-    public void handleUpdate(Update update) {
+    public void scanUpdateReceived(Update update) {
         if (update instanceof Update.Found) {
             maybeInsertItem((Update.Found) update);
             return;
@@ -78,7 +78,7 @@ public class DiscoveredList<T extends HasId> extends ObservedList<T> implements 
     }
 
     private void removeItem(Update.Lost lost) {
-        final Id id = Id.fromString(lost.getElem().getInstanceId());
+        final Id id = Id.fromString(lost.getElem().getService().getInstanceId());
         mHandler.post(new Runnable() {
             @Override
             public void run() {
