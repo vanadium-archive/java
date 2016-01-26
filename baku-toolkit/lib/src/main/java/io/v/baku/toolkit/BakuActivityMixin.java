@@ -6,9 +6,8 @@ package io.v.baku.toolkit;
 
 import android.app.Activity;
 
-import io.v.baku.toolkit.bind.RangeAdapter;
 import io.v.baku.toolkit.bind.SyncbaseBinding;
-import io.v.baku.toolkit.bind.SyncbaseRangeAdapter;
+import io.v.baku.toolkit.bind.CollectionBinding;
 import io.v.baku.toolkit.syncbase.BakuDb;
 import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
@@ -92,8 +91,8 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
                 .bakuActivity(this);
     }
 
-    public <U> SyncbaseRangeAdapter.Builder<U, ?> collectionBinder() {
-        return SyncbaseRangeAdapter.<U, RangeAdapter>builder()
+    public CollectionBinding.Builder collectionBinder() {
+        return CollectionBinding.builder()
                 .bakuActivity(this);
     }
 }

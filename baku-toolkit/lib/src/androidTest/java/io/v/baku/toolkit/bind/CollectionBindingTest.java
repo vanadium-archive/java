@@ -12,7 +12,7 @@ import io.v.baku.toolkit.VAndroidTestCase;
 import io.v.rx.syncbase.RxSyncbase;
 import io.v.rx.syncbase.RxTable;
 
-public class SyncbaseRangeAdapterTest extends VAndroidTestCase {
+public class CollectionBindingTest extends VAndroidTestCase {
     private RxSyncbase mRxSyncbase;
     private RxTable mTable;
 
@@ -37,34 +37,33 @@ public class SyncbaseRangeAdapterTest extends VAndroidTestCase {
                 mTable.put("Good morning", "starshine")));
 
         final ListView listView = new ListView(getContext());
-        try (final SyncbaseListAdapter<String> adapter = SyncbaseRangeAdapter.builder()
+        try (final SyncbaseListAdapter<RxTable.Row<String>> adapter = CollectionBinding.builder()
                 .onError(t -> fail(Throwables.getStackTraceAsString(t)))
                 .viewAdapterContext(getContext())
                 .rxTable(mTable)
-                .prefix("Good")
+                .onPrefix("Good")
                 .type(String.class)
-                .bindTo(listView)
-                .getAdapter()) {
+                .bindTo(listView)) {
 
             pause();
 
             assertEquals(2, listView.getCount());
-            assertEquals("Goodnight", adapter.getLatestState().getRowAt(0).getRowName());
-            assertEquals("moon", adapter.getItem(0));
-            assertEquals("Good morning", adapter.getLatestState().getRowAt(1).getRowName());
-            assertEquals("starshine", adapter.getItem(1));
+            assertEquals("Goodnight", adapter.getItem(0).getRowName());
+            assertEquals("moon", adapter.getItem(0).getValue());
+            assertEquals("Good morning", adapter.getItem(1).getRowName());
+            assertEquals("starshine", adapter.getItem(1).getValue());
 
             start(mTable.put("Goodbye", "Mr. Bond"));
             pause();
 
-            assertEquals("Goodbye", adapter.getLatestState().getRowAt(0).getRowName());
-            assertEquals("Mr. Bond", adapter.getItem(0));
+            assertEquals("Goodbye", adapter.getItem(0).getRowName());
+            assertEquals("Mr. Bond", adapter.getItem(0).getValue());
 
             start(mTable.delete("Good morning"));
             pause();
 
-            assertEquals(1, adapter.getLatestState().getRowIndex("Goodnight"));
-            assertEquals("moon", adapter.getItem(1));
+            assertEquals(1, adapter.getRowIndex("Goodnight"));
+            assertEquals("moon", adapter.getItem(1).getValue());
         }
     }
 }

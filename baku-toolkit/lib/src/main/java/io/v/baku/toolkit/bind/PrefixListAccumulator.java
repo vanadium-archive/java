@@ -18,9 +18,6 @@ import io.v.rx.syncbase.RangeWatchBatch;
 import io.v.rx.syncbase.RangeWatchEvent;
 import io.v.rx.syncbase.RxTable;
 import io.v.v23.syncbase.nosql.ChangeType;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
@@ -32,26 +29,14 @@ import rx.functions.Func2;
  * <p>{@code .scan(new PrefixListAccumulator<>(...), PrefixListAccumulator::add)}
  * @param <T>
  */
-@Accessors(prefix = "m")
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PrefixListAccumulator<T> {
+public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>> {
     private static final String ERR_INCONSISTENT = "Sorted data are inconsistent with map data";
 
-    public static final PrefixListAccumulator<Object> EMPTY = new PrefixListAccumulator<>(
-            Collections.emptyMap(), Collections.emptyList(), Ordering.arbitrary());
-
-    @SuppressWarnings("unchecked")
-    public static <T> PrefixListAccumulator<T> empty() {
-        return (PrefixListAccumulator<T>)EMPTY;
-    }
-
-    private final Map<String, T> mRows;
-    private final List<RxTable.Row<T>> mSorted;
+    private final Map<String, T> mRows = new HashMap<>();
+    private final List<RxTable.Row<T>> mSorted = new ArrayList<>();
     private final Ordering<? super RxTable.Row<T>> mOrdering;
 
     public PrefixListAccumulator(final Ordering<? super RxTable.Row<T>> ordering) {
-        mRows = new HashMap<>();
-        mSorted = new ArrayList<>();
         // ensure deterministic ordering by always applying secondary order on row name
         mOrdering = ordering.compound(Ordering.natural().onResultOf(RxTable.Row::getRowName));
     }
@@ -61,7 +46,7 @@ public class PrefixListAccumulator<T> {
         return watch
                 .concatMap(RangeWatchBatch::collectChanges)
                 .observeOn(AndroidSchedulers.mainThread()) // required unless we copy
-                .scan(this, PrefixListAccumulator::add);
+                .scan(this, PrefixListAccumulator::withUpdates);
     }
 
     private int findRowForEdit(final String rowName, final T oldValue) {
@@ -74,8 +59,9 @@ public class PrefixListAccumulator<T> {
         }
     }
 
-    private PrefixListAccumulator<T> add(final Collection<RangeWatchEvent<T>> events) {
+    private PrefixListAccumulator<T> withUpdates(final Collection<RangeWatchEvent<T>> events) {
         // TODO(rosswang): more efficient updates for larger batches
+        // TODO(rosswang): allow option to copy on add (immutable accumulator)
         for (final RangeWatchEvent<T> e : events) {
             if (e.getChangeType() == ChangeType.DELETE_CHANGE) {
                 removeOne(e.getRow());
@@ -120,10 +106,12 @@ public class PrefixListAccumulator<T> {
         }
     }
 
+    @Override
     public int getCount() {
         return mRows.size();
     }
 
+    @Override
     public RxTable.Row<T> getRowAt(final int position) {
         return mSorted.get(position);
     }
@@ -132,11 +120,13 @@ public class PrefixListAccumulator<T> {
         return mRows.get(rowName);
     }
 
+    @Override
     public int getRowIndex(final String rowName) {
         return Collections.binarySearch(mSorted, new RxTable.Row<>(rowName, mRows.get(rowName)),
                 mOrdering);
     }
 
+    @Override
     public boolean containsRow(final String rowName) {
         return mRows.containsKey(rowName);
     }

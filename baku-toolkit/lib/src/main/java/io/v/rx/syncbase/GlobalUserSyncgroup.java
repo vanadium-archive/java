@@ -52,12 +52,6 @@ public class GlobalUserSyncgroup {
         return builder().activity(t).build();
     }
 
-    /*
-    As of Lombok IntelliJ 0.9.6, @Builder exhibits a few bugs interacting with @Accessors (Gradle
-    build is fine).
-
-    https://github.com/mplushnikov/lombok-intellij-plugin/issues/151
-     */
     public static class Builder {
         private String sgSuffix = DEFAULT_SYNCGROUP_SUFFIX;
         private Function<String, String> descriptionForUsername = u -> "User syncgroup for " + u;

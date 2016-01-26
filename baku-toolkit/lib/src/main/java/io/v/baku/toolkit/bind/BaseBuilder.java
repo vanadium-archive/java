@@ -6,8 +6,6 @@ package io.v.baku.toolkit.bind;
 
 
 import android.app.Activity;
-import android.support.annotation.IdRes;
-import android.view.View;
 
 import io.v.baku.toolkit.BakuActivityTrait;
 import io.v.rx.syncbase.RxTable;
@@ -19,14 +17,13 @@ import rx.subscriptions.CompositeSubscription;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public abstract class BaseBuilder<T extends BaseBuilder<T>> {
+    @SuppressWarnings("unchecked")
+    protected final T mSelf = (T)this;
+
     protected Activity mActivity;
     protected RxTable mRxTable;
     protected CompositeSubscription mSubscriptionParent;
     protected Action1<Throwable> mOnError;
-
-    @SuppressWarnings("unchecked")
-    protected final T mSelf = (T)this;
-
 
     public T activity(final Activity activity) {
         mActivity = activity;
@@ -65,11 +62,5 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
     public T onError(final Action1<Throwable> onError) {
         mOnError = onError;
         return mSelf;
-    }
-
-    public abstract T bindTo(final View view);
-
-    public T bindTo(final @IdRes int viewId) {
-        return bindTo(mActivity.findViewById(viewId));
     }
 }

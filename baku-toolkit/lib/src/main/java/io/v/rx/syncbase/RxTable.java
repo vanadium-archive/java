@@ -7,6 +7,7 @@ package io.v.rx.syncbase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -92,11 +93,11 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     }
 
     private <T> Observable<T> getInitial(
-            final BatchDatabase db, final String tableName, final String key, final Class<T> type,
+            final BatchDatabase db, final String tableName, final String key, final TypeToken<T> tt,
             final T defaultValue) {
         @SuppressWarnings("unchecked")
         final ListenableFuture<T> fromGet = (ListenableFuture<T>) db.getTable(tableName).get(
-                mVContext, key, type);
+                mVContext, key, tt == null ? Object.class : tt.getType());
         return toObservable(Futures.withFallback(fromGet, t -> t instanceof NoExistException ?
                 Futures.immediateFuture(defaultValue) : Futures.immediateFailedFuture(t)));
     }
@@ -104,14 +105,14 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     @SuppressWarnings("unchecked")
     private <T> Observable<Row<T>> getInitial(
             final BatchDatabase db, final String tableName, final RowRange keys,
-            @Nullable final Func1<String, Boolean> keyFilter, final Class<T> type) {
+            @Nullable final Func1<String, Boolean> keyFilter, final TypeToken<T> tt) {
         Observable<KeyValue> untyped = RxInputChannel.wrap(
                 db.getTable(tableName).scan(mVContext, keys)).autoConnect();
         if (keyFilter != null) {
             untyped = untyped.filter(kv -> keyFilter.call(kv.getKey()));
         }
         return untyped.concatMap(VFn.wrap(kv -> new Row<>(kv.getKey(),
-                (T) VomUtil.decode(kv.getValue(), type))));
+                (T) VomUtil.decode(kv.getValue(), tt == null ? Object.class : tt.getType()))));
     }
 
     /**
@@ -126,14 +127,15 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
      * once, as we can only iterate over the underlying stream once.
      */
     private static <T> Observable<SingleWatchEvent<T>> observeWatchStream(
-            final InputChannel<WatchChange> s, final String key, final T defaultValue) {
+            final InputChannel<WatchChange> s, final String key, final TypeToken<T> tt,
+            final T defaultValue) {
         return RxInputChannel.wrap(s)
                 .autoConnect()
                 .filter(c -> c.getRowName().equals(key))
                         // About the Vfn.wrap, on error, the wrapping replay will disconnect,
                         // calling cancellation (see cancelOnDisconnect). The possible source of
                         // VException here is VOM decoding.
-                .concatMap(VFn.wrap(c -> SingleWatchEvent.fromWatchChange(c, defaultValue)))
+                .concatMap(VFn.wrap(c -> SingleWatchEvent.fromWatchChange(c, tt, defaultValue)))
                 .distinctUntilChanged();
     }
 
@@ -181,7 +183,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
      */
     private static <T> Observable<RangeWatchBatch<T>> observeWatchStream(
             final InputChannel<WatchChange> s, @Nullable final Func1<String, Boolean> prefixFilter,
-            final Class<T> type) {
+            final TypeToken<T> tt) {
         // TODO(rosswang): support other RowRange types
         final Observable<WatchChange> raw = RxInputChannel.wrap(s).autoConnect();
 
@@ -193,7 +195,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                                 if (prefixFilter == null || prefixFilter.call(c.getRowName())) {
                                     try {
                                         windower.onNext(c.getResumeMarker(),
-                                                RangeWatchEvent.fromWatchChange(c, type));
+                                                RangeWatchEvent.fromWatchChange(c, tt));
                                     } catch (final VException e) {
                                         windower.onError(c.getResumeMarker(), e);
                                     }
@@ -246,11 +248,11 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     }
 
     private <T> void subscribeWatch(final Subscriber<? super SingleWatchEvent<T>> subscriber,
-                                    final Database db, final String key, final Class<T> type,
+                                    final Database db, final String key, final TypeToken<T> tt,
                                     final T defaultValue) {
         subscribeWatch(subscriber, db, key,
-                b -> getInitial(b, mName, key, type, defaultValue),
-                s -> observeWatchStream(s, key, defaultValue),
+                b -> getInitial(b, mName, key, tt, defaultValue),
+                s -> observeWatchStream(s, key, tt, defaultValue),
                 (i, s) -> s.startWith(i.initial.map(iv ->
                         new SingleWatchEvent<>(iv, i.resumeMarker, false))));
     }
@@ -258,10 +260,10 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     private <T> void subscribeWatch(
             final Subscriber<? super RangeWatchBatch<T>> subscriber, final Database db,
             final PrefixRange prefix, @Nullable final Func1<String, Boolean> keyFilter,
-            final Class<T> type) {
+            final TypeToken<T> tt) {
         subscribeWatch(subscriber, db, prefix.getPrefix(),
-                b -> getInitial(b, mName, prefix, keyFilter, type),
-                s -> RxTable.observeWatchStream(s, keyFilter, type),
+                b -> getInitial(b, mName, prefix, keyFilter, tt),
+                s -> RxTable.observeWatchStream(s, keyFilter, tt),
                 (i, s) -> s.startWith(new RangeWatchBatch<>(i.resumeMarker, i.initial.map(r ->
                         new RangeWatchEvent<>(r, ChangeType.PUT_CHANGE, false)))));
     }
@@ -277,14 +279,31 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     /**
      * Watches a specific Syncbase row for changes.
      */
-    public <T> Observable<SingleWatchEvent<T>> watch(final String key, final Class<T> type,
+    public <T> Observable<SingleWatchEvent<T>> watch(final String key, final TypeToken<T> tt,
                                                      final T defaultValue) {
         return this.<SingleWatchEvent<T>>watch((db, s) ->
-                subscribeWatch(s, db, key, type, defaultValue))
+                subscribeWatch(s, db, key, tt, defaultValue))
                 // Don't create new watch streams for subsequent subscribers, but do cancel the
                 // stream if no subscribers are listening (and restart if new subscriptions happen).
                 .replay(1)
                 .refCount();
+    }
+
+    /**
+     * Watches a specific Syncbase row for changes.
+     */
+    public <T> Observable<SingleWatchEvent<T>> watch(final String key, final Class<T> type,
+                                                     final T defaultValue) {
+        return watch(key, TypeToken.of(type), defaultValue);
+    }
+
+    /**
+     * Watches a Syncbase prefix for changes.
+     */
+    public <T> Observable<RangeWatchBatch<T>> watch(
+            final PrefixRange prefix, @Nullable final Func1<String, Boolean> keyFilter,
+            final TypeToken<T> tt) {
+        return watch((db, s) -> subscribeWatch(s, db, prefix, keyFilter, tt));
     }
 
     /**
@@ -293,7 +312,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     public <T> Observable<RangeWatchBatch<T>> watch(
             final PrefixRange prefix, @Nullable final Func1<String, Boolean> keyFilter,
             final Class<T> type) {
-        return watch((db, s) -> subscribeWatch(s, db, prefix, keyFilter, type));
+        return watch(prefix, keyFilter, TypeToken.of(type));
     }
 
     /**

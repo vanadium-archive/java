@@ -10,7 +10,8 @@ import android.view.View;
 import java8.util.function.Function;
 
 public abstract class AbstractViewAdapter<T, VH extends ViewHolder> implements ViewAdapter<T, VH> {
-    public <U> AbstractViewAdapter<U, VH> map(final Function<U, T> fn) {
+    @Override
+    public <U> ViewAdapter<U, VH> map(final Function<U, ? extends T> fn) {
         return new TransformingViewAdapter<>(this, fn);
     }
 

@@ -8,24 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import io.v.rx.syncbase.RxTable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import lombok.experimental.Delegate;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 @Accessors(prefix = "m")
-public class SyncbaseListAdapter<T> extends BaseAdapter implements RangeAdapter {
-    private final ViewAdapter<? super RxTable.Row<T>, ?> mViewAdapter;
-    @Getter
-    private PrefixListAccumulator<T> mLatestState = PrefixListAccumulator.empty();
+public class SyncbaseListAdapter<T> extends BaseAdapter
+        implements RangeAdapter, ListAccumulator<T> {
+    private final ViewAdapter<? super T, ?> mViewAdapter;
+    @Delegate
+    private ListAccumulator<T> mLatestState = ListAccumulators.empty();
     @Getter
     private final Subscription mSubscription;
 
-    public SyncbaseListAdapter(final Observable<PrefixListAccumulator<T>> data,
-                               final ViewAdapter<? super RxTable.Row<T>, ?> viewAdapter,
+    public SyncbaseListAdapter(final Observable<? extends ListAccumulator<T>> data,
+                               final ViewAdapter<? super T, ?> viewAdapter,
                                final Action1<Throwable> onError) {
         mViewAdapter = viewAdapter;
         mSubscription = data
@@ -42,23 +43,18 @@ public class SyncbaseListAdapter<T> extends BaseAdapter implements RangeAdapter 
     }
 
     @Override
-    public int getCount() {
-        return mLatestState.getCount();
-    }
-
-    @Override
     public View getView(final int position, View view, final ViewGroup parent) {
-        final RxTable.Row<T> entry = mLatestState.getRowAt(position);
+        final T row = mLatestState.getRowAt(position);
         if (view == null) {
             view = mViewAdapter.createView(parent);
         }
-        mViewAdapter.bindView(view, position, entry);
+        mViewAdapter.bindView(view, position, row);
         return view;
     }
 
     @Override
     public T getItem(int position) {
-        return mLatestState.getRowAt(position).getValue();
+        return getRowAt(position);
     }
 
     /**

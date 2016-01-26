@@ -4,6 +4,7 @@
 
 package io.v.baku.toolkit.bind;
 
+import android.support.annotation.IdRes;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -164,13 +165,20 @@ public abstract class SyncbaseBinding {
             return bindTwoWay(editText);
         }
 
-        @Override
         public Builder<T> bindTo(final View view) {
             if (view instanceof TextView) {
                 return bindTo((TextView) view);
             } else {
                 throw new IllegalArgumentException("No default binding for view " + view);
             }
+        }
+
+        /**
+         * Binds to the view identified by {@code viewId}.
+         * @see #bindTo(View)
+         */
+        public Builder<T> bindTo(final @IdRes int viewId) {
+            return bindTo(mActivity.findViewById(viewId));
         }
     }
 

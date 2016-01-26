@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class TransformingViewAdapter<T, U, VH extends ViewHolder>
         extends AbstractViewAdapter<T, VH> {
     private final ViewAdapter<U, VH> mBase;
-    private final Function<T, U> mFn;
+    private final Function<T, ? extends U> mFn;
 
     @Override
     public View createView(final ViewGroup parent) {
