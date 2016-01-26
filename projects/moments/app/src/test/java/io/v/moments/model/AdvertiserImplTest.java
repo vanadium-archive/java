@@ -21,10 +21,9 @@ import java.util.Map;
 import io.v.moments.ifc.Moment;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.V23Manager;
-import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
-import io.v.v23.discovery.VDiscovery;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
@@ -51,6 +50,8 @@ public class AdvertiserImplTest {
     @Mock
     V23Manager mV23Manager;
     @Mock
+    VContext mServerContext;
+    @Mock
     Server mServer;
     @Mock
     Moment mMoment;
@@ -59,7 +60,7 @@ public class AdvertiserImplTest {
     @Mock
     ServerStatus mServerStatus;
     @Mock
-    CancelableVContext mContext;
+    VContext mContext;
 
     @Captor
     ArgumentCaptor<Service> mAdvertisement;
@@ -76,7 +77,8 @@ public class AdvertiserImplTest {
 
         when(mV23Manager.makeServer(
                 eq(AdvertiserImpl.NO_MOUNT_NAME),
-                any(AdvertiserImpl.MomentServer.class))).thenReturn(mServer);
+                any(AdvertiserImpl.MomentServer.class))).thenReturn(mServerContext);
+        when(mV23Manager.getServer(mServerContext)).thenReturn(mServer);
         when(mServer.getStatus()).thenReturn(mServerStatus);
 
         Endpoint[] endpoints = {mEndpoint};
@@ -91,8 +93,7 @@ public class AdvertiserImplTest {
         List<BlessingPattern> list = any();
         when(mV23Manager.advertise(
                 any(Service.class),
-                list,
-                any(VDiscovery.AdvertiseDoneCallback.class))).thenReturn(mContext);
+                list)).thenReturn(mContext);
 
         mAdvertiser = new AdvertiserImpl(mV23Manager, mMoment);
     }
@@ -118,8 +119,7 @@ public class AdvertiserImplTest {
 
         verify(mV23Manager).advertise(
                 mAdvertisement.capture(),
-                mBlessingList.capture(),
-                any(VDiscovery.AdvertiseDoneCallback.class));
+                mBlessingList.capture());
 
         assertEquals(0, mBlessingList.getValue().size());
 
@@ -159,7 +159,7 @@ public class AdvertiserImplTest {
         assertTrue(mAdvertiser.isAdvertising());
         mAdvertiser.advertiseStop();
         verify(mContext).cancel();
-        verify(mServer).stop();
+        verify(mServerContext).cancel();
         assertFalse(mAdvertiser.isAdvertising());
     }
 

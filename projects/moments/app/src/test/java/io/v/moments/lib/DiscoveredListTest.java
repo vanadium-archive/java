@@ -6,6 +6,8 @@ package io.v.moments.lib;
 
 import android.os.Handler;
 
+import com.google.common.collect.ImmutableList;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,12 +18,19 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import io.v.moments.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
 import io.v.moments.ifc.ListObserver;
+import io.v.v23.discovery.Attachments;
+import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Found;
 import io.v.v23.discovery.Lost;
+import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 
 import static org.junit.Assert.assertEquals;
@@ -46,12 +55,22 @@ public class DiscoveredListTest {
     ListObserver mObserver;
     @Mock
     AdConverter<Thing> mConverter;
-    @Mock
-    IdSet mRejects;
+
+    final Set<Id> mRejectIds = new HashSet<>();
+
+    IdSet mRejects = new IdSet() {
+        @Override
+        public boolean contains(Id id) {
+            return mRejectIds.contains(id);
+        }
+    };
+
     @Mock
     Handler mHandler;
-    @Mock
-    io.v.v23.discovery.Service mAdvertisement;
+
+    io.v.v23.discovery.Service mAdvertisement =
+            new Service(UUID.randomUUID().toString(), "someInstance", "iface", new Attributes(),
+                    ImmutableList.<String>of(), new Attachments());
 
     @Captor
     ArgumentCaptor<Runnable> mRunnable;
@@ -135,12 +154,8 @@ public class DiscoveredListTest {
     public void handleNormalFound() throws Exception {
         mList.setObserver(mObserver);
 
-        // Make sure the advertisement isn't rejected as a self-ad.
-        when(mAdvertisement.getInstanceId()).thenReturn(ID0.toString());
-        when(mRejects.contains(ID0)).thenReturn(false);
         when(mConverter.make(mAdvertisement)).thenReturn(THING0);
-
-        mList.handleUpdate(new Update.Found(new Found(mAdvertisement)));
+        mList.scanUpdateReceived(new Update.Found(new Found(mAdvertisement)));
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -153,10 +168,9 @@ public class DiscoveredListTest {
     public void handleSelfFound() throws Exception {
         mList.setObserver(mObserver);
 
-        when(mAdvertisement.getInstanceId()).thenReturn(ID0.toString());
-        when(mRejects.contains(ID0)).thenReturn(true);
+        mRejectIds.add(ID0);
 
-        mList.handleUpdate(new Update.Found(new Found(mAdvertisement)));
+        mList.scanUpdateReceived(new Update.Found(new Found(mAdvertisement)));
 
         verifyZeroInteractions(mHandler);
         verifyZeroInteractions(mObserver);
@@ -167,8 +181,7 @@ public class DiscoveredListTest {
     public void handleUnrecognizedLost() throws Exception {
         mList.setObserver(mObserver);
 
-        when(mRejects.contains(ID0)).thenReturn(false);
-        mList.handleUpdate(new Update.Lost(new Lost(ID0.toString())));
+        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -183,8 +196,8 @@ public class DiscoveredListTest {
     public void handleSelfLost() throws Exception {
         mList.setObserver(mObserver);
 
-        when(mRejects.contains(ID0)).thenReturn(true);
-        mList.handleUpdate(new Update.Lost(new Lost(ID0.toString())));
+        mRejectIds.add(ID0);
+        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -202,8 +215,9 @@ public class DiscoveredListTest {
         verify(mObserver).notifyItemInserted(0);
         assertEquals(1, mList.size());
 
-        when(mRejects.contains(ID0)).thenReturn(false);
-        mList.handleUpdate(new Update.Lost(new Lost(ID0.toString())));
+        mList.scanUpdateReceived(new Update.Lost(new Lost(
+                new Service(THING0.getId().toString(), "foo", "bar", new Attributes(),
+                        ImmutableList.<String>of(), new Attachments()))));
 
         verify(mHandler).post(mRunnable.capture());
 
@@ -221,8 +235,6 @@ public class DiscoveredListTest {
         verify(mObserver, times(2)).notifyItemInserted(0);
         assertEquals(2, mList.size());
 
-        when(mRejects.contains(ID0)).thenReturn(false);
-        when(mRejects.contains(ID1)).thenReturn(false);
         mList.dropAll();
 
         verify(mHandler).post(mRunnable.capture());

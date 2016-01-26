@@ -48,7 +48,7 @@ import io.v.moments.model.Config;
 import io.v.moments.model.FileUtil;
 import io.v.moments.model.MomentFactoryImpl;
 import io.v.moments.model.StateStore;
-import io.v.v23.context.CancelableVContext;
+import io.v.v23.context.VContext;
 
 /**
  * This app allows the user to take photos and advertise them on the network.
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private BitMapper mBitMapper;
     private ObservedList<Moment> mLocalMoments;
     private DiscoveredList<Moment> mRemoteMoments;
-    private CancelableVContext mScanCtx;
+    private VContext mScanCtx;
     private boolean mShouldBeScanning;
     private Id mCurrentPhotoId;
 
@@ -141,11 +141,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         // On return, should trigger onActivityResult as expected.
         mV23Manager.init(getApplicationContext(), this);
 
+        if (!mPermissionManager.haveAllPermissions()) {
+            Log.d(TAG, "Post v23 trying to get permissions");
+            mPermissionManager.obtainPermission();
+        }
+
         wireUxToDataModel();
-
-        // Fail fast if no permissions to read/write storage.
-        mBitMapper.checkIoPermissions();
-
         initializeOrRestore(savedInstanceState);
     }
 
@@ -494,15 +495,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         logState("onActivityResult");
-        if (V23Manager.onActivityResult(
-                getApplicationContext(), requestCode, resultCode, data)) {
-            Log.d(TAG, "Got the v23 result");
-            if (!mPermissionManager.haveAllPermissions()) {
-                Log.d(TAG, "Post v23 trying to get permissions");
-                mPermissionManager.obtainPermission();
-            }
-            return;
-        }
         if (requestCode == RequestCode.CAPTURE_IMAGE) {
             if (resultCode == RESULT_OK) {
                 processCapturedPhoto();

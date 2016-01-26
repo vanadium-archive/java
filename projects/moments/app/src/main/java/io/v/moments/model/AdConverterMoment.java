@@ -30,7 +30,6 @@ import io.v.v23.discovery.Service;
  * Creates instances of Moment by making an RPC on a service.
  */
 public class AdConverterMoment implements AdConverter<Moment> {
-    private static final String TAG = "AdConverterMoment";
     private final V23Manager mV23Manager;
     private final ExecutorService mExecutor;
     private final Handler mHandler;
@@ -112,7 +111,7 @@ public class AdConverterMoment implements AdConverter<Moment> {
     private void getFullImage(final MomentIfcClient client, final Moment moment) {
         try {
             ListenableFuture<byte[]> data = client.getFullImage(
-                    mV23Manager.getCancellableContext(Deadline.FULL));
+                    mV23Manager.contextWithTimeout(Deadline.FULL));
             moment.setPhoto(Kind.REMOTE, Style.FULL, data.get());
             signalChange(moment);
         } catch (InterruptedException | ExecutionException e) {
@@ -123,7 +122,7 @@ public class AdConverterMoment implements AdConverter<Moment> {
     private void getThumbImage(final MomentIfcClient client, final Moment moment) {
         try {
             ListenableFuture<byte[]> data = client.getThumbImage(
-                    mV23Manager.getCancellableContext(Deadline.THUMB));
+                    mV23Manager.contextWithTimeout(Deadline.THUMB));
             moment.setPhoto(Kind.REMOTE, Style.THUMB, data.get());
             signalChange(moment);
         } catch (InterruptedException | ExecutionException e) {
