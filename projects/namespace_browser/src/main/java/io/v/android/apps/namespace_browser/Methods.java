@@ -4,13 +4,19 @@
 
 package io.v.android.apps.namespace_browser;
 
+import com.google.common.base.Function;
 import com.google.common.reflect.TypeToken;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import org.joda.time.Duration;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.v.android.v23.V;
 import io.v.v23.context.VContext;
@@ -20,33 +26,41 @@ import io.v.v23.vdlroot.signature.Interface;
 import io.v.v23.vdlroot.signature.Method;
 import io.v.v23.verror.VException;
 
-/**
- * Namespace provides utility methods for working with Veyron object methods.
- */
-public class Methods {
-    /**
-     * Returns the list of method names of the provided object.
-     *
-     * @param name a name of the object
-     * @return list of method names of the provided object.
-     * @throws VException if there was an error getting the list of names.
-     */
-    public static List<String> get(String name, VContext ctx) throws VException {
+class Methods {
+    // Returns a new future whose result is the list of method names of the provided object.
+    static ListenableFuture<List<String>> get(VContext ctx, String name) {
         Client client = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        ClientCall call =
+        ListenableFuture<ClientCall> callFuture =
                 client.startCall(ctxT, name, "__Signature", new Object[0], new Type[0]);
-        Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
+        final Type[] resultTypes = new Type[]{new TypeToken<Interface[]>() {
         }.getType()};
-        Interface[] sSign = (Interface[]) call.finish(resultTypes)[0];
-        List<String> ret = new ArrayList<String>();
-        for (Interface iface : sSign) {
-            if (iface.getMethods() != null) {
-                for (Method method : iface.getMethods()) {
-                    ret.add(method.getName());
+        ListenableFuture<Interface[]> sign = Futures.transform(callFuture,
+                new AsyncFunction<ClientCall, Interface[]>() {
+                    @Override
+                    public ListenableFuture<Interface[]> apply(ClientCall call) throws Exception {
+                        return Futures.transform(call.finish(resultTypes),
+                                new Function<Object[], Interface[]>() {
+                                    @Override
+                                    public Interface[] apply(Object[] input) {
+                                        return (Interface[]) (input[0]);
+                                    }
+                                });
+                    }
+                });
+        return Futures.transform(sign, new Function<Interface[], List<String>>() {
+            @Override
+            public List<String> apply(Interface[] input) {
+                List<String> ret = new ArrayList<String>();
+                for (Interface iface : input) {
+                    if (iface.getMethods() != null) {
+                        for (Method method : iface.getMethods()) {
+                            ret.add(method.getName());
+                        }
+                    }
                 }
+                return ret;
             }
-        }
-        return ret;
+        });
     }
 }

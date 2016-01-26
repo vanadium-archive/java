@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.preference.PreferenceManager;
@@ -25,37 +24,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import org.joda.time.Duration;
 
 import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
-import io.v.android.v23.services.blessing.BlessingCreationException;
-import io.v.android.v23.services.blessing.BlessingService;
+import io.v.v23.InputChannelCallback;
+import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
+import io.v.v23.naming.GlobError;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.naming.MountEntry;
 import io.v.v23.naming.MountedServer;
 import io.v.v23.security.Blessings;
-import io.v.v23.security.VPrincipal;
-import io.v.v23.security.VSecurity;
-import io.v.v23.verror.VException;
-import io.v.v23.vom.VomUtil;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
+    private static final String BLESSINGS_KEY = "BlessingsKey";
+
     private static final String PREF_NAMESPACE_GLOB_ROOT = "pref_namespace_glob_root";
     private static final String DEFAULT_NAMESPACE_GLOB_ROOT = "";
     private static final String SAVED_VIEW_STATE_KEY = "browser_viewstate";
 
-    private static final int BLESSING_REQUEST = 1;
-
-    private VContext mBaseContext = null;
+    private VContext mBaseContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mBaseContext = V.init(this);
         String root = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 PREF_NAMESPACE_GLOB_ROOT, DEFAULT_NAMESPACE_GLOB_ROOT);
         View dirView = findViewById(R.id.directory);
@@ -65,15 +67,25 @@ public class MainActivity extends Activity {
                 new MountEntry(root, ImmutableList.<MountedServer>of(), true, false)));
         TextView nameView = (TextView) dirView.findViewById(R.id.name);
         nameView.setText("/");
-        mBaseContext = V.init(this);
         Drawable d = getResources().getDrawable(R.drawable.ic_account_box_black_36dp);
         d.setColorFilter(new LightingColorFilter(Color.BLACK, Color.GRAY));
-        getBlessings();
+        Futures.addCallback(BlessingsManager.getBlessings(mBaseContext, this, BLESSINGS_KEY, true),
+                new FutureCallback<Blessings>() {
+                    @Override
+                    public void onSuccess(Blessings result) {
+                        android.util.Log.i(TAG, "Success.");
+                    }
+                    @Override
+                    public void onFailure(Throwable t) {
+                        android.util.Log.e(TAG, "Couldn't get blessings: " + t.getMessage());
+                    }
+                });
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onDestroy() {
+        super.onDestroy();
+        mBaseContext.cancel();
     }
 
     @Override
@@ -124,8 +136,7 @@ public class MainActivity extends Activity {
         LinearLayout dirView = (LinearLayout) view;
         if (!dirView.isActivated()) {
             // Add new views.
-            new NameFetcher(dirView).execute();
-            // dirView will be updated only when the NameFetcher completes.
+            fetchNames(dirView);
         } else {
             // Remove all but the first view.
             if (dirView.getChildCount() > 1) {
@@ -139,8 +150,7 @@ public class MainActivity extends Activity {
         LinearLayout objView = (LinearLayout) view;
         if (!objView.isActivated()) {
             // Add new views.
-            new MethodFetcher(objView).execute();
-            // objView will be updated only when the NameFetcher completes.
+            fetchMethods(objView);
         } else {
             // Remove all but the first view.
             if (objView.getChildCount() > 1) {
@@ -166,7 +176,20 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_account: {
-                refreshBlessings();
+                Futures.addCallback(
+                        BlessingsManager.mintBlessings(mBaseContext, this, BLESSINGS_KEY, true),
+                        new FutureCallback<Blessings>() {
+                            @Override
+                            public void onSuccess(Blessings result) {
+                                Toast.makeText(
+                                        MainActivity.this, "Success.", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Log.e(TAG, "Couldn't get blessings: " + t.getMessage());
+                            }
+                        });
                 return true;
             }
             case R.id.action_settings: {
@@ -179,182 +202,93 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case BLESSING_REQUEST:
-                try {
-                    byte[] blessingVom = BlessingService.extractBlessingReply(resultCode, data);
-                    Blessings blessings = (Blessings) VomUtil.decode(blessingVom, Blessings.class);
-                    BlessingsManager.addBlessings(this, blessings);
-                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-                    getBlessings();
-                } catch (BlessingCreationException e) {
-                    String msg = "Couldn't retrieve blessing from blessing service: " + e.getMessage();
-                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                    android.util.Log.e(TAG, msg);
-                } catch (VException e) {
-                    String msg = "Couldn't decode and store blessing: " + e.getMessage();
-                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                    android.util.Log.e(TAG, msg);
-                }
-                return;
-        }
-    }
-
-    private void refreshBlessings() {
-        Intent intent = BlessingService.newBlessingIntent(this);
-        startActivityForResult(intent, BLESSING_REQUEST);
-    }
-
-    private void getBlessings() {
-        Blessings blessings = null;
-        try {
-            // See if there are blessings stored in shared preferences.
-            blessings = BlessingsManager.getBlessings(this);
-        } catch (VException e) {
-            String msg = "Error getting blessings from shared preferences " + e.getMessage();
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-            android.util.Log.e(TAG, msg);
-        }
-        if (blessings == null) {
-            // Request new blessings from the account manager.  If successful, this will eventually
-            // trigger another call to this method, with BlessingsManager.getBlessings() returning
-            // non-null blessings.
-            refreshBlessings();
+    private void fetchNames(final LinearLayout dirView) {
+        ViewUtil.updateDirectoryView(dirView, true);
+        GlobReply entry = (GlobReply) dirView.getTag();
+        if (!(entry instanceof GlobReply.Entry)) {
             return;
         }
-        try {
-            // Update local state with the new blessings.
-            VPrincipal p = V.getPrincipal(mBaseContext);
-            p.blessingStore().setDefaultBlessings(blessings);
-            VSecurity.addToRoots(p, blessings);
-        } catch (VException e) {
-            String msg = String.format(
-                    "Couldn't set local blessing %s: %s", blessings, e.getMessage());
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            android.util.Log.e(TAG, msg);
-        }
-    }
-
-    private class NameFetcher extends AsyncTask<Void, Void, List<GlobReply>> {
+        final MountEntry dirEntry = ((GlobReply.Entry) entry).getElem();
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-        final LinearLayout dirView;
-        String errorMsg = "";
-
-        NameFetcher(LinearLayout dirView) {
-            this.dirView = dirView;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog.setMessage("Fetching Names...");
-            progressDialog.show();
-        }
-
-        @Override
-        protected List<GlobReply> doInBackground(Void... args) {
-            GlobReply entry = (GlobReply) dirView.getTag();
-            if (!(entry instanceof GlobReply.Entry)) {
-                return ImmutableList.<GlobReply>of();
-            }
-            try {
-                return Namespace.glob(((GlobReply.Entry) entry).getElem().getName(), mBaseContext);
-            } catch (VException e) {
-                errorMsg = "Error fetching names: " + e.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<GlobReply> replies) {
-            progressDialog.dismiss();
-            ViewUtil.updateDirectoryView(dirView, true);
-            if (replies == null) {
-                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
-                android.util.Log.e(TAG, errorMsg);
-                return;
-            }
-            GlobReply.Entry parentEntry = (GlobReply.Entry) dirView.getTag();
-            for (GlobReply reply : replies) {
-                if (reply instanceof GlobReply.Entry) {
-                    MountEntry entry = ((GlobReply.Entry) reply).getElem();
-                    String text = "";
-                    if (parentEntry.getName().isEmpty()) {
-                        text = entry.getName();
-                    } else {
-                        if (!entry.getName().startsWith(parentEntry.getElem().getName() + "/")) {
-                            android.util.Log.e(TAG, String.format(
-                                    "Entry %s doesn't start with parent prefix %s",
-                                    entry.getName(), parentEntry.getElem().getName() + "/"));
-                            // TODO(sjr): figure out the correct name format
-                            // continue;
+        progressDialog.setMessage("Fetching Names...");
+        progressDialog.show();
+        String root = dirEntry.getName();
+        io.v.v23.namespace.Namespace n = V.getNamespace(mBaseContext);
+        VContext ctxT = mBaseContext.withTimeout(new Duration(20000));  // 20s
+        Futures.addCallback(
+                InputChannels.withCallback(n.glob(ctxT, root.isEmpty() ? "*" : root + "/*"),
+                        new InputChannelCallback<GlobReply>() {
+                    @Override
+                    public ListenableFuture<Void> onNext(GlobReply reply) {
+                        if (reply instanceof GlobReply.Error) {
+                            GlobError error = ((GlobReply.Error) reply).getElem();
+                            String msg = String.format(
+                                    "Couldn't fetch namespace subtree \"%s\": %s",
+                                    error.getName(),
+                                    error.getError().getMessage());
+                            android.util.Log.e(TAG, msg);
+                            return null;
                         }
-                        text = entry.getName();
+                        MountEntry entry = ((GlobReply.Entry) reply).getElem();
+                        String text = "";
+                        if (dirEntry.getName().isEmpty()) {
+                            text = entry.getName();
+                        } else if (entry.getName().startsWith(dirEntry.getName() + "/")) {
+                            text = entry.getName().substring(dirEntry.getName().length() + 1);
+                        } else {
+                            Log.e(TAG, String.format(
+                                    "Entry %s doesn't start with parent prefix %s",
+                                    entry.getName(), dirEntry.getName() + "/"));
+                            return null;
+                        }
+                        LinearLayout childView =
+                                (entry.getServers() == null || entry.getServers().size() <= 0)
+                                        ? ViewUtil.createDirectoryView(
+                                                text, reply, getLayoutInflater())
+                                        : ViewUtil.createObjectView(
+                                                text, reply, getLayoutInflater());
+                        dirView.addView(childView);
+                        return null;
                     }
-                    LinearLayout childView =
-                            (entry.getServers() == null || entry.getServers().size() <= 0)
-                                    ? ViewUtil.createDirectoryView(text, reply, getLayoutInflater())
-                                    // sub-dir
-                                    : ViewUtil.createObjectView(text, reply,
-                                    getLayoutInflater());   // object
-                    dirView.addView(childView);
-                } else if (reply instanceof GlobReply.Error) {
-                    String msg = String.format("Couldn't fetch namespace subtree \"%s\": %s",
-                            ((GlobReply.Error) reply).getElem().getName(),
-                            ((GlobReply.Error) reply).getElem().getError().getMessage());
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-                    android.util.Log.e(TAG, msg);
-                }
+                }), new FutureCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                progressDialog.dismiss();
             }
-        }
+                    @Override
+                    public void onFailure(Throwable t) {
+                        progressDialog.dismiss();
+                        Log.e(TAG, "Error fetching names: " + t.getMessage());
+                    }
+                });
     }
 
-    private class MethodFetcher extends AsyncTask<Void, Void, List<String>> {
+    private void fetchMethods(final LinearLayout objView) {
+        ViewUtil.updateObjectView(objView, true);
+        final GlobReply entry = (GlobReply) objView.getTag();
+        if (!(entry instanceof GlobReply.Entry)) {
+            return;
+        }
+        final MountEntry objEntry = ((GlobReply.Entry) entry).getElem();
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-        final LinearLayout objView;
-        String errorMsg = "";
-
-        MethodFetcher(LinearLayout objView) {
-            this.objView = objView;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog.setMessage("Fetching Methods...");
-            progressDialog.show();
-        }
-
-        @Override
-        protected List<String> doInBackground(Void... args) {
-            GlobReply entry = (GlobReply) objView.getTag();
-            if (!(entry instanceof GlobReply.Entry)) {
-                return ImmutableList.<String>of();
+        progressDialog.setMessage("Fetching Methods...");
+        progressDialog.show();
+        Futures.addCallback(Methods.get(mBaseContext, objEntry.getName()),
+                new FutureCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> methods) {
+                for (String method : methods) {
+                    LinearLayout childView =
+                            ViewUtil.createMethodView(method, entry, getLayoutInflater());
+                    objView.addView(childView);
+                }
+                progressDialog.dismiss();
             }
-
-            try {
-                return Methods.get(((GlobReply.Entry) entry).getElem().getName(), mBaseContext);
-            } catch (VException e) {
-                errorMsg = "Error fetching methods: " + e.getMessage();
-                return null;
+            @Override
+            public void onFailure(Throwable t) {
+                progressDialog.dismiss();
+                Log.e(TAG, "Error fetching methods: " + t.getMessage());
             }
-        }
-
-        @Override
-        protected void onPostExecute(List<String> methods) {
-            progressDialog.dismiss();
-            ViewUtil.updateObjectView(objView, true);
-            if (methods == null) {
-                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_LONG).show();
-                android.util.Log.e(TAG, errorMsg);
-                return;
-            }
-            GlobReply reply = (GlobReply) objView.getTag();
-            for (String method : methods) {
-                LinearLayout childView =
-                        ViewUtil.createMethodView(method, reply, getLayoutInflater());
-                objView.addView(childView);
-            }
-        }
+        });
     }
 }

@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.v.android.apps.namespace_browser"
-          android:versionCode="1"
-          android:versionName="1.0">
-
-    <uses-sdk
-        android:minSdkVersion="19"
-        android:targetSdkVersion="19"/>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <!--  Needed for Security -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <!--  Needed for Security -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Needed for Blessings -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+          package="io.v.android.apps.namespace_browser" >
 
     <application
         android:allowBackup="true"
@@ -33,12 +18,6 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings">
-        </activity>
-        <activity
-            android:name="io.v.android.impl.google.services.blessing.BlessingActivity" >
-            <intent-filter>
-                <action android:name="io.v.android.x.ref.services.blessing.BLESSING" />
-            </intent-filter>
         </activity>
     </application>
 </manifest>
