@@ -39,43 +39,46 @@ public class FortuneServerImpl implements FortuneServer, Globber {
 
     public static final ComplexException COMPLEX_ERROR = new ComplexException(
             "en", "test", "test", COMPLEX_PARAM, "secondParam", 3);
-    private final CountDownLatch latch;
+    private final CountDownLatch clientLatch;
+    private final CountDownLatch serverLatch;
 
     private String lastAddedFortune;
 
     public FortuneServerImpl() {
-        this(null);
+        this(null, null);
     }
 
     /**
-     * If not {@code null}, the {@link FortuneServerImpl#get} method will block until the
-     * latch is counted down. This allows for testing asynchronous RPCs.
+     * Creates a new instance of this server with the provided latches.
+     *
+     * @param clientLatch   if not {@code null}, {@link FortuneServerImpl#get} method will block
+     *                      until the latch is counted down
+     * @param serverLatch   if not {@code null}, {@link FortuneServerImpl#get} method will count
+     *                      down this latch upon its invocation
      */
-    public FortuneServerImpl(CountDownLatch latch) {
-        this.latch = latch;
+    public FortuneServerImpl(CountDownLatch clientLatch, CountDownLatch serverLatch) {
+        this.clientLatch = clientLatch;
+        this.serverLatch = serverLatch;
     }
 
     @Override
     public ListenableFuture<String> get(final VContext context, ServerCall call) {
-        final SettableFuture<String> future = SettableFuture.create();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (latch != null) {
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        future.setException(new VException(e.getMessage()));
-                    }
-                }
-                if (lastAddedFortune == null) {
-                    future.setException(new NoFortunesException(context));
-                } else {
-                    future.set(lastAddedFortune);
-                }
+        if (serverLatch != null) {
+            serverLatch.countDown();
+        }
+        if (clientLatch != null) {
+            try {
+                // Caution: this is not idiomatic for server methods: they must be non-blocking.
+                // However, it helps us with LameDuck tests.
+                clientLatch.await();
+            } catch (InterruptedException e) {
+                return Futures.immediateFailedFuture(new VException(e.getMessage()));
             }
-        }).start();
-        return future;
+        }
+        if (lastAddedFortune == null) {
+            return Futures.immediateFailedFuture(new NoFortunesException(context));
+        }
+        return Futures.immediateFuture(lastAddedFortune);
     }
 
     @Override
