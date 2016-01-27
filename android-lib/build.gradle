@@ -76,13 +76,6 @@ public static getOS() {
     return System.properties['os.name'].toLowerCase()
 }
 
-public static newStyleProfiles() {
-    return new File(System.getenv()['JIRI_ROOT'], '.jiri_v23_profiles').exists()
-}
-
-def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
-def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
-
 class VanadiumEnvironment {
     File jiriRoot;
     File jiriBin;
@@ -108,72 +101,72 @@ class VanadiumEnvironment {
     }
 }
 
-task checkVanadiumEnvironment() {
-    VanadiumEnvironment.getVanadiumEnvironment()
-    if (!isAmd64()) {
-        throw new InvalidUserDataException("Android Vanadium builds only enabled on amd64 "
-                + "architectures, not: " + getArch())
-    }
-    if (!isLinux() && !isDarwin()) {
-        throw new InvalidUserDataException("Android Vanadium builds only enabled on "
-                + "linux/darwin systems, not: " + getOS())
+enum VanadiumSupportedArchitecture {
+    X86_64('x86_64', 'amd64', '@5'),
+    ARM_V7A('armeabi-v7a', 'arm', '');
+
+    public final String abiName
+    public final String goArch
+    public final String profileVersion
+
+    private VanadiumSupportedArchitecture(String abiName, String goArch, String profileVersion) {
+        this.abiName = abiName
+        this.goArch = goArch
+        this.profileVersion = profileVersion
     }
 }
 
-task checkVanadiumSyncbaseEnvironment(type: Exec, dependsOn: checkVanadiumEnvironment) {
-    if (newStyleProfiles()) {
+// Returns a task that will build the Vanadium native library for the given architecture.
+def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
+    def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+    def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
+
+    def check = task("checkVanadiumAndroidEnvironment-${arch.goArch}", type: Exec) {
         commandLine jiriBin, 'v23-profile', 'list',
-            '--info', 'Target.InstallationDir', '--target=arm-android', 'syncbase'
-    } else {
-        commandLine "echo", [jiriRoot, 'third_party', 'cout', 'android_arm', 'leveldb'].join(File.separator)
-    }
-    standardOutput = new ByteArrayOutputStream()
-    doLast {
-        def syncbaseOutputDir = new File(standardOutput.toString().trim())
-        if (!syncbaseOutputDir.exists() || !syncbaseOutputDir.isDirectory()) {
-            throw new InvalidUserDataException(
-                syncbaseOutputDir.toString() + " does not exist or is not a directory. "
-                + "You probably didn't install the android base profile. Try running\n\n"
-                + "jiri v23-profile install --target=arm-android base"
-                + "\n\nand then try building again"
-            )
+                '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android${arch.profileVersion}", 'android'
+        standardOutput = new ByteArrayOutputStream()
+        doLast {
+            def androidOutputDir = new File(standardOutput.toString().trim())
+            if (!androidOutputDir.exists() || !androidOutputDir.isDirectory()) {
+                throw new InvalidUserDataException(
+                        androidOutputDir.toString() + " does not exist or is not a directory. "
+                                + "You probably didn't install the android base profile. Try running\n\n"
+                                + "jiri v23-profile install "
+                                + "--target=${arch.goArch}-android${arch.profileVersion} android\n\n"
+                                + "and then try building again"
+                )
+            }
         }
     }
-}
 
-task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumSyncbaseEnvironment) {
-    def existingPath = System.getenv('PATH')
-    if (existingPath == null) {
-        existingPath = ""
-    }
-
-    // NOTE(spetrovic): we add the '-installsuffix=shared' flag as a safe measure, because the build
-    // without it doesn't work on linux/arm.  (It does work on android/arm, but we are playing it
-    // safe here.)
-    if (newStyleProfiles()) {
-        environment 'GOOS': 'android'
-        environment 'GOARCH': 'arm'
-        commandLine jiriBin, 'go', '--target=arm-android', 'install',
+    def goBuild = task("goBuildVanadiumLib-${arch.goArch}", type: Exec, dependsOn: check) {
+        // NOTE(spetrovic): we add the '-installsuffix=' flag as a safe measure, because the build
+        // without it doesn't work on linux/arm.  (It does work on android/arm, but we are playing it
+        // safe here.)
+        commandLine jiriBin, 'go', "--target=${arch.goArch}-android", 'install',
                 '-buildmode=c-shared', '-v', '-tags', 'android',
-                '-installsuffix=shared', 'v.io/x/jni/main'
-    } else {
-        environment 'JIRI_PROFILE': 'android'
-        commandLine jiriBin, 'go', 'install',
-            '-buildmode=c-shared', '-v', '-tags', 'android',
-                '-installsuffix=shared', 'v.io/x/jni/main'
+          '-installsuffix=shared', 'v.io/x/jni/main'
     }
+
+    // Copy the shared library to its ultimate destination.
+    def copyLib = task("copyVanadiumLib-${arch.goArch}", type: Copy, dependsOn: goBuild) {
+        from jiriRoot + "/release/go/pkg/android_${arch.goArch}_shared_shared/v.io/x/jni"
+        into "src/main/resources/lib/${arch.abiName}"
+        include 'main.a'
+        rename 'main.a', 'libv23.so'
+    }
+
+    tasks.preBuild.dependsOn(copyLib)
 }
 
-// Copy the shared library to its ultimate destination.
-task copyVanadiumLib(type: Copy, dependsOn: goBuildVanadiumLib) {
-    from jiriRoot + '/release/go/pkg/android_arm_shared_shared/v.io/x/jni'
-    into 'src/main/resources/lib/armeabi-v7a'
-    include 'main.a'
-    rename 'main.a', 'libv23.so'
+VanadiumSupportedArchitecture.values().each { arch ->
+    buildVanadiumLib(arch)
 }
 
 clean {
-    delete 'src/main/resources/lib/armeabi-v7a/libv23.so'
+    VanadiumSupportedArchitecture.values().each() { arch ->
+        delete "src/main/resources/lib/${arch.abiName}/libv23.so"
+    }
 }
 
 task sourceJar(type: Jar) {
@@ -244,7 +237,6 @@ wrapper {
     gradleVersion = '2.4'
 }
 
-tasks.preBuild.dependsOn(copyVanadiumLib)
 tasks.publishToMavenLocal.dependsOn(tasks.assemble)
 tasks.bintrayUpload.dependsOn(tasks.assemble)
 
