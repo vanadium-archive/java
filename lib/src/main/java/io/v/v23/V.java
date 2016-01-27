@@ -450,14 +450,13 @@ public class V {
     }
 
     /**
-     * Returns the {@link VDiscovery} attached to the given context, or {@code null} if no discovery
-     * instance is attached.
-     * <p>
-     * If the passed-in context is derived from the context returned by {@link #init}, the returned
-     * instance will never be {@code null}.
+     * Returns a new {@link VDiscovery} instance.
+     *
+     * @param  ctx             current context
+     * @throws VException      if a new discovery instance cannot be created
      */
-    public static VDiscovery getDiscovery(VContext ctx) {
-        return getRuntime(ctx).getDiscovery(ctx);
+    public static VDiscovery newDiscovery(VContext ctx) throws VException {
+        return getRuntime(ctx).newDiscovery(ctx);
     }
 
     /**

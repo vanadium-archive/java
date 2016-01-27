@@ -198,11 +198,10 @@ public interface VRuntime {
     VContext getContext();
 
     /**
-     * Returns the {@code VDiscovery} attached to the given context, or {@code null} if no discovery
-     * instance is attached.
-     * <p>
-     * If the passed in context is derived from the context returned by {@link #getContext()},
-     * the returned discovery instance will never be {@code null}.
+     * Returns a new {@code VDiscovery} instance.
+     *
+     * @param  ctx             current context
+     * @throws VException      if a new discovery instance cannot be created
      */
-    VDiscovery getDiscovery(VContext ctx);
+    VDiscovery newDiscovery(VContext ctx) throws VException;
 }
