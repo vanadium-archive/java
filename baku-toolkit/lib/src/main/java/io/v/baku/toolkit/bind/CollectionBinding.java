@@ -22,7 +22,7 @@ public class CollectionBinding {
         }
     }
 
-    public static <A extends RangeAdapter> Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 }

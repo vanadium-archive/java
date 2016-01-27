@@ -112,7 +112,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     }
 
     public void onSyncError(final Throwable t) {
-        mVAndroidContextTrait.getErrorReporter().onError(R.string.err_sync, t);
+        ErrorReporters.getDefaultSyncErrorReporter(mVAndroidContextTrait);
     }
 
     public <U> SyncbaseBinding.Builder<U> binder() {

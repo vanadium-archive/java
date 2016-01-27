@@ -18,10 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class BakuActivity extends VActivity implements BakuActivityTrait<Activity> {
     @Delegate
-    private BakuActivityTrait mBakuActivityTrait;
+    private BakuActivityTrait<Activity> mBakuActivityTrait;
 
-    protected BakuActivityTrait createBakuActivityTrait() {
-        return new BakuActivityMixin(this);
+    protected BakuActivityTrait<Activity> createBakuActivityTrait() {
+        return new BakuActivityMixin<>(this);
     }
 
     @Override

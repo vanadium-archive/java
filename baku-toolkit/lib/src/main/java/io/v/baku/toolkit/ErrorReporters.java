@@ -8,6 +8,7 @@ import android.app.Fragment;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import rx.functions.Action1;
 
 @Slf4j
 @UtilityClass
@@ -22,5 +23,23 @@ public class ErrorReporters {
                 erf.onError(s, t);
             }
         };
+    }
+
+    /**
+     * Derives a default sync error reporting function from a {@link VAndroidContextTrait}. The
+     * error message is {@link io.v.baku.toolkit.R.string#err_sync}.
+     *
+     * @see #getDefaultSyncErrorReporter(ErrorReporter)
+     */
+    public static Action1<Throwable> getDefaultSyncErrorReporter(final VAndroidContextTrait<?> v) {
+        return getDefaultSyncErrorReporter(v.getErrorReporter());
+    }
+
+    /**
+     * Derives a default sync error reporting function from an {@link ErrorReporter}. The error
+     * message is {@link io.v.baku.toolkit.R.string#err_sync}.
+     */
+    public static Action1<Throwable> getDefaultSyncErrorReporter(final ErrorReporter r) {
+        return t -> r.onError(R.string.err_sync, t);
     }
 }

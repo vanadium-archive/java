@@ -8,6 +8,8 @@ package io.v.baku.toolkit.bind;
 import android.app.Activity;
 
 import io.v.baku.toolkit.BakuActivityTrait;
+import io.v.baku.toolkit.ErrorReporters;
+import io.v.baku.toolkit.VAndroidContextTrait;
 import io.v.rx.syncbase.RxTable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +37,32 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
         return mSelf;
     }
 
+    /**
+     * Sets the following properties from the given {@link BakuActivityTrait}:
+     * <ul>
+     *     <li>{@code activity}</li>
+     *     <li>{@code rxTable}</li>
+     *     <li>{@code subscriptionParent}</li>
+     *     <li>{@code onError}</li>
+     * </ul>
+     */
     public T bakuActivity(final BakuActivityTrait<?> trait) {
         return activity(trait.getVAndroidContextTrait().getAndroidContext())
                 .rxTable(trait.getSyncbaseTable())
                 .subscriptionParent(trait.getSubscriptions())
                 .onError(trait::onSyncError);
+    }
+
+    /**
+     * Sets the following properties from the given {@link VAndroidContextTrait}:
+     * <ul>
+     *     <li>{@code activity}</li>
+     *     <li>{@code onError}</li>
+     * </ul>
+     */
+    public T vActivity(final VAndroidContextTrait<? extends Activity> trait) {
+        return activity(trait.getAndroidContext())
+                .onError(ErrorReporters.getDefaultSyncErrorReporter(trait));
     }
 
     public T subscriptionParent(final CompositeSubscription subscriptionParent) {
