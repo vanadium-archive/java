@@ -71,6 +71,9 @@ public class RxNamespace {
     }
 
     /**
+     * TODO(rosswang): This does not work properly if the name is relative and the namespace root is
+     * changed during the life of the server. https://github.com/vanadium/issues/issues/1052
+     *
      * @return an {@code Observable} of {@code MountEvent}s. Events including servers come from
      * polling and may or may not include an error. Events without servers are from
      * {@link Server#addName(String)} and may or may not include an error. If a server is already

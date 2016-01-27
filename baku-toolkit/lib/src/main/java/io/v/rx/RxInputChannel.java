@@ -4,8 +4,7 @@
 
 package io.v.rx;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
+import org.robotninjas.concurrent.FluentFutures;
 
 import io.v.v23.InputChannel;
 import io.v.v23.verror.EndOfFileException;
@@ -25,21 +24,17 @@ public class RxInputChannel {
     }
 
     private static <T> void connect(final InputChannel<T> i, final Subscriber<? super T> s) {
-        Futures.addCallback(i.recv(), new FutureCallback<T>() {
-            @Override
-            public void onSuccess(T result) {
-                s.onNext(result);
-                connect(i, s);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                if (t instanceof EndOfFileException) {
-                    s.onCompleted();
-                } else {
-                    s.onError(t);
-                }
-            }
-        });
+        FluentFutures.from(i.recv())
+                .onSuccess(r -> {
+                    s.onNext(r);
+                    connect(i, s);
+                })
+                .onFailure(t -> {
+                    if (t instanceof EndOfFileException) {
+                        s.onCompleted();
+                    } else {
+                        s.onError(t);
+                    }
+                });
     }
 }

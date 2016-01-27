@@ -30,6 +30,13 @@ public class RxDb extends RxEntity<Database, SyncbaseApp> {
         mObservable = rxApp.getObservable().switchMap(this::mapFrom);
     }
 
+    protected RxDb(final RxDb other) {
+        mVContext = other.mVContext;
+        mName = other.mName;
+        mRxApp = other.mRxApp;
+        mObservable = other.mObservable;
+    }
+
     @Override
     public Observable<Database> mapFrom(final SyncbaseApp app) {
         final Database db = app.getNoSqlDatabase(mName, null);

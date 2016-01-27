@@ -4,7 +4,6 @@
 
 package io.v.rx.syncbase;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.io.FileUtils;
@@ -16,22 +15,15 @@ import io.v.baku.toolkit.VAndroidTestCase;
 import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.impl.google.services.mounttable.MountTableServer;
 import io.v.v23.context.VContext;
-import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import lombok.experimental.Delegate;
 
 public class SgHostUtilLocalTest extends VAndroidTestCase {
     private File mStorageRoot;
-    private Namespace mNamespace;
     private Server mMountTable;
 
-    private interface Ignore {
-        // Known failure in io.v:vanadium-android:0.8
-        void testEnsureSgHost();
-    }
-
-    @Delegate(excludes = Ignore.class)
+    @Delegate
     private SgHostUtilTestCases mTestCases;
 
     @Override
@@ -49,19 +41,16 @@ public class SgHostUtilLocalTest extends VAndroidTestCase {
                 .withPermissions(ImmutableMap.of("test", BlessingsUtils.OPEN_DATA_PERMS))
                 .withStatsPrefix("test"));
 
-        // TODO(rosswang): This should use withNewNamespace or reset the roots after test, but
-        // we can't do that yet.
+        // TODO(rosswang): We might like to do this by changing the namespace root, but
+        // https://github.com/vanadium/issues/issues/1052
 
-        mNamespace = V.getNamespace(nsctx);
         mMountTable = V.getServer(nsctx);
-        mNamespace.setRoots(ImmutableList.of(mMountTable.getStatus().getEndpoints()[0].name()));
-
-        mTestCases = new SgHostUtilTestCases(getContext(), getVContext());
+        final String endpoint = mMountTable.getStatus().getEndpoints()[0].name();
+        mTestCases = new SgHostUtilTestCases(getContext(), getVContext(), endpoint);
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mNamespace.setRoots(ImmutableList.of("/ns.dev.v.io:8101"));
         mMountTable.stop();
         FileUtils.deleteDirectory(mStorageRoot);
         super.tearDown();

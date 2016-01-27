@@ -9,10 +9,10 @@ import android.app.Activity;
 import io.v.baku.toolkit.bind.RangeAdapter;
 import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.bind.SyncbaseRangeAdapter;
+import io.v.baku.toolkit.syncbase.BakuDb;
+import io.v.baku.toolkit.syncbase.BakuSyncbase;
+import io.v.baku.toolkit.syncbase.BakuTable;
 import io.v.rx.syncbase.GlobalUserSyncgroup;
-import io.v.rx.syncbase.RxDb;
-import io.v.rx.syncbase.RxSyncbase;
-import io.v.rx.syncbase.RxTable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +37,11 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     private final VAndroidContextTrait<T> mVAndroidContextTrait;
 
     @Getter
-    private final RxSyncbase mSyncbase;
+    private final BakuSyncbase mSyncbase;
     @Getter
-    private final RxDb mSyncbaseDb;
+    private final BakuDb mSyncbaseDb;
     @Getter
-    private final RxTable mSyncbaseTable;
+    private final BakuTable mSyncbaseTable;
     @Getter
     private final CompositeSubscription mSubscriptions;
 
@@ -49,7 +49,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         mVAndroidContextTrait = vAndroidContextTrait;
 
         mSubscriptions = new CompositeSubscription();
-        mSyncbase = new RxSyncbase(vAndroidContextTrait);
+        mSyncbase = new BakuSyncbase(this);
 
         final String app = getSyncbaseAppName(),
                 db = getSyncbaseDbName(),

@@ -12,7 +12,6 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import net.javacrumbs.futureconverter.guavarx.FutureConverter;
 
-import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.services.blessing.BlessingCreationException;
 import io.v.baku.toolkit.ErrorReporter;
 import io.v.baku.toolkit.R;
@@ -92,7 +91,7 @@ public abstract class ActivityBlessingsSeeker implements RefreshableBlessingsPro
 
         Blessings mgrBlessings;
         try {
-            mgrBlessings = BlessingsManager.getBlessings(mActivity.getApplicationContext());
+            mgrBlessings = BlessingsUtils.readSharedPrefs(mActivity.getApplicationContext());
         } catch (final VException e) {
             log.warn("Could not get blessings from shared preferences", e);
             mgrBlessings = null;
@@ -149,7 +148,7 @@ public abstract class ActivityBlessingsSeeker implements RefreshableBlessingsPro
      */
     public void setBlessings(final Blessings b) {
         try {
-            BlessingsManager.addBlessings(mActivity.getApplicationContext(), b);
+            BlessingsUtils.writeSharedPrefs(mActivity.getApplicationContext(), b);
         } catch (final VException e) {
             mErrorReporter.onError(R.string.err_blessings_store, e);
         } finally {

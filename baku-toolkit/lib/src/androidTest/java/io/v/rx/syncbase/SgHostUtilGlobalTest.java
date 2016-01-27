@@ -9,13 +9,8 @@ import io.v.baku.toolkit.blessings.BlessingsUtils;
 import lombok.experimental.Delegate;
 
 public class SgHostUtilGlobalTest extends VAndroidTestCase {
-    private interface Ignore {
-        // Known failure in io.v:vanadium-android:0.8
-        // Requires real blessings
-        void testEnsureSgHost();
-    }
 
-    @Delegate(excludes = Ignore.class)
+    @Delegate
     private SgHostUtilTestCases mTestCases;
 
     @Override

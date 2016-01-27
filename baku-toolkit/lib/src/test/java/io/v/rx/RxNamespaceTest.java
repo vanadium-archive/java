@@ -80,7 +80,7 @@ public class RxNamespaceTest extends RxTestCase {
     }
 
     private static ServerStatus mockStatus(final MountStatus... ms) {
-        return new ServerStatus(null, false, ms, null, null);
+        return new ServerStatus(null, false, ms, null, null, null);
     }
 
     private static boolean isInitialMountAttemptStart(final MountEvent e) {

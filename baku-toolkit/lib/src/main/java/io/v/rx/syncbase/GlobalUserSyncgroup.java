@@ -18,12 +18,12 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Permissions;
+import io.v.v23.services.syncbase.nosql.SyncgroupJoinFailedException;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
 import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.Syncgroup;
-import io.v.v23.verror.NoExistException;
 import java8.util.function.Function;
 import java8.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -149,7 +149,7 @@ public class GlobalUserSyncgroup {
         final Syncgroup sg = db.getSyncgroup(sgName);
         return Observable.defer(() -> toObservable(sg.join(mVContext, mMemberInfo)))
                 .doOnCompleted(() -> log.info("Joined syncgroup " + sgName))
-                .onErrorResumeNext(t -> t instanceof NoExistException ?
+                .onErrorResumeNext(t -> t instanceof SyncgroupJoinFailedException ?
                         toObservable(sg.create(mVContext, spec, mMemberInfo))
                                 .doOnCompleted(() -> log.info("Created syncgroup " + sgName))
                                 .map(x -> spec) :
@@ -169,7 +169,7 @@ public class GlobalUserSyncgroup {
                         createOrJoinSyncgroup(db, sgName, spec)), mount));
     }
 
-    public Subscription join() {
+    public Observable<?> rxJoin() {
         return Observable.switchOnNext(mRxBlessings
                 .map(b -> {
                     final AccessList acl = BlessingsUtils.blessingsToAcl(mVContext, b);
@@ -183,8 +183,15 @@ public class GlobalUserSyncgroup {
                                 "username; no username blessings found. Blessings: " + b);
                     }
                     return Observable.merge(createOrJoins);
-                }))
-                .subscribe(x -> {
-                }, t -> mOnError.call(R.string.err_syncgroup_join, t));
+                }));
+    }
+
+    /**
+     * It is not generally necessary to unsubscribe explicitly from this subscription since the
+     * lifecycle of the Syncbase client is generally tied to a Baku Activity.
+     */
+    public Subscription join() {
+        return rxJoin().subscribe(x -> {
+        }, t -> mOnError.call(R.string.err_syncgroup_join, t));
     }
 }

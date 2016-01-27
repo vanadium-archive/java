@@ -4,9 +4,9 @@
 
 package io.v.baku.toolkit.bind;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.robotninjas.concurrent.FluentFutures;
 
 import java.util.Objects;
 
@@ -50,17 +50,9 @@ public class SyncbaseBindingTermini {
                         final ListenableFuture<Void> op = Objects.equals(w.data, deleteValue) ?
                                 w.t.delete(rxTable.getVContext(), key) :
                                 w.t.put(rxTable.getVContext(), key, w.data, type);
-                        Futures.addCallback(op, new FutureCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void result) {
-                                request(1);
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                onError(t);
-                            }
-                        });
+                        FluentFutures.from(op)
+                                .onSuccess(r -> request(1))
+                                .onFailure(this::onError);
                     }
 
                     @Override

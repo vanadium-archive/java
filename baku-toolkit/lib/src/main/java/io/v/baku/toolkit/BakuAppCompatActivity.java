@@ -19,10 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BakuAppCompatActivity
         extends VAppCompatActivity implements BakuActivityTrait<AppCompatActivity> {
     @Delegate
-    private BakuActivityTrait mBakuActivityTrait;
+    private BakuActivityTrait<AppCompatActivity> mBakuActivityTrait;
 
-    protected BakuActivityTrait createBakuActivityTrait() {
-        return new BakuActivityMixin(this);
+    protected BakuActivityTrait<AppCompatActivity> createBakuActivityTrait() {
+        return new BakuActivityMixin<>(this);
     }
 
     @Override

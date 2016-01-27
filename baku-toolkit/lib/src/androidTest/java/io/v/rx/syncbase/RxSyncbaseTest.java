@@ -16,6 +16,7 @@ import io.v.baku.toolkit.VAndroidTestCase;
 import io.v.v23.syncbase.nosql.RowRange;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import rx.Observable;
 
 @Accessors(prefix = "m")
 @Getter
@@ -70,22 +71,28 @@ public class RxSyncbaseTest extends VAndroidTestCase {
         assertEquals("Goodbye", w.next().getValue());
     }
 
+    private Iterator<? extends Map<String, String>> wrapWatch(
+            final Observable<RangeWatchBatch<String>> watch) {
+        return block(watch
+                .concatMap(RangeWatchBatch::collectChanges)
+                .scan(new HashMap<String, String>(), (data, events) -> {
+                    for (final RangeWatchEvent<String> event : events) {
+                        event.applyTo(data);
+                    }
+                    return data;
+                }).skip(1) // skip the initial empty map
+        ).getIterator();
+    }
+
     public void testRangeWatch() throws Exception {
         await(parallel(
                 mTable.put("Hello", "world"),
                 mTable.put("Goodnight", "moon"),
                 mTable.put("Good morning", "starshine")));
 
-        final Iterator<? extends Map<String, String>> w = block(
-                mTable.watch(RowRange.prefix("Good"), null, String.class)
-                        .concatMap(RangeWatchBatch::collectChanges)
-                        .scan(new HashMap<String, String>(), (data, events) -> {
-                            for (final RangeWatchEvent<String> event : events) {
-                                event.applyTo(data);
-                            }
-                            return data;
-                        }).skip(1) // skip the initial empty map
-        ).getIterator();
+        final Observable<RangeWatchBatch<String>> watch =
+                mTable.watch(RowRange.prefix("Good"), null, String.class);
+        final Iterator<? extends Map<String, String>> w = wrapWatch(watch);
         assertEquals(ImmutableMap.of(
                 "Goodnight", "moon",
                 "Good morning", "starshine"), w.next());
@@ -102,5 +109,25 @@ public class RxSyncbaseTest extends VAndroidTestCase {
 
         start(mTable.delete("Goodnight"));
         assertEquals(ImmutableMap.of("Good morning", "America"), w.next());
+
+        final Iterator<? extends Map<String, String>> w2 = wrapWatch(watch);
+        assertEquals(ImmutableMap.of("Good morning", "America"), w2.next());
+    }
+
+    public void testManyInitialRangeWatch() {
+        final int count = 50;
+        final Observable<?>[] puts = new Observable[count];
+        final ImmutableMap.Builder<String, String> expected = ImmutableMap.builder();
+        for (int i = 0; i < count; i++) {
+            final String si = Integer.toString(i);
+            puts[i] = mTable.put(si, si);
+            expected.put(si, si);
+        }
+        await(parallel(puts));
+
+        final Observable<RangeWatchBatch<String>> watch =
+                mTable.watch(RowRange.prefix(""), null, String.class);
+        final Iterator<? extends Map<String, String>> w = wrapWatch(watch);
+        assertEquals(expected.build(), w.next());
     }
 }
