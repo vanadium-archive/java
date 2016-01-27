@@ -12,7 +12,7 @@ import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * A default application of {@link BakuActivityTrait} extending {@link android.app.Activity}. Most
+ * A default integration with {@link BakuActivityTrait} extending {@link android.app.Activity}. Most
  * activities with distributed state should inherit from this.
  */
 @Slf4j

@@ -5,6 +5,7 @@
 package io.v.baku.toolkit;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.bind.CollectionBinding;
@@ -26,6 +27,7 @@ import rx.subscriptions.CompositeSubscription;
  * <li>{@link BakuActivity} (extends {@link Activity})</li>
  * <li>{@link BakuAppCompatActivity} (extends {@link android.support.v7.app.AppCompatActivity})</li>
  * </ul>
+ * <p>
  * Since Java doesn't actually support multiple inheritance, clients requiring custom inheritance
  * hierarchies will need to wire in manually, like any of the examples above.
  */
@@ -58,6 +60,33 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         mSyncbaseTable = mSyncbaseDb.rxTable(t);
 
         joinInitialSyncGroup();
+    }
+
+    /**
+     * Convenience constructor for compositional integration. Example usage:
+     *
+     * <pre><code>
+     * public class SampleCompositionActivity extends Activity {
+     *     private BakuActivityTrait<SampleCompositionActivity> mBaku;
+     *
+     *     &#64;Override
+     *     protected void onCreate(Bundle savedInstanceState) {
+     *         super.onCreate(savedInstanceState);
+     *         setContentView(R.layout.activity_hello);
+     *
+     *         mBaku = new BakuActivityMixin<>(this, savedInstanceState);
+     *     }
+     *
+     *     &#64;Override
+     *     protected void onDestroy() {
+     *         mBaku.close();
+     *         super.onDestroy();
+     *     }
+     * }
+     * </code></pre>
+     */
+    public BakuActivityMixin(final T context, final Bundle savedInstanceState) {
+        this(VAndroidContextMixin.withDefaults(context, savedInstanceState));
     }
 
     @Override
