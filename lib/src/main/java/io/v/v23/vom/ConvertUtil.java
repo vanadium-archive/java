@@ -262,9 +262,13 @@ final class ConvertUtil {
     static Object convertFromBytes(byte[] bytes, ConversionTarget target)
             throws ConversionException {
         Class<?> targetClass = target.getTargetClass();
+        if (targetClass.equals(byte[].class)) {
+            return bytes;
+        }
         if (targetClass == String.class || VdlString.class.isAssignableFrom(targetClass)) {
             return ReflectUtil.createPrimitive(target, new String(bytes), String.class);
-        } else if (VdlEnum.class.isAssignableFrom(targetClass)) {
+        }
+        if (VdlEnum.class.isAssignableFrom(targetClass)) {
             return ReflectUtil.createEnum(target, new String(bytes));
         }
         int len = bytes.length;
