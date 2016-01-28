@@ -117,11 +117,11 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
 
     public <U> SyncbaseBinding.Builder<U> binder() {
         return SyncbaseBinding.<U>builder()
-                .bakuActivity(this);
+                .activity(this);
     }
 
     public CollectionBinding.Builder collectionBinder() {
         return CollectionBinding.builder()
-                .bakuActivity(this);
+                .activity(this);
     }
 }

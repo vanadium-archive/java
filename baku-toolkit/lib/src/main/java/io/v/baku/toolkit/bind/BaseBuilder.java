@@ -40,13 +40,13 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
     /**
      * Sets the following properties from the given {@link BakuActivityTrait}:
      * <ul>
-     *     <li>{@code activity}</li>
-     *     <li>{@code rxTable}</li>
-     *     <li>{@code subscriptionParent}</li>
-     *     <li>{@code onError}</li>
+     *     <li>{@link #activity(Activity)}</li>
+     *     <li>{@link #rxTable(RxTable)}</li>
+     *     <li>{@link #subscriptionParent(CompositeSubscription)}</li>
+     *     <li>{@link #onError(Action1)}</li>
      * </ul>
      */
-    public T bakuActivity(final BakuActivityTrait<?> trait) {
+    public T activity(final BakuActivityTrait<?> trait) {
         return activity(trait.getVAndroidContextTrait().getAndroidContext())
                 .rxTable(trait.getSyncbaseTable())
                 .subscriptionParent(trait.getSubscriptions())
@@ -56,11 +56,11 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
     /**
      * Sets the following properties from the given {@link VAndroidContextTrait}:
      * <ul>
-     *     <li>{@code activity}</li>
-     *     <li>{@code onError}</li>
+     *     <li>{@link #activity(Activity)}</li>
+     *     <li>{@link #onError(Action1)}</li>
      * </ul>
      */
-    public T vActivity(final VAndroidContextTrait<? extends Activity> trait) {
+    public T activity(final VAndroidContextTrait<? extends Activity> trait) {
         return activity(trait.getAndroidContext())
                 .onError(ErrorReporters.getDefaultSyncErrorReporter(trait));
     }
