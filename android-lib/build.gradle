@@ -102,17 +102,15 @@ class VanadiumEnvironment {
 }
 
 enum VanadiumSupportedArchitecture {
-    X86_64('x86_64', 'amd64', '@5'),
-    ARM_V7A('armeabi-v7a', 'arm', '');
+    X86_64('x86_64', 'amd64'),
+    ARM_V7A('armeabi-v7a', 'arm');
 
     public final String abiName
     public final String goArch
-    public final String profileVersion
 
-    private VanadiumSupportedArchitecture(String abiName, String goArch, String profileVersion) {
+    private VanadiumSupportedArchitecture(String abiName, String goArch) {
         this.abiName = abiName
         this.goArch = goArch
-        this.profileVersion = profileVersion
     }
 }
 
@@ -123,7 +121,7 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
 
     def check = task("checkVanadiumAndroidEnvironment-${arch.goArch}", type: Exec) {
         commandLine jiriBin, 'v23-profile', 'list',
-                '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android${arch.profileVersion}", 'android'
+                '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android", 'android'
         standardOutput = new ByteArrayOutputStream()
         doLast {
             def androidOutputDir = new File(standardOutput.toString().trim())
@@ -132,7 +130,7 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
                         androidOutputDir.toString() + " does not exist or is not a directory. "
                                 + "You probably didn't install the android base profile. Try running\n\n"
                                 + "jiri v23-profile install "
-                                + "--target=${arch.goArch}-android${arch.profileVersion} android\n\n"
+                                + "--target=${arch.goArch}-android android\n\n"
                                 + "and then try building again"
                 )
             }
@@ -153,7 +151,7 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
     // Copy the shared library to its ultimate destination.
     def copyLib = task("copyVanadiumLib-${arch.goArch}", type: Copy, dependsOn: goBuild) {
         from jiriRoot + "/release/go/pkg/android_${arch.goArch}_shared_shared/v.io/x/jni"
-        into "src/main/resources/lib/${arch.abiName}"
+        into "src/main/jniLibs/${arch.abiName}"
         include 'main.a'
         rename 'main.a', 'libv23.so'
     }
@@ -167,7 +165,7 @@ VanadiumSupportedArchitecture.values().each { arch ->
 
 clean {
     VanadiumSupportedArchitecture.values().each() { arch ->
-        delete "src/main/resources/lib/${arch.abiName}/libv23.so"
+        delete "src/main/jniLibs/${arch.abiName}/libv23.so"
     }
 }
 
