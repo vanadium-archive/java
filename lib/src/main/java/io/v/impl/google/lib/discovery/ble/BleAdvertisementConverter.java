@@ -84,10 +84,10 @@ public class BleAdvertisementConverter {
     }
 
     /**
-     * Converts from Map of Characteristic UUIDs -> values to a {@link Advertisement}
+     * Converts from map of characteristic {@link UUID}s -> values to an {@link Advertisement}.
      *
-     * @param attr the map of characteristic uuids to their values
-     * @return the Vanadium Advertisement based on characteristics.
+     * @param bleAttr      map of characteristic uuids to their values
+     * @return             Vanadium advertisement based on characteristics
      * @throws IOException
      */
     public static Advertisement bleAttrToVAdvertisement(Map<UUID, byte[]> bleAttr)

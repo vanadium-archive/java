@@ -13,6 +13,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.Invoker;
+import io.v.v23.rpc.ReflectInvoker;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.rpc.ServiceObjectWithAuthorizer;
 import io.v.v23.rpc.StreamServerCall;
@@ -116,8 +117,9 @@ class ServerRPCHelper {
         if (obj == null) {
             throw new VException("Null service object returned by Java's dispatcher");
         }
+        Invoker invoker = obj instanceof Invoker ? (Invoker) obj : new ReflectInvoker(obj);
         Authorizer auth = result.getAuthorizer();
-        return new long[] { nativeGoInvoker(obj), auth == null ? 0 : nativeGoAuthorizer(auth) };
+        return new long[] { nativeGoInvoker(invoker), auth == null ? 0 : nativeGoAuthorizer(auth) };
     }
 
     private ServerRPCHelper() {}
