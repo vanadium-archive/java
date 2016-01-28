@@ -6,10 +6,11 @@ package io.v.rpcbench;
 
 import com.google.caliper.BeforeExperiment;
 import com.google.caliper.Benchmark;
-import com.google.caliper.Param;
 import com.google.caliper.runner.CaliperMain;
-import com.yourkit.api.Controller;
-
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import io.v.v23.InputChannelCallback;
+import io.v.v23.InputChannels;
 import io.v.v23.V;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class RpcBenchmark {
     VContext baseContext;
@@ -41,20 +41,19 @@ public class RpcBenchmark {
         baseContext = V.init();
         VContext serverContext = V.withNewServer(baseContext, "", new EchoServer() {
             @Override
-            public byte[] echo(VContext ctx, ServerCall call, byte[] payload) throws VException {
-                return payload;
+            public ListenableFuture<byte[]> echo(VContext ctx, ServerCall call, byte[] payload) {
+                return Futures.immediateFuture(payload);
             }
 
             @Override
-            public void echoStream(VContext ctx, ServerCall call, ServerStream<byte[], byte[]> stream) throws VException {
-                Iterator<byte[]> byteIterator = stream.iterator();
-                while (byteIterator.hasNext()) {
-                    byte[] payload = byteIterator.next();
-                    stream.send(payload);
-                }
-                if (stream.error() != null) {
-                    throw stream.error();
-                }
+            public ListenableFuture<Void> echoStream(VContext ctx, ServerCall call, final ServerStream<byte[],
+                    byte[]> stream) {
+                return InputChannels.withCallback(stream, new InputChannelCallback<byte[]>() {
+                    @Override
+                    public ListenableFuture<Void> onNext(byte[] result) {
+                        return stream.send(result);
+                    }
+                });
             }
         }, VSecurity.newAllowEveryoneAuthorizer());
         echoServer = V.getServer(serverContext);
@@ -68,12 +67,7 @@ public class RpcBenchmark {
 
     @Benchmark
     public void echoBenchmark1B(int nreps) throws Exception {
-        callEcho(baseContext, echoClient, 100, 1);
-        Controller c = new Controller();
-        c.startCPUTracing(null);
-        callEcho(baseContext, echoClient, 100, 1);
-        c.stopCPUProfiling();
-        System.out.println(c.capturePerformanceSnapshot());
+        callEcho(baseContext, echoClient, nreps, 1);
     }
 
     @Benchmark
