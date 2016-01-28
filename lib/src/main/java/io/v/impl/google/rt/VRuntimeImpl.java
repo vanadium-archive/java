@@ -202,7 +202,7 @@ public class VRuntimeImpl implements VRuntime {
 
     private static Duration lameDuckTimeoutFromOptions(Options opts) {
         if (!opts.has(OptionDefs.SERVER_LAME_DUCK_TIMEOUT)) {
-            return Duration.standardSeconds(5);
+            return Duration.standardSeconds(0);
         }
         Object timeout = opts.get(OptionDefs.SERVER_LAME_DUCK_TIMEOUT);
         if (!(timeout instanceof Duration)) {

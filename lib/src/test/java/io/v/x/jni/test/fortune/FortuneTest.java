@@ -5,12 +5,15 @@
 package io.v.x.jni.test.fortune;
 
 import com.google.common.reflect.TypeToken;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import io.v.v23.InputChannels;
+import io.v.v23.OptionDefs;
+import io.v.v23.Options;
 import io.v.v23.V;
 import io.v.v23.V23TestUtil;
 import io.v.v23.context.VContext;
@@ -51,6 +54,14 @@ public class FortuneTest extends TestCase {
 
     private VContext ctx;
 
+    private static String name(VContext ctx) {
+        Server s = V.getServer(ctx);
+        if (s == null) {
+            return "";
+        }
+        return "/" + s.getStatus().getEndpoints()[0];
+    }
+
     @Override
     protected void setUp() throws Exception {
         ctx = V.init();
@@ -63,18 +74,10 @@ public class FortuneTest extends TestCase {
         ctx.cancel();
     }
 
-    private String name() {
-        Server s = V.getServer(ctx);
-        if (s == null) {
-            return "";
-        }
-        return "/" + s.getStatus().getEndpoints()[0];
-    }
-
     public void testFortune() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             sync(client.get(ctxT));
@@ -91,11 +94,11 @@ public class FortuneTest extends TestCase {
 
     public void testFortuneWithCancel() throws Exception {
         CountDownLatch callLatch = new CountDownLatch(1);
-        FortuneServer server = new FortuneServerImpl(callLatch);
+        FortuneServer server = new FortuneServerImpl(callLatch, null);
         ctx = V.withNewServer(ctx, "", server, null);
         VContext ctxC = ctx.withCancel();
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         sync(client.add(ctxT, "Hello world"));
         ListenableFuture<String> result = client.get(ctxC);
@@ -118,7 +121,7 @@ public class FortuneTest extends TestCase {
         ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         V23TestUtil.assertRunsOnThread(client.add(ctxT, firstMessage), executorThread);
@@ -131,17 +134,106 @@ public class FortuneTest extends TestCase {
         ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String serverThreadName = sync(client.getServerThread(ctxT));
         assertThat(serverThreadName).isEqualTo(executorThread.toString());
     }
 
+
+    public void testLameDuck() throws Exception {
+        CountDownLatch clientLatch = new CountDownLatch(1);
+        CountDownLatch serverLatch = new CountDownLatch(1);
+        FortuneServer server = new FortuneServerImpl(clientLatch, serverLatch);
+        Options opts = new Options();
+        opts.set(OptionDefs.SERVER_LAME_DUCK_TIMEOUT, Duration.standardSeconds(20));
+        VContext serverCtx = ctx.withCancel();
+        // Set a single-thread executor so that only one get() request is processed at-a-time.
+        serverCtx = V.withExecutor(serverCtx, Executors.newSingleThreadExecutor());
+        serverCtx = V.withNewServer(serverCtx, "", server, null, opts);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(serverCtx));
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        String firstMessage = "The only fortune";
+        sync(client.add(ctxT, firstMessage));
+        final SettableFuture<String> future1 = SettableFuture.create();
+        final SettableFuture<String> future2 = SettableFuture.create();
+        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
+            @Override
+            public void onSuccess(String fortune) {
+                future1.set(fortune);
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                future1.setException(t);
+            }
+        });
+        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
+            @Override
+            public void onSuccess(String fortune) {
+                future2.set(fortune);
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                future2.setException(t);
+            }
+        });
+        if (!serverLatch.await(20, TimeUnit.SECONDS)) {
+            fail("server get() method never invoked");
+        }
+        serverCtx.cancel();
+        clientLatch.countDown();
+        assertThat(sync(future1)).isEqualTo(firstMessage);
+        assertThat(sync(future2)).isEqualTo(firstMessage);
+        try {
+            ctxT = ctx.withTimeout(new Duration(1000));  // 1s
+            sync(client.get(ctxT));
+            fail("get() that starts after server context cancel should fail");
+        } catch (CanceledException e) {
+            // OK
+        }
+    }
+
+    public void testNoLameDuck() throws Exception {
+        CountDownLatch clientLatch = new CountDownLatch(1);
+        CountDownLatch serverLatch = new CountDownLatch(1);
+        FortuneServer server = new FortuneServerImpl(clientLatch, serverLatch);
+        VContext serverCtx = ctx.withCancel();
+        // Set a single-thread executor so that only one get() request is processed at-a-time.
+        serverCtx = V.withExecutor(serverCtx, Executors.newSingleThreadExecutor());
+        serverCtx = V.withNewServer(serverCtx, "", server, null);
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(serverCtx));
+        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+        String firstMessage = "The only fortune";
+        sync(client.add(ctxT, firstMessage));
+        final SettableFuture<String> future = SettableFuture.create();
+        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
+            @Override
+            public void onSuccess(String fortune) {
+                future.set(fortune);
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                future.setException(t);
+            }
+        });
+        if (!serverLatch.await(20, TimeUnit.SECONDS)) {
+            fail("server get() method never invoked");
+        }
+        serverCtx.cancel();
+        clientLatch.countDown();
+        try {
+            sync(future);
+            fail("get() in progress during server context cancel should fail");
+        } catch (VException e) {
+            // OK
+        }
+    }
+
     public void testStreaming() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
-        VContext ctxT = ctx.withTimeout(new Duration(2000000));  // 20s
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
+        VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
         sync(client.add(ctxT, msg));
@@ -160,7 +252,7 @@ public class FortuneTest extends TestCase {
         ctx = V.withExecutor(ctx, new DelayedExecutor(executor, 100));
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
@@ -178,7 +270,7 @@ public class FortuneTest extends TestCase {
     public void testStreamingWithCancel() throws Exception {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, Integer> stream = client.streamingGet(ctxT);
         String msg = "The only fortune";
@@ -203,7 +295,7 @@ public class FortuneTest extends TestCase {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         sync(client.add(ctxT, firstMessage));
@@ -217,7 +309,7 @@ public class FortuneTest extends TestCase {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000));  // 20s
         ClientStream<Boolean, String, FortuneClient.MultipleStreamingGetOut> stream =
                 client.multipleStreamingGet(ctxT);
@@ -237,7 +329,7 @@ public class FortuneTest extends TestCase {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             sync(client.getComplexError(ctxT));
@@ -254,7 +346,7 @@ public class FortuneTest extends TestCase {
         FortuneServer server = new FortuneServerImpl();
         ctx = V.withNewServer(ctx, "", server, null);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         try {
             sync(client.testServerCall(ctxT));
@@ -277,7 +369,7 @@ public class FortuneTest extends TestCase {
         Client c = V.getClient(ctx);
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         ClientCall call = sync(
-                c.startCall(ctxT, name(), "__Signature", new Object[0], new Type[0]));
+                c.startCall(ctxT, name(ctx), "__Signature", new Object[0], new Type[0]));
         Object[] results = sync(
                 call.finish(new Type[]{new TypeToken<Interface[]>() {
                 }.getType()}));
@@ -292,18 +384,18 @@ public class FortuneTest extends TestCase {
         ctx = V.withNewServer(ctx, "", server, null);
 
         List<GlobReply> globResult = sync(InputChannels.asList(
-                V.getNamespace(ctx).glob(ctx, name() + "/*")));
+                V.getNamespace(ctx).glob(ctx, name(ctx) + "/*")));
         assertThat(globResult).hasSize(2);
         assertThat(globResult.get(0)).isInstanceOf(GlobReply.Entry.class);
         assertThat(((GlobReply.Entry) globResult.get(0)).getElem().getName())
-                .isEqualTo(name() + "/helloworld");
+                .isEqualTo(name(ctx) + "/helloworld");
         assertThat(globResult.get(1)).isInstanceOf(GlobReply.Error.class);
     }
 
     public void testCustomInvoker() throws Exception {
         ctx = V.withNewServer(ctx, "", new TestInvoker(), null);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(sync(client.get(ctxT))).isEqualTo(TEST_INVOKER_FORTUNE);
     }
@@ -318,7 +410,7 @@ public class FortuneTest extends TestCase {
         };
         ctx = V.withNewServer(ctx, "", dispatcher);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         String firstMessage = "First fortune";
         sync(client.add(ctxT, firstMessage));
@@ -334,7 +426,7 @@ public class FortuneTest extends TestCase {
         };
         ctx = V.withNewServer(ctx, "", dispatcher);
 
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name());
+        FortuneClient client = FortuneClientFactory.getFortuneClient(name(ctx));
         VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
         assertThat(sync(client.get(ctxT))).isEqualTo(TEST_INVOKER_FORTUNE);
     }
