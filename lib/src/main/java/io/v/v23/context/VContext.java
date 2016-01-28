@@ -117,11 +117,11 @@ public class VContext {
     private native boolean nativeIsCanceled(long nativePtr);
     private native DateTime nativeDeadline(long nativePtr) throws VException;
     private native void nativeOnDone(long nativePtr, Callback<DoneReason> callback);
-    private native Object nativeValue(long nativePtr, Object key) throws VException;
+    private native Object nativeValue(long nativePtr, String keySign) throws VException;
     private native VContext nativeWithCancel(long nativePtr) throws VException;
     private native VContext nativeWithDeadline(long nativePtr, DateTime deadline) throws VException;
     private native VContext nativeWithTimeout(long nativePtr, Duration timeout) throws VException;
-    private native VContext nativeWithValue(long nativePtr, long nativeCancelPtr, Object key, Object value)
+    private native VContext nativeWithValue(long nativePtr, long nativeCancelPtr, String keySign, Object value)
             throws VException;
     private native void nativeFinalize(long nativePtr, long nativeCancelPtr);
 
@@ -194,7 +194,7 @@ public class VContext {
      */
     public Object value(Object key) {
         try {
-            return nativeValue(nativePtr, key);
+            return nativeValue(nativePtr, keySignature(key));
         } catch (VException e) {
             throw new RuntimeException("Couldn't get value: ", e);
         }
@@ -278,10 +278,17 @@ public class VContext {
      */
     public VContext withValue(Object key, Object value) {
         try {
-            return nativeWithValue(nativePtr, nativeCancelPtr, key, value);
+            return nativeWithValue(nativePtr, nativeCancelPtr, keySignature(key), value);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create context with data:", e);
         }
+    }
+
+    private static String keySignature(Object key) {
+        if (key == null) {
+            return "";
+        }
+        return key.getClass().getName() + ":" + key.hashCode();
     }
 
     private long nativePtr() {
