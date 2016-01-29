@@ -20,7 +20,7 @@ import java8.util.stream.StreamSupport;
 import static org.junit.Assert.fail;
 
 public abstract class RxTestCase {
-    public static final long BLOCKING_DELAY_MS = 250;
+    public static final long BLOCKING_DELAY_MS = 375;
 
     public static long verificationDelay(final Duration nominal) {
         return 2 * nominal.getMillis();
