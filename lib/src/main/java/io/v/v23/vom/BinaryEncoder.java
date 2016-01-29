@@ -61,7 +61,7 @@ public class BinaryEncoder {
     private List<Long> typeIds;
 
     public BinaryEncoder(OutputStream out) {
-        this(out, Version.DefaultVersion);
+        this(out, Version.DEFAULT_VERSION);
     }
 
     public BinaryEncoder(OutputStream out, Version version) {
@@ -84,7 +84,7 @@ public class BinaryEncoder {
     public void encodeValue(VdlType type, Object value) throws IOException {
         if (!binaryMagicByteWritten) {
             binaryMagicByteWritten = true;
-            out.write(version.AsByte());
+            out.write(version.asByte());
         }
         valueBuffer.reset();
         typeIds = new ArrayList<Long>();

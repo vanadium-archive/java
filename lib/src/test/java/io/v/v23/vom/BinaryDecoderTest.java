@@ -80,7 +80,7 @@ public class BinaryDecoderTest extends TestCase {
 
     public void testDecodeVdlArray() throws Exception {
         VdlArray<Byte> v = new VdlArray<Byte>(Types.arrayOf(4, Types.BYTE), new Byte[]{1, 2, 3, 4});
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DEFAULT_VERSION, v));
         Object decoded = TestUtil.decode(encoded, VdlValue.class);
         assertNotNull(decoded);
     }
@@ -102,7 +102,7 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DEFAULT_VERSION, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         if (!v.deepEquals(decoded)) {
             fail(String.format("Expected error %s, got %s", v, decoded));
@@ -122,7 +122,7 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeVExceptionBadParams",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DEFAULT_VERSION, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         VException expected = new VException(id, "en", "test", "test");
         if (!expected.deepEquals(decoded)) {
@@ -147,20 +147,20 @@ public class BinaryDecoderTest extends TestCase {
                 "io.v.v23.vom.BinaryDecoderTest.testDecodeEncodeVException",
                 VException.ActionCode.NO_RETRY, "{1} {2} {_}");
         VException v = new VException(id, "en", "test", "test", params, paramTypes);
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, VException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DEFAULT_VERSION, VException.class, v));
         Object decoded = TestUtil.decode(encoded);
         if (!(decoded instanceof VException)) {
             fail(String.format("Decoded into %s, wanted %s", decoded.getClass(), VException.class));
         }
         VException decodedV = (VException) decoded;
         byte[] reEncoded = TestUtil.hexStringToBytes(
-                TestUtil.encode(Version.DefaultVersion, VException.class, decodedV));
+                TestUtil.encode(Version.DEFAULT_VERSION, VException.class, decodedV));
         assertEquals(Arrays.toString(encoded), Arrays.toString(reEncoded));
     }
 
     public void testDecodeSubVException() throws Exception {
         SubVException v = new SubVException();
-        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DefaultVersion, SubVException.class, v));
+        byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(Version.DEFAULT_VERSION, SubVException.class, v));
         Object decoded = TestUtil.decode(encoded);
         VException expected = new SubVException();
         assertThat(decoded).isInstanceOf(SubVException.class);
@@ -191,13 +191,13 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeEncodeTime() throws Exception {
-        Version version = Version.DefaultVersion;
+        Version version = Version.DEFAULT_VERSION;
         assertDecodeEncode(new DateTime(2015, 2, 18, 20, 34, 35, 997, DateTimeZone.UTC), version);
         assertDecodeEncode(new Duration(239017), version);
     }
 
     public void testDecodeEncodeJavaObject() throws Exception {
-        Version version = Version.DefaultVersion;
+        Version version = Version.DEFAULT_VERSION;
         assertDecodeEncode(new JavaObject(
                 5, "boo", ImmutableList.of(new JavaObject(7, "foo", null))), version);
     }

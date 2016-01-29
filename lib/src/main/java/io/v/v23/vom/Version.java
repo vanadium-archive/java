@@ -14,19 +14,19 @@ public enum Version {
 
     private byte versionByte;
 
-    public byte AsByte() {
+    public byte asByte() {
         return versionByte;
     }
 
-    public static Version FromByte(byte b) {
+    public static Version fromByte(byte b) {
         for (Version v : Version.values()) {
-            if (v.AsByte() == b) {
+            if (v.asByte() == b) {
                 return v;
             }
         }
         throw new RuntimeException("invalid version byte " + b);
     }
 
-    public static Version DefaultVersion = Version80;
+    public static Version DEFAULT_VERSION = Version80;
 
 }

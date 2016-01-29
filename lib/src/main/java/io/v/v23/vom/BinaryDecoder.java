@@ -67,7 +67,7 @@ public class BinaryDecoder {
      */
     public Object decodeValue(Type targetType) throws IOException, ConversionException {
         if (!binaryMagicByteRead) {
-            version = Version.FromByte((byte)in.read());
+            version = Version.fromByte((byte)in.read());
             binaryMagicByteRead = true;
         }
         VdlType actualType = decodeType();
