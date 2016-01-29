@@ -85,8 +85,8 @@ public class BinaryEncoderTest extends TestCase {
 
     public void testZeroValue() throws Exception {
         for (Map.Entry<VdlType, Object> entry : zeroValues.entrySet()) {
-            assertEquals(TestUtil.encode(Version.DefaultVersion, entry.getKey(), entry.getValue()),
-                    TestUtil.encode(Version.DefaultVersion, entry.getKey(), null));
+            assertEquals(TestUtil.encode(Version.DEFAULT_VERSION, entry.getKey(), entry.getValue()),
+                    TestUtil.encode(Version.DEFAULT_VERSION, entry.getKey(), null));
         }
     }
 }

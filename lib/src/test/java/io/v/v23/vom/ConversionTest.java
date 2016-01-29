@@ -47,7 +47,7 @@ public class ConversionTest extends TestCase {
     }
 
     public void testConversion() throws Exception {
-        Version version = Version.DefaultVersion;
+        Version version = Version.DEFAULT_VERSION;
         for (Map.Entry<VdlValue, Type> test : tests.entries()) {
             final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(version, test.getKey()));
             final Object decoded = TestUtil.decode(encoded, test.getValue());
