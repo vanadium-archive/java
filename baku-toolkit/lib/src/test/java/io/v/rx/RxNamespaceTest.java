@@ -145,7 +145,7 @@ public class RxNamespaceTest extends RxTestCase {
     @Test
     public void testUnsubscribeOnUnmount() throws InterruptedException {
         mountWithOldStatus();
-        Thread.sleep(BLOCKING_DELAY_MS);
+        Thread.sleep(DIAGNOSTIC_DELAY_MS);
         assertNoAsyncErrors();
 
         mSubscriber.mayComplete = true;

@@ -186,7 +186,6 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
             // https://github.com/ReactiveX/RxJava/pull/3167
             // This should be fixed in the next version of RxJava.
         }
-        Thread.sleep(BLOCKING_DELAY_MS);
         statusPolls.set(0);
         Thread.sleep(STATUS_POLLING_DELAY_MS);
         assertEquals("Polling should stop after Syncgroup join is unsubscribed",

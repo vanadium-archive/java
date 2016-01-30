@@ -18,14 +18,14 @@ import rx.subjects.ReplaySubject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class SyncbaseBindingTerminiTest extends RxTestCase {
     @Test
-    public void testSequencing() throws Exception {
+    public void testSequencing() {
         final ReplaySubject<Table> mockTables = ReplaySubject.createWithSize(1);
         final RxTable rxTable = mock(RxTable.class);
         when(rxTable.getObservable()).thenReturn(mockTables);
@@ -38,45 +38,36 @@ public class SyncbaseBindingTerminiTest extends RxTestCase {
                 this::catchAsync);
 
         rxData.onNext(1);
-        Thread.sleep(BLOCKING_DELAY_MS);
-
         rxData.onNext(2);
-        Thread.sleep(BLOCKING_DELAY_MS);
 
         final Table t1 = mock(Table.class);
         when(t1.put(any(), any(), any(), any())).thenReturn(Futures.immediateFuture(null));
 
         mockTables.onNext(t1);
-        Thread.sleep(BLOCKING_DELAY_MS);
-        verify(t1).put(null, key, 2, Integer.class);
+        verify(t1, never()).put(null, key, 1, Integer.class);
+        verify(t1, timeout(BLOCKING_DELAY_MS) ).put(null, key, 2, Integer.class);
 
         rxData.onNext(3);
-        Thread.sleep(BLOCKING_DELAY_MS);
-        verify(t1).put(null, key, 3, Integer.class);
-
-        verifyNoMoreInteractions(t1);
+        verify(t1, timeout(BLOCKING_DELAY_MS)).put(null, key, 3, Integer.class);
 
         final Table t2 = mock(Table.class);
         final SettableFuture<Void> putComplete = SettableFuture.create();
         when(t2.put(any(), any(), any(), any())).thenReturn(putComplete);
 
         mockTables.onNext(t2);
-        Thread.sleep(BLOCKING_DELAY_MS);
-        verifyZeroInteractions(t2);
 
         rxData.onNext(4);
-        Thread.sleep(BLOCKING_DELAY_MS);
-        verify(t2).put(null, key, 4, Integer.class);
+        verify(t2, timeout(BLOCKING_DELAY_MS)).put(null, key, 4, Integer.class);
 
         rxData.onNext(5);
-        Thread.sleep(BLOCKING_DELAY_MS);
 
         rxData.onNext(6);
-        Thread.sleep(BLOCKING_DELAY_MS);
         putComplete.set(null);
-        Thread.sleep(BLOCKING_DELAY_MS);
 
         verify(t2, never()).put(null, key, 5, Integer.class);
-        verify(t2).put(null, key, 6, Integer.class);
+        verify(t2, timeout(BLOCKING_DELAY_MS)).put(null, key, 6, Integer.class);
+
+        verifyNoMoreInteractions(t1);
+        verifyNoMoreInteractions(t2);
     }
 }
