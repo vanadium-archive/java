@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import io.v.android.impl.google.services.blessing.BlessingActivity;
 import io.v.android.v23.V;
+import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Constants;
@@ -68,6 +69,7 @@ public class BlessingsManager extends Fragment {
      * <p>
      * This method must be invoked on the UI thread.
      *
+     * @param context      Vanadium context
      * @param activity     android {@link Activity} requesting blessings
      * @param key          a key under which the blessings are stored
      * @param setAsDefault if true, the returned {@link Blessings} will be set as default
@@ -75,34 +77,56 @@ public class BlessingsManager extends Fragment {
      * @return             a new {@link ListenableFuture} whose result are the blessings
      *                     persisted under the given key
      */
-    public static ListenableFuture<Blessings> getBlessings(VContext ctx,
+    public static ListenableFuture<Blessings> getBlessings(VContext context,
             final Activity activity, String key, boolean setAsDefault) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             return Futures.immediateFailedFuture(new VException("getBlessings() must be invoked " +
                     "on the UI thread"));
         }
         try {
-            Blessings blessings = readBlessings(activity, key);
+            Blessings blessings = readBlessings(context, activity, key, setAsDefault);
             if (blessings != null) {
-                // TODO(spetrovic): validate the blessings and mint if they aren't valid.
-                ListenableFuture<Blessings> ret = Futures.immediateFuture(blessings);
-                return setAsDefault ? wrapWithSetAsDefault(ctx, activity, ret) : ret;
+                return Futures.immediateFuture(blessings);
             }
         } catch (VException e) {
             Log.e(TAG, "Malformed blessings in SharedPreferences. Minting new blessings: " +
                     e.getMessage());
         }
-        return mintBlessings(ctx, activity, key, setAsDefault);
+        return mintBlessings(context, activity, key, setAsDefault);
     }
 
     /**
-     * A shortcut for {@link #mintBlessings(VContext, Activity, String, String, boolean)}} with
-     * empty Google account, causing the user to be prompted to pick one of the installed Google
-     * accounts (if there is more than one installed).
+     * Returns {@link Blessings} found in {@link SharedPreferences} under the given key.
+     * <p>
+     * Unlike {@link #getBlessings}, if no {@link Blessings} are found this method won't mint a new
+     * set of {@link Blessings}; instead, {@code null} value is returned.
+     *
+     * @param context         Vanadium context
+     * @param androidContext  android {@link Context} requesting blessings
+     * @param key             a key under which the blessings are stored
+     * @param setAsDefault    if true, the returned {@link Blessings}, if non-{@code null}, will be
+     *                        set as default blessings for the app
+     * @return                {@link Blessings} found in {@link SharedPreferences} under the given
+     *                        key or {@code null} if no blessings are found
+     * @throws VException     if the blessings are found in {@link SharedPreferences} but they
+     *                        are invalid
      */
-    public static ListenableFuture<Blessings> mintBlessings(VContext ctx,
-            Activity activity, final String key, boolean setAsDefault) {
-        return mintBlessings(ctx, activity, key, "", setAsDefault);
+    public static Blessings readBlessings(VContext context, Context androidContext, String key,
+                                          boolean setAsDefault) throws VException {
+        String blessingsVom =
+                PreferenceManager.getDefaultSharedPreferences(androidContext).getString(key, "");
+        if (blessingsVom == null || blessingsVom.isEmpty()) {
+            return null;
+        }
+        Blessings blessings = (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
+        if (blessings == null) {
+            throw new VException("Couldn't decode blessings: got null blessings");
+        }
+        // TODO(spetrovic): validate the blessings and fail if they aren't valid
+        return setAsDefault ?
+                VFutures.sync(wrapWithSetAsDefault(
+                    context, androidContext, Futures.immediateFuture(blessings)))
+                : blessings;
     }
 
     /**
@@ -155,6 +179,16 @@ public class BlessingsManager extends Fragment {
         transaction.add(fragment, UUID.randomUUID().toString());
         transaction.commit();  // this will invoke the fragment's onCreate() immediately.
         return setAsDefault ? wrapWithSetAsDefault(ctx, activity, mintFuture) : mintFuture;
+    }
+
+    /**
+     * A shortcut for {@link #mintBlessings(VContext, Activity, String, String, boolean)}} with
+     * empty Google account, causing the user to be prompted to pick one of the installed Google
+     * accounts (if there is more than one installed).
+     */
+    public static ListenableFuture<Blessings> mintBlessings(
+            VContext ctx, Activity activity, final String key, boolean setAsDefault) {
+        return mintBlessings(ctx, activity, key, "", setAsDefault);
     }
 
     public BlessingsManager() {}
@@ -233,16 +267,6 @@ public class BlessingsManager extends Fragment {
         transaction.remove(this);
         transaction.commit();
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private static Blessings readBlessings(Context context, String prefKey)
-            throws VException {
-        String blessingsVom =
-                PreferenceManager.getDefaultSharedPreferences(context).getString(prefKey, "");
-        if (blessingsVom == null || blessingsVom.isEmpty()) {
-            return null;
-        }
-        return (Blessings) VomUtil.decodeFromString(blessingsVom, Blessings.class);
     }
 
     private static ListenableFuture<Blessings> wrapWithSetAsDefault(final VContext ctx,
