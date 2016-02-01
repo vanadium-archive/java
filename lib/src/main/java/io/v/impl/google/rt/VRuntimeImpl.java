@@ -56,7 +56,7 @@ public class VRuntimeImpl implements VRuntime {
             throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
 
-    private static native VDiscovery nativeGetDiscovery(VContext ctx) throws VException;
+    private static native VDiscovery nativeNewDiscovery(VContext ctx) throws VException;
 
     // Attaches a server to the given context.  Used by this class and other classes
     // that natively create a server.
@@ -161,12 +161,8 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public VDiscovery getDiscovery(VContext ctx) {
-        try {
-            return nativeGetDiscovery(ctx);
-        } catch (VException e) {
-            throw new RuntimeException("Couldn't get discovery: ", e);
-        }
+    public VDiscovery newDiscovery(VContext ctx) throws VException {
+        return nativeNewDiscovery(ctx);
     }
     @Override
     public VContext getContext() {
