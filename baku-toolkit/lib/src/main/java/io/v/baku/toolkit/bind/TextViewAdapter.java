@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
-public class TextViewAdapter<T> extends AbstractViewAdapter<T, TextViewAdapter.ViewHolder> {
+public class TextViewAdapter extends AbstractViewAdapter<Object, TextViewAdapter.ViewHolder> {
     @Accessors(prefix = "m")
     @Getter
     @RequiredArgsConstructor
@@ -87,7 +87,8 @@ public class TextViewAdapter<T> extends AbstractViewAdapter<T, TextViewAdapter.V
     }
 
     @Override
-    public void bindViewHolder(final ViewHolder viewHolder, final int position, final T value) {
+    public void bindViewHolder(final ViewHolder viewHolder, final int position,
+                               final Object value) {
         viewHolder.setText(format(position, value));
     }
 
@@ -96,7 +97,7 @@ public class TextViewAdapter<T> extends AbstractViewAdapter<T, TextViewAdapter.V
      * or stringizes otherwise. We avoid agnostic stringization to preserve any Android formatting
      * that might be present, like with {@link android.text.SpannableString}.
      */
-    protected CharSequence format(final int position, final T value) {
+    protected CharSequence format(final int position, final Object value) {
         return value instanceof CharSequence ? (CharSequence) value : Objects.toString(value);
     }
 }

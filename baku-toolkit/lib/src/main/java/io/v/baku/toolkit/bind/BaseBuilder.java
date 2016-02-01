@@ -6,10 +6,10 @@ package io.v.baku.toolkit.bind;
 
 
 import android.app.Activity;
-import android.support.annotation.IdRes;
-import android.view.View;
 
 import io.v.baku.toolkit.BakuActivityTrait;
+import io.v.baku.toolkit.ErrorReporters;
+import io.v.baku.toolkit.VAndroidContextTrait;
 import io.v.rx.syncbase.RxTable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,13 @@ import rx.subscriptions.CompositeSubscription;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public abstract class BaseBuilder<T extends BaseBuilder<T>> {
+    @SuppressWarnings("unchecked")
+    protected final T mSelf = (T)this;
+
     protected Activity mActivity;
     protected RxTable mRxTable;
     protected CompositeSubscription mSubscriptionParent;
     protected Action1<Throwable> mOnError;
-
-    @SuppressWarnings("unchecked")
-    protected final T mSelf = (T)this;
-
 
     public T activity(final Activity activity) {
         mActivity = activity;
@@ -38,11 +37,32 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
         return mSelf;
     }
 
-    public T bakuActivity(final BakuActivityTrait<?> trait) {
+    /**
+     * Sets the following properties from the given {@link BakuActivityTrait}:
+     * <ul>
+     *     <li>{@link #activity(Activity)}</li>
+     *     <li>{@link #rxTable(RxTable)}</li>
+     *     <li>{@link #subscriptionParent(CompositeSubscription)}</li>
+     *     <li>{@link #onError(Action1)}</li>
+     * </ul>
+     */
+    public T activity(final BakuActivityTrait<?> trait) {
         return activity(trait.getVAndroidContextTrait().getAndroidContext())
                 .rxTable(trait.getSyncbaseTable())
                 .subscriptionParent(trait.getSubscriptions())
                 .onError(trait::onSyncError);
+    }
+
+    /**
+     * Sets the following properties from the given {@link VAndroidContextTrait}:
+     * <ul>
+     *     <li>{@link #activity(Activity)}</li>
+     *     <li>{@link #onError(Action1)}</li>
+     * </ul>
+     */
+    public T activity(final VAndroidContextTrait<? extends Activity> trait) {
+        return activity(trait.getAndroidContext())
+                .onError(ErrorReporters.getDefaultSyncErrorReporter(trait));
     }
 
     public T subscriptionParent(final CompositeSubscription subscriptionParent) {
@@ -65,11 +85,5 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
     public T onError(final Action1<Throwable> onError) {
         mOnError = onError;
         return mSelf;
-    }
-
-    public abstract T bindTo(final View view);
-
-    public T bindTo(final @IdRes int viewId) {
-        return bindTo(mActivity.findViewById(viewId));
     }
 }

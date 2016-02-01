@@ -12,7 +12,7 @@ import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * A default application of {@link VAndroidContextTrait} extending
+ * A default integration with {@link VAndroidContextTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
  */
 @Slf4j

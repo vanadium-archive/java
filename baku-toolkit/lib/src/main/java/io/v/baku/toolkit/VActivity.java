@@ -11,7 +11,7 @@ import android.os.PersistableBundle;
 import lombok.experimental.Delegate;
 
 /**
- * A default application of {@link VAndroidContextTrait} extending {@link Activity}.
+ * A default integration with {@link VAndroidContextTrait} extending {@link Activity}.
  */
 public abstract class VActivity extends Activity implements VAndroidContextTrait<Activity> {
     @Delegate

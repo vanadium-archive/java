@@ -8,51 +8,53 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.google.common.collect.Ordering;
-
-import java.util.Collection;
-
-import io.v.rx.syncbase.RangeWatchBatch;
-import io.v.rx.syncbase.RangeWatchEvent;
-import io.v.rx.syncbase.RxTable;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 @Accessors(prefix = "m")
-public class SyncbaseListAdapter<T> extends BaseAdapter implements RangeAdapter {
+public class SyncbaseListAdapter<T> extends BaseAdapter
+        implements RangeAdapter, ListAccumulator<T> {
+    private final ViewAdapter<? super T, ?> mViewAdapter;
     @Delegate
-    private final SyncbaseRangeAdapter<T> mAdapter;
-    private final ViewAdapter<? super RxTable.Row<T>, ?> mViewAdapter;
+    private ListAccumulator<T> mLatestState = ListAccumulators.empty();
+    @Getter
+    private final Subscription mSubscription;
 
-    public SyncbaseListAdapter(final Observable<RangeWatchBatch<T>> watch,
-                               final Ordering<? super RxTable.Row<T>> ordering,
-                               final ViewAdapter<? super RxTable.Row<T>, ?> viewAdapter,
+    public SyncbaseListAdapter(final Observable<? extends ListAccumulator<T>> data,
+                               final ViewAdapter<? super T, ?> viewAdapter,
                                final Action1<Throwable> onError) {
-        mAdapter = new SyncbaseRangeAdapter<T>(watch, ordering, onError) {
-            @Override
-            protected void processEvents(Collection<RangeWatchEvent<T>> rangeWatchEvents) {
-                super.processEvents(rangeWatchEvents);
-                notifyDataSetChanged();
-            }
-        };
         mViewAdapter = viewAdapter;
+        mSubscription = data
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(d -> {
+                    mLatestState = d;
+                    notifyDataSetChanged();
+                }, onError);
+    }
+
+    @Override
+    public void close() throws Exception {
+        mSubscription.unsubscribe();
     }
 
     @Override
     public View getView(final int position, View view, final ViewGroup parent) {
-        final RxTable.Row<T> entry = mAdapter.getRowAt(position);
+        final T row = mLatestState.getRowAt(position);
         if (view == null) {
             view = mViewAdapter.createView(parent);
         }
-        mViewAdapter.bindView(view, position, entry);
+        mViewAdapter.bindView(view, position, row);
         return view;
     }
 
     @Override
     public T getItem(int position) {
-        return mAdapter.getRowAt(position).getValue();
+        return getRowAt(position);
     }
 
     /**
