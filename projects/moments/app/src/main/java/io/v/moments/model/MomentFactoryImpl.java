@@ -95,7 +95,7 @@ public class MomentFactoryImpl implements MomentFactory {
                 p.getBoolean(km.get(F.ADVERTISING), false) ? AdState.ON : AdState.OFF);
     }
 
-    private class KeyMaker {
+    private static class KeyMaker {
         private final String mPrefix;
 
         KeyMaker(String prefix) {

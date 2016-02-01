@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.google.common.util.concurrent.FutureCallback;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +51,7 @@ import io.v.moments.model.FileUtil;
 import io.v.moments.model.MomentFactoryImpl;
 import io.v.moments.model.StateStore;
 import io.v.v23.context.VContext;
+import io.v.v23.security.Blessings;
 
 /**
  * This app allows the user to take photos and advertise them on the network.
@@ -137,17 +140,31 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         setContentView(R.layout.activity_main);
 
-        // This call might leave this activity to get a Vanadium blessing.
-        // On return, should trigger onActivityResult as expected.
-        mV23Manager.init(getApplicationContext(), this);
-
-        if (!mPermissionManager.haveAllPermissions()) {
-            Log.d(TAG, "Post v23 trying to get permissions");
-            mPermissionManager.obtainPermission();
-        }
+        // This will look in prefs for a Vanadium blessing, and if not
+        // found will leave this activity (onStop likely to be called) and
+        // return via a start intent (not via onActivityResult).
+        mV23Manager.init(this, onBlessings());
 
         wireUxToDataModel();
         initializeOrRestore(savedInstanceState);
+    }
+
+    private FutureCallback<Blessings> onBlessings() {
+        return new FutureCallback<Blessings>() {
+            @Override
+            public void onSuccess(Blessings b) {
+                Log.d(TAG, "Got blessings!");
+                if (!mPermissionManager.haveAllPermissions()) {
+                    Log.d(TAG, "Obtaining permissions");
+                    mPermissionManager.obtainPermission();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Failure to get blessings, nothing will work.", t);
+            }
+        };
     }
 
     /**
@@ -236,20 +253,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        logState("onResume");
-        if (mV23Manager.isBlessed()) {
-            if (mPermissionManager.haveAllPermissions()) {
-            } else {
-                if (!mPermissionManager.isRequestInProgress()) {
-                    mPermissionManager.obtainPermission();
-                }
-            }
-        }
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         logState("onPause");
@@ -274,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         startActivityForResult(intent, RequestCode.CAPTURE_IMAGE);
     }
-
 
     /**
      * On new permissions, assume it's a fresh install and wipe the working
@@ -334,13 +336,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     public void run() {
                         try {
                             mAdvertiserFactory.getOrMake(moment).advertiseStart();
-                            // This toast noisy if not debugging.
-                            // toast("Started advertising " + moment.getCaption());
                             Log.d(TAG, "Started advertising " + moment.getCaption());
-
                         } catch (Exception e) {
                             e.printStackTrace();
-                            toast("Had problem starting advertising.");
+                            toast("Unable to advertise - see log.");
                         }
                     }
                 });
@@ -350,6 +349,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         if (mShouldBeScanning && !isScanning()) {
             startScanning();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        logState("onResume");
     }
 
     @Override

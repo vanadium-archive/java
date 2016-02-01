@@ -6,6 +6,9 @@ package io.v.moments.model;
 
 import android.graphics.Bitmap;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,9 @@ import io.v.v23.verror.VException;
  * Handles the advertising of a moment.
  */
 public class AdvertiserImpl implements Advertiser {
+    static final String NO_MOUNT_NAME = "";
     private static final String TAG = "AdvertiserImpl";
     private static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
-    static final String NO_MOUNT_NAME = "";
     private final V23Manager mV23Manager;
     private final Moment mMoment;
 
@@ -64,7 +67,8 @@ public class AdvertiserImpl implements Advertiser {
             throw new IllegalStateException("Already advertising.");
         }
         try {
-            mServerCtx = mV23Manager.makeServer(NO_MOUNT_NAME, new MomentServer());
+            mServerCtx = mV23Manager.makeServerContext(
+                    NO_MOUNT_NAME, new MomentServer());
         } catch (VException e) {
             throw new IllegalStateException("Unable to start service.", e);
         }
@@ -113,13 +117,13 @@ public class AdvertiserImpl implements Advertiser {
         private byte[] mRawBytes = null;  // lazy init
         private byte[] mThumbBytes = null;  // lazy init
 
-        public MomentWireData getBasics(VContext ctx, ServerCall call)
-                throws VException {
+        public ListenableFuture<MomentWireData> getBasics(
+                VContext ctx, ServerCall call) {
             MomentWireData data = new MomentWireData();
             data.setAuthor(mMoment.getAuthor());
             data.setCaption(mMoment.getCaption());
             data.setCreationTime(mMoment.getCreationTime().getMillis());
-            return data;
+            return Futures.immediateFuture(data);
         }
 
         private byte[] makeBytes(Bitmap bitmap) {
@@ -142,14 +146,13 @@ public class AdvertiserImpl implements Advertiser {
             return mThumbBytes;
         }
 
-        public byte[] getThumbImage(VContext ctx, ServerCall call)
-                throws VException {
-            return getThumbBytes();
+        public ListenableFuture<byte[]> getThumbImage(
+                VContext ctx, ServerCall call) {
+            return Futures.immediateFuture(getThumbBytes());
         }
 
-        public byte[] getFullImage(VContext ctx, ServerCall call)
-                throws VException {
-            return getFullBytes();
+        public ListenableFuture<byte[]> getFullImage(VContext ctx, ServerCall call) {
+            return Futures.immediateFuture(getFullBytes());
         }
     }
 

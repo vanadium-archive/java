@@ -46,7 +46,6 @@ public class DiscoveredListTest {
     static final Thing THING0 = makeThing("hey0");
     static final Thing THING1 = makeThing("hey1");
     static final Id ID0 = THING0.getId();
-    static final Id ID1 = THING1.getId();
 
     @Rule
     public ExpectedException mThrown = ExpectedException.none();
@@ -55,22 +54,12 @@ public class DiscoveredListTest {
     ListObserver mObserver;
     @Mock
     AdConverter<Thing> mConverter;
-
-    final Set<Id> mRejectIds = new HashSet<>();
-
-    IdSet mRejects = new IdSet() {
-        @Override
-        public boolean contains(Id id) {
-            return mRejectIds.contains(id);
-        }
-    };
-
+    @Mock
+    IdSet mRejects;
     @Mock
     Handler mHandler;
-
-    io.v.v23.discovery.Service mAdvertisement =
-            new Service(UUID.randomUUID().toString(), "someInstance", "iface", new Attributes(),
-                    ImmutableList.<String>of(), new Attachments());
+    @Mock
+    io.v.v23.discovery.Service mAdvertisement;
 
     @Captor
     ArgumentCaptor<Runnable> mRunnable;
@@ -85,6 +74,9 @@ public class DiscoveredListTest {
     @Before
     public void setup() {
         mList = new DiscoveredList<>(mConverter, mRejects, mHandler);
+        // By default, ID0 is not rejected.
+        when(mRejects.contains(ID0)).thenReturn(false);
+        when(mAdvertisement.getInstanceId()).thenReturn(ID0.toString());
     }
 
     @Test
@@ -150,6 +142,9 @@ public class DiscoveredListTest {
         assertEquals(THING0, mList.get(0));
     }
 
+    /**
+     * Advertisements from others (not-self) should be handled/observed.
+     */
     @Test
     public void handleNormalFound() throws Exception {
         mList.setObserver(mObserver);
@@ -164,11 +159,14 @@ public class DiscoveredListTest {
         verify(mObserver).notifyItemInserted(0);
     }
 
+    /**
+     * Advertisements from self should not be handled/observed.
+     */
     @Test
     public void handleSelfFound() throws Exception {
         mList.setObserver(mObserver);
 
-        mRejectIds.add(ID0);
+        when(mRejects.contains(ID0)).thenReturn(true);
 
         mList.scanUpdateReceived(new Update.Found(new Found(mAdvertisement)));
 
@@ -177,6 +175,9 @@ public class DiscoveredListTest {
         assertEquals(0, mList.size());
     }
 
+    /**
+     * Do nothing upon loss of an unrecognized advertisement.
+     */
     @Test
     public void handleUnrecognizedLost() throws Exception {
         mList.setObserver(mObserver);
@@ -192,11 +193,15 @@ public class DiscoveredListTest {
         verifyZeroInteractions(mObserver);
     }
 
+    /**
+     * Do nothing upon loss of a self-advertisement.
+     */
     @Test
     public void handleSelfLost() throws Exception {
         mList.setObserver(mObserver);
 
-        mRejectIds.add(ID0);
+        when(mRejects.contains(ID0)).thenReturn(true);
+
         mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
 
         verify(mHandler).post(mRunnable.capture());
@@ -208,6 +213,9 @@ public class DiscoveredListTest {
         verifyZeroInteractions(mObserver);
     }
 
+    /**
+     * Handle the loss of a non-self advertisement.
+     */
     @Test
     public void handleNormalLost() throws Exception {
         mList.setObserver(mObserver);
@@ -215,9 +223,7 @@ public class DiscoveredListTest {
         verify(mObserver).notifyItemInserted(0);
         assertEquals(1, mList.size());
 
-        mList.scanUpdateReceived(new Update.Lost(new Lost(
-                new Service(THING0.getId().toString(), "foo", "bar", new Attributes(),
-                        ImmutableList.<String>of(), new Attachments()))));
+        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
 
         verify(mHandler).post(mRunnable.capture());
 

@@ -75,7 +75,7 @@ public class AdvertiserImplTest {
     public void setup() throws Exception {
         mAttrs = new Attributes(makeFakeAttributes());
 
-        when(mV23Manager.makeServer(
+        when(mV23Manager.makeServerContext(
                 eq(AdvertiserImpl.NO_MOUNT_NAME),
                 any(AdvertiserImpl.MomentServer.class))).thenReturn(mServerContext);
         when(mV23Manager.getServer(mServerContext)).thenReturn(mServer);

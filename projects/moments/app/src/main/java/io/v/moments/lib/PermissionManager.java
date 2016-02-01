@@ -39,7 +39,6 @@ public class PermissionManager {
     private final int mRequestCode;
     private final String[] mPerms;
     private final int mAndroidLevel;
-    private boolean mIsRequestInProgress;
 
     PermissionManager(int androidLevel, Activity activity, int requestCode, String[] perms) {
         mAndroidLevel = androidLevel;
@@ -50,13 +49,6 @@ public class PermissionManager {
 
     public PermissionManager(Activity activity, int requestCode, String[] perms) {
         this(Build.VERSION.SDK_INT, activity, requestCode, perms);
-    }
-
-    /**
-     * This helps to avoid stacking requests for permissions.
-     */
-    public synchronized boolean isRequestInProgress() {
-        return mIsRequestInProgress;
     }
 
     public boolean haveAllPermissions() {
@@ -76,16 +68,11 @@ public class PermissionManager {
         if (haveAllPermissions()) {
             return;
         }
-        if (mIsRequestInProgress) {
-            throw new IllegalStateException("Request in progress.");
-        }
-        mIsRequestInProgress = true;
         mActivity.requestPermissions(mPerms, mRequestCode);
     }
 
     public synchronized boolean granted(
             int requestCode, String[] permissions, int[] results) {
-        mIsRequestInProgress = false;
         if (requestCode != mRequestCode) {
             return false;
         }

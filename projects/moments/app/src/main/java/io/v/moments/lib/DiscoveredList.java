@@ -17,7 +17,7 @@ import io.v.v23.discovery.Update;
  * List that updates itself in response to found or lost advertisements.
  */
 public class DiscoveredList<T extends HasId> extends ObservedList<T> implements ScanListener {
-    private final String TAG = "DiscoveredList";
+    private static final String TAG = "DiscoveredList";
 
     private final Handler mHandler;
 

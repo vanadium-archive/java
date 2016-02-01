@@ -4,7 +4,7 @@
 
 package io.v.moments.lib;
 
-import java.util.UUID;
+import java.util.Random;
 
 /**
  * Consolidates different id styles under one type.
@@ -12,18 +12,21 @@ import java.util.UUID;
  * Discovery demands strings, android RecyclerView demands longs.
  */
 public class Id implements Comparable<Id> {
-    private UUID mId;
+    private Long mId;
+    private static final Random RANDOM = new Random();
 
-    private Id(UUID id) {
+    private Id(Long id) {
         mId = id;
     }
 
     public static Id makeRandom() {
-        return new Id(UUID.randomUUID());
+        long lng = RANDOM.nextLong();
+        // Keep it positive to assure roundtrip to string works simply.
+        return new Id(lng < 0 ? -lng : lng);
     }
 
     public static Id fromString(String id) {
-        return new Id(UUID.fromString(id));
+        return new Id(Long.parseLong(id, 16));
     }
 
     public boolean equals(Object obj) {
@@ -38,11 +41,11 @@ public class Id implements Comparable<Id> {
     }
 
     public String toString() {
-        return mId.toString();
+        return Long.toHexString(mId);
     }
 
     public Long toLong() {
-        return mId.getLeastSignificantBits();
+        return mId;
     }
 
     @Override

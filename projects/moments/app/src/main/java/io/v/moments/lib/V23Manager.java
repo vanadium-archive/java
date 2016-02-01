@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -35,13 +36,10 @@ import io.v.v23.verror.VException;
  * Various static V23 utilities gathered in an injectable class.
  */
 public class V23Manager {
-    private static final String BLESSINGS_KEY = "BlessingsKey";
-
-    public static final int BLESSING_REQUEST = 201;
     private static final String TAG = "V23Manager";
+    private static final String BLESSINGS_KEY = "BlessingsKey";
     private Context mAndroidCtx;
     private VContext mV23Ctx = null;
-    private Blessings mBlessings = null;
 
     // Singleton.
     private V23Manager() {
@@ -51,17 +49,46 @@ public class V23Manager {
         return V.getDiscovery(mV23Ctx);
     }
 
-    public VContext advertise(Service service, List<BlessingPattern> patterns) {
+    public VContext advertise(final Service service, List<BlessingPattern> patterns) {
         VContext context = mV23Ctx.withCancel();
-        Log.d(TAG, "Calling V.getDiscovery.advertise");
-        V.getDiscovery(mV23Ctx).advertise(context, service, patterns);
+        final ListenableFuture<ListenableFuture<Void>> fStart =
+                V.getDiscovery(mV23Ctx).advertise(context, service, patterns);
+        Futures.addCallback(fStart, new FutureCallback<ListenableFuture<Void>>() {
+            @Override
+            public void onSuccess(ListenableFuture<Void> result) {
+                Log.d(TAG, "Started advertising with ID = " +
+                        service.getInstanceId());
+                Futures.addCallback(
+                        result, new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                Log.d(TAG, "Stopped advertising.");
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                if (!(t instanceof  java.util.concurrent.CancellationException)) {
+                                    Log.d(TAG, "Failure to gracefully stop advertising.", t);
+                                }
+                            }
+                        }
+                );
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Failure to start advertising.", t);
+            }
+        });
         Log.d(TAG, "Back from V.getDiscovery.advertise");
         return context;
     }
 
     public VContext scan(String query, final ScanListener listener) {
         VContext context = mV23Ctx.withCancel();
-        InputChannels.withCallback(V.getDiscovery(mV23Ctx).scan(context, query),
+        Log.d(TAG, "Calling V.getDiscovery.scan with q=" + query);
+        final ListenableFuture<Void> fStart =
+            InputChannels.withCallback(V.getDiscovery(mV23Ctx).scan(context, query),
                 new InputChannelCallback<Update>() {
                     @Override
                     public ListenableFuture<Void> onNext(Update result) {
@@ -69,48 +96,39 @@ public class V23Manager {
                         return Futures.immediateFuture(null);
                     }
                 });
+        Futures.addCallback(fStart, new FutureCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Log.d(TAG, "Scan started.");
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "Failure to start scan.", t);
+            }
+        });
         return context;
     }
 
-    public synchronized ListenableFuture<Blessings> init(Context androidCtx, Activity activity) {
+    public synchronized void init(Activity activity, FutureCallback<Blessings> future) {
         Log.d(TAG, "init");
         if (mAndroidCtx != null) {
-            if (mAndroidCtx == androidCtx) {
+            if (mAndroidCtx == activity.getApplicationContext()) {
                 Log.d(TAG, "Initialization already started.");
-                return null;
+                return;
             } else {
                 Log.d(TAG, "Initialization with new context.");
                 shutdown();
             }
         }
-        mAndroidCtx = androidCtx;
+        mAndroidCtx = activity.getApplicationContext();
         // Must call V.init before attempting to load blessings, so that proper
         // code is loaded.
         mV23Ctx = V.init(mAndroidCtx);
-        return BlessingsManager.getBlessings(mV23Ctx, activity, "", true);
-    }
-
-    /**
-     * v23 operations that require a blessing (almost everything) will fail if
-     * attempted before this is true.
-     *
-     * The simplest usage is 1) There are no blessings. 2) An activity starts
-     * and calls V23Manager.init. 2) init notices there are no blessings and
-     * calls startActivityForResult 3) meanwhile, the activity and/or its
-     * components still run, but can test isBlessed before attempting anything
-     * requiring blessings. The activity will soon be re-initialized anyway. 4)
-     * user kicked over into 'account manager', gets a blessing, and the
-     * activity is restarted, this time with isBlessed == true.
-     */
-    public boolean isBlessed() {
-        return mBlessings != null;
-    }
-
-    /**
-     * Returns the blessings for this process.
-     */
-    public Blessings getBlessings() {
-        return mBlessings;
+        Log.d(TAG, "Attempting to get blessings.");
+        ListenableFuture<Blessings> f = BlessingsManager.getBlessings(
+                mV23Ctx, activity, BLESSINGS_KEY, true);
+        Futures.addCallback(f, future);
     }
 
     public void shutdown() {
@@ -128,25 +146,26 @@ public class V23Manager {
         // Disabled while debugging network performance / visibility issues.
         if (useProxy) {
             ListenSpec spec = V.getListenSpec(mV23Ctx).withProxy("proxy");
-            //ListenSpec spec = V.getListenSpec(mV23Ctx).withAddress(
-            //        new ListenSpec.Address("tcp", "0.0.0.0:0"));
-            Log.d(TAG, "spec : " + spec.toString());
-            Log.d(TAG, "spec proxy: " + spec.getProxy());
+            Log.d(TAG, "listenSpec = " + spec.toString() + " p=" + spec.getProxy());
             return V.withListenSpec(mV23Ctx, spec);
         }
         return mV23Ctx;
     }
 
-    public VContext makeServer(String mountName, Object server) throws VException {
+    public VContext makeServerContext(String mountName, Object server) throws VException {
         return V.withNewServer(
-                        getListenContext(),
-                        mountName,
-                        server,
-                        VSecurity.newAllowEveryoneAuthorizer());
+                getListenContext(),
+                mountName,
+                server,
+                VSecurity.newAllowEveryoneAuthorizer());
     }
 
     public Server getServer(VContext mServerCtx) {
         return V.getServer(mServerCtx);
+    }
+
+    public VContext contextWithTimeout(Duration timeout) {
+        return mV23Ctx.withTimeout(timeout);
     }
 
     public static class Singleton {
@@ -164,9 +183,5 @@ public class V23Manager {
             }
             return result;
         }
-    }
-
-    public VContext contextWithTimeout(Duration timeout) {
-        return mV23Ctx.withTimeout(timeout);
     }
 }

@@ -29,7 +29,6 @@ public class IdTest {
         Id id1 = Id.makeRandom();
         Id id2 = Id.makeRandom();
         assertNotEquals(id1, id2);
-        assertNotEquals(id1.toLong(), id2.toLong());
     }
 
     @Test
@@ -39,9 +38,9 @@ public class IdTest {
     }
 
     @Test
-    public void constructionFailure() {
+    public void fromStringFailure() {
         mThrown.expect(java.lang.IllegalArgumentException.class);
-        mThrown.expectMessage("Invalid UUID string: pizza");
+        mThrown.expectMessage("For input string: \"pizza\"");
         Id id = Id.fromString("pizza");
     }
 }

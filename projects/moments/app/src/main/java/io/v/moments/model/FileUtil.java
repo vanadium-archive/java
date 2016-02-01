@@ -40,7 +40,8 @@ public class FileUtil {
      */
     public static void rmMinusF(File path) {
         if (!path.exists()) {
-            throw new IllegalArgumentException(path.getAbsolutePath());
+            throw new IllegalArgumentException(
+                    "non-existent path: " + path.getAbsolutePath());
         }
         File[] contents = path.listFiles();
         if (contents != null) {
@@ -48,6 +49,9 @@ public class FileUtil {
                 rmMinusF(f);
             }
         }
-        path.delete();
+        if (!path.delete()) {
+            throw new IllegalStateException(
+                    "unable to delete " + path.getAbsolutePath());
+        }
     }
 }
