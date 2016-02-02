@@ -5,6 +5,7 @@
 package io.v.moments.model;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -66,6 +67,7 @@ public class AdvertiserImpl implements Advertiser {
         if (isAdvertising()) {
             throw new IllegalStateException("Already advertising.");
         }
+        Log.d(TAG, "Starting service for moment " + mMoment);
         try {
             mServerCtx = mV23Manager.makeServerContext(
                     NO_MOUNT_NAME, new MomentServer());
@@ -78,6 +80,7 @@ public class AdvertiserImpl implements Advertiser {
             addresses.add(point.toString());
         }
         Attributes attrs = mMoment.makeAttributes();
+        Log.d(TAG, "Starting advertisement of moment " + mMoment);
         mAdvCtx = mV23Manager.advertise(
                 makeAdvertisement(attrs, addresses),
                 NO_PATTERNS);
@@ -88,10 +91,14 @@ public class AdvertiserImpl implements Advertiser {
         if (!isAdvertising()) {
             throw new IllegalStateException("Not advertising.");
         }
+        Log.d(TAG, "Stopping advertisement of " + mMoment);
+        Log.d(TAG, "Cancelling advertising context.");
         mAdvCtx.cancel();
-        mServerCtx.cancel();
         mAdvCtx = null;
+        Log.d(TAG, "Cancelling server context.");
+        mServerCtx.cancel();
         mServerCtx = null;
+        Log.d(TAG, "Advertising stopped.");
     }
 
     /**

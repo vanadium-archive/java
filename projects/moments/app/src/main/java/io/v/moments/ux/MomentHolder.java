@@ -109,7 +109,7 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
                 if (isChecked) {
-                    moment.setDesiredAdState(Moment.AdState.ON);
+                    moment.setDesiredAdState(AdState.ON);
                     mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
@@ -123,7 +123,7 @@ public class MomentHolder extends RecyclerView.ViewHolder {
                         }
                     });
                 } else {
-                    moment.setDesiredAdState(Moment.AdState.OFF);
+                    moment.setDesiredAdState(AdState.OFF);
                     mExecutor.submit(new Runnable() {
                         @Override
                         public void run() {
