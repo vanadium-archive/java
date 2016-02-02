@@ -326,8 +326,13 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     }
 
     public <T> Observable<Void> put(final String key, final T value,
+                                    final TypeToken<T> tt) {
+        return exec(t -> t.put(mVContext, key, value, tt.getType()));
+    }
+
+    public <T> Observable<Void> put(final String key, final T value,
                                     final Class<T> type) {
-        return exec(t -> t.put(mVContext, key, value, type));
+        return put(key, value, TypeToken.of(type));
     }
 
     @SuppressWarnings("unchecked")
@@ -336,9 +341,13 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Observable<T> get(final String key, final Class<? extends T> type) {
-        return exec(t -> t.get(mVContext, key, type))
+    public <T> Observable<T> get(final String key, final TypeToken<? extends T> tt) {
+        return exec(t -> t.get(mVContext, key, tt.getType()))
                 .map(x -> (T) x);
+    }
+
+    public <T> Observable<T> get(final String key, final Class<? extends T> type) {
+        return get(key, TypeToken.of(type));
     }
 
     public <T> Observable<T> get(final String key, final Class<? extends T> type,

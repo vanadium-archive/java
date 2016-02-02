@@ -48,4 +48,9 @@ public class IdListAccumulator implements ListAccumulator<String> {
         // TODO(rosswang): possibly index
         return mIds.indexOf(rowName);
     }
+
+    @Override
+    public ImmutableList<String> getListSnapshot() {
+        return mIds;
+    }
 }

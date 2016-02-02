@@ -4,6 +4,7 @@
 
 package io.v.baku.toolkit.bind;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
 import java.util.ArrayList;
@@ -129,5 +130,10 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
     @Override
     public boolean containsRow(final String rowName) {
         return mRows.containsKey(rowName);
+    }
+
+    @Override
+    public ImmutableList<RxTable.Row<T>> getListSnapshot() {
+        return ImmutableList.copyOf(mSorted);
     }
 }

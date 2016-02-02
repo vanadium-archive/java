@@ -25,6 +25,7 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
     protected Activity mActivity;
     protected RxTable mRxTable;
     protected CompositeSubscription mSubscriptionParent;
+    protected Subscription mLastSubscription;
     protected Action1<Throwable> mOnError;
 
     public T activity(final Activity activity) {
@@ -75,11 +76,19 @@ public abstract class BaseBuilder<T extends BaseBuilder<T>> {
             mSubscriptionParent = new CompositeSubscription();
         }
         mSubscriptionParent.add(subscription);
+        mLastSubscription = subscription;
         return subscription;
     }
 
-    public Subscription getSubscription() {
+    /**
+     * @return the current subscription parent.
+     */
+    public CompositeSubscription getAllBindings() {
         return mSubscriptionParent;
+    }
+
+    public Subscription getLastBinding() {
+        return mLastSubscription;
     }
 
     public T onError(final Action1<Throwable> onError) {
