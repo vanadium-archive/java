@@ -16,8 +16,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 @Accessors(prefix = "m")
-public class SyncbaseRecyclerAdapter<T, VH extends ViewHolder>
-        extends RecyclerView.Adapter<SyncbaseRecyclerAdapter.ViewHolderAdapter<VH>>
+public class RxRecyclerAdapter<T, VH extends ViewHolder>
+        extends RecyclerView.Adapter<RxRecyclerAdapter.ViewHolderAdapter<VH>>
         implements RangeAdapter, ListAccumulator<T> {
 
     public static class ViewHolderAdapter<B extends ViewHolder> extends RecyclerView.ViewHolder {
@@ -34,9 +34,9 @@ public class SyncbaseRecyclerAdapter<T, VH extends ViewHolder>
     @Getter
     private final Subscription mSubscription;
 
-    public SyncbaseRecyclerAdapter(final Observable<? extends ListAccumulator<T>> data,
-                                   final ViewAdapter<? super T, VH> viewAdapter,
-                                   final Action1<Throwable> onError) {
+    public RxRecyclerAdapter(final Observable<? extends ListAccumulator<T>> data,
+                             final ViewAdapter<? super T, VH> viewAdapter,
+                             final Action1<Throwable> onError) {
         mViewAdapter = viewAdapter;
         mSubscription = data
                 .observeOn(AndroidSchedulers.mainThread())

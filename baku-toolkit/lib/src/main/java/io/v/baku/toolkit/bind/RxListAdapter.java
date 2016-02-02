@@ -17,7 +17,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 @Accessors(prefix = "m")
-public class SyncbaseListAdapter<T> extends BaseAdapter
+public class RxListAdapter<T> extends BaseAdapter
         implements RangeAdapter, ListAccumulator<T> {
     private final ViewAdapter<? super T, ?> mViewAdapter;
     @Delegate
@@ -25,9 +25,9 @@ public class SyncbaseListAdapter<T> extends BaseAdapter
     @Getter
     private final Subscription mSubscription;
 
-    public SyncbaseListAdapter(final Observable<? extends ListAccumulator<T>> data,
-                               final ViewAdapter<? super T, ?> viewAdapter,
-                               final Action1<Throwable> onError) {
+    public RxListAdapter(final Observable<? extends ListAccumulator<T>> data,
+                         final ViewAdapter<? super T, ?> viewAdapter,
+                         final Action1<Throwable> onError) {
         mViewAdapter = viewAdapter;
         mSubscription = data
                 .observeOn(AndroidSchedulers.mainThread())

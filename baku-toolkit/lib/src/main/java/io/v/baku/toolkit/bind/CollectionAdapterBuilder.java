@@ -56,24 +56,24 @@ public abstract class CollectionAdapterBuilder<B extends CollectionAdapterBuilde
 
     public abstract Observable<? extends ListAccumulator<T>> buildListAccumulator();
 
-    public SyncbaseListAdapter<T> buildListAdapter() {
-        return subscribeAdapter(new SyncbaseListAdapter<>(
+    public RxListAdapter<T> buildListAdapter() {
+        return subscribeAdapter(new RxListAdapter<>(
                 buildListAccumulator(), getViewAdapter(), mBase.mOnError));
     }
 
-    public SyncbaseRecyclerAdapter<T, ?> buildRecyclerAdapter() {
-        return subscribeAdapter(new SyncbaseRecyclerAdapter<>(
+    public RxRecyclerAdapter<T, ?> buildRecyclerAdapter() {
+        return subscribeAdapter(new RxRecyclerAdapter<>(
                 buildListAccumulator(), getViewAdapter(), mBase.mOnError));
     }
 
-    public SyncbaseListAdapter<T> bindTo(final ListView listView) {
-        final SyncbaseListAdapter<T> adapter = buildListAdapter();
+    public RxListAdapter<T> bindTo(final ListView listView) {
+        final RxListAdapter<T> adapter = buildListAdapter();
         listView.setAdapter(adapter);
         return adapter;
     }
 
-    public SyncbaseRecyclerAdapter<T, ?> bindTo(final RecyclerView recyclerView) {
-        final SyncbaseRecyclerAdapter<T, ?> adapter = buildRecyclerAdapter();
+    public RxRecyclerAdapter<T, ?> bindTo(final RecyclerView recyclerView) {
+        final RxRecyclerAdapter<T, ?> adapter = buildRecyclerAdapter();
         recyclerView.setAdapter(adapter);
         return adapter;
     }

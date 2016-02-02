@@ -37,7 +37,7 @@ public class CollectionBindingTest extends VAndroidTestCase {
                 mTable.put("Good morning", "starshine")));
 
         final ListView listView = new ListView(getContext());
-        try (final SyncbaseListAdapter<RxTable.Row<String>> adapter = CollectionBinding.builder()
+        try (final RxListAdapter<RxTable.Row<String>> adapter = CollectionBinding.builder()
                 .onError(t -> fail(Throwables.getStackTraceAsString(t)))
                 .viewAdapterContext(getContext())
                 .rxTable(mTable)
