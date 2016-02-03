@@ -13,6 +13,8 @@ import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
+import io.v.v23.security.Authorizer;
+import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -27,7 +29,8 @@ public class ClientImpl implements Client {
 
     private native void nativeStartCall(long nativePtr, VContext context,
                                         String name, String method, byte[][] vomArgs,
-                                        boolean skipServerAuth,
+                                        Authorizer nameResolutionAuthorizer,
+                                        Authorizer serverAuthorizer,
                                         Callback<ClientCall> callback);
     private native void nativeClose(long nativePtr);
     private native void nativeFinalize(long nativePtr);
@@ -40,6 +43,26 @@ public class ClientImpl implements Client {
         return !opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION)
                     ? false
                     : opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class);
+    }
+
+    private Authorizer nameResolutionAuthorizer(Options opts) {
+        if (opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION) &&
+                opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class))
+            return VSecurity.newAllowEveryoneAuthorizer();
+
+        return !opts.has(OptionDefs.NAME_RESOLUTION_AUTHORIZER)
+                ? null
+                : opts.get(OptionDefs.NAME_RESOLUTION_AUTHORIZER, Authorizer.class);
+    }
+
+    private Authorizer serverAuthorizer(Options opts) {
+        if (opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION) &&
+                opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class))
+            return VSecurity.newAllowEveryoneAuthorizer();
+
+        return !opts.has(OptionDefs.SERVER_AUTHORIZER)
+                ? null
+                : opts.get(OptionDefs.SERVER_AUTHORIZER, Authorizer.class);
     }
 
     // Implement io.v.v23.rpc.Client.
@@ -59,7 +82,7 @@ public class ClientImpl implements Client {
             checkStartCallArgs(name, method, args, argTypes);
             nativeStartCall(nativePtr, ctx, name, getMethodName(method),
                     getEncodedVomArgs(args, argTypes),
-                    shouldSkipServerAuth(opts), callback);
+                    nameResolutionAuthorizer(opts), serverAuthorizer(opts), callback);
         } catch (VException e) {
             callback.onFailure(e);
         }

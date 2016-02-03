@@ -341,16 +341,51 @@ public class VSecurity {
         return PermissionsAuthorizer.create(acls, type);
     }
 
+    private enum AuthorizerTypes {
+        ALLOW_EVERYONE_AUTHORIZER,
+        ENDPOINT_AUTHORIZER,
+        DEFAULT_AUTHORIZER,
+        PUBLIC_KEY_AUTHORIZER
+    }
+    private static native Authorizer nativeCreateAuthorizer(int type, ECPublicKey key);
+
     /**
      * Returns an authorizer that allows all requests.
      */
     public static Authorizer newAllowEveryoneAuthorizer() {
-        return new Authorizer() {
-            @Override
-            public void authorize(VContext ctx, Call call) throws VException {
-                // do nothing
-            }
-        };
+        return nativeCreateAuthorizer(AuthorizerTypes.ALLOW_EVERYONE_AUTHORIZER.ordinal(), null);
+    }
+
+    /**
+     * Returns an authorizer that authorizes principals iff they present blessings that
+     * match those specified in {@link Call#remoteEndpoint()}.
+     */
+    public static Authorizer newEndpointAuthorizer() {
+        return nativeCreateAuthorizer(AuthorizerTypes.ENDPOINT_AUTHORIZER.ordinal(), null);
+    }
+
+    /**
+     * Returns an authorizer that implements a "reasonably secure"
+     * authorization policy that can be used whenever in doubt.
+     * <p>
+     * It has the conservative policy that requires one end of the RPC to have a
+     * blessing that is extended from the blessing presented by the other end.
+     */
+    public static Authorizer newDefaultAuthorizer() {
+        return nativeCreateAuthorizer(AuthorizerTypes.DEFAULT_AUTHORIZER.ordinal(), null);
+    }
+
+    /**
+     * Returns an authorizer that only authorizes principals with a specific public key.
+     * <p>
+     * Normally, authorizations in Vanadium should be based on blessing names and not
+     * public keys, since the former are resilient to key rotations and process
+     * replication. However, in rare circumstances it may be possible that blessing names
+     * cannot be used (for example, if the local end does not recognize the remote end's
+     * blessing root), and the public key might be usable instead.
+     */
+    public static Authorizer newPublicKeyAuthorizer(ECPublicKey key) {
+        return nativeCreateAuthorizer(AuthorizerTypes.PUBLIC_KEY_AUTHORIZER.ordinal(), key);
     }
 
     /**
