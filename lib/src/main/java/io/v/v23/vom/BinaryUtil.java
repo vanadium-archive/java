@@ -172,11 +172,46 @@ public final class BinaryUtil {
         }
     }
 
-    static boolean hasAnyOrTypeObject(VdlType t) {
-        return hasAnyOrTypeObjectInternal(t, new HashSet<VdlType>());
+    static boolean hasTypeObject(VdlType t) {
+        return hasTypeObjectInternal(t, new HashSet<VdlType>());
     }
 
-    private static boolean hasAnyOrTypeObjectInternal(VdlType t, HashSet<VdlType> seen) {
+    private static boolean hasTypeObjectInternal(VdlType t, HashSet<VdlType> seen) {
+        if (seen.contains(t)) {
+            return false;
+        }
+        seen.add(t);
+
+        switch (t.getKind()) {
+            case TYPEOBJECT:
+                return true;
+            case OPTIONAL:
+            case LIST:
+            case ARRAY:
+                return hasTypeObjectInternal(t.getElem(), seen);
+            case SET:
+                return hasTypeObjectInternal(t.getKey(), seen);
+            case MAP:
+                return hasTypeObjectInternal(t.getKey(), seen) ||
+                        hasTypeObjectInternal(t.getElem(), seen);
+            case STRUCT:
+            case UNION:
+                for (VdlField fld : t.getFields()) {
+                    if (hasTypeObjectInternal(fld.getType(), seen)) {
+                        return true;
+                    }
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    static boolean hasAny(VdlType t) {
+        return hasAnyInternal(t, new HashSet<VdlType>());
+    }
+
+    private static boolean hasAnyInternal(VdlType t, HashSet<VdlType> seen) {
         if (seen.contains(t)) {
             return false;
         }
@@ -184,21 +219,20 @@ public final class BinaryUtil {
 
         switch (t.getKind()) {
             case ANY:
-            case TYPEOBJECT:
                 return true;
             case OPTIONAL:
             case LIST:
             case ARRAY:
-                return hasAnyOrTypeObjectInternal(t.getElem(), seen);
+                return hasAnyInternal(t.getElem(), seen);
             case SET:
-                return hasAnyOrTypeObjectInternal(t.getKey(), seen);
+                return hasAnyInternal(t.getKey(), seen);
             case MAP:
-                return hasAnyOrTypeObjectInternal(t.getKey(), seen) ||
-                        hasAnyOrTypeObjectInternal(t.getElem(), seen);
+                return hasAnyInternal(t.getKey(), seen) ||
+                        hasAnyInternal(t.getElem(), seen);
             case STRUCT:
             case UNION:
                 for (VdlField fld : t.getFields()) {
-                    if (hasAnyOrTypeObjectInternal(fld.getType(), seen)) {
+                    if (hasAnyInternal(fld.getType(), seen)) {
                         return true;
                     }
                 }

@@ -59,6 +59,7 @@ public class BinaryEncoder {
     private boolean binaryMagicByteWritten;
     private Version version;
     private List<Long> typeIds;
+    private List<Long> anyLens;
 
     public BinaryEncoder(OutputStream out) {
         this(out, Version.DEFAULT_VERSION);
@@ -88,9 +89,11 @@ public class BinaryEncoder {
         }
         valueBuffer.reset();
         typeIds = new ArrayList<Long>();
+        anyLens = new ArrayList<Long>();
         TypeId typeId = getType(type);
         writeValue(valueBuffer, value, type);
-        writeMessage(valueBuffer, BinaryUtil.hasAnyOrTypeObject(type), false, typeId.getValue(), BinaryUtil.hasBinaryMsgLen(type));
+        writeMessage(valueBuffer, BinaryUtil.hasAny(type), BinaryUtil.hasTypeObject(type),
+                false, typeId.getValue(), BinaryUtil.hasBinaryMsgLen(type));
     }
 
     /**
@@ -114,19 +117,26 @@ public class BinaryEncoder {
         encodeValue(value.vdlType(), value);
     }
 
-    private void writeMessage(ByteArrayOutputStream buffer, boolean hasAnyOrTypeObject, boolean typeIncomplete,
-                              long messageId, boolean encodeLength)
+    private void writeMessage(ByteArrayOutputStream buffer, boolean hasAny, boolean hasTypeObject,
+                              boolean typeIncomplete, long messageId, boolean encodeLength)
             throws IOException {
         if (version != Version.Version80 && typeIncomplete) {
             out.write(Constants.WIRE_CTRL_TYPE_INCOMPLETE);
         }
         BinaryUtil.encodeInt(out, messageId);
-        if (version != Version.Version80 && hasAnyOrTypeObject && messageId > 0) {
+        if (version != Version.Version80 && (hasAny || hasTypeObject) && messageId > 0) {
             BinaryUtil.encodeUint(out, typeIds.size());
             for (Long id : typeIds) {
                 BinaryUtil.encodeUint(out, id);
             }
             typeIds = null;
+        }
+        if (version != Version.Version80 && hasAny && messageId > 0) {
+            BinaryUtil.encodeUint(out, anyLens.size());
+            for (Long len : anyLens) {
+                BinaryUtil.encodeUint(out, len);
+            }
+            anyLens = null;
         }
         if (encodeLength) {
             BinaryUtil.encodeUint(out, buffer.size());
@@ -160,7 +170,8 @@ public class BinaryEncoder {
         boolean incomplete = typeIncomplete(type, pending, new HashSet<VdlType>());
         typeBuffer.reset();
         writeValue(typeBuffer, wireType, wireType.vdlType());
-        writeMessage(typeBuffer, BinaryUtil.hasAnyOrTypeObject(type), incomplete, -typeId.getValue(), true);
+        writeMessage(typeBuffer, BinaryUtil.hasAny(type), BinaryUtil.hasTypeObject(type),
+                incomplete, -typeId.getValue(), true);
         return typeId;
     }
 
@@ -332,7 +343,19 @@ public class BinaryEncoder {
         if (elem != null) {
             long id = getType(anyValue.getElemType()).getValue();
             writeTypeId(out, id);
+            int anyLenIndex = -1;
+            long startPos = -1;
+            if (version != Version.Version80) {
+                anyLenIndex = anyLens.size();
+                BinaryUtil.encodeUint(out, anyLenIndex);
+                anyLens.add(0L);
+                startPos = out.getCount();
+            }
             writeValue(out, elem, anyValue.getElemType());
+            if (version != Version.Version80) {
+                long endPos = out.getCount();
+                anyLens.set(anyLenIndex, endPos - startPos);
+            }
             return true;
         } else {
             writeVdlControlByte(out, Constants.WIRE_CTRL_NIL);

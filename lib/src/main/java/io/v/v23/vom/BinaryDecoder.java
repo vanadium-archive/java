@@ -108,11 +108,17 @@ public class BinaryDecoder {
 
     private Object readValueMessage(VdlType actualType, Type targetType) throws IOException,
             ConversionException {
-        if (version != Version.Version80 && BinaryUtil.hasAnyOrTypeObject(actualType)) {
+        if (version != Version.Version80 && (BinaryUtil.hasAny(actualType) || BinaryUtil.hasTypeObject(actualType))) {
             long len = BinaryUtil.decodeUint(in);
             typeIds = new long[(int)len];
             for (int i = 0; i < len; i++) {
                 typeIds[i] = BinaryUtil.decodeUint(in);
+            }
+        }
+        if (version != Version.Version80 && BinaryUtil.hasAny(actualType)) {
+            long len = BinaryUtil.decodeUint(in);
+            for (int i = 0; i < len; i++) {
+                BinaryUtil.decodeUint(in); // read anyMsgLen (ignore value -- it is unused)
             }
         }
         if (BinaryUtil.hasBinaryMsgLen(actualType)) {
@@ -270,6 +276,7 @@ public class BinaryDecoder {
             typeId = BinaryUtil.decodeUint(in);
         } else {
             typeId = typeIds[(int)BinaryUtil.decodeUint(in)];
+            BinaryUtil.decodeUint(in); // read anyLen index (ignore for now -- unused)
         }
         VdlType actualType = getType(new TypeId(typeId));
         if (target.getKind() == Kind.ANY) {
