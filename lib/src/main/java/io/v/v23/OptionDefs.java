@@ -29,6 +29,35 @@ public class OptionDefs {
             "io.v.v23.SKIP_SERVER_ENDPOINT_AUTHORIZATION";
 
     /**
+     * A key for an option of type {@link io.v.v23.security.Authorizer} that encapsulates the
+     * authorization policy used by a client to authorize mounttable servers before sending them a
+     * name resolutionrequest. By specifying this policy, clients avoid revealing the names they
+     * are interested in resolving to unauthorized mounttables.
+     * <p>
+     * If no such option is provided, then runtime implementations are expected to
+     * default to {@link io.v.v23.security.VSecurity#newEndpointAuthorizer()}.
+     */
+    public static final String NAME_RESOLUTION_AUTHORIZER = "io.v.v23.NAME_RESOLUTION_AUTHORIZER";
+
+    /**
+     * A key for an option of type {@link io.v.v23.security.Authorizer} that encapsulates the
+     * authorization policy used by a client to authorize the end server of an RPC.
+     * <p>
+     * This policy is applied before the client sends information about itself
+     * {@code (public key, blessings, the RPC request)} to the server. Thus, if a server
+     * does not satisfy this policy then the client will abort the request.
+     * <p>
+     * Authorization of other servers communicated with in the process of
+     * contacting the end server are controlled by other options, like
+     * {@link #NAME_RESOLUTION_AUTHORIZER}.
+     * <p>
+     * Runtime implementations are expected to use
+     * {@link io.v.v23.security.VSecurity#newEndpointAuthorizer()}
+     * if no explicit server authorizer has been provided for the call.
+     */
+     public static final String SERVER_AUTHORIZER = "io.v.v23.SERVER_AUTHORIZER";
+
+    /**
      * A key for an option of type {@link String} that specifies the directory that should be
      * used for storing the log files.  If not present, logs will be written into the system's
      * temporary directory.
