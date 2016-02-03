@@ -40,19 +40,20 @@ public class V23Manager {
     private static final String BLESSINGS_KEY = "BlessingsKey";
     private Context mAndroidCtx;
     private VContext mV23Ctx = null;
+    private VDiscovery mDiscovery = null;
 
     // Singleton.
     private V23Manager() {
     }
-
-    public VDiscovery getDiscovery() {
-        return V.getDiscovery(mV23Ctx);
-    }
-
+    
     public VContext advertise(final Service service, List<BlessingPattern> patterns) {
+        if (mDiscovery == null) {
+            Log.d(TAG, "Discovery not ready.");
+            return null;
+        }
         VContext context = mV23Ctx.withCancel();
         final ListenableFuture<ListenableFuture<Void>> fStart =
-                V.getDiscovery(mV23Ctx).advertise(context, service, patterns);
+                mDiscovery.advertise(context, service, patterns);
         Futures.addCallback(fStart, new FutureCallback<ListenableFuture<Void>>() {
             @Override
             public void onSuccess(ListenableFuture<Void> result) {
@@ -85,10 +86,14 @@ public class V23Manager {
     }
 
     public VContext scan(String query, final ScanListener listener) {
+        if (mDiscovery == null) {
+            Log.d(TAG, "Discovery not ready.");
+            return null;
+        }
         VContext context = mV23Ctx.withCancel();
         Log.d(TAG, "Calling V.getDiscovery.scan with q=" + query);
         final ListenableFuture<Void> fStart =
-            InputChannels.withCallback(V.getDiscovery(mV23Ctx).scan(context, query),
+            InputChannels.withCallback(mDiscovery.scan(context, query),
                 new InputChannelCallback<Update>() {
                     @Override
                     public ListenableFuture<Void> onNext(Update result) {
@@ -129,6 +134,11 @@ public class V23Manager {
         ListenableFuture<Blessings> f = BlessingsManager.getBlessings(
                 mV23Ctx, activity, BLESSINGS_KEY, true);
         Futures.addCallback(f, future);
+        try {
+            mDiscovery = V.newDiscovery(mV23Ctx);
+        } catch (VException e) {
+            Log.d(TAG, "Unable to get discovery object.", e);
+        }
     }
 
     public void shutdown() {
