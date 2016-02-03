@@ -27,6 +27,6 @@ public enum Version {
         throw new RuntimeException("invalid version byte " + b);
     }
 
-    public static Version DEFAULT_VERSION = Version80;
+    public static Version DEFAULT_VERSION = Version81;
 
 }
