@@ -4,22 +4,24 @@
 
 package io.v.rpcbench;
 
-import android.os.Debug;
 import android.test.AndroidTestCase;
+
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import io.v.android.v23.V;
+import io.v.v23.InputChannelCallback;
+import io.v.v23.InputChannels;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
-import io.v.v23.rpc.ReflectInvoker;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerCall;
 import io.v.v23.security.VSecurity;
@@ -39,23 +41,19 @@ public class AndroidRpcBenchmark extends AndroidTestCase {
         VContext serverContext = io.v.v23.V
                 .withNewServer(listenSpec, "", new EchoServer() {
                     @Override
-                    public byte[] echo(VContext ctx, ServerCall call, byte[] payload)
-                            throws VException {
-                        return payload;
+                    public ListenableFuture<byte[]> echo(VContext ctx, ServerCall call, byte[] payload) {
+                        return Futures.immediateFuture(payload);
                     }
 
                     @Override
-                    public void echoStream(VContext ctx, ServerCall call,
-                                           ServerStream<byte[], byte[]> stream)
-                            throws VException {
-                        Iterator<byte[]> byteIterator = stream.iterator();
-                        while (byteIterator.hasNext()) {
-                            byte[] payload = byteIterator.next();
-                            stream.send(payload);
-                        }
-                        if (stream.error() != null) {
-                            throw stream.error();
-                        }
+                    public ListenableFuture<Void> echoStream(VContext ctx, ServerCall call,
+                                                             final ServerStream<byte[], byte[]> stream) {
+                        return InputChannels.withCallback(stream, new InputChannelCallback<byte[]>() {
+                            @Override
+                            public ListenableFuture<Void> onNext(byte[] result) {
+                                return stream.send(result);
+                            }
+                        });
                     }
                 }, VSecurity.newAllowEveryoneAuthorizer());
         Server echoServer = V.getServer(serverContext);
@@ -75,11 +73,9 @@ public class AndroidRpcBenchmark extends AndroidTestCase {
             VFutures.sync(echoClient.echo(baseContext, payload));
         }
         for (int i = 0; i < 1000; i++) {
-            if (i == 999) { Debug.startMethodTracing(); }
             long start = System.nanoTime();
             VFutures.sync(echoClient.echo(baseContext, payload));
             long end = System.nanoTime();
-            if (i == 999) { Debug.stopMethodTracing(); }
             long duration = end - start;
             if (i == 0) {
                 cma = duration;
@@ -91,7 +87,7 @@ public class AndroidRpcBenchmark extends AndroidTestCase {
     }
 
     public void testSingleEncoder() throws IOException, ConversionException {
-        int nreps = 1;
+        int nreps = 1000;
         PipedOutputStream outStream = new PipedOutputStream();
         PipedInputStream inStream = new PipedInputStream(outStream);
         BinaryEncoder encoder = new BinaryEncoder(outStream);
@@ -120,7 +116,7 @@ public class AndroidRpcBenchmark extends AndroidTestCase {
     }
 
     public void testNewEncoderEachTime() throws VException {
-        int nreps = 1;
+        int nreps = 1000;
         byte[] payload = new byte[] { 0x01 };
         double cma = 0;
         for (int i = 0; i < nreps; i++) {
