@@ -29,21 +29,39 @@ public class RxRecyclerAdapter<T, VH extends ViewHolder>
     }
 
     private final ViewAdapter<? super T, VH> mViewAdapter;
-    @Delegate
-    private ListAccumulator<T> mLatestState = ListAccumulators.empty();
+
+    /**
+     * The main purpose of this class is to capture the generic arg {@link T}. Otherwise, the
+     * {@link Delegate} annotation fails to capture it and cannot implement {@link ListAccumulator}
+     * with the right generic type.
+     * <p>
+     * While we're here, we might as well use it to override
+     * {@link android.support.v7.widget.RecyclerView.Adapter#getItemId(int)}.
+     */
+    private abstract class Delegated implements ListAccumulator<T> {
+        /**
+         * Overrides {@link android.support.v7.widget.RecyclerView.Adapter#getItemId(int)}.
+         */
+        public abstract long getItemId(int position);
+    }
+
+    @Delegate(types = Delegated.class)
+    private ListDeltaAccumulator<T> mLatestState =
+            new DerivedListDeltaAccumulator<>(null, ListAccumulators.empty());
+
     @Getter
     private final Subscription mSubscription;
 
-    public RxRecyclerAdapter(final Observable<? extends ListAccumulator<T>> data,
+    public RxRecyclerAdapter(final Observable<? extends ListDeltaAccumulator<T>> data,
                              final ViewAdapter<? super T, VH> viewAdapter,
                              final Action1<Throwable> onError) {
+        setHasStableIds(true);
         mViewAdapter = viewAdapter;
         mSubscription = data
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(d -> {
                     mLatestState = d;
-                    notifyDataSetChanged();
-                    // TODO(rosswang): Use higher-fidelity update notifications.
+                    d.notifyDeltas(this);
                 }, onError);
     }
 
@@ -67,13 +85,5 @@ public class RxRecyclerAdapter<T, VH extends ViewHolder>
     @Override
     public int getItemCount() {
         return getCount();
-    }
-
-    /**
-     * TODO(rosswang): If this can improve UX, allot numeric IDs to row keys.
-     */
-    @Override
-    public long getItemId(int i) {
-        return RecyclerView.NO_ID;
     }
 }

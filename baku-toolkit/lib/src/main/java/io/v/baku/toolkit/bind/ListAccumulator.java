@@ -6,6 +6,17 @@ package io.v.baku.toolkit.bind;
 
 import com.google.common.collect.ImmutableList;
 
+import java8.util.function.Function;
+import rx.Observable;
+
+/**
+ * This interface tracks list updates for use with {@link android.widget.ListView}s via
+ * {@link RxListAdapter} and {@link android.support.v7.widget.RecyclerView}s via
+ * {@link RxRecyclerAdapter}. To support granular update notifications for {@code RecyclerView},
+ * the {@link ListDeltaAccumulator} subinterface is required. A {@code ListAccumulator} can be
+ * converted to a {@code ListDeltaAccumulator} by wrapping it with
+ * {@link DerivedListDeltaAccumulator#scanFrom(Observable, Function)}.
+ */
 public interface ListAccumulator<T> {
     boolean containsRow(String rowName);
     int getCount();

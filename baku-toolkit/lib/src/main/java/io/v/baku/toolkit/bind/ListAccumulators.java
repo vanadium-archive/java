@@ -13,8 +13,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ListAccumulators {
-
-
     public static final ListAccumulator<Object> EMPTY = new ListAccumulator<Object>(){
         @Override
         public int getCount() {

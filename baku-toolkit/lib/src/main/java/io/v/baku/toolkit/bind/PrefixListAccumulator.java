@@ -42,7 +42,7 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
         mOrdering = ordering.compound(Ordering.natural().onResultOf(RxTable.Row::getRowName));
     }
 
-    public Observable<PrefixListAccumulator<T>> scanFrom(
+    public Observable<? extends PrefixListAccumulator<T>> scanFrom(
             final Observable<RangeWatchBatch<T>> watch) {
         return watch
                 .concatMap(RangeWatchBatch::collectChanges)
@@ -60,9 +60,10 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
         }
     }
 
-    private PrefixListAccumulator<T> withUpdates(final Collection<RangeWatchEvent<T>> events) {
+    protected PrefixListAccumulator<T> withUpdates(final Collection<RangeWatchEvent<T>> events) {
         // TODO(rosswang): more efficient updates for larger batches
         // TODO(rosswang): allow option to copy on add (immutable accumulator)
+        // If we copy on add, don't forget to override the clone in PrefixListDeltaAccumulator.
         for (final RangeWatchEvent<T> e : events) {
             if (e.getChangeType() == ChangeType.DELETE_CHANGE) {
                 removeOne(e.getRow());
@@ -73,10 +74,10 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
         return this;
     }
 
-    protected void removeOne(final RxTable.Row<T> entry) {
+    private void removeOne(final RxTable.Row<T> entry) {
         final T old = mRows.remove(entry.getRowName());
         if (old != null) {
-            mSorted.remove(findRowForEdit(entry.getRowName(), old));
+            remove(findRowForEdit(entry.getRowName(), old));
         }
     }
 
@@ -85,26 +86,36 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
         return bs < 0 ? ~bs : bs;
     }
 
-    protected void updateOne(final RxTable.Row<T> entry) {
+    private void updateOne(final RxTable.Row<T> entry) {
         final T old = mRows.put(entry.getRowName(), entry.getValue());
         if (old == null) {
-            mSorted.add(insertionIndex(entry), entry);
+            insert(insertionIndex(entry), entry);
         } else {
             final int oldIndex = findRowForEdit(entry.getRowName(), old);
-            int newIndex = insertionIndex(entry);
-
-            if (newIndex >= oldIndex) {
-                newIndex--;
-                for (int i = oldIndex; i < newIndex; i++) {
-                    mSorted.set(i, mSorted.get(i + 1));
-                }
+            final int newIndex = insertionIndex(entry);
+            if (oldIndex == newIndex) {
+                change(newIndex, entry);
             } else {
-                for (int i = oldIndex; i > newIndex; i--) {
-                    mSorted.set(i, mSorted.get(i - 1));
-                }
+                move(oldIndex, newIndex, entry);
             }
-            mSorted.set(newIndex, entry);
         }
+    }
+
+    protected void remove(final int index) {
+        mSorted.remove(index);
+    }
+
+    protected void insert(final int index, final RxTable.Row<T> entry) {
+        mSorted.add(index, entry);
+    }
+
+    protected void move(final int from, final int to, final RxTable.Row<T> entry) {
+        mSorted.remove(from);
+        mSorted.add(to, entry);
+    }
+
+    protected void change(final int index, final RxTable.Row<T> entry) {
+        mSorted.set(index, entry);
     }
 
     @Override

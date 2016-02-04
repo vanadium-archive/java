@@ -11,6 +11,7 @@ import java.util.List;
 
 import io.v.rx.syncbase.SingleWatchEvent;
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 public class IdListBindingBuilder<A extends RangeAdapter>
         extends CollectionAdapterBuilder<IdListBindingBuilder<A>, String, A> {
@@ -29,6 +30,9 @@ public class IdListBindingBuilder<A extends RangeAdapter>
         return this;
     }
 
+    /**
+     * This assumes that no IDs are null.
+     */
     public Observable<SingleWatchEvent<ImmutableList<String>>> buildIdListWatch() {
         return mBase.mRxTable.watch(mIdListRowName, new TypeToken<List<String>>() {
         }, ImmutableList.of()).map(w -> w.map(ImmutableList::copyOf));
@@ -38,5 +42,11 @@ public class IdListBindingBuilder<A extends RangeAdapter>
     public Observable<IdListAccumulator> buildListAccumulator() {
         return new IdListAccumulator()
                 .scanFrom(buildIdListWatch());
+    }
+
+    @Override
+    public Observable<? extends ListDeltaAccumulator<String>> buildListDeltaAccumulator() {
+        return DerivedListDeltaAccumulator.scanFrom(buildListAccumulator()
+                .observeOn(Schedulers.computation()), IdListAccumulator::new);
     }
 }

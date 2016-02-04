@@ -55,6 +55,7 @@ public abstract class CollectionAdapterBuilder<B extends CollectionAdapterBuilde
     }
 
     public abstract Observable<? extends ListAccumulator<T>> buildListAccumulator();
+    public abstract Observable<? extends ListDeltaAccumulator<T>> buildListDeltaAccumulator();
 
     public RxListAdapter<T> buildListAdapter() {
         return subscribeAdapter(new RxListAdapter<>(
@@ -63,7 +64,7 @@ public abstract class CollectionAdapterBuilder<B extends CollectionAdapterBuilde
 
     public RxRecyclerAdapter<T, ?> buildRecyclerAdapter() {
         return subscribeAdapter(new RxRecyclerAdapter<>(
-                buildListAccumulator(), getViewAdapter(), mBase.mOnError));
+                buildListDeltaAccumulator(), getViewAdapter(), mBase.mOnError));
     }
 
     public RxListAdapter<T> bindTo(final ListView listView) {

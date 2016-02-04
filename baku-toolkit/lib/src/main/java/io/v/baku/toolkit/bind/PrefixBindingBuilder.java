@@ -98,8 +98,14 @@ public class PrefixBindingBuilder<T, A extends RangeAdapter>
     }
 
     @Override
-    public Observable<PrefixListAccumulator<T>> buildListAccumulator() {
+    public Observable<? extends PrefixListAccumulator<T>> buildListAccumulator() {
         return new PrefixListAccumulator<>(getOrdering())
+                .scanFrom(buildPrefixWatch());
+    }
+
+    @Override
+    public Observable<? extends PrefixListDeltaAccumulator<T>> buildListDeltaAccumulator() {
+        return new PrefixListDeltaAccumulator<>(getOrdering())
                 .scanFrom(buildPrefixWatch());
     }
 }

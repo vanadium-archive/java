@@ -10,6 +10,10 @@ import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.RequiredArgsConstructor;
 import rx.Observable;
 
+/**
+ * This accumulator is not a true accumulator, but rather a first-order transformation.
+ * TODO(rosswang): Rename these.
+ */
 @RequiredArgsConstructor
 public class IdListAccumulator implements ListAccumulator<String> {
     private final ImmutableList<String> mIds;
@@ -20,7 +24,7 @@ public class IdListAccumulator implements ListAccumulator<String> {
 
     public Observable<IdListAccumulator> scanFrom(
             final Observable<SingleWatchEvent<ImmutableList<String>>> watch) {
-        return watch.scan(this, (t, w) -> new IdListAccumulator(w.getValue()));
+        return watch.map(w -> new IdListAccumulator(w.getValue()));
     }
 
     @Override
