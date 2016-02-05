@@ -16,14 +16,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.concurrent.ExecutorService;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.moments.R;
 import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
-import static io.v.moments.ifc.Moment.AdState;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
+
+import static io.v.moments.ifc.Moment.AdState;
 
 /**
  * Holds the views comprising a Moment for a RecyclerView.
@@ -35,15 +38,11 @@ public class MomentHolder extends RecyclerView.ViewHolder {
     private final SwitchCompat advertiseButton;
     private final ImageView imageView;
     private final Context mContext;
-    private final ExecutorService mExecutor;
     private final Handler mHandler;
 
-    public MomentHolder(
-            View itemView, Context context,
-            ExecutorService executor, Handler handler) {
+    public MomentHolder(View itemView, Context context, Handler handler) {
         super(itemView);
         mContext = context;
-        mExecutor = executor;
         mHandler = handler;
         authorTextView = (TextView) itemView.findViewById(R.id.moment_author);
         captionTextView = (TextView) itemView.findViewById(R.id.moment_caption);
@@ -56,22 +55,18 @@ public class MomentHolder extends RecyclerView.ViewHolder {
      */
     public void bind(Moment moment, Advertiser advertiser) {
         final Kind kind = advertiser == null ? Kind.REMOTE : Kind.LOCAL;
-        Log.d(TAG, "Holder: binding " + kind + " " + moment);
+        Log.d(TAG, "Binding " + kind + " " + moment);
         authorTextView.setText(moment.getAuthor());
         captionTextView.setText(moment.getCaption());
         if (moment.hasPhoto(kind, Style.THUMB)) {
             imageView.setImageBitmap(moment.getPhoto(kind, Style.THUMB));
             imageView.setOnClickListener(showPhoto(moment, kind));
-        } else {
-            Log.d(TAG, kind.toString() + " " + Style.THUMB + " not ready.");
         }
         if (moment.hasPhoto(kind, Style.FULL)) {
             if (!moment.hasPhoto(kind, Style.THUMB)) {
                 throw new IllegalStateException(Style.THUMB.toString() +
                         " should be ready if " + Style.FULL + " is ready.");
             }
-        } else {
-            Log.d(TAG, kind.toString() + " " + Style.FULL + " not ready.");
         }
         if (kind.equals(Kind.REMOTE)) {
             advertiseButton.setVisibility(View.INVISIBLE);
@@ -79,9 +74,10 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             advertiseButton.setText("");
             advertiseButton.setVisibility(View.VISIBLE);
             advertiseButton.setEnabled(true);
-            advertiseButton.setChecked(moment.getDesiredAdState().equals(AdState.ON));
             advertiseButton.setOnCheckedChangeListener(
                     toggleAdvertising(moment, advertiser));
+            advertiseButton.setChecked(
+                    moment.getDesiredAdState().equals(AdState.ON));
         }
     }
 
@@ -94,12 +90,10 @@ public class MomentHolder extends RecyclerView.ViewHolder {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "Clicked moment.");
                 Intent intent = ShowPhotoActivity.makeIntent(
                         mContext, moment.getOrdinal(), kind);
                 mContext.startActivity(intent);
             }
-
         };
     }
 
@@ -109,34 +103,89 @@ public class MomentHolder extends RecyclerView.ViewHolder {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
                 if (isChecked) {
-                    moment.setDesiredAdState(AdState.ON);
-                    mExecutor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                advertiser.advertiseStart();
-                                toast("Started advertising " + moment.getCaption());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                toast("Had problem starting advertising.");
-                            }
-                        }
-                    });
+                    handleStartAdvertising(moment, advertiser);
                 } else {
-                    moment.setDesiredAdState(AdState.OFF);
-                    mExecutor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                advertiser.advertiseStop();
-                                toast("Stopped advertising " + moment.getCaption());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                toast("Had problem stopping advertising.");
+                    handleStopAdvertising(moment, advertiser);
+                }
+            }
+        };
+    }
+
+    private void handleStartAdvertising(final Moment moment, final Advertiser advertiser) {
+        moment.setDesiredAdState(AdState.ON);
+        advertiser.advertiseStart(makeAdvertiseCallback(moment));
+    }
+
+    private void handleStopAdvertising(final Moment moment, final Advertiser advertiser) {
+        moment.setDesiredAdState(AdState.OFF);
+        if (advertiser.isAdvertising()) {
+            advertiser.advertiseStop();
+            toast("Stopped advertising " + moment.getCaption());
+        } else {
+            Log.d(TAG, "handleStopAdvertising called, but not advertising.");
+        }
+    }
+
+    private FutureCallback<ListenableFuture<Void>> makeAdvertiseCallback(final Moment moment) {
+        return new FutureCallback<ListenableFuture<Void>>() {
+            private void assureStopped() {
+                moment.setDesiredAdState(AdState.OFF);
+                if (advertiseButton.isChecked()) {
+                    advertiseButton.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onSuccess(ListenableFuture<Void> result) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        moment.setDesiredAdState(AdState.ON);
+                        advertiseButton.setChecked(true);
+                    }
+                });
+                Futures.addCallback(
+                        result, new FutureCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        assureStopped();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(final Throwable t) {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        assureStopped();
+                                        if (t instanceof java.util.concurrent.CancellationException) {
+                                            // At the time of writing, the only way advertising ends
+                                            // is by throwing this exception, so this is actually
+                                            // a non-exceptional success case.
+                                        } else {
+                                            Log.d(TAG, "Failure to gracefully stop advertising.", t);
+
+                                        }
+                                    }
+                                });
                             }
                         }
-                    });
-                }
+                );
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        assureStopped();
+                        Log.d(TAG, "Failure to start advertising " + moment, t);
+                    }
+                });
             }
         };
     }

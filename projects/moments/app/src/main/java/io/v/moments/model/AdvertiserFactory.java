@@ -9,15 +9,14 @@ import java.util.Map;
 
 import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.IdSet;
-import io.v.moments.lib.Id;
 import io.v.moments.ifc.Moment;
-import io.v.moments.ifc.MomentFactory;
+import io.v.moments.lib.Id;
 import io.v.moments.lib.V23Manager;
 
 /**
  * Makes advertisers.  Keeps a record of all of them for the life of the app.
- * Can use this record to reject local advertisements when scanning, or to
- * shut down all advertising.
+ * Can use this record to reject local advertisements when scanning, or to shut
+ * down all advertising.
  */
 public class AdvertiserFactory implements IdSet {
     private final V23Manager mV23Manager;

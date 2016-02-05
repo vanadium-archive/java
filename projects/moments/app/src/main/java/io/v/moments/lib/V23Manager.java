@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import org.joda.time.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
@@ -25,7 +26,6 @@ import io.v.v23.context.VContext;
 import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 import io.v.v23.discovery.VDiscovery;
-import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
@@ -38,6 +38,7 @@ import io.v.v23.verror.VException;
 public class V23Manager {
     private static final String TAG = "V23Manager";
     private static final String BLESSINGS_KEY = "BlessingsKey";
+    private static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
     private Context mAndroidCtx;
     private VContext mV23Ctx = null;
     private VDiscovery mDiscovery = null;
@@ -45,42 +46,16 @@ public class V23Manager {
     // Singleton.
     private V23Manager() {
     }
-    
-    public VContext advertise(final Service service, List<BlessingPattern> patterns) {
+
+    public VContext advertise(final Service service, FutureCallback<ListenableFuture<Void>> callback) {
         if (mDiscovery == null) {
-            Log.d(TAG, "Discovery not ready.");
+            callback.onFailure(new IllegalStateException("Discovery not ready."));
             return null;
         }
-        VContext context = mV23Ctx.withCancel();
+        VContext context = mV23Ctx.withTimeout(Duration.standardMinutes(5));
         final ListenableFuture<ListenableFuture<Void>> fStart =
-                mDiscovery.advertise(context, service, patterns);
-        Futures.addCallback(fStart, new FutureCallback<ListenableFuture<Void>>() {
-            @Override
-            public void onSuccess(ListenableFuture<Void> result) {
-                Log.d(TAG, "Started advertising with ID = " +
-                        service.getInstanceId());
-                Futures.addCallback(
-                        result, new FutureCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void result) {
-                                Log.d(TAG, "Stopped advertising.");
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                if (!(t instanceof  java.util.concurrent.CancellationException)) {
-                                    Log.d(TAG, "Failure to gracefully stop advertising.", t);
-                                }
-                            }
-                        }
-                );
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.d(TAG, "Failure to start advertising.", t);
-            }
-        });
+                mDiscovery.advertise(context, service, NO_PATTERNS);
+        Futures.addCallback(fStart, callback);
         Log.d(TAG, "Back from V.getDiscovery.advertise");
         return context;
     }
@@ -93,14 +68,14 @@ public class V23Manager {
         VContext context = mV23Ctx.withCancel();
         Log.d(TAG, "Calling V.getDiscovery.scan with q=" + query);
         final ListenableFuture<Void> fStart =
-            InputChannels.withCallback(mDiscovery.scan(context, query),
-                new InputChannelCallback<Update>() {
-                    @Override
-                    public ListenableFuture<Void> onNext(Update result) {
-                        listener.scanUpdateReceived(result);
-                        return Futures.immediateFuture(null);
-                    }
-                });
+                InputChannels.withCallback(mDiscovery.scan(context, query),
+                        new InputChannelCallback<Update>() {
+                            @Override
+                            public ListenableFuture<Void> onNext(Update result) {
+                                listener.scanUpdateReceived(result);
+                                return Futures.immediateFuture(null);
+                            }
+                        });
         Futures.addCallback(fStart, new FutureCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
@@ -151,20 +126,9 @@ public class V23Manager {
         mAndroidCtx = null;
     }
 
-    private VContext getListenContext() throws VException {
-        final boolean useProxy = false;
-        // Disabled while debugging network performance / visibility issues.
-        if (useProxy) {
-            ListenSpec spec = V.getListenSpec(mV23Ctx).withProxy("proxy");
-            Log.d(TAG, "listenSpec = " + spec.toString() + " p=" + spec.getProxy());
-            return V.withListenSpec(mV23Ctx, spec);
-        }
-        return mV23Ctx;
-    }
-
     public VContext makeServerContext(String mountName, Object server) throws VException {
         return V.withNewServer(
-                getListenContext(),
+                mV23Ctx.withCancel(),
                 mountName,
                 server,
                 VSecurity.newAllowEveryoneAuthorizer());

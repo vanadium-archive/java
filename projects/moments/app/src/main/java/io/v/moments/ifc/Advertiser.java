@@ -4,14 +4,19 @@
 
 package io.v.moments.ifc;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
+
 /**
  * Something needing to advertise itself will want an implementation of this.
  */
 public interface Advertiser {
     /**
-     * Synchronously start advertising.
+     * Asynchronously start advertising.  Callback executed on success or
+     * failure of advertising startup.  The future returned on successful
+     * startup should be given a callback to handle advertising shutdown.
      */
-    void advertiseStart();
+    void advertiseStart(FutureCallback<ListenableFuture<Void>> callback);
 
     /**
      * True if advertiseStop could usefully be called.

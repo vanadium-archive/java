@@ -11,12 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.concurrent.ExecutorService;
-
 import io.v.moments.R;
 import io.v.moments.ifc.ListObserver;
 import io.v.moments.ifc.Moment;
-import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.lib.ObservedList;
 import io.v.moments.model.AdvertiserFactory;
 
@@ -28,18 +25,15 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
     private final ObservedList<Moment> mRemoteMoments;
     private final ObservedList<Moment> mLocalMoments;
     private final AdvertiserFactory mAdvertiserFactory;
-    private final ExecutorService mExecutor;
     private final Handler mHandler;
 
     public MomentAdapter(ObservedList<Moment> remoteMoments,
                          ObservedList<Moment> localMoments,
                          AdvertiserFactory advertiserFactory,
-                         ExecutorService executor,
                          Handler handler) {
         mRemoteMoments = remoteMoments;
         mLocalMoments = localMoments;
         mAdvertiserFactory = advertiserFactory;
-        mExecutor = executor;
         mHandler = handler;
     }
 
@@ -73,7 +67,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.item_moment, parent, false);
-        return new MomentHolder(view, context, mExecutor, mHandler);
+        return new MomentHolder(view, context, mHandler);
     }
 
     private boolean isRemote(int position) {

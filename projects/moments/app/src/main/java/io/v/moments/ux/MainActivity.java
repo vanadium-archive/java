@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         // serialExecutor is used to start/stop advertisements in the UX.
         MomentAdapter adapter = new MomentAdapter(
                 mRemoteMoments, mLocalMoments,
-                mAdvertiserFactory, mSerialExecutor, mHandler);
+                mAdvertiserFactory, mHandler);
 
         // Lets the adapter speed up a bit.
         adapter.setHasStableIds(true);
@@ -328,23 +328,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         if (mLocalMoments.isEmpty()) {
             Log.d(TAG, "Loading moments from prefs.");
             mStateStore.prefsLoad(mLocalMoments);
-        }
-        for (final Moment moment : mLocalMoments) {
-            if (moment.getDesiredAdState().equals(Moment.AdState.ON)) {
-                mSerialExecutor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            mAdvertiserFactory.getOrMake(moment).advertiseStart();
-                            Log.d(TAG, "Started advertising " + moment.getCaption());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            toast("Unable to advertise - see log.");
-                        }
-                    }
-                });
-
-            }
         }
         if (mShouldBeScanning && !isScanning()) {
             startScanning();

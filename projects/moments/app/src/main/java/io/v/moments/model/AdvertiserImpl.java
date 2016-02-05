@@ -7,6 +7,7 @@ package io.v.moments.model;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -25,7 +26,6 @@ import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ServerCall;
-import io.v.v23.security.BlessingPattern;
 import io.v.v23.verror.VException;
 
 /**
@@ -34,7 +34,6 @@ import io.v.v23.verror.VException;
 public class AdvertiserImpl implements Advertiser {
     static final String NO_MOUNT_NAME = "";
     private static final String TAG = "AdvertiserImpl";
-    private static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
     private final V23Manager mV23Manager;
     private final Moment mMoment;
 
@@ -54,7 +53,7 @@ public class AdvertiserImpl implements Advertiser {
 
     @Override
     public boolean isAdvertising() {
-        return mAdvCtx != null;
+        return mAdvCtx != null || mServerCtx != null;
     }
 
     @Override
@@ -63,16 +62,20 @@ public class AdvertiserImpl implements Advertiser {
     }
 
     @Override
-    public void advertiseStart() {
+    public void advertiseStart(FutureCallback<ListenableFuture<Void>> callback) {
+        Log.d(TAG, "Entering advertiseStart.");
         if (isAdvertising()) {
-            throw new IllegalStateException("Already advertising.");
+            callback.onFailure(new IllegalStateException("Already advertising."));
+            return;
         }
         Log.d(TAG, "Starting service for moment " + mMoment);
         try {
             mServerCtx = mV23Manager.makeServerContext(
                     NO_MOUNT_NAME, new MomentServer());
         } catch (VException e) {
-            throw new IllegalStateException("Unable to start service.", e);
+            mServerCtx = null;
+            callback.onFailure(new IllegalStateException("Unable to start service.", e));
+            return;
         }
         List<String> addresses = new ArrayList<>();
         Endpoint[] points = mV23Manager.getServer(mServerCtx).getStatus().getEndpoints();
@@ -81,24 +84,25 @@ public class AdvertiserImpl implements Advertiser {
         }
         Attributes attrs = mMoment.makeAttributes();
         Log.d(TAG, "Starting advertisement of moment " + mMoment);
-        mAdvCtx = mV23Manager.advertise(
-                makeAdvertisement(attrs, addresses),
-                NO_PATTERNS);
+        Service service = makeAdvertisement(attrs, addresses);
+        mAdvCtx = mV23Manager.advertise(service, callback);
+        Log.d(TAG, "Exiting advertiseStart.");
     }
 
     @Override
     public void advertiseStop() {
-        if (!isAdvertising()) {
-            throw new IllegalStateException("Not advertising.");
+        Log.d(TAG, "Entering advertiseStop");
+        if (mAdvCtx != null) {
+            Log.d(TAG, "Cancelling advertising.");
+            mAdvCtx.cancel();
+            mAdvCtx = null;
         }
-        Log.d(TAG, "Stopping advertisement of " + mMoment);
-        Log.d(TAG, "Cancelling advertising context.");
-        mAdvCtx.cancel();
-        mAdvCtx = null;
-        Log.d(TAG, "Cancelling server context.");
-        mServerCtx.cancel();
-        mServerCtx = null;
-        Log.d(TAG, "Advertising stopped.");
+        if (mServerCtx != null) {
+            Log.d(TAG, "Cancelling service.");
+            mServerCtx.cancel();
+            mServerCtx = null;
+        }
+        Log.d(TAG, "Exiting advertiseStop");
     }
 
     /**
