@@ -3,7 +3,7 @@ Vanadium Gradle Plugin
 
 This plugin provides users of [Gradle](https://gradle.org/) with a convenient
 way to generate Java
-[VDL](https://github.com/vanadium/docs/blob/master/designdocs/vdl-spec.md)
+[VDL](https://vanadium.github.io/designdocs/vdl-spec.html)
 wrappers and to use those wrappers in a Java or Android project. It automates
 several tasks that projects using VDL commonly have to perform.
 

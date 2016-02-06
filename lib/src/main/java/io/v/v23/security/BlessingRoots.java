@@ -12,7 +12,7 @@ import java.security.interfaces.ECPublicKey;
 /**
  * The set of authoritative public keys for roots of blessings.
  * <p>
- * See also: <a href="https://github.com/vanadium/docs/blob/master/glossary.md#blessing-root">https://github.com/vanadium/docs/blob/master/glossary.md#blessing-root</a>.
+ * See also: <a href="https://vanadium.github.io/glossary.html#blessing-root">https://vanadium.github.io/glossary.html#blessing-root</a>.
  */
 public interface BlessingRoots {
     /**

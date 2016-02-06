@@ -75,7 +75,7 @@ public interface VDiscovery {
      *     v.Attrs["a"] = "v1" OR v.Attrs["a"] = "v2"
      * </pre></blockquote><p>
      * You can find the {@code SyncQL} tutorial at:
-     *     https://github.com/vanadium/docs/blob/master/tutorials/syncql-tutorial.md
+     *     https://vanadium.github.io/tutorials/syncbase/syncql-tutorial.html
      *
      * @param context  a context that will be used to stop the scan;  scan will end when the context
      *                 is cancelled or timed out

@@ -12,7 +12,7 @@ package io.v.v23.security;
  * <p>
  * {@code Discharge} objects are immutable and are therefore threadsafe.
  * <p>
- * @see <a href="https://github.com/vanadium/docs/blob/master/glossary.md#discharge">the Discharge glossary entry</a>
+ * @see <a href="https://vanadium.github.io/glossary.html#discharge">the Discharge glossary entry</a>
  */
 public class Discharge {
     private final WireDischarge wire;

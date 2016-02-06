@@ -86,7 +86,7 @@ class VanadiumEnvironment {
         if (!System.getenv().containsKey('JIRI_ROOT')) {
             throw new InvalidUserDataException("JIRI_ROOT is not set. "
                     + "Please follow the Vanadium installation instructions at "
-                    + "https://github.com/vanadium/docs/blob/master/installation.md")
+                    + "https://vanadium.github.io/installation/")
         }
 
         result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
@@ -95,7 +95,7 @@ class VanadiumEnvironment {
             throw new InvalidUserDataException(
                     result.jiriBin.toString() + " does not exist or is not an executable file. "
                     + "Please follow the Vanadium installation instructions at "
-                    + "https://github.com/vanadium/docs/blob/master/installation.md")
+                    + "https://vanadium.github.io/installation/")
         }
         return result
     }

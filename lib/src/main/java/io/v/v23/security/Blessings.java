@@ -28,7 +28,7 @@ import io.v.v23.verror.VException;
  * {@link Blessings} objects are immutable and multiple threads may invoke methods on
  * them simultaneously.
  * <p>
- * See also: <a href="https://github.com/vanadium/docs/blob/master/glossary.md#blessing">https://github.com/vanadium/docs/blob/master/glossary.md#blessing</a>.
+ * See also: <a href="https://vanadium.github.io/glossary.html#blessing">https://vanadium.github.io/glossary.html#blessing</a>.
  */
 public final class Blessings implements Serializable {
     private static final long serialVersionUID = 1L;

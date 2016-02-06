@@ -5,7 +5,7 @@
 /**
  * Package security defines types and utilities associated with security.
  * <p><ul>
- *   <li>Concept: <a href="https://github.com/vanadium/docs/blob/master/concepts/security.md">https://github.com/vanadium/docs/blob/master/concepts/security.md</a></li>
+ *   <li>Concept: <a href="https://vanadium.github.io/concepts/security.html">https://vanadium.github.io/concepts/security.html</a></li>
  *   <li>Tutorial: (forthcoming)</li>
  * </ul><p>
  * The primitives and APIs defined in this package enable bi-directional,

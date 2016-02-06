@@ -14,7 +14,7 @@ import java.security.interfaces.ECPublicKey;
  * <p>
  * Multiple goroutines may invoke methods on a {@link VPrincipal} simultaneously.
  * <p>
- * See also: <a href="https://github.com/vanadium/docs/blob/master/glossary.md#principal">https://github.com/vanadium/docs/blob/master/glossary.md#principal</a>.
+ * See also: <a href="https://vanadium.github.io/glossary.html#principal">https://vanadium.github.io/glossary.html#principal</a>.
  */
 public interface VPrincipal {
     /**
