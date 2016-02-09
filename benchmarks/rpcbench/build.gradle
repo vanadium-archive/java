@@ -26,13 +26,6 @@ dependencies {
     compile 'com.google.caliper:caliper:1.0-beta-2'
 }
 
-task copyLib(type: Copy) {
-    from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
-    destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
-}
-
-tasks.'processResources'.dependsOn(copyLib)
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
 }
@@ -44,3 +37,8 @@ clean {
 vdl {
     inputPaths += ['src/main/java']
 }
+
+def libProject = rootProject.findProject(':lib')
+
+tasks.run.dependsOn libProject.tasks.copyVanadiumLib
+tasks.run.jvmArgs "-Djava.library.path=${libProject.buildDir}/libs"
