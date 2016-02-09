@@ -4,8 +4,6 @@
 
 package io.v.rx.syncbase;
 
-import android.content.Context;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,26 +13,20 @@ import io.v.impl.google.naming.NamingUtil;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UserAppSyncHost implements SyncHostLevel {
-    private final String mAppName, mSgHostSuffix, mRendezvousSuffix;
+public class ClientLevelCloudSync implements SyncHostLevel {
+    public static final ClientLevelCloudSync DEFAULT =
+            new ClientLevelCloudSync(DEFAULT_CLOUD_SYNC_SUFFIX, DEFAULT_RENDEZVOUS_SUFFIX);
 
-    public UserAppSyncHost(final String appName) {
-        this(appName, DEFAULT_SG_HOST_SUFFIX, DEFAULT_RENDEZVOUS_SUFFIX);
-    }
-
-    public UserAppSyncHost(final Context androidContext) {
-        this(androidContext.getPackageName());
-    }
+    private final String mSgHostSuffix, mRendezvousSuffix;
 
     @Override
     public String getSyncgroupHostName(final ClientUser clientUser) {
-        return NamingUtil.join(BlessingsUtils.userMount(clientUser.getUsername()),
-                mAppName, mSgHostSuffix);
+        return NamingUtil.join(BlessingsUtils.clientMount(clientUser.getClientId()), mSgHostSuffix);
     }
 
     @Override
     public List<String> getRendezvousTableNames(final ClientUser clientUser) {
         return Arrays.asList(NamingUtil.join(
-                BlessingsUtils.userMount(clientUser.getUsername()), mAppName, mRendezvousSuffix));
+                BlessingsUtils.clientMount(clientUser.getClientId()), mRendezvousSuffix));
     }
 }

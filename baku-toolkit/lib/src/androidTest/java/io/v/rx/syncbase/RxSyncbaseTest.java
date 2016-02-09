@@ -21,13 +21,13 @@ import rx.Observable;
 @Accessors(prefix = "m")
 @Getter
 public class RxSyncbaseTest extends VAndroidTestCase {
-    private RxSyncbase mRxSyncbase;
+    private RxAndroidSyncbase mRxSyncbase;
     private RxTable mTable;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mRxSyncbase = new RxSyncbase(getVContext(), createSyncbaseClient());
+        mRxSyncbase = new RxAndroidSyncbase(getVContext(), createSyncbaseClient());
         mTable = mRxSyncbase.rxApp(getClass().getName()).rxDb("db").rxTable("t");
     }
 

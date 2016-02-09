@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import io.v.rx.RxTestCase;
 import io.v.rx.SubscriberInputChannel;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.KeyValue;
 import io.v.v23.services.watch.ResumeMarker;
@@ -77,7 +76,6 @@ public class RxTableTest extends RxTestCase {
         mChanges.subscribe(watchChan);
 
         final VContext ctx = mock(VContext.class);
-        final CancelableVContext cctx = mock(CancelableVContext.class);
         final RxDb rxdb = mock(RxDb.class);
         final Database db = mock(Database.class);
         final BatchDatabase bdb = mock(BatchDatabase.class);
@@ -85,7 +83,7 @@ public class RxTableTest extends RxTestCase {
 
         mockStatic(VomUtil.class);
 
-        when(ctx.withCancel()).thenReturn(cctx);
+        when(ctx.withCancel()).thenReturn(ctx);
         when(rxdb.getVContext()).thenReturn(ctx);
         when(rxdb.getObservable()).thenReturn(Observable.just(db));
         when(db.getTable("t")).thenReturn(t);

@@ -12,7 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import io.v.android.v23.V;
-import io.v.baku.toolkit.blessings.AccountManagerBlessingsFragment;
+import io.v.baku.toolkit.blessings.BlessingsManagerBlessingsProvider;
 import io.v.baku.toolkit.blessings.BlessingsProvider;
 import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.baku.toolkit.debug.DebugFragment;
@@ -21,6 +21,7 @@ import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
+import java8.util.function.BiFunction;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -70,17 +71,6 @@ public class VAndroidContextMixin<T extends Context> implements VAndroidContextT
         try {
             return V.init(mAndroidContext, getSavedOptions());
         } catch (final RuntimeException e) {
-            try {
-                /* V.shutdown so we might try V.init again if warranted. If we don't V.shutdown
-                first, the process can abruptly die. It seems that if this happens, Android might
-                just restart the app immediately, i.e. before we've been able to display an
-                intelligible error message. */
-                V.shutdown();
-            } catch (final RuntimeException e2) {
-                log.error("Unable to clean up failed Vanadium initialization", e2);
-                e.addSuppressed(e2);
-            }
-
             if (mVanadiumPreferences.getAll().isEmpty()) {
                 throw e;
             } else {
@@ -93,16 +83,28 @@ public class VAndroidContextMixin<T extends Context> implements VAndroidContextT
 
     public VAndroidContextMixin(final T androidContext, final BlessingsProvider blessingsProvider,
                                 final ErrorReporter errorReporter) {
+        this(androidContext, (x, y) -> blessingsProvider, errorReporter);
+    }
+
+    public VAndroidContextMixin(
+            final T androidContext, final BiFunction<? super VContext, ? super T, BlessingsProvider>
+            blessingsProviderFactory, final ErrorReporter errorReporter) {
         mAndroidContext = androidContext;
-        mBlessingsProvider = blessingsProvider;
         mErrorReporter = errorReporter;
 
         mVanadiumPreferences = getVanadiumPreferences(mAndroidContext);
         mVContext = vinit();
 
+        mBlessingsProvider = blessingsProviderFactory.apply(mVContext, mAndroidContext);
+
         //Any time our blessings change, we need to attach them to our principal.
         mBlessingsProvider.getPassiveRxBlessings().subscribe(this::processBlessings,
                 t -> errorReporter.onError(R.string.err_blessings_misc, t));
+    }
+
+    @Override
+    public void close() {
+        mVContext.cancel();
     }
 
     protected void processBlessings(final Blessings blessings) {
@@ -116,15 +118,12 @@ public class VAndroidContextMixin<T extends Context> implements VAndroidContextT
     public static <T extends Activity> VAndroidContextMixin<T> withDefaults(
             final T activity, final Bundle savedInstanceState) {
         final FragmentManager mgr = activity.getFragmentManager();
-        final AccountManagerBlessingsFragment blessingsProvider;
         final ErrorReporterFragment errorReporter;
 
         if (savedInstanceState == null) {
-            blessingsProvider = new AccountManagerBlessingsFragment();
             errorReporter = new ErrorReporterFragment();
 
             final FragmentTransaction t = mgr.beginTransaction()
-                    .add(blessingsProvider, AccountManagerBlessingsFragment.TAG)
                     .add(errorReporter, ErrorReporterFragment.TAG);
 
             if (DebugUtils.isApkDebug(activity)) {
@@ -133,9 +132,9 @@ public class VAndroidContextMixin<T extends Context> implements VAndroidContextT
             }
             t.commit();
         } else {
-            blessingsProvider = AccountManagerBlessingsFragment.find(mgr);
             errorReporter = ErrorReporterFragment.find(mgr);
         }
-        return new VAndroidContextMixin<>(activity, blessingsProvider, errorReporter);
+        return new VAndroidContextMixin<>(activity, BlessingsManagerBlessingsProvider::new,
+                errorReporter);
     }
 }

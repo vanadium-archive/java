@@ -30,7 +30,7 @@ import rx.subjects.ReplaySubject;
  * {@link Observable}.
  */
 @Accessors(prefix = "m")
-public class SyncbaseClient implements AutoCloseable {
+public class SyncbaseAndroidClient implements AutoCloseable {
     public static class BindException extends Exception {
         public BindException(final String message) {
             super(message);
@@ -100,8 +100,8 @@ public class SyncbaseClient implements AutoCloseable {
      *                    will not be started until blessings are available.
      *                    TODO(rosswang): this should either handle blessings changes or not care.
      */
-    public SyncbaseClient(final Context androidContext, final Observable<Blessings> rxBlessings,
-                          final boolean cleanStart, final Duration keepAlive) {
+    public SyncbaseAndroidClient(final Context androidContext, final Observable<Blessings> rxBlessings,
+                                 final boolean cleanStart, final Duration keepAlive) {
         mAndroidContext = androidContext;
 
         /*
@@ -129,7 +129,7 @@ public class SyncbaseClient implements AutoCloseable {
         mObservable = rpl.filter(s -> s != null);
     }
 
-    public SyncbaseClient(final Context androidContext, final Observable<Blessings> rxBlessings) {
+    public SyncbaseAndroidClient(final Context androidContext, final Observable<Blessings> rxBlessings) {
         this(androidContext, rxBlessings, false, null);
     }
 

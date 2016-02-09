@@ -7,12 +7,12 @@ package io.v.baku.toolkit;
 import android.app.Activity;
 import android.os.Bundle;
 
-import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.bind.CollectionBinding;
+import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.syncbase.BakuDb;
 import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
-import io.v.rx.syncbase.GlobalUserSyncgroup;
+import io.v.rx.syncbase.UserCloudSyncgroup;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +108,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     }
 
     protected void joinInitialSyncGroup() {
-        GlobalUserSyncgroup.forActivity(this).join();
+        UserCloudSyncgroup.forActivity(this).join();
     }
 
     public void onSyncError(final Throwable t) {

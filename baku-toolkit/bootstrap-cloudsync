@@ -1,0 +1,22 @@
+#!/bin/bash
+# Copyright 2016 The Vanadium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+if [ ${host-} ]; then
+  client=${client-608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com}
+  
+  blessings="dev.v.io:o:$client"
+  
+  name="tmp/clients/$client/cloudsync"
+  echo "Running syncbased on $host as $name"
+  
+  $JIRI_ROOT/release/go/bin/dmrun --debug --ssh $host \
+    --sshoptions "-i $HOME/.ssh/google_compute_engine" \
+    $JIRI_ROOT/release/go/bin/syncbased --root-dir="/tmp/syncbase" \
+    --name=$name --v23.tcp.address=:8199 \
+    --v23.namespace.root=/ns.dev.v.io:8101 \
+    --v23.permissions.literal="{\"Admin\":{\"In\":[\"${blessings}\"]},\"Write\":{\"In\":[\"${blessings}\"]},\"Read\":{\"In\":[\"${blessings}\"]},\"Resolve\":{\"In\":[\"${blessings}\"]},\"Debug\":{\"In\":[\"${blessings}\"]}}"
+else
+  echo "Missing required environment variable host."
+fi

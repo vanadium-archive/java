@@ -13,7 +13,6 @@ import android.content.pm.ServiceInfo;
 
 import java.io.IOException;
 
-import io.v.android.v23.V;
 import io.v.baku.toolkit.R;
 import io.v.baku.toolkit.VAndroidContextTrait;
 import lombok.experimental.UtilityClass;
@@ -79,7 +78,6 @@ public class DebugUtils {
      */
     public static void killProcess(final Context context) {
         stopPackageServices(context);
-        V.shutdown();
         System.exit(0);
     }
 

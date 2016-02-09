@@ -13,7 +13,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import io.v.baku.toolkit.RobolectricTestCase;
 import io.v.v23.InputChannel;
 import io.v.v23.verror.EndOfFileException;
 
@@ -32,7 +31,7 @@ public class RxInputChannelTest {
                 Futures.immediateFuture(1),
                 Futures.immediateFuture(2),
                 Futures.immediateFailedFuture(PowerMockito.mock(EndOfFileException.class)));
-        assertEquals(ImmutableList.of(1, 2), RobolectricTestCase.first(
+        assertEquals(ImmutableList.of(1, 2), RxTestCase.first(
                 RxInputChannel.wrap(mockInputChannel).autoConnect().toList()));
     }
 }

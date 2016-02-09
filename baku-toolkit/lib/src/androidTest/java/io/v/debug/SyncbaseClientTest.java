@@ -17,7 +17,7 @@ public class SyncbaseClientTest extends VAndroidTestCase {
     public void testAppPersistence() throws Exception {
         final VContext ctx = getVContext();
 
-        try (final SyncbaseClient sb = createSyncbaseClient()) {
+        try (final SyncbaseAndroidClient sb = createSyncbaseClient()) {
             final SyncbaseApp app = first(sb.getRxClient()).getApp(APP);
             try {
                 sync(app.create(ctx, null));
@@ -26,7 +26,7 @@ public class SyncbaseClientTest extends VAndroidTestCase {
             assertEquals(true, (boolean) sync(app.exists(ctx)));
         }
 
-        try (final SyncbaseClient sb = createSyncbaseClient()) {
+        try (final SyncbaseAndroidClient sb = createSyncbaseClient()) {
             final SyncbaseApp app = first(sb.getRxClient()).getApp(APP);
             assertEquals(true, (boolean) sync(app.exists(ctx)));
             sync(app.destroy(ctx));

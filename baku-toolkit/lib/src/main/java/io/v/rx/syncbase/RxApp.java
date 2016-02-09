@@ -40,9 +40,7 @@ public class RxApp extends RxEntity<SyncbaseApp, SyncbaseService> {
     @Override
     public Observable<SyncbaseApp> mapFrom(final SyncbaseService sb) {
         final SyncbaseApp app = sb.getApp(mName);
-        return toObservable(SyncbaseEntity.compose(app::exists, app::create)
-                .ensureExists(mVContext, null))
-                .map(x -> app);
+        return toObservable(SyncbaseEntity.forApp(app).ensureExists(mVContext)).map(x -> app);
     }
 
     public RxDb rxDb(final String name) {

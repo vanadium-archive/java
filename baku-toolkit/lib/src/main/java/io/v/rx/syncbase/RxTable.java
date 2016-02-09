@@ -16,7 +16,6 @@ import org.robotninjas.concurrent.FluentFutures;
 import io.v.rx.RxInputChannel;
 import io.v.rx.VFn;
 import io.v.v23.InputChannel;
-import io.v.v23.context.CancelableVContext;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.KeyValue;
@@ -87,9 +86,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     @Override
     public Observable<Table> mapFrom(final DatabaseCore db) {
         final Table t = db.getTable(mName);
-        return toObservable(SyncbaseEntity.compose(t::exists, t::create)
-                .ensureExists(mVContext, null))
-                .map(x -> t);
+        return toObservable(SyncbaseEntity.forTable(t).ensureExists(mVContext)).map(x -> t);
     }
 
     private <T> Observable<T> getInitial(
@@ -212,7 +209,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
     }
 
     private void cancelContextOnDisconnect(final Subscriber<?> subscriber,
-                                           final CancelableVContext cancelable,
+                                           final VContext cancelable,
                                            final String prefix) {
         subscriber.add(Subscriptions.create(() -> {
             log.debug("Cancelling watch on {}: {}", mName, prefix);
@@ -239,7 +236,7 @@ public class RxTable extends RxEntity<Table, DatabaseCore> {
                                     "Unable to abort watch initial read query", t))), r));
                 })
                 .switchMap(i -> {
-                    final CancelableVContext cancelable = mVContext.withCancel();
+                    final VContext cancelable = mVContext.withCancel();
                     cancelContextOnDisconnect(subscriber, cancelable, prefix);
                     log.debug("Watching {}: {}", mName, prefix);
                     return mergeInitial.call(i, observeWatchStream.call(

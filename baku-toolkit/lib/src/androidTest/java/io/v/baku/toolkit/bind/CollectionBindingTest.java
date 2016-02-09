@@ -9,17 +9,17 @@ import android.widget.ListView;
 import com.google.common.base.Throwables;
 
 import io.v.baku.toolkit.VAndroidTestCase;
-import io.v.rx.syncbase.RxSyncbase;
+import io.v.rx.syncbase.RxAndroidSyncbase;
 import io.v.rx.syncbase.RxTable;
 
 public class CollectionBindingTest extends VAndroidTestCase {
-    private RxSyncbase mRxSyncbase;
+    private RxAndroidSyncbase mRxSyncbase;
     private RxTable mTable;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mRxSyncbase = new RxSyncbase(getVContext(), createSyncbaseClient());
+        mRxSyncbase = new RxAndroidSyncbase(getVContext(), createSyncbaseClient());
         mTable = mRxSyncbase.rxApp(getClass().getName()).rxDb("db").rxTable("t");
     }
 

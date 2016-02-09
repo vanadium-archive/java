@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.6.0'
+version = '0.7.0'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -59,7 +59,6 @@ dependencies {
             'org.powermock:powermock-classloading-xstream:1.6.3',
             'org.powermock:powermock-module-junit4:1.6.3',
             'org.powermock:powermock-module-junit4-rule:1.6.3',
-            'org.robolectric:robolectric:3.0',
             'org.slf4j:slf4j-simple:1.7.12'
     )
 
@@ -70,10 +69,10 @@ dependencies {
     compile(
             'com.jakewharton.rxbinding:rxbinding:0.3.0',
             'commons-io:commons-io:2.4',
-            'io.reactivex:rxandroid:1.0.1',
-            'io.reactivex:rxjava:1.0.16',
+            'io.reactivex:rxandroid:1.1.0',
+            'io.reactivex:rxjava:1.0.17',
             'io.reactivex:rxjava-async-util:0.21.0',
-            'io.v:vanadium-android:1.0',
+            'io.v:vanadium-android:1.6',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
             'net.sourceforge.streamsupport:streamsupport:1.3.2',
             'org.robotninjas:fluent-futures:1.0'
@@ -156,15 +155,7 @@ bintray {
     user = project.properties.bintrayUsername
     key = project.properties.bintrayApiKey
 
-    // TODO(rosswang): use - https://github.com/bintray/gradle-bintray-plugin/issues/81
-    //configurations = ['archives']
-    // TODO(rosswang): remove - https://github.com/bintray/gradle-bintray-plugin/issues/81
-    filesSpec {
-        from 'build/libs', 'build/outputs/aar', 'build/poms'
-        rename '.+\\.aar', artifactPrefix + '.aar'
-        rename 'pom-default\\.xml', artifactPrefix + '.pom'
-        into 'io/v/baku-toolkit/' + version
-    }
+    configurations = ['archives']
 
     pkg {
         desc = pkgDesc

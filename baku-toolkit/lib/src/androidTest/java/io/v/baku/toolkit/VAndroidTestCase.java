@@ -11,7 +11,7 @@ import org.joda.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import io.v.android.v23.V;
-import io.v.debug.SyncbaseClient;
+import io.v.debug.SyncbaseAndroidClient;
 import io.v.v23.context.VContext;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -72,15 +72,12 @@ public class VAndroidTestCase extends AndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        // TODO(rosswang): https://github.com/vanadium/issues/issues/809
-        // We can't shut down Vanadium because we can't shut down Syncbase. Nothing will fail
-        // outright, but operations on subsequent uses of Syncbase will hang indefinitely.
-        //V.shutdown();
+        mVContext.cancel();
         super.tearDown();
     }
 
-    public SyncbaseClient createSyncbaseClient() {
+    public SyncbaseAndroidClient createSyncbaseClient() {
         // TODO(rosswang): zero duration after https://github.com/vanadium/issues/issues/809
-        return new SyncbaseClient(getContext(), null, true, Duration.standardMinutes(2));
+        return new SyncbaseAndroidClient(getContext(), null, true, Duration.standardMinutes(2));
     }
 }

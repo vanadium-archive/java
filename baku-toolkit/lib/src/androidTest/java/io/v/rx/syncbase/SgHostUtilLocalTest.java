@@ -51,7 +51,6 @@ public class SgHostUtilLocalTest extends VAndroidTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        mMountTable.stop();
         FileUtils.deleteDirectory(mStorageRoot);
         super.tearDown();
     }

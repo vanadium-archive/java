@@ -32,4 +32,10 @@ public abstract class VActivity extends Activity implements VAndroidContextTrait
         super.onCreate(savedInstanceState, persistentState);
         mVAndroidContextTrait = createVActivityTrait(savedInstanceState);
     }
+
+    @Override
+    protected void onDestroy() {
+        mVAndroidContextTrait.close();
+        super.onDestroy();
+    }
 }

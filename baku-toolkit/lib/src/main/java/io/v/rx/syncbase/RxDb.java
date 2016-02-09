@@ -40,9 +40,7 @@ public class RxDb extends RxEntity<Database, SyncbaseApp> {
     @Override
     public Observable<Database> mapFrom(final SyncbaseApp app) {
         final Database db = app.getNoSqlDatabase(mName, null);
-        return toObservable(SyncbaseEntity.compose(db::exists, db::create)
-                .ensureExists(mVContext, null))
-                .map(x -> db);
+        return toObservable(SyncbaseEntity.forDb(db).ensureExists(mVContext)).map(x -> db);
     }
 
     public RxTable rxTable(final String name) {
