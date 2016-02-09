@@ -14,10 +14,21 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
+    <uses-permission android:name="android.permission.NFC" />
+
     <application>
-        <activity
-            android:name="io.v.android.impl.google.services.blessing.BlessingActivity"
+        <activity android:name="io.v.android.impl.google.services.blessing.BlessingActivity"
             android:excludeFromRecents="true"/>
+        <activity android:name="io.v.android.impl.google.services.beam.BeamActivity"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="vnd.android.nfc"
+                    android:host="ext"
+                    android:pathPrefix="/io.v.android.vbeam:vbs"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

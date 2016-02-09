@@ -8,6 +8,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
+        classpath 'io.v:gradle-plugin:1.4'
     }
 }
 
@@ -16,6 +17,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'wrapper'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'io.v.vdl'
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
@@ -54,6 +56,10 @@ dependencies {
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
     }
+}
+
+vdl {
+    inputPaths += 'src/main/java'
 }
 
 public static isDarwin() {
