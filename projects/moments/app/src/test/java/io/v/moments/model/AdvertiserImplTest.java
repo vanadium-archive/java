@@ -115,7 +115,7 @@ public class AdvertiserImplTest {
     @Test
     public void advertiseStartSuccess() {
         assertFalse(mAdvertiser.isAdvertising());
-        mAdvertiser.advertiseStart();
+        mAdvertiser.start();
 
         verify(mV23Manager).advertise(
                 mAdvertisement.capture(),
@@ -139,25 +139,25 @@ public class AdvertiserImplTest {
     @Test
     public void advertiseStartFailure() {
         assertFalse(mAdvertiser.isAdvertising());
-        mAdvertiser.advertiseStart();
+        mAdvertiser.start();
         assertTrue(mAdvertiser.isAdvertising());
         mThrown.expect(IllegalStateException.class);
         mThrown.expectMessage("Already advertising.");
-        mAdvertiser.advertiseStart();
+        mAdvertiser.start();
     }
 
     @Test
     public void advertiseStopFailure() {
         mThrown.expect(IllegalStateException.class);
         mThrown.expectMessage("Not advertising.");
-        mAdvertiser.advertiseStop();
+        mAdvertiser.stop();
     }
 
     @Test
     public void advertiseStopSuccess() throws Exception {
         advertiseStartSuccess();
         assertTrue(mAdvertiser.isAdvertising());
-        mAdvertiser.advertiseStop();
+        mAdvertiser.stop();
         verify(mContext).cancel();
         verify(mServerContext).cancel();
         assertFalse(mAdvertiser.isAdvertising());

@@ -16,6 +16,7 @@ import io.v.moments.ifc.ListObserver;
 import io.v.moments.ifc.Moment;
 import io.v.moments.lib.ObservedList;
 import io.v.moments.model.AdvertiserFactory;
+import io.v.moments.model.Toaster;
 
 /**
  * Stacks two moment lists in a recycler view.
@@ -24,17 +25,17 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
         implements ListObserver {
     private final ObservedList<Moment> mRemoteMoments;
     private final ObservedList<Moment> mLocalMoments;
+    private final Toaster mToaster;
     private final AdvertiserFactory mAdvertiserFactory;
-    private final Handler mHandler;
 
     public MomentAdapter(ObservedList<Moment> remoteMoments,
                          ObservedList<Moment> localMoments,
-                         AdvertiserFactory advertiserFactory,
-                         Handler handler) {
+                         Toaster toaster,
+                         AdvertiserFactory advertiserFactory) {
         mRemoteMoments = remoteMoments;
         mLocalMoments = localMoments;
+        mToaster = toaster;
         mAdvertiserFactory = advertiserFactory;
-        mHandler = handler;
     }
 
     public void beginObserving() {
@@ -67,7 +68,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.item_moment, parent, false);
-        return new MomentHolder(view, context, mHandler);
+        return new MomentHolder(view, context, mToaster);
     }
 
     private boolean isRemote(int position) {

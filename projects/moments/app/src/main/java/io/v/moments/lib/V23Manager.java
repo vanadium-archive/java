@@ -19,7 +19,6 @@ import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
-import io.v.moments.ifc.ScanListener;
 import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
@@ -33,7 +32,10 @@ import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
 /**
- * Various static V23 utilities gathered in an injectable class.
+ * Various static V23 utilities gathered into an instantiatable class.
+ *
+ * This allows v23 usage to be injected and mocked.  The class is a singleton to
+ * avoid confusion about init, shutdown and the 'base context'.
  */
 public class V23Manager {
     private static final String TAG = "V23Manager";
@@ -47,50 +49,69 @@ public class V23Manager {
     private V23Manager() {
     }
 
-    public VContext advertise(final Service service, FutureCallback<ListenableFuture<Void>> callback) {
+    public void scan(
+            String query,
+            Duration duration,
+            FutureCallback<VContext> startupCallback,
+            InputChannelCallback<Update> updateCallback,
+            FutureCallback<Void> completionCallback) {
+        Log.d(TAG, "Starting scan with q=[" + query + "]");
         if (mDiscovery == null) {
-            callback.onFailure(new IllegalStateException("Discovery not ready."));
-            return null;
+            startupCallback.onFailure(
+                    new IllegalStateException("Discovery not ready."));
+            return;
         }
-        VContext context = mV23Ctx.withTimeout(Duration.standardMinutes(5));
-        final ListenableFuture<ListenableFuture<Void>> fStart =
-                mDiscovery.advertise(context, service, NO_PATTERNS);
-        Futures.addCallback(fStart, callback);
-        Log.d(TAG, "Back from V.getDiscovery.advertise");
-        return context;
+        VContext context = contextWithTimeout(duration);
+        Futures.addCallback(
+                InputChannels.withCallback(
+                        mDiscovery.scan(context, query), updateCallback),
+                completionCallback);
+        startupCallback.onSuccess(context);
     }
 
-    public VContext scan(String query, final ScanListener listener) {
+    public void advertise(
+            Service advertisement,
+            Duration duration,
+            FutureCallback<VContext> startupCallback,
+            FutureCallback<Void> completionCallback) {
         if (mDiscovery == null) {
-            Log.d(TAG, "Discovery not ready.");
-            return null;
+            startupCallback.onFailure(
+                    new IllegalStateException("Discovery not ready."));
+            return;
         }
-        VContext context = mV23Ctx.withCancel();
-        Log.d(TAG, "Calling V.getDiscovery.scan with q=" + query);
-        final ListenableFuture<Void> fStart =
-                InputChannels.withCallback(mDiscovery.scan(context, query),
-                        new InputChannelCallback<Update>() {
-                            @Override
-                            public ListenableFuture<Void> onNext(Update result) {
-                                listener.scanUpdateReceived(result);
-                                return Futures.immediateFuture(null);
-                            }
-                        });
-        Futures.addCallback(fStart, new FutureCallback<Void>() {
+        VContext context = contextWithTimeout(duration);
+        ListenableFuture<ListenableFuture<Void>> hey =
+                mDiscovery.advertise(context, advertisement, NO_PATTERNS);
+        Futures.addCallback(hey, makeWrapped(context, startupCallback, completionCallback));
+    }
+
+    /**
+     * This exists to allow the scan and advertise interfaces to behave the same
+     * way to clients, and to deliver the context via the "success" callback
+     * so there's no chance of a race condition between usage of that context
+     * and code in the callback.
+     */
+    private FutureCallback<ListenableFuture<Void>> makeWrapped(
+            final VContext context,
+            final FutureCallback<VContext> startup,
+            final FutureCallback<Void> completion) {
+        return new FutureCallback<ListenableFuture<Void>>() {
             @Override
-            public void onSuccess(Void result) {
-                Log.d(TAG, "Scan started.");
+            public void onSuccess(ListenableFuture<Void> result) {
+                startup.onSuccess(context);
+                Futures.addCallback(result, completion);
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                Log.d(TAG, "Failure to start scan.", t);
+            public void onFailure(final Throwable t) {
+                startup.onFailure(t);
             }
-        });
-        return context;
+        };
     }
 
-    public synchronized void init(Activity activity, FutureCallback<Blessings> future) {
+
+    public synchronized void init(
+            Activity activity, FutureCallback<Blessings> blessingCallback) {
         Log.d(TAG, "init");
         if (mAndroidCtx != null) {
             if (mAndroidCtx == activity.getApplicationContext()) {
@@ -108,7 +129,7 @@ public class V23Manager {
         Log.d(TAG, "Attempting to get blessings.");
         ListenableFuture<Blessings> f = BlessingsManager.getBlessings(
                 mV23Ctx, activity, BLESSINGS_KEY, true);
-        Futures.addCallback(f, future);
+        Futures.addCallback(f, blessingCallback);
         try {
             mDiscovery = V.newDiscovery(mV23Ctx);
         } catch (VException e) {
@@ -126,7 +147,8 @@ public class V23Manager {
         mAndroidCtx = null;
     }
 
-    public VContext makeServerContext(String mountName, Object server) throws VException {
+    public VContext makeServerContext(
+            String mountName, Object server) throws VException {
         return V.withNewServer(
                 mV23Ctx.withCancel(),
                 mountName,

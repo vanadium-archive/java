@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -38,6 +37,7 @@ import io.v.moments.R;
 import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.MomentFactory;
+import io.v.moments.ifc.Scanner;
 import io.v.moments.lib.DiscoveredList;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
@@ -49,8 +49,9 @@ import io.v.moments.model.BitMapper;
 import io.v.moments.model.Config;
 import io.v.moments.model.FileUtil;
 import io.v.moments.model.MomentFactoryImpl;
+import io.v.moments.model.ScannerImpl;
 import io.v.moments.model.StateStore;
-import io.v.v23.context.VContext;
+import io.v.moments.model.Toaster;
 import io.v.v23.security.Blessings;
 
 /**
@@ -77,8 +78,14 @@ import io.v.v23.security.Blessings;
  * adding a (very large) photo to an advertisement as an attribute noticeably
  * increases the time taken between clicking 'advertise' on one device and
  * seeing any evidence of the advertisement on another device.
+ *
+ * TODO: when reloading from prefs, don't change advertise or scan state. only
+ * do that when reloading from bundle. TODO: ScannerImpl should handle the
+ * Update parsing currently done by DiscoveredList. TODO: unit tests. TODO:
+ * Add version number to prefs, ignore and overwrite state if old version (to
+ * avoid need to manually wipe data to avoid crashes).
  */
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     // Android Marshmallow permissions list.
     private static final String[] PERMS = {
@@ -104,13 +111,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     // See wireUxToDataModel for discussion of the following.
     private StateStore mStateStore;
     private AdvertiserFactory mAdvertiserFactory;
+    private Scanner mScanner;
+    private ScanSwitchHolder mScanSwitchHolder;
     private MomentFactory mMomentFactory;
     private BitMapper mBitMapper;
     private ObservedList<Moment> mLocalMoments;
     private DiscoveredList<Moment> mRemoteMoments;
-    private VContext mScanCtx;
-    private boolean mShouldBeScanning;
     private Id mCurrentPhotoId;
+    private boolean mShouldBeScanning = false;
 
     /**
      * The number used in a moment's file name is called the moments 'ordinal'
@@ -202,6 +210,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         // represent local moments).
         mRemoteMoments = new DiscoveredList<>(converter, mAdvertiserFactory, mHandler);
 
+        Toaster toaster = new Toaster(this);
+
+        mScanner = new ScannerImpl(mV23Manager, Config.Discovery.QUERY);
+        mScanSwitchHolder = new ScanSwitchHolder(
+                toaster, mScanner, mRemoteMoments);
+
         // Stores app state to bundles, preferences, etc.  The mMomentFactory
         // needed to recreate moments.
         mStateStore = new StateStore(
@@ -217,8 +231,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         // for local moments when a user wants to advertise them.  The
         // serialExecutor is used to start/stop advertisements in the UX.
         MomentAdapter adapter = new MomentAdapter(
-                mRemoteMoments, mLocalMoments,
-                mAdvertiserFactory, mHandler);
+                mRemoteMoments, mLocalMoments, toaster, mAdvertiserFactory);
 
         // Lets the adapter speed up a bit.
         adapter.setHasStableIds(true);
@@ -292,16 +305,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     Config.getWorkingDirectory(this));
             return;
         }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(
-                        MainActivity.this,
-                        R.string.need_permissions,
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
-        });
+        toast(getString(R.string.need_permissions));
     }
 
     /**
@@ -329,9 +333,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             Log.d(TAG, "Loading moments from prefs.");
             mStateStore.prefsLoad(mLocalMoments);
         }
-        if (mShouldBeScanning && !isScanning()) {
-            startScanning();
-        }
     }
 
     @Override
@@ -344,11 +345,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     protected void onDestroy() {
         super.onDestroy();
         logState("onDestroy");
-        if (isScanning()) {
-            stopScanning();
+        if (mScanner.isScanning()) {
+            mScanner.stop();
         }
         stopAllAdvertising();
+        mV23Manager.shutdown();
         Log.d(TAG, "Destruction complete.");
+        Log.d(TAG, " ");
+        Log.d(TAG, " ");
     }
 
     private void stopAllAdvertising() {
@@ -356,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         for (Advertiser advertiser : mAdvertiserFactory.allAdvertisers()) {
             if (advertiser.isAdvertising()) {
                 try {
-                    advertiser.advertiseStop();
+                    advertiser.stop();
                     count++;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -365,10 +369,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             } else {
                 Log.d(TAG, "A moment was not advertising");
             }
-        }
-        if (count > 0) {
-            // This toast noisy if not debugging.
-            // toast("Stopped " + count + " advertisements.");
         }
         Log.d(TAG, "Stopped " + count + " advertisements.");
     }
@@ -391,26 +391,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         return mgr;
     }
 
-    private boolean isScanning() {
-        return mScanCtx != null;
-    }
-
-    private Runnable setScanningSwitch(final boolean on) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                SwitchCompat sw = (SwitchCompat) findViewById(R.id.action_scan);
-                if (sw != null) {
-                    sw.setChecked(on);
-                    if (on) {
-                        toast("Started scanning.");
-                    } else {
-                        toast("Stopped scanning.");
-                    }
-                }
-            }
-        };
-    }
 
     private void toast(final String msg) {
         mHandler.post(new Runnable() {
@@ -421,61 +401,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         });
     }
 
-    private void startScanning() {
-        if (isScanning()) {
-            throw new IllegalStateException("Already scanning.");
-        }
-        mSerialExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Starting scan.");
-                mScanCtx = mV23Manager.scan(Config.QUERY, mRemoteMoments);
-                runOnUiThread(setScanningSwitch(true));
-                Log.d(TAG, "Scan started.");
-            }
-        });
-    }
-
-    private void stopScanning() {
-        if (!isScanning()) {
-            throw new IllegalStateException("Not scanning.");
-        }
-        mSerialExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Stopping scan.");
-                mScanCtx.cancel();
-                mScanCtx = null;
-                mRemoteMoments.dropAll();
-                runOnUiThread(setScanningSwitch(false));
-                Log.d(TAG, "Scan stopped.");
-            }
-        });
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-        if (button.getId() != R.id.action_scan) {
-            throw new IllegalStateException("Bad scan wiring.");
-        }
-        if (isChecked) {
-            mShouldBeScanning = true;
-            if (!isScanning()) {
-                startScanning();
-            }
-        } else {
-            mShouldBeScanning = false;
-            if (isScanning()) {
-                stopScanning();
-            }
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        logState("onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem item = menu.findItem(R.id.action_scan);
-        ((SwitchCompat) MenuItemCompat.getActionView(item)).setOnCheckedChangeListener(this);
+        SwitchCompat sw = (SwitchCompat) MenuItemCompat.getActionView(item);
+        mScanSwitchHolder.setSwitch(sw);
+        if (mShouldBeScanning && !sw.isChecked()) {
+            sw.setChecked(true);
+        }
         return true;
     }
 
@@ -511,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     protected void onSaveInstanceState(Bundle b) {
         super.onSaveInstanceState(b);
         logState("onSaveInstanceState");
-        b.putBoolean(B.SHOULD_BE_SCANNING, mShouldBeScanning);
+        b.putBoolean(B.SHOULD_BE_SCANNING, mScanner.isScanning());
         mStateStore.bundleSave(b, mRemoteMomentCache.values());
         mStateStore.prefsSave(mLocalMoments);
     }
@@ -520,7 +456,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         mStateStore.prefsLoad(mLocalMoments);
         if (b == null) {
             Log.d(TAG, "No bundle passed, starting fresh.");
-            mShouldBeScanning = false;
             mRemoteMomentCache.clear();
             return;
         }

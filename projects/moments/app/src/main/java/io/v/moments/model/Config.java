@@ -10,6 +10,8 @@ import android.graphics.Point;
 import android.os.Environment;
 import android.os.Handler;
 
+import org.joda.time.Duration;
+
 import java.io.File;
 
 import io.v.moments.R;
@@ -22,18 +24,12 @@ public class Config {
     // App can become slower as a result, e.g. a thumbnail transfer that would
     // be quick might be competing for bandwidth with a full size photo.
     public static final boolean DO_FULL_SIZE_TOO = true;
-
-    // Parent directory to all app storage.
+    /**
+     * Parent directory to all app storage.
+     */
     private static final File PHOTO_PARENT_DIR =
             Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES);
-
-    // Required type/interface name, probably a URL into a web-based
-    // ontology.  Necessary for querying.
-    static final String INTERFACE_NAME = "v.io/x/ref.Moments";
-
-    // To limit scans to see only this service.
-    public static final String QUERY = "v.InterfaceName=\"" + INTERFACE_NAME + "\"";
 
     /**
      * Returns purported image display area.
@@ -63,5 +59,25 @@ public class Config {
                 activity.getResources().getDimensionPixelSize(
                         R.dimen.moment_image_width)
         );
+    }
+
+    /** Constants related to discovery. */
+    public static class Discovery {
+        /**
+         * Required type/interface name, probably a URL into a web-based
+         * ontology.  Necessary for querying.
+         */
+        public static final String INTERFACE_NAME = "v.io/x/ref.Moments";
+        /**
+         * To limit scans to see only this service.
+         */
+        public static final String QUERY = "v.InterfaceName=\"" + INTERFACE_NAME + "\"";
+
+        /**
+         * After this duration an advertisement or scan for an advertisement
+         * will automatically stop. Choice is arbitrary. A nice exercise would
+         * be to add this to a settings menu.
+         */
+        public static final Duration DURATION = Duration.standardMinutes(5);
     }
 }

@@ -5,26 +5,34 @@
 package io.v.moments.ifc;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 
 /**
- * Something needing to advertise itself will want an implementation of this.
+ * Advertiser controls, intended to be similar to Scanner controls.
  */
 public interface Advertiser {
     /**
-     * Asynchronously start advertising.  Callback executed on success or
-     * failure of advertising startup.  The future returned on successful
-     * startup should be given a callback to handle advertising shutdown.
+     * Asynchronously start advertising.
+     *
+     * Callbacks can be expected to run on the UX thread.
+     *
+     * @param startupCallback    executed on success or failure of advertising
+     *                           startup.
+     * @param completionCallback executed on success or failure of advertising
+     *                           completion.  An advertisement might shutdown
+     *                           for reasons other than a call to stop, e.g. a
+     *                           timeout.
      */
-    void advertiseStart(FutureCallback<ListenableFuture<Void>> callback);
+    void start(FutureCallback<Void> startupCallback,
+               FutureCallback<Void> completionCallback);
 
     /**
-     * True if advertiseStop could usefully be called.
+     * True if stop could usefully be called.
      */
     boolean isAdvertising();
 
     /**
-     * Synchronously stop advertising.
+     * Synchronously stop advertising.  Should result in execution of
+     * completionCallback.
      */
-    void advertiseStop();
+    void stop();
 }
