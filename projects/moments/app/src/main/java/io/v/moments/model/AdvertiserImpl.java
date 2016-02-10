@@ -136,6 +136,9 @@ public class AdvertiserImpl implements Advertiser {
 
     @Override
     public void stop() {
+        if (!isAdvertising()) {
+            throw new IllegalStateException("Not advertising.");
+        }
         Log.d(TAG, "Entering stop");
         if (mAdvCtx != null) {
             Log.d(TAG, "Cancelling advertising.");

@@ -4,6 +4,8 @@
 
 package io.v.moments.model;
 
+import com.google.common.util.concurrent.FutureCallback;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,15 +63,35 @@ public class AdvertiserImplTest {
     ServerStatus mServerStatus;
     @Mock
     VContext mContext;
+    @Mock
+    FutureCallback<Void> mStartupCallback;
+    @Mock
+    FutureCallback<Void> mShutdownCallback;
+    @Mock
+    FutureCallback<Void> mStartupCallback2;
+    @Mock
+    FutureCallback<Void> mShutdownCallback2;
 
     @Captor
     ArgumentCaptor<Service> mAdvertisement;
     @Captor
     ArgumentCaptor<List<BlessingPattern>> mBlessingList;
+    @Captor
+    ArgumentCaptor<FutureCallback<VContext>> mV23StartupCallback;
+    @Captor
+    ArgumentCaptor<FutureCallback<Void>> mV23ShutdownCallback;
+    @Captor
+    ArgumentCaptor<Throwable> mThrowable;
 
     Attributes mAttrs;
 
     AdvertiserImpl mAdvertiser;
+
+    static Map<String, String> makeFakeAttributes() {
+        Map<String, String> result = new HashMap<>();
+        result.put("color", "teal");
+        return result;
+    }
 
     @Before
     public void setup() throws Exception {
@@ -89,11 +111,6 @@ public class AdvertiserImplTest {
         when(mMoment.getId()).thenReturn(ID);
         when(mMoment.toString()).thenReturn(MOMENT_NAME);
         when(mMoment.makeAttributes()).thenReturn(mAttrs);
-
-        List<BlessingPattern> list = any();
-        when(mV23Manager.advertise(
-                any(Service.class),
-                list)).thenReturn(mContext);
 
         mAdvertiser = new AdvertiserImpl(mV23Manager, mMoment);
     }
@@ -115,39 +132,56 @@ public class AdvertiserImplTest {
     @Test
     public void advertiseStartSuccess() {
         assertFalse(mAdvertiser.isAdvertising());
-        mAdvertiser.start();
+        mAdvertiser.start(mStartupCallback, mShutdownCallback);
 
-        verify(mV23Manager).advertise(
-                mAdvertisement.capture(),
-                mBlessingList.capture());
-
-        assertEquals(0, mBlessingList.getValue().size());
+        verifyAdvertiseCall();
 
         Service service = mAdvertisement.getValue();
         assertEquals(ID.toString(), service.getInstanceId());
         assertEquals(MOMENT_NAME, service.getInstanceName());
-        assertEquals(Config.INTERFACE_NAME, service.getInterfaceName());
+        assertEquals(Config.Discovery.INTERFACE_NAME, service.getInterfaceName());
         assertSame(mAttrs, service.getAttrs());
 
         List<String> addresses = service.getAddrs();
         assertTrue(addresses.contains(ADDRESS));
         assertEquals(1, addresses.size());
 
+        assertSame(mV23ShutdownCallback.getValue(), mShutdownCallback);
+
+        assertFalse(mAdvertiser.isAdvertising());
+        activateAdvertising();
         assertTrue(mAdvertiser.isAdvertising());
+    }
+
+    private void verifyAdvertiseCall() {
+        verify(mV23Manager).advertise(
+                mAdvertisement.capture(),
+                eq(Config.Discovery.DURATION),
+                mV23StartupCallback.capture(),
+                mV23ShutdownCallback.capture());
+    }
+
+    // Make the transition to advertising by returning a context from V23.
+    private void activateAdvertising() {
+        mV23StartupCallback.getValue().onSuccess(mContext);
+        // Verify that the UX will be impacted.
+        verify(mStartupCallback).onSuccess(null);
     }
 
     @Test
     public void advertiseStartFailure() {
         assertFalse(mAdvertiser.isAdvertising());
-        mAdvertiser.start();
+        mAdvertiser.start(mStartupCallback, mShutdownCallback);
+        verifyAdvertiseCall();
+        activateAdvertising();
         assertTrue(mAdvertiser.isAdvertising());
-        mThrown.expect(IllegalStateException.class);
-        mThrown.expectMessage("Already advertising.");
-        mAdvertiser.start();
+        mAdvertiser.start(mStartupCallback2, mShutdownCallback2);
+        verify(mStartupCallback2).onFailure(mThrowable.capture());
+        assertEquals("Already advertising.", mThrowable.getValue().getMessage());
     }
 
     @Test
-    public void advertiseStopFailure() {
+    public void advertiseStopDoesNotThrowIfNotAdvertising() {
         mThrown.expect(IllegalStateException.class);
         mThrown.expectMessage("Not advertising.");
         mAdvertiser.stop();
@@ -161,11 +195,5 @@ public class AdvertiserImplTest {
         verify(mContext).cancel();
         verify(mServerContext).cancel();
         assertFalse(mAdvertiser.isAdvertising());
-    }
-
-    static Map<String, String> makeFakeAttributes() {
-        Map<String, String> result = new HashMap<>();
-        result.put("color", "teal");
-        return result;
     }
 }
