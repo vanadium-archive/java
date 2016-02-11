@@ -210,9 +210,7 @@ public interface Database extends DatabaseCore, AccessController {
 
     /**
      * Compares the current schema version of the database with the schema version provided while
-     * creating this database handle.  If the current database schema version is lower, then the
-     * {@link SchemaUpgrader} associated with the schema is called. If {@link SchemaUpgrader} is
-     * successful, this method stores the new schema metadata in database.
+     * creating this database handle and updates the schema metadata if required.
      * <p>
      * This method also registers a conflict resolver with syncbase to receive conflicts.
      * <p>
