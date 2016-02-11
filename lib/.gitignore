@@ -2,9 +2,6 @@
 /bin/
 /vdl_bin/
 
-# Vanadium
-/.v23
-
 # Gradle
 .gradle/
 build/

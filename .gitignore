@@ -1,5 +1,5 @@
 /.jiri
-#TODO(nlacasse): Get rid of .v23 below once v23->jiri transition is complete.
+
 # Gradle dirs
 build/
 /buildSrc/schema
@@ -15,9 +15,6 @@ local.properties
 
 # vdl files
 /src
-
-# Vanadium
-/.v23
 
 # Generated source
 generated-src/
