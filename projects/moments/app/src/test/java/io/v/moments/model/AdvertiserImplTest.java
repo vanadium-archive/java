@@ -6,6 +6,7 @@ package io.v.moments.model;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,13 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.v.moments.ifc.Moment;
-import io.v.moments.lib.Id;
+import io.v.moments.ifc.AdSupporter;
+import io.v.moments.lib.AdvertiserImpl;
 import io.v.moments.lib.V23Manager;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Service;
-import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.security.BlessingPattern;
@@ -35,16 +35,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AdvertiserImplTest {
-    static final Id ID = Id.makeRandom();
-    static final String MOMENT_NAME = "cabbage";
-    static final String ADDRESS = "192.168.notrealfoo";
+    static final String MOUNT_NAME = "southamerica";
+    static final Duration DURATION = Duration.standardMinutes(5);
 
     @Rule
     public ExpectedException mThrown = ExpectedException.none();
@@ -56,13 +56,13 @@ public class AdvertiserImplTest {
     @Mock
     Server mServer;
     @Mock
-    Moment mMoment;
-    @Mock
-    Endpoint mEndpoint;
+    List<String> mAddresses;
     @Mock
     ServerStatus mServerStatus;
     @Mock
     VContext mContext;
+    @Mock
+    Service mService;
     @Mock
     FutureCallback<Void> mStartupCallback;
     @Mock
@@ -71,6 +71,8 @@ public class AdvertiserImplTest {
     FutureCallback<Void> mStartupCallback2;
     @Mock
     FutureCallback<Void> mShutdownCallback2;
+    @Mock
+    AdSupporter mAdSupporter;
 
     @Captor
     ArgumentCaptor<Service> mAdvertisement;
@@ -83,8 +85,6 @@ public class AdvertiserImplTest {
     @Captor
     ArgumentCaptor<Throwable> mThrowable;
 
-    Attributes mAttrs;
-
     AdvertiserImpl mAdvertiser;
 
     static Map<String, String> makeFakeAttributes() {
@@ -95,38 +95,35 @@ public class AdvertiserImplTest {
 
     @Before
     public void setup() throws Exception {
-        mAttrs = new Attributes(makeFakeAttributes());
-
         when(mV23Manager.makeServerContext(
-                eq(AdvertiserImpl.NO_MOUNT_NAME),
-                any(AdvertiserImpl.MomentServer.class))).thenReturn(mServerContext);
-        when(mV23Manager.getServer(mServerContext)).thenReturn(mServer);
+                eq(MOUNT_NAME),
+                anyObject())).thenReturn(mServerContext);
+
+        when(mV23Manager.makeServerAddressList(
+                mServerContext)).thenReturn(mAddresses);
+
+        when(mAdSupporter.getMountName()).thenReturn(MOUNT_NAME);
+
+        when(mAdSupporter.makeAdvertisement(
+                same(mAddresses))).thenReturn(mService);
+
         when(mServer.getStatus()).thenReturn(mServerStatus);
 
-        Endpoint[] endpoints = {mEndpoint};
-        when(mEndpoint.toString()).thenReturn(ADDRESS);
-
-        when(mServerStatus.getEndpoints()).thenReturn(endpoints);
-
-        when(mMoment.getId()).thenReturn(ID);
-        when(mMoment.toString()).thenReturn(MOMENT_NAME);
-        when(mMoment.makeAttributes()).thenReturn(mAttrs);
-
-        mAdvertiser = new AdvertiserImpl(mV23Manager, mMoment);
+        mAdvertiser = new AdvertiserImpl(mV23Manager, mAdSupporter, DURATION);
     }
 
     @Test
     public void construction1() {
         mThrown.expect(IllegalArgumentException.class);
         mThrown.expectMessage("Null v23Manager");
-        mAdvertiser = new AdvertiserImpl(null, mMoment);
+        mAdvertiser = new AdvertiserImpl(null, mAdSupporter, DURATION);
     }
 
     @Test
     public void construction2() {
         mThrown.expect(IllegalArgumentException.class);
-        mThrown.expectMessage("Null moment");
-        mAdvertiser = new AdvertiserImpl(mV23Manager, null);
+        mThrown.expectMessage("Null adSupporter");
+        mAdvertiser = new AdvertiserImpl(mV23Manager, null, null);
     }
 
     @Test
@@ -136,16 +133,7 @@ public class AdvertiserImplTest {
 
         verifyAdvertiseCall();
 
-        Service service = mAdvertisement.getValue();
-        assertEquals(ID.toString(), service.getInstanceId());
-        assertEquals(MOMENT_NAME, service.getInstanceName());
-        assertEquals(Config.Discovery.INTERFACE_NAME, service.getInterfaceName());
-        assertSame(mAttrs, service.getAttrs());
-
-        List<String> addresses = service.getAddrs();
-        assertTrue(addresses.contains(ADDRESS));
-        assertEquals(1, addresses.size());
-
+        assertSame(mService, mAdvertisement.getValue());
         assertSame(mV23ShutdownCallback.getValue(), mShutdownCallback);
 
         assertFalse(mAdvertiser.isAdvertising());
@@ -156,7 +144,7 @@ public class AdvertiserImplTest {
     private void verifyAdvertiseCall() {
         verify(mV23Manager).advertise(
                 mAdvertisement.capture(),
-                eq(Config.Discovery.DURATION),
+                eq(DURATION),
                 mV23StartupCallback.capture(),
                 mV23ShutdownCallback.capture());
     }

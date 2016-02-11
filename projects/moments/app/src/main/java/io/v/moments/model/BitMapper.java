@@ -17,6 +17,7 @@ import java.io.IOException;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
+import io.v.moments.lib.FileUtil;
 import io.v.moments.lib.ObservedList;
 
 /**

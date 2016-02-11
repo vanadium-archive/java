@@ -47,7 +47,7 @@ import io.v.moments.model.AdConverterMoment;
 import io.v.moments.model.AdvertiserFactory;
 import io.v.moments.model.BitMapper;
 import io.v.moments.model.Config;
-import io.v.moments.model.FileUtil;
+import io.v.moments.lib.FileUtil;
 import io.v.moments.model.MomentFactoryImpl;
 import io.v.moments.model.ScannerImpl;
 import io.v.moments.model.StateStore;
