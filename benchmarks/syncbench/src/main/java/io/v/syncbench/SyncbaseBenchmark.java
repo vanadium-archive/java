@@ -79,7 +79,7 @@ public class SyncbaseBenchmark {
 
     @AfterExperiment
     public void tearDown() throws VException {
-        syncbaseServer.stop();
+        baseContext.cancel();
     }
 
     @Benchmark

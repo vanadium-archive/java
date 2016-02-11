@@ -13,6 +13,10 @@ dependencies {
     compile 'com.google.caliper:caliper:1.0-beta-2'
 }
 
+static isDarwin() {
+    return System.properties['os.name'].toLowerCase().contains("os x")
+}
+
 task copyLib(type: Copy) {
     from([project(':lib').buildDir.getAbsolutePath(), 'libs', 'libv23.so'].join(File.separator))
     destinationDir = new File(['src', 'main', 'resources'].join(File.separator))
@@ -26,4 +30,15 @@ task wrapper(type: Wrapper) {
 
 clean {
     delete 'src/main/resources/libv23.so'
+}
+
+def libProject = rootProject.findProject(':lib')
+
+tasks.run.dependsOn libProject.tasks.copyVanadiumLib
+tasks.run.jvmArgs "-Djava.library.path=${libProject.buildDir}/libs"
+tasks.run.jvmArgs "-XX:-TieredCompilation"  // needed for caliper
+if (isDarwin()) {
+    // See: https://github.com/vanadium/issues/issues/567
+    tasks.run.jvmArgs "-XX:+UnlockDiagnosticVMOptions"
+    tasks.run.jvmArgs "-XX:-LogEvents"
 }

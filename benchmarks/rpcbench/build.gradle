@@ -26,6 +26,10 @@ dependencies {
     compile 'com.google.caliper:caliper:1.0-beta-2'
 }
 
+static isDarwin() {
+    return System.properties['os.name'].toLowerCase().contains("os x")
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
 }
@@ -42,3 +46,9 @@ def libProject = rootProject.findProject(':lib')
 
 tasks.run.dependsOn libProject.tasks.copyVanadiumLib
 tasks.run.jvmArgs "-Djava.library.path=${libProject.buildDir}/libs"
+tasks.run.jvmArgs "-XX:-TieredCompilation"  // needed for caliper
+if (isDarwin()) {
+    // See: https://github.com/vanadium/issues/issues/567
+    tasks.run.jvmArgs "-XX:+UnlockDiagnosticVMOptions"
+    tasks.run.jvmArgs "-XX:-LogEvents"
+}
