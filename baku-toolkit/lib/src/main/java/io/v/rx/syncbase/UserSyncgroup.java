@@ -44,8 +44,7 @@ public abstract class UserSyncgroup extends RxSyncgroup {
         protected String mSgSuffix = DEFAULT_SYNCGROUP_SUFFIX;
         protected RxDb mDb;
         protected Function<String, String> mDescriptionForUsername = u -> "User syncgroup for " + u;
-        protected Function<AccessList, Permissions> mPermissionsForAcl =
-                BlessingsUtils::syncgroupPermissions;
+        protected Function<AccessList, Permissions> mPermissionsForAcl;
         protected List<TableRow> mPrefixes = new ArrayList<>();
         protected SyncgroupMemberInfo mMemberInfo = DEFAULT_SYNCGROUP_MEMBER_INFO;
         protected Action2<Integer, Throwable> mOnError;
@@ -169,20 +168,27 @@ public abstract class UserSyncgroup extends RxSyncgroup {
                     .prefix(t.getSyncbaseTableName());
         }
 
-        protected Parameters buildParameters(final Supplier<SyncHostLevel> defaultSyncHost) {
+        protected Parameters buildParameters(
+                final Supplier<SyncHostLevel> defaultSyncHost,
+                final Function<AccessList, Permissions> defaultPermissionsForAcl) {
             return new Parameters(mVContext, mRxBlessings,
-                    mSyncHostLevel == null ? defaultSyncHost.get() : mSyncHostLevel, mSgSuffix, mDb,
-                    mDescriptionForUsername, mPermissionsForAcl, ImmutableList.copyOf(mPrefixes),
-                    mMemberInfo, mOnError);
+                    mSyncHostLevel == null ? defaultSyncHost.get() : mSyncHostLevel,
+                    mSgSuffix, mDb, mDescriptionForUsername,
+                    mPermissionsForAcl == null? defaultPermissionsForAcl : mPermissionsForAcl,
+                    ImmutableList.copyOf(mPrefixes), mMemberInfo, mOnError);
         }
 
         public UserCloudSyncgroup buildCloud() {
-            return new UserCloudSyncgroup(buildParameters(() -> ClientLevelCloudSync.DEFAULT));
+            return new UserCloudSyncgroup(buildParameters(
+                    () -> ClientLevelCloudSync.DEFAULT,
+                    acl -> BlessingsUtils.cloudSyngroupPermissions(acl,
+                            UserCloudSyncgroup.DEBUG_SG_HOST_BLESSING)));
         }
 
         public UserPeerSyncgroup buildPeer() {
             return new UserPeerSyncgroup(buildParameters(
-                    () -> new UserAppSyncHost(mAndroidContext)));
+                    () -> new UserAppSyncHost(mAndroidContext),
+                    BlessingsUtils::syncgroupPermissions));
         }
     }
 

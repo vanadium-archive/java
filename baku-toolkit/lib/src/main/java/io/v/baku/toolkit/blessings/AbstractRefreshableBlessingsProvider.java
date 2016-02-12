@@ -5,6 +5,7 @@
 package io.v.baku.toolkit.blessings;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import net.javacrumbs.futureconverter.guavarx.FutureConverter;
 
@@ -71,6 +72,11 @@ public abstract class AbstractRefreshableBlessingsProvider implements Refreshabl
 
     protected abstract ListenableFuture<Blessings> handleBlessingsRefresh();
 
+    @Synchronized("mSeekLock")
+    private void onBlessingsHandled() {
+        mCurrentSeek = null;
+    }
+
     @Override
     @Synchronized("mSeekLock")
     public ListenableFuture<Blessings> refreshBlessings() {
@@ -78,8 +84,12 @@ public abstract class AbstractRefreshableBlessingsProvider implements Refreshabl
             return mCurrentSeek;
         }
 
-        final ListenableFuture<Blessings> nextBlessings = handleBlessingsRefresh();
-        mPub.onNext(nextBlessings);
-        return nextBlessings;
+        // Store in a local variable as well in case onBlessingsHandled immediately clears the
+        // Future
+        final ListenableFuture<Blessings> seek = mCurrentSeek = handleBlessingsRefresh();
+        mPub.onNext(seek);
+        seek.addListener(this::onBlessingsHandled, MoreExecutors.directExecutor());
+
+        return seek;
     }
 }

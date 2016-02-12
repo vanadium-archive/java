@@ -7,6 +7,8 @@ package io.v.baku.toolkit.blessings;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +49,6 @@ public class BlessingsManagerBlessingsProviderTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testBlessingsFromManager() throws Exception {
-        @SuppressWarnings("unchecked")
         final Action1<Blessings>
                 cold = mock(Action1.class),
                 hot = mock(Action1.class);
@@ -79,7 +80,6 @@ public class BlessingsManagerBlessingsProviderTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testDeferOnNewSubscriber() throws Exception {
-        @SuppressWarnings("unchecked")
         final Action1<Blessings>
                 s1 = mock(Action1.class),
                 s2 = mock(Action1.class);
@@ -104,5 +104,30 @@ public class BlessingsManagerBlessingsProviderTest {
         bf2.set(b2);
         verify(s1).call(b2);
         verify(s2).call(b2);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConcurrentSeeks() {
+        final Action1<Blessings>
+                s1 = mock(Action1.class),
+                s2 = mock(Action1.class);
+        final Blessings b = PowerMockito.mock(Blessings.class);
+
+        final SettableFuture<Blessings>
+                bf = SettableFuture.create();
+
+        when(BlessingsManager.getBlessings(any(), any(), any(), anyBoolean()))
+                .thenReturn(bf, Futures.immediateFailedFuture(
+                        new AssertionFailedError("Expected at most one getBlessings call.")));
+
+        final RefreshableBlessingsProvider t = new BlessingsManagerBlessingsProvider(null, null);
+        t.getRxBlessings().subscribe(s1);
+        t.getRxBlessings().subscribe(s2);
+
+        bf.set(b);
+
+        verify(s1).call(b);
+        verify(s2).call(b);
     }
 }

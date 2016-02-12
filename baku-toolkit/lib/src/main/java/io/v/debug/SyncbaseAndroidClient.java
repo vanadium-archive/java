@@ -120,7 +120,7 @@ public class SyncbaseAndroidClient implements AutoCloseable {
         if (rxBlessings == null) {
             startService(androidContext, intent);
         } else {
-            rxBlessings.first()
+            rxBlessings.take(1)
                     .subscribe(s -> {
                         startService(androidContext, intent);
                     }, rpl::onError);

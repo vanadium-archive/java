@@ -13,6 +13,7 @@ import android.util.JsonReader;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -116,8 +117,20 @@ public class BlessingsUtils {
                 ImmutableList.of());
     }
 
+    /**
+     * This method adds the given {@link BlessingPattern} to the given {@link AccessList} but does
+     * not perform deduping or checking to make sure the new pattern is not in
+     * {@link AccessList#getNotIn()}.
+     */
+    public static AccessList augmentAcl(final AccessList acl, final BlessingPattern newBlessing) {
+        return new AccessList(ImmutableList.<BlessingPattern>builder()
+                .addAll(acl.getIn())
+                .add(newBlessing).build(),
+                ImmutableList.of());
+    }
+
     public static Stream<ClientUser> blessingsToClientUserStream(final VContext ctx,
-                                                           final Blessings blessings) {
+                                                                 final Blessings blessings) {
         return StreamSupport.stream(getBlessingNames(ctx, blessings))
                 .map(DEV_V_IO_CLIENT_USER::matcher)
                 .filter(Matcher::matches)
@@ -146,7 +159,8 @@ public class BlessingsUtils {
                 .map(cu -> BlessingsUtils.clientMount(cu.getClientId()));
     }
 
-    public static Set<String> blessingsToClientMounts(final VContext ctx, final Blessings blessings) {
+    public static Set<String> blessingsToClientMounts(final VContext ctx,
+                                                      final Blessings blessings) {
         return blessingsToClientMountStream(ctx, blessings).collect(Collectors.toSet());
     }
 
@@ -164,6 +178,22 @@ public class BlessingsUtils {
 
     public static Permissions syncgroupPermissions(final AccessList acl) {
         return homogeneousPermissions(SYNCGROUP_TAGS, acl);
+    }
+
+    /**
+     * TODO(rosswang): This probably won't be best practice in the long run, but we'll need it until
+     * we can bless the cloud Syncbase instance remotely.
+     */
+    public static Permissions cloudSyngroupPermissions(final AccessList userAcl,
+                                                       final BlessingPattern sgHostBlessing) {
+        final AccessList cloudAcl = augmentAcl(userAcl, sgHostBlessing);
+        return new Permissions(ImmutableMap.of(
+                Constants.ADMIN.getValue(), cloudAcl,
+                Constants.READ.getValue(), userAcl,
+                Constants.WRITE.getValue(), userAcl,
+                Constants.RESOLVE.getValue(), userAcl,
+                Constants.DEBUG.getValue(), userAcl
+        ));
     }
 
     /**

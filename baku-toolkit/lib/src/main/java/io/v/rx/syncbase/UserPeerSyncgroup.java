@@ -25,6 +25,14 @@ public class UserPeerSyncgroup extends UserSyncgroup {
         return builder().activity(t).buildPeer();
     }
 
+    public UserPeerSyncgroup(final Parameters params) {
+        super(params);
+        if (!(params.getDb().getRxApp().getRxSyncbase() instanceof RxAndroidSyncbase)) {
+            throw new IllegalArgumentException("UserPeerSyncgroup must be constructed with a " +
+                    "local Syncbase server (RxAndroidSyncbase).");
+        }
+    }
+
     private Observable<SyncgroupSpec> createOrJoinSyncgroup(final Database db, final String sgName,
                                                             final SyncgroupSpec spec) {
         final Syncgroup sg = db.getSyncgroup(sgName);
@@ -49,13 +57,5 @@ public class UserPeerSyncgroup extends UserSyncgroup {
         return mParams.getDb().getObservable()
                 .switchMap(db -> Observable.merge(mount.first().ignoreElements()
                         .concatWith(createOrJoinSyncgroup(db, sgName, spec)), mount));
-    }
-
-    public UserPeerSyncgroup(final Parameters params) {
-        super(params);
-        if (!(params.getDb().getRxApp().getRxSyncbase() instanceof RxAndroidSyncbase)) {
-            throw new IllegalArgumentException("UserPeerSyncgroup must be constructed with a " +
-                    "local Syncbase server (RxAndroidSyncbase).");
-        }
     }
 }
