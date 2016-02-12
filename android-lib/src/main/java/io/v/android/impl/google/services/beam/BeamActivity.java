@@ -31,7 +31,6 @@ import io.v.v23.security.VSecurity;
  * It contacts the VBeam server on the sending phone, then retrieves and starts the shared intent.
  */
 public class BeamActivity extends Activity {
-
     private static final String TAG = "BeamActivity";
 
     @Override
@@ -90,7 +89,7 @@ public class BeamActivity extends Activity {
                         flags = Intent.URI_ANDROID_APP_SCHEME;
                     }
                     Intent resultIntent = Intent.parseUri(result.intentUri, flags);
-                    resultIntent.putExtra(VBeam.EXTRA_VBEAM_PAYLOAD, result.payload);
+                    resultIntent.putExtra(VBeamManager.EXTRA_VBEAM_PAYLOAD, result.payload);
                     startActivity(resultIntent);
                     finish();
                 } catch (Throwable t) {
