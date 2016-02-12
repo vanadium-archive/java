@@ -5,12 +5,13 @@
 package io.v.android.v23;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.google.common.base.Preconditions;
 
+import io.v.android.impl.google.services.gcm.GcmRegistrationService;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.BlessingStore;
 import io.v.v23.security.Constants;
@@ -80,11 +81,18 @@ public class V extends io.v.v23.V {
                 throw new RuntimeException("Couldn't setup Vanadium principal", e);
             }
             globalContext = ctx;
+            // Start the GCM registration service, which obtains the GCM token for the app
+            // (if the app is configured to use GCM).
+            // NOTE: this call may lead to a recursive call to V.init() (in a separate thread),
+            // so keep this code below the line where 'globalContext' is set, or we may run
+            // into an infinite recursion.
+            Intent intent = new Intent(androidCtx, GcmRegistrationService.class);
+            androidCtx.startService(intent);
             return ctx;
         }
     }
 
-    // Inializes Vanadium state that's local to the invoking activity/service.
+    // Initializes Vanadium state that's local to the invoking activity/service.
     private static VContext initAndroidLocal(VContext ctx, Context androidCtx, Options opts) {
         return ctx.withValue(new AndroidContextKey(), androidCtx);
     }

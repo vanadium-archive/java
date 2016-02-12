@@ -19,6 +19,30 @@
     <application>
         <activity android:name="io.v.android.impl.google.services.blessing.BlessingActivity"
             android:excludeFromRecents="true"/>
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="io.v.android" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="io.v.android.impl.google.services.gcm.GcmTokenRefreshListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="io.v.android.impl.google.services.gcm.GcmReceiveListenerService"
+            android:exported="false" >
+        </service>
+        <service
+            android:name="io.v.android.impl.google.services.gcm.GcmRegistrationService"
+            android:exported="false" >
+        </service>
         <activity android:name="io.v.android.impl.google.services.beam.BeamActivity"
             android:excludeFromRecents="true">
             <intent-filter>

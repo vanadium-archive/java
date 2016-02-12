@@ -282,7 +282,7 @@ public final class ReflectInvoker implements Invoker {
                     } catch (InvocationTargetException | IllegalAccessException e) {
                         ret.setException(new VException(String.format(
                                 "Error invoking method %s: %s",
-                                method, e.getCause().getMessage())));
+                                method, e.getCause().toString())));
                     }
                 }
             });
