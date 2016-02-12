@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
-import io.v.moments.ifc.AdConverter;
+import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
@@ -23,7 +23,7 @@ import io.v.moments.ifc.MomentClientFactory;
 import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
-import io.v.moments.lib.V23Manager;
+import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.discovery.Service;
 
 /**

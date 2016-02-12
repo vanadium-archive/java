@@ -2,14 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.moments.model;
+package io.v.moments.v23.impl;
 
 import android.util.Log;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import io.v.moments.ifc.Scanner;
-import io.v.moments.lib.V23Manager;
+import io.v.moments.model.Config;
+import io.v.moments.v23.ifc.Scanner;
+import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.InputChannelCallback;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Update;
@@ -19,11 +20,11 @@ import io.v.v23.discovery.Update;
  *
  * This class similar to AdvertiserImpl - see that class for more commentary -
  * in that it functions as decoupling of the UX from the moving target that is
- * the V23/VContext API
+ * the V23Manager/VContext API
  *
  * At the moment, the complexity is far less than it is for advertising
  * (scanning doesn't require a running service), so this class doesn't add much
- * value over using an instance of V23Manager and VContext directly in whatever
+ * value over using an instance of V23ManagerImpl and VContext directly in whatever
  * class uses a Scanner.  To make this class more useful in decoupling moments
  * specific code from v23 specifics, this class could tease apart a scan Update,
  * and feed advertisement data from the Update.Found and Update.Lost object

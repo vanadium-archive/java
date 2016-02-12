@@ -3,6 +3,6 @@
 // license that can be found in the LICENSE file.
 
 /**
- * Iterfaces used by the moments app.
+ * Interfaces used by the moments app.
  */
 package io.v.moments.ifc;

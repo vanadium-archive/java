@@ -34,22 +34,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.v.moments.R;
-import io.v.moments.ifc.Advertiser;
+import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.MomentFactory;
-import io.v.moments.ifc.Scanner;
+import io.v.moments.v23.ifc.Scanner;
 import io.v.moments.lib.DiscoveredList;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
 import io.v.moments.lib.PermissionManager;
-import io.v.moments.lib.V23Manager;
+import io.v.moments.v23.impl.V23ManagerImpl;
 import io.v.moments.model.AdConverterMoment;
 import io.v.moments.model.AdvertiserFactory;
 import io.v.moments.model.BitMapper;
 import io.v.moments.model.Config;
 import io.v.moments.lib.FileUtil;
 import io.v.moments.model.MomentFactoryImpl;
-import io.v.moments.model.ScannerImpl;
+import io.v.moments.v23.impl.ScannerImpl;
 import io.v.moments.model.StateStore;
 import io.v.moments.model.Toaster;
 import io.v.v23.security.Blessings;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     // For changes to UX.
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     // For discovery, serving and behaving as a client.
-    private final V23Manager mV23Manager = V23Manager.Singleton.get();
+    private final V23ManagerImpl mV23ManagerImpl = V23ManagerImpl.Singleton.get();
 
     // See wireUxToDataModel for discussion of the following.
     private StateStore mStateStore;
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         // This will look in prefs for a Vanadium blessing, and if not
         // found will leave this activity (onStop likely to be called) and
         // return via a start intent (not via onActivityResult).
-        mV23Manager.init(this, onBlessings());
+        mV23ManagerImpl.init(this, onBlessings());
 
         wireUxToDataModel();
         initializeOrRestore(savedInstanceState);
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         mBitMapper = Config.makeBitmapper(this);
 
         // Makes advertisers.  Needs v23Manager to do advertising.
-        mAdvertiserFactory = new AdvertiserFactory(mV23Manager);
+        mAdvertiserFactory = new AdvertiserFactory(mV23ManagerImpl);
 
         // Makes moments.  Each moment needs a bitmapper to read its BitMaps.
         mMomentFactory = new MomentFactoryImpl(mBitMapper);
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         // for making RPCs to get photos, needs mHandler to post photos on the
         // UX thread, fills the cache with remote moments.
         AdConverterMoment converter = new AdConverterMoment(
-                mV23Manager, mMomentFactory, mPoolExecutor,
+                mV23ManagerImpl, mMomentFactory, mPoolExecutor,
                 mHandler, mRemoteMomentCache);
 
         // The list of remote (discovered) moments.  Pass mAdvertiserFactory
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toaster toaster = new Toaster(this);
 
-        mScanner = new ScannerImpl(mV23Manager, Config.Discovery.QUERY);
+        mScanner = new ScannerImpl(mV23ManagerImpl, Config.Discovery.QUERY);
         mScanSwitchHolder = new ScanSwitchHolder(
                 toaster, mScanner, mRemoteMoments);
 
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
             mScanner.stop();
         }
         stopAllAdvertising();
-        mV23Manager.shutdown();
+        mV23ManagerImpl.shutdown();
         Log.d(TAG, "Destruction complete.");
         Log.d(TAG, " ");
         Log.d(TAG, " ");

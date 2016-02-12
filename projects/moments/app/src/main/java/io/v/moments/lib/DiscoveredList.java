@@ -6,10 +6,10 @@ package io.v.moments.lib;
 
 import android.os.Handler;
 
-import io.v.moments.ifc.AdConverter;
+import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
-import io.v.moments.ifc.ScanListener;
+import io.v.moments.v23.ifc.ScanListener;
 import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 

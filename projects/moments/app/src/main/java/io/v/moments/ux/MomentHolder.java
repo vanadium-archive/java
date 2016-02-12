@@ -13,14 +13,13 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
 
 import java.util.concurrent.CancellationException;
 
 import io.v.moments.R;
-import io.v.moments.ifc.Advertiser;
+import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;

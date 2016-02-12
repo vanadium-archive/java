@@ -4,11 +4,9 @@
 
 package io.v.moments.ux;
 
-import android.app.Activity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -17,7 +15,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.CancellationException;
 
 import io.v.moments.ifc.Moment;
-import io.v.moments.ifc.Scanner;
+import io.v.moments.v23.ifc.Scanner;
 import io.v.moments.lib.DiscoveredList;
 import io.v.moments.model.Toaster;
 import io.v.v23.InputChannelCallback;

@@ -7,12 +7,11 @@ package io.v.moments.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.IdSet;
 import io.v.moments.ifc.Moment;
-import io.v.moments.lib.AdvertiserImpl;
 import io.v.moments.lib.Id;
-import io.v.moments.lib.V23Manager;
+import io.v.moments.v23.ifc.Advertiser;
+import io.v.moments.v23.ifc.V23Manager;
 
 /**
  * Makes moment advertisers.
@@ -33,9 +32,10 @@ public class AdvertiserFactory implements IdSet {
         if (contains(moment.getId())) {
             return mLocalAds.get(moment.getId());
         }
-        Advertiser result = new AdvertiserImpl(
-                mV23Manager, new MomentAdSupporter(moment),
-                Config.Discovery.DURATION);
+        Advertiser result = mV23Manager.makeAdvertiser(
+                new MomentAdSupporter(moment),
+                Config.Discovery.DURATION,
+                Config.Discovery.NO_PATTERNS);
         mLocalAds.put(moment.getId(), result);
         return result;
     }

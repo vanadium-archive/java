@@ -12,7 +12,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-import io.v.moments.ifc.AdSupporter;
+import io.v.moments.v23.ifc.AdSupporter;
 import io.v.moments.ifc.Moment;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attachments;

@@ -6,8 +6,6 @@ package io.v.moments.lib;
 
 import android.os.Handler;
 
-import com.google.common.collect.ImmutableList;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,19 +16,12 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import io.v.moments.ifc.AdConverter;
+import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
 import io.v.moments.ifc.ListObserver;
-import io.v.v23.discovery.Attachments;
-import io.v.v23.discovery.Attributes;
 import io.v.v23.discovery.Found;
 import io.v.v23.discovery.Lost;
-import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 
 import static org.junit.Assert.assertEquals;

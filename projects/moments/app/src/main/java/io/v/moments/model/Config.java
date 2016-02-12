@@ -13,8 +13,11 @@ import android.os.Handler;
 import org.joda.time.Duration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.v.moments.R;
+import io.v.v23.security.BlessingPattern;
 
 /**
  * Configuration.
@@ -79,5 +82,10 @@ public class Config {
          * be to add this to a settings menu.
          */
         public static final Duration DURATION = Duration.standardMinutes(5);
+
+        /**
+         * Used for public advertisements (no limits on who can see them).
+         */
+        public static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
     }
 }

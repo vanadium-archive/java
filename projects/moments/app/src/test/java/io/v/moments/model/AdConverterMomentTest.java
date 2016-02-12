@@ -29,7 +29,7 @@ import io.v.moments.ifc.MomentClientFactory;
 import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
-import io.v.moments.lib.V23Manager;
+import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.context.VContext;
 
 import static org.junit.Assert.assertEquals;

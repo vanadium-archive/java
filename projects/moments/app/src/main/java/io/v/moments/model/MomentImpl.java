@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 
 import org.joda.time.DateTime;
 
-import io.v.moments.ifc.Advertiser;
 import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.ifc.Moment;
