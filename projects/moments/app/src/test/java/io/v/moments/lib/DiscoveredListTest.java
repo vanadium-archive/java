@@ -16,13 +16,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
 import io.v.moments.ifc.ListObserver;
-import io.v.v23.discovery.Found;
-import io.v.v23.discovery.Lost;
-import io.v.v23.discovery.Update;
+import io.v.moments.v23.ifc.AdConverter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.never;
@@ -141,7 +138,7 @@ public class DiscoveredListTest {
         mList.setObserver(mObserver);
 
         when(mConverter.make(mAdvertisement)).thenReturn(THING0);
-        mList.scanUpdateReceived(new Update.Found(new Found(mAdvertisement)));
+        mList.handleFoundAdvertisement(mAdvertisement);
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -159,7 +156,7 @@ public class DiscoveredListTest {
 
         when(mRejects.contains(ID0)).thenReturn(true);
 
-        mList.scanUpdateReceived(new Update.Found(new Found(mAdvertisement)));
+        mList.handleFoundAdvertisement(mAdvertisement);
 
         verifyZeroInteractions(mHandler);
         verifyZeroInteractions(mObserver);
@@ -173,7 +170,7 @@ public class DiscoveredListTest {
     public void handleUnrecognizedLost() throws Exception {
         mList.setObserver(mObserver);
 
-        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
+        mList.handleLostAdvertisement(mAdvertisement);
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -193,7 +190,7 @@ public class DiscoveredListTest {
 
         when(mRejects.contains(ID0)).thenReturn(true);
 
-        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
+        mList.handleLostAdvertisement(mAdvertisement);
 
         verify(mHandler).post(mRunnable.capture());
         mRunnable.getValue().run();
@@ -214,7 +211,7 @@ public class DiscoveredListTest {
         verify(mObserver).notifyItemInserted(0);
         assertEquals(1, mList.size());
 
-        mList.scanUpdateReceived(new Update.Lost(new Lost(mAdvertisement)));
+        mList.handleLostAdvertisement(mAdvertisement);
 
         verify(mHandler).post(mRunnable.capture());
 

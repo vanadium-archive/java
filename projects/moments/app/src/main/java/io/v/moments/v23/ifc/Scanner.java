@@ -6,9 +6,6 @@ package io.v.moments.v23.ifc;
 
 import com.google.common.util.concurrent.FutureCallback;
 
-import io.v.v23.InputChannelCallback;
-import io.v.v23.discovery.Update;
-
 /**
  * Scanner controls, intended to be similar to Advertiser controls.
  */
@@ -18,15 +15,16 @@ public interface Scanner {
      *
      * Callbacks can be expected to run on the UX thread.
      *
-     * @param onStart  executed on success or failure of scan startup.
-     * @param onUpdate executed on each scan update (each found or lost
-     *                 advertisement).
-     * @param onStop   executed on success or failure of scan completion.  A
-     *                 scan might shutdown for reasons other than a call to
-     *                 stop, e.g. a timeout.
+     * @param onStart       executed on success or failure of scan startup.
+     * @param foundListener executed on each found advertisement.
+     * @param lostListener  executed on each lost advertisement.
+     * @param onStop        executed on success or failure of scan completion. A
+     *                      scan might shutdown for reasons other than a call to
+     *                      stop, e.g. a timeout.
      */
     void start(FutureCallback<Void> onStart,
-               InputChannelCallback<Update> onUpdate,
+               AdvertisementFoundListener foundListener,
+               AdvertisementLostListener lostListener,
                FutureCallback<Void> onStop);
 
     /**

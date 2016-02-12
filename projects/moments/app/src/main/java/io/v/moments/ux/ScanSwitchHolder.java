@@ -9,17 +9,13 @@ import android.util.Log;
 import android.widget.CompoundButton;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.CancellationException;
 
 import io.v.moments.ifc.Moment;
-import io.v.moments.v23.ifc.Scanner;
 import io.v.moments.lib.DiscoveredList;
 import io.v.moments.model.Toaster;
-import io.v.v23.InputChannelCallback;
-import io.v.v23.discovery.Update;
+import io.v.moments.v23.ifc.Scanner;
 
 /**
  * Manages scanning UX.
@@ -62,7 +58,11 @@ public class ScanSwitchHolder implements CompoundButton.OnCheckedChangeListener 
                 Log.d(TAG, "Asked to start scanning, but already scanning.");
                 return;
             }
-            mScanner.start(makeStartupCallback(), makeUpdateCallback(), makeCompletionCallback());
+            mScanner.start(
+                    makeStartupCallback(),
+                    mRemoteMoments,
+                    mRemoteMoments,
+                    makeCompletionCallback());
         } else {
             if (!mScanner.isScanning()) {
                 Log.d(TAG, "Asked to stop scanning, but already not scanning.");
@@ -97,17 +97,9 @@ public class ScanSwitchHolder implements CompoundButton.OnCheckedChangeListener 
         };
     }
 
-    private InputChannelCallback<Update> makeUpdateCallback() {
-        return new InputChannelCallback<Update>() {
-            @Override
-            public ListenableFuture<Void> onNext(Update result) {
-                mRemoteMoments.scanUpdateReceived(result);
-                return Futures.immediateFuture(null);
-            }
-        };
-    }
-
-    /** Verify that scanning is off and that the UX reflects that fact. */
+    /**
+     * Verify that scanning is off and that the UX reflects that fact.
+     */
     private void cleanUpPostStop() {
         Log.d(TAG, "cleanUpPostStop");
         if (mScanner.isScanning()) {

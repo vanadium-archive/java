@@ -6,17 +6,19 @@ package io.v.moments.lib;
 
 import android.os.Handler;
 
-import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.ifc.HasId;
 import io.v.moments.ifc.IdSet;
-import io.v.moments.v23.ifc.ScanListener;
+import io.v.moments.v23.ifc.AdConverter;
+import io.v.moments.v23.ifc.AdvertisementFoundListener;
+import io.v.moments.v23.ifc.AdvertisementLostListener;
 import io.v.v23.discovery.Service;
-import io.v.v23.discovery.Update;
 
 /**
  * List that updates itself in response to found or lost advertisements.
  */
-public class DiscoveredList<T extends HasId> extends ObservedList<T> implements ScanListener {
+public class DiscoveredList<T extends HasId>
+        extends ObservedList<T>
+        implements AdvertisementFoundListener, AdvertisementLostListener {
     private static final String TAG = "DiscoveredList";
 
     private final Handler mHandler;
@@ -43,32 +45,19 @@ public class DiscoveredList<T extends HasId> extends ObservedList<T> implements 
         mHandler = handler;
     }
 
-    @Override
-    public void scanUpdateReceived(Update update) {
-        if (update instanceof Update.Found) {
-            maybeInsertItem((Update.Found) update);
-            return;
-        }
-        removeItem((Update.Lost) update);
-    }
-
     /**
      * Accept the advertisement if it's not on the reject list.
      */
-    private void maybeInsertItem(Update.Found found) {
-        Service service = found.getElem().getService();
-        final Id id = Id.fromString(service.getInstanceId());
+    @Override
+    public void handleFoundAdvertisement(Service advertisement) {
+        final Id id = Id.fromString(advertisement.getInstanceId());
         if (mRejects.contains(id)) {
             return;
         }
-        final T item = mConverter.make(service);
+        final T item = mConverter.make(advertisement);
         if (item == null) {
             return;
         }
-        insertItem(id, item);
-    }
-
-    private void insertItem(final Id id, final T item) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -77,8 +66,12 @@ public class DiscoveredList<T extends HasId> extends ObservedList<T> implements 
         });
     }
 
-    private void removeItem(Update.Lost lost) {
-        final Id id = Id.fromString(lost.getElem().getService().getInstanceId());
+    /**
+     * Remove the lost advertisement.
+     */
+    @Override
+    public void handleLostAdvertisement(Service advertisement) {
+        final Id id = Id.fromString(advertisement.getInstanceId());
         mHandler.post(new Runnable() {
             @Override
             public void run() {

@@ -20,6 +20,8 @@ import java.util.List;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.moments.v23.ifc.AdCampaign;
+import io.v.moments.v23.ifc.AdvertisementFoundListener;
+import io.v.moments.v23.ifc.AdvertisementLostListener;
 import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.v23.ifc.Scanner;
 import io.v.moments.v23.ifc.V23Manager;
@@ -348,7 +350,8 @@ public class V23ManagerImpl implements V23Manager {
         @Override
         public void start(
                 FutureCallback<Void> onStart,
-                InputChannelCallback<Update> onUpdate,
+                AdvertisementFoundListener foundListener,
+                AdvertisementLostListener lostListener,
                 FutureCallback<Void> onStop) {
             Log.d(TAG, "Entering start.");
             if (isScanning()) {
@@ -363,17 +366,35 @@ public class V23ManagerImpl implements V23Manager {
                         new IllegalStateException("Discovery not ready."));
                 return;
             }
-
             mScanCtx = contextWithTimeout(mDuration);
 
             Futures.addCallback(
                     InputChannels.withCallback(
-                            mDiscovery.scan(mScanCtx, mQuery), onUpdate),
+                            mDiscovery.scan(mScanCtx, mQuery),
+                            makeUpdateCallback(foundListener, lostListener)),
                     onStop);
 
             onStart.onSuccess(null);
 
             Log.d(TAG, "Exiting start.");
+        }
+
+        private InputChannelCallback<Update> makeUpdateCallback(
+                final AdvertisementFoundListener foundListener,
+                final AdvertisementLostListener lostListener) {
+            return new InputChannelCallback<Update>() {
+                @Override
+                public ListenableFuture<Void> onNext(Update result) {
+                    if (result instanceof Update.Found) {
+                        foundListener.handleFoundAdvertisement(
+                                ((Update.Found) result).getElem().getService());
+                    } else {
+                        lostListener.handleLostAdvertisement(
+                                ((Update.Lost) result).getElem().getService());
+                    }
+                    return Futures.immediateFuture(null);
+                }
+            };
         }
 
         @Override
