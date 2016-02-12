@@ -48,7 +48,9 @@ public class UserCloudSyncgroup extends UserSyncgroup {
                 Lists.transform(mParams.getPrefixes(), TableRow::getTableName);
 
         return SgHostUtil.ensureSyncgroupHierarchies(remoteDb, tableNames)
-                // syncgroup create is implicitly deferred via flatMap from a real observable
+                // Syncgroup create is implicitly deferred via flatMap from a real observable.
+                // Create this syncgroup on the remote Syncbase to auto-join that remote and sync
+                // data to it. Otherwise, we won't actually write anything to the cloud syncbase.
                 .switchMap(db -> toObservable(db.getSyncgroup(sgName)
                         .create(mParams.getVContext(), spec, mParams.getMemberInfo()))
                         .doOnCompleted(() ->
@@ -66,7 +68,7 @@ public class UserCloudSyncgroup extends UserSyncgroup {
             return toObservable(sg.join(mParams.getVContext(), mParams.getMemberInfo()))
                     .doOnCompleted(() -> log.info("Joined syncgroup " + sgName))
                     .flatMap(spec -> spec.equals(expectedSpec) ? Observable.just(null) :
-                            toObservable(sg.setSpec(mParams.getVContext(), expectedSpec, null))
+                            toObservable(sg.setSpec(mParams.getVContext(), expectedSpec, ""))
                                     .doOnCompleted(() ->
                                             log.info("Updated spec for syncgroup " + sgName)));
         });

@@ -189,7 +189,7 @@ public class BlessingsUtils {
         final AccessList cloudAcl = augmentAcl(userAcl, sgHostBlessing);
         return new Permissions(ImmutableMap.of(
                 Constants.ADMIN.getValue(), cloudAcl,
-                Constants.READ.getValue(), userAcl,
+                Constants.READ.getValue(), cloudAcl,
                 Constants.WRITE.getValue(), userAcl,
                 Constants.RESOLVE.getValue(), userAcl,
                 Constants.DEBUG.getValue(), userAcl
