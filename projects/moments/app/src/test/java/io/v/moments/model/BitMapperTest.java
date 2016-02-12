@@ -19,6 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.File;
 
 import io.v.moments.ifc.Moment;
+import io.v.moments.lib.FileUtil;
 
 import static org.junit.Assert.assertEquals;
 

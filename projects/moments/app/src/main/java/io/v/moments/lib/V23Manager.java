@@ -6,6 +6,7 @@ package io.v.moments.lib;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -25,6 +26,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 import io.v.v23.discovery.VDiscovery;
+import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
@@ -156,8 +158,18 @@ public class V23Manager {
                 VSecurity.newAllowEveryoneAuthorizer());
     }
 
-    public Server getServer(VContext mServerCtx) {
+    private Server getServer(VContext mServerCtx) {
         return V.getServer(mServerCtx);
+    }
+
+    public List<String> makeServerAddressList(VContext serverCtx) {
+        List<String> addresses = new ArrayList<>();
+        Endpoint[] points = getServer(
+                serverCtx).getStatus().getEndpoints();
+        for (Endpoint point : points) {
+            addresses.add(point.toString());
+        }
+        return addresses;
     }
 
     public VContext contextWithTimeout(Duration timeout) {

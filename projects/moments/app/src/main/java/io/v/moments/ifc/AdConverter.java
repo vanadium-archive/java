@@ -8,7 +8,7 @@ import io.v.v23.discovery.Service;
 
 /**
  * The io.v.v23.discovery.Service isn't a service, it's the *description* of a
- * service found in a discovery advertisement.
+ * service used as a discovery advertisement.
  *
  * Implementations of this interface construct an instance of T from the
  * attributes in Service, and/or by making an RPC to the real underlying service
