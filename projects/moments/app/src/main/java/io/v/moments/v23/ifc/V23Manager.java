@@ -12,37 +12,43 @@ import org.joda.time.Duration;
 
 import java.util.List;
 
-import io.v.v23.InputChannelCallback;
 import io.v.v23.context.VContext;
-import io.v.v23.discovery.Update;
 import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
-import io.v.v23.verror.VException;
 
 /**
  * V23 functionality; service creation and discovery.
  */
 public interface V23Manager {
-    void init(
-            Activity activity, FutureCallback<Blessings> blessingCallback);
+    /**
+     * Start V23 runtime bound to the given activity, and give it a callback via
+     * which it will get its blessings.
+     */
+    void init(Activity activity,
+              FutureCallback<Blessings> blessingCallback);
 
+    /**
+     * Shutdown the v23 runtime.  This should be called in onDestroy to clean up
+     * any lingering contexts associated with advertising or scanning.
+     */
     void shutdown();
 
-    void scan(
-            String query,
-            Duration duration,
-            FutureCallback<VContext> startupCallback,
-            InputChannelCallback<Update> updateCallback,
-            FutureCallback<Void> completionCallback);
+    /**
+     * Used to construct RPCs.
+     */
+    VContext contextWithTimeout(Duration timeout);
 
-    Advertiser makeAdvertiser(AdSupporter adSupporter,
+    /**
+     * Returns an advertiser that will start advertising using the adCampaign
+     * for a fixed time duration.
+     */
+    Advertiser makeAdvertiser(AdCampaign adCampaign,
                               Duration duration,
                               List<BlessingPattern> visibility);
 
-    VContext makeServerContext(
-            String mountName, Object server) throws VException;
-
-    VContext contextWithTimeout(Duration timeout);
-
-    List<String> makeServerAddressList(VContext serverCtx);
+    /**
+     * Returns a scanner that will look for advertisements matching the query,
+     * for a fixed time duration.
+     */
+    Scanner makeScanner(String query, Duration duration);
 }

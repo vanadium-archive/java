@@ -33,7 +33,7 @@ public class AdvertiserFactory implements IdSet {
             return mLocalAds.get(moment.getId());
         }
         Advertiser result = mV23Manager.makeAdvertiser(
-                new MomentAdSupporter(moment),
+                new MomentAdCampaign(moment),
                 Config.Discovery.DURATION,
                 Config.Discovery.NO_PATTERNS);
         mLocalAds.put(moment.getId(), result);

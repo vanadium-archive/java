@@ -11,7 +11,7 @@ import io.v.v23.discovery.Service;
 /**
  * Makes objects that support advertising.
  */
-public interface AdSupporter {
+public interface AdCampaign {
     /**
      * Makes an instance of a service that will be run during the life of the
      * advertisement.

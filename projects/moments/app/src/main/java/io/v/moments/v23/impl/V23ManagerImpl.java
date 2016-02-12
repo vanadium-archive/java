@@ -19,8 +19,9 @@ import java.util.List;
 
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
-import io.v.moments.v23.ifc.AdSupporter;
+import io.v.moments.v23.ifc.AdCampaign;
 import io.v.moments.v23.ifc.Advertiser;
+import io.v.moments.v23.ifc.Scanner;
 import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
@@ -34,13 +35,13 @@ import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 
 /**
- * Various static V23Manager utilities gathered into an instantiatable class.
+ * Various static V23 utilities gathered into an instantiatable class.
  *
- * This allows v23 usage to be injected and mocked.  The class is a singleton to
+ * This allows V23 usage to be injected and mocked.  The class is a singleton to
  * avoid confusion about init, shutdown and the 'base context'.
  *
- * Nothing in here has anything in particular to do with Moments; its generic
- * code that hides an evolving, static API.
+ * Nothing in here has anything in particular to do with Moments; it's an object
+ * hiding an evolving API based on static functions.
  */
 public class V23ManagerImpl implements V23Manager {
     private static final String TAG = "V23ManagerImpl";
@@ -51,34 +52,6 @@ public class V23ManagerImpl implements V23Manager {
 
     // Constructor should only be called from tests.
     /* package private */ V23ManagerImpl() {
-    }
-
-    @Override
-    public void scan(
-            String query,
-            Duration duration,
-            FutureCallback<VContext> startupCallback,
-            InputChannelCallback<Update> updateCallback,
-            FutureCallback<Void> completionCallback) {
-        Log.d(TAG, "Starting scan with q=[" + query + "]");
-        if (mDiscovery == null) {
-            startupCallback.onFailure(
-                    new IllegalStateException("Discovery not ready."));
-            return;
-        }
-        VContext context = contextWithTimeout(duration);
-        Futures.addCallback(
-                InputChannels.withCallback(
-                        mDiscovery.scan(context, query), updateCallback),
-                completionCallback);
-        startupCallback.onSuccess(context);
-    }
-
-    @Override
-    public Advertiser makeAdvertiser(AdSupporter adSupporter,
-                                     Duration duration,
-                                     List<BlessingPattern> visibility) {
-        return new AdvertiserImpl(adSupporter, duration, visibility);
     }
 
     @Override
@@ -120,8 +93,7 @@ public class V23ManagerImpl implements V23Manager {
         mAndroidCtx = null;
     }
 
-    @Override
-    public VContext makeServerContext(
+    private VContext makeServerContext(
             String mountName, Object server) throws VException {
         return V.withNewServer(
                 mV23Ctx.withCancel(),
@@ -130,8 +102,7 @@ public class V23ManagerImpl implements V23Manager {
                 VSecurity.newAllowEveryoneAuthorizer());
     }
 
-    @Override
-    public List<String> makeServerAddressList(VContext serverCtx) {
+    private List<String> makeServerAddressList(VContext serverCtx) {
         List<String> addresses = new ArrayList<>();
         Endpoint[] points = V.getServer(
                 serverCtx).getStatus().getEndpoints();
@@ -144,6 +115,18 @@ public class V23ManagerImpl implements V23Manager {
     @Override
     public VContext contextWithTimeout(Duration timeout) {
         return mV23Ctx.withTimeout(timeout);
+    }
+
+    @Override
+    public Advertiser makeAdvertiser(AdCampaign adCampaign,
+                                     Duration duration,
+                                     List<BlessingPattern> visibility) {
+        return new AdvertiserImpl(adCampaign, duration, visibility);
+    }
+
+    @Override
+    public Scanner makeScanner(String query, Duration duration) {
+        return new ScannerImpl(query, duration);
     }
 
     public static class Singleton {
@@ -172,7 +155,7 @@ public class V23ManagerImpl implements V23Manager {
     class AdvertiserImpl implements Advertiser {
         private static final String TAG = "AdvertiserImpl";
 
-        private final AdSupporter mAdSupporter;
+        private final AdCampaign mAdCampaign;
         private final Duration mDuration;
         private final List<BlessingPattern> mVisibility;
 
@@ -180,11 +163,11 @@ public class V23ManagerImpl implements V23Manager {
         private VContext mServerCtx;
 
         public AdvertiserImpl(
-                AdSupporter adSupporter,
+                AdCampaign adCampaign,
                 Duration duration,
                 List<BlessingPattern> visibility) {
-            if (adSupporter == null) {
-                throw new IllegalArgumentException("Null adSupporter");
+            if (adCampaign == null) {
+                throw new IllegalArgumentException("Null adCampaign");
             }
             if (duration == null) {
                 throw new IllegalArgumentException("Null duration");
@@ -192,7 +175,7 @@ public class V23ManagerImpl implements V23Manager {
             if (visibility == null) {
                 throw new IllegalArgumentException("Null visibility");
             }
-            mAdSupporter = adSupporter;
+            mAdCampaign = adCampaign;
             mDuration = duration;
             mVisibility = visibility;
         }
@@ -215,8 +198,8 @@ public class V23ManagerImpl implements V23Manager {
 
             try {
                 mServerCtx = makeServerContext(
-                        mAdSupporter.getMountName(),
-                        mAdSupporter.makeServer());
+                        mAdCampaign.getMountName(),
+                        mAdCampaign.makeServer());
             } catch (VException e) {
                 onStartCallback.onFailure(
                         new IllegalStateException("Unable to start service.", e));
@@ -229,7 +212,7 @@ public class V23ManagerImpl implements V23Manager {
             ListenableFuture<ListenableFuture<Void>> nestedFuture =
                     mDiscovery.advertise(
                             context,
-                            mAdSupporter.makeAdvertisement(
+                            mAdCampaign.makeAdvertisement(
                                     makeServerAddressList(mServerCtx)),
                             mVisibility);
 
@@ -326,6 +309,89 @@ public class V23ManagerImpl implements V23Manager {
                 }
                 mServerCtx = null;
             }
+        }
+    }
+
+    /**
+     * Handles scanning for moments.
+     *
+     * To make this class more useful in decoupling moments specific code from
+     * v23 specifics, this class could tease apart a scan Update, and feed
+     * advertisement data from the Update.Found and Update.Lost object directly
+     * into, say, the appropriate instances of java.util.function.Consumer<T>
+     * that were passed to #start en lieu of the InputChannelCallback<Update>
+     * updateCallback.  That way the caller would have no exposure to v23
+     * classes (Update and Lost).
+     */
+    class ScannerImpl implements Scanner {
+        private static final String TAG = "ScannerImpl";
+        private final String mQuery;
+        private final Duration mDuration;
+        private VContext mScanCtx;
+
+        public ScannerImpl(String query, Duration duration) {
+            if (query == null || query.isEmpty()) {
+                throw new IllegalArgumentException("Empty query.");
+            }
+            if (duration == null) {
+                throw new IllegalArgumentException("Null duration.");
+            }
+            mDuration = duration;
+            mQuery = query;
+        }
+
+        @Override
+        public String toString() {
+            return "scan(" + mQuery + "," + isScanning() + ")";
+        }
+
+        @Override
+        public void start(
+                FutureCallback<Void> onStart,
+                InputChannelCallback<Update> onUpdate,
+                FutureCallback<Void> onStop) {
+            Log.d(TAG, "Entering start.");
+            if (isScanning()) {
+                onStart.onFailure(
+                        new IllegalStateException("Already scanning."));
+                return;
+            }
+
+            Log.d(TAG, "Starting scan with q=[" + mQuery + "]");
+            if (mDiscovery == null) {
+                onStart.onFailure(
+                        new IllegalStateException("Discovery not ready."));
+                return;
+            }
+
+            mScanCtx = contextWithTimeout(mDuration);
+
+            Futures.addCallback(
+                    InputChannels.withCallback(
+                            mDiscovery.scan(mScanCtx, mQuery), onUpdate),
+                    onStop);
+
+            onStart.onSuccess(null);
+
+            Log.d(TAG, "Exiting start.");
+        }
+
+        @Override
+        public boolean isScanning() {
+            return mScanCtx != null && !mScanCtx.isCanceled();
+        }
+
+        @Override
+        public void stop() {
+            Log.d(TAG, "Entering stop");
+            if (mScanCtx != null) {
+                Log.d(TAG, "Cancelling scan.");
+                if (!mScanCtx.isCanceled()) {
+                    mScanCtx.cancel();
+                }
+                mScanCtx = null;
+            }
+            Log.d(TAG, "Exiting stop");
         }
     }
 }

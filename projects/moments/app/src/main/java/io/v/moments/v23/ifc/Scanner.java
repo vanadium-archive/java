@@ -18,17 +18,16 @@ public interface Scanner {
      *
      * Callbacks can be expected to run on the UX thread.
      *
-     * @param startupCallback    executed on success or failure of scan
-     *                           startup.
-     * @param updateCallback     executed on each scan update (each found or
-     *                           lost advertisement).
-     * @param completionCallback executed on success or failure of scan
-     *                           completion.  A scan might shutdown for reasons
-     *                           other than a call to stop, e.g. a timeout.
+     * @param onStart  executed on success or failure of scan startup.
+     * @param onUpdate executed on each scan update (each found or lost
+     *                 advertisement).
+     * @param onStop   executed on success or failure of scan completion.  A
+     *                 scan might shutdown for reasons other than a call to
+     *                 stop, e.g. a timeout.
      */
-    void start(FutureCallback<Void> startupCallback,
-               InputChannelCallback<Update> updateCallback,
-               FutureCallback<Void> completionCallback);
+    void start(FutureCallback<Void> onStart,
+               InputChannelCallback<Update> onUpdate,
+               FutureCallback<Void> onStop);
 
     /**
      * True if stop could usefully be called.

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import io.v.moments.ifc.Moment;
 import io.v.moments.lib.Id;
-import io.v.moments.v23.ifc.AdSupporter;
+import io.v.moments.v23.ifc.AdCampaign;
 import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.security.BlessingPattern;
@@ -45,7 +45,7 @@ public class AdvertiserFactoryTest {
     public ExpectedException mThrown = ExpectedException.none();
 
     @Captor
-    ArgumentCaptor<MomentAdSupporter> mSupporter;
+    ArgumentCaptor<MomentAdCampaign> mSupporter;
     @Captor
     ArgumentCaptor<Duration> mDuration;
     @Captor
@@ -66,7 +66,7 @@ public class AdvertiserFactoryTest {
     public void setup() throws Exception {
         mFactory = new AdvertiserFactory(mV23Manager);
         when(mV23Manager.makeAdvertiser(
-                any(AdSupporter.class),
+                any(AdCampaign.class),
                 eq(Config.Discovery.DURATION),
                 eq(Config.Discovery.NO_PATTERNS)
         )).thenReturn(mAdvertiser0);
@@ -98,7 +98,7 @@ public class AdvertiserFactoryTest {
 
         when(mMoment.getId()).thenReturn(ID1);
         when(mV23Manager.makeAdvertiser(
-                any(AdSupporter.class),
+                any(AdCampaign.class),
                 eq(Config.Discovery.DURATION),
                 eq(Config.Discovery.NO_PATTERNS)
         )).thenReturn(mAdvertiser1);
