@@ -3,9 +3,9 @@
 // license that can be found in the LICENSE file.
 
 /**
- * Below this point sits code that wraps the evolving v23 API.
+ * Below this point sits code that wraps the underlying, evolving v23 API.
  *
- * None of it depends on any 'moments' code/data.
+ * None of it depends on 'moments'-specific code/data.
  *
  * The wrapper facilitates the use of the underlying API, and makes it easier to
  * test classes that use the API.

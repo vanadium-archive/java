@@ -16,22 +16,29 @@ import android.widget.TextView;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import org.joda.time.Duration;
+
 import java.util.concurrent.CancellationException;
 
 import io.v.moments.R;
-import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.Moment.Kind;
 import io.v.moments.ifc.Moment.Style;
 import io.v.moments.model.Toaster;
+import io.v.moments.v23.ifc.Advertiser;
 
 import static io.v.moments.ifc.Moment.AdState;
 
 /**
  * Holds the views comprising a Moment for a RecyclerView.
  */
-public class MomentHolder extends RecyclerView.ViewHolder {
+class MomentHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "MomentHolder";
+    /**
+     * After this duration a advertisement automatically stop. Choice is
+     * arbitrary.
+     */
+    private static final Duration DURATION = Duration.standardMinutes(5);
     private final TextView mAuthorTextView;
     private final TextView mCaptionTextView;
     private final SwitchCompat mAdvertiseButton;
@@ -105,7 +112,8 @@ public class MomentHolder extends RecyclerView.ViewHolder {
                     if (!advertiser.isAdvertising()) {
                         advertiser.start(
                                 makeAdvertiseStartCallback(moment),
-                                makeAdvertiseStopCallback(moment));
+                                makeAdvertiseStopCallback(moment),
+                                DURATION);
                     } else {
                         Log.d(TAG, "Advertiser already on.");
                     }

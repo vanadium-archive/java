@@ -14,17 +14,19 @@ import io.v.v23.discovery.Attributes;
  * Makes moments, converts them to and from other formats.
  */
 public interface MomentFactory {
+    Moment make(Id id, int index, String author, String caption);
+
     void toPrefs(SharedPreferences.Editor editor, String prefix, Moment m);
+
+    Moment fromPrefs(SharedPreferences p, String prefix);
 
     void toBundle(Bundle b, String prefix, Moment m);
 
     Moment fromBundle(Bundle b, String prefix);
 
-    Moment make(Id id, int index, String author, String caption);
+    Attributes toAttributes(Moment moment);
 
-    Moment makeFromAttributes(Id id, int ordinal, Attributes attr);
-
-    Moment fromPrefs(SharedPreferences p, String prefix);
+    Moment fromAttributes(Id id, int ordinal, Attributes attr);
 
     enum F {
         DATE, AUTHOR, CAPTION, ORDINAL, ID, ADVERTISING

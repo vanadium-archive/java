@@ -34,13 +34,23 @@ public class MomentFactoryImpl implements MomentFactory {
     }
 
     @Override
-    public Moment makeFromAttributes(Id id, int ordinal, Attributes attr) {
+    public Moment fromAttributes(Id id, int ordinal, Attributes attr) {
         return new MomentImpl(
                 mBitMapper, id, ordinal,
                 attr.get(F.AUTHOR.toString()),
                 attr.get(F.CAPTION.toString()),
                 Moment.FMT.parseDateTime(attr.get(F.DATE.toString())),
                 AdState.OFF);
+    }
+
+    @Override
+    public Attributes toAttributes(Moment moment) {
+        Attributes attr = new Attributes();
+        attr.put(MomentFactory.F.AUTHOR.toString(), moment.getAuthor());
+        attr.put(MomentFactory.F.CAPTION.toString(), moment.getCaption());
+        attr.put(MomentFactory.F.DATE.toString(),
+                Moment.FMT.print(moment.getCreationTime()));
+        return attr;
     }
 
     @Override

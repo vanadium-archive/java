@@ -28,10 +28,10 @@ import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.Service;
 import io.v.v23.discovery.Update;
 import io.v.v23.discovery.VDiscovery;
 import io.v.v23.naming.Endpoint;
-import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
@@ -120,15 +120,13 @@ public class V23ManagerImpl implements V23Manager {
     }
 
     @Override
-    public Advertiser makeAdvertiser(AdCampaign adCampaign,
-                                     Duration duration,
-                                     List<BlessingPattern> visibility) {
-        return new AdvertiserImpl(adCampaign, duration, visibility);
+    public Advertiser makeAdvertiser(AdCampaign adCampaign) {
+        return new AdvertiserImpl(adCampaign);
     }
 
     @Override
-    public Scanner makeScanner(String query, Duration duration) {
-        return new ScannerImpl(query, duration);
+    public Scanner makeScanner(String query) {
+        return new ScannerImpl(query);
     }
 
     public static class Singleton {
@@ -158,39 +156,33 @@ public class V23ManagerImpl implements V23Manager {
         private static final String TAG = "AdvertiserImpl";
 
         private final AdCampaign mAdCampaign;
-        private final Duration mDuration;
-        private final List<BlessingPattern> mVisibility;
 
         private VContext mAdvCtx;
         private VContext mServerCtx;
+        private Duration mDuration;
 
-        public AdvertiserImpl(
-                AdCampaign adCampaign,
-                Duration duration,
-                List<BlessingPattern> visibility) {
+        public AdvertiserImpl(AdCampaign adCampaign) {
             if (adCampaign == null) {
                 throw new IllegalArgumentException("Null adCampaign");
             }
-            if (duration == null) {
-                throw new IllegalArgumentException("Null duration");
-            }
-            if (visibility == null) {
-                throw new IllegalArgumentException("Null visibility");
-            }
             mAdCampaign = adCampaign;
-            mDuration = duration;
-            mVisibility = visibility;
         }
 
         @Override
         public void start(FutureCallback<Void> onStartCallback,
-                          FutureCallback<Void> onStopCallback) {
+                          FutureCallback<Void> onStopCallback,
+                          Duration timeout) {
             Log.d(TAG, "Entering start.");
             if (isAdvertising()) {
                 onStartCallback.onFailure(
                         new IllegalStateException("Already advertising."));
                 return;
             }
+
+            if (timeout == null) {
+                throw new IllegalArgumentException("Null timeout");
+            }
+            mDuration = timeout;
 
             if (mDiscovery == null) {
                 onStartCallback.onFailure(
@@ -201,7 +193,7 @@ public class V23ManagerImpl implements V23Manager {
             try {
                 mServerCtx = makeServerContext(
                         mAdCampaign.getMountName(),
-                        mAdCampaign.makeServer());
+                        mAdCampaign.makeService());
             } catch (VException e) {
                 onStartCallback.onFailure(
                         new IllegalStateException("Unable to start service.", e));
@@ -211,12 +203,19 @@ public class V23ManagerImpl implements V23Manager {
 
             VContext context = contextWithTimeout(mDuration);
 
+            Service advertisement = new Service(
+                    mAdCampaign.getInstanceId(),
+                    mAdCampaign.getInstanceName(),
+                    mAdCampaign.getInterfaceName(),
+                    mAdCampaign.getAttributes(),
+                    makeServerAddressList(mServerCtx),
+                    mAdCampaign.getAttachments());
+
             ListenableFuture<ListenableFuture<Void>> nestedFuture =
                     mDiscovery.advertise(
                             context,
-                            mAdCampaign.makeAdvertisement(
-                                    makeServerAddressList(mServerCtx)),
-                            mVisibility);
+                            advertisement,
+                            mAdCampaign.getVisibility());
 
             Futures.addCallback(
                     nestedFuture,
@@ -328,17 +327,13 @@ public class V23ManagerImpl implements V23Manager {
     class ScannerImpl implements Scanner {
         private static final String TAG = "ScannerImpl";
         private final String mQuery;
-        private final Duration mDuration;
+        private Duration mDuration;
         private VContext mScanCtx;
 
-        public ScannerImpl(String query, Duration duration) {
+        public ScannerImpl(String query) {
             if (query == null || query.isEmpty()) {
                 throw new IllegalArgumentException("Empty query.");
             }
-            if (duration == null) {
-                throw new IllegalArgumentException("Null duration.");
-            }
-            mDuration = duration;
             mQuery = query;
         }
 
@@ -352,14 +347,18 @@ public class V23ManagerImpl implements V23Manager {
                 FutureCallback<Void> onStart,
                 AdvertisementFoundListener foundListener,
                 AdvertisementLostListener lostListener,
-                FutureCallback<Void> onStop) {
+                FutureCallback<Void> onStop,
+                Duration timeout) {
             Log.d(TAG, "Entering start.");
             if (isScanning()) {
                 onStart.onFailure(
                         new IllegalStateException("Already scanning."));
                 return;
             }
-
+            if (timeout == null) {
+                throw new IllegalArgumentException("Null timeout.");
+            }
+            mDuration = timeout;
             Log.d(TAG, "Starting scan with q=[" + mQuery + "]");
             if (mDiscovery == null) {
                 onStart.onFailure(

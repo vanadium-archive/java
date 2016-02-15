@@ -87,7 +87,7 @@ public class AdConverterMomentTest {
         when(mMoment.getId()).thenReturn(ID);
         when(mAdvertisement.getAttrs()).thenReturn(mAttributes);
         when(mAdvertisement.getAddrs()).thenReturn(ADDRESSES);
-        when(mMomentFactory.makeFromAttributes(
+        when(mMomentFactory.fromAttributes(
                 eq(ID), anyInt(), eq(mAttributes))).thenReturn(mMoment);
         when(mClientFactory.makeClient(eq("/" + ADDRESS0))).thenReturn(mClient);
         when(mV23Manager.contextWithTimeout(
@@ -124,7 +124,7 @@ public class AdConverterMomentTest {
         // Make the moment - this is the call being tested.
         assertEquals(mMoment, mConverter.make(mAdvertisement));
 
-        verify(mMomentFactory).makeFromAttributes(
+        verify(mMomentFactory).fromAttributes(
                 eq(ID), mOrdinal.capture(), eq(mAttributes));
 
         // The ordinal value supplied to the factory should be one.

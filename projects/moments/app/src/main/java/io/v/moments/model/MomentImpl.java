@@ -8,15 +8,13 @@ import android.graphics.Bitmap;
 
 import org.joda.time.DateTime;
 
-import io.v.moments.ifc.MomentFactory;
-import io.v.moments.lib.Id;
 import io.v.moments.ifc.Moment;
-import io.v.v23.discovery.Attributes;
+import io.v.moments.lib.Id;
 
 /**
  * A photo and ancillary information.
  */
-public class MomentImpl implements Moment {
+class MomentImpl implements Moment {
     private static final String NOT_LETTERS_DIGITS = "[^a-zA-Z0-9]";
     protected final BitMapper mBitMapper;
     private final DateTime mCreationTime;
@@ -45,15 +43,6 @@ public class MomentImpl implements Moment {
 
     public void setDesiredAdState(AdState value) {
         mDesiredAdState = value;
-    }
-
-    @Override
-    public Attributes makeAttributes() {
-        Attributes attr = new Attributes();
-        attr.put(MomentFactory.F.AUTHOR.toString(), getAuthor());
-        attr.put(MomentFactory.F.CAPTION.toString(), getCaption());
-        attr.put(MomentFactory.F.DATE.toString(), FMT.print(getCreationTime()));
-        return attr;
     }
 
     public boolean hasPhoto(Kind kind, Style style) {

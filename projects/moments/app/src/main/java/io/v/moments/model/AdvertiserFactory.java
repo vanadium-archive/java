@@ -9,6 +9,7 @@ import java.util.Map;
 
 import io.v.moments.ifc.IdSet;
 import io.v.moments.ifc.Moment;
+import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.v23.ifc.V23Manager;
@@ -16,16 +17,24 @@ import io.v.moments.v23.ifc.V23Manager;
 /**
  * Makes moment advertisers.
  *
- * More importantly, keeps a record of all of them for the life of the app. Can
- * use this record to reject local advertisements when scanning, or to shut down
- * all advertising.
+ * Keeps a record of all of them for the life of the app. This record used to
+ * reject locally created advertisements when scanning, or to shut down all
+ * advertising.
  */
 public class AdvertiserFactory implements IdSet {
     private final V23Manager mV23Manager;
     private final Map<Id, Advertiser> mLocalAds = new HashMap<>();
+    private final MomentFactory mFactory;
 
-    public AdvertiserFactory(V23Manager v23Manager) {
+    public AdvertiserFactory(V23Manager v23Manager, MomentFactory factory) {
+        if (v23Manager == null) {
+            throw new IllegalArgumentException("Null v23Manager");
+        }
+        if (factory == null) {
+            throw new IllegalArgumentException("Null factory");
+        }
         mV23Manager = v23Manager;
+        mFactory = factory;
     }
 
     public Advertiser getOrMake(Moment moment) {
@@ -33,9 +42,7 @@ public class AdvertiserFactory implements IdSet {
             return mLocalAds.get(moment.getId());
         }
         Advertiser result = mV23Manager.makeAdvertiser(
-                new MomentAdCampaign(moment),
-                Config.Discovery.DURATION,
-                Config.Discovery.NO_PATTERNS);
+                new MomentAdCampaign(moment, mFactory));
         mLocalAds.put(moment.getId(), result);
         return result;
     }

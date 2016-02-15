@@ -10,45 +10,57 @@ import com.google.common.util.concurrent.FutureCallback;
 
 import org.joda.time.Duration;
 
-import java.util.List;
-
 import io.v.v23.context.VContext;
-import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.Blessings;
 
 /**
- * V23 functionality; service creation and discovery.
+ * Secure distributed computing via underlying v23 APIs.
+ *
+ * This and other interfaces in the encompassing package comprise an API that
+ * might feel more comfortable to java Android developers.  It wraps the
+ * underlying static v23 methods in a framework of injectable, mockable
+ * instances.
  */
 public interface V23Manager {
     /**
      * Start V23 runtime bound to the given activity, and give it a callback via
-     * which it will get its blessings.
+     * which it will get its blessings.  This should be called on onCreate().
+     *
+     * When the blessings come in, the app can safely use v23 operations that
+     * require a notion of identity, but until that time should make no attempt
+     * to do so.
      */
-    void init(Activity activity,
-              FutureCallback<Blessings> blessingCallback);
+    void init(Activity activity, FutureCallback<Blessings> blessingCallback);
 
     /**
-     * Shutdown the v23 runtime.  This should be called in onDestroy to clean up
-     * any lingering contexts associated with advertising or scanning.
+     * Shutdown the v23 runtime.  This should be called in onDestroy() to cancel
+     * any lingering contexts associated with v23 operations (advertising,
+     * scanning, serving etc.), so that a subsequent call to init - say, during
+     * destroy/create lifecycle event series - will start with clean state in
+     * the v23 runtime.
      */
     void shutdown();
 
     /**
-     * Used to construct RPCs.
+     * Used by v23 clients to make v23 RPCs.
+     *
+     * @param duration Amount of time until the operation self-cancels.
      */
-    VContext contextWithTimeout(Duration timeout);
+    VContext contextWithTimeout(Duration duration);
 
     /**
-     * Returns an advertiser that will start advertising using the adCampaign
-     * for a fixed time duration.
+     * Returns an advertiser bound to the given adCampaign.
+     *
+     * @param adCampaign Immutable description of the ad to run.
+     * @return Advertiser that can start, stop and restart the advertisement.
      */
-    Advertiser makeAdvertiser(AdCampaign adCampaign,
-                              Duration duration,
-                              List<BlessingPattern> visibility);
+    Advertiser makeAdvertiser(AdCampaign adCampaign);
 
     /**
-     * Returns a scanner that will look for advertisements matching the query,
-     * for a fixed time duration.
+     * Returns a scanner that will look for advertisements matching the query.
+     *
+     * @param query Query limiting the ads that are processed.
+     * @return Scanner that can start, stop and restart the scan.
      */
-    Scanner makeScanner(String query, Duration duration);
+    Scanner makeScanner(String query);
 }

@@ -76,7 +76,7 @@ public class AdConverterMoment implements AdConverter<Moment> {
         if (mRemoteMomentCache.containsKey(id)) {
             return mRemoteMomentCache.get(id);
         }
-        final Moment moment = mMomentFactory.makeFromAttributes(
+        final Moment moment = mMomentFactory.fromAttributes(
                 id, nextOrdinal(), descriptor.getAttrs());
         mRemoteMomentCache.put(id, moment);
 

@@ -45,6 +45,7 @@ import io.v.moments.model.AdConverterMoment;
 import io.v.moments.model.AdvertiserFactory;
 import io.v.moments.model.BitMapper;
 import io.v.moments.model.Config;
+import io.v.moments.model.MomentAdCampaign;
 import io.v.moments.model.MomentFactoryImpl;
 import io.v.moments.model.StateStore;
 import io.v.moments.model.Toaster;
@@ -188,11 +189,11 @@ public class MainActivity extends AppCompatActivity {
         // Compresses byte data, converts byte[] to bitmap, manages file storage.
         mBitMapper = Config.makeBitmapper(this);
 
-        // Makes advertisers.  Needs v23Manager to do advertising.
-        mAdvertiserFactory = new AdvertiserFactory(mV23Manager);
-
         // Makes moments.  Each moment needs a bitmapper to read its BitMaps.
         mMomentFactory = new MomentFactoryImpl(mBitMapper);
+
+        // Makes advertisers.  Needs v23Manager to do advertising.
+        mAdvertiserFactory = new AdvertiserFactory(mV23Manager, mMomentFactory);
 
         // Local moments, with photos taken by the local device.
         mLocalMoments = new ObservedList<>();
@@ -212,8 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
         Toaster toaster = new Toaster(this);
 
-        mScanner = mV23Manager.makeScanner(
-                Config.Discovery.QUERY, Config.Discovery.DURATION);
+        mScanner = mV23Manager.makeScanner(MomentAdCampaign.QUERY);
         mScanSwitchHolder = new ScanSwitchHolder(
                 toaster, mScanner, mRemoteMoments);
 

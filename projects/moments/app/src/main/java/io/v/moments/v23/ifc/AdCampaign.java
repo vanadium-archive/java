@@ -6,27 +6,64 @@ package io.v.moments.v23.ifc;
 
 import java.util.List;
 
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Attachments;
+import io.v.v23.discovery.Attributes;
+import io.v.v23.security.BlessingPattern;
 
 /**
- * Makes objects that support advertising.
+ * Provides the data needed to run an advertisement.
  */
 public interface AdCampaign {
     /**
-     * Makes an instance of a service that will be run during the life of the
-     * advertisement.
+     * Unique Id associated with the advertisement, used to discriminate when an
+     * ad is found or lost.
      */
-    Object makeServer();
+    String getInstanceId();
 
     /**
-     * Name at which the service should be mounted. Can be empty.
+     * Optional human readable name, can be used in query discrimination.
+     */
+    String getInstanceName();
+
+    /**
+     * Optional service interface name, can be used in query discrimination. The
+     * name, if provided, should be the name of the service interface associated
+     * with the result of #makeServer().
+     */
+    String getInterfaceName();
+
+    /**
+     * Map of 'smallish' name/value pairs to send with the advertisement.
+     */
+    Attributes getAttributes();
+
+    /**
+     * Larger blobs of data to made available asynchronously to scanners.
+     */
+    Attachments getAttachments();
+
+    /**
+     * Makes an instance of a service (a set of handlers) that will be run
+     * during the life of the advertisement.
+     *
+     * I.e., every time an advertisement is started using this campaign, this
+     * factory method will be called to create a new service object with a clean
+     * state.  The service object will be used to start an actual server that
+     * will serve requests only as long as the advertisement.
+     *
+     * If null returned, no server is launched.
+     */
+    Object makeService();
+
+    /**
+     * Name at which the service associated with #makeService() should be
+     * mounted. Can be empty.
      */
     String getMountName();
 
     /**
-     * Makes an instance of 'Service', which is actually a service description,
-     * i.e. an advertisement.  The argument is the list of real addresses at
-     * which the service can be found (presumes no mount name).
+     * A set of blessing patterns for whom this advertisement is meant; any
+     * entity not matching a pattern here won't see the advertisement.
      */
-    Service makeAdvertisement(List<String> addresses);
+    List<BlessingPattern> getVisibility();
 }

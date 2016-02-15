@@ -11,12 +11,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import io.v.moments.lib.Id;
-import io.v.v23.discovery.Attributes;
 
 /**
  * A photo with ancillary information.
  */
 public interface Moment extends HasId {
+    DateTimeFormatter FMT = DateTimeFormat.forPattern("yyyyMMdd_HHmmss");
+
     /**
      * A unique moment ID valid for the life of the app.
      */
@@ -55,8 +56,8 @@ public interface Moment extends HasId {
     /**
      * An advertiser can be scheduled to start advertising, but not actually be
      * advertising yet.  There's also a lag to stop advertising.  This member
-     * tracks the desired eventual state, to maintain sensible UX, through
-     * phone rotations and whatnot.
+     * tracks the desired eventual state, to maintain sensible UX, through phone
+     * rotations and whatnot.
      */
     AdState getDesiredAdState();
 
@@ -69,12 +70,6 @@ public interface Moment extends HasId {
      * Is the specified photo available?
      */
     boolean hasPhoto(Kind kind, Style style);
-
-
-    /**
-     * From this, make a set of discovery 'attributes'.
-     */
-    Attributes makeAttributes();
 
     /**
      * Get the specified photo.
@@ -104,7 +99,5 @@ public interface Moment extends HasId {
         HUGE, FULL, THUMB
     }
 
-    enum AdState { ON, OFF }
-
-    DateTimeFormatter FMT = DateTimeFormat.forPattern("yyyyMMdd_HHmmss");
+    enum AdState {ON, OFF}
 }

@@ -10,6 +10,8 @@ import android.widget.CompoundButton;
 
 import com.google.common.util.concurrent.FutureCallback;
 
+import org.joda.time.Duration;
+
 import java.util.concurrent.CancellationException;
 
 import io.v.moments.ifc.Moment;
@@ -23,8 +25,12 @@ import io.v.moments.v23.ifc.Scanner;
  * The callbacks provided will be run on the UX thread, so its safe to perform
  * UX operations in the callbacks.
  */
-public class ScanSwitchHolder implements CompoundButton.OnCheckedChangeListener {
+class ScanSwitchHolder implements CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "ScanSwitchHolder";
+    /**
+     * After this duration a scan automatically stop. Choice is arbitrary.
+     */
+    private static final Duration DURATION = Duration.standardMinutes(5);
     private final Scanner mScanner;
     private final Toaster mToaster;
     private final DiscoveredList<Moment> mRemoteMoments;
@@ -62,7 +68,8 @@ public class ScanSwitchHolder implements CompoundButton.OnCheckedChangeListener 
                     makeStartupCallback(),
                     mRemoteMoments,
                     mRemoteMoments,
-                    makeCompletionCallback());
+                    makeCompletionCallback(),
+                    DURATION);
         } else {
             if (!mScanner.isScanning()) {
                 Log.d(TAG, "Asked to stop scanning, but already not scanning.");

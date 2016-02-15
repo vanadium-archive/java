@@ -17,22 +17,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import io.v.moments.ifc.Moment;
+import io.v.moments.ifc.MomentFactory;
 import io.v.moments.lib.Id;
 import io.v.moments.v23.ifc.AdCampaign;
 import io.v.moments.v23.ifc.Advertiser;
 import io.v.moments.v23.ifc.V23Manager;
-import io.v.v23.security.BlessingPattern;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertSame;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,14 +44,14 @@ public class AdvertiserFactoryTest {
     public ExpectedException mThrown = ExpectedException.none();
 
     @Captor
-    ArgumentCaptor<MomentAdCampaign> mSupporter;
+    ArgumentCaptor<AdCampaign> mCampaign;
     @Captor
     ArgumentCaptor<Duration> mDuration;
-    @Captor
-    ArgumentCaptor<List<BlessingPattern>> mBlessings;
 
     @Mock
     V23Manager mV23Manager;
+    @Mock
+    MomentFactory mMomentFactory;
     @Mock
     Moment mMoment;
     @Mock
@@ -64,12 +63,9 @@ public class AdvertiserFactoryTest {
 
     @Before
     public void setup() throws Exception {
-        mFactory = new AdvertiserFactory(mV23Manager);
+        mFactory = new AdvertiserFactory(mV23Manager, mMomentFactory);
         when(mV23Manager.makeAdvertiser(
-                any(AdCampaign.class),
-                eq(Config.Discovery.DURATION),
-                eq(Config.Discovery.NO_PATTERNS)
-        )).thenReturn(mAdvertiser0);
+                any(AdCampaign.class))).thenReturn(mAdvertiser0);
     }
 
     @Test
@@ -84,11 +80,9 @@ public class AdvertiserFactoryTest {
         assertEquals(a0, iter.next());
         assertFalse(iter.hasNext());
 
-        verify(mV23Manager).makeAdvertiser(
-                mSupporter.capture(), mDuration.capture(), mBlessings.capture());
+        verify(mV23Manager).makeAdvertiser(mCampaign.capture());
 
-        assertEquals(Config.Discovery.DURATION, mDuration.getValue());
-        assertSame(Config.Discovery.NO_PATTERNS, mBlessings.getValue());
+        assertNotNull(mCampaign.getValue());
     }
 
     @Test
@@ -98,10 +92,7 @@ public class AdvertiserFactoryTest {
 
         when(mMoment.getId()).thenReturn(ID1);
         when(mV23Manager.makeAdvertiser(
-                any(AdCampaign.class),
-                eq(Config.Discovery.DURATION),
-                eq(Config.Discovery.NO_PATTERNS)
-        )).thenReturn(mAdvertiser1);
+                any(AdCampaign.class))).thenReturn(mAdvertiser1);
 
         Advertiser a1 = mFactory.getOrMake(mMoment);
 

@@ -10,14 +10,9 @@ import android.graphics.Point;
 import android.os.Environment;
 import android.os.Handler;
 
-import org.joda.time.Duration;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.v.moments.R;
-import io.v.v23.security.BlessingPattern;
 
 /**
  * Configuration.
@@ -62,30 +57,5 @@ public class Config {
                 activity.getResources().getDimensionPixelSize(
                         R.dimen.moment_image_width)
         );
-    }
-
-    /** Constants related to discovery. */
-    public static class Discovery {
-        /**
-         * Required type/interface name, probably a URL into a web-based
-         * ontology.  Necessary for querying.
-         */
-        public static final String INTERFACE_NAME = "v.io/x/ref.Moments";
-        /**
-         * To limit scans to see only this service.
-         */
-        public static final String QUERY = "v.InterfaceName=\"" + INTERFACE_NAME + "\"";
-
-        /**
-         * After this duration an advertisement or scan for an advertisement
-         * will automatically stop. Choice is arbitrary. A nice exercise would
-         * be to add this to a settings menu.
-         */
-        public static final Duration DURATION = Duration.standardMinutes(5);
-
-        /**
-         * Used for public advertisements (no limits on who can see them).
-         */
-        public static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
     }
 }

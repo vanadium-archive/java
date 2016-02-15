@@ -5,7 +5,6 @@
 package io.v.moments.ux;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,7 @@ import io.v.moments.model.Toaster;
 /**
  * Stacks two moment lists in a recycler view.
  */
-public class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
+class MomentAdapter extends RecyclerView.Adapter<MomentHolder>
         implements ListObserver {
     private final ObservedList<Moment> mRemoteMoments;
     private final ObservedList<Moment> mLocalMoments;

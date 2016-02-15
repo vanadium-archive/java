@@ -10,47 +10,98 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.v.moments.ifc.Moment;
+import io.v.moments.ifc.MomentFactory;
 import io.v.moments.v23.ifc.AdCampaign;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Attachments;
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Attributes;
 import io.v.v23.rpc.ServerCall;
+import io.v.v23.security.BlessingPattern;
 
 /**
  * Makes objects that support the advertisement of a Moment.
  */
-class MomentAdCampaign implements AdCampaign {
-    private static final String NO_MOUNT_NAME = "";
+public class MomentAdCampaign implements AdCampaign {
+    /**
+     * Required type/interface name, probably a URL into a web-based ontology.
+     * Necessary for querying.
+     */
+    public static final String INTERFACE_NAME = "v.io/x/ref.Moments";
+    /**
+     * To limit scans to see only this service.
+     */
+    public static final String QUERY = "v.InterfaceName=\"" + INTERFACE_NAME + "\"";
+    /**
+     * Used for public advertisements (no limits on who can see them).
+     */
+    public static final List<BlessingPattern> NO_PATTERNS = new ArrayList<>();
 
     private final Moment mMoment;
+    private final MomentFactory mFactory;
 
-    public MomentAdCampaign(Moment moment) {
+    public MomentAdCampaign(Moment moment, MomentFactory factory) {
+        if (moment == null) {
+            throw new IllegalArgumentException("Null moment");
+        }
+        if (factory == null) {
+            throw new IllegalArgumentException("Null factory");
+        }
         mMoment = moment;
+        mFactory = factory;
     }
 
+    @Override
+    public String getInstanceId() {
+        return mMoment.getId().toString();
+    }
+
+    @Override
+    public String getInstanceName() {
+        return mMoment.toString();
+    }
+
+    @Override
+    public String getInterfaceName() {
+        return INTERFACE_NAME;
+    }
+
+    @Override
+    public Attributes getAttributes() {
+        return mFactory.toAttributes(mMoment);
+    }
+
+    /**
+     * No attachments (empty list).
+     */
+    @Override
+    public Attachments getAttachments() {
+        return new Attachments();
+    }
+
+    /**
+     * Empty string means make no attempt to mount a server in a mount table.
+     */
+    @Override
     public String getMountName() {
-        return NO_MOUNT_NAME;
+        return "";
     }
 
-    public Object makeServer() {
+    @Override
+    public Object makeService() {
         return new MomentServer();
     }
 
     /**
-     * Makes an instance of 'Service', which is actually a service description,
-     * i.e. an advertisement.
+     * A set of blessing patterns for whom this advertisement is meant; any
+     * entity not matching a pattern here won't see the advertisement.
      */
-    public Service makeAdvertisement(List<String> addresses) {
-        return new Service(
-                mMoment.getId().toString(), /* instance Id */
-                mMoment.toString(), /* instance name */
-                Config.Discovery.INTERFACE_NAME, /* interface name */
-                mMoment.makeAttributes(),
-                addresses,
-                new Attachments() /* no attachments */);
+    @Override
+    public List<BlessingPattern> getVisibility() {
+        return NO_PATTERNS;
     }
 
     /**
