@@ -4,6 +4,8 @@
 
 package io.v.baku.toolkit.bind;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.NoSuchElementException;
 
 import io.v.rx.syncbase.RxTable;
@@ -32,6 +34,11 @@ public class ListAccumulators {
         @Override
         public int getRowIndex(final String rowName) {
             return -1;
+        }
+
+        @Override
+        public ImmutableList<Object> getListSnapshot() {
+            return ImmutableList.of();
         }
     };
 

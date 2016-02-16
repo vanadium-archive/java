@@ -9,7 +9,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Objects;
@@ -17,11 +16,8 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
-@Slf4j
-public class TextViewAdapter extends AbstractViewAdapter<Object, TextViewAdapter.ViewHolder> {
+public class TextViewAdapter extends LayoutAdapter<Object, TextViewAdapter.ViewHolder> {
     @Accessors(prefix = "m")
     @Getter
     @RequiredArgsConstructor
@@ -48,9 +44,6 @@ public class TextViewAdapter extends AbstractViewAdapter<Object, TextViewAdapter
         }
     }
 
-    private final LayoutInflater mInflater;
-    @LayoutRes
-    private final int mResource;
     @IdRes
     private final int mFieldId;
 
@@ -67,9 +60,10 @@ public class TextViewAdapter extends AbstractViewAdapter<Object, TextViewAdapter
         this(LayoutInflater.from(context), resource, textViewResourceId);
     }
 
-    @Override
-    public View createView(final ViewGroup parent) {
-        return mInflater.inflate(mResource, parent, false);
+    public TextViewAdapter(final LayoutInflater inflater, final @LayoutRes int resource,
+                           final @IdRes int textViewResourceId) {
+        super(inflater, resource);
+        mFieldId = textViewResourceId;
     }
 
     @Override

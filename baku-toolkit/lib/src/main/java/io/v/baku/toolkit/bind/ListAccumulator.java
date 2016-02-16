@@ -4,6 +4,8 @@
 
 package io.v.baku.toolkit.bind;
 
+import com.google.common.collect.ImmutableList;
+
 public interface ListAccumulator<T> {
     boolean containsRow(String rowName);
     int getCount();
@@ -14,4 +16,6 @@ public interface ListAccumulator<T> {
      *  not it has meaning) may vary by implementation.
      */
     int getRowIndex(String rowName);
+
+    ImmutableList<T> getListSnapshot();
 }
