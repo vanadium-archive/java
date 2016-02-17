@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.v.example.vbeam.vbeamexample">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:debuggable="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".GotBeamActivity"
+            android:label="@string/title_activity_got_beam"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name="io.v.android.impl.google.services.blessing.BlessingActivity"
+            android:excludeFromRecents="true"/>
+    </application>
+
+    <uses-permission android:name="android.permission.SET_DEBUG_APP"/>
+</manifest>
