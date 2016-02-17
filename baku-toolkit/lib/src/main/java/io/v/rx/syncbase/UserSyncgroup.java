@@ -35,13 +35,15 @@ import rx.functions.Action2;
 // TODO(rosswang): Generalize this to other possible syncgroup strategies.
 @Accessors(prefix = "m")
 public abstract class UserSyncgroup extends RxSyncgroup {
-    public static final String DEFAULT_SYNCGROUP_SUFFIX = "user";
+    public static final SgSuffixFormat<Parameters> DEFAULT_SYNCGROUP_SUFFIX =
+            SgSuffixFormats.discriminated("user");
 
     public static class Builder {
         protected VContext mVContext;
         protected Observable<Blessings> mRxBlessings;
         protected SyncHostLevel mSyncHostLevel;
-        protected String mSgSuffix = DEFAULT_SYNCGROUP_SUFFIX;
+        protected SgSuffixFormat<? super Parameters> mSgSuffixFormat =
+                DEFAULT_SYNCGROUP_SUFFIX;
         protected RxDb mDb;
         protected Function<String, String> mDescriptionForUsername = u -> "User syncgroup for " + u;
         protected Function<AccessList, Permissions> mPermissionsForAcl;
@@ -68,9 +70,17 @@ public abstract class UserSyncgroup extends RxSyncgroup {
             return this;
         }
 
-        public Builder sgSuffix(final String sgSuffix) {
-            mSgSuffix = sgSuffix;
+        public Builder sgSuffixFormat(final SgSuffixFormat sgSuffixFormat) {
+            mSgSuffixFormat = sgSuffixFormat;
             return this;
+        }
+
+        public Builder sgSuffix(final String sgSuffix) {
+            return sgSuffixFormat(SgSuffixFormats.simple(sgSuffix));
+        }
+
+        public Builder discriminatedSgSuffix(final String customSuffix) {
+            return sgSuffixFormat(SgSuffixFormats.discriminated(customSuffix));
         }
 
         public Builder db(final RxDb db) {
@@ -78,12 +88,14 @@ public abstract class UserSyncgroup extends RxSyncgroup {
             return this;
         }
 
-        public Builder descriptionForUsername(final Function<String, String> descriptionForUsername) {
+        public Builder descriptionForUsername(
+                final Function<String, String> descriptionForUsername) {
             mDescriptionForUsername = descriptionForUsername;
             return this;
         }
 
-        public Builder permissionsForAcl(final Function<AccessList, Permissions> permissionsForAcl) {
+        public Builder permissionsForAcl(
+                final Function<AccessList, Permissions> permissionsForAcl) {
             mPermissionsForAcl = permissionsForAcl;
             return this;
         }
@@ -173,7 +185,7 @@ public abstract class UserSyncgroup extends RxSyncgroup {
                 final Function<AccessList, Permissions> defaultPermissionsForAcl) {
             return new Parameters(mVContext, mRxBlessings,
                     mSyncHostLevel == null ? defaultSyncHost.get() : mSyncHostLevel,
-                    mSgSuffix, mDb, mDescriptionForUsername,
+                    mSgSuffixFormat, mDb, mDescriptionForUsername,
                     mPermissionsForAcl == null? defaultPermissionsForAcl : mPermissionsForAcl,
                     ImmutableList.copyOf(mPrefixes), mMemberInfo, mOnError);
         }
@@ -201,7 +213,7 @@ public abstract class UserSyncgroup extends RxSyncgroup {
         VContext mVContext;
         Observable<Blessings> mRxBlessings;
         SyncHostLevel mSyncHostLevel;
-        String mSgSuffix;
+        SgSuffixFormat<? super Parameters> mSgSuffixFormat;
         RxDb mDb;
         Function<String, String> mDescriptionForUsername;
         Function<AccessList, Permissions> mPermissionsForAcl;
@@ -229,7 +241,8 @@ public abstract class UserSyncgroup extends RxSyncgroup {
 
     private Observable<?> rxJoin(final ClientUser clientUser, final AccessList acl) {
         final String sgHost = mParams.getSyncHostLevel().getSyncgroupHostName(clientUser);
-        final String sgName = RxSyncbase.syncgroupName(sgHost, mParams.getSgSuffix());
+        final String sgName = RxSyncbase.syncgroupName(sgHost,
+                mParams.getSgSuffixFormat().get(mParams));
         final SyncgroupSpec spec = createSpec(clientUser, acl);
 
         return rxJoin(sgHost, sgName, spec);
