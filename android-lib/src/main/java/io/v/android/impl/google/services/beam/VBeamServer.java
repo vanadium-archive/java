@@ -76,9 +76,7 @@ class VBeamServer implements IntentBeamerServer {
     synchronized String newRequest() {
         evictStaleRequests();
         String secret = UUID.randomUUID().toString();
-        synchronized(requestMap) {
-            requestMap.put(secret, System.currentTimeMillis());
-        }
+        requestMap.put(secret, System.currentTimeMillis());
         return secret;
     }
 }
