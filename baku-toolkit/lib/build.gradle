@@ -39,7 +39,6 @@ android {
 
 dependencies {
     provided(
-            'com.android.support:recyclerview-v7:23.0.1',
             /*
             https://projectlombok.org/setup/android.html
             Follow Android Studio instructions at the bottom of the page to install the Lombok
@@ -64,6 +63,12 @@ dependencies {
     }
 
     compile(
+            /*
+            Ideally this would be optional, but this unexpectedly becomes required if you touch
+            the Baku CollectionBinding Builder, even if you don't actually try to bind to a
+            RecyclerView.
+             */
+            'com.android.support:recyclerview-v7:23.0.1',
             'com.jakewharton.rxbinding:rxbinding:0.3.0',
             'commons-io:commons-io:2.4',
             'io.reactivex:rxandroid:1.1.0',

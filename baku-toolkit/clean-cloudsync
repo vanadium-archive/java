@@ -5,7 +5,7 @@
 
 
 if [ ${host-} ]; then
-    ssh="/usr/bin/ssh -i /home/$USER/.ssh/google_compute_engine $host"
+    ssh="/usr/bin/ssh -i $HOME/.ssh/google_compute_engine $host"
 
     fullinstallation=`$ssh ls /tmp/dmrun/dm/dmroot/app'*'`
     installation=${fullinstallation:13}

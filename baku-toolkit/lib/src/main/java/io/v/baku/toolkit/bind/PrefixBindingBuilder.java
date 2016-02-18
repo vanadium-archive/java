@@ -6,6 +6,8 @@ package io.v.baku.toolkit.bind;
 
 import com.google.common.collect.Ordering;
 
+import java.util.Comparator;
+
 import io.v.rx.syncbase.RangeWatchBatch;
 import io.v.rx.syncbase.RxTable;
 import io.v.v23.syncbase.nosql.PrefixRange;
@@ -21,7 +23,7 @@ public class PrefixBindingBuilder<T, A extends RangeAdapter>
         extends CollectionAdapterBuilder<PrefixBindingBuilder<T, A>, RxTable.Row<T>, A> {
     private Class<T> mType;
     private PrefixRange mPrefix;
-    private Ordering<? super RxTable.Row<T>> mOrdering;
+    private Comparator<? super RxTable.Row<T>> mOrdering;
     private Func1<String, Boolean> mKeyFilter;
 
     public PrefixBindingBuilder(final CollectionBinding.Builder base) {
@@ -38,9 +40,11 @@ public class PrefixBindingBuilder<T, A extends RangeAdapter>
     }
 
     /**
+     * The element type for the collection, i.e. the value type for rows matching the prefix and key
+     * filter.
+     * <p>
      * This setter is minimally typesafe; after setting the {@code type}, clients should
-     * probably also update {@code ordering} and {@code viewAdapter}. If intending to use a
-     * collection binding that requires a
+     * probably also update {@code ordering} and {@code viewAdapter}.
      */
     public <U> PrefixBindingBuilder<U, A> type(final Class<U> type) {
         @SuppressWarnings("unchecked")
@@ -68,12 +72,19 @@ public class PrefixBindingBuilder<T, A extends RangeAdapter>
         return new TextViewAdapter(mBase.getDefaultViewAdapterContext()).map(RxTable.Row::getValue);
     }
 
+    private Class<T> getType() {
+        if (mType == null) {
+            throw new IllegalStateException("Missing required type property");
+        }
+        return mType;
+    }
+
     /**
      * For comparable {@code T}, default to natural ordering on values. Otherwise, default to
      * natural ordering on row names.
      */
     private Ordering<? super RxTable.Row<? extends T>> getDefaultOrdering() {
-        if (mOrdering == null && Comparable.class.isAssignableFrom(mType)) {
+        if (mOrdering == null && Comparable.class.isAssignableFrom(getType())) {
             return Ordering.natural().onResultOf(r -> (Comparable) r.getValue());
         } else {
             return Ordering.natural().onResultOf(RxTable.Row::getRowName);
@@ -86,14 +97,11 @@ public class PrefixBindingBuilder<T, A extends RangeAdapter>
     }
 
     public Observable<RangeWatchBatch<T>> buildPrefixWatch() {
-        if (mType == null) {
-            throw new IllegalStateException("Missing required type property");
-        }
         return mBase.mRxTable.watch(mPrefix == null? RowRange.prefix("") : mPrefix,
-                mKeyFilter, mType);
+                mKeyFilter, getType());
     }
 
-    private Ordering<? super RxTable.Row<T>> getOrdering() {
+    private Comparator<? super RxTable.Row<T>> getOrdering() {
         return mOrdering == null ? getDefaultOrdering() : mOrdering;
     }
 

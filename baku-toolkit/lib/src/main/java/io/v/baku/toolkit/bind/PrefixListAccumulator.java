@@ -10,6 +10,7 @@ import com.google.common.collect.Ordering;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +36,17 @@ public class PrefixListAccumulator<T> implements ListAccumulator<RxTable.Row<T>>
 
     private final Map<String, T> mRows = new HashMap<>();
     private final List<RxTable.Row<T>> mSorted = new ArrayList<>();
-    private final Ordering<? super RxTable.Row<T>> mOrdering;
+    private final Comparator<? super RxTable.Row<T>> mOrdering;
 
-    public PrefixListAccumulator(final Ordering<? super RxTable.Row<T>> ordering) {
+    public PrefixListAccumulator(final Comparator<? super RxTable.Row<T>> ordering) {
         // ensure deterministic ordering by always applying secondary order on row name
-        mOrdering = ordering.compound(Ordering.natural().onResultOf(RxTable.Row::getRowName));
+        mOrdering = Ordering.from(ordering).compound(
+                Ordering.natural().onResultOf(RxTable.Row::getRowName));
     }
 
+    /**
+     * The generic wildcard is for the benefit of subclass overrides.
+     */
     public Observable<? extends PrefixListAccumulator<T>> scanFrom(
             final Observable<RangeWatchBatch<T>> watch) {
         return watch
