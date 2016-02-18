@@ -27,15 +27,15 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Android context mix-in incorporating common Vanadium utilities:
+ * Android context mix-in incorporating common Vanadium utilities. These include:
  * <ul>
  * <li>Vanadium initialization during {@code onCreate}; context available via
  * {@code getVContext}</li>
- * <li>Blessings management, available via {@code getBlessingsProvider().getRxBlessings}.
- * Upon {@code subscribe}, blessings are refreshed from the {@code BlessingsManager} or sought from
- * the {@code BlessingsProvider} (by default, the Account Manager).</li>
+ * <li>Blessings management, available via {@link BlessingsProvider#getRxBlessings()
+ * getBlessingsProvider().getRxBlessings()}. Upon {@code subscribe}, blessings are refreshed from
+ * the {@code BlessingsManager} or sought from the {@code BlessingsProvider} (by default, the
+ * Vanadium {@link io.v.android.libs.security.BlessingsManager}).</li>
  * </ul>
- * <p>
  * Default activity extensions incorporating this mix-in are available:
  * <ul>
  * <li>{@link VActivity} (extends {@link Activity})</li>

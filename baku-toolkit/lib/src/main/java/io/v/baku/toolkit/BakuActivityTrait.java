@@ -13,6 +13,9 @@ import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
 import rx.subscriptions.CompositeSubscription;
 
+/**
+ * @see BakuActivityMixin
+ */
 public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     VAndroidContextTrait<T> getVAndroidContextTrait();
     BakuSyncbase getSyncbase();

@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * A default integration with {@link BakuActivityTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
+ *
+ * @see io.v.baku.toolkit
  */
 @Slf4j
 public abstract class BakuAppCompatActivity
