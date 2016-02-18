@@ -31,8 +31,6 @@ public class EndpointImpl implements Endpoint {
     private final boolean isMountTable;
     private final boolean isLeaf;
 
-    // TODO(suharshs): Remove endpoint 5 when the transition to endpoint 6 is complete.
-
     public static Endpoint fromString(String s) {
         Matcher matcher = hostPortPattern.matcher(s);
         if (matcher.matches()) {
@@ -57,55 +55,11 @@ public class EndpointImpl implements Endpoint {
         List<String> parts = Splitter.on('@').splitToList(s);
         int version = Integer.parseInt(parts.get(0));
         switch (version) {
-            case 5:
-                return fromV5String(parts);
             case 6:
                 return fromV6String(parts);
             default:
                 return null;
         }
-    }
-
-    private static Endpoint fromV5String(List<String> parts) {
-        if (parts.size() < 5) {
-            throw new IllegalArgumentException(
-                    "Invalid format for endpoint, expecting 5 '@'-separated components");
-        }
-
-        String protocol = parts.get(1);
-        String address = unescapeAddress(parts.get(2));
-        if (address.isEmpty()) {
-            address = ":0";
-        }
-        RoutingId routingId = RoutingId.fromString(parts.get(3));
-        String mountTableFlag = parts.get(4);
-        boolean isMountTable;
-        boolean isLeaf;
-        if ("".equals(mountTableFlag)) {
-            isMountTable = true;
-            isLeaf = false;
-        } else if ("l".equals(mountTableFlag)) {
-            isMountTable = false;
-            isLeaf = true;
-        } else if ("m".equals(mountTableFlag)) {
-            isMountTable = true;
-            isLeaf = false;
-        } else if ("s".equals(mountTableFlag)) {
-            isMountTable = false;
-            isLeaf = false;
-        } else {
-            throw new IllegalArgumentException("Invalid mounttable flag " + mountTableFlag +
-                    ", should be one of 'l', 'm' or 's'");
-        }
-
-        List<String> blessings;
-        if ("".equals(parts.get(5))) {
-            blessings = ImmutableList.of();
-        } else {
-            blessings = Splitter.on(',').splitToList(
-                    Joiner.on("@").join(parts.subList(5, parts.size())));
-        }
-        return new EndpointImpl(protocol, address, ImmutableList.<String>of(), routingId, blessings, isMountTable, isLeaf);
     }
 
     private static Endpoint fromV6String(List<String> parts) {
