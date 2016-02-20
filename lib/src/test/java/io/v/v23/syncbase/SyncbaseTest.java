@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.v23.VFutures.sync;
@@ -250,16 +251,38 @@ public class SyncbaseTest extends TestCase {
         VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
                 db.watch(ctxC, TABLE_NAME, "b", marker)).iterator();
-        for (WatchChange expected : expectedChanges) {
-            assertThat(it.hasNext()).isTrue();
-            WatchChange actual = it.next();
-            assertThat(actual.getTableName()).isEqualTo(expected.getTableName());
-            assertThat(actual.getRowName()).isEqualTo(expected.getRowName());
-            assertThat(actual.getChangeType()).isEqualTo(expected.getChangeType());
-            assertThat(actual.getVomValue()).isEqualTo(expected.getVomValue());
-            assertThat(actual.isFromSync()).isEqualTo(expected.isFromSync());
-            assertThat(actual.isContinued()).isEqualTo(expected.isContinued());
-        }
+        checkWatch(it, expectedChanges);
+        ctxC.cancel();
+    }
+
+    public void testDatabaseWatchWithInitialState() throws Exception {
+        Database db = createDatabase(createApp(createService()));
+        Table table = createTable(db);
+        Foo foo = new Foo(4, "f");
+        Bar bar = new Bar(0.5f, "b");
+        Baz baz = new Baz("John Doe", true);
+
+        sync(table.put(ctx, "foo", foo, Foo.class));
+        sync(table.put(ctx, "barfoo", foo, Foo.class));
+        sync(table.put(ctx, "bar", bar, Bar.class));
+
+        VContext ctxC = ctx.withCancel();
+        Iterator<WatchChange> it = InputChannels.asIterable(
+                db.watch(ctxC, TABLE_NAME, "b")).iterator();
+
+        sync(table.put(ctx, "baz", baz, Baz.class));
+        sync(table.getRow("baz").delete(ctx));
+
+        ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
+                new WatchChange(TABLE_NAME, "bar", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(bar, Bar.class), null, false, true),
+                new WatchChange(TABLE_NAME, "barfoo", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(foo, Foo.class), null, false, false),
+                new WatchChange(TABLE_NAME, "baz", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(baz, Baz.class), null, false, false),
+                new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
+                        new byte[0], null, false, false));
+        checkWatch(it, expectedChanges);
         ctxC.cancel();
     }
 
@@ -563,6 +586,20 @@ public class SyncbaseTest extends TestCase {
         Table table = db.getTable(TABLE_NAME);
         sync(table.create(ctx, allowAll));
         return table;
+    }
+
+    private void checkWatch(Iterator<WatchChange> it,
+                            List<WatchChange> expectedChanges) throws Exception {
+        for (WatchChange expected : expectedChanges) {
+            assertThat(it.hasNext()).isTrue();
+            WatchChange actual = it.next();
+            assertThat(actual.getTableName()).isEqualTo(expected.getTableName());
+            assertThat(actual.getRowName()).isEqualTo(expected.getRowName());
+            assertThat(actual.getChangeType()).isEqualTo(expected.getChangeType());
+            assertThat(actual.getVomValue()).isEqualTo(expected.getVomValue());
+            assertThat(actual.isFromSync()).isEqualTo(expected.isFromSync());
+            assertThat(actual.isContinued()).isEqualTo(expected.isContinued());
+        }
     }
 
     private static class Foo implements Serializable {

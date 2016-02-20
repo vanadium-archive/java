@@ -167,6 +167,11 @@ class DatabaseImpl implements Database, BatchDatabase {
                 });
     }
     @Override
+    public InputChannel<WatchChange> watch(VContext ctx, String tableRelativeName,
+                                           String rowPrefix) {
+        return this.watch(ctx, tableRelativeName, rowPrefix, null);
+    }
+    @Override
     public ListenableFuture<ResumeMarker> getResumeMarker(VContext ctx) {
         return client.getResumeMarker(ctx);
     }

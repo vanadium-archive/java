@@ -113,21 +113,12 @@ public interface Database extends DatabaseCore, AccessController {
 
     /**
      * Allows a client to watch for updates to the database. For each watch request, the client will
-     * receive a reliable {@link InputChannel} of watch events without re-ordering.
+     * receive a reliable {@link InputChannel} of watch events since the provided
+     * {@link ResumeMarker} without re-ordering.
      * <p>
      * See {@link io.v.v23.services.watch.GlobWatcherClient} for a detailed explanation of the
-     * watch behavior.
+     * watch behavior and additional {@link ResumeMarker} semantics.
      * <p>
-     * In order to not miss any changes, clients should obtain a {@link ResumeMarker} from a
-     * fixed snapshot of the database, and then listen to changes that occurred only after this
-     * snapshot.  In other words, a client should:
-     * <p><ol>
-     * <li>begin a read-only batch,</li>
-     * <li>read all information your app needs,</li>
-     * <li>read the ResumeMarker,</li>
-     * <li>abort the batch,</li>
-     * <li>start watching for changes to the data using the {@link ResumeMarker}.</li>
-     * </ol><p>
      * {@link io.v.v23.context.VContext#cancel Canceling} the provided context will
      * stop the watch operation and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
@@ -140,6 +131,20 @@ public interface Database extends DatabaseCore, AccessController {
      */
     InputChannel<WatchChange> watch(VContext context, String tableRelativeName,
                                     String rowPrefix, ResumeMarker resumeMarker);
+
+    /**
+     * Allows a client to watch for updates to the database. Same as
+     * {@link #watch(VContext, String, String, ResumeMarker)} with an empty {@link ResumeMarker}:
+     * the first batch on the returned stream represents the initial state of the watched row set
+     * at the time of the call.
+     *
+     * @param context             vanadium context
+     * @param tableRelativeName   relative name of the table to watch
+     * @param rowPrefix           prefix of the rows to watch
+     * @return                    a (potentially-infinite) {@link InputChannel} of changes
+     */
+    InputChannel<WatchChange> watch(VContext context, String tableRelativeName,
+                                    String rowPrefix);
 
     /**
      * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.
