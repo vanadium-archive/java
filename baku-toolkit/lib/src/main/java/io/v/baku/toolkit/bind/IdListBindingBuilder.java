@@ -13,6 +13,17 @@ import io.v.rx.syncbase.SingleWatchEvent;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+/**
+ * Builder class for data bindings to collections with item IDs derived from a serialized list of
+ * IDs persisted as a single Syncbase row. Each item has its own set of data rows identified by
+ * those IDs. This kind of ordering allows user-driven reordering of items where the ordering at any
+ * time is guaranteed to have been determined by a modifying party. For example, if Alice writes
+ * [1, 2, 4] and Bob writes [1, 3, 4], this strategy will resolve the conflict to either [1, 2, 4]
+ * or [1, 3, 4], whereas {@linkplain PrefixBindingBuilder prefix bindings} would resolve to either
+ * [1, 2, 3, 4] or [1, 3, 2, 4].
+ *
+ * @see io.v.baku.toolkit.bind.CollectionBinding.Builder#onIdList(String)
+ */
 public class IdListBindingBuilder<A extends RangeAdapter>
         extends CollectionAdapterBuilder<IdListBindingBuilder<A>, String, A> {
     private String mIdListRowName;

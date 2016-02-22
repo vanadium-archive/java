@@ -8,7 +8,7 @@
  * {@link io.v.baku.toolkit.BakuActivity} (or {@link io.v.baku.toolkit.BakuAppCompatActivity}; see
  * {@link io.v.baku.toolkit.BakuActivityMixin} for custom inheritance trees). Then, for any UI
  * widget that should have distributed state, the client application should build data bindings by
- * chaining methods from a {@link io.v.baku.toolkit.BakuActivityMixin#binder() binder()} call,
+ * chaining methods from a {@link io.v.baku.toolkit.BakuActivityTrait#binder() binder()} call,
  * binding shared data fields to UI widget properties. For <a href="https://goo.gl/P0Ag9a"
  * target="_blank">example</a>, the following binds a data key named {@code "text"} to the text of a
  * {@link android.widget.TextView} with ID {@code textView}:
@@ -18,13 +18,15 @@
  *     super.onCreate(savedInstanceState);
  *     setContentView(R.layout.activity_layout);
  *
- *     binder().key("text")
- *             .bindTo(R.id.textView);
+ *     {@link io.v.baku.toolkit.BakuActivityMixin#binder() binder}().{@link
+ *     io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("text")
+ *             .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *             bindTo}(R.id.textView);
  *     }
  * }
  * </code></pre>
  * Collection bindings (from vector data to list/recycler views) are similarly exposed through a
- * {@link io.v.baku.toolkit.BakuActivityMixin#collectionBinder() collectionBinder()} builder. Writes
+ * {@link io.v.baku.toolkit.BakuActivityTrait#collectionBinder() collectionBinder()} builder. Writes
  * can be performed directly via {@link io.v.baku.toolkit.syncbase.BakuTable#put(java.lang.String,
  * java.lang.Object) getSyncbaseTable().put(key, value)}. More information about data bindings is
  * available in the {@link io.v.baku.toolkit.bind} package documentation.
