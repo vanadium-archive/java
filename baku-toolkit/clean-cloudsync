@@ -3,19 +3,16 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+host=${host-104.197.225.29}
 
-if [ ${host-} ]; then
-    ssh="/usr/bin/ssh -i $HOME/.ssh/google_compute_engine $host"
+ssh="/usr/bin/ssh -i $HOME/.ssh/google_compute_engine $host"
 
-    fullinstallation=`$ssh ls /tmp/dmrun/dm/dmroot/app'*'`
-    installation=${fullinstallation:13}
+fullinstallation=`$ssh ls /tmp/dmrun/dm/dmroot/app'*'`
+installation=${fullinstallation:13}
 
-    fullinstance=`$ssh ls /tmp/dmrun/dm/dmroot/app*/*/instances`
-    instance=${fullinstance:9}
-    
-     ${JIRI_ROOT}/release/go/bin/device kill /$host:8150/apps/app/$installation/$instance
-     eval "$ssh sudo killall -9 agentd deviced"
-     eval "$ssh rm -rf /tmp/'*'"
-else
-    echo "Missing required environment variable host."
-fi
+fullinstance=`$ssh ls /tmp/dmrun/dm/dmroot/app*/*/instances`
+instance=${fullinstance:9}
+
+${JIRI_ROOT}/release/go/bin/device kill /$host:8150/apps/app/$installation/$instance
+eval "$ssh sudo killall -9 agentd deviced"
+eval "$ssh rm -rf /tmp/'*'"
