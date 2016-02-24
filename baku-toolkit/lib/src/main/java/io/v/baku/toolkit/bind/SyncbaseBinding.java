@@ -23,12 +23,13 @@ public abstract class SyncbaseBinding {
      * Builder class for scalar Syncbase bindings, which bind individual Syncbase data rows to
      * Android widget properties. The Baku Toolkit offers read-only and read/write scalar data
      * bindings. (Write-only bindings are generally no more useful than direct database writes.)
+     *
      * Unidirectional read-only bindings are simpler and preferred, but some standard Android
      * widgets like {@link EditText} are more naturally bidirectional. To behave in a reasonable
      * manner, bidirectional bindings with Android widgets require coordination between the read and
      * write directions. The Baku Toolkit provides default coordination policies for reasonable
      * behavior.
-     * <p>
+     *
      * The {@link #deleteValue(Object)} and {@link #defaultValue(Object)} options are minimally
      * typesafe, but keeping this builder simple is preferable, and the absence of rigorous static
      * type checking here is acceptable.
@@ -51,7 +52,7 @@ public abstract class SyncbaseBinding {
         /**
          * For bidirectional bindings, this value being input in the widget will trigger a delete of
          * the bound Syncbase row.
-         * <p>
+         *
          * Note that although this option is generic and attempts to enforce some weak measure of
          * type safety in normal use, type pollution may still result in a
          * {@link ClassCastException} at build time.
@@ -68,7 +69,7 @@ public abstract class SyncbaseBinding {
 
         /**
          * If the Syncbase row is not present, the widget will be bound to this value.
-         * <p>
+         *
          * Note that although this option is generic and attempts to enforce some weak measure of
          * type safety in normal use, type pollution may still result in a
          * {@link ClassCastException} at build time.
@@ -111,10 +112,10 @@ public abstract class SyncbaseBinding {
         }
 
         /**
-         * Constructs a read-only binding from a {@code String} in Syncbase to the text of a
+         * Constructs a read-only binding from a `String` in Syncbase to the text of a
          * {@link TextView}. This is a simple unidirectional binding that does not involve any
          * coordinators.
-         * <p>
+         *
          * If {@link #subscriptionParent(CompositeSubscription) subscriptionParent} is set, this
          * method adds the generated binding to it.
          */
@@ -133,25 +134,23 @@ public abstract class SyncbaseBinding {
         }
 
         /**
-         * Constructs a two-way, bidirectional binding between a {@code String} in Syncbase and the
-         * text of a {@link TextView}.
-         * <p>
+         * Constructs a two-way, bidirectional binding between a `String` in Syncbase and the text
+         * of a {@link TextView}.
+         *
          * Defaults:
-         * <ul>
-         * <li>{@link #defaultValue(Object) defaultValue}: {@code ""}</li>
-         * <li>{@link #deleteValue(Object) deleteValue}: {@code null}</li>
-         * <li>{@link #coordinators(Iterable) coordinators}: {@link DebouncingCoordinator}, and
-         * ensures that there is a {@link SuppressWriteOnReadCoordinator} somewhere in the chain,
-         * injecting it right above the {@code TextView} if absent.</li>
-         * </ul>
-         * <p>
+         *
+         * * {@link #defaultValue(Object) defaultValue}: `""`
+         * * {@link #deleteValue(Object) deleteValue}: `null`
+         * * {@link #coordinators(Iterable) coordinators}: {@link DebouncingCoordinator}, and
+         *   ensures that there is a {@link SuppressWriteOnReadCoordinator} somewhere in the chain,
+         *   injecting it right above the `TextView` if absent.
+         *
          * The coordination policy must end its downlink on the Android main thread.
-         * <!-- TODO(rosswang): provide a Coordinator that coerces this. -->
-         * <p>
+         * @todo(rosswang): provide a Coordinator that coerces this.
+         *
          * If {@link #subscriptionParent(CompositeSubscription) subscriptionParent} is set, this
          * method adds the generated binding to it.
-         * <!-- TODO(rosswang): produce a SyncbaseBinding, and allow mutable bindings. -->
-         * <!-- Yo dawg, I heard you like documentation... -->
+         * @todo(rosswang): produce a SyncbaseBinding, and allow mutable bindings.
          */
         public Builder<T> bindTwoWay(final TextView textView) {
             @SuppressWarnings("unchecked")

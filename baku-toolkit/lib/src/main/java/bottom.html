@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    // Open external links in a new window or tab. This is especially important for links to sites
+    // like bintray which reload the whole page if opened in a frame, and sites that cannot be
+    // opened in cross-domain frame.
+
+    var links = document.getElementsByTagName("a");
+    for (var i = 0; i < links.length; i++) {
+        if (links[i].href && links[i].href.substring(0, 4) == "http") {
+            links[i].target = "_blank";
+        }
+    }
+
+    // "@" in fenced code blocks (https://github.com/Abnaxos/pegdown-doclet#markdown-extensions)
+    // must be rendered through {@literal @} tags. However, due to
+    // https://bugs.openjdk.java.net/browse/JDK-8080797 (see
+    // https://bugs.openjdk.java.net/browse/JDK-8002387 for background), this injects a space we
+    // do not want.
+
+    var code = document.getElementsByTagName("code");
+    for (var i = 0; i < code.length; i++) {
+        code[i].innerHTML = code[i].innerHTML.replace(/ @/g, "@");
+    }
+</script>

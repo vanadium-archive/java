@@ -20,14 +20,13 @@ import rx.subscriptions.CompositeSubscription;
 
 /**
  * Activity mix-in for activities with distributed UI state. By default, shared state is stored
- * in Syncbase under <i>app.package.name</i>/db/ui.
- * <p>
+ * in Syncbase under _app.package.name_/db/ui.
+ *
  * Default activity extensions incorporating this mix-in are available:
- * <ul>
- * <li>{@link BakuActivity} (extends {@link Activity})</li>
- * <li>{@link BakuAppCompatActivity} (extends {@link android.support.v7.app.AppCompatActivity})</li>
- * </ul>
- * <p>
+ *
+ * * {@link BakuActivity} (extends {@link Activity})
+ * * {@link BakuAppCompatActivity} (extends {@link android.support.v7.app.AppCompatActivity})
+ *
  * Since Java doesn't actually support multiple inheritance, clients requiring custom inheritance
  * hierarchies will need to wire in manually, like any of the examples above. Alternatively, this
  * class may be used via pure composition, as detailed at
@@ -69,11 +68,11 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     /**
      * Convenience constructor for compositional integration. Example usage:
      *
-     * <pre><code>
+     * ```java
      * public class SampleCompositionActivity extends Activity {
      *     private BakuActivityTrait<SampleCompositionActivity> mBaku;
      *
-     *     &#64;Override
+     *     {@literal @}Override
      *     protected void onCreate(final Bundle savedInstanceState) {
      *         super.onCreate(savedInstanceState);
      *         setContentView(R.layout.activity_hello);
@@ -81,13 +80,13 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
      *         mBaku = new BakuActivityMixin<>(this, savedInstanceState);
      *     }
      *
-     *     &#64;Override
+     *     {@literal @}Override
      *     protected void onDestroy() {
      *         mBaku.close();
      *         super.onDestroy();
      *     }
      * }
-     * </code></pre>
+     * ```
      */
     public BakuActivityMixin(final T context, final Bundle savedInstanceState) {
         this(VAndroidContextMixin.withDefaults(context, savedInstanceState));

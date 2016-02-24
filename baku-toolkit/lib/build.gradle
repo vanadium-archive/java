@@ -1,3 +1,9 @@
+import java.nio.file.Files
+import java.nio.file.Path as JPath
+import java.nio.file.StandardCopyOption
+
+import ch.raffael.doclets.pegdown.PegdownDoclet
+
 import org.gradle.api.tasks.javadoc.internal.JavadocSpec
 import org.gradle.jvm.internal.toolchain.JavaToolChainInternal
 import org.gradle.jvm.platform.JavaPlatform
@@ -5,7 +11,7 @@ import org.gradle.jvm.platform.internal.DefaultJavaPlatform
 import org.gradle.language.base.internal.compile.Compiler
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.7.0'
+version = '0.7.1'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -40,6 +46,10 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+}
+
+configurations {
+    pegdown
 }
 
 dependencies {
@@ -94,6 +104,8 @@ dependencies {
     Applications should include a suitable runtime binding, such as
     apk ('org.slf4j:slf4j-android:1.7.12')
     */
+
+    pegdown 'ch.raffael.pegdown-doclet:pegdown-doclet:1.2'
 }
 
 install {
@@ -131,14 +143,20 @@ install {
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
+    classifier 'sources'
 }
 
 task javadoc (type: FullProcessingJavadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 
-    options.overview = 'src/main/java/overview.html'
+    options {
+        overview 'src/main/java/overview.md'
+        docletpath = configurations.pegdown.files.asType(List)
+        doclet 'ch.raffael.doclets.pegdown.PegdownDoclet'
+        stylesheetFile = new File('lib/src/main/java/custom-styles.css')
+        bottom new File('lib/src/main/java/bottom.html').text
+    }
 
     if (JavaVersion.current().isJava8Compatible()) {
         // TODO(rosswang): Can we get rid of this?
@@ -194,17 +212,32 @@ class FullProcessingJavadoc extends Javadoc {
             }
         }
 
-        Set<String> roots = new HashSet<>();
-        for (File sourceDir : sourceDirs) {
-            roots += sourceDir.absolutePath
+        Set<JPath> roots = sourceDirs.collect { it.toPath() } as Set
+        Collection<JPath> sourcePaths = source.collect{ it.toPath() }
+        Set<String> packages = new HashSet<>()
+
+        sourcePaths.each { sourcePath ->
+            JPath curRoot = roots.find { sourcePath.startsWith(it) }
+            JPath rel = curRoot.relativize(sourcePath)
+
+            if (sourcePath.parent.fileName as String == "doc-files") {
+                // The Pegdown doclet seems to ignore doc-files entirely, so copy them explicitly.
+                JPath dest = options.destinationDirectory.toPath().resolve(rel)
+                Files.createDirectories(dest.parent)
+                Files.copy(sourcePath, dest, StandardCopyOption.REPLACE_EXISTING)
+            } else if (rel.parent != null) {
+                packages += rel.parent.toString().replaceAll("/", ".")
+            }
         }
-        /*Set<String> packages = new HashSet<>();
-        for (File sourceFile : getSource()) {
-            println sourceFile.getPath()
-        }*/
-        options.setSourceNames(Arrays.asList('io.v'));
-        options.addStringOption('subpackages', 'io.v')
-        options.addStringsOption('sourcepath').value = new ArrayList<>(roots)
+        options.setSourceNames(packages as List);
+        options.addStringsOption('sourcepath').value =
+                roots.collect { it.toAbsolutePath() as String }
+
+        // Pegdown won't copy the default stylesheet if we've specified a stylesheet of our own, but
+        // ours is based off the default
+        Files.copy(PegdownDoclet.class.getResourceAsStream("stylesheet.8.css"),
+                options.destinationDirectory.toPath().resolve("stylesheet.css"),
+                StandardCopyOption.REPLACE_EXISTING)
 
         executeExternalJavadoc();
     }
@@ -217,7 +250,8 @@ class FullProcessingJavadoc extends Javadoc {
         spec.setWorkingDir(getProject().getProjectDir());
         spec.setOptionsFile(getOptionsFile());
 
-        Compiler<JavadocSpec> generator = ((JavaToolChainInternal) getToolChain()).select(getPlatform()).newCompiler(JavadocSpec.class);
+        Compiler<JavadocSpec> generator = ((JavaToolChainInternal) getToolChain())
+                .select(getPlatform()).newCompiler(JavadocSpec.class);
         generator.execute(spec);
     }
 

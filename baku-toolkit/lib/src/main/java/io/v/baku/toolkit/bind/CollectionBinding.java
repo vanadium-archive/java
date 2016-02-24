@@ -15,14 +15,13 @@ public class CollectionBinding {
      * to defining the Syncbase data being mapped, collection bindings are responsible for
      * ordering/arranging the data and mapping them to their view elements (they are Android widget
      * adapters). Writes are generally done through direct database writes.
-     * <p>
+     *
      * Two forms of collection binding are currently available:
-     * <ul>
-     * <li>{@linkplain PrefixBindingBuilder Prefix bindings}, built via the
-     * {@link #onPrefix(String)} or {@link #onPrefix(PrefixRange)} method</li>
-     * <li>{@linkplain IdListBindingBuilder ID-list bindings}, built via the
-     * {@link #onIdList(String)} method</li>
-     * </ul>
+     *
+     * * {@linkplain PrefixBindingBuilder Prefix bindings}, built via the {@link #onPrefix(String)}
+     *   or {@link #onPrefix(PrefixRange)} method
+     * * {@linkplain IdListBindingBuilder ID-list bindings}, built via the {@link #onIdList(String)}
+     *   method
      */
     public static class Builder extends BaseCollectionBindingBuilder<Builder> {
         /**
