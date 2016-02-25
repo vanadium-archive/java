@@ -9,20 +9,20 @@
  * {@link io.v.baku.toolkit.BakuActivityMixin} for custom inheritance trees). Then, for any UI
  * widget that should have distributed state, the client application should build data bindings by
  * chaining methods from a {@link io.v.baku.toolkit.BakuActivityTrait#binder() binder()} call,
- * binding shared data fields to UI widget properties. For <a href="https://goo.gl/P0Ag9a"
- * target="_blank">example</a>, the following binds a data key named `"text"` to the text of a
- * {@link android.widget.TextView} with ID `textView`:
+ * binding shared data fields in the Syncbase distributed storage system to UI widget properties.
+ * For [example](https://goo.gl/P0Ag9a), the following binds a data key named `"text"` to the text
+ * of a {@link android.widget.TextView} with ID `textView`:
  *
  * ```java
  * {@literal @}Override
  * protected void onCreate(final Bundle savedInstanceState) {
  *     super.onCreate(savedInstanceState);
- *     setContentView(R.layout.activity_layout);
+ *     setContentView(R.layout.my_activity_layout);
  *
  *     {@link io.v.baku.toolkit.BakuActivityMixin#binder() binder}().{@link
- *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("text")
+ *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("myDataRow")
  *             .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
- *             bindTo}(R.id.textView);
+ *             bindTo}(R.id.myTextView);
  *     }
  * }
  * ```

@@ -16,11 +16,11 @@ import rx.Subscription;
  * Android {@link android.widget.EditText} fires text update events whether changes originate from
  * the user or from code. If we don't suppress writes while responding to Syncbase changes with
  * Android widgets, we easily end up in update loops.
- * <p>
+ *
  * To operate correctly, this coordinator must occur single-threaded with the widget binding layer.
- * <p>
+ *
  * This coordinator is required (and injected if missing) in the coordinator chain for
- * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTwoWay(TextView) two-way
+ * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
  */
 @RequiredArgsConstructor

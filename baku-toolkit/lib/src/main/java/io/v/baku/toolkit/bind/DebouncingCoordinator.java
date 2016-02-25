@@ -22,16 +22,16 @@ import rx.subjects.ReplaySubject;
  * {@value #DEFAULT_IO_DEBOUNCE_MILLIS} ms) after the latest write, then taking the latest read.
  * Write/watch latency can cause reflexive watch changes from Syncbase to arrive after subsequent
  * changes to the UI state have already been made, causing a stuttering revert.
- * <p>
+ *
  * A simple debounce on the uplink or downlink doesn't solve the problem because it effectively just
  * adds a delay to the boundary condition. To prevent this, any update from the model must be
  * throttled if there was a recent update from the view.
- * <p>
+ *
  * Unfortunately for rapid concurrent updates this can result in divergence which should be handled
  * via conflict resolution or CRDT.
- * <p>
+ *
  * This coordinator is included in the default coordinator chain for
- * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTwoWay(TextView) two-way
+ * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
  */
 @RequiredArgsConstructor

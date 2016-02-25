@@ -40,6 +40,9 @@ public abstract class SyncbaseBinding {
         private T mDeleteValue, mDefaultValue;
         private final List<CoordinatorChain<T>> mCoordinators = new ArrayList<>();
 
+        /**
+         * Sets the row name for the Syncbase side of the binding.
+         */
         public Builder<T> key(final String key) {
             mKey = key;
             return this;
@@ -112,14 +115,14 @@ public abstract class SyncbaseBinding {
         }
 
         /**
-         * Constructs a read-only binding from a `String` in Syncbase to the text of a
-         * {@link TextView}. This is a simple unidirectional binding that does not involve any
-         * coordinators.
+         * Constructs a binding from a `String` in Syncbase to the text of a {@link TextView}, only
+         * propagating changes from Syncbase to the `TextView` and not in the other direction. This
+         * is a simple unidirectional binding that does not involve any coordinators.
          *
          * If {@link #subscriptionParent(CompositeSubscription) subscriptionParent} is set, this
          * method adds the generated binding to it.
          */
-        public Builder<T> bindOneWay(final TextView textView) {
+        public Builder<T> bindReadOnly(final TextView textView) {
             @SuppressWarnings("unchecked")
             final Builder<String> t = (Builder<String>) this;
 
@@ -131,6 +134,27 @@ public abstract class SyncbaseBinding {
                     mOnError));
 
             return this;
+        }
+
+        /**
+         * Binds to the provided view in a read-only direction. This method delegates to
+         * {@link #bindReadOnly(TextView)} for {@link TextView}s. Other view types are not yet
+         * supported.
+         */
+        public Builder<T> bindReadOnly(final View view) {
+            if (view instanceof TextView) {
+                return bindReadOnly((TextView) view);
+            } else {
+                throw new IllegalArgumentException("No read-only binding for view " + view);
+            }
+        }
+
+        /**
+         * Binds to the view identified by {@code viewId} in a read-only direction.
+         * @see #bindTo(View)
+         */
+        public Builder<T> bindReadOnly(final @IdRes int viewId) {
+            return bindReadOnly(mActivity.findViewById(viewId));
         }
 
         /**
@@ -152,7 +176,7 @@ public abstract class SyncbaseBinding {
          * method adds the generated binding to it.
          * @todo(rosswang): produce a SyncbaseBinding, and allow mutable bindings.
          */
-        public Builder<T> bindTwoWay(final TextView textView) {
+        public Builder<T> bindTo(final TextView textView) {
             @SuppressWarnings("unchecked")
             final Builder<String> t = (Builder<String>) this;
 
@@ -175,22 +199,6 @@ public abstract class SyncbaseBinding {
             subscribe(TextViewBindingTermini.bind(textView, core, mOnError));
 
             return this;
-        }
-
-        /**
-         * Calls {@link #bindTwoWay(TextView)} if the {@link TextView} is an {@link EditText},
-         * {@link #bindOneWay(TextView)} otherwise.
-         */
-        public Builder<T> bindTo(final TextView textView) {
-            return textView instanceof EditText ? bindTwoWay(textView) : bindOneWay(textView);
-        }
-
-        /**
-         * An alias for {@link #bindTwoWay(TextView)}, which is the default for {@link EditText}
-         * widgets.
-         */
-        public Builder<T> bindTo(final EditText editText) {
-            return bindTwoWay(editText);
         }
 
         /**
