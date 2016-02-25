@@ -10,6 +10,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.vdl.VdlAny;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import javax.annotation.CheckReturnValue;
@@ -75,6 +76,23 @@ public interface DatabaseCore {
      */
     @CheckReturnValue
     ListenableFuture<QueryResults> exec(VContext context, String query);
+
+    /**
+     * Executes a SyncQL parameterized query. Same as {@link #exec(VContext, String)}, with the
+     * query supporting positional parameters. {@code paramValues} and {@code paramTypes} must each
+     * have one element corresponding to each '?' placeholder in the query.
+     *
+     * @param  context      Vanadium context
+     * @param  query        a SyncQL query
+     * @param  paramValues  SyncQL query parameters, one per '?' placeholder in the query
+     * @param  paramTypes   SyncQL query parameter types, one per parameter in paramValues
+     * @return              a {@link ListenableFuture} whose result is a {@link QueryResults}
+     *                      object that allows the caller to iterate over arrays of values for each
+     *                      row that matches the query
+     */
+    @CheckReturnValue
+    ListenableFuture<QueryResults> exec(VContext context, String query,
+                                        List<Object> paramValues, List<Type> paramTypes);
 
     /**
      * Returns a new {@link ListenableFuture} whose result is the {@link ResumeMarker} that points

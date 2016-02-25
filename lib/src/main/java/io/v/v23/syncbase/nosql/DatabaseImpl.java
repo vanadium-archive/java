@@ -5,6 +5,7 @@
 package io.v.v23.syncbase.nosql;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -35,8 +36,10 @@ import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlOptional;
 import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -98,17 +101,27 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     public ListenableFuture<QueryResults> exec(VContext ctx, String query) {
-        final ClientRecvStream<List<VdlAny>, Void> stream =
-                client.exec(ctx, getSchemaVersion(), query);
-        return VFutures.withUserLandChecks(ctx, Futures.transform(stream.recv(),
-                new AsyncFunction<List<VdlAny>, QueryResults>() {
-                    @Override
-                    public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
-                            throws Exception {
-                        return Futures.immediateFuture(
-                                (QueryResults) new QueryResultsImpl(columnNames, stream));
-                    }
-                }));
+        return this.execInternal(ctx, query, null);
+    }
+    @Override
+    public ListenableFuture<QueryResults> exec(VContext ctx, String query,
+                                               List<Object> paramValues, List<Type> paramTypes) {
+        Preconditions.checkNotNull(paramValues);
+        Preconditions.checkNotNull(paramTypes);
+        if (paramValues.size() != paramTypes.size()) {
+            throw new IllegalArgumentException("Length of paramValues and paramTypes is not equal");
+        }
+        List<VdlAny> params = new ArrayList<VdlAny>();
+        try {
+            Iterator<Object> v = paramValues.iterator();
+            Iterator<Type> t = paramTypes.iterator();
+            while (v.hasNext() && t.hasNext()) {
+                params.add(new VdlAny(VomUtil.valueOf(v.next(), t.next())));
+            }
+        } catch (VException e) {
+            return VFutures.withUserLandChecks(ctx, Futures.<QueryResults>immediateFailedFuture(e));
+        }
+        return this.execInternal(ctx, query, params);
     }
 
     // Implements AccessController interface.
@@ -290,6 +303,20 @@ class DatabaseImpl implements Database, BatchDatabase {
         return new WatchChange(tableName, rowName, changeType, storeChange.getValue(),
                 watchChange.getResumeMarker(), storeChange.getFromSync(),
                 watchChange.getContinued());
+    }
+
+    private ListenableFuture<QueryResults> execInternal(VContext ctx, String query, List<VdlAny> params) {
+        final ClientRecvStream<List<VdlAny>, Void> stream =
+                client.exec(ctx, getSchemaVersion(), query, params);
+        return VFutures.withUserLandChecks(ctx, Futures.transform(stream.recv(),
+                new AsyncFunction<List<VdlAny>, QueryResults>() {
+                    @Override
+                    public ListenableFuture<QueryResults> apply(List<VdlAny> columnNames)
+                            throws Exception {
+                        return Futures.immediateFuture(
+                                (QueryResults) new QueryResultsImpl(columnNames, stream));
+                    }
+                }));
     }
 
     private static List<String> splitInTwo(String str, String separator) {

@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -222,6 +224,17 @@ public class SyncbaseTest extends TestCase {
             assertThat(results.columnNames()).containsExactly("k", "v");
             assertThat(sync(InputChannels.asList(results))).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "bar"), new VdlAny(Bar.class, bar)),
+                    ImmutableList.of(new VdlAny(String.class, "baz"), new VdlAny(Baz.class, baz)),
+                    ImmutableList.of(new VdlAny(String.class, "foo"), new VdlAny(Foo.class, foo))
+            );
+        }
+        {
+            DatabaseCore.QueryResults results = sync(db.exec(ctx,
+                "select k, v from " + TABLE_NAME + " where k = ? or v.I = ?",
+                Arrays.<Object>asList("baz", 4),
+                Arrays.<Type>asList(String.class, int.class)));
+            assertThat(results.columnNames()).containsExactly("k", "v");
+            assertThat(sync(InputChannels.asList(results))).containsExactly(
                     ImmutableList.of(new VdlAny(String.class, "baz"), new VdlAny(Baz.class, baz)),
                     ImmutableList.of(new VdlAny(String.class, "foo"), new VdlAny(Foo.class, foo))
             );
