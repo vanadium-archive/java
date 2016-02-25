@@ -3,8 +3,8 @@
 // license that can be found in the LICENSE file.
 
 /**
- * For each {@link io.v.rx.syncbase.SyncbaseEntity RxSyncbase entity} class, this package adds a
- * {@link io.v.baku.toolkit.BakuActivityTrait} as context information from which to derive other
+ * For each {@linkplain io.v.rx.syncbase.SyncbaseEntity RxSyncbase entity} class, this package adds
+ * a {@link io.v.baku.toolkit.BakuActivityTrait} as context information from which to derive other
  * dependencies and to use for error handling. This allows Baku client code to use Syncbase more
  * easily, without needing to explicitly subscribe error handlers for every operation. For more
  * information, see {@link io.v.baku.toolkit.syncbase.BakuTable#exec(rx.functions.Func1)}.

@@ -5,13 +5,13 @@
 package io.v.baku.toolkit.syncbase;
 
 import io.v.baku.toolkit.BakuActivityTrait;
-import io.v.rx.syncbase.RxSyncbase;
+import io.v.rx.syncbase.RxAndroidSyncbase;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 @Getter
-public class BakuSyncbase extends RxSyncbase {
+public class BakuSyncbase extends RxAndroidSyncbase {
     private final BakuActivityTrait<?> mBakuContext;
 
     public BakuSyncbase(final BakuActivityTrait bakuContext) {

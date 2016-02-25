@@ -10,7 +10,7 @@ import org.joda.time.Duration;
 
 import java.util.concurrent.TimeUnit;
 
-import io.v.debug.SyncbaseClient;
+import io.v.debug.SyncbaseAndroidClient;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.context.VContext;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class SgHostUtilTestCases {
 
     public void testEnsureSgHost() {
         final String name = name("users/jenkins.veyron@gmail.com/integ/ensuredsghost");
-        try (final SyncbaseClient sb = new SyncbaseClient(mContext, null)) {
+        try (final SyncbaseAndroidClient sb = new SyncbaseAndroidClient(mContext, null)) {
             block(SgHostUtil.ensureSyncgroupHost(mVContext, sb.getRxServer(), name)).first();
             assertTrue(block(SgHostUtil.isSyncbaseOnline(mVContext, name)).first());
         }
@@ -58,13 +58,13 @@ public class SgHostUtilTestCases {
     /*public void testGlobalUserSyncgroup() {
         final Observable<Blessings> blessings =
                 Observable.just(V.getPrincipal(mVContext).blessingStore().forPeer("..."));
-        try (final SyncbaseClient sb = new SyncbaseClient(mContext, blessings)) {
+        try (final SyncbaseAndroidClient sb = new SyncbaseAndroidClient(mContext, blessings)) {
             final RxSyncbase rsb = new RxSyncbase(mVContext, sb);
-            block(GlobalUserSyncgroup.builder()
+            block(UserPeerSyncgroup.builder()
                     .syncbase(rsb)
                     .db(rsb.rxApp("app").rxDb("db"))
                     .sgSuffix("test")
-                    .syncHostLevel(new UserAppSyncHost("integ"))
+                    .syncHostLevel(new ClientLevelCloudSync("integ"))
                     .rxBlessings(blessings)
                     .build()
                     .rxJoin()).first();

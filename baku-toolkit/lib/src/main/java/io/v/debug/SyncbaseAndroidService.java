@@ -81,7 +81,7 @@ public class SyncbaseAndroidService extends Service {
         try {
             mObservable.doOnNext(VFn.unchecked(b -> {
                 log.info("Stopping Syncbase");
-                b.mServer.stop();
+                mVContext.cancel();
             }))
                     .timeout(STOP_TIMEOUT.getMillis(), TimeUnit.MILLISECONDS)
                     .toBlocking()

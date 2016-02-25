@@ -21,7 +21,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.v.baku.toolkit.blessings.BlessingsUtils;
-import io.v.debug.SyncbaseClient;
+import io.v.baku.toolkit.blessings.ClientUser;
+import io.v.debug.SyncbaseAndroidClient;
 import io.v.rx.RxMountState;
 import io.v.rx.RxTestCase;
 import io.v.v23.context.VContext;
@@ -50,7 +51,7 @@ import static org.mockito.Mockito.when;
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("io.v.baku.toolkit.blessings.BlessingsUtils")
 @PrepareForTest({BlessingsUtils.class, SgHostUtil.class})
-public class GlobalUserSyncgroupTest extends RxTestCase {
+public class UserPeerSyncgroupTest extends RxTestCase {
     private static final long STATUS_POLLING_DELAY_MS = verificationDelay(
             RxMountState.DEFAULT_POLLING_INTERVAL);
 
@@ -65,11 +66,11 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
     private final Database mDb = mock(Database.class);
     private final Syncgroup mSg = mock(Syncgroup.class);
 
-    private RxSyncbase mSb;
+    private RxAndroidSyncbase mSb;
 
     @Before
     public void setUp() throws Exception {
-        final SyncbaseClient sbClient = mock(SyncbaseClient.class);
+        final SyncbaseAndroidClient sbClient = mock(SyncbaseAndroidClient.class);
         final SyncbaseApp app = mock(SyncbaseApp.class);
 
         when(sbClient.getRxServer()).thenReturn(mRxServer);
@@ -86,7 +87,7 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
 
         when(mSg.join(any(), any())).thenReturn(Futures.immediateFuture(null));
 
-        mSb = new RxSyncbase(null, sbClient);
+        mSb = new RxAndroidSyncbase(null, sbClient);
 
         PowerMockito.spy(SgHostUtil.class);
     }
@@ -96,20 +97,19 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
                 .thenReturn(mSg);
         final Stopwatch t = Stopwatch.createStarted();
 
-        final Subscription subscription = GlobalUserSyncgroup.builder()
+        final Subscription subscription = UserPeerSyncgroup.builder()
                 .vContext(mVContext)
                 .rxBlessings(mRxBlessings)
                 .syncHostLevel(new UserAppSyncHost("app", "sghost", "sgmt"))
                 .sgSuffix("sg")
-                .syncbase(mSb)
                 .db(mSb.rxApp("app").rxDb("db"))
                 .onError((m, e) -> catchAsync(e))
-                .build()
+                .buildPeer()
                 .join();
 
         PowerMockito.spy(BlessingsUtils.class);
-        PowerMockito.doReturn(RefStreams.of("foo@bar.com"))
-                .when(BlessingsUtils.class, "blessingsToUsernameStream", any(), any());
+        PowerMockito.doReturn(RefStreams.of(new ClientUser("fooclient", "foo@bar.com")))
+                .when(BlessingsUtils.class, "blessingsToClientUserStream", any(), any());
         PowerMockito.doReturn(null)
                 .when(BlessingsUtils.class, "blessingsToAcl", any(), any());
         PowerMockito.doReturn(null)
@@ -117,7 +117,7 @@ public class GlobalUserSyncgroupTest extends RxTestCase {
 
         long elapsed = t.elapsed(TimeUnit.MILLISECONDS);
         if (elapsed > BLOCKING_DELAY_MS) {
-            fail("GlobalUserSyncgroup.join should not block; took " + elapsed + " ms (threshold " +
+            fail("UserPeerSyncgroup.join should not block; took " + elapsed + " ms (threshold " +
                     BLOCKING_DELAY_MS + " ms)");
         }
         return subscription;

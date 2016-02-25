@@ -6,7 +6,7 @@ package io.v.baku.toolkit.bind;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.google.common.collect.Ordering;
+import java.util.Comparator;
 
 import io.v.rx.syncbase.RangeWatchBatch;
 import io.v.rx.syncbase.RxTable;
@@ -24,7 +24,7 @@ public class PrefixListDeltaAccumulator<T> extends PrefixListAccumulator<T>
     private Consumer<RecyclerView.Adapter> mDeltas;
     private final NumericIdMapper mIds = new NumericIdMapper();
 
-    public PrefixListDeltaAccumulator(final Ordering<? super RxTable.Row<T>> ordering) {
+    public PrefixListDeltaAccumulator(final Comparator<? super RxTable.Row<T>> ordering) {
         super(ordering);
     }
 

@@ -13,9 +13,12 @@ import org.joda.time.Duration;
 import org.junit.After;
 
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
+import rx.Observable;
+import rx.observables.BlockingObservable;
 
 import static org.junit.Assert.fail;
 
@@ -26,6 +29,14 @@ public abstract class RxTestCase {
 
     public static long verificationDelay(final Duration nominal) {
         return 2 * nominal.getMillis();
+    }
+
+    public static <T> BlockingObservable<T> block(final Observable<T> source) {
+        return source.timeout(BLOCKING_DELAY_MS, TimeUnit.SECONDS).toBlocking();
+    }
+
+    public static <T> T first(final Observable<T> source) {
+        return block(source).first();
     }
 
     private final Multimap<Class<? extends Throwable>, Throwable> mErrors =

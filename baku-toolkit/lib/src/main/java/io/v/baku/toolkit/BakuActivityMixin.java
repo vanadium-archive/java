@@ -7,19 +7,19 @@ package io.v.baku.toolkit;
 import android.app.Activity;
 import android.os.Bundle;
 
-import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.bind.CollectionBinding;
+import io.v.baku.toolkit.bind.SyncbaseBinding;
 import io.v.baku.toolkit.syncbase.BakuDb;
 import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
-import io.v.rx.syncbase.GlobalUserSyncgroup;
+import io.v.rx.syncbase.UserCloudSyncgroup;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import rx.subscriptions.CompositeSubscription;
 
 /**
- * Activity trait for activities with distributed UI state. By default, shared state is stored
+ * Activity mix-in for activities with distributed UI state. By default, shared state is stored
  * in Syncbase under <i>app.package.name</i>/db/ui.
  * <p>
  * Default activity extensions incorporating this mix-in are available:
@@ -29,7 +29,11 @@ import rx.subscriptions.CompositeSubscription;
  * </ul>
  * <p>
  * Since Java doesn't actually support multiple inheritance, clients requiring custom inheritance
- * hierarchies will need to wire in manually, like any of the examples above.
+ * hierarchies will need to wire in manually, like any of the examples above. Alternatively, this
+ * class may be used via pure composition, as detailed at
+ * {@link BakuActivityMixin#BakuActivityMixin(Activity, Bundle)}.
+ *
+ * @see io.v.baku.toolkit
  */
 @Accessors(prefix = "m")
 @Slf4j
@@ -70,7 +74,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
      *     private BakuActivityTrait<SampleCompositionActivity> mBaku;
      *
      *     &#64;Override
-     *     protected void onCreate(Bundle savedInstanceState) {
+     *     protected void onCreate(final Bundle savedInstanceState) {
      *         super.onCreate(savedInstanceState);
      *         setContentView(R.layout.activity_hello);
      *
@@ -108,7 +112,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     }
 
     protected void joinInitialSyncGroup() {
-        GlobalUserSyncgroup.forActivity(this).join();
+        UserCloudSyncgroup.forActivity(this).join();
     }
 
     public void onSyncError(final Throwable t) {

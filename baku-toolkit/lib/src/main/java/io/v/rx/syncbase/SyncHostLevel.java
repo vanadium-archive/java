@@ -6,9 +6,13 @@ package io.v.rx.syncbase;
 
 import java.util.List;
 
-public interface SyncHostLevel {
-    String DEFAULT_SG_HOST_SUFFIX = "sghost", DEFAULT_RENDEZVOUS_SUFFIX = "sgmt";
+import io.v.baku.toolkit.blessings.ClientUser;
 
-    String getSyncgroupHostName(String username);
-    List<String> getRendezvousTableNames(String username);
+public interface SyncHostLevel {
+    String DEFAULT_CLOUD_SYNC_SUFFIX = "cloudsync",
+            DEFAULT_SG_HOST_SUFFIX = "sghost",
+            DEFAULT_RENDEZVOUS_SUFFIX = "sgmt";
+
+    String getSyncgroupHostName(ClientUser clientUser);
+    List<String> getRendezvousTableNames(ClientUser clientUser);
 }

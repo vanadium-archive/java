@@ -5,7 +5,6 @@
 package io.v.baku.toolkit.blessings;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
@@ -14,6 +13,7 @@ import android.util.JsonReader;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -30,8 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.v.android.v23.V;
-import io.v.android.v23.services.blessing.BlessingCreationException;
-import io.v.android.v23.services.blessing.BlessingService;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.context.VContext;
 import io.v.v23.security.BlessingPattern;
@@ -62,7 +60,8 @@ public class BlessingsUtils {
     public static final String
             PREF_BLESSINGS = "VanadiumBlessings",
             GLOBAL_BLESSING_ROOT_URL = "https://dev.v.io/auth/blessing-root";
-    public static final Pattern DEV_V_IO_USER = Pattern.compile("dev\\.v\\.io:u:([^:]+).*");
+    public static final Pattern DEV_V_IO_CLIENT_USER =
+            Pattern.compile("dev\\.v\\.io:o:([^:]+):([^:]+).*");
 
     public static final AccessList OPEN_ACL = new AccessList(
             ImmutableList.of(new BlessingPattern("...")), ImmutableList.of());
@@ -76,12 +75,6 @@ public class BlessingsUtils {
     public static final Permissions
             OPEN_DATA_PERMS = dataPermissions(OPEN_ACL),
             OPEN_MOUNT_PERMS = mountPermissions(OPEN_ACL);
-
-    public static Blessings fromActivityResult(final int resultCode, final Intent data)
-            throws BlessingCreationException, VException {
-        // The Account Manager will pass us the blessings to use as an array of bytes.
-        return decodeBlessings(BlessingService.extractBlessingReply(resultCode, data));
-    }
 
     public static void writeSharedPrefs(final Context context, final Blessings blessings)
             throws VException {
@@ -124,34 +117,51 @@ public class BlessingsUtils {
                 ImmutableList.of());
     }
 
-    public static Stream<String> blessingsToUsernameStream(final VContext ctx,
-                                                           final Blessings blessings) {
+    /**
+     * This method adds the given {@link BlessingPattern} to the given {@link AccessList} but does
+     * not perform deduping or checking to make sure the new pattern is not in
+     * {@link AccessList#getNotIn()}.
+     */
+    public static AccessList augmentAcl(final AccessList acl, final BlessingPattern newBlessing) {
+        return new AccessList(ImmutableList.<BlessingPattern>builder()
+                .addAll(acl.getIn())
+                .add(newBlessing).build(),
+                ImmutableList.of());
+    }
+
+    public static Stream<ClientUser> blessingsToClientUserStream(final VContext ctx,
+                                                                 final Blessings blessings) {
         return StreamSupport.stream(getBlessingNames(ctx, blessings))
-                .map(DEV_V_IO_USER::matcher)
+                .map(DEV_V_IO_CLIENT_USER::matcher)
                 .filter(Matcher::matches)
-                .map(m -> m.group(1));
+                .map(m -> new ClientUser(m.group(1), m.group(2)));
     }
 
     /**
-     * This method finds and parses all blessings of the form dev.v.io/u/.... This is different from
-     * the method at https://v.io/tutorials/java/android.html, which can return additional
-     * extensions ("/android").
+     * This method finds and parses all blessings of the form dev.v.io/o/....
      */
-    public static Set<String> blessingsToUsernames(final VContext ctx, final Blessings blessings) {
-        return blessingsToUsernameStream(ctx, blessings).collect(Collectors.toSet());
+    public static Set<ClientUser> blessingsToClientUsers(
+            final VContext ctx, final Blessings blessings) {
+        return blessingsToClientUserStream(ctx, blessings).collect(Collectors.toSet());
     }
 
     public static String userMount(final String username) {
         return NamingUtil.join("users", username);
     }
 
-    public static Stream<String> blessingsToUserMountStream(final VContext ctx, final Blessings blessings) {
-        return blessingsToUsernameStream(ctx, blessings)
-                .map(BlessingsUtils::userMount);
+    public static String clientMount(final String clientId) {
+        return NamingUtil.join("tmp", "clients", clientId);
     }
 
-    public static Set<String> blessingsToUserMounts(final VContext ctx, final Blessings blessings) {
-        return blessingsToUserMountStream(ctx, blessings).collect(Collectors.toSet());
+    public static Stream<String> blessingsToClientMountStream(final VContext ctx,
+                                                              final Blessings blessings) {
+        return blessingsToClientUserStream(ctx, blessings)
+                .map(cu -> BlessingsUtils.clientMount(cu.getClientId()));
+    }
+
+    public static Set<String> blessingsToClientMounts(final VContext ctx,
+                                                      final Blessings blessings) {
+        return blessingsToClientMountStream(ctx, blessings).collect(Collectors.toSet());
     }
 
     public static Permissions homogeneousPermissions(final Set<Tag> tags, final AccessList acl) {
@@ -168,6 +178,22 @@ public class BlessingsUtils {
 
     public static Permissions syncgroupPermissions(final AccessList acl) {
         return homogeneousPermissions(SYNCGROUP_TAGS, acl);
+    }
+
+    /**
+     * TODO(rosswang): This probably won't be best practice in the long run, but we'll need it until
+     * we can bless the cloud Syncbase instance remotely.
+     */
+    public static Permissions cloudSyngroupPermissions(final AccessList userAcl,
+                                                       final BlessingPattern sgHostBlessing) {
+        final AccessList cloudAcl = augmentAcl(userAcl, sgHostBlessing);
+        return new Permissions(ImmutableMap.of(
+                Constants.ADMIN.getValue(), cloudAcl,
+                Constants.READ.getValue(), cloudAcl,
+                Constants.WRITE.getValue(), userAcl,
+                Constants.RESOLVE.getValue(), userAcl,
+                Constants.DEBUG.getValue(), userAcl
+        ));
     }
 
     /**

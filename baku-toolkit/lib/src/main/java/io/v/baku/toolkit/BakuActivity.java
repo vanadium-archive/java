@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * A default integration with {@link BakuActivityTrait} extending {@link android.app.Activity}. Most
  * activities with distributed state should inherit from this.
+ *
+ * @see io.v.baku.toolkit
  */
 @Slf4j
 public abstract class BakuActivity extends VActivity implements BakuActivityTrait<Activity> {

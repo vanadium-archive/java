@@ -9,11 +9,12 @@ import android.content.Context;
 import io.v.baku.toolkit.blessings.BlessingsProvider;
 import io.v.v23.context.VContext;
 
-public interface VAndroidContextTrait<T extends Context> {
+public interface VAndroidContextTrait<T extends Context> extends AutoCloseable {
     String VANADIUM_OPTIONS_SHARED_PREFS = "VanadiumOptions";
 
     T getAndroidContext();
     BlessingsProvider getBlessingsProvider();
     ErrorReporter getErrorReporter();
     VContext getVContext();
+    void close();
 }

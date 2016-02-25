@@ -1,6 +1,11 @@
+import org.gradle.api.tasks.javadoc.internal.JavadocSpec
+import org.gradle.jvm.internal.toolchain.JavaToolChainInternal
+import org.gradle.jvm.platform.JavaPlatform
+import org.gradle.jvm.platform.internal.DefaultJavaPlatform
+import org.gradle.language.base.internal.compile.Compiler
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.6.0'
+version = '0.7.0'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -39,10 +44,6 @@ android {
 
 dependencies {
     provided(
-            /* If the application wishes to use support libraries, it should include them as compile
-            dependencies in its own build.gradle. */
-            'com.android.support:appcompat-v7:23.0.1',
-            'com.android.support:recyclerview-v7:23.0.1',
             /*
             https://projectlombok.org/setup/android.html
             Follow Android Studio instructions at the bottom of the page to install the Lombok
@@ -52,14 +53,13 @@ dependencies {
             'org.slf4j:slf4j-api:1.7.12'
     )
 
-    androidTestCompile('org.slf4j:slf4j-android:1.7.12')
+    androidTestCompile 'org.slf4j:slf4j-android:1.7.12'
 
     testCompile(
             'org.mockito:mockito-core:1.10.19',
             'org.powermock:powermock-classloading-xstream:1.6.3',
             'org.powermock:powermock-module-junit4:1.6.3',
             'org.powermock:powermock-module-junit4-rule:1.6.3',
-            'org.robolectric:robolectric:3.0',
             'org.slf4j:slf4j-simple:1.7.12'
     )
 
@@ -68,12 +68,18 @@ dependencies {
     }
 
     compile(
+            /*
+            Ideally this would be optional, but this unexpectedly becomes required if you touch
+            the Baku CollectionBinding Builder, even if you don't actually try to bind to a
+            RecyclerView.
+             */
+            'com.android.support:recyclerview-v7:23.0.1',
             'com.jakewharton.rxbinding:rxbinding:0.3.0',
             'commons-io:commons-io:2.4',
-            'io.reactivex:rxandroid:1.0.1',
-            'io.reactivex:rxjava:1.0.16',
+            'io.reactivex:rxandroid:1.1.0',
+            'io.reactivex:rxjava:1.0.17',
             'io.reactivex:rxjava-async-util:0.21.0',
-            'io.v:vanadium-android:1.0',
+            'io.v:vanadium-android:1.7',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
             'net.sourceforge.streamsupport:streamsupport:1.3.2',
             'org.robotninjas:fluent-futures:1.0'
@@ -128,13 +134,95 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
-task javadoc (type: Javadoc) {
+task javadoc (type: FullProcessingJavadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+    options.overview = 'src/main/java/overview.html'
 
     if (JavaVersion.current().isJava8Compatible()) {
         // TODO(rosswang): Can we get rid of this?
         options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+/**
+ * https://groups.google.com/d/topic/gradle-dev/R83dy_6PHMc/discussion
+ */
+@ParallelizableTask
+class FullProcessingJavadoc extends Javadoc {
+    private Set<File> sourceDirs
+
+    @Override
+    public void setSource(Object sourceDirs) {
+        this.sourceDirs = sourceDirs
+        super.setSource(sourceDirs)
+    }
+
+    @Override
+    protected void generate() {
+        final File destinationDir = getDestinationDir();
+
+        if (options.getDestinationDirectory() == null) {
+            options.destinationDirectory(destinationDir);
+        }
+
+        options.classpath(new ArrayList<File>(getClasspath().getFiles()));
+
+        if (!GUtil.isTrue(options.getWindowTitle()) && GUtil.isTrue(getTitle())) {
+            options.windowTitle(getTitle());
+        }
+        if (options instanceof StandardJavadocDocletOptions) {
+            StandardJavadocDocletOptions docletOptions = (StandardJavadocDocletOptions) options;
+            if (!GUtil.isTrue(docletOptions.getDocTitle()) && GUtil.isTrue(getTitle())) {
+                docletOptions.setDocTitle(getTitle());
+            }
+        }
+
+        if (maxMemory != null) {
+            final List<String> jFlags = options.getJFlags();
+            final Iterator<String> jFlagsIt = jFlags.iterator();
+            boolean containsXmx = false;
+            while (!containsXmx && jFlagsIt.hasNext()) {
+                final String jFlag = jFlagsIt.next();
+                if (jFlag.startsWith("-Xmx")) {
+                    containsXmx = true;
+                }
+            }
+            if (!containsXmx) {
+                options.jFlags("-Xmx" + maxMemory);
+            }
+        }
+
+        Set<String> roots = new HashSet<>();
+        for (File sourceDir : sourceDirs) {
+            roots += sourceDir.absolutePath
+        }
+        /*Set<String> packages = new HashSet<>();
+        for (File sourceFile : getSource()) {
+            println sourceFile.getPath()
+        }*/
+        options.setSourceNames(Arrays.asList('io.v'));
+        options.addStringOption('subpackages', 'io.v')
+        options.addStringsOption('sourcepath').value = new ArrayList<>(roots)
+
+        executeExternalJavadoc();
+    }
+
+    private void executeExternalJavadoc() {
+        JavadocSpec spec = new JavadocSpec();
+        spec.setExecutable(executable);
+        spec.setOptions(options);
+        spec.setIgnoreFailures(!failOnError);
+        spec.setWorkingDir(getProject().getProjectDir());
+        spec.setOptionsFile(getOptionsFile());
+
+        Compiler<JavadocSpec> generator = ((JavaToolChainInternal) getToolChain()).select(getPlatform()).newCompiler(JavadocSpec.class);
+        generator.execute(spec);
+    }
+
+    private static JavaPlatform getPlatform() {
+        return DefaultJavaPlatform.current();
     }
 }
 
@@ -156,15 +244,7 @@ bintray {
     user = project.properties.bintrayUsername
     key = project.properties.bintrayApiKey
 
-    // TODO(rosswang): use - https://github.com/bintray/gradle-bintray-plugin/issues/81
-    //configurations = ['archives']
-    // TODO(rosswang): remove - https://github.com/bintray/gradle-bintray-plugin/issues/81
-    filesSpec {
-        from 'build/libs', 'build/outputs/aar', 'build/poms'
-        rename '.+\\.aar', artifactPrefix + '.aar'
-        rename 'pom-default\\.xml', artifactPrefix + '.pom'
-        into 'io/v/baku-toolkit/' + version
-    }
+    configurations = ['archives']
 
     pkg {
         desc = pkgDesc

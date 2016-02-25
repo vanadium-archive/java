@@ -4,6 +4,8 @@
 
 package io.v.rx.syncbase;
 
+import com.google.common.collect.Iterables;
+
 import org.joda.time.Duration;
 
 import io.v.rx.MountEvent;
@@ -11,6 +13,7 @@ import io.v.rx.RxNamespace;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.syncbase.Syncbase;
+import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.verror.TimeoutException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -86,5 +89,20 @@ public class SgHostUtil {
             final VContext vContext, final Observable<Server> rxServer, final String name) {
         return rxServer.switchMap(s -> isSyncbaseOnline(vContext, name)
                 .flatMap(online -> online ? Observable.just(0) : mountSgHost(rxServer, name)));
+    }
+
+    /**
+     * @return an observable that echos the db after the each db emitted by
+     * {@link RxDb#getObservable()} has been ensured to possess the given table names. Upon
+     * subscription, for each db emitted, the observable will create these app/db/table hierarchies
+     * if not already present.
+     */
+    public static Observable<Database> ensureSyncgroupHierarchies(
+            final RxDb rxDb, final Iterable<String> tableNames) {
+        return rxDb.getObservable().switchMap(db -> Observable.merge(Iterables.transform(tableNames,
+                t -> rxDb.rxTable(t)
+                        .mapFrom(db)
+                        .map(rxt -> db)))
+                .lastOrDefault(db));
     }
 }

@@ -37,4 +37,10 @@ public abstract class VAppCompatActivity extends AppCompatActivity
         super.onCreate(savedInstanceState, persistentState);
         mVAndroidContextTrait = createVActivityTrait(savedInstanceState);
     }
+
+    @Override
+    protected void onDestroy() {
+        mVAndroidContextTrait.close();
+        super.onDestroy();
+    }
 }

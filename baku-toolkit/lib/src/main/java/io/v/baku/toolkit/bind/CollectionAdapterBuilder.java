@@ -4,6 +4,7 @@
 
 package io.v.baku.toolkit.bind;
 
+import android.support.annotation.IdRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ListView;
@@ -87,5 +88,13 @@ public abstract class CollectionAdapterBuilder<B extends CollectionAdapterBuilde
         } else {
             throw new IllegalArgumentException("No default binding for view " + view);
         }
+    }
+
+    /**
+     * Binds to the view identified by {@code viewId}.
+     * @see #bindTo(View)
+     */
+    public RangeAdapter bindTo(final @IdRes int viewId) {
+        return bindTo(mBase.mActivity.findViewById(viewId));
     }
 }
