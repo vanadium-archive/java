@@ -18,7 +18,7 @@ import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
-import io.v.v23.discovery.VDiscovery;
+import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
@@ -56,7 +56,7 @@ public class VRuntimeImpl implements VRuntime {
             throws VException;
     private static native ListenSpec nativeGetListenSpec(VContext ctx) throws VException;
 
-    private static native VDiscovery nativeNewDiscovery(VContext ctx) throws VException;
+    private static native Discovery nativeNewDiscovery(VContext ctx) throws VException;
 
     // Attaches a server to the given context.  Used by this class and other classes
     // that natively create a server.
@@ -161,7 +161,7 @@ public class VRuntimeImpl implements VRuntime {
         }
     }
     @Override
-    public VDiscovery newDiscovery(VContext ctx) throws VException {
+    public Discovery newDiscovery(VContext ctx) throws VException {
         return nativeNewDiscovery(ctx);
     }
     @Override

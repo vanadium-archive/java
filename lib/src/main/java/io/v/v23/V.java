@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 
 import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.context.VContext;
-import io.v.v23.discovery.VDiscovery;
+import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -450,12 +450,12 @@ public class V {
     }
 
     /**
-     * Returns a new {@link VDiscovery} instance.
+     * Returns a new {@link Discovery} instance.
      *
      * @param  ctx             current context
      * @throws VException      if a new discovery instance cannot be created
      */
-    public static VDiscovery newDiscovery(VContext ctx) throws VException {
+    public static Discovery newDiscovery(VContext ctx) throws VException {
         return getRuntime(ctx).newDiscovery(ctx);
     }
 

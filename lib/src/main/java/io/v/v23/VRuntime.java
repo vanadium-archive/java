@@ -5,7 +5,7 @@
 package io.v.v23;
 
 import io.v.v23.context.VContext;
-import io.v.v23.discovery.VDiscovery;
+import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -198,10 +198,10 @@ public interface VRuntime {
     VContext getContext();
 
     /**
-     * Returns a new {@code VDiscovery} instance.
+     * Returns a new {@code Discovery} instance.
      *
      * @param  ctx             current context
      * @throws VException      if a new discovery instance cannot be created
      */
-    VDiscovery newDiscovery(VContext ctx) throws VException;
+    Discovery newDiscovery(VContext ctx) throws VException;
 }

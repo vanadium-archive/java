@@ -1,9 +1,8 @@
-// Copyright 2015 The Vanadium Authors. All rights reserved.
+// Copyright 2016 The Vanadium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package io.v.impl.google.lib.discovery;
-
 
 import com.google.common.primitives.Bytes;
 
@@ -17,15 +16,15 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
 import io.v.x.ref.lib.discovery.EncryptionKey;
 
 /**
  * A utility to encode and decode fields in io.v.v23.Service fields for use in discovery.
- *
- * TODO(bjornick,jhahn): Consider to share v.io/x/ref/lib/discovery/encoding.go through jni.
  */
 public class EncodingUtil {
-    static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    // We use "ISO8859-1" to preserve data in a string without interpretation.
+    private static final Charset ENC = Charset.forName("ISO8859-1");
 
     private static void writeUint(OutputStream out, int x) throws IOException {
         while ((x & 0xffffff80) != 0) {
@@ -36,7 +35,7 @@ public class EncodingUtil {
     }
 
     private static int readUint(InputStream in) throws IOException {
-        for (int x = 0, s = 0; ;) {
+        for (int x = 0, s = 0; ; ) {
             int b = in.read();
             if (b == -1) {
                 throw new EOFException();
@@ -55,15 +54,15 @@ public class EncodingUtil {
     /**
      * Encodes the addresses passed in.
      *
-     * @param addrs the list of addresses to encode.
-     * @return the byte representation of the encoded addresses.
-     * @throws IOException if the address can't be encoded.
+     * @param addrs         the list of addresses to encode
+     * @return              the byte representation of the encoded addresses
+     * @throws IOException  if the address can't be encoded
      */
     public static byte[] packAddresses(List<String> addrs) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         for (String addr : addrs) {
             writeUint(stream, addr.length());
-            stream.write(addr.getBytes(UTF8_CHARSET));
+            stream.write(addr.getBytes(ENC));
         }
         return stream.toByteArray();
     }
@@ -71,9 +70,9 @@ public class EncodingUtil {
     /**
      * Decodes addresses from a byte array that was encoded by packAddresses
      *
-     * @param input the byte array toe decode
-     * @return the list of addresses.
-     * @throws IOException if the addresses can't be decoded.
+     * @param input         the byte array to decode
+     * @return              the list of addresses.
+     * @throws IOException  if the addresses can't be decoded
      */
     public static List<String> unpackAddresses(byte[] input) throws IOException {
         ByteArrayInputStream stream = new ByteArrayInputStream(input);
@@ -85,24 +84,24 @@ public class EncodingUtil {
             if (read != size) {
                 throw new EOFException();
             }
-            output.add(new String(data, UTF8_CHARSET));
+            output.add(new String(data, ENC));
         }
         return output;
     }
 
     /**
-     * Encode the encryption keys and algorithm passed in.
+     * Encodes the encryption algorithm and keys passed in.
      *
-     * @param encryptionAlgorithm the encryption algorithm to use.
-     *                            See io.v.x.ref.lib.discovery.Constants for valid values.
-     * @param keys the keys to encode
-     * @return the byte array that is the encoded form.
-     * @throws IOException if the keys can't be encoded.
+     * @param algo          the encryption algorithm to use; See
+     *                      {@link io.v.x.ref.lib.discovery.Constants} for valid values
+     * @param keys          the keys to encode
+     * @return              the byte array that is the encoded form
+     * @throws IOException  if the keys can't be encoded
      */
-    public static byte[] packEncryptionKeys(int encryptionAlgorithm, List<EncryptionKey> keys)
+    public static byte[] packEncryptionKeys(EncryptionAlgorithm algo, List<EncryptionKey> keys)
             throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        writeUint(stream, encryptionAlgorithm);
+        writeUint(stream, algo.getValue());
         for (EncryptionKey key : keys) {
             byte[] byteKey = Bytes.toArray(key);
             writeUint(stream, byteKey.length);
@@ -114,14 +113,15 @@ public class EncodingUtil {
     /**
      * Decodes the encryption algorithm and keys that was encoded by packEncryptionKeys.
      *
-     * @param input the byte array containg the keys.
-     * @return the keys and the encryption algorithm in input.
-     * @throws IOException if the keys can't be decoded.
+     * @param input         the byte array to decode
+     * @param keys          the keys where the decoded keys is stored
+     * @return              the encryption algorithm
+     * @throws IOException  if the keys can't be decoded
      */
-    public static KeysAndAlgorithm unpackEncryptionKeys(byte[] input) throws IOException {
+    public static EncryptionAlgorithm unpackEncryptionKeys(byte[] input, List<EncryptionKey> keys)
+            throws IOException {
         ByteArrayInputStream stream = new ByteArrayInputStream(input);
         int algo = readUint(stream);
-        List<EncryptionKey> keys = new ArrayList<>();
         while (stream.available() > 0) {
             int size = readUint(stream);
             byte[] key = new byte[size];
@@ -131,33 +131,6 @@ public class EncodingUtil {
             }
             keys.add(new EncryptionKey(Bytes.asList(key)));
         }
-        return new KeysAndAlgorithm(algo, keys);
-    }
-
-    /**
-     * Stores {@link EncryptionKey}s and the encryption algorithm.
-     */
-    public static class KeysAndAlgorithm {
-        int encryptionAlgorithm;
-        List<EncryptionKey> keys;
-
-        /**
-         * Returns the stored encryption algorithm.
-         */
-        public int getEncryptionAlgorithm() {
-            return encryptionAlgorithm;
-        }
-
-        /**
-         * Returns the stored keys.
-         */
-        public List<EncryptionKey> getKeys() {
-            return keys;
-        }
-
-        KeysAndAlgorithm(int encryptionAlgo, List<EncryptionKey> keys) {
-            encryptionAlgorithm = encryptionAlgo;
-            this.keys = keys;
-        }
+        return new EncryptionAlgorithm(algo);
     }
 }
