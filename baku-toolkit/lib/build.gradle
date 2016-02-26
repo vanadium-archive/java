@@ -156,6 +156,8 @@ task javadoc (type: FullProcessingJavadoc) {
         doclet 'ch.raffael.doclets.pegdown.PegdownDoclet'
         stylesheetFile = new File('lib/src/main/java/custom-styles.css')
         bottom new File('lib/src/main/java/bottom.html').text
+        group 'API Surface', 'io.v.baku.toolkit'
+        group 'Component Packages', 'io.v.baku.toolkit.*:io.v.rx:io.v.rx.*'
     }
 
     if (JavaVersion.current().isJava8Compatible()) {

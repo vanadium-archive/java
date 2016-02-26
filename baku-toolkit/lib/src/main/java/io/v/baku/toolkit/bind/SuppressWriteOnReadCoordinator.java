@@ -4,8 +4,10 @@
 
 package io.v.baku.toolkit.bind;
 
+import android.view.View;
 import android.widget.TextView;
 
+import io.v.baku.toolkit.BakuActivityTrait;
 import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.RequiredArgsConstructor;
 import rx.Observable;
@@ -22,6 +24,20 @@ import rx.Subscription;
  * This coordinator is required (and injected if missing) in the coordinator chain for
  * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
+ *
+ * ## Usage
+ *The following example shows how you would use this coordinator explicitly while creating a custom
+ * binding within a {@link io.v.baku.toolkit.BakuActivityTrait}:
+ *
+ * ```java
+ * {@link BakuActivityTrait#binder() binder()}.{@link
+ *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("foo")
+ *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#coordinators(CoordinatorChain[])
+ *         coordinators}({@link
+ *         SuppressWriteOnReadCoordinator#SuppressWriteOnReadCoordinator(TwoWayBinding)
+ *         SuppressWriteOnReadCoordinator::new})
+ *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(View) bindTo}(myView);
+ * ```
  */
 @RequiredArgsConstructor
 public class SuppressWriteOnReadCoordinator<T> implements TwoWayBinding<T> {

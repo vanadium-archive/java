@@ -19,7 +19,7 @@
  *     super.onCreate(savedInstanceState);
  *     setContentView(R.layout.my_activity_layout);
  *
- *     {@link io.v.baku.toolkit.BakuActivityMixin#binder() binder}().{@link
+ *     {@link io.v.baku.toolkit.BakuActivityTrait#binder() binder}().{@link
  *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("myDataRow")
  *             .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
  *             bindTo}(R.id.myTextView);

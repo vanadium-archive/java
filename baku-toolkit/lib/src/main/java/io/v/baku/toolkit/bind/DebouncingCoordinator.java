@@ -4,12 +4,14 @@
 
 package io.v.baku.toolkit.bind;
 
+import android.view.View;
 import android.widget.TextView;
 
 import org.joda.time.Duration;
 
 import java.util.concurrent.TimeUnit;
 
+import io.v.baku.toolkit.BakuActivityTrait;
 import io.v.rx.syncbase.SingleWatchEvent;
 import lombok.RequiredArgsConstructor;
 import rx.Observable;
@@ -18,10 +20,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.ReplaySubject;
 
 /**
- * This coordinator defers the read binding until a specified timeout (default
- * {@value #DEFAULT_IO_DEBOUNCE_MILLIS} ms) after the latest write, then taking the latest read.
- * Write/watch latency can cause reflexive watch changes from Syncbase to arrive after subsequent
- * changes to the UI state have already been made, causing a stuttering revert.
+ * This coordinator defers the read binding until a specified delay after the latest write, then
+ * taking the latest read. Write/watch latency can cause reflexive watch changes from Syncbase to
+ * arrive after subsequent changes to the UI state have already been made, causing a stuttering
+ * revert.
+ *
+ * The default delay is 500 ms.
  *
  * A simple debounce on the uplink or downlink doesn't solve the problem because it effectively just
  * adds a delay to the boundary condition. To prevent this, any update from the model must be
@@ -33,11 +37,23 @@ import rx.subjects.ReplaySubject;
  * This coordinator is included in the default coordinator chain for
  * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
+ *
+ * ## Usage
+ *The following example shows how you would use this coordinator explicitly while creating a custom
+ * binding within a {@link io.v.baku.toolkit.BakuActivityTrait}:
+ *
+ * ```java
+ * {@link BakuActivityTrait#binder() binder()}.{@link
+ *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("foo")
+ *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#coordinators(CoordinatorChain[])
+ *         coordinators}({@link DebouncingCoordinator#DebouncingCoordinator(TwoWayBinding)
+ *         DebouncingCoordinator::new})
+ *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(View) bindTo}(myView);
+ * ```
  */
 @RequiredArgsConstructor
 public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
-    private static final long DEFAULT_IO_DEBOUNCE_MILLIS = 500;
-    public static final Duration DEFAULT_IO_DEBOUNCE = Duration.millis(DEFAULT_IO_DEBOUNCE_MILLIS);
+    public static final Duration DEFAULT_IO_DEBOUNCE = Duration.millis(500);
 
     private final TwoWayBinding<T> mChild;
     private final Duration mIoDebounce;
@@ -49,6 +65,9 @@ public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
         //We expect these timeouts to be on the main thread; see putDebounceWindow
     }
 
+    /**
+     * A reference to this constructor can be used as a {@link CoordinatorChain}.
+     */
     public DebouncingCoordinator(final TwoWayBinding<T> child) {
         this(child, DEFAULT_IO_DEBOUNCE);
     }
