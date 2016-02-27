@@ -17,20 +17,48 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 
 /**
- * Activity mix-in for activities with distributed UI state. By default, shared state is stored
- * in Syncbase under _app.package.name_/db/ui.
+ * Backing [mix-in](package-summary.html#mixins) for {@link BakuActivityTrait}. By default, shared
+ * state is stored in Syncbase under _app.package.name_/db/ui.
  *
- * Default activity extensions incorporating this mix-in are available:
+ * Default `Activity` subclasses incorporating this mix-in are available:
  *
- * * {@link BakuActivity} (extends {@link Activity})
- * * {@link BakuAppCompatActivity} (extends {@link android.support.v7.app.AppCompatActivity})
+ * * {@link BakuActivity} (`extends {@link Activity}`)
+ * * {@link BakuAppCompatActivity} (`extends {@link android.support.v7.app.AppCompatActivity}`)
  *
  * Since Java doesn't actually support multiple inheritance, clients requiring custom inheritance
  * hierarchies will need to wire in manually, like any of the examples above. Alternatively, this
- * class may be used via pure composition, as detailed at
- * {@link BakuActivityMixin#BakuActivityMixin(Activity, Bundle)}.
+ * class may be used via pure composition:
+ *
+ * ```java
+ * public class SampleCompositionActivity extends Activity {
+ *     private {@link BakuActivityTrait}<SampleCompositionActivity> mBaku;
+ *
+ *     {@literal @}Override
+ *     protected void onCreate(final Bundle savedInstanceState) {
+ *         super.onCreate(savedInstanceState);
+ *         setContentView(R.layout.my_activity_layout);
+ *
+ *         mBaku = new {@link #BakuActivityMixin(Activity, Bundle)
+ *             BakuActivityMixin}<>(this, savedInstanceState);
+ *
+ *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
+ *         mBaku.{@link #binder() binder}().{@link
+ *             io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String)
+ *             key}("myDataRow")
+ *                       .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *                       bindTo}(R.id.myTextView);
+ *     }
+ *
+ *     {@literal @}Override
+ *     protected void onDestroy() {
+ *         mBaku.{@link BakuActivityMixin#close() close}();
+ *         super.onDestroy();
+ *     }
+ * }
+ * ```
  *
  * @see io.v.baku.toolkit
  */
@@ -66,30 +94,13 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     }
 
     /**
-     * Convenience constructor for compositional integration. Example usage:
-     *
-     * ```java
-     * public class SampleCompositionActivity extends Activity {
-     *     private BakuActivityTrait<SampleCompositionActivity> mBaku;
-     *
-     *     {@literal @}Override
-     *     protected void onCreate(final Bundle savedInstanceState) {
-     *         super.onCreate(savedInstanceState);
-     *         setContentView(R.layout.activity_hello);
-     *
-     *         mBaku = new BakuActivityMixin<>(this, savedInstanceState);
-     *     }
-     *
-     *     {@literal @}Override
-     *     protected void onDestroy() {
-     *         mBaku.close();
-     *         super.onDestroy();
-     *     }
-     * }
-     * ```
+     * Convenience constructor for compositional integration. For example usage,
+     * see the {@linkplain BakuActivityMixin class docs}.
      */
     public BakuActivityMixin(final T context, final Bundle savedInstanceState) {
         this(VAndroidContextMixin.withDefaults(context, savedInstanceState));
+        // We have to manage this VAndroidContextTrait since we created it.
+        mSubscriptions.add(Subscriptions.create(mVAndroidContextTrait::close));
     }
 
     @Override

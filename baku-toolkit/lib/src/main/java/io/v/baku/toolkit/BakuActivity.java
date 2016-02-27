@@ -15,13 +15,36 @@ import lombok.extern.slf4j.Slf4j;
  * A default integration with {@link BakuActivityTrait} extending {@link android.app.Activity}. Most
  * activities with distributed state should inherit from this.
  *
- * @see io.v.baku.toolkit
+ * Example usage:
+ *
+ * ```java
+ * public class SampleBakuActivity extends BakuActivity {
+ *     {@literal @}Override
+ *     protected void onCreate(final Bundle savedInstanceState) {
+ *         super.onCreate(savedInstanceState);
+ *         setContentView(R.layout.my_activity_layout);
+ *
+ *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
+ *         {@link #binder() binder}().{@link
+ *             io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String)
+ *             key}("myDataRow")
+ *                 .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *                 bindTo}(R.id.myTextView);
+ *     }
+ * }
+ * ```
+ *
+ * @see BakuAppCompatActivity
  */
 @Slf4j
 public abstract class BakuActivity extends VActivity implements BakuActivityTrait<Activity> {
     @Delegate
     private BakuActivityTrait<Activity> mBakuActivityTrait;
 
+    /**
+     * Instantiates the {@link BakuActivityTrait} implementation for this Activity. By default, this
+     * uses {@link BakuActivityMixin}.
+     */
     protected BakuActivityTrait<Activity> createBakuActivityTrait() {
         return new BakuActivityMixin<>(this);
     }

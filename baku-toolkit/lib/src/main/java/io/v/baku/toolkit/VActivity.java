@@ -12,11 +12,17 @@ import lombok.experimental.Delegate;
 
 /**
  * A default integration with {@link VAndroidContextTrait} extending {@link Activity}.
+ *
+ * @see VAppCompatActivity
  */
 public abstract class VActivity extends Activity implements VAndroidContextTrait<Activity> {
     @Delegate
     private VAndroidContextTrait<Activity> mVAndroidContextTrait;
 
+    /**
+     * Instantiates the {@link VAndroidContextTrait} implementation for this Activity. By default,
+     * this uses {@link VAndroidContextMixin#withDefaults(Activity, Bundle)}.
+     */
     protected VAndroidContextTrait<Activity> createVActivityTrait(final Bundle savedInstanceState) {
         return VAndroidContextMixin.withDefaults(this, savedInstanceState);
     }

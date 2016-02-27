@@ -11,7 +11,7 @@ import org.gradle.jvm.platform.internal.DefaultJavaPlatform
 import org.gradle.language.base.internal.compile.Compiler
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.8.0'
+version = '0.8.1'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'

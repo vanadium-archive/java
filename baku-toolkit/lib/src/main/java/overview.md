@@ -2,7 +2,7 @@ The Baku Android Toolkit includes software components facilitating the
 development of applications with distributed user interfaces.
 
 ## Getting Started
-To get started, see the {@link io.v.baku.toolkit} package docs.
+To get started, see {@link io.v.baku.toolkit.BakuActivity}.
 
 ## Usage
 The Baku Android Toolkit library is available from JCenter and Maven

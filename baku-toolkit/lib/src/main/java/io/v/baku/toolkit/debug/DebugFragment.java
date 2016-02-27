@@ -5,6 +5,7 @@
 package io.v.baku.toolkit.debug;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,14 @@ import android.view.MenuItem;
 import io.v.baku.toolkit.R;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Fragment containing a debug menu for common Vanadium/Syncbase debug actions. These actions
+ * include:
+ *
+ * * {@linkplain DebugLogDialogFragment Change log level and view logcat}
+ * * {@linkplain DebugUtils#clearAppData(Context) Clear app data}
+ * * {@linkplain DebugUtils#killProcess(Context) Kill process}
+ */
 @Slf4j
 public class DebugFragment extends Fragment {
 

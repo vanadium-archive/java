@@ -3,10 +3,14 @@
 // license that can be found in the LICENSE file.
 
 /**
- * These classes provide bindings between Android widgets and Syncbase data. For the reasons
- * outlined in {@link io.v.rx.syncbase}, Vanadium state distribution with Syncbase would ideally be
- * done with pure FRP [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel),
- * with distributed state elements modeled in Syncbase.
+ * These classes provide bindings between Android widgets and Syncbase data. Most functionality is
+ * most easily accessed through access vectors in {@link io.v.baku.toolkit} rather than
+ * instantiating directly from this package.
+ *
+ * For the reasons outlined in {@link io.v.rx.syncbase}, Vanadium state distribution with Syncbase
+ * would ideally be done with pure FRP [MVVM]
+ * (https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel), with distributed state
+ * elements modeled in Syncbase.
  *
  * ![MVVM illustration](doc-files/mvvm.png)
  *

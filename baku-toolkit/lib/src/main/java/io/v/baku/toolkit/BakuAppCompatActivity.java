@@ -15,7 +15,26 @@ import lombok.extern.slf4j.Slf4j;
  * A default integration with {@link BakuActivityTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
  *
- * @see io.v.baku.toolkit
+ * Example usage:
+ *
+ * ```java
+ * public class SampleBakuActivity extends BakuAppCompatActivity {
+ *     {@literal @}Override
+ *     protected void onCreate(final Bundle savedInstanceState) {
+ *         super.onCreate(savedInstanceState);
+ *         setContentView(R.layout.my_activity_layout);
+ *
+ *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
+ *         {@link #binder() binder}().{@link
+ *             io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String)
+ *             key}("myDataRow")
+ *                 .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *                 bindTo}(R.id.myTextView);
+ *     }
+ * }
+ * ```
+ *
+ * @see BakuActivity
  */
 @Slf4j
 public abstract class BakuAppCompatActivity
@@ -23,6 +42,10 @@ public abstract class BakuAppCompatActivity
     @Delegate
     private BakuActivityTrait<AppCompatActivity> mBakuActivityTrait;
 
+    /**
+     * Instantiates the {@link BakuActivityTrait} implementation for this Activity. By default, this
+     * uses {@link BakuActivityMixin}.
+     */
     protected BakuActivityTrait<AppCompatActivity> createBakuActivityTrait() {
         return new BakuActivityMixin<>(this);
     }

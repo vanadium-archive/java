@@ -4,6 +4,7 @@
 
 package io.v.baku.toolkit;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * A default integration with {@link VAndroidContextTrait} extending
  * {@link android.support.v7.app.AppCompatActivity}.
+ *
+ * @see VActivity
  */
 @Slf4j
 public abstract class VAppCompatActivity extends AppCompatActivity
@@ -21,6 +24,10 @@ public abstract class VAppCompatActivity extends AppCompatActivity
     @Delegate
     private VAndroidContextTrait<AppCompatActivity> mVAndroidContextTrait;
 
+    /**
+     * Instantiates the {@link VAndroidContextTrait} implementation for this Activity. By default,
+     * this uses {@link VAndroidContextMixin#withDefaults(Activity, Bundle)}.
+     */
     protected VAndroidContextTrait<AppCompatActivity> createVActivityTrait(
             final Bundle savedInstanceState) {
         return VAndroidContextMixin.withDefaults(this, savedInstanceState);

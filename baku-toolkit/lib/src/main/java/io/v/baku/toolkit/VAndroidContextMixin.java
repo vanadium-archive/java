@@ -27,20 +27,12 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Android context mix-in incorporating common Vanadium utilities. These include:
- * <ul>
- * <li>Vanadium initialization during {@code onCreate}; context available via
- * {@code getVContext}</li>
- * <li>Blessings management, available via {@link BlessingsProvider#getRxBlessings()
- * getBlessingsProvider().getRxBlessings()}. Upon {@code subscribe}, blessings are refreshed from
- * the {@code BlessingsManager} or sought from the {@code BlessingsProvider} (by default, the
- * Vanadium {@link io.v.android.libs.security.BlessingsManager}).</li>
- * </ul>
- * Default activity extensions incorporating this mix-in are available:
- * <ul>
- * <li>{@link VActivity} (extends {@link Activity})</li>
- * <li>{@link VAppCompatActivity} (extends {@link android.support.v7.app.AppCompatActivity})</li>
- * </ul>
+ * Backing [mix-in](package-summary.html#mixins) for {@link VAndroidContextTrait}. Default
+ * `Activity` subclasses incorporating this mix-in are available:
+ *
+ * * {@link VActivity} (`extends {@link Activity}`)
+ * * {@link VAppCompatActivity} (`extends {@link android.support.v7.app.AppCompatActivity}`)
+ *
  * Since Java doesn't actually support multiple inheritance, clients requiring custom inheritance
  * hierarchies will need to wire in manually, like any of the examples above.
  */
@@ -115,6 +107,18 @@ public class VAndroidContextMixin<T extends Context> implements VAndroidContextT
         }
     }
 
+    /**
+     * Creates a `VAndroidContextMixin` with default settings. Default settings include:
+     *
+     * * {@link ErrorReporter}: {@link ErrorReporterFragment}
+     * * {@link BlessingsProvider}: {@link BlessingsManagerBlessingsProvider}
+     *
+     * Furthermore, if the apk is built as {@linkplain DebugUtils#isApkDebug(Context) debug}, a
+     * {@linkplain DebugFragment debug menu} is included.
+     *
+     * The signature of this method is intended to be called from {@link Activity#onCreate(Bundle)}
+     * or similar methods.
+     */
     public static <T extends Activity> VAndroidContextMixin<T> withDefaults(
             final T activity, final Bundle savedInstanceState) {
         final FragmentManager mgr = activity.getFragmentManager();
