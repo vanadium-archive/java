@@ -283,14 +283,17 @@ public class SyncbaseTest extends TestCase {
         Iterator<WatchChange> it = InputChannels.asIterable(
                 db.watch(ctxC, TABLE_NAME, "b")).iterator();
 
+        ImmutableList<WatchChange> expectedInitialChanges = ImmutableList.of(
+                new WatchChange(TABLE_NAME, "bar", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(bar, Bar.class), null, false, true),
+                new WatchChange(TABLE_NAME, "barfoo", ChangeType.PUT_CHANGE,
+                        VomUtil.encode(foo, Foo.class), null, false, false));
+        checkWatch(it, expectedInitialChanges);
+
         sync(table.put(ctx, "baz", baz, Baz.class));
         sync(table.getRow("baz").delete(ctx));
 
         ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
-                new WatchChange(TABLE_NAME, "bar", ChangeType.PUT_CHANGE,
-                        VomUtil.encode(bar, Bar.class), null, false, true),
-                new WatchChange(TABLE_NAME, "barfoo", ChangeType.PUT_CHANGE,
-                        VomUtil.encode(foo, Foo.class), null, false, false),
                 new WatchChange(TABLE_NAME, "baz", ChangeType.PUT_CHANGE,
                         VomUtil.encode(baz, Baz.class), null, false, false),
                 new WatchChange(TABLE_NAME, "baz", ChangeType.DELETE_CHANGE,
