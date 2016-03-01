@@ -87,7 +87,7 @@ public class RemoteInspectors {
 
         // In sync with the "debug delegate" command in
         // v.io/x/ref/services/debug/debug/browse.go
-        List<Tag> tags = ImmutableList<>.of(
+        List<Tag> tags = ImmutableList.of(
                 io.v.v23.security.access.Constants.DEBUG,
                 io.v.v23.security.access.Constants.RESOLVE);
 
