@@ -4,7 +4,12 @@
 
 package io.v.moments.lib;
 
+import com.google.common.primitives.Longs;
+
+import java.nio.ByteBuffer;
 import java.util.Random;
+
+import io.v.v23.discovery.AdId;
 
 /**
  * Consolidates different id styles under one type.
@@ -29,6 +34,10 @@ public class Id implements Comparable<Id> {
         return new Id(Long.parseLong(id, 16));
     }
 
+    public static Id fromAdId(AdId id) {
+        return new Id(Longs.fromByteArray(id.toPrimitiveArray()));
+    }
+
     public boolean equals(Object obj) {
         if (!(obj instanceof Id)) {
             return false;
@@ -42,6 +51,13 @@ public class Id implements Comparable<Id> {
 
     public String toString() {
         return Long.toHexString(mId);
+    }
+
+    public AdId toAdId() {
+        byte[] id = new byte[AdId.VDL_TYPE.getLength()];
+        System.arraycopy(
+                Longs.toByteArray(mId), 0, id, 0, Math.min(Longs.BYTES, AdId.VDL_TYPE.getLength()));
+        return new AdId(id);
     }
 
     public Long toLong() {

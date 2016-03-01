@@ -4,11 +4,11 @@
 
 package io.v.moments.v23.ifc;
 
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Advertisement;
 
 /**
  * Something that handles recently lost advertisements.
  */
 public interface AdvertisementLostListener {
-    void handleLostAdvertisement(Service advertisement);
+    void handleLostAdvertisement(Advertisement advertisement);
 }

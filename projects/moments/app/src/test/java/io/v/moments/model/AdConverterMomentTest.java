@@ -48,58 +48,47 @@ public class AdConverterMomentTest {
     static final String[] AD_ARRAY = {ADDRESS0, ADDRESS1};
     static final List<String> ADDRESSES = Arrays.asList(AD_ARRAY);
 
-    @Rule
-    public ExpectedException mThrown = ExpectedException.none();
+    @Rule public ExpectedException mThrown = ExpectedException.none();
 
-    @Mock
-    V23Manager mV23Manager;
-    @Mock
-    MomentFactory mMomentFactory;
-    @Mock
-    Handler mHandler;
-    @Captor
-    ArgumentCaptor<Runnable> mHandlerRunnable;
-    @Mock
-    io.v.v23.discovery.Service mAdvertisement;
-    @Mock
-    io.v.v23.discovery.Attributes mAttributes;
-    @Mock
-    MomentClientFactory mClientFactory;
-    @Mock
-    Moment mMoment;
-    @Mock
-    VContext mContext;
-    @Mock
-    MomentIfcClient mClient;
-    @Mock
-    ListenableFuture<byte[]> mFutureBytes;
-    @Mock
-    ObservedList<Moment> mMomentList;
-    @Captor
-    ArgumentCaptor<Integer> mOrdinal;
+    @Mock V23Manager mV23Manager;
+    @Mock MomentFactory mMomentFactory;
+    @Mock Handler mHandler;
+    @Captor ArgumentCaptor<Runnable> mHandlerRunnable;
+    @Mock io.v.v23.discovery.Advertisement mAdvertisement;
+    @Mock io.v.v23.discovery.Attributes mAttributes;
+    @Mock MomentClientFactory mClientFactory;
+    @Mock Moment mMoment;
+    @Mock VContext mContext;
+    @Mock MomentIfcClient mClient;
+    @Mock ListenableFuture<byte[]> mFutureBytes;
+    @Mock ObservedList<Moment> mMomentList;
+    @Captor ArgumentCaptor<Integer> mOrdinal;
 
     Map<Id, Moment> mRemoteMomentCache;
     AdConverterMoment mConverter;
 
     @Before
     public void setup() throws Exception {
-        when(mAdvertisement.getInstanceId()).thenReturn(ID.toString());
+        when(mAdvertisement.getId()).thenReturn(ID.toAdId());
         when(mMoment.getId()).thenReturn(ID);
-        when(mAdvertisement.getAttrs()).thenReturn(mAttributes);
-        when(mAdvertisement.getAddrs()).thenReturn(ADDRESSES);
-        when(mMomentFactory.fromAttributes(
-                eq(ID), anyInt(), eq(mAttributes))).thenReturn(mMoment);
+        when(mAdvertisement.getAddresses()).thenReturn(ADDRESSES);
+        when(mAdvertisement.getAttributes()).thenReturn(mAttributes);
+        when(mMomentFactory.fromAttributes(eq(ID), anyInt(), eq(mAttributes))).thenReturn(mMoment);
         when(mClientFactory.makeClient(eq("/" + ADDRESS0))).thenReturn(mClient);
-        when(mV23Manager.contextWithTimeout(
-                AdConverterMoment.Deadline.THUMB)).thenReturn(mContext);
+        when(mV23Manager.contextWithTimeout(AdConverterMoment.Deadline.THUMB)).thenReturn(mContext);
         when(mClient.getThumbImage(mContext)).thenReturn(mFutureBytes);
         when(mFutureBytes.get()).thenReturn(MOCK_PHOTO_BYTES);
 
         mRemoteMomentCache = new HashMap<>();
-        mConverter = new AdConverterMoment(
-                mV23Manager, mMomentFactory,
-                MoreExecutors.newDirectExecutorService(),
-                mHandler, mRemoteMomentCache, mClientFactory, DO_FULL_SIZE);
+        mConverter =
+                new AdConverterMoment(
+                        mV23Manager,
+                        mMomentFactory,
+                        MoreExecutors.newDirectExecutorService(),
+                        mHandler,
+                        mRemoteMomentCache,
+                        mClientFactory,
+                        DO_FULL_SIZE);
     }
 
     @Test
@@ -113,7 +102,7 @@ public class AdConverterMomentTest {
     public void makeWithMomentAlreadyInCache() throws Exception {
         mConverter.setList(mMomentList);
         mRemoteMomentCache.put(ID, mMoment);
-        when(mAdvertisement.getInstanceId()).thenReturn(ID.toString());
+        when(mAdvertisement.getId()).thenReturn(ID.toAdId());
         assertEquals(mMoment, mConverter.make(mAdvertisement));
     }
 
@@ -124,22 +113,20 @@ public class AdConverterMomentTest {
         // Make the moment - this is the call being tested.
         assertEquals(mMoment, mConverter.make(mAdvertisement));
 
-        verify(mMomentFactory).fromAttributes(
-                eq(ID), mOrdinal.capture(), eq(mAttributes));
+        verify(mMomentFactory).fromAttributes(eq(ID), mOrdinal.capture(), eq(mAttributes));
 
         // The ordinal value supplied to the factory should be one.
         assertEquals(1, mOrdinal.getValue().intValue());
 
         // A crucial result of processing an advertisement is calling a
         // client to get a photo, and saving it as a REMOTE photo.
-        verify(mMoment).setPhoto(
-                Moment.Kind.REMOTE, Moment.Style.THUMB, MOCK_PHOTO_BYTES);
+        verify(mMoment).setPhoto(Moment.Kind.REMOTE, Moment.Style.THUMB, MOCK_PHOTO_BYTES);
         verify(mHandler).post(mHandlerRunnable.capture());
 
         // Also, on the *UI* thread, the moment list should see a change,
         // and notify its observers.
         mHandlerRunnable.getValue().run();
-        verify(mMomentList).changeById(ID);  // notification.
+        verify(mMomentList).changeById(ID); // notification.
         assertEquals(1, mRemoteMomentCache.size());
         assertEquals(mMoment, mRemoteMomentCache.get(ID));
     }

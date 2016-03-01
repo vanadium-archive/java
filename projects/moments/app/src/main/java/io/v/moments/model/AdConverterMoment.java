@@ -24,7 +24,7 @@ import io.v.moments.lib.Id;
 import io.v.moments.lib.ObservedList;
 import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.v23.ifc.V23Manager;
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Advertisement;
 
 /**
  * Creates instances of Moment by making an RPC on a service.
@@ -41,10 +41,13 @@ public class AdConverterMoment implements AdConverter<Moment> {
 
     // Package private for tests.
     AdConverterMoment(
-            V23Manager v23Manager, MomentFactory factory,
-            ExecutorService executor, Handler handler,
+            V23Manager v23Manager,
+            MomentFactory factory,
+            ExecutorService executor,
+            Handler handler,
             Map<Id, Moment> remoteMomentCache,
-            MomentClientFactory clientFactory, boolean doFullSizeToo) {
+            MomentClientFactory clientFactory,
+            boolean doFullSizeToo) {
         mV23Manager = v23Manager;
         mMomentFactory = factory;
         mHandler = handler;
@@ -55,11 +58,19 @@ public class AdConverterMoment implements AdConverter<Moment> {
     }
 
     public AdConverterMoment(
-            V23Manager v23Manager, MomentFactory factory,
-            ExecutorService executor, Handler handler,
+            V23Manager v23Manager,
+            MomentFactory factory,
+            ExecutorService executor,
+            Handler handler,
             Map<Id, Moment> remoteMomentCache) {
-        this(v23Manager, factory, executor, handler, remoteMomentCache,
-                new ClientFactoryImpl(), Config.DO_FULL_SIZE_TOO);
+        this(
+                v23Manager,
+                factory,
+                executor,
+                handler,
+                remoteMomentCache,
+                new ClientFactoryImpl(),
+                Config.DO_FULL_SIZE_TOO);
     }
 
     public void setList(ObservedList<Moment> moments) {
@@ -67,34 +78,35 @@ public class AdConverterMoment implements AdConverter<Moment> {
     }
 
     @Override
-    public Moment make(Service descriptor) {
+    public Moment make(Advertisement descriptor) {
         if (mMoments == null) {
             throw new IllegalStateException("Must have a list to modify.");
         }
-        Id id = Id.fromString(descriptor.getInstanceId());
+        Id id = Id.fromAdId(descriptor.getId());
 
         if (mRemoteMomentCache.containsKey(id)) {
             return mRemoteMomentCache.get(id);
         }
-        final Moment moment = mMomentFactory.fromAttributes(
-                id, nextOrdinal(), descriptor.getAttrs());
+        final Moment moment =
+                mMomentFactory.fromAttributes(id, nextOrdinal(), descriptor.getAttributes());
         mRemoteMomentCache.put(id, moment);
 
-        List<String> addresses = descriptor.getAddrs();
+        List<String> addresses = descriptor.getAddresses();
         if (addresses.isEmpty()) {
             throw new IllegalStateException("No addresses.");
         }
         String name = "/" + addresses.get(0);
         final MomentIfcClient client = mClientFactory.makeClient(name);
-        mExecutor.submit(new Runnable() {
-            @Override
-            public void run() {
-                getThumbImage(client, moment);
-                if (mDoFullSizeToo) {
-                    getFullImage(client, moment);
-                }
-            }
-        });
+        mExecutor.submit(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        getThumbImage(client, moment);
+                        if (mDoFullSizeToo) {
+                            getFullImage(client, moment);
+                        }
+                    }
+                });
         return moment;
     }
 
@@ -110,8 +122,8 @@ public class AdConverterMoment implements AdConverter<Moment> {
 
     private void getFullImage(final MomentIfcClient client, final Moment moment) {
         try {
-            ListenableFuture<byte[]> data = client.getFullImage(
-                    mV23Manager.contextWithTimeout(Deadline.FULL));
+            ListenableFuture<byte[]> data =
+                    client.getFullImage(mV23Manager.contextWithTimeout(Deadline.FULL));
             moment.setPhoto(Kind.REMOTE, Style.FULL, data.get());
             signalChange(moment);
         } catch (InterruptedException | ExecutionException e) {
@@ -121,8 +133,8 @@ public class AdConverterMoment implements AdConverter<Moment> {
 
     private void getThumbImage(final MomentIfcClient client, final Moment moment) {
         try {
-            ListenableFuture<byte[]> data = client.getThumbImage(
-                    mV23Manager.contextWithTimeout(Deadline.THUMB));
+            ListenableFuture<byte[]> data =
+                    client.getThumbImage(mV23Manager.contextWithTimeout(Deadline.THUMB));
             moment.setPhoto(Kind.REMOTE, Style.THUMB, data.get());
             signalChange(moment);
         } catch (InterruptedException | ExecutionException e) {
@@ -131,12 +143,13 @@ public class AdConverterMoment implements AdConverter<Moment> {
     }
 
     private void signalChange(final Moment moment) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mMoments.changeById(moment.getId());
-            }
-        });
+        mHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mMoments.changeById(moment.getId());
+                    }
+                });
     }
 
     // Allows mocking of a static generated method.

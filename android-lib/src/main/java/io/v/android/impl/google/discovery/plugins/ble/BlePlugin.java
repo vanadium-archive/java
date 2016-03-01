@@ -94,7 +94,7 @@ public class BlePlugin implements Plugin {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    public BlePlugin(String host, Context androidContext) {
+    public BlePlugin(Context androidContext, String host) {
         this.androidContext = androidContext;
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {

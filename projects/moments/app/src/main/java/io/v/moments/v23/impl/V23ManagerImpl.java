@@ -28,9 +28,9 @@ import io.v.moments.v23.ifc.V23Manager;
 import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Advertisement;
+import io.v.v23.discovery.Discovery;
 import io.v.v23.discovery.Update;
-import io.v.v23.discovery.VDiscovery;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.VSecurity;
@@ -50,15 +50,13 @@ public class V23ManagerImpl implements V23Manager {
     private static final String BLESSINGS_KEY = "BlessingsKey";
     private Context mAndroidCtx;
     private VContext mV23Ctx = null;
-    private VDiscovery mDiscovery = null;
+    private Discovery mDiscovery = null;
 
     // Constructor should only be called from tests.
-    /* package private */ V23ManagerImpl() {
-    }
+    /* package private */ V23ManagerImpl() {}
 
     @Override
-    public synchronized void init(
-            Activity activity, FutureCallback<Blessings> blessingCallback) {
+    public synchronized void init(Activity activity, FutureCallback<Blessings> blessingCallback) {
         Log.d(TAG, "init");
         if (mAndroidCtx != null) {
             if (mAndroidCtx == activity.getApplicationContext()) {
@@ -74,8 +72,8 @@ public class V23ManagerImpl implements V23Manager {
         // code is loaded.
         mV23Ctx = V.init(mAndroidCtx);
         Log.d(TAG, "Attempting to get blessings.");
-        ListenableFuture<Blessings> f = BlessingsManager.getBlessings(
-                mV23Ctx, activity, BLESSINGS_KEY, true);
+        ListenableFuture<Blessings> f =
+                BlessingsManager.getBlessings(mV23Ctx, activity, BLESSINGS_KEY, true);
         Futures.addCallback(f, blessingCallback);
         try {
             mDiscovery = V.newDiscovery(mV23Ctx);
@@ -95,19 +93,14 @@ public class V23ManagerImpl implements V23Manager {
         mAndroidCtx = null;
     }
 
-    private VContext makeServerContext(
-            String mountName, Object server) throws VException {
+    private VContext makeServerContext(String mountName, Object server) throws VException {
         return V.withNewServer(
-                mV23Ctx.withCancel(),
-                mountName,
-                server,
-                VSecurity.newAllowEveryoneAuthorizer());
+                mV23Ctx.withCancel(), mountName, server, VSecurity.newAllowEveryoneAuthorizer());
     }
 
     private List<String> makeServerAddressList(VContext serverCtx) {
         List<String> addresses = new ArrayList<>();
-        Endpoint[] points = V.getServer(
-                serverCtx).getStatus().getEndpoints();
+        Endpoint[] points = V.getServer(serverCtx).getStatus().getEndpoints();
         for (Endpoint point : points) {
             addresses.add(point.toString());
         }
@@ -169,13 +162,13 @@ public class V23ManagerImpl implements V23Manager {
         }
 
         @Override
-        public void start(FutureCallback<Void> onStartCallback,
-                          FutureCallback<Void> onStopCallback,
-                          Duration timeout) {
+        public void start(
+                FutureCallback<Void> onStartCallback,
+                FutureCallback<Void> onStopCallback,
+                Duration timeout) {
             Log.d(TAG, "Entering start.");
             if (isAdvertising()) {
-                onStartCallback.onFailure(
-                        new IllegalStateException("Already advertising."));
+                onStartCallback.onFailure(new IllegalStateException("Already advertising."));
                 return;
             }
 
@@ -185,99 +178,41 @@ public class V23ManagerImpl implements V23Manager {
             mDuration = timeout;
 
             if (mDiscovery == null) {
-                onStartCallback.onFailure(
-                        new IllegalStateException("Discovery not ready."));
+                onStartCallback.onFailure(new IllegalStateException("Discovery not ready."));
                 return;
             }
 
             try {
-                mServerCtx = makeServerContext(
-                        mAdCampaign.getMountName(),
-                        mAdCampaign.makeService());
+                mServerCtx =
+                        makeServerContext(mAdCampaign.getMountName(), mAdCampaign.makeService());
             } catch (VException e) {
-                onStartCallback.onFailure(
-                        new IllegalStateException("Unable to start service.", e));
+                onStartCallback.onFailure(new IllegalStateException("Unable to start service.", e));
                 return;
             }
 
-
             VContext context = contextWithTimeout(mDuration);
+            Advertisement advertisement =
+                    new Advertisement(
+                            mAdCampaign.getId(),
+                            mAdCampaign.getInterfaceName(),
+                            makeServerAddressList(mServerCtx),
+                            mAdCampaign.getAttributes(),
+                            mAdCampaign.getAttachments());
 
-            Service advertisement = new Service(
-                    mAdCampaign.getInstanceId(),
-                    mAdCampaign.getInstanceName(),
-                    mAdCampaign.getInterfaceName(),
-                    mAdCampaign.getAttributes(),
-                    makeServerAddressList(mServerCtx),
-                    mAdCampaign.getAttachments());
-
-            ListenableFuture<ListenableFuture<Void>> nestedFuture =
-                    mDiscovery.advertise(
-                            context,
-                            advertisement,
-                            mAdCampaign.getVisibility());
-
-            Futures.addCallback(
-                    nestedFuture,
-                    deliverContextCallback(
-                            context,
-                            confirmCleanStartCallback(onStartCallback),
-                            onStopCallback));
-
+            ListenableFuture<Void> future;
+            try {
+                future = mDiscovery.advertise(context, advertisement, mAdCampaign.getVisibility());
+            } catch (VException e) {
+                mAdvCtx = null;
+                cancelService();
+                onStartCallback.onFailure(
+                        new IllegalStateException("Unable to advertise service.", e));
+                return;
+            }
+            mAdvCtx = context;
+            onStartCallback.onSuccess(null);
+            Futures.addCallback(future, onStopCallback);
             Log.d(TAG, "Exiting start.");
-        }
-
-        /**
-         * A service must be started before advertising begins, which creates a
-         * cleanup problem should advertising fail to start. This callback
-         * accepts the advertising context on startup success, and cancels the
-         * already started service on failure.
-         *
-         * This wrapper necessary to cleanly kill the service should advertising
-         * fail to start.  This callback feeds info to the startup callback,
-         * which presumably has some effect on UX.
-         */
-        private FutureCallback<VContext> confirmCleanStartCallback(
-                final FutureCallback<Void> onStart) {
-            return new FutureCallback<VContext>() {
-                @Override
-                public void onSuccess(VContext context) {
-                    mAdvCtx = context;
-                    onStart.onSuccess(null);
-                }
-
-                @Override
-                public void onFailure(final Throwable t) {
-                    mAdvCtx = null;
-                    cancelService();
-                    onStart.onFailure(t);
-                }
-            };
-        }
-
-        /**
-         * This exists to allow the scan and advertise interfaces to behave the
-         * same way to clients (accepting simple Callback<Void> for both onStart
-         * and onStop), and to deliver the context via the "success" callback so
-         * there's no chance of a race condition between usage of that context
-         * and code in the onStart callback.
-         */
-        private FutureCallback<ListenableFuture<Void>> deliverContextCallback(
-                final VContext context,
-                final FutureCallback<VContext> onStart,
-                final FutureCallback<Void> onStop) {
-            return new FutureCallback<ListenableFuture<Void>>() {
-                @Override
-                public void onSuccess(ListenableFuture<Void> result) {
-                    onStart.onSuccess(context);
-                    Futures.addCallback(result, onStop);
-                }
-
-                @Override
-                public void onFailure(final Throwable t) {
-                    onStart.onFailure(t);
-                }
-            };
         }
 
         @Override
@@ -351,8 +286,7 @@ public class V23ManagerImpl implements V23Manager {
                 Duration timeout) {
             Log.d(TAG, "Entering start.");
             if (isScanning()) {
-                onStart.onFailure(
-                        new IllegalStateException("Already scanning."));
+                onStart.onFailure(new IllegalStateException("Already scanning."));
                 return;
             }
             if (timeout == null) {
@@ -361,17 +295,20 @@ public class V23ManagerImpl implements V23Manager {
             mDuration = timeout;
             Log.d(TAG, "Starting scan with q=[" + mQuery + "]");
             if (mDiscovery == null) {
-                onStart.onFailure(
-                        new IllegalStateException("Discovery not ready."));
+                onStart.onFailure(new IllegalStateException("Discovery not ready."));
                 return;
             }
             mScanCtx = contextWithTimeout(mDuration);
 
-            Futures.addCallback(
-                    InputChannels.withCallback(
-                            mDiscovery.scan(mScanCtx, mQuery),
-                            makeUpdateCallback(foundListener, lostListener)),
-                    onStop);
+            try {
+                Futures.addCallback(
+                        InputChannels.withCallback(
+                                mDiscovery.scan(mScanCtx, mQuery),
+                                makeUpdateCallback(foundListener, lostListener)),
+                        onStop);
+            } catch (VException e) {
+                onStart.onFailure(new IllegalStateException("Unable to scan.", e));
+            }
 
             onStart.onSuccess(null);
 
@@ -384,12 +321,10 @@ public class V23ManagerImpl implements V23Manager {
             return new InputChannelCallback<Update>() {
                 @Override
                 public ListenableFuture<Void> onNext(Update result) {
-                    if (result instanceof Update.Found) {
-                        foundListener.handleFoundAdvertisement(
-                                ((Update.Found) result).getElem().getService());
+                    if (result.isLost()) {
+                        lostListener.handleLostAdvertisement(result.getAdvertisement());
                     } else {
-                        lostListener.handleLostAdvertisement(
-                                ((Update.Lost) result).getElem().getService());
+                        foundListener.handleFoundAdvertisement(result.getAdvertisement());
                     }
                     return Futures.immediateFuture(null);
                 }

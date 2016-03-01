@@ -4,7 +4,7 @@
 
 package io.v.moments.v23.ifc;
 
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Advertisement;
 
 /**
  * Implementations of this interface construct an instance of T from the
@@ -14,5 +14,5 @@ import io.v.v23.discovery.Service;
  * TODO(jregan): This method should return ListenableFuture<T>.
  */
 public interface AdConverter<T> {
-    T make(Service advertisement);
+    T make(Advertisement advertisement);
 }

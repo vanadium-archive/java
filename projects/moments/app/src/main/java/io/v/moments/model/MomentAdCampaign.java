@@ -17,6 +17,7 @@ import io.v.moments.ifc.Moment;
 import io.v.moments.ifc.MomentFactory;
 import io.v.moments.v23.ifc.AdCampaign;
 import io.v.v23.context.VContext;
+import io.v.v23.discovery.AdId;
 import io.v.v23.discovery.Attachments;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.rpc.ServerCall;
@@ -55,13 +56,8 @@ public class MomentAdCampaign implements AdCampaign {
     }
 
     @Override
-    public String getInstanceId() {
-        return mMoment.getId().toString();
-    }
-
-    @Override
-    public String getInstanceName() {
-        return mMoment.toString();
+    public AdId getId() {
+        return mMoment.getId().toAdId();
     }
 
     @Override
@@ -109,11 +105,10 @@ public class MomentAdCampaign implements AdCampaign {
      */
     private class MomentServer implements MomentIfcServer {
         private static final String TAG = "MomentServer";
-        private byte[] mRawBytes = null;  // lazy init
-        private byte[] mThumbBytes = null;  // lazy init
+        private byte[] mRawBytes = null; // lazy init
+        private byte[] mThumbBytes = null; // lazy init
 
-        public ListenableFuture<MomentWireData> getBasics(
-                VContext ctx, ServerCall call) {
+        public ListenableFuture<MomentWireData> getBasics(VContext ctx, ServerCall call) {
             MomentWireData data = new MomentWireData();
             data.setAuthor(mMoment.getAuthor());
             data.setCaption(mMoment.getCaption());
@@ -141,8 +136,7 @@ public class MomentAdCampaign implements AdCampaign {
             return mThumbBytes;
         }
 
-        public ListenableFuture<byte[]> getThumbImage(
-                VContext ctx, ServerCall call) {
+        public ListenableFuture<byte[]> getThumbImage(VContext ctx, ServerCall call) {
             return Futures.immediateFuture(getThumbBytes());
         }
 

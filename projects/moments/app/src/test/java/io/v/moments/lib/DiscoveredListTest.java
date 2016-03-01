@@ -35,23 +35,15 @@ public class DiscoveredListTest {
     static final Thing THING1 = makeThing("hey1");
     static final Id ID0 = THING0.getId();
 
-    @Rule
-    public ExpectedException mThrown = ExpectedException.none();
+    @Rule public ExpectedException mThrown = ExpectedException.none();
 
-    @Mock
-    ListObserver mObserver;
-    @Mock
-    AdConverter<Thing> mConverter;
-    @Mock
-    IdSet mRejects;
-    @Mock
-    Handler mHandler;
-    @Mock
-    io.v.v23.discovery.Service mAdvertisement;
+    @Mock ListObserver mObserver;
+    @Mock AdConverter<Thing> mConverter;
+    @Mock IdSet mRejects;
+    @Mock Handler mHandler;
+    @Mock io.v.v23.discovery.Advertisement mAdvertisement;
 
-    @Captor
-    ArgumentCaptor<Runnable> mRunnable;
-
+    @Captor ArgumentCaptor<Runnable> mRunnable;
 
     DiscoveredList<Thing> mList;
 
@@ -64,7 +56,7 @@ public class DiscoveredListTest {
         mList = new DiscoveredList<>(mConverter, mRejects, mHandler);
         // By default, ID0 is not rejected.
         when(mRejects.contains(ID0)).thenReturn(false);
-        when(mAdvertisement.getInstanceId()).thenReturn(ID0.toString());
+        when(mAdvertisement.getId()).thenReturn(ID0.toAdId());
     }
 
     @Test

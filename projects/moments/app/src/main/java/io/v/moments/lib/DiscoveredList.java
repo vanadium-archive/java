@@ -11,13 +11,12 @@ import io.v.moments.ifc.IdSet;
 import io.v.moments.v23.ifc.AdConverter;
 import io.v.moments.v23.ifc.AdvertisementFoundListener;
 import io.v.moments.v23.ifc.AdvertisementLostListener;
-import io.v.v23.discovery.Service;
+import io.v.v23.discovery.Advertisement;
 
 /**
  * List that updates itself in response to found or lost advertisements.
  */
-public class DiscoveredList<T extends HasId>
-        extends ObservedList<T>
+public class DiscoveredList<T extends HasId> extends ObservedList<T>
         implements AdvertisementFoundListener, AdvertisementLostListener {
     private static final String TAG = "DiscoveredList";
 
@@ -29,8 +28,7 @@ public class DiscoveredList<T extends HasId>
     // Ids to ignore (likely local advertisements).
     private final IdSet mRejects;
 
-    public DiscoveredList(
-            AdConverter<T> converter, IdSet rejects, Handler handler) {
+    public DiscoveredList(AdConverter<T> converter, IdSet rejects, Handler handler) {
         if (converter == null) {
             throw new IllegalArgumentException("Null converter");
         }
@@ -49,8 +47,8 @@ public class DiscoveredList<T extends HasId>
      * Accept the advertisement if it's not on the reject list.
      */
     @Override
-    public void handleFoundAdvertisement(Service advertisement) {
-        final Id id = Id.fromString(advertisement.getInstanceId());
+    public void handleFoundAdvertisement(Advertisement advertisement) {
+        final Id id = Id.fromAdId(advertisement.getId());
         if (mRejects.contains(id)) {
             return;
         }
@@ -58,43 +56,46 @@ public class DiscoveredList<T extends HasId>
         if (item == null) {
             return;
         }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                push(item);
-            }
-        });
+        mHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        push(item);
+                    }
+                });
     }
 
     /**
      * Remove the lost advertisement.
      */
     @Override
-    public void handleLostAdvertisement(Service advertisement) {
-        final Id id = Id.fromString(advertisement.getInstanceId());
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mRejects.contains(id)) {
-                    return;
-                }
-                int i = findIndexWithId(id);
-                if (i == NOT_FOUND) {
-                    return;
-                }
-                remove(i);
-            }
-        });
+    public void handleLostAdvertisement(Advertisement advertisement) {
+        final Id id = Id.fromAdId(advertisement.getId());
+        mHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mRejects.contains(id)) {
+                            return;
+                        }
+                        int i = findIndexWithId(id);
+                        if (i == NOT_FOUND) {
+                            return;
+                        }
+                        remove(i);
+                    }
+                });
     }
 
     public void dropAll() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                while (size() > 0) {
-                    remove(size() - 1);
-                }
-            }
-        });
+        mHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        while (size() > 0) {
+                            remove(size() - 1);
+                        }
+                    }
+                });
     }
 }

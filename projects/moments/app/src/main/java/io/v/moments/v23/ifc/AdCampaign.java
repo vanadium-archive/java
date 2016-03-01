@@ -6,6 +6,7 @@ package io.v.moments.v23.ifc;
 
 import java.util.List;
 
+import io.v.v23.discovery.AdId;
 import io.v.v23.discovery.Attachments;
 import io.v.v23.discovery.Attributes;
 import io.v.v23.security.BlessingPattern;
@@ -18,12 +19,7 @@ public interface AdCampaign {
      * Unique Id associated with the advertisement, used to discriminate when an
      * ad is found or lost.
      */
-    String getInstanceId();
-
-    /**
-     * Optional human readable name, can be used in query discrimination.
-     */
-    String getInstanceName();
+    AdId getId();
 
     /**
      * Optional service interface name, can be used in query discrimination. The
