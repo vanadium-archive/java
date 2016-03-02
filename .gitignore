@@ -12,6 +12,8 @@ local.properties
 
 # Eclipse
 .settings/
+.metadata/
+.recommenders/
 
 # vdl files
 /src
