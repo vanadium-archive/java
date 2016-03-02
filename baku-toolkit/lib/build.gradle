@@ -160,6 +160,7 @@ task javadoc (type: FullProcessingJavadoc) {
         bottom new File('lib/src/main/java/bottom.html').text
         group 'API Surface', 'io.v.baku.toolkit'
         group 'Component Packages', 'io.v.baku.toolkit.*:io.v.rx:io.v.rx.*'
+        //addStringOption 'defaultstart', 'io/v/baku/toolkit/BakuActivity.html'
     }
 
     if (JavaVersion.current().isJava8Compatible()) {
@@ -256,6 +257,7 @@ class FullProcessingJavadoc extends Javadoc {
 
         Compiler<JavadocSpec> generator = ((JavaToolChainInternal) getToolChain())
                 .select(getPlatform()).newCompiler(JavadocSpec.class);
+
         generator.execute(spec);
     }
 
