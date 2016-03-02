@@ -12,6 +12,10 @@ pre code code {
     color: inherit;
 }
 
+pre code a {
+    border-bottom: 1px dotted;
+}
+
 /*
 Although headings should be fine in class docs, the default stylesheet includes a
 ul.blockList li.blockList h2 style with padding-bottom: 20px for some reason.
