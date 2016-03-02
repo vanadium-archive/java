@@ -4,4 +4,9 @@
     <string name="photo_file_prefix">momento_</string>
     <string name="need_permissions">Must have permissions to store and share photos.</string>
     <string name="title_activity_show_photo">ShowPhotoActivity</string>
+    <string name="invite_remote_inspector">Invite someone to inspect this app</string>
+    <string name="invite_remote_inspector_failed">Cannot send invitation. Install an email app and retry.</string>
+    <string name="invite_remote_inspector_positive_button">Invite</string>
+    <string name="invite_remote_inspector_negative_button">Cancel</string>
+    <string name="invite_remote_inspector_neutral_button">Stop</string>
 </resources>

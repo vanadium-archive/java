@@ -13,10 +13,12 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.joda.time.Duration;
+import org.joda.time.ReadableDuration;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.v.android.libs.inspectors.RemoteInspectors;
 import io.v.android.libs.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.moments.v23.ifc.AdCampaign;
@@ -51,6 +53,7 @@ public class V23ManagerImpl implements V23Manager {
     private Context mAndroidCtx;
     private VContext mV23Ctx = null;
     private Discovery mDiscovery = null;
+    private RemoteInspectors mInspectors = null;
 
     // Constructor should only be called from tests.
     /* package private */ V23ManagerImpl() {}
@@ -89,6 +92,7 @@ public class V23ManagerImpl implements V23Manager {
             Log.d(TAG, "Was never initialized.");
             return;
         }
+        mInspectors = null;
         mV23Ctx.cancel();
         mAndroidCtx = null;
     }
@@ -136,6 +140,29 @@ public class V23ManagerImpl implements V23Manager {
                 }
             }
             return result;
+        }
+    }
+
+
+    @Override
+    public void enableRemoteInspection() throws IllegalStateException {
+        if (mInspectors != null) {
+            return;
+        }
+        try {
+            mInspectors = new RemoteInspectors(mV23Ctx);
+        } catch (VException e) {
+            throw new IllegalStateException("Unable to setup remote V23 inspection:" + e);
+        }
+    }
+
+    @Override
+    public String inviteInspector(String invitee, ReadableDuration duration) throws IllegalStateException {
+        enableRemoteInspection();
+        try {
+            return mInspectors.invite(invitee, duration);
+        } catch (VException e) {
+            throw new IllegalStateException("Unable to invite V23 inspector(" + invitee + "):" + e);
         }
     }
 

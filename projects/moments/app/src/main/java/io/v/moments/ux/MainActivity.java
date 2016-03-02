@@ -5,8 +5,14 @@
 package io.v.moments.ux;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,13 +26,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
+
+import org.joda.time.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,7 +96,7 @@ import io.v.v23.security.Blessings;
  * version number to prefs, ignore and overwrite state if old version (to avoid
  * need to manually wipe data to avoid crashes).
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener{
     private static final String TAG = "MainActivity";
     // Android Marshmallow permissions list.
     private static final String[] PERMS = {
@@ -120,6 +130,21 @@ public class MainActivity extends AppCompatActivity {
     private DiscoveredList<Moment> mRemoteMoments;
     private Id mCurrentPhotoId;
     private boolean mShouldBeScanning = false;
+
+    // When the device is shaken while this activity is in the foreground, a dialog pops
+    // up prompting the user for an email address to which it will send an email detailing
+    // how the recipient can inspect the state of the application. This may be useful for live
+    // debugging (the recipient can inspect logs, exported stats, system information etc.).
+    // Arguably, using a "shake" to initiate this interaction isn't particularly well thought out
+    // UI, but we just wanted to demonstrate this remote inspection technique in this sample
+    // application.
+    private static final double SHAKE_THRESHOLD = 3;
+    private static final int SHAKE_EVENT_MS = 500;
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private long mShakeTimestamp;
+    private boolean mRemoteInspectionEnabled;
+
 
     /**
      * The number used in a moment's file name is called the moments 'ordinal'
@@ -156,6 +181,12 @@ public class MainActivity extends AppCompatActivity {
 
         wireUxToDataModel();
         initializeOrRestore(savedInstanceState);
+        initializeShakeDetector();
+    }
+
+    private void initializeShakeDetector() {
+        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     private FutureCallback<Blessings> onBlessings() {
@@ -269,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+        mSensorManager.unregisterListener(this);
         logState("onPause");
     }
 
@@ -339,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         logState("onResume");
     }
 
@@ -451,6 +484,7 @@ public class MainActivity extends AppCompatActivity {
         b.putBoolean(B.SHOULD_BE_SCANNING, mScanner.isScanning());
         mStateStore.bundleSave(b, mRemoteMomentCache.values());
         mStateStore.prefsSave(mLocalMoments);
+        b.putBoolean(BundleField.REMOTE_INSPECTION.toString(), mRemoteInspectionEnabled);
     }
 
     private void initializeOrRestore(Bundle b) {
@@ -463,7 +497,13 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Reloading from bundle.");
         mShouldBeScanning = b.getBoolean(B.SHOULD_BE_SCANNING, false);
         mStateStore.bundleLoad(b, mRemoteMomentCache);
+        mRemoteInspectionEnabled = b.getBoolean(BundleField.REMOTE_INSPECTION.toString());
+        if (mRemoteInspectionEnabled) {
+            mV23Manager.enableRemoteInspection();
+        }
     }
+
+    private enum BundleField {REMOTE_INSPECTION};
 
     private String nameOfSharedPrefs() {
         return getClass().getPackage() +
@@ -472,6 +512,78 @@ public class MainActivity extends AppCompatActivity {
 
     private void logState(String state) {
         Log.d(TAG, state + " --------------------------------------------");
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        float gX = event.values[0] / SensorManager.GRAVITY_EARTH;
+        float gY = event.values[1] / SensorManager.GRAVITY_EARTH;
+        float gZ = event.values[2] / SensorManager.GRAVITY_EARTH;
+        double gForce = Math.sqrt(gX*gX + gY*gY + gZ*gZ);
+        if (gForce < SHAKE_THRESHOLD) {
+            return;
+        }
+        final long now = System.currentTimeMillis();
+        if (now - mShakeTimestamp < SHAKE_EVENT_MS) {
+            return;
+        }
+        mShakeTimestamp = now;
+
+        final EditText invitee = new EditText(this);
+        invitee.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.invite_remote_inspector))
+                .setView(invitee)
+                .setPositiveButton(
+                        getString(R.string.invite_remote_inspector_positive_button),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_SEND);
+                                String to = invitee.getText().toString();
+                                intent.setType("message/rfc822");
+                                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+                                intent.putExtra(Intent.EXTRA_SUBJECT, "Please help me debug");
+                                try {
+                                    intent.putExtra(Intent.EXTRA_TEXT,
+                                            mV23Manager.inviteInspector(to, Duration.standardDays(1)));
+                                    mRemoteInspectionEnabled = true;
+                                } catch (Exception e) {
+                                    toast(e.toString());
+                                    return;
+                                }
+                                if (intent.resolveActivity(getPackageManager()) != null) {
+                                    startActivity(intent);
+                                } else {
+                                    toast(getString(R.string.invite_remote_inspector_failed));
+                                }
+                            }
+                        })
+                .setNegativeButton(getString(R.string.invite_remote_inspector_negative_button),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+        if (mRemoteInspectionEnabled) {
+            builder.setNeutralButton(
+                    getString(R.string.invite_remote_inspector_neutral_button),
+                    new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // This doesn't take effect till the next time the activity is created
+                    // (invited users will still be able to connect till then).
+                    mRemoteInspectionEnabled = false;
+                }
+            });
+        }
+        builder.show();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
     private static class RequestCode {

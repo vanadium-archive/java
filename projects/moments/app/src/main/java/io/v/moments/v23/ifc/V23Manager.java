@@ -9,6 +9,7 @@ import android.app.Activity;
 import com.google.common.util.concurrent.FutureCallback;
 
 import org.joda.time.Duration;
+import org.joda.time.ReadableDuration;
 
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
@@ -63,4 +64,22 @@ public interface V23Manager {
      * @return Scanner that can start, stop and restart the scan.
      */
     Scanner makeScanner(String query);
+
+    /**
+     * Starts a server which invited remote users can connect to in order to inspect
+     * application state (logs, statistics etc.).
+     */
+    void enableRemoteInspection();
+
+    /**
+     * Creates the invitation text to send to a remote user that authorizes them to
+     * inspect the state of this application (logs, statistics etc.) using
+     * <a href="https://godoc.org/v.io/x/ref/services/debug/debug">{@code debug browse}</a>.
+     *
+     * @param invitee identifier of the user to invite, typically their email address
+     * @param duration duration for which this invitation is valid
+     * @return A string containing the required credentials and instructions to access application
+     * state
+     */
+    String inviteInspector(String invitee, ReadableDuration duration);
 }
