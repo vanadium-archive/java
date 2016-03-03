@@ -43,17 +43,17 @@ import java.security.interfaces.ECPublicKey;
  * </pre></blockquote><p>
  */
 public class V extends io.v.v23.V {
-    private static native void nativeInitGlobalAndroid(Context androidContext, Options opts)
+    private static native void nativeInitGlobalAndroid(VContext ctx, Options opts)
             throws VException;
 
     private static volatile VContext globalContext;
 
     // Initializes the Vanadium Android-specific global state.
-    private static VContext initGlobalAndroid(VContext ctx, Context androidContext, Options opts) {
+    private static VContext initGlobalAndroid(VContext ctx, Context androidCtx, Options opts) {
         try {
-            nativeInitGlobalAndroid(androidContext, opts);
-            ctx = V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
-            return ctx;
+            ctx = ctx.withValue(new AndroidContextKey(), androidCtx);
+            nativeInitGlobalAndroid(ctx, opts);
+            return V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize global Android state", e);
         }
@@ -148,8 +148,10 @@ public class V extends io.v.v23.V {
             // Generate a new private key.
             keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
         }
-        VSigner signer = VSecurity.newSigner(
-                keyEntry.getPrivateKey(), (ECPublicKey)keyEntry.getCertificate().getPublicKey());
+        VSigner signer =
+                VSecurity.newSigner(
+                        keyEntry.getPrivateKey(),
+                        (ECPublicKey) keyEntry.getCertificate().getPublicKey());
         VPrincipal principal =
                 VSecurity.newPersistentPrincipal(signer, ctx.getFilesDir().getAbsolutePath());
         // Make sure we have at least one (i.e., self-signed) blessing in the store.

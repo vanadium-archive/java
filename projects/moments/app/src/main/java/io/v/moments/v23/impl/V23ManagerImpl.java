@@ -143,7 +143,6 @@ public class V23ManagerImpl implements V23Manager {
         }
     }
 
-
     @Override
     public void enableRemoteInspection() throws IllegalStateException {
         if (mInspectors != null) {
@@ -157,7 +156,8 @@ public class V23ManagerImpl implements V23Manager {
     }
 
     @Override
-    public String inviteInspector(String invitee, ReadableDuration duration) throws IllegalStateException {
+    public String inviteInspector(String invitee, ReadableDuration duration)
+            throws IllegalStateException {
         enableRemoteInspection();
         try {
             return mInspectors.invite(invitee, duration);

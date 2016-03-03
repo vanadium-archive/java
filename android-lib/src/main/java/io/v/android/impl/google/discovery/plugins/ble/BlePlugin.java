@@ -45,6 +45,7 @@ import java.util.UUID;
 
 import org.joda.time.Duration;
 
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.AdId;
 
@@ -85,24 +86,23 @@ public class BlePlugin implements Plugin {
     private DeviceCache deviceCache;
     private ScanCallback scanCallback;
 
-    // If isEnabled is false, then all operations on the ble plugin are no-oped. This will only
-    // be false if the ble hardware is inaccessible.
-    private boolean isEnabled = false;
-
     private boolean hasPermission(String perm) {
         return ContextCompat.checkSelfPermission(androidContext, perm)
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    public BlePlugin(Context androidContext, String host) {
-        this.androidContext = androidContext;
+    public BlePlugin(VContext ctx, String host) throws Exception {
+        androidContext = V.getAndroidContext(ctx);
+        if (androidContext == null) {
+            throw new IllegalStateException("androidContext not available");
+        }
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            return;
+            throw new IllegalStateException("BluetoothAdapter not available");
         }
         if (!hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 && !hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            return;
+            throw new IllegalStateException("No permission on BluetoothAdapter");
         }
 
         bluetoothLeAdvertise = bluetoothAdapter.getBluetoothLeAdvertiser();
@@ -151,14 +151,9 @@ public class BlePlugin implements Plugin {
         scanners = new HashSet<>();
         pendingConnections = new HashSet<>();
         deviceCache = new DeviceCache(defaultCacheDuration);
-        isEnabled = true;
     }
 
     public void startAdvertising(AdInfo adInfo) throws Exception {
-        if (!isEnabled) {
-            throw new IllegalStateException("BlePlugin not enabled");
-        }
-
         BluetoothGattService service =
                 new BluetoothGattService(
                         UUIDUtil.serviceUUID(adInfo.getAd().getInterfaceName()),
@@ -233,10 +228,6 @@ public class BlePlugin implements Plugin {
     }
 
     public void startScan(String interfaceName, Plugin.ScanHandler handler) throws Exception {
-        if (!isEnabled) {
-            throw new IllegalStateException("BlePlugin not enabled");
-        }
-
         synchronized (scanners) {
             if (!scanners.add(handler)) {
                 throw new IllegalArgumentException("handler already registered");
