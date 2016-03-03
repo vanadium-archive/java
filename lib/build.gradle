@@ -77,10 +77,6 @@ def String getOsName() {
     }
 }
 
-public static newStyleProfiles() {
-    return new File(System.getenv()['JIRI_ROOT'], '.jiri_v23_profiles').exists()
-}
-
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
 def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 
@@ -138,14 +134,8 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
     // NOTE(spetrovic): we add the '-installsuffix=shared' flag because the build doesn't work
     // without it on linux/arm.  (There is some conflict with "regular", i.e., non-shared builds).
-    if (newStyleProfiles()) {
-        commandLine jiriBin, 'go', '--profiles=java', 'install', '-buildmode=c-shared', '-v',
+    commandLine jiriBin, 'go', '--profiles=java', 'install', '-buildmode=c-shared', '-v',
                 '-tags', 'java', '-installsuffix=shared', 'v.io/x/jni/main'
-    } else {
-        environment 'JIRI_PROFILE': 'java'
-        commandLine jiriBin, 'go', 'install', '-buildmode=c-shared', '-v', '-tags', 'java',
-                '-installsuffix=shared', 'v.io/x/jni/main'
-    }
 }
 
 // Copy the shared library to its ultimate destination.
