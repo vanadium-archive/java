@@ -24,3 +24,12 @@ ul.blockList li.blockList h2 style with padding-bottom: 20px for some reason.
 ul.blockList li.blockList .block h2 {
     padding: initial;
 }
+
+/*
+TODO(rosswang): These styles should be moved to the doclet.
+Fix the spacing between a package header and its description in the package summaries.
+*/
+
+.header + .contentContainer > .block:first-child p:first-child {
+    margin-top: 0;
+}

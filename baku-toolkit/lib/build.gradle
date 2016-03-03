@@ -105,7 +105,7 @@ dependencies {
     apk ('org.slf4j:slf4j-android:1.7.12')
     */
 
-    //javadoc 'io.v:doclet:0.1.0'
+    //javadoc 'io.v:doclet:0.1.1'
     javadoc 'ch.raffael.pegdown-doclet:pegdown-doclet:1.2'
 }
 
@@ -150,6 +150,7 @@ task sourcesJar(type: Jar) {
 task javadoc (type: FullProcessingJavadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    title 'Baku Toolkit ' + version + ' API'
 
     options {
         overview 'src/main/java/overview.md'
