@@ -43,16 +43,14 @@ import java.security.interfaces.ECPublicKey;
  * </pre></blockquote><p>
  */
 public class V extends io.v.v23.V {
-    private static native void nativeInitGlobalAndroid(VContext ctx, Options opts)
-            throws VException;
+    private static native void nativeInitGlobalAndroid(Options opts) throws VException;
 
     private static volatile VContext globalContext;
 
     // Initializes the Vanadium Android-specific global state.
-    private static VContext initGlobalAndroid(VContext ctx, Context androidCtx, Options opts) {
+    private static VContext initGlobalAndroid(VContext ctx, Options opts) {
         try {
-            ctx = ctx.withValue(new AndroidContextKey(), androidCtx);
-            nativeInitGlobalAndroid(ctx, opts);
+            nativeInitGlobalAndroid(opts);
             return V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize global Android state", e);
@@ -71,7 +69,7 @@ public class V extends io.v.v23.V {
             }
             if (opts == null) opts = new Options();
             VContext ctx = initGlobalShared(opts);
-            ctx = initGlobalAndroid(ctx, androidCtx, opts);
+            ctx = initGlobalAndroid(ctx, opts);
             // Set the VException component name to the Android context package name.
             ctx = VException.contextWithComponentName(ctx, androidCtx.getPackageName());
             try {
