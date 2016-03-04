@@ -34,11 +34,11 @@ public class DerivedListDeltaAccumulator<T> implements ListDeltaAccumulator<T> {
 
         /**
          * Algorithm:
-         * <ol>
-         * <li>Notify of all removals.</li>
-         * <li>Notify of moves to reorder intersection.</li>
-         * <li>Notify of all insertions.</li>
-         * </ol>
+         *
+         * 1. Notify of all removals.
+         * 2. Notify of moves to reorder intersection.
+         * 3. Notify of all insertions.
+         *
          * This algorithm does not trigger any item change events, preferring remove/insert instead.
          * Also, it fails if any items are not unique.
          */
@@ -71,7 +71,7 @@ public class DerivedListDeltaAccumulator<T> implements ListDeltaAccumulator<T> {
         /**
          * @param start the mutable ordered start state
          * @param goal  the elements in the end state
-         * @return the result of retaining {@code goal} from {@code start}
+         * @return the result of retaining `goal` from `start`
          */
         List<T> processRemovals(final ImmutableList<T> start, final ImmutableSet<T> goal) {
             final List<T> working = new ArrayList<>(start);

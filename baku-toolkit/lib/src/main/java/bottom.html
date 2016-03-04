@@ -5,7 +5,8 @@
 
     var links = document.getElementsByTagName("a");
     for (var i = 0; i < links.length; i++) {
-        if (links[i].href && links[i].href.substring(0, 4) == "http") {
+        var href = links[i].getAttribute("href");
+        if (href && href.substring(0, 4) == "http") {
             links[i].target = "_blank";
         }
     }

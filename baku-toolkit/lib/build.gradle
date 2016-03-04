@@ -147,10 +147,13 @@ task sourcesJar(type: Jar) {
     classifier 'sources'
 }
 
-task javadoc (type: FullProcessingJavadoc) {
+task javadoc(type: FullProcessingJavadoc) {
+    android.libraryVariants.all { variant ->
+        dependsOn variant.javaCompile
+    }
+
     source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    title 'Baku Toolkit ' + version + ' API'
+    title "Baku Toolkit ${version} API"
 
     options {
         overview 'src/main/java/overview.md'
@@ -162,11 +165,26 @@ task javadoc (type: FullProcessingJavadoc) {
         group 'API Surface', 'io.v.baku.toolkit'
         group 'Component Packages', 'io.v.baku.toolkit.*:io.v.rx:io.v.rx.*'
         //addStringOption 'defaultstart', 'io/v/baku/toolkit/BakuActivity.html'
+
+        links 'http://docs.oracle.com/javase/8/docs/api/', 'http://reactivex.io/RxJava/javadoc/'
+        linksOffline 'http://d.android.com/reference', "${android.sdkDirectory}/docs/reference"
     }
 
     if (JavaVersion.current().isJava8Compatible()) {
         // TODO(rosswang): Can we get rid of this?
         options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    classpath += files(android.getBootClasspath())
+    doFirst {
+        // This must happen after compile because compile injects some generated classpath, but
+        // before Javadoc generation.
+        android.libraryVariants.all { variant ->
+            classpath += files(
+                    variant.javaCompile.classpath.files,
+                    variant.javaCompile.destinationDir // for io.v.baku.toolkit.R
+            )
+        }
     }
 }
 
