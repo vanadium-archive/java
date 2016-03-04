@@ -35,7 +35,7 @@ import rx.subjects.ReplaySubject;
  * via conflict resolution or CRDT.
  *
  * This coordinator is included in the default coordinator chain for
- * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
+ * {@linkplain ScalarBindingBuilder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
  *
  * ## Usage
@@ -44,11 +44,11 @@ import rx.subjects.ReplaySubject;
  *
  * ```java
  * {@link BakuActivityTrait#binder() binder()}.{@link
- *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("foo")
- *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#coordinators(CoordinatorChain[])
+ *         BindingBuilder#onKey(java.lang.String) onKey}("foo")
+ *         .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
  *         coordinators}({@link DebouncingCoordinator#DebouncingCoordinator(TwoWayBinding)
  *         DebouncingCoordinator::new})
- *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(View) bindTo}(myView);
+ *         .{@link ScalarBindingBuilder#bindTo(View) bindTo}(myView);
  * ```
  */
 @RequiredArgsConstructor

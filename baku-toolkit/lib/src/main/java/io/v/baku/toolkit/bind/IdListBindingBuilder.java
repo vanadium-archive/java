@@ -22,19 +22,19 @@ import rx.schedulers.Schedulers;
  * or [1, 3, 4], whereas {@linkplain PrefixBindingBuilder prefix bindings} would resolve to either
  * [1, 2, 3, 4] or [1, 3, 2, 4].
  *
- * @see io.v.baku.toolkit.bind.CollectionBinding.Builder#onIdList(String)
+ * @see io.v.baku.toolkit.bind.BindingBuilder#onIdList(String)
  */
 public class IdListBindingBuilder<A extends RangeAdapter>
-        extends CollectionAdapterBuilder<IdListBindingBuilder<A>, String, A> {
+        extends CollectionBindingBuilder<IdListBindingBuilder<A>, String, A> {
     private String mIdListRowName;
 
-    public IdListBindingBuilder(final CollectionBinding.Builder base) {
+    public IdListBindingBuilder(final BindingBuilder base) {
         super(base);
     }
 
     /**
      * This binding will produce lists of row name strings, which the item {@link ViewAdapter} will
-     * need to bind to Syncbase rows with scalar {@link SyncbaseBinding}s.
+     * need to bind to Syncbase rows with {@linkplain ScalarBindingBuilder scalar bindings}.
      */
     public IdListBindingBuilder<A> idListRowName(final String idListRowName) {
         mIdListRowName = idListRowName;

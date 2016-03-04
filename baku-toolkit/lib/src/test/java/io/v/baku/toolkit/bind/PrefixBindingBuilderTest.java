@@ -11,7 +11,7 @@ import org.junit.Test;
 public class PrefixBindingBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void testMissingType() {
-        CollectionBinding.builder()
+        new BindingBuilder()
                 .onPrefix("foo")
                 .bindTo((ListView)null);
     }

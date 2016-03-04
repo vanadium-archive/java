@@ -5,7 +5,8 @@
 /**
  * These classes provide bindings between Android widgets and Syncbase data. Most functionality is
  * most easily accessed through access vectors in {@link io.v.baku.toolkit} rather than
- * instantiating directly from this package.
+ * instantiating directly from this package. Otherwise, it is easiest to instantiate a
+ * `new {@link io.v.baku.toolkit.bind.BindingBuilder}()` and chain methods to configure bindings.
  *
  * For the reasons outlined in {@link io.v.rx.syncbase}, Vanadium state distribution with Syncbase
  * would ideally be done with pure FRP [MVVM]

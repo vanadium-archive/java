@@ -7,8 +7,7 @@ package io.v.baku.toolkit;
 import android.app.Activity;
 import android.os.Bundle;
 
-import io.v.baku.toolkit.bind.CollectionBinding;
-import io.v.baku.toolkit.bind.SyncbaseBinding;
+import io.v.baku.toolkit.bind.BindingBuilder;
 import io.v.baku.toolkit.syncbase.BakuDb;
 import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
@@ -45,10 +44,9 @@ import rx.subscriptions.Subscriptions;
  *             BakuActivityMixin}<>(this, savedInstanceState);
  *
  *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
- *         mBaku.{@link #binder() binder}().{@link
- *             io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String)
- *             key}("myDataRow")
- *                       .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *         mBaku.{@link #binder() binder}().{@link BindingBuilder#onKey(java.lang.String)
+ *             onKey}("myDataRow")
+ *                       .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
  *                       bindTo}(R.id.myTextView);
  *     }
  *
@@ -117,6 +115,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         return "db";
     }
 
+    @Override
     public String getSyncbaseTableName() {
         return "ui";
     }
@@ -125,17 +124,13 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
         UserCloudSyncgroup.forActivity(this).join();
     }
 
+    @Override
     public void onSyncError(final Throwable t) {
         ErrorReporters.getDefaultSyncErrorReporter(mVAndroidContextTrait);
     }
 
-    public <U> SyncbaseBinding.Builder<U> binder() {
-        return SyncbaseBinding.<U>builder()
-                .activity(this);
-    }
-
-    public CollectionBinding.Builder collectionBinder() {
-        return CollectionBinding.builder()
-                .activity(this);
+    @Override
+    public BindingBuilder binder() {
+        return new BindingBuilder().activity(this);
     }
 }

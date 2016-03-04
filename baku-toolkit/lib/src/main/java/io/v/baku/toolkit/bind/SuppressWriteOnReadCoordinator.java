@@ -22,7 +22,7 @@ import rx.Subscription;
  * To operate correctly, this coordinator must occur single-threaded with the widget binding layer.
  *
  * This coordinator is required (and injected if missing) in the coordinator chain for
- * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(TextView) two-way
+ * {@linkplain ScalarBindingBuilder#bindTo(TextView) two-way
  * <code>TextView</code> bindings}.
  *
  * ## Usage
@@ -31,12 +31,12 @@ import rx.Subscription;
  *
  * ```java
  * {@link BakuActivityTrait#binder() binder()}.{@link
- *         io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String) key}("foo")
- *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#coordinators(CoordinatorChain[])
+ *         BindingBuilder#onKey(java.lang.String) key}("foo")
+ *         .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
  *         coordinators}({@link
  *         SuppressWriteOnReadCoordinator#SuppressWriteOnReadCoordinator(TwoWayBinding)
  *         SuppressWriteOnReadCoordinator::new})
- *         .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(View) bindTo}(myView);
+ *         .{@link ScalarBindingBuilder#bindTo(View) bindTo}(myView);
  * ```
  */
 @RequiredArgsConstructor

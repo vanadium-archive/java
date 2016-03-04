@@ -9,22 +9,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ListView;
 
+import io.v.baku.toolkit.BakuActivityTrait;
 import java8.util.function.Function;
-import lombok.RequiredArgsConstructor;
 import rx.Observable;
 
 /**
- * Encapsulates the common logic for building the widget side of a collection binding.
- *
- * @see BaseCollectionBindingBuilder
+ * Collection bindings are read-only bindings from Syncbase data to collections of UI elements, such
+ * as items in a {@link ListView} or {@link RecyclerView}. In addition to defining the Syncbase data
+ * being mapped, collection bindings are responsible for ordering/arranging the data and mapping
+ * them to their view elements (they are Android widget adapters). Writes are generally done through
+ * {@linkplain BakuActivityTrait#getSyncbaseTable() direct database writes}.
  */
-@RequiredArgsConstructor
-public abstract class CollectionAdapterBuilder<B extends CollectionAdapterBuilder<B, T, A>,
-        T, A extends RangeAdapter> {
-    @SuppressWarnings("unchecked")
-    protected final B mSelf = (B)this;
-
-    protected final CollectionBinding.Builder mBase;
+public abstract class CollectionBindingBuilder<B extends CollectionBindingBuilder<B, T, A>,
+        T, A extends RangeAdapter> extends DerivedBuilder<B, BindingBuilder>{
+    public CollectionBindingBuilder(final BindingBuilder base) {
+        super(base);
+    }
 
     private ViewAdapter<? super T, ?> mViewAdapter;
 

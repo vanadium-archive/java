@@ -11,7 +11,7 @@ import org.gradle.jvm.platform.internal.DefaultJavaPlatform
 import org.gradle.language.base.internal.compile.Compiler
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.8.1'
+version = '0.9.0'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -37,11 +37,14 @@ android {
     }
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
+    buildTypes {
+        debug {
+            multiDexEnabled true
+        }
+    }
     defaultConfig {
         minSdkVersion 21
     }
-
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'

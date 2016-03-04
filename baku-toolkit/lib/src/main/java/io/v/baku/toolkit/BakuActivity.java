@@ -26,9 +26,9 @@ import lombok.extern.slf4j.Slf4j;
  *
  *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
  *         {@link #binder() binder}().{@link
- *             io.v.baku.toolkit.bind.SyncbaseBinding.Builder#key(java.lang.String)
- *             key}("myDataRow")
- *                 .{@link io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTo(int)
+ *             io.v.baku.toolkit.bind.BindingBuilder#onKey(java.lang.String)
+ *             onKey}("myDataRow")
+ *                 .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
  *                 bindTo}(R.id.myTextView);
  *     }
  * }
