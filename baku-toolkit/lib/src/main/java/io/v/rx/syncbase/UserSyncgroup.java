@@ -70,7 +70,7 @@ public abstract class UserSyncgroup extends RxSyncgroup {
             return this;
         }
 
-        public Builder sgSuffixFormat(final SgSuffixFormat sgSuffixFormat) {
+        public Builder sgSuffixFormat(final SgSuffixFormat<? super Parameters> sgSuffixFormat) {
             mSgSuffixFormat = sgSuffixFormat;
             return this;
         }

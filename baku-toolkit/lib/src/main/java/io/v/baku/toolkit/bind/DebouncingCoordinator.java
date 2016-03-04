@@ -4,6 +4,8 @@
 
 package io.v.baku.toolkit.bind;
 
+import android.widget.TextView;
+
 import org.joda.time.Duration;
 
 import java.util.concurrent.TimeUnit;
@@ -16,9 +18,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.ReplaySubject;
 
 /**
- * If input events arrive too quickly, the resulting watch updates can come back in a stutter, where
- * older watch events arrive after the input has already been subsequently updated, reverting the
- * view for a brief moment and messing with the cursor position.
+ * This coordinator defers the read binding until a specified timeout (default
+ * {@value #DEFAULT_IO_DEBOUNCE_MILLIS} ms) after the latest write, then taking the latest read.
+ * Write/watch latency can cause reflexive watch changes from Syncbase to arrive after subsequent
+ * changes to the UI state have already been made, causing a stuttering revert.
  * <p>
  * A simple debounce on the uplink or downlink doesn't solve the problem because it effectively just
  * adds a delay to the boundary condition. To prevent this, any update from the model must be
@@ -26,10 +29,15 @@ import rx.subjects.ReplaySubject;
  * <p>
  * Unfortunately for rapid concurrent updates this can result in divergence which should be handled
  * via conflict resolution or CRDT.
+ * <p>
+ * This coordinator is included in the default coordinator chain for
+ * {@linkplain io.v.baku.toolkit.bind.SyncbaseBinding.Builder#bindTwoWay(TextView) two-way
+ * <code>TextView</code> bindings}.
  */
 @RequiredArgsConstructor
 public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
-    public static final Duration DEFAULT_IO_DEBOUNCE = Duration.millis(500);
+    private static final long DEFAULT_IO_DEBOUNCE_MILLIS = 500;
+    public static final Duration DEFAULT_IO_DEBOUNCE = Duration.millis(DEFAULT_IO_DEBOUNCE_MILLIS);
 
     private final TwoWayBinding<T> mChild;
     private final Duration mIoDebounce;

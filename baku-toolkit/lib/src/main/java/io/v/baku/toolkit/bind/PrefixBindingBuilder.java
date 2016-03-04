@@ -16,8 +16,17 @@ import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * If {@code T} is {@link Comparable}, the default row ordering is natural ordering on row
- * values. Otherwise, the default is natural ordering on row names.
+ * Builder class for data bindings to collections derived from rows with names matching a key
+ * prefix, optionally with additional filter criteria. Ordering is data driven. This type of
+ * collection binding is advantageous in its simplicity, at the cost of being less flexible than
+ * other collection bindings. Internally, the ordering always includes a secondary ordering on key
+ * to remove ambiguity.
+ * <p>
+ * If {@code T} is {@link Comparable}, the default row ordering is natural ordering on row values.
+ * Otherwise, the default is natural ordering on row names.
+ *
+ * @see io.v.baku.toolkit.bind.CollectionBinding.Builder#onPrefix(String)
+ * @see io.v.baku.toolkit.bind.CollectionBinding.Builder#onPrefix(PrefixRange)
  */
 public class PrefixBindingBuilder<T, A extends RangeAdapter>
         extends CollectionAdapterBuilder<PrefixBindingBuilder<T, A>, RxTable.Row<T>, A> {

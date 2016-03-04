@@ -13,9 +13,7 @@ import io.v.baku.toolkit.syncbase.BakuSyncbase;
 import io.v.baku.toolkit.syncbase.BakuTable;
 import rx.subscriptions.CompositeSubscription;
 
-/**
- * @see BakuActivityMixin
- */
+
 public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     VAndroidContextTrait<T> getVAndroidContextTrait();
     BakuSyncbase getSyncbase();
@@ -24,7 +22,17 @@ public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
     CompositeSubscription getSubscriptions();
     String getSyncbaseTableName();
     void onSyncError(Throwable t);
+
+    /**
+     * Exposes a default scalar data binding builder for this Activity. The returned builder may be
+     * freely customized; a new builder is returned for each call.
+     */
     <U> SyncbaseBinding.Builder<U> binder();
+
+    /**
+     * Exposes a default collection data binding builder for this Activity. The returned builder may
+     * be freely customized; a new builder is returned for each call.
+     */
     CollectionBinding.Builder collectionBinder();
     void close();
 }

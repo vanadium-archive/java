@@ -11,9 +11,10 @@ import lombok.RequiredArgsConstructor;
 import rx.Observable;
 
 /**
- * This accumulator is not a true accumulator, but rather a first-order transformation.
- * TODO(rosswang): Rename these.
+ * Transforms a watch stream of ID lists into a {@link ListAccumulator}. This accumulator is not a
+ * true accumulator, but rather a first-order transformation.
  */
+// TODO(rosswang): Rename these.
 @RequiredArgsConstructor
 public class IdListAccumulator implements ListAccumulator<String> {
     private final ImmutableList<String> mIds;
