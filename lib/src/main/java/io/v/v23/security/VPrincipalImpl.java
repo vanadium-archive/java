@@ -9,7 +9,7 @@ import io.v.v23.verror.VException;
 import java.security.interfaces.ECPublicKey;
 
 class VPrincipalImpl implements VPrincipal {
-    private final long nativePtr;
+    private final long nativeRef;
     private final VSigner signer;
     private final BlessingStore store;
     private final BlessingRoots roots;
@@ -40,19 +40,19 @@ class VPrincipalImpl implements VPrincipal {
         return nativeCreatePersistentForSigner(signer, dir);
     }
 
-    private native Blessings nativeBless(long nativePtr, ECPublicKey key, Blessings with,
+    private native Blessings nativeBless(long nativeRef, ECPublicKey key, Blessings with,
         String extension, Caveat caveat, Caveat[] additionalCaveats) throws VException;
-    private native Blessings nativeBlessSelf(long nativePtr, String name, Caveat[] caveats)
+    private native Blessings nativeBlessSelf(long nativeRef, String name, Caveat[] caveats)
             throws VException;
-    private native VSignature nativeSign(long nativePtr, byte[] message) throws VException;
-    private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
-    private native BlessingStore nativeBlessingStore(long nativePtr) throws VException;
-    private native BlessingRoots nativeRoots(long nativePtr) throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private native VSignature nativeSign(long nativeRef, byte[] message) throws VException;
+    private native ECPublicKey nativePublicKey(long nativeRef) throws VException;
+    private native BlessingStore nativeBlessingStore(long nativeRef) throws VException;
+    private native BlessingRoots nativeRoots(long nativeRef) throws VException;
+    private native void nativeFinalize(long nativeRef);
 
     private VPrincipalImpl(
-            long nativePtr, VSigner signer, BlessingStore store, BlessingRoots roots) {
-        this.nativePtr = nativePtr;
+            long nativeRef, VSigner signer, BlessingStore store, BlessingRoots roots) {
+        this.nativeRef = nativeRef;
         this.signer = signer;
         this.store = store;
         this.roots = roots;
@@ -61,11 +61,11 @@ class VPrincipalImpl implements VPrincipal {
     @Override
     public Blessings bless(ECPublicKey key, Blessings with, String extension, Caveat caveat,
         Caveat... additionalCaveats) throws VException {
-        return nativeBless(nativePtr, key, with, extension, caveat, additionalCaveats);
+        return nativeBless(nativeRef, key, with, extension, caveat, additionalCaveats);
     }
     @Override
     public Blessings blessSelf(String name, Caveat... caveats) throws VException {
-        return nativeBlessSelf(nativePtr, name, caveats);
+        return nativeBlessSelf(nativeRef, name, caveats);
     }
     @Override
     public VSignature sign(byte[] message) throws VException {
@@ -73,7 +73,7 @@ class VPrincipalImpl implements VPrincipal {
             byte[] purpose = Constants.SIGNATURE_FOR_MESSAGE_SIGNING.getBytes();
             return this.signer.sign(purpose, message);
         }
-        return nativeSign(nativePtr, message);
+        return nativeSign(nativeRef, message);
     }
     @Override
     public ECPublicKey publicKey() {
@@ -81,7 +81,7 @@ class VPrincipalImpl implements VPrincipal {
             return this.signer.publicKey();
         }
         try {
-            return nativePublicKey(nativePtr);
+            return nativePublicKey(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
         }
@@ -92,7 +92,7 @@ class VPrincipalImpl implements VPrincipal {
             return this.store;
         }
         try {
-            return nativeBlessingStore(nativePtr);
+            return nativeBlessingStore(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get Blessing Store", e);
         }
@@ -103,25 +103,25 @@ class VPrincipalImpl implements VPrincipal {
             return this.roots;
         }
         try {
-            return nativeRoots(nativePtr);
+            return nativeRoots(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get Blessing Store", e);
         }
     }
-    private long nativePtr() { return nativePtr; }
+    private long nativeRef() { return nativeRef; }
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return nativePtr == ((VPrincipalImpl) other).nativePtr;
+        return nativeRef == ((VPrincipalImpl) other).nativeRef;
     }
     @Override
     public int hashCode() {
-        return Long.valueOf(nativePtr).hashCode();
+        return Long.valueOf(nativeRef).hashCode();
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

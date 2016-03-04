@@ -12,44 +12,44 @@ import io.v.v23.security.Call;
 import io.v.v23.verror.VException;
 
 public class ServerCallImpl implements ServerCall {
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private static native Call nativeSecurity(long nativePtr);
-    private static native String nativeSuffix(long nativePtr);
-    private static native Endpoint nativeLocalEndpoint(long nativePtr);
-    private static native Endpoint nativeRemoteEndpoint(long nativePtr);
-    private static native Blessings nativeGrantedBlessings(long nativePtr) throws VException;
-    private static native Server nativeServer(long nativePtr) throws VException;
-    private static native void nativeFinalize(long nativePtr);
+    private static native Call nativeSecurity(long nativeRef);
+    private static native String nativeSuffix(long nativeRef);
+    private static native Endpoint nativeLocalEndpoint(long nativeRef);
+    private static native Endpoint nativeRemoteEndpoint(long nativeRef);
+    private static native Blessings nativeGrantedBlessings(long nativeRef) throws VException;
+    private static native Server nativeServer(long nativeRef) throws VException;
+    private static native void nativeFinalize(long nativeRef);
 
-    private ServerCallImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private ServerCallImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     @Override
     public Call security() {
-        return nativeSecurity(nativePtr);
+        return nativeSecurity(nativeRef);
     }
 
     @Override
     public String suffix() {
-        return nativeSuffix(nativePtr);
+        return nativeSuffix(nativeRef);
     }
 
     @Override
     public Endpoint localEndpoint() {
-        return nativeLocalEndpoint(nativePtr);
+        return nativeLocalEndpoint(nativeRef);
     }
 
     @Override
     public Endpoint remoteEndpoint() {
-        return nativeRemoteEndpoint(nativePtr);
+        return nativeRemoteEndpoint(nativeRef);
     }
 
     @Override
     public Blessings grantedBlessings() {
         try {
-            return nativeGrantedBlessings(nativePtr);
+            return nativeGrantedBlessings(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get granted blessings: ", e);
         }
@@ -58,7 +58,7 @@ public class ServerCallImpl implements ServerCall {
     @Override
     public Server server() {
         try {
-            return nativeServer(nativePtr);
+            return nativeServer(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get server: ", e);
         }
@@ -66,6 +66,6 @@ public class ServerCallImpl implements ServerCall {
 
     @Override
     protected void finalize() throws Throwable {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

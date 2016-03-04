@@ -57,12 +57,12 @@ class DatabaseImpl implements Database, BatchDatabase {
         }
     }
 
-    private native void nativeEnforceSchema(long nativePtr, VContext ctx, Callback<Void> callback);
-    private native void nativeBeginBatch(long nativePtr, VContext ctx, BatchOptions opts,
+    private native void nativeEnforceSchema(long nativeRef, VContext ctx, Callback<Void> callback);
+    private native void nativeBeginBatch(long nativeRef, VContext ctx, BatchOptions opts,
                                          Callback<BatchDatabase> callback);
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private final long nativePtr;  // can be 0 (e.g., for BatchDatabase)
+    private final long nativeRef;  // can be 0 (e.g., for BatchDatabase)
     private final String parentFullName;
     private final String fullName;
     private final String name;
@@ -70,9 +70,9 @@ class DatabaseImpl implements Database, BatchDatabase {
 
     private final DatabaseClient client;
 
-    private DatabaseImpl(long nativePtr, String parentFullName, String fullName,
+    private DatabaseImpl(long nativeRef, String parentFullName, String fullName,
                          String relativeName, Schema schema) {
-        this.nativePtr = nativePtr;
+        this.nativeRef = nativeRef;
         this.parentFullName = parentFullName;
         this.fullName = fullName;
         this.name = relativeName;
@@ -159,11 +159,11 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     public ListenableFuture<BatchDatabase> beginBatch(VContext ctx, BatchOptions opts) {
         ListenableFutureCallback<BatchDatabase> callback = new ListenableFutureCallback<>();
-        if (nativePtr == 0) {
-            throw new RuntimeException("beginBatch() called with zero nativePtr - is it called " +
+        if (nativeRef == 0) {
+            throw new RuntimeException("beginBatch() called with zero nativeRef - is it called " +
                     "from within BatchDatabase?");
         }
-        nativeBeginBatch(nativePtr, ctx, opts, callback);
+        nativeBeginBatch(nativeRef, ctx, opts, callback);
         return callback.getFuture(ctx);
     }
     @Override
@@ -219,11 +219,11 @@ class DatabaseImpl implements Database, BatchDatabase {
     @Override
     public ListenableFuture<Void> enforceSchema(final VContext ctx) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        if (nativePtr == 0) {
-            throw new RuntimeException("enforceSchema() called with zero nativePtr - is it " +
+        if (nativeRef == 0) {
+            throw new RuntimeException("enforceSchema() called with zero nativeRef - is it " +
                     "called from within BatchDatabase?");
         }
-        nativeEnforceSchema(nativePtr, ctx, callback);
+        nativeEnforceSchema(nativeRef, ctx, callback);
         return callback.getFuture(ctx);
     }
 
@@ -238,8 +238,8 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
     @Override
     protected void finalize() {
-        if (nativePtr != 0) {
-            nativeFinalize(nativePtr);
+        if (nativeRef != 0) {
+            nativeFinalize(nativeRef);
         }
     }
 

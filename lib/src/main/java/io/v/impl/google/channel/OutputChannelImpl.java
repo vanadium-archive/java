@@ -17,35 +17,35 @@ import io.v.v23.rpc.Callback;
  */
 class OutputChannelImpl<T> implements OutputChannel<T> {
     private final VContext ctx;
-    private final long nativeConvertPtr;
-    private final long nativeSendPtr;
-    private final long nativeClosePtr;
+    private final long nativeConvertRef;
+    private final long nativeSendRef;
+    private final long nativeCloseRef;
 
-    private static native <T> void nativeSend(long nativeConvertPtr, long nativeSendPtr, T value,
+    private static native <T> void nativeSend(long nativeConvertRef, long nativeSendRef, T value,
                                               Callback<Void> callback);
-    private static native void nativeClose(long nativeClosePtr, Callback<Void> callback);
-    private static native void nativeFinalize(long nativeConvertPtr, long nativeSendPtr, long nativeClosePtr);
+    private static native void nativeClose(long nativeCloseRef, Callback<Void> callback);
+    private static native void nativeFinalize(long nativeConvertRef, long nativeSendRef, long nativeCloseRef);
 
-    private OutputChannelImpl(VContext ctx, long convertPtr, long sendPtr, long closePtr) {
+    private OutputChannelImpl(VContext ctx, long convertRef, long sendRef, long closeRef) {
         this.ctx = ctx;
-        this.nativeConvertPtr = convertPtr;
-        this.nativeSendPtr = sendPtr;
-        this.nativeClosePtr = closePtr;
+        this.nativeConvertRef = convertRef;
+        this.nativeSendRef = sendRef;
+        this.nativeCloseRef = closeRef;
     }
     @Override
     public ListenableFuture<Void> send(T item) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeSend(nativeConvertPtr, nativeSendPtr, item, callback);
+        nativeSend(nativeConvertRef, nativeSendRef, item, callback);
         return callback.getFuture(ctx);
     }
     @Override
     public ListenableFuture<Void> close() {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeClose(nativeClosePtr, callback);
+        nativeClose(nativeCloseRef, callback);
         return callback.getFuture(ctx);
     }
     @Override
     protected void finalize() throws Throwable {
-        nativeFinalize(nativeConvertPtr, nativeSendPtr, nativeClosePtr);
+        nativeFinalize(nativeConvertRef, nativeSendRef, nativeCloseRef);
     }
 }

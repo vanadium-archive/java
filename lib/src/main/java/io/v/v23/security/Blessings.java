@@ -48,21 +48,21 @@ public final class Blessings implements Serializable {
         return nativeCreateUnion(blessings);
     }
 
-    private long nativePtr;
+    private long nativeRef;
     private volatile WireBlessings wire;  // can be null
 
-    private native ECPublicKey nativePublicKey(long nativePtr) throws VException;
-    private native Blessings nativeSigningBlessings(long nativePtr) throws VException;
-    private native WireBlessings nativeWireFormat(long nativePtr) throws VException;
+    private native ECPublicKey nativePublicKey(long nativeRef) throws VException;
+    private native Blessings nativeSigningBlessings(long nativeRef) throws VException;
+    private native WireBlessings nativeWireFormat(long nativeRef) throws VException;
 
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private Blessings(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private Blessings(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
-    private Blessings(long nativePtr, WireBlessings wire) {
-        this.nativePtr = nativePtr;
+    private Blessings(long nativeRef, WireBlessings wire) {
+        this.nativeRef = nativeRef;
         this.wire = wire;
     }
 
@@ -72,7 +72,7 @@ public final class Blessings implements Serializable {
      */
     public ECPublicKey publicKey() {
         try {
-            return nativePublicKey(nativePtr);
+            return nativePublicKey(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get public key", e);
         }
@@ -85,7 +85,7 @@ public final class Blessings implements Serializable {
      */
     public Blessings signingBlessings() {
         try {
-            return nativeSigningBlessings(nativePtr);
+            return nativeSigningBlessings(nativeRef);
       } catch (VException e) {
           throw new RuntimeException("Couldn't get signing blessings", e);
       }
@@ -103,7 +103,7 @@ public final class Blessings implements Serializable {
         }
         WireBlessings ret = null;
         try {
-            ret = nativeWireFormat(nativePtr);
+            ret = nativeWireFormat(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get wire blessings representation.", e);
         }
@@ -129,8 +129,8 @@ public final class Blessings implements Serializable {
         return wireFormat().getCertificateChains();
     }
 
-    private long nativePtr() {
-        return nativePtr;
+    private long nativeRef() {
+        return nativeRef;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -140,7 +140,7 @@ public final class Blessings implements Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         wire = (WireBlessings) in.readObject();
         try {
-            nativePtr = nativeCreate(wire);
+            nativeRef = nativeCreate(wire);
         } catch (VException e) {
             throw new IOException("Couldn't create native blessings.", e);
         }
@@ -179,6 +179,6 @@ public final class Blessings implements Serializable {
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

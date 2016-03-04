@@ -27,19 +27,19 @@ import io.v.v23.vom.VomUtil;
 import io.v.impl.google.ListenableFutureCallback;
 
 class UpdateImpl implements Update {
-    private final long nativePtr;
+    private final long nativeRef;
 
     private boolean lost;
     private Advertisement ad;
 
     private native void nativeAttachment(
-            long nativePtr, VContext ctx, String name, ListenableFutureCallback<byte[]> callback)
+            long nativeRef, VContext ctx, String name, ListenableFutureCallback<byte[]> callback)
             throws VException;
 
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private UpdateImpl(long nativePtr, boolean lost, Advertisement ad) {
-        this.nativePtr = nativePtr;
+    private UpdateImpl(long nativeRef, boolean lost, Advertisement ad) {
+        this.nativeRef = nativeRef;
         this.lost = lost;
         this.ad = ad;
     }
@@ -87,7 +87,7 @@ class UpdateImpl implements Update {
         }
 
         ListenableFutureCallback<byte[]> callback = new ListenableFutureCallback<>();
-        nativeAttachment(nativePtr, ctx, name, callback);
+        nativeAttachment(nativeRef, ctx, name, callback);
         return VFutures.withUserLandChecks(
                 ctx,
                 Futures.transform(
@@ -140,6 +140,6 @@ class UpdateImpl implements Update {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

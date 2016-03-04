@@ -25,18 +25,18 @@ import java.lang.reflect.Type;
  * functionalities.
  */
 public class ClientImpl implements Client {
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private native void nativeStartCall(long nativePtr, VContext context,
+    private native void nativeStartCall(long nativeRef, VContext context,
                                         String name, String method, byte[][] vomArgs,
                                         Authorizer nameResolutionAuthorizer,
                                         Authorizer serverAuthorizer,
                                         Callback<ClientCall> callback);
-    private native void nativeClose(long nativePtr);
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeClose(long nativeRef);
+    private native void nativeFinalize(long nativeRef);
 
-    private ClientImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private ClientImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     private boolean shouldSkipServerAuth(Options opts) {
@@ -80,7 +80,7 @@ public class ClientImpl implements Client {
         }
         try {
             checkStartCallArgs(name, method, args, argTypes);
-            nativeStartCall(nativePtr, ctx, name, getMethodName(method),
+            nativeStartCall(nativeRef, ctx, name, getMethodName(method),
                     getEncodedVomArgs(args, argTypes),
                     nameResolutionAuthorizer(opts), serverAuthorizer(opts), callback);
         } catch (VException e) {
@@ -120,7 +120,7 @@ public class ClientImpl implements Client {
 
     @Override
     public void close() {
-        nativeClose(nativePtr);
+        nativeClose(nativeRef);
     }
     // Implement java.lang.Object.
     @Override
@@ -128,14 +128,14 @@ public class ClientImpl implements Client {
         if (this == other) return true;
         if (other == null) return false;
         if (getClass() != other.getClass()) return false;
-        return nativePtr == ((ClientImpl) other).nativePtr;
+        return nativeRef == ((ClientImpl) other).nativeRef;
     }
     @Override
     public int hashCode() {
-        return Long.valueOf(nativePtr).hashCode();
+        return Long.valueOf(nativeRef).hashCode();
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

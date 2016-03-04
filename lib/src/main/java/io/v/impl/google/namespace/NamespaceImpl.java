@@ -27,37 +27,37 @@ import io.v.v23.verror.VException;
  * functionalities.
  */
 public class NamespaceImpl implements Namespace {
-    private final long nativePtr;
+    private final long nativeRef;
 
     private static native InputChannel<GlobReply> nativeGlob(
-            long nativePtr, VContext context, String pattern, Options options) throws VException;
-    private static native void nativeMount(long nativePtr, VContext context, String name,
+            long nativeRef, VContext context, String pattern, Options options) throws VException;
+    private static native void nativeMount(long nativeRef, VContext context, String name,
                                            String server, Duration ttl, Options options,
                                            Callback<Void> callback);
-    private static native void nativeUnmount(long nativePtr, VContext context, String name,
+    private static native void nativeUnmount(long nativeRef, VContext context, String name,
                                              String server, Options options,
                                              Callback<Void> callback);
-    private static native void nativeDelete(long nativePtr, VContext context, String name,
+    private static native void nativeDelete(long nativeRef, VContext context, String name,
                                             boolean deleteSubtree, Options options,
                                             Callback<Void> callback);
-    private static native void nativeResolveToMountTable(long nativePtr, VContext context,
+    private static native void nativeResolveToMountTable(long nativeRef, VContext context,
                                                          String name, Options options,
                                                          Callback<MountEntry> callback);
-    private static native void nativeResolve(long nativePtr, VContext context, String name,
+    private static native void nativeResolve(long nativeRef, VContext context, String name,
                                              Options options, Callback<MountEntry> callback);
-    private static native boolean nativeFlushCacheEntry(long nativePtr, VContext context,
+    private static native boolean nativeFlushCacheEntry(long nativeRef, VContext context,
                                                         String name);
-    private static native void nativeSetRoots(long nativePtr, List<String> roots) throws VException;
-    private static native void nativeSetPermissions(long nativePtr, VContext context, String name,
+    private static native void nativeSetRoots(long nativeRef, List<String> roots) throws VException;
+    private static native void nativeSetPermissions(long nativeRef, VContext context, String name,
                                                     Permissions permissions, String version,
                                                     Options options, Callback<Void> callback);
-    private static native void nativeGetPermissions(long nativePtr, VContext context, String name,
+    private static native void nativeGetPermissions(long nativeRef, VContext context, String name,
                                                     Options options,
                                                     Callback<Map<String, Permissions>> callback);
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private NamespaceImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private NamespaceImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<Void> mount(VContext ctx, String name, String server, Duration ttl,
                                         Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeMount(nativePtr, ctx, name, server, ttl, options, callback);
+        nativeMount(nativeRef, ctx, name, server, ttl, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -83,7 +83,7 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<Void> unmount(VContext ctx, String name, String server,
                                           Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeUnmount(nativePtr, ctx, name, server, options, callback);
+        nativeUnmount(nativeRef, ctx, name, server, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -96,7 +96,7 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<Void> delete(VContext ctx, String name, boolean deleteSubtree,
                                          Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeDelete(nativePtr, ctx, name, deleteSubtree, options, callback);
+        nativeDelete(nativeRef, ctx, name, deleteSubtree, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -108,7 +108,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public ListenableFuture<MountEntry> resolve(VContext ctx, String name, Options options) {
         ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
-        nativeResolve(nativePtr, ctx, name, options, callback);
+        nativeResolve(nativeRef, ctx, name, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -121,13 +121,13 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<MountEntry> resolveToMountTable(VContext ctx, String name,
                                                             Options options) {
         ListenableFutureCallback<MountEntry> callback = new ListenableFutureCallback<>();
-        nativeResolveToMountTable(nativePtr, ctx, name, options, callback);
+        nativeResolveToMountTable(nativeRef, ctx, name, options, callback);
         return callback.getFuture(ctx);
     }
 
     @Override
     public boolean flushCacheEntry(VContext ctx, String name) {
-        return nativeFlushCacheEntry(nativePtr, ctx, name);
+        return nativeFlushCacheEntry(nativeRef, ctx, name);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class NamespaceImpl implements Namespace {
     @Override
     public InputChannel<GlobReply> glob(VContext ctx, String pattern, Options options) {
         try {
-            return nativeGlob(nativePtr, ctx, pattern, options);
+            return nativeGlob(nativeRef, ctx, pattern, options);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create glob InputChannel.", e);
         }
@@ -146,7 +146,7 @@ public class NamespaceImpl implements Namespace {
 
     @Override
     public void setRoots(List<String> roots) throws VException {
-        nativeSetRoots(nativePtr, roots);
+        nativeSetRoots(nativeRef, roots);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class NamespaceImpl implements Namespace {
                                                  Permissions permissions, String version,
                                                  Options options) {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeSetPermissions(nativePtr, ctx, name, permissions, version, options, callback);
+        nativeSetPermissions(nativeRef, ctx, name, permissions, version, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -174,7 +174,7 @@ public class NamespaceImpl implements Namespace {
     public ListenableFuture<Map<String, Permissions>> getPermissions(VContext ctx, String name,
                                                                      Options options) {
         final ListenableFutureCallback<Map<String, Permissions>> callback = new ListenableFutureCallback<>();
-        nativeGetPermissions(nativePtr, ctx, name, options, callback);
+        nativeGetPermissions(nativeRef, ctx, name, options, callback);
         return callback.getFuture(ctx);
     }
 
@@ -189,16 +189,16 @@ public class NamespaceImpl implements Namespace {
         if (this.getClass() != other.getClass()) {
             return false;
         }
-        return this.nativePtr == ((NamespaceImpl) other).nativePtr;
+        return this.nativeRef == ((NamespaceImpl) other).nativeRef;
     }
 
     @Override
     public int hashCode() {
-        return Long.valueOf(this.nativePtr).hashCode();
+        return Long.valueOf(this.nativeRef).hashCode();
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

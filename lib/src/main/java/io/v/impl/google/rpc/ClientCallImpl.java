@@ -21,16 +21,16 @@ import java.lang.reflect.Type;
 
 public class ClientCallImpl implements ClientCall {
     private final VContext ctx;
-    private final long nativePtr;
+    private final long nativeRef;
     private final Stream stream;
 
-    private native void nativeCloseSend(long nativePtr, Callback<Void> callback);
-    private native void nativeFinish(long nativePtr, int numResults, Callback<byte[][]> callback);
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeCloseSend(long nativeRef, Callback<Void> callback);
+    private native void nativeFinish(long nativeRef, int numResults, Callback<byte[][]> callback);
+    private native void nativeFinalize(long nativeRef);
 
-    private ClientCallImpl(VContext ctx, long nativePtr, Stream stream) {
+    private ClientCallImpl(VContext ctx, long nativeRef, Stream stream) {
         this.ctx = ctx;
-        this.nativePtr = nativePtr;
+        this.nativeRef = nativeRef;
         this.stream = stream;
     }
 
@@ -45,13 +45,13 @@ public class ClientCallImpl implements ClientCall {
     @Override
     public ListenableFuture<Void> closeSend() {
         ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
-        nativeCloseSend(nativePtr, callback);
+        nativeCloseSend(nativeRef, callback);
         return callback.getFuture(ctx);
     }
     @Override
     public ListenableFuture<Object[]> finish(final Type[] types) {
         ListenableFutureCallback<byte[][]> callback = new ListenableFutureCallback<>();
-        nativeFinish(nativePtr, types.length, callback);
+        nativeFinish(nativeRef, types.length, callback);
         return VFutures.withUserLandChecks(ctx,
                 Futures.transform(callback.getVanillaFuture(),
                         new AsyncFunction<byte[][], Object[]>() {
@@ -73,6 +73,6 @@ public class ClientCallImpl implements ClientCall {
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

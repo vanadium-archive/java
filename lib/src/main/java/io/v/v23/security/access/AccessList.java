@@ -18,12 +18,12 @@ import java.util.List;
 public class AccessList extends WireAccessList implements Authorizer {
     private static final long serialVersionUID = 1L;
 
-    private final long nativePtr;
+    private final long nativeRef;
 
     private native long nativeCreate() throws VException;
-    private native boolean nativeIncludes(long nativePtr, String[] blessings) throws VException;
-    private native void nativeAuthorize(long nativePtr, VContext context, Call call);
-    private native void nativeFinalize(long nativePtr);
+    private native boolean nativeIncludes(long nativeRef, String[] blessings) throws VException;
+    private native void nativeAuthorize(long nativeRef, VContext context, Call call);
+    private native void nativeFinalize(long nativeRef);
 
     /**
      * Creates a new {@link AccessList} object.
@@ -34,7 +34,7 @@ public class AccessList extends WireAccessList implements Authorizer {
     public AccessList(List<BlessingPattern> in, List<String> notIn) {
         super(in, notIn);
         try {
-            this.nativePtr = nativeCreate();
+            this.nativeRef = nativeCreate();
         } catch (VException e) {
             throw new RuntimeException("Couldn't create native AccessList", e);
         }
@@ -54,7 +54,7 @@ public class AccessList extends WireAccessList implements Authorizer {
      */
     public boolean includes(String... blessings) {
         try {
-            return nativeIncludes(this.nativePtr, blessings);
+            return nativeIncludes(this.nativeRef, blessings);
         } catch (VException e) {
             throw new RuntimeException("Couldn't test for access list inclusion", e);
         }
@@ -69,11 +69,11 @@ public class AccessList extends WireAccessList implements Authorizer {
      */
     @Override
     public void authorize(VContext context, Call call) throws VException {
-        nativeAuthorize(this.nativePtr, context, call);
+        nativeAuthorize(this.nativeRef, context, call);
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

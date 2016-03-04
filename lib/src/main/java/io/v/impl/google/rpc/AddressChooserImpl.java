@@ -13,21 +13,21 @@ import io.v.v23.verror.VException;
  * code for most of its functionalities.
  */
 public class AddressChooserImpl implements AddressChooser {
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private native NetworkAddress[] nativeChoose(long nativePtr,
+    private native NetworkAddress[] nativeChoose(long nativeRef,
             String protocol, NetworkAddress[] candidates) throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private AddressChooserImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private AddressChooserImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
     @Override
     public NetworkAddress[] choose(String protocol, NetworkAddress[] candidates) throws VException {
-        return nativeChoose(this.nativePtr, protocol, candidates);
+        return nativeChoose(this.nativeRef, protocol, candidates);
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

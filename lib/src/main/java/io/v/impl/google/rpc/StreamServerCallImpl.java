@@ -18,14 +18,14 @@ import io.v.v23.security.Call;
 import java.lang.reflect.Type;
 
 public class StreamServerCallImpl implements StreamServerCall {
-    private final long nativePtr;
+    private final long nativeRef;
     private final Stream stream;
     private final ServerCall serverCall;
 
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private StreamServerCallImpl(long nativePtr, Stream stream, ServerCall serverCall) {
-        this.nativePtr = nativePtr;
+    private StreamServerCallImpl(long nativeRef, Stream stream, ServerCall serverCall) {
+        this.nativeRef = nativeRef;
         this.stream = stream;
         this.serverCall = serverCall;
     }
@@ -69,6 +69,6 @@ public class StreamServerCallImpl implements StreamServerCall {
     // Implements java.lang.Object.
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

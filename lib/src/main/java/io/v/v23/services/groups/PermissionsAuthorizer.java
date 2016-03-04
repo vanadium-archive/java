@@ -45,16 +45,16 @@ public class PermissionsAuthorizer implements Authorizer {
         }
     }
 
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private native void nativeAuthorize(long nativePtr, VContext ctx, Call call) throws VException;
+    private native void nativeAuthorize(long nativeRef, VContext ctx, Call call) throws VException;
 
-    private PermissionsAuthorizer(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private PermissionsAuthorizer(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     @Override
     public void authorize(VContext ctx, Call call) throws VException {
-        nativeAuthorize(nativePtr, ctx, call);
+        nativeAuthorize(nativeRef, ctx, call);
     }
 }

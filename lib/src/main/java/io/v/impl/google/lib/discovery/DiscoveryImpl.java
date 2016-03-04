@@ -22,30 +22,30 @@ import io.v.v23.verror.VException;
 import io.v.impl.google.ListenableFutureCallback;
 
 class DiscoveryImpl implements Discovery {
-    private final long nativePtr;
+    private final long nativeRef;
 
     private native void nativeAdvertise(
-            long nativePtr,
+            long nativeRef,
             VContext ctx,
             Advertisement ad,
             List<BlessingPattern> visibility,
             ListenableFutureCallback<Void> cb)
             throws VException;
 
-    private native InputChannel<Update> nativeScan(long nativePtr, VContext ctx, String query)
+    private native InputChannel<Update> nativeScan(long nativeRef, VContext ctx, String query)
             throws VException;
 
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
-    private DiscoveryImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private DiscoveryImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     @Override
     public ListenableFuture<Void> advertise(
             VContext ctx, Advertisement ad, List<BlessingPattern> visibility) throws VException {
         ListenableFutureCallback<Void> cb = new ListenableFutureCallback<>();
-        nativeAdvertise(nativePtr, ctx, ad, visibility, cb);
+        nativeAdvertise(nativeRef, ctx, ad, visibility, cb);
         return Futures.withFallback(
                 cb.getFuture(ctx),
                 new FutureFallback<Void>() {
@@ -60,12 +60,12 @@ class DiscoveryImpl implements Discovery {
 
     @Override
     public InputChannel<Update> scan(VContext ctx, String query) throws VException {
-        return nativeScan(nativePtr, ctx, query);
+        return nativeScan(nativeRef, ctx, query);
     }
 
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

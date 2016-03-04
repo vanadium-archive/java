@@ -82,7 +82,7 @@ import java.lang.reflect.Type;
 public class PermissionsAuthorizer implements Authorizer {
     private static native PermissionsAuthorizer nativeCreate(Permissions perms, VdlType type)
             throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeFinalize(long nativeRef);
 
     /**
      * Creates a new {@link PermissionsAuthorizer} authorizer.
@@ -103,21 +103,21 @@ public class PermissionsAuthorizer implements Authorizer {
         }
     }
 
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private native void nativeAuthorize(long nativePtr, VContext ctx, Call call) throws VException;
+    private native void nativeAuthorize(long nativeRef, VContext ctx, Call call) throws VException;
 
-    private PermissionsAuthorizer(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private PermissionsAuthorizer(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
 
     @Override
     public void authorize(VContext ctx, Call call) throws VException {
-        nativeAuthorize(nativePtr, ctx, call);
+        nativeAuthorize(nativeRef, ctx, call);
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

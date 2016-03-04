@@ -13,11 +13,11 @@ public class BlessingPattern extends WireBlessingPattern {
     private static final long serialVersionUID = 1L;
     private static native long nativeCreate(String value) throws VException;
 
-    private final long nativePtr;
-    private native boolean nativeIsMatchedBy(long nativePtr, String[] blessings) throws VException;
-    private native boolean nativeIsValid(long nativePtr);
-    private native BlessingPattern nativeMakeNonExtendable(long nativePtr) throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private final long nativeRef;
+    private native boolean nativeIsMatchedBy(long nativeRef, String[] blessings) throws VException;
+    private native boolean nativeIsValid(long nativeRef);
+    private native BlessingPattern nativeMakeNonExtendable(long nativeRef) throws VException;
+    private native void nativeFinalize(long nativeRef);
 
     /**
      * Constructs a new {@link BlessingPattern} from the provided string.
@@ -27,7 +27,7 @@ public class BlessingPattern extends WireBlessingPattern {
     public BlessingPattern(String value) {
         super(value);
         try {
-            this.nativePtr = nativeCreate(value);
+            this.nativeRef = nativeCreate(value);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create native BlessingPattern", e);
         }
@@ -37,9 +37,9 @@ public class BlessingPattern extends WireBlessingPattern {
         this(wire.getValue());
     }
 
-    private BlessingPattern(long nativePtr, String value) {
+    private BlessingPattern(long nativeRef, String value) {
         super(value);
-        this.nativePtr = nativePtr;
+        this.nativeRef = nativeRef;
     }
 
     /**
@@ -50,7 +50,7 @@ public class BlessingPattern extends WireBlessingPattern {
      */
     public boolean isMatchedBy(String... blessings) {
         try {
-            return nativeIsMatchedBy(nativePtr, blessings);
+            return nativeIsMatchedBy(nativeRef, blessings);
         } catch (VException e) {
             throw new RuntimeException("Couldn't check blessings match", e);
         }
@@ -61,7 +61,7 @@ public class BlessingPattern extends WireBlessingPattern {
      * sequences that will cause the {@link BlessingPattern} to never match any valid blessings.
      */
     public boolean isValid() {
-        return nativeIsValid(nativePtr);
+        return nativeIsValid(nativeRef);
     }
 
     /**
@@ -82,18 +82,18 @@ public class BlessingPattern extends WireBlessingPattern {
      */
     public BlessingPattern makeNonExtendable() {
         try {
-            return nativeMakeNonExtendable(nativePtr);
+            return nativeMakeNonExtendable(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't make blessing pattern non-extendable", e);
         }
     }
 
-    private long nativePtr() {
-        return nativePtr;
+    private long nativeRef() {
+        return nativeRef;
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr);
+        nativeFinalize(nativeRef);
     }
 }

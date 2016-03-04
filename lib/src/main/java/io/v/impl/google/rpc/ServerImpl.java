@@ -9,29 +9,29 @@ import io.v.v23.rpc.ServerStatus;
 import io.v.v23.verror.VException;
 
 public class ServerImpl implements Server {
-    private final long nativePtr;
+    private final long nativeRef;
 
-    private native void nativeAddName(long nativePtr, String name) throws VException;
-    private native void nativeRemoveName(long nativePtr, String name);
-    private native ServerStatus nativeGetStatus(long nativePtr) throws VException;
-    private native void nativeFinalize(long nativePtr);
+    private native void nativeAddName(long nativeRef, String name) throws VException;
+    private native void nativeRemoveName(long nativeRef, String name);
+    private native ServerStatus nativeGetStatus(long nativeRef) throws VException;
+    private native void nativeFinalize(long nativeRef);
 
-    private ServerImpl(long nativePtr) {
-        this.nativePtr = nativePtr;
+    private ServerImpl(long nativeRef) {
+        this.nativeRef = nativeRef;
     }
     // Implement io.v.v23.rpc.Server.
     @Override
     public void addName(String name) throws VException {
-        nativeAddName(this.nativePtr, name);
+        nativeAddName(this.nativeRef, name);
     }
     @Override
     public void removeName(String name) {
-        nativeRemoveName(this.nativePtr, name);
+        nativeRemoveName(this.nativeRef, name);
     }
     @Override
     public ServerStatus getStatus() {
         try {
-            return nativeGetStatus(this.nativePtr);
+            return nativeGetStatus(this.nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get status", e);
         }
@@ -42,14 +42,14 @@ public class ServerImpl implements Server {
         if (this == other) return true;
         if (other == null) return false;
         if (this.getClass() != other.getClass()) return false;
-        return this.nativePtr == ((ServerImpl) other).nativePtr;
+        return this.nativeRef == ((ServerImpl) other).nativeRef;
     }
     @Override
     public int hashCode() {
-        return Long.valueOf(this.nativePtr).hashCode();
+        return Long.valueOf(this.nativeRef).hashCode();
     }
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativePtr);
+        nativeFinalize(this.nativeRef);
     }
 }

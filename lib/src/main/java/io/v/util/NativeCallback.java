@@ -11,27 +11,27 @@ import io.v.v23.verror.VException;
  * A {@link Callback} that calls native functions to handle success/failures.
  */
 class NativeCallback<T> implements Callback<T> {
-    private long nativeSuccessPtr;
-    private long nativeFailurePtr;
+    private long nativeSuccessRef;
+    private long nativeFailureRef;
 
-    private native void nativeOnSuccess(long nativeSuccessPtr, T result);
-    private native void nativeOnFailure(long nativeFailurePtr, VException error);
-    private native void nativeFinalize(long nativeSuccessPtr, long nativeFailurePtr);
+    private native void nativeOnSuccess(long nativeSuccessRef, T result);
+    private native void nativeOnFailure(long nativeFailureRef, VException error);
+    private native void nativeFinalize(long nativeSuccessRef, long nativeFailureRef);
 
-    private NativeCallback(long nativeSuccessPtr, long nativeFailurePtr) {
-        this.nativeSuccessPtr = nativeSuccessPtr;
-        this.nativeFailurePtr = nativeFailurePtr;
+    private NativeCallback(long nativeSuccessRef, long nativeFailureRef) {
+        this.nativeSuccessRef = nativeSuccessRef;
+        this.nativeFailureRef = nativeFailureRef;
     }
     @Override
     public void onSuccess(T result) {
-        nativeOnSuccess(nativeSuccessPtr, result);
+        nativeOnSuccess(nativeSuccessRef, result);
     }
     @Override
     public void onFailure(VException error) {
-        nativeOnFailure(nativeFailurePtr, error);
+        nativeOnFailure(nativeFailureRef, error);
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativeSuccessPtr, nativeFailurePtr);
+        nativeFinalize(nativeSuccessRef, nativeFailureRef);
     }
 }

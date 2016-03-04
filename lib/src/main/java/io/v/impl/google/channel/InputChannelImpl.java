@@ -16,23 +16,23 @@ import io.v.v23.rpc.Callback;
  */
 class InputChannelImpl<T> implements InputChannel<T> {
     private final VContext ctx;
-    private final long nativeRecvPtr;
+    private final long nativeRef;
 
-    private native void nativeRecv(long nativeRecvPtr, Callback<T> callback);
-    private native void nativeFinalize(long nativeRecvPtr);
+    private native void nativeRecv(long nativeRef, Callback<T> callback);
+    private native void nativeFinalize(long nativeRef);
 
-    private InputChannelImpl(VContext ctx, long nativeRecvPtr) {
+    private InputChannelImpl(VContext ctx, long nativeRef) {
         this.ctx = ctx;
-        this.nativeRecvPtr = nativeRecvPtr;
+        this.nativeRef = nativeRef;
     }
     @Override
     public ListenableFuture<T> recv() {
         ListenableFutureCallback<T> callback = new ListenableFutureCallback<>();
-        nativeRecv(nativeRecvPtr, callback);
+        nativeRecv(nativeRef, callback);
         return callback.getFuture(ctx);
     }
     @Override
     protected void finalize() {
-        nativeFinalize(nativeRecvPtr);
+        nativeFinalize(nativeRef);
     }
 }

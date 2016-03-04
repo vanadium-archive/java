@@ -110,31 +110,31 @@ public class VContext {
         }
     }
 
-    private long nativePtr;
-    private long nativeCancelPtr;  // may be 0
+    private long nativeRef;
+    private long nativeCancelRef;  // may be 0
 
-    private native void nativeCancel(long nativeCancelPtr);
-    private native boolean nativeIsCanceled(long nativePtr);
-    private native DateTime nativeDeadline(long nativePtr) throws VException;
-    private native void nativeOnDone(long nativePtr, Callback<DoneReason> callback);
-    private native Object nativeValue(long nativePtr, String keySign) throws VException;
-    private native VContext nativeWithCancel(long nativePtr) throws VException;
-    private native VContext nativeWithDeadline(long nativePtr, DateTime deadline) throws VException;
-    private native VContext nativeWithTimeout(long nativePtr, Duration timeout) throws VException;
-    private native VContext nativeWithValue(long nativePtr, long nativeCancelPtr, String keySign, Object value)
+    private native void nativeCancel(long nativeCancelRef);
+    private native boolean nativeIsCanceled(long nativeRef);
+    private native DateTime nativeDeadline(long nativeRef) throws VException;
+    private native void nativeOnDone(long nativeRef, Callback<DoneReason> callback);
+    private native Object nativeValue(long nativeRef, String keySign) throws VException;
+    private native VContext nativeWithCancel(long nativeRef) throws VException;
+    private native VContext nativeWithDeadline(long nativeRef, DateTime deadline) throws VException;
+    private native VContext nativeWithTimeout(long nativeRef, Duration timeout) throws VException;
+    private native VContext nativeWithValue(long nativeRef, long nativeCancelRef, String keySign, Object value)
             throws VException;
-    private native void nativeFinalize(long nativePtr, long nativeCancelPtr);
+    private native void nativeFinalize(long nativeRef, long nativeCancelRef);
 
-    protected VContext(long nativePtr, long nativeCancelPtr) {
-        this.nativePtr = nativePtr;
-        this.nativeCancelPtr = nativeCancelPtr;
+    protected VContext(long nativeRef, long nativeCancelRef) {
+        this.nativeRef = nativeRef;
+        this.nativeCancelRef = nativeCancelRef;
     }
 
     /**
      * Returns {@code true} iff this context is cancelable.
      */
     public boolean isCancelable() {
-        return nativeCancelPtr != 0;
+        return nativeCancelRef != 0;
     }
 
     /**
@@ -144,7 +144,7 @@ public class VContext {
      * {@link #isCancelable() cancelable}.
      */
     public boolean isCanceled() {
-        return nativeIsCanceled(nativePtr);
+        return nativeIsCanceled(nativeRef);
     }
 
     /**
@@ -155,7 +155,7 @@ public class VContext {
      */
     public void cancel() {
         Preconditions.checkState(isCancelable(), "Context isn't cancelable.");
-        nativeCancel(nativeCancelPtr);
+        nativeCancel(nativeCancelRef);
     }
 
     /**
@@ -169,7 +169,7 @@ public class VContext {
      */
     public ListenableFuture<DoneReason> onDone() {
         ListenableFutureCallback<DoneReason> callback = new ListenableFutureCallback<>();
-        nativeOnDone(nativePtr, callback);
+        nativeOnDone(nativeRef, callback);
         return callback.getFutureOnExecutor(this);
     }
 
@@ -179,7 +179,7 @@ public class VContext {
      */
     public DateTime deadline() {
         try {
-            return nativeDeadline(nativePtr);
+            return nativeDeadline(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't get deadline", e);
         }
@@ -194,7 +194,7 @@ public class VContext {
      */
     public Object value(Object key) {
         try {
-            return nativeValue(nativePtr, keySignature(key));
+            return nativeValue(nativeRef, keySignature(key));
         } catch (VException e) {
             throw new RuntimeException("Couldn't get value: ", e);
         }
@@ -209,7 +209,7 @@ public class VContext {
      */
     public VContext withCancel() {
         try {
-            return nativeWithCancel(nativePtr);
+            return nativeWithCancel(nativeRef);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create cancelable context", e);
         }
@@ -229,7 +229,7 @@ public class VContext {
      */
     public VContext withDeadline(DateTime deadline) {
         try {
-            return nativeWithDeadline(nativePtr, deadline);
+            return nativeWithDeadline(nativeRef, deadline);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create context with deadline", e);
         }
@@ -249,7 +249,7 @@ public class VContext {
      */
     public VContext withTimeout(Duration timeout) {
         try {
-            return nativeWithTimeout(nativePtr, timeout);
+            return nativeWithTimeout(nativeRef, timeout);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create context with timeout", e);
         }
@@ -278,7 +278,7 @@ public class VContext {
      */
     public VContext withValue(Object key, Object value) {
         try {
-            return nativeWithValue(nativePtr, nativeCancelPtr, keySignature(key), value);
+            return nativeWithValue(nativeRef, nativeCancelRef, keySignature(key), value);
         } catch (VException e) {
             throw new RuntimeException("Couldn't create context with data:", e);
         }
@@ -291,16 +291,16 @@ public class VContext {
         return key.getClass().getName() + ":" + key.hashCode();
     }
 
-    private long nativePtr() {
-        return nativePtr;
+    private long nativeRef() {
+        return nativeRef;
     }
 
-    private long nativeCancelPtr() {
-        return nativeCancelPtr;
+    private long nativeCancelRef() {
+        return nativeCancelRef;
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(nativePtr, nativeCancelPtr);
+        nativeFinalize(nativeRef, nativeCancelRef);
     }
 }
