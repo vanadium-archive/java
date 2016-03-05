@@ -27,8 +27,8 @@ import rx.subjects.ReplaySubject;
  *
  * The default delay is 500 ms.
  *
- * A simple debounce on the uplink or downlink doesn't solve the problem because it effectively just
- * adds a delay to the boundary condition. To prevent this, any update from the model must be
+ * A simple debounce on the read link or write link doesn't solve the problem because it effectively
+ * just adds a delay to the boundary condition. To prevent this, any update from the model must be
  * throttled if there was a recent update from the view.
  *
  * Unfortunately for rapid concurrent updates this can result in divergence which should be handled
@@ -46,13 +46,14 @@ import rx.subjects.ReplaySubject;
  * {@link BakuActivityTrait#binder() binder()}.{@link
  *         BindingBuilder#onKey(java.lang.String) onKey}("foo")
  *         .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
- *         coordinators}({@link DebouncingCoordinator#DebouncingCoordinator(TwoWayBinding)
- *         DebouncingCoordinator::new})
+ *         coordinators}({@link
+ *         DeferReadOnWriteCoordinator#DeferReadOnWriteCoordinator(TwoWayBinding)
+ *         DeferReadOnWriteCoordinator::new})
  *         .{@link ScalarBindingBuilder#bindTo(View) bindTo}(myView);
  * ```
  */
 @RequiredArgsConstructor
-public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
+public class DeferReadOnWriteCoordinator<T> implements TwoWayBinding<T> {
     public static final Duration DEFAULT_IO_DEBOUNCE = Duration.millis(500);
 
     private final TwoWayBinding<T> mChild;
@@ -68,7 +69,7 @@ public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
     /**
      * A reference to this constructor can be used as a {@link CoordinatorChain}.
      */
-    public DebouncingCoordinator(final TwoWayBinding<T> child) {
+    public DeferReadOnWriteCoordinator(final TwoWayBinding<T> child) {
         this(child, DEFAULT_IO_DEBOUNCE);
     }
 
@@ -84,12 +85,12 @@ public class DebouncingCoordinator<T> implements TwoWayBinding<T> {
     }
 
     @Override
-    public Observable<SingleWatchEvent<T>> downlink() {
-        return mChild.downlink().debounce(s -> getDebounceWindow());
+    public Observable<SingleWatchEvent<T>> linkRead() {
+        return mChild.linkRead().debounce(s -> getDebounceWindow());
     }
 
     @Override
-    public Subscription uplink(final Observable<T> rxData) {
-        return mChild.uplink(rxData.doOnNext(d -> putDebounceWindow()));
+    public Subscription linkWrite(final Observable<T> rxData) {
+        return mChild.linkWrite(rxData.doOnNext(d -> putDebounceWindow()));
     }
 }

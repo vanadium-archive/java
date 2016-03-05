@@ -37,7 +37,7 @@ public class TextViewBindingTermini {
     public static Subscription bind(final TextView textView, final TwoWayBinding<String> binding,
                                     final Action1<Throwable> onError) {
         return new CompositeSubscription(
-                bindRead(textView, binding.downlink(), onError),
-                binding.uplink(bindWrite(textView)));
+                bindRead(textView, binding.linkRead(), onError),
+                binding.linkWrite(bindWrite(textView)));
     }
 }

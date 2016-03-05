@@ -171,11 +171,11 @@ public class ScalarBindingBuilder<T>
      *
      * * {@link #defaultValue(Object) defaultValue}: `""`
      * * {@link #deleteValue(Object) deleteValue}: `null`
-     * * {@link #coordinators(Iterable) coordinators}: {@link DebouncingCoordinator}, and
+     * * {@link #coordinators(Iterable) coordinators}: {@link DeferReadOnWriteCoordinator}, and
      *   ensures that there is a {@link SuppressWriteOnReadCoordinator} somewhere in the chain,
      *   injecting it right above the `TextView` if absent.
      *
-     * The coordination policy must end its downlink on the Android main thread.
+     * The coordination policy must end its read pipeline on the Android main thread.
      * @todo(rosswang): provide a Coordinator that coerces this.
      *
      * If {@link BindingBuilder#subscriptionParent(CompositeSubscription) subscriptionParent} is
@@ -197,7 +197,7 @@ public class ScalarBindingBuilder<T>
             }
         }
         if (mCoordinators.isEmpty()) {
-            core = new DebouncingCoordinator<>(core);
+            core = new DeferReadOnWriteCoordinator<>(core);
         }
         if (!hasSuppressWriteOnRead) {
             core = new SuppressWriteOnReadCoordinator<>(core);

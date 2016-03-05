@@ -71,12 +71,12 @@ public class SyncbaseBindingTermini {
             final T deleteValue, final Action1<Throwable> onError) {
         return new TwoWayBinding<T>() {
             @Override
-            public Observable<SingleWatchEvent<T>> downlink() {
+            public Observable<SingleWatchEvent<T>> linkRead() {
                 return bindRead(rxTable, key, type, defaultValue);
             }
 
             @Override
-            public Subscription uplink(final Observable<T> rxData) {
+            public Subscription linkWrite(final Observable<T> rxData) {
                 return bindWrite(rxTable, rxData, key, type, deleteValue, onError);
             }
         };

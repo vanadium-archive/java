@@ -46,8 +46,8 @@ public class SuppressWriteOnReadCoordinator<T> implements TwoWayBinding<T> {
     private boolean mSuppressWrites;
 
     @Override
-    public Observable<SingleWatchEvent<T>> downlink() {
-        final Observable<SingleWatchEvent<T>> childDownlink = mChild.downlink();
+    public Observable<SingleWatchEvent<T>> linkRead() {
+        final Observable<SingleWatchEvent<T>> childDownlink = mChild.linkRead();
         return Observable.create(s -> s.add(childDownlink.subscribe(x -> {
             mSuppressWrites = true;
             s.onNext(x);
@@ -56,7 +56,7 @@ public class SuppressWriteOnReadCoordinator<T> implements TwoWayBinding<T> {
     }
 
     @Override
-    public Subscription uplink(Observable<T> rxData) {
-        return mChild.uplink(rxData.filter(x -> !mSuppressWrites));
+    public Subscription linkWrite(Observable<T> rxData) {
+        return mChild.linkWrite(rxData.filter(x -> !mSuppressWrites));
     }
 }
