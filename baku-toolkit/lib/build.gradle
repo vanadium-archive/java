@@ -150,12 +150,43 @@ task sourcesJar(type: Jar) {
     classifier 'sources'
 }
 
-task javadoc(type: FullProcessingJavadoc) {
+task delombok {
+    inputs.files android.sourceSets.main.java.srcDirs
+    outputs.dir('build/delombok')
+
     android.libraryVariants.all { variant ->
         dependsOn variant.javaCompile
     }
 
-    source = android.sourceSets.main.java.srcDirs
+    ant.taskdef(
+            name: 'delombok',
+            classname: 'lombok.delombok.ant.Tasks$Delombok',
+            classpath: configurations.provided.asPath
+    )
+
+    doLast {
+        // This must happen after compile because compile injects some generated classpath.
+        ext.classpath = files(android.bootClasspath)
+        android.libraryVariants.all { variant ->
+            classpath += files(
+                    variant.javaCompile.classpath.files,
+                    variant.javaCompile.destinationDir // for io.v.baku.toolkit.R
+            )
+        }
+
+        ant.delombok(
+                from:inputs.files.asPath,
+                to:outputs.files.asPath,
+                classpath: classpath.asPath) {
+            format(value: 'suppressWarnings:skip')
+            format(value: 'danceAroundIdeChecks:skip')
+            format(value: 'javaLangAsFQN:skip')
+        }
+    }
+}
+
+task javadoc(type: FullProcessingJavadoc) {
+    source = delombok.outputs.files
     title "Baku Toolkit ${version} API"
 
     options {
@@ -184,16 +215,9 @@ task javadoc(type: FullProcessingJavadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
     }
 
-    classpath += files(android.getBootClasspath())
+    // This has to happen after the delombok task has actually run but before Javadoc generation.
     doFirst {
-        // This must happen after compile because compile injects some generated classpath, but
-        // before Javadoc generation.
-        android.libraryVariants.all { variant ->
-            classpath += files(
-                    variant.javaCompile.classpath.files,
-                    variant.javaCompile.destinationDir // for io.v.baku.toolkit.R
-            )
-        }
+        classpath += delombok.classpath
     }
 }
 
@@ -206,7 +230,7 @@ class FullProcessingJavadoc extends Javadoc {
 
     @Override
     public void setSource(Object sourceDirs) {
-        this.sourceDirs = sourceDirs
+        this.sourceDirs = project.files(sourceDirs).files
         super.setSource(sourceDirs)
     }
 
