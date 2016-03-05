@@ -176,11 +176,11 @@ public class ScalarBindingBuilder<T>
      *   injecting it right above the `TextView` if absent.
      *
      * The coordination policy must end its read pipeline on the Android main thread.
-     * @todo(rosswang): provide a Coordinator that coerces this.
+     * <!-- todo(rosswang): provide a Coordinator that coerces this. -->
      *
      * If {@link BindingBuilder#subscriptionParent(CompositeSubscription) subscriptionParent} is
      * set, this method adds the generated binding to it.
-     * @todo(rosswang): produce a ScalarBinding, and allow mutable bindings.
+     * <!-- todo(rosswang): produce a ScalarBinding, and allow mutable bindings. -->
      */
     public ScalarBindingBuilder<T> bindTo(final TextView textView) {
         @SuppressWarnings("unchecked")
