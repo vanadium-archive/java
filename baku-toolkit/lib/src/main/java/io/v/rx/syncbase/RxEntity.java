@@ -12,8 +12,8 @@ public abstract class RxEntity<T, P> {
     public abstract Observable<T> mapFrom(P parent);
 
     /**
-     * This is a shortcut for {@code getObservable().first()}, to reduce the likelihood of
-     * forgetting to filter by {@code first}. Most commands should be run in this way.
+     * This is a shortcut for `getObservable().{@link Observable#first() first}()`, to reduce the
+     * likelihood of forgetting to filter by `first`. Most commands should be run in this way.
      */
     public Observable<T> once() {
         return getObservable().first();
