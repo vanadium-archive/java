@@ -116,22 +116,24 @@ public class NoSql {
 
                     @Override
                     public void onSuccess(Void result) {
-                        Futures.addCallback(batch.commit(ctx), new FutureCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void result) {
-                                ret.set(true);  // success
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                if (t instanceof ConcurrentBatchException) {
-                                    // retry
-                                    ret.set(false);
-                                } else {
-                                    ret.setException(t);
+                        Futures.addCallback(
+                            opts.getReadOnly() ? batch.abort(ctx) : batch.commit(ctx),
+                            new FutureCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void result) {
+                                    ret.set(true);  // success
                                 }
-                            }
-                        });
+
+                                @Override
+                                public void onFailure(Throwable t) {
+                                    if (t instanceof ConcurrentBatchException) {
+                                        // retry
+                                        ret.set(false);
+                                    } else {
+                                        ret.setException(t);
+                                    }
+                                }
+                            });
                     }
                 });
             }

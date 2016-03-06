@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.InputChannel;
@@ -15,8 +17,10 @@ import io.v.v23.InputChannels;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
+import io.v.v23.services.syncbase.nosql.BatchOptions;
 import io.v.v23.services.syncbase.nosql.BlobRef;
 import io.v.v23.services.syncbase.nosql.KeyValue;
+import io.v.v23.services.syncbase.nosql.ReadOnlyBatchException;
 import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.nosql.TableRow;
 import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
@@ -27,6 +31,7 @@ import io.v.v23.syncbase.nosql.BlobWriter;
 import io.v.v23.syncbase.nosql.ChangeType;
 import io.v.v23.syncbase.nosql.Database;
 import io.v.v23.syncbase.nosql.DatabaseCore;
+import io.v.v23.syncbase.nosql.NoSql;
 import io.v.v23.syncbase.nosql.Row;
 import io.v.v23.syncbase.nosql.RowRange;
 import io.v.v23.syncbase.nosql.Syncgroup;
@@ -41,6 +46,7 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.nosql.WatchChange;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.CanceledException;
+import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 import junit.framework.TestCase;
@@ -353,6 +359,84 @@ public class SyncbaseTest extends TestCase {
         } catch (VException e) {
             // ok
         }
+    }
+
+    public void testRunInBatch() throws Exception {
+        final Database d = createDatabase(createApp(createService()));
+        Table table = createTable(d);
+
+        sync(NoSql.runInBatch(ctx, d, new BatchOptions(), new NoSql.BatchOperation() {
+            private int retries = 0;
+            @Override
+            public ListenableFuture<Void> run(BatchDatabase b) {
+                ++retries;
+                String fooKey = String.format("foo-%d", retries);
+                String barKey = String.format("bar-%d", retries);
+                try {
+                    // Read foo. It does not exist.
+                    try {
+                        sync(b.getTable(TABLE_NAME).get(ctx, fooKey, String.class));
+                        throw new VException("Expected b.get() to fail with NoExistException");
+                    } catch (NoExistException e) {
+                        // ok
+                    }
+                    // If we need to fail the commit, write to foo in a separate concurrent batch.
+                    if (retries < 2) {
+                        sync(d.getTable(TABLE_NAME).put(ctx, fooKey, "foo", String.class));
+                    }
+                    // Write to bar.
+                    sync(b.getTable(TABLE_NAME).put(ctx, barKey, "bar", String.class));
+                } catch (VException e) {
+                    return Futures.immediateFailedFuture(e);
+                }
+                return Futures.immediateFuture(null);
+            }
+        }));
+
+        // First try failed (wrote foo), second succeeded (bar commit succeeded).
+        assertThat(sync(InputChannels.asList(table.scan(ctx, RowRange.prefix("")))))
+                .containsExactly(
+                new KeyValue("bar-2", VomUtil.encode("bar", String.class)),
+                new KeyValue("foo-1", VomUtil.encode("foo", String.class)));
+    }
+
+    public void testRunInBatchReadOnly() throws Exception {
+        final Database d = createDatabase(createApp(createService()));
+        Table table = createTable(d);
+        sync(table.put(ctx, "foo", "foo", String.class));
+
+        sync(NoSql.runInBatch(ctx, d, new BatchOptions("", true), new NoSql.BatchOperation() {
+            @Override
+            public ListenableFuture<Void> run(BatchDatabase b) {
+                try {
+                    // Read foo.
+                    Object before = sync(b.getTable(TABLE_NAME).get(ctx, "foo", String.class));
+                    // Write to foo in a separate concurrent batch. It should not cause a retry
+                    // since readonly batches are not committed.
+                    sync(d.getTable(TABLE_NAME).put(ctx, "foo", "oof", String.class));
+                    // Read foo again. Batch should not see the changed value.
+                    Object after = sync(b.getTable(TABLE_NAME).get(ctx, "foo", String.class));
+                    if (!before.equals(after)) {
+                        throw new VException("batch should not see concurrently changed value");
+                    }
+                    // Try writing to bar. This should fail since the batch is readonly.
+                    try {
+                        sync(b.getTable(TABLE_NAME).put(ctx, "bar", "bar", String.class));
+                        throw new VException("Expected b.put() to fail with ReadOnlyBatchException");
+                    } catch (ReadOnlyBatchException e) {
+                        // ok
+                    }
+                } catch (VException e) {
+                    return Futures.immediateFailedFuture(e);
+                }
+                return Futures.immediateFuture(null);
+            }
+        }));
+
+        // Single uncommitted iteration.
+        assertThat(sync(InputChannels.asList(table.scan(ctx, RowRange.prefix("")))))
+                .containsExactly(
+                new KeyValue("foo", VomUtil.encode("oof", String.class)));
     }
 
     public void testSyncgroup() throws Exception {
