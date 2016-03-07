@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class ServerStatus {
     private final ServerState state;
     private final boolean servesMountTable;
-    private final MountStatus[] mounts;
+    private final PublisherEntry[] entries;
     private final String[] endpoints;
     private final Map<Address, VException> lnErrors;
     private final Map<String, VException> proxyErrors;
@@ -30,17 +30,17 @@ public class ServerStatus {
      *
      * @param  state            the current state of the server
      * @param  servesMountTable whether this server serves a mount table
-     * @param  mounts           status of the last mount or unmount operation for every combination
+     * @param  entries           status of the last mount or unmount operation for every combination
      *                          of name and server address being published by this server
      * @param  endpoints        set of endpoints currently registered with the mount table
      * @param  lnErrors         set of errors currently encountered from listening
      * @param  proxyErrors      set of errors currently encountered from listening on proxies
      */
-    public ServerStatus(ServerState state, boolean servesMountTable, MountStatus[] mounts,
+    public ServerStatus(ServerState state, boolean servesMountTable, PublisherEntry[] entries,
             String[] endpoints, Map<Address, VException> lnErrors, Map<String, VException> proxyErrors) {
         this.state = state;
         this.servesMountTable = servesMountTable;
-        this.mounts = mounts == null ? new MountStatus[0] : Arrays.copyOf(mounts, mounts.length);
+        this.entries = entries == null ? new PublisherEntry[0] : Arrays.copyOf(entries, entries.length);
         this.endpoints = endpoints == null ?
                 new String[0] : Arrays.copyOf(endpoints, endpoints.length);
         this.lnErrors = lnErrors;
@@ -65,8 +65,8 @@ public class ServerStatus {
      * Returns the status of the last mount or unmount operation for every combination of name and
      * server address being published by this server.
      */
-    public MountStatus[] getMounts() {
-        return Arrays.copyOf(mounts, mounts.length);
+    public PublisherEntry[] getPublisherStatus() {
+        return Arrays.copyOf(entries, entries.length);
     }
 
     /**
@@ -101,7 +101,7 @@ public class ServerStatus {
     public String toString() {
         return String.format("State: %s, MountTable: %s, Mounts: %s, Endpoints: %s," +
                         " ListenErrors: %s, ProxyErrors: %s",
-            state, servesMountTable, Arrays.toString(mounts),
+            state, servesMountTable, Arrays.toString(entries),
             Arrays.toString(endpoints), lnErrors.toString(), proxyErrors.toString());
     }
 }

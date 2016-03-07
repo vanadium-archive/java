@@ -248,7 +248,7 @@ public class SyncbaseDB implements DB {
 
             // Create the syncgroup.
             final String syncgroupName = NamingUtil.join(
-                    mSyncbaseServer.getStatus().getMounts()[0].getName(),
+                    mSyncbaseServer.getStatus().getPublisherStatus()[0].getName(),
                     "%%sync/syncslides",
                     prefix);
             Log.i(TAG, "Creating syncgroup " + syncgroupName);
