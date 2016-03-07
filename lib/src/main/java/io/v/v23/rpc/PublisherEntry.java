@@ -12,7 +12,7 @@ import io.v.v23.verror.VException;
 /**
  * The status of the last mount or unmount operation for a server.
  */
-public class MountStatus {
+public class PublisherEntry {
     private final String name;
     private final String server;
     private final DateTime lastMount;
@@ -22,7 +22,7 @@ public class MountStatus {
     private final VException lastUnmountError;
 
     /**
-     * Creates a new {@link MountStatus} object.
+     * Creates a new {@link PublisherEntry} object.
      *
      * @param  name             name under which server is mounted
      * @param  server           address under which server is mounted
@@ -32,7 +32,7 @@ public class MountStatus {
      * @param  lastUnmount      time of the last attempted unmount request
      * @param  lastUnmountError any error reported by the last attempted unmount
      */
-    public MountStatus(String name, String server, DateTime lastMount,
+    public PublisherEntry(String name, String server, DateTime lastMount,
         VException lastMountError, Duration ttl, DateTime lastUnmount,
         VException lastUnmountError) {
         this.name = name;
