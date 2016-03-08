@@ -56,7 +56,7 @@ public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
      * Example usage:
      *
      * ```java
-     * dataBinder().{@link BindingBuilder#onKey(java.lang.String) onKey}("myDataRow")
+     * dataBinder().{@link BindingBuilder#forKey(java.lang.String) forKey}("myDataRow")
      *             .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
      *             bindTo}(R.id.myTextView);
      * ```

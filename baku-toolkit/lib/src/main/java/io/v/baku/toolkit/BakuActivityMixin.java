@@ -45,7 +45,7 @@ import rx.subscriptions.Subscriptions;
  *
  *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
  *         mBaku.{@link #dataBinder() dataBinder}()
- *              .{@link BindingBuilder#onKey(java.lang.String) onKey}("myDataRow")
+ *              .{@link BindingBuilder#forKey(java.lang.String) forKey}("myDataRow")
  *              .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
  *                  bindTo}(R.id.myTextView);
  *     }

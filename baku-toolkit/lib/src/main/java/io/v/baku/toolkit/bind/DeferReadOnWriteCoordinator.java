@@ -43,8 +43,8 @@ import rx.subjects.ReplaySubject;
  * binding within a {@link io.v.baku.toolkit.BakuActivityTrait}:
  *
  * ```java
- * {@link BakuActivityTrait#dataBinder() dataBinder()}.{@link BindingBuilder#onKey(java.lang.String)
- *     onKey}("foo")
+ * {@link BakuActivityTrait#dataBinder() dataBinder()}.{@link BindingBuilder#forKey(java.lang.String)
+ *     forKey}("foo")
  *             .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
  *             coordinators}({@link
  *             DeferReadOnWriteCoordinator#DeferReadOnWriteCoordinator(TwoWayBinding)

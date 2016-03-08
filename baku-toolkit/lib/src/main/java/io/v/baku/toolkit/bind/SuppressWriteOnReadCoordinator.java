@@ -30,7 +30,7 @@ import rx.Subscription;
  * binding within a {@link io.v.baku.toolkit.BakuActivityTrait}:
  *
  * ```java
- * {@link BakuActivityTrait#dataBinder() dataBinder()}.{@link BindingBuilder#onKey(java.lang.String)
+ * {@link BakuActivityTrait#dataBinder() dataBinder()}.{@link BindingBuilder#forKey(java.lang.String)
  *     key}("foo")
  *             .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
  *             coordinators}({@link

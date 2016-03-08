@@ -41,7 +41,7 @@ public class CollectionBindingTest extends VAndroidTestCase {
                 .onError(t -> fail(Throwables.getStackTraceAsString(t)))
                 .viewAdapterContext(getContext())
                 .rxTable(mTable)
-                .onPrefix("Good")
+                .forPrefix("Good")
                 .type(String.class)
                 .bindTo(listView)) {
 

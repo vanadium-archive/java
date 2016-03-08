@@ -23,11 +23,12 @@ import rx.subscriptions.CompositeSubscription;
  *
  * Three forms of data binding are currently available:
  *
- * * {@linkplain ScalarBindingBuilder Scalar bindings}, built via the {@link #onKey(String)} method.
- * * {@linkplain PrefixBindingBuilder Prefix bindings}, built via the {@link #onPrefix(String)}
- *   or {@link #onPrefix(PrefixRange)} method. This is a
+ * * {@linkplain ScalarBindingBuilder Scalar bindings}, built via the {@link #forKey(String)}
+ *   method.
+ * * {@linkplain PrefixBindingBuilder Prefix bindings}, built via the {@link #forPrefix(String)}
+ *   or {@link #forPrefix(PrefixRange)} method. This is a
  *   {@linkplain CollectionBindingBuilder collection binding}.
- * * {@linkplain IdListBindingBuilder ID-list bindings}, built via the {@link #onIdList(String)}
+ * * {@linkplain IdListBindingBuilder ID-list bindings}, built via the {@link #forIdList(String)}
  *   method. This is a {@linkplain CollectionBindingBuilder collection binding}.
  */
 public class BindingBuilder implements CommonBindingConfiguration<BindingBuilder> {
@@ -108,33 +109,54 @@ public class BindingBuilder implements CommonBindingConfiguration<BindingBuilder
     }
 
     /**
-     * Invokes a {@link ScalarBindingBuilder} on the given row name (key).
+     * Invokes a {@link ScalarBindingBuilder} from the settings configured on this builder.
      */
-    public <T> ScalarBindingBuilder<T> onKey(final String key) {
-        return new ScalarBindingBuilder<T>(this).key(key);
+    protected <T> ScalarBindingBuilder<T> scalarBinder() {
+        return new ScalarBindingBuilder<>(this);
     }
 
     /**
-     * Invokes a {@link PrefixBindingBuilder} on the given row name prefix.
+     * Invokes a {@link ScalarBindingBuilder} for the given row name (key).
      */
-    public <T, A extends RangeAdapter> PrefixBindingBuilder<T, A> onPrefix(
+    public <T> ScalarBindingBuilder<T> forKey(final String key) {
+        return this.<T>scalarBinder().key(key);
+    }
+
+    /**
+     * Invokes a {@link PrefixBindingBuilder} from the settings configured on this builder.
+     */
+    protected <T, A extends RangeAdapter> PrefixBindingBuilder<T, A> prefixBinder() {
+        return new PrefixBindingBuilder<>(this);
+    }
+
+    /**
+     * Invokes a {@link PrefixBindingBuilder} for the given row name prefix.
+     */
+    public <T, A extends RangeAdapter> PrefixBindingBuilder<T, A> forPrefix(
             final String prefix) {
-        return new PrefixBindingBuilder<T, A>(this).prefix(prefix);
+        return this.<T, A>prefixBinder().prefix(prefix);
     }
 
     /**
-     * Invokes a {@link PrefixBindingBuilder} on the given row name prefix.
+     * Invokes a {@link PrefixBindingBuilder} for the given row name prefix.
      */
-    public <T, A extends RangeAdapter> PrefixBindingBuilder<T, A> onPrefix(
+    public <T, A extends RangeAdapter> PrefixBindingBuilder<T, A> forPrefix(
             final PrefixRange prefix) {
-        return new PrefixBindingBuilder<T, A>(this).prefix(prefix);
+        return this.<T, A>prefixBinder().prefix(prefix);
     }
 
     /**
-     * Invokes a {@link IdListBindingBuilder} on the given ID list row name.
+     * Invokes an {@link IdListBindingBuilder} from the settings configured on this builder.
      */
-    public <A extends RangeAdapter> IdListBindingBuilder<A> onIdList(
+    protected <A extends RangeAdapter> IdListBindingBuilder<A> idListBinder() {
+        return new IdListBindingBuilder<>(this);
+    }
+
+    /**
+     * Invokes a {@link IdListBindingBuilder} for the given ID list row name.
+     */
+    public <A extends RangeAdapter> IdListBindingBuilder<A> forIdList(
             final String idListRowName) {
-        return new IdListBindingBuilder<A>(this).idListRowName(idListRowName);
+        return this.<A>idListBinder().idListRowName(idListRowName);
     }
 }

@@ -12,7 +12,7 @@ public class PrefixBindingBuilderTest {
     @Test(expected = IllegalStateException.class)
     public void testMissingType() {
         new BindingBuilder()
-                .onPrefix("foo")
+                .forPrefix("foo")
                 .bindTo((ListView)null);
     }
 }
