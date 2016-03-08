@@ -30,13 +30,13 @@ import rx.Subscription;
  * binding within a {@link io.v.baku.toolkit.BakuActivityTrait}:
  *
  * ```java
- * {@link BakuActivityTrait#binder() binder()}.{@link
- *         BindingBuilder#onKey(java.lang.String) key}("foo")
- *         .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
- *         coordinators}({@link
- *         SuppressWriteOnReadCoordinator#SuppressWriteOnReadCoordinator(TwoWayBinding)
- *         SuppressWriteOnReadCoordinator::new})
- *         .{@link ScalarBindingBuilder#bindTo(View) bindTo}(myView);
+ * {@link BakuActivityTrait#dataBinder() dataBinder()}.{@link BindingBuilder#onKey(java.lang.String)
+ *     key}("foo")
+ *             .{@link ScalarBindingBuilder#coordinators(CoordinatorChain[])
+ *             coordinators}({@link
+ *             SuppressWriteOnReadCoordinator#SuppressWriteOnReadCoordinator(TwoWayBinding)
+ *             SuppressWriteOnReadCoordinator::new})
+ *             .{@link ScalarBindingBuilder#bindTo(View) bindTo}(myView);
  * ```
  */
 @RequiredArgsConstructor

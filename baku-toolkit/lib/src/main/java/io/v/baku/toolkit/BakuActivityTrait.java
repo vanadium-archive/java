@@ -17,7 +17,7 @@ import rx.subscriptions.CompositeSubscription;
  * implemented by {@link BakuActivityMixin}.
  *
  * For any UI widget that should have distributed state, the application should build data bindings
- * by chaining methods from a {@link #binder()} call, binding shared data fields in the Syncbase
+ * by chaining methods from a {@link #dataBinder()} call, binding shared data fields in the Syncbase
  * distributed storage system to UI widget properties. Writes can be performed directly via
  * {@link #getSyncbaseTable()}`.`{@link io.v.baku.toolkit.syncbase.BakuTable#put(java.lang.String,
  * java.lang.Object) put(key, value)}. For two-way scalar bindings, writes can also be performed by
@@ -56,12 +56,12 @@ public interface BakuActivityTrait<T extends Activity> extends AutoCloseable {
      * Example usage:
      *
      * ```java
-     * binder().{@link BindingBuilder#onKey(java.lang.String) onKey}("myDataRow")
-     *         .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
-     *         bindTo}(R.id.myTextView);
+     * dataBinder().{@link BindingBuilder#onKey(java.lang.String) onKey}("myDataRow")
+     *             .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
+     *             bindTo}(R.id.myTextView);
      * ```
      */
-    BindingBuilder binder();
+    BindingBuilder dataBinder();
 
     /**
      * Unsubscribes all data bindings associated with this activity and releases the local Syncbase

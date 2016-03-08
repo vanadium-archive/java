@@ -44,10 +44,10 @@ import rx.subscriptions.Subscriptions;
  *             BakuActivityMixin}<>(this, savedInstanceState);
  *
  *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
- *         mBaku.{@link #binder() binder}().{@link BindingBuilder#onKey(java.lang.String)
- *             onKey}("myDataRow")
- *                       .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
- *                       bindTo}(R.id.myTextView);
+ *         mBaku.{@link #dataBinder() dataBinder}()
+ *              .{@link BindingBuilder#onKey(java.lang.String) onKey}("myDataRow")
+ *              .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
+ *                  bindTo}(R.id.myTextView);
  *     }
  *
  *     {@literal @}Override
@@ -130,7 +130,7 @@ public class BakuActivityMixin<T extends Activity> implements BakuActivityTrait<
     }
 
     @Override
-    public BindingBuilder binder() {
+    public BindingBuilder dataBinder() {
         return new BindingBuilder().activity(this);
     }
 }
