@@ -13,7 +13,6 @@ import io.v.baku.toolkit.ErrorReporters;
 import io.v.baku.toolkit.VAndroidContextTrait;
 import io.v.rx.syncbase.RxTable;
 import io.v.v23.syncbase.nosql.PrefixRange;
-import lombok.RequiredArgsConstructor;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
@@ -31,7 +30,6 @@ import rx.subscriptions.CompositeSubscription;
  * * {@linkplain IdListBindingBuilder ID-list bindings}, built via the {@link #onIdList(String)}
  *   method. This is a {@linkplain CollectionBindingBuilder collection binding}.
  */
-@RequiredArgsConstructor
 public class BindingBuilder implements CommonBindingConfiguration<BindingBuilder> {
     protected Activity mActivity;
     protected RxTable mRxTable;

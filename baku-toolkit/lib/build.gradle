@@ -145,11 +145,6 @@ install {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier 'sources'
-}
-
 task delombok {
     inputs.files android.sourceSets.main.java.srcDirs
     outputs.dir('build/delombok')
@@ -316,6 +311,11 @@ class FullProcessingJavadoc extends Javadoc {
     private static JavaPlatform getPlatform() {
         return DefaultJavaPlatform.current();
     }
+}
+
+task sourcesJar(type: Jar) {
+    from delombok
+    classifier 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
