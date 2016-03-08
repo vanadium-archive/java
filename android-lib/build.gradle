@@ -127,8 +127,8 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
     def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 
     def check = task("checkVanadiumAndroidEnvironment-${arch.goArch}", type: Exec) {
-        commandLine jiriBin, 'v23-profile', 'list',
-                '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android", 'android'
+        commandLine jiriBin, 'profile', 'list',
+                '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android", 'v23:android'
         standardOutput = new ByteArrayOutputStream()
         doLast {
             def androidOutputDir = new File(standardOutput.toString().trim())
@@ -136,8 +136,8 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
                 throw new InvalidUserDataException(
                         androidOutputDir.toString() + " does not exist or is not a directory. "
                                 + "You probably didn't install the android base profile. Try running\n\n"
-                                + "jiri v23-profile install "
-                                + "--target=${arch.goArch}-android android\n\n"
+                                + "jiri profile install "
+                                + "--target=${arch.goArch}-android v23:android\n\n"
                                 + "and then try building again"
                 )
             }

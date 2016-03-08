@@ -114,7 +114,7 @@ task checkVanadiumEnvironment {
         throw new InvalidUserDataException("The JAVA_HOME environment variable is not set. "
                 + "Please set it to the root of a JDK installation directory.  If JDK isn't "
                 + "installed, you probably didn't install the java profile: try running\n\n"
-                + "jiri v23-profile install java\n\nand then try building again.")
+                + "jiri profile install v23:java\n\nand then try building again.")
     }
     if (!isAmd64() && !isArm()) {
         throw new InvalidUserDataException("Java Vanadium builds only enabled on amd64 "
@@ -134,7 +134,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
     // NOTE(spetrovic): we add the '-installsuffix=shared' flag because the build doesn't work
     // without it on linux/arm.  (There is some conflict with "regular", i.e., non-shared builds).
-    commandLine jiriBin, 'go', '--profiles=java', 'install', '-buildmode=c-shared', '-v',
+    commandLine jiriBin, 'go', '--profiles=v23:java', 'install', '-buildmode=c-shared', '-v',
                 '-tags', 'java', '-installsuffix=shared', 'v.io/x/jni/main'
 }
 
