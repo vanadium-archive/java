@@ -36,7 +36,7 @@ import rx.subscriptions.CompositeSubscription;
  * type checking here is acceptable.
  */
 public class ScalarBindingBuilder<T>
-        extends DerivedBuilder<ScalarBindingBuilder<T>, BindingBuilder> {
+        extends DerivedBindingBuilder<ScalarBindingBuilder<T>, BindingBuilder> {
     private String mKey;
     private boolean mExplicitDefaultValue;
     private T mDeleteValue, mDefaultValue;

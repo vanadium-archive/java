@@ -22,7 +22,7 @@ import rx.schedulers.Schedulers;
  * or [1, 3, 4], whereas {@linkplain PrefixBindingBuilder prefix bindings} would resolve to either
  * [1, 2, 3, 4] or [1, 3, 2, 4].
  *
- * @see io.v.baku.toolkit.bind.BindingBuilder#onIdList(String)
+ * @see BindingBuilder#onIdList(String)
  */
 public class IdListBindingBuilder<A extends RangeAdapter>
         extends CollectionBindingBuilder<IdListBindingBuilder<A>, String, A> {

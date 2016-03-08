@@ -25,8 +25,8 @@ import rx.functions.Func1;
  * If {@code T} is {@link Comparable}, the default row ordering is natural ordering on row values.
  * Otherwise, the default is natural ordering on row names.
  *
- * @see io.v.baku.toolkit.bind.BindingBuilder#onPrefix(String)
- * @see io.v.baku.toolkit.bind.BindingBuilder#onPrefix(PrefixRange)
+ * @see BindingBuilder#onPrefix(String)
+ * @see BindingBuilder#onPrefix(PrefixRange)
  */
 public class PrefixBindingBuilder<T, A extends RangeAdapter>
         extends CollectionBindingBuilder<PrefixBindingBuilder<T, A>, RxTable.Row<T>, A> {

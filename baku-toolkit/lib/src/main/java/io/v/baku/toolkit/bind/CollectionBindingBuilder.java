@@ -21,7 +21,7 @@ import rx.Observable;
  * {@linkplain BakuActivityTrait#getSyncbaseTable() direct database writes}.
  */
 public abstract class CollectionBindingBuilder<B extends CollectionBindingBuilder<B, T, A>,
-        T, A extends RangeAdapter> extends DerivedBuilder<B, BindingBuilder>{
+        T, A extends RangeAdapter> extends DerivedBindingBuilder<B, BindingBuilder> {
     public CollectionBindingBuilder(final BindingBuilder base) {
         super(base);
     }

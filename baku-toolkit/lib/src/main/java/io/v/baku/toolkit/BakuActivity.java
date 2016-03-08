@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
+import io.v.baku.toolkit.bind.BindingBuilder;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  *         // Example binding between "myDataRow" in Syncbase and myTextView in my_activity_layout.
  *         {@link #binder() binder}().{@link
- *             io.v.baku.toolkit.bind.BindingBuilder#onKey(java.lang.String)
+ *             BindingBuilder#onKey(java.lang.String)
  *             onKey}("myDataRow")
  *                 .{@link io.v.baku.toolkit.bind.ScalarBindingBuilder#bindTo(int)
  *                 bindTo}(R.id.myTextView);

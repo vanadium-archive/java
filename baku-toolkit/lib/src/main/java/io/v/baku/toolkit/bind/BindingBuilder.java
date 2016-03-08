@@ -19,7 +19,8 @@ import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 /**
- * Builder class for bindings from Syncbase data to UI elements.
+ * Starting builder class for bindings from Syncbase data to UI elements. To build concrete
+ * bindings, this builder must be specialized for a specific form of data binding.
  *
  * Three forms of data binding are currently available:
  *
@@ -31,7 +32,7 @@ import rx.subscriptions.CompositeSubscription;
  *   method. This is a {@linkplain CollectionBindingBuilder collection binding}.
  */
 @RequiredArgsConstructor
-public class BindingBuilder {
+public class BindingBuilder implements CommonBindingConfiguration<BindingBuilder> {
     protected Activity mActivity;
     protected RxTable mRxTable;
     protected CompositeSubscription mSubscriptionParent;
@@ -40,34 +41,30 @@ public class BindingBuilder {
 
     private Context mViewAdapterContext;
 
+    @Override
     public BindingBuilder viewAdapterContext(final Context context) {
         mViewAdapterContext = context;
         return this;
     }
 
+    @Override
     public Context getDefaultViewAdapterContext() {
         return mViewAdapterContext == null ? mActivity : mViewAdapterContext;
     }
 
-
+    @Override
     public BindingBuilder activity(final Activity activity) {
         mActivity = activity;
         return this;
     }
 
+    @Override
     public BindingBuilder rxTable(final RxTable rxTable) {
         mRxTable = rxTable;
         return this;
     }
 
-    /**
-     * Sets the following properties from the given {@link BakuActivityTrait}:
-     *
-     * * {@link #activity(Activity)}
-     * * {@link #rxTable(RxTable)}
-     * * {@link #subscriptionParent(CompositeSubscription)}
-     * * {@link #onError(Action1)}
-     */
+    @Override
     public BindingBuilder activity(final BakuActivityTrait<?> trait) {
         return activity(trait.getVAndroidContextTrait().getAndroidContext())
                 .rxTable(trait.getSyncbaseTable())
@@ -75,17 +72,13 @@ public class BindingBuilder {
                 .onError(trait::onSyncError);
     }
 
-    /**
-     * Sets the following properties from the given {@link VAndroidContextTrait}:
-     *
-     * * {@link #activity(Activity)}
-     * * {@link #onError(Action1)}
-     */
+    @Override
     public BindingBuilder activity(final VAndroidContextTrait<? extends Activity> trait) {
         return activity(trait.getAndroidContext())
                 .onError(ErrorReporters.getDefaultSyncErrorReporter(trait));
     }
 
+    @Override
     public BindingBuilder subscriptionParent(final CompositeSubscription subscriptionParent) {
         mSubscriptionParent = subscriptionParent;
         return this;
@@ -100,17 +93,17 @@ public class BindingBuilder {
         return subscription;
     }
 
-    /**
-     * @return the current subscription parent.
-     */
+    @Override
     public CompositeSubscription getAllBindings() {
         return mSubscriptionParent;
     }
 
+    @Override
     public Subscription getLastBinding() {
         return mLastSubscription;
     }
 
+    @Override
     public BindingBuilder onError(final Action1<Throwable> onError) {
         mOnError = onError;
         return this;
