@@ -7,6 +7,7 @@ package io.v.baku.toolkit;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.widget.Toast;
 
 import lombok.AllArgsConstructor;
@@ -22,12 +23,13 @@ public class ErrorReporterFragment extends Fragment implements ErrorReporter {
     public static final String TAG = ErrorReporterFragment.class.getName();
 
     public static ErrorReporterFragment find(final FragmentManager mgr) {
-        return (ErrorReporterFragment)mgr.findFragmentByTag(TAG);
+        return (ErrorReporterFragment) mgr.findFragmentByTag(TAG);
     }
 
     @AllArgsConstructor
     @EqualsAndHashCode
     private static class ErrorEntry {
+        @StringRes
         private final int summaryStringId;
         private final Throwable error;
     }
@@ -57,11 +59,11 @@ public class ErrorReporterFragment extends Fragment implements ErrorReporter {
     /**
      * @param summaryStringId string resource ID for the error summary
      */
-    public void onError(final int summaryStringId, final Throwable t) {
+    public void onError(final @StringRes int summaryStringId, final Throwable t) {
         mErrors.onNext(new ErrorEntry(summaryStringId, t));
     }
 
-    protected void reportError(final int summaryStringId, final Throwable t) {
+    protected void reportError(final @StringRes int summaryStringId, final Throwable t) {
         log.error(getString(summaryStringId), t);
         Toast.makeText(getActivity(), summaryStringId, Toast.LENGTH_LONG).show();
     }

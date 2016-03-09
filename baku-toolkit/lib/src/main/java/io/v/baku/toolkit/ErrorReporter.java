@@ -4,9 +4,11 @@
 
 package io.v.baku.toolkit;
 
+import android.support.annotation.StringRes;
+
 import java8.lang.FunctionalInterface;
 
 @FunctionalInterface
 public interface ErrorReporter {
-    void onError(int summaryStringId, Throwable t);
+    void onError(@StringRes int summaryStringId, Throwable t);
 }
