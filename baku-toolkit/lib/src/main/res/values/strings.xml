@@ -2,10 +2,17 @@
     <string name="app_name">Baku Toolkit</string>
     <string name="clear_app_data">Clear app data</string>
     <string name="debug">Debug</string>
+    <string name="inspect">Remote inspection</string>
     <string name="kill_process">Kill process</string>
     <string name="logging">Logging</string>
     <string name="vlevel">V23 log verbosity</string>
     <string name="vmodule">V23 module log verbosity</string>
+
+    <string name="inspect_email">E-mail to invite:</string>
+    <string name="inspect_invite">Invite</string>
+    <string name="inspect_enable">Enable</string>
+    <string name="inspect_disable">Disable</string>
+    <string name="inspect_email_subject">Please help me debug</string>
 
     <string name="reset">Reset</string>
     <string name="restart">Restart app</string>

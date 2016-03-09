@@ -6,6 +6,9 @@
     <string name="err_blessings_misc">Unexpected error while attaining blessings</string>
     <string name="err_blessings_required">Blessings required</string>
     <string name="err_blessings_store">Unable to store blessings</string>
+    <string name="err_inspect_setup">Unable to set up remote Vanadium inspection</string>
+    <string name="err_inspect_invite">Unable to invite remote Vanadium inspector</string>
+    <string name="err_inspect_email">Cannot send invitation. Install an e-mail app and retry.</string>
     <string name="err_sync">Unable to sync state</string>
     <string name="err_syncgroup_join">Unable to join syncgroup</string>
     <string name="err_misc">Unknown error</string>
