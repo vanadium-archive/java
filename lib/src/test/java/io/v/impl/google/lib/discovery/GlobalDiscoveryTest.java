@@ -4,7 +4,6 @@
 
 package io.v.impl.google.lib.discovery;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Arrays;
@@ -19,34 +18,35 @@ import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Discovery;
 import io.v.v23.discovery.Advertisement;
-import io.v.v23.discovery.Attributes;
-import io.v.v23.discovery.Attachments;
 import io.v.v23.discovery.Update;
-import io.v.v23.verror.VException;
+
+import io.v.impl.google.namespace.NamespaceTestUtil;
+
+import org.joda.time.Duration;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.impl.google.lib.discovery.DiscoveryTestUtil.assertThat;
 
 /**
- * Tests for {@link Discovery} implementation.
+ * Tests for {@link GlobalDiscovery} implementation.
  */
-public class DiscoveryTest extends TestCase {
-    public void testBasicTest() throws VException {
-        VContext ctx = V.init();
-        FactoryUtil.injectMockPlugin(ctx);
+public class GlobalDiscoveryTest extends TestCase {
+    private static final String testPath = "a/b/c";
 
-        Discovery d1 = V.newDiscovery(ctx);
+    public void testBasicTest() throws Exception {
+        VContext ctx = V.init();
+        ctx = NamespaceTestUtil.withTestMountServer(ctx);
+
+        Discovery d1 = GlobalDiscovery.newDiscovery(ctx, testPath);
 
         Advertisement ad = new Advertisement();
-        ad.setInterfaceName("v.io/v23/a");
         ad.setAddresses(Arrays.asList("/h1:123/x"));
-        ad.setAttributes(new Attributes(ImmutableMap.of("a", "v")));
-        ad.setAttachments(new Attachments(ImmutableMap.of("a", new byte[] {1, 2, 3})));
 
         VContext advCtx = ctx.withCancel();
         ListenableFuture<Void> advFuture = d1.advertise(advCtx, ad, null);
 
-        Discovery d2 = V.newDiscovery(ctx);
+        Discovery d2 =
+                GlobalDiscovery.newDiscovery(ctx, testPath, Duration.ZERO, Duration.millis(1));
         VContext scanCtx = ctx.withCancel();
 
         InputChannel<Update> updateCh = d2.scan(scanCtx, "");
@@ -64,7 +64,6 @@ public class DiscoveryTest extends TestCase {
         update = it.next();
         assertThat(update.isLost()).isTrue();
         assertThat(update).isEqualTo(ctx, ad);
-        assertThat(update.getAdvertisement()).isEqualTo(ad);
 
         scanCtx.cancel();
         assertThat(it.hasNext()).isFalse();

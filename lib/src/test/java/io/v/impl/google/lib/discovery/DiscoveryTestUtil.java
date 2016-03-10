@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import io.v.v23.V;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Advertisement;
@@ -32,22 +31,6 @@ import io.v.x.ref.lib.discovery.AdInfo;
  * Various test utilities for discovery.
  */
 public class DiscoveryTestUtil {
-    /**
-     * Allows a runtime to use a mock discovery instance.
-     * <p>
-     * This should be called before V.newDiscovery() is called.
-     */
-    private static native void injectMockDiscovery(VContext ctx) throws VException;
-
-    /**
-     * Initializes a runtime with a mock discovery instance.
-     */
-    public static VContext withMockDiscovery() throws VException {
-        VContext ctx = V.init();
-        injectMockDiscovery(ctx);
-        return ctx;
-    }
-
     private static final Equivalence<byte[]> BYTE_ARRAY_EQUIVALENCE =
             new Equivalence<byte[]>() {
                 @Override
