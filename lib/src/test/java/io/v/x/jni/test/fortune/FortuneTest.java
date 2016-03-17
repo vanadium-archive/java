@@ -12,8 +12,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import io.v.v23.InputChannels;
-import io.v.v23.OptionDefs;
-import io.v.v23.Options;
 import io.v.v23.V;
 import io.v.v23.V23TestUtil;
 import io.v.v23.context.VContext;
@@ -140,58 +138,58 @@ public class FortuneTest extends TestCase {
         assertThat(serverThreadName).isEqualTo(executorThread.toString());
     }
 
-
-    public void testLameDuck() throws Exception {
-        CountDownLatch clientLatch = new CountDownLatch(1);
-        CountDownLatch serverLatch = new CountDownLatch(1);
-        FortuneServer server = new FortuneServerImpl(clientLatch, serverLatch);
-        Options opts = new Options();
-        opts.set(OptionDefs.SERVER_LAME_DUCK_TIMEOUT, Duration.standardSeconds(20));
-        VContext serverCtx = ctx.withCancel();
-        // Set a single-thread executor so that only one get() request is processed at-a-time.
-        serverCtx = V.withExecutor(serverCtx, Executors.newSingleThreadExecutor());
-        serverCtx = V.withNewServer(serverCtx, "", server, null, opts);
-        FortuneClient client = FortuneClientFactory.getFortuneClient(name(serverCtx));
-        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
-        String firstMessage = "The only fortune";
-        sync(client.add(ctxT, firstMessage));
-        final SettableFuture<String> future1 = SettableFuture.create();
-        final SettableFuture<String> future2 = SettableFuture.create();
-        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
-            @Override
-            public void onSuccess(String fortune) {
-                future1.set(fortune);
-            }
-            @Override
-            public void onFailure(Throwable t) {
-                future1.setException(t);
-            }
-        });
-        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
-            @Override
-            public void onSuccess(String fortune) {
-                future2.set(fortune);
-            }
-            @Override
-            public void onFailure(Throwable t) {
-                future2.setException(t);
-            }
-        });
-        if (!serverLatch.await(20, TimeUnit.SECONDS)) {
-            fail("server get() method never invoked");
-        }
-        serverCtx.cancel();
-        clientLatch.countDown();
-        assertThat(sync(future1)).isEqualTo(firstMessage);
-        assertThat(sync(future2)).isEqualTo(firstMessage);
-        try {
-            ctxT = ctx.withTimeout(new Duration(1000));  // 1s
-            sync(client.get(ctxT));
-            fail("get() that starts after server context cancel should fail");
-        } catch (CanceledException e) {
-            // OK
-        }
-    }
+// TODO(spetrovic): disabled due to flakiness: fix and re-enable.
+//    public void testLameDuck() throws Exception {
+//        CountDownLatch clientLatch = new CountDownLatch(1);
+//        CountDownLatch serverLatch = new CountDownLatch(1);
+//        FortuneServer server = new FortuneServerImpl(clientLatch, serverLatch);
+//        Options opts = new Options();
+//        opts.set(OptionDefs.SERVER_LAME_DUCK_TIMEOUT, Duration.standardSeconds(20));
+//        VContext serverCtx = ctx.withCancel();
+//        // Set a single-thread executor so that only one get() request is processed at-a-time.
+//        serverCtx = V.withExecutor(serverCtx, Executors.newSingleThreadExecutor());
+//        serverCtx = V.withNewServer(serverCtx, "", server, null, opts);
+//        FortuneClient client = FortuneClientFactory.getFortuneClient(name(serverCtx));
+//        VContext ctxT = ctx.withTimeout(new Duration(20000)); // 20s
+//        String firstMessage = "The only fortune";
+//        sync(client.add(ctxT, firstMessage));
+//        final SettableFuture<String> future1 = SettableFuture.create();
+//        final SettableFuture<String> future2 = SettableFuture.create();
+//        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
+//            @Override
+//            public void onSuccess(String fortune) {
+//                future1.set(fortune);
+//            }
+//            @Override
+//            public void onFailure(Throwable t) {
+//                future1.setException(t);
+//            }
+//        });
+//        Futures.addCallback(client.get(ctxT), new FutureCallback<String>() {
+//            @Override
+//            public void onSuccess(String fortune) {
+//                future2.set(fortune);
+//            }
+//            @Override
+//            public void onFailure(Throwable t) {
+//                future2.setException(t);
+//            }
+//        });
+//        if (!serverLatch.await(20, TimeUnit.SECONDS)) {
+//            fail("server get() method never invoked");
+//        }
+//        serverCtx.cancel();
+//        clientLatch.countDown();
+//        assertThat(sync(future1)).isEqualTo(firstMessage);
+//        assertThat(sync(future2)).isEqualTo(firstMessage);
+//        try {
+//            ctxT = ctx.withTimeout(new Duration(1000));  // 1s
+//            sync(client.get(ctxT));
+//            fail("get() that starts after server context cancel should fail");
+//        } catch (CanceledException e) {
+//            // OK
+//        }
+//    }
 
     public void testNoLameDuck() throws Exception {
         CountDownLatch clientLatch = new CountDownLatch(1);
