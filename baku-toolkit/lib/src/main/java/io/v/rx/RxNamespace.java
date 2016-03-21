@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.v.v23.rpc.MountStatus;
-import io.v.v23.rpc.MountStatusKey;
-import io.v.v23.rpc.MountStatusValue;
+import io.v.v23.rpc.PublisherEntry;
+import io.v.v23.rpc.PublisherEntryKey;
+import io.v.v23.rpc.PublisherEntryValue;
 import io.v.v23.rpc.Server;
 import io.v.v23.verror.VException;
 import java8.util.Maps;
@@ -36,14 +36,14 @@ public class RxNamespace {
         public DateTime lastMount = new DateTime(0),
                 lastUnmount = new DateTime(0);
 
-        public static MountRecord fromStatus(final MountStatus status) {
+        public static MountRecord fromStatus(final PublisherEntry status) {
             return new MountRecord(status.getLastMount(), status.getLastUnmount());
         }
     }
 
     private static Observable<MountEvent> processStatus(
-            final Map<MountStatusKey, MountRecord> mountRecords,
-            final MountStatusKey k, final MountStatusValue v) {
+            final Map<PublisherEntryKey, MountRecord> mountRecords,
+            final PublisherEntryKey k, final PublisherEntryValue v) {
 
         final List<MountEvent> newEvents = new ArrayList<>(2);
         synchronized (mountRecords) {
@@ -64,7 +64,7 @@ public class RxNamespace {
         return Observable.from(newEvents);
     }
 
-    private static boolean isAlreadyMounted(final MountStatus status) {
+    private static boolean isAlreadyMounted(final PublisherEntry status) {
         //There are also ambiguous cases; err on the side of false.
         return status.getLastMount().isAfter(status.getLastUnmount()) &&
                 status.getLastMountError() == null;
@@ -97,12 +97,12 @@ public class RxNamespace {
                     A fully correct minimal lock would include a thread-safe map and a read/write
                     lock for each record.
                      */
-                    final Map<MountStatusKey, MountRecord> mountRecords = new HashMap<>();
-                    final MountStatus[] mounts = server.getStatus().getMounts();
+                    final Map<PublisherEntryKey, MountRecord> mountRecords = new HashMap<>();
+                    final PublisherEntry[] mounts = server.getStatus().getPublisherStatus();
                     final List<MountEvent> alreadyMounted = new ArrayList<>(mounts.length);
-                    for (final MountStatus status : mounts) {
+                    for (final PublisherEntry status : mounts) {
                         if (status.getName().equals(name)) {
-                            mountRecords.put(MountStatusKey.fromMountStatus(status),
+                            mountRecords.put(PublisherEntryKey.fromPublisherEntry(status),
                                     MountRecord.fromStatus(status));
                             if (isAlreadyMounted(status)) {
                                 alreadyMounted.add(MountEvent.forStatus(true, status.getName(),
@@ -119,8 +119,8 @@ public class RxNamespace {
                         }
                         final MountEvent initial = MountEvent.forAddNameSuccess(name);
 
-                        return RxMountState.index(
-                                RxMountState.poll(server).map(state -> state.filter(
+                        return RxPublisherState.index(
+                                RxPublisherState.poll(server).map(state -> state.filter(
                                         status -> status.getName().equals(name))))
                                 .flatMapIterable(Map::entrySet)
                                 .concatMap(e -> processStatus(mountRecords,

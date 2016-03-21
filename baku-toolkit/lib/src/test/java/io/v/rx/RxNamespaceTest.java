@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import io.v.v23.rpc.MountStatus;
+import io.v.v23.rpc.PublisherEntry;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import java8.util.function.Predicate;
@@ -36,7 +36,7 @@ public class RxNamespaceTest extends RxTestCase {
             THE_PAST = new DateTime(2000, DateTimeConstants.JANUARY, 1, 0, 0),
             THE_DISTANT_PAST = new DateTime(1990, DateTimeConstants.JANUARY, 1, 0, 0);
     private static final long STATUS_POLLING_DELAY_MS = verificationDelay(
-            RxMountState.DEFAULT_POLLING_INTERVAL);
+            RxPublisherState.DEFAULT_POLLING_INTERVAL);
 
     private class TestSubscriber extends Subscriber<MountEvent> {
         public boolean mayComplete;
@@ -79,7 +79,7 @@ public class RxNamespaceTest extends RxTestCase {
         }
     }
 
-    private static ServerStatus mockStatus(final MountStatus... ms) {
+    private static ServerStatus mockStatus(final PublisherEntry... ms) {
         return new ServerStatus(null, false, ms, null, null, null);
     }
 
@@ -107,7 +107,7 @@ public class RxNamespaceTest extends RxTestCase {
 
     @Test
     public void testAlreadyMounted() {
-        when(mServer.getStatus()).thenReturn(mockStatus(new MountStatus("foo", "bar",
+        when(mServer.getStatus()).thenReturn(mockStatus(new PublisherEntry("foo", "bar",
                 THE_PAST, null, null, THE_DISTANT_PAST, null)));
 
         mSubscriber.expectedEvents.add(MountEvent::isSuccessfulMount);
@@ -117,7 +117,7 @@ public class RxNamespaceTest extends RxTestCase {
 
     @Test
     public void testExistingOtherNames() {
-        when(mServer.getStatus()).thenReturn(mockStatus(new MountStatus("baz", "bar",
+        when(mServer.getStatus()).thenReturn(mockStatus(new PublisherEntry("baz", "bar",
                 THE_PAST, null, null, THE_DISTANT_PAST, null)));
 
         mSubscriber.expectedEvents.add(RxNamespaceTest::isInitialMountAttemptStart);
@@ -126,7 +126,7 @@ public class RxNamespaceTest extends RxTestCase {
     }
 
     private void mountWithOldStatus() {
-        when(mServer.getStatus()).thenReturn(mockStatus(new MountStatus("foo", "bar",
+        when(mServer.getStatus()).thenReturn(mockStatus(new PublisherEntry("foo", "bar",
                 THE_DISTANT_PAST, null, null, THE_PAST, null)));
 
         mSubscriber.expectedEvents.add(RxNamespaceTest::isInitialMountAttemptStart);
@@ -149,7 +149,7 @@ public class RxNamespaceTest extends RxTestCase {
         assertNoAsyncErrors();
 
         mSubscriber.mayComplete = true;
-        when(mServer.getStatus()).thenReturn(mockStatus(new MountStatus("foo", "bar",
+        when(mServer.getStatus()).thenReturn(mockStatus(new PublisherEntry("foo", "bar",
                 THE_DISTANT_PAST, null, null, DateTime.now(), null)));
         Thread.sleep(STATUS_POLLING_DELAY_MS);
         assertTrue("Mount should unsubscribe after unmount", mSubscriber.isUnsubscribed());

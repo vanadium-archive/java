@@ -13,15 +13,15 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 @Value
-public class MountStatusValue {
+public class PublisherEntryValue {
     DateTime mLastMount;
     VException mLastMountError;
     Duration mTtl;
     DateTime mLastUnmount;
     VException mLastUnmountError;
 
-    public static MountStatusValue fromMountStatus(final MountStatus m) {
-        return new MountStatusValue(m.getLastMount(), m.getLastMountError(), m.getTTL(),
+    public static PublisherEntryValue fromPublisherEntry(final PublisherEntry m) {
+        return new PublisherEntryValue(m.getLastMount(), m.getLastMountError(), m.getTTL(),
                 m.getLastUnmount(), m.getLastUnmountError());
     }
 }

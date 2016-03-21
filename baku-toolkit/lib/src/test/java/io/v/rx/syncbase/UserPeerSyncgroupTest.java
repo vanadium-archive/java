@@ -23,10 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.v.baku.toolkit.blessings.BlessingsUtils;
 import io.v.baku.toolkit.blessings.ClientUser;
 import io.v.debug.SyncbaseAndroidClient;
-import io.v.rx.RxMountState;
+import io.v.rx.RxPublisherState;
 import io.v.rx.RxTestCase;
 import io.v.v23.context.VContext;
-import io.v.v23.rpc.MountStatus;
+import io.v.v23.rpc.PublisherEntry;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.security.Blessings;
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 @PrepareForTest({BlessingsUtils.class, SgHostUtil.class})
 public class UserPeerSyncgroupTest extends RxTestCase {
     private static final long STATUS_POLLING_DELAY_MS = verificationDelay(
-            RxMountState.DEFAULT_POLLING_INTERVAL);
+            RxPublisherState.DEFAULT_POLLING_INTERVAL);
 
     private final VContext mVContext = mock(VContext.class);
 
@@ -144,9 +144,9 @@ public class UserPeerSyncgroupTest extends RxTestCase {
 
         final AtomicInteger statusPolls = new AtomicInteger();
         final ServerStatus statusNone = mock(ServerStatus.class);
-        when(statusNone.getMounts()).then(i -> {
+        when(statusNone.getPublisherStatus()).then(i -> {
             statusPolls.incrementAndGet();
-            return new MountStatus[0];
+            return new PublisherEntry[0];
         });
         when(mServer.getStatus()).thenReturn(statusNone);
 
@@ -156,22 +156,22 @@ public class UserPeerSyncgroupTest extends RxTestCase {
 
         mRxBlessings.onNext(null);
         //Verify 3 polls + initial to ensure polling loop is working.
-        Thread.sleep(RxMountState.DEFAULT_POLLING_INTERVAL.getMillis() +
+        Thread.sleep(RxPublisherState.DEFAULT_POLLING_INTERVAL.getMillis() +
                 SgHostUtil.SYNCBASE_PING_TIMEOUT.getMillis());
         verify(mSg, never()).join(any(), any());
         final String name = "users/foo@bar.com/app/sghost";
         verify(mServer).addName(name);
 
-        final MountStatus mountedMountStatus = new MountStatus(name, "foo", new DateTime(), null,
-                        Duration.standardMinutes(5), new DateTime(0), null);
+        final PublisherEntry mountedPublisherEntry = new PublisherEntry(name, "foo", new DateTime(),
+                null, Duration.standardMinutes(5), new DateTime(0), null);
         final ServerStatus statusMounted = mock(ServerStatus.class);
-        when(statusMounted.getMounts()).then(i -> {
+        when(statusMounted.getPublisherStatus()).then(i -> {
             statusPolls.incrementAndGet();
-            return new MountStatus[]{mountedMountStatus};
+            return new PublisherEntry[]{mountedPublisherEntry};
         });
         when(mServer.getStatus()).thenReturn(statusMounted);
 
-        Thread.sleep(3 * RxMountState.DEFAULT_POLLING_INTERVAL.getMillis());
+        Thread.sleep(3 * RxPublisherState.DEFAULT_POLLING_INTERVAL.getMillis());
         final int nPolls = statusPolls.get();
         if (nPolls < 4) {
             fail("Polling should start and continue after blessings are resolved (" + nPolls +

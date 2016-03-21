@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 
 @Accessors(prefix = "m")
 @Value
-public class MountStatusKey {
+public class PublisherEntryKey {
     String mName, mServer;
 
-    public static MountStatusKey fromMountStatus(final MountStatus m) {
-        return new MountStatusKey(m.getName(), m.getServer());
+    public static PublisherEntryKey fromPublisherEntry(final PublisherEntry m) {
+        return new PublisherEntryKey(m.getName(), m.getServer());
     }
 }
