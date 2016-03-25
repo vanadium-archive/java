@@ -97,7 +97,7 @@ class VanadiumEnvironment {
         }
 
         result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
-        result.jiriBin = new File(result.jiriRoot, ['devtools', 'bin', 'jiri'].join(File.separator))
+        result.jiriBin = new File(result.jiriRoot, ['.jiri_root', 'scripts', 'jiri'].join(File.separator))
         if (!result.jiriBin.exists() || !result.jiriBin.isFile() || !result.jiriBin.canExecute()) {
             throw new InvalidUserDataException(
                     result.jiriBin.toString() + " does not exist or is not an executable file. "
