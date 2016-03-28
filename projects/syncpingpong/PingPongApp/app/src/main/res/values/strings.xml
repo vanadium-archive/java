@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PingPongApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="pingpongtoggle">Toggle Ping/Pong</string>
+    <string name="pingpongbegin">Start Ping Pong</string>
+    <string name="useproxybutton">Use Proxy</string>
+</resources>
