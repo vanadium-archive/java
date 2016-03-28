@@ -42,7 +42,11 @@ class VdlPlugin implements Plugin<Project> {
 
                 generateTask.environment(VDLROOT: getVdlRootPath(project))
                 generateTask.environment(VDLPATH: vdlPaths.join(":"))
-                List<String> commandLine = ['build/vdltool/vdl-' + getOsName(),
+		String vdlToolPath = 'build/vdltool/vdl-' + getOsName()
+		if (project.vdl.vdlToolPath != "") {
+			vdlToolPath = project.vdl.vdlToolPath
+		}
+                List<String> commandLine = [vdlToolPath,
                                             'generate',
                                             '--lang=java',
                                             '--java-out-dir=' + outDirs.join(",")

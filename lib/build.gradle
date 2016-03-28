@@ -333,6 +333,7 @@ vdl {
     inputPaths += [jiriRoot, 'release', 'go', 'src'].join(File.separator)
     vdlRootPath = [jiriRoot, 'release', 'go', 'src', 'v.io', 'v23', 'vdlroot'].join(File.separator)
     generateVdlRoot = true
+    vdlToolPath = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
 }
 
 bintray {
