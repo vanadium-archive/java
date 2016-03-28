@@ -11,7 +11,7 @@ import org.gradle.jvm.platform.internal.DefaultJavaPlatform
 import org.gradle.language.base.internal.compile.Compiler
 // You should change this after releasing a new version of the Baku Toolkit. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/baku-toolkit.
-version = '0.10.0'
+version = '0.10.1'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java'
@@ -92,7 +92,7 @@ dependencies {
             'io.reactivex:rxandroid:1.1.0',
             'io.reactivex:rxjava:1.0.17',
             'io.reactivex:rxjava-async-util:0.21.0',
-            'io.v:vanadium-android:1.10',
+            'io.v:vanadium-android:1.11',
             'net.javacrumbs.future-converter:future-converter-guava-rxjava:0.3.0',
             'net.sourceforge.streamsupport:streamsupport:1.3.2',
             'org.robotninjas:fluent-futures:1.0'
