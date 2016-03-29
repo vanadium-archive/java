@@ -24,21 +24,21 @@
         <Button
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/pingpongtoggle"
+            android:text="@string/ping_pong_toggle"
             android:onClick="pingpongToggle" />
 
         <Button
             android:id="@+id/useproxybutton"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/useproxybutton"
+            android:text="@string/use_proxy"
             android:onClick="useProxy" />
 
         <Button
             android:id="@+id/pingpongbutton"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/pingpongbegin"
+            android:text="@string/ping_pong_begin"
             android:onClick="startTestPingPong" />
     </LinearLayout>
 

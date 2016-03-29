@@ -54,14 +54,14 @@ import static io.v.v23.VFutures.sync;
 
 public class MainActivity extends AppCompatActivity {
     // Syncgroup-related names for where the mounttable is and the syncgroup name's suffix.
-    public static final String mtPrefix = "/ns.dev.v.io:8101/tmp/benchmark/pingpong/";
-    public static final String sgSuffix = "/s0/%%sync/sg";
+    public static final String MT_PREFIX = "/ns.dev.v.io:8101/tmp/benchmark/pingpong/";
+    public static final String SG_SUFFIX = "/s0/%%sync/sg";
 
     // Syncbase-related names for the app/db/tb hierarchy and where to write data.
-    public static final String appName = "app";
-    public static final String dbName = "db";
-    public static final String tbName = "table";
-    public static final String syncPrefix = "prefix";
+    public static final String APP_NAME = "app";
+    public static final String DB_NAME = "db";
+    public static final String TB_NAME = "table";
+    public static final String SYNC_PREFIX = "prefix";
 
     // Allow each asynchronous operation to take at most this amount of time.
     private static final long TEST_TIMEOUT = 5;
@@ -69,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     // Fixed parameters for the app.
     private static final String TAG = "PingPong"; // Debug tag for Log.d
-    private static final String testID = "AndroidPingPongTest";
-    private static final int numPeers = 2;
-    private static final int numTimes = 100;
+    private static final String TEST_ID = "AndroidPingPongTest";
+    private static final int NUM_TIMES = 100;
     // Log success/failure once blessings are received.
     private static final FutureCallback<Blessings> ON_BLESSINGS = new FutureCallback<Blessings>() {
         @Override
@@ -84,12 +83,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Failure to get blessings, nothing will work.", t);
         }
     };
+
     // The V context tracked by the app.
-    VContext baseContext;
+    VContext mBaseContext;
     // Values that can be changed by the app.
-    private int peerID = 0;
-    private Thread testThread;
-    private boolean usingProxy = false;
+    private int mPeerID = 0;
+    private Thread mTestThread;
+    private boolean mUsingProxy = false;
 
     public static Permissions openPermissions() {
         AccessList acl = new AccessList(
@@ -103,17 +103,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getMountPoint(String testID, int peerID) {
-        return mtPrefix + testID + "/s" + peerID;
+        return MT_PREFIX + testID + "/s" + peerID;
     }
 
     private String getSyncgroupName(String testID) {
-        return mtPrefix + testID + sgSuffix;
+        return MT_PREFIX + testID + SG_SUFFIX;
     }
 
     // Helper to show default text before the test starts.
     private void setPreTestText() {
-        String suffix = usingProxy ? " with proxy" : " w/o proxy";
-        String prefix = peerID == 0 ? "Pinger: Hello World!" : "Ponger: Hello World!";
+        String suffix = mUsingProxy ? " with proxy" : " w/o proxy";
+        String prefix = mPeerID == 0 ? "Pinger: Hello World!" : "Ponger: Hello World!";
         updateText(prefix + suffix);
     }
 
@@ -125,26 +125,26 @@ public class MainActivity extends AppCompatActivity {
 
     // Callback (from button press). Changes the text color between pinger and ponger.
     public void pingpongToggle(View view) {
-        if (testThread == null) {
+        if (mTestThread == null) {
             Log.d(TAG, "Toggling peer ID!");
-            peerID = 1 - peerID;
+            mPeerID = 1 - mPeerID;
             setPreTestText();
             TextView tv = (TextView) findViewById(R.id.debug_text);
-            tv.setTextColor(peerID == 0 ? Color.BLACK : Color.BLUE);
+            tv.setTextColor(mPeerID == 0 ? Color.BLACK : Color.BLUE);
         }
     }
 
     // Callback (from button press). If not pressed yet, the proxy will be added to the listen spec.
     public void useProxy(View view) {
         // If we don't proxy, we can't communicate across networks.
-        if (!usingProxy) {
+        if (!mUsingProxy) {
             Log.d(TAG, "Using the proxy!");
             try {
-                baseContext = V.withListenSpec(baseContext,
-                        V.getListenSpec(baseContext).withProxy("proxy"));
-                usingProxy = true;
+                mBaseContext = V.withListenSpec(mBaseContext,
+                        V.getListenSpec(mBaseContext).withProxy("proxy"));
+                mUsingProxy = true;
                 setPreTestText();
-                ((Button) findViewById(R.id.useproxybutton)).setText("Using the Proxy");
+                ((Button) findViewById(R.id.useproxybutton)).setText(R.string.using_proxy);
 
             } catch (final VException e) {
                 Log.d(TAG, e.toString());
@@ -157,13 +157,13 @@ public class MainActivity extends AppCompatActivity {
     private void setUpBlessings() {
         Log.d(TAG, "Attempting to get blessings.");
 
-        Futures.addCallback(BlessingsManager.getBlessings(baseContext, this, "BlessingsKey", true),
+        Futures.addCallback(BlessingsManager.getBlessings(mBaseContext, this, "BlessingsKey", true),
                 ON_BLESSINGS);
     }
 
     // Folder where Syncbase will store its data.
     private String getDataDir() {
-        return getApplicationContext().getApplicationInfo().dataDir + "/" + testID;
+        return getApplicationContext().getApplicationInfo().dataDir + "/" + TEST_ID;
     }
 
     /**
@@ -181,11 +181,11 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void startTestPingPong(final View view) {
-        if (testThread == null) {
-            ((Button) findViewById(R.id.pingpongbutton)).setText("Running Ping Pong!");
+        if (mTestThread == null) {
+            ((Button) findViewById(R.id.pingpongbutton)).setText(R.string.running_ping_pong);
 
             Log.d(TAG, "Starting Syncbase Ping Pong Test!");
-            testThread = new Thread() {
+            mTestThread = new Thread() {
                 long startTime;
                 long endTime;
 
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (ExecutionException | InterruptedException | TimeoutException |
                             VException e) {
                         Log.d(TAG, e.toString());
-                        baseContext.cancel();
+                        mBaseContext.cancel();
                     }
                 }
 
@@ -211,16 +211,16 @@ public class MainActivity extends AppCompatActivity {
 
                     // Create the syncbase server...
                     try {
-                        baseContext = SyncbaseServer.withNewServer(baseContext,
+                        mBaseContext = SyncbaseServer.withNewServer(mBaseContext,
                                 new SyncbaseServer.Params()
                                         .withPermissions(openPermissions())
                                         .withStorageRootDir(getDataDir())
-                                        .withName(getMountPoint(testID, peerID)));
+                                        .withName(getMountPoint(TEST_ID, mPeerID)));
                     } catch (SyncbaseServer.StartException e) {
                         Log.d(TAG, e.toString());
                     }
 
-                    Server syncbaseServer = io.v.v23.V.getServer(baseContext);
+                    Server syncbaseServer = io.v.v23.V.getServer(mBaseContext);
 
 
                     Log.d(TAG, "Preparing Syncbase Client");
@@ -232,48 +232,48 @@ public class MainActivity extends AppCompatActivity {
                     SyncbaseService service = Syncbase.newService(
                             "/" + syncbaseServer.getStatus().getEndpoints()[0]);
 
-                    SyncbaseApp app = service.getApp(appName);
-                    final Database db = app.getNoSqlDatabase(dbName, null);
-                    final Table tb = db.getTable(tbName);
+                    SyncbaseApp app = service.getApp(APP_NAME);
+                    final Database db = app.getNoSqlDatabase(DB_NAME, null);
+                    final Table tb = db.getTable(TB_NAME);
                     Log.d(TAG, "app exists?");
-                    if (!syncWithTimeout(app.exists(baseContext))) {
+                    if (!syncWithTimeout(app.exists(mBaseContext))) {
                         Log.d(TAG, "app create");
-                        syncWithTimeout(app.create(baseContext, openPermissions()));
+                        syncWithTimeout(app.create(mBaseContext, openPermissions()));
                     }
                     Log.d(TAG, "db exists?");
-                    if (!syncWithTimeout(db.exists(baseContext))) {
+                    if (!syncWithTimeout(db.exists(mBaseContext))) {
                         Log.d(TAG, "db create");
-                        syncWithTimeout(db.create(baseContext, openPermissions()));
+                        syncWithTimeout(db.create(mBaseContext, openPermissions()));
                     }
                     Log.d(TAG, "tb exists?");
-                    if (!syncWithTimeout(tb.exists(baseContext))) {
+                    if (!syncWithTimeout(tb.exists(mBaseContext))) {
                         Log.d(TAG, "tb create");
-                        syncWithTimeout(tb.create(baseContext, openPermissions()));
+                        syncWithTimeout(tb.create(mBaseContext, openPermissions()));
                     }
 
-                    Log.d(TAG, "I am peer " + peerID);
-                    helpUpdateText("I am peer " + peerID);
+                    Log.d(TAG, "I am peer " + mPeerID);
+                    helpUpdateText("I am peer " + mPeerID);
 
                     // If you're peer 0, you should create the syncgroup. Otherwise, join it.
-                    String sgName = getSyncgroupName(testID);
-                    String mtPointName = mtPrefix + "/" + testID;
+                    String sgName = getSyncgroupName(TEST_ID);
+                    String mtPointName = MT_PREFIX + "/" + TEST_ID;
                     Syncgroup group = db.getSyncgroup(sgName);
 
                     SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
                     memberInfo.setSyncPriority((byte) 3);
-                    if (peerID == 0) {
+                    if (mPeerID == 0) {
                         Log.d(TAG, "Creating Syncgroup" + sgName);
                         helpUpdateText("Creating Syncgroup");
 
                         SyncgroupSpec spec = new SyncgroupSpec(
-                                testID, openPermissions(),
-                                ImmutableList.of(new TableRow(tbName, syncPrefix)),
+                                TEST_ID, openPermissions(),
+                                ImmutableList.of(new TableRow(TB_NAME, SYNC_PREFIX)),
                                 ImmutableList.of(mtPointName), false);
-                        syncWithTimeout(group.create(baseContext, spec, memberInfo));
+                        syncWithTimeout(group.create(mBaseContext, spec, memberInfo));
                     } else {
                         Log.d(TAG, "Joining Syncgroup" + sgName);
                         helpUpdateText("Joining Syncgroup");
-                        syncWithTimeout(group.join(baseContext, memberInfo));
+                        syncWithTimeout(group.join(mBaseContext, memberInfo));
                     }
 
                     // Now that we've all joined the syncgroup...
@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                     helpUpdateText("We are now ready to time sync!");
 
                     // 0 will send to 1, and 1 responds via watch.
-                    if (peerID == 0) {
+                    if (mPeerID == 0) {
                         writeData(tb);
                     }
 
@@ -290,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Log.d(TAG, "We finished!");
                     helpUpdateText("We finished!");
-                    double delta = (endTime - startTime) / (numTimes * 1000000.);
+                    double delta = (endTime - startTime) / (NUM_TIMES * 1000000.);
                     Log.d(TAG, "Average Time: " + delta + " ms per ping pong iteration\n");
                     helpUpdateText("Average Time: " + delta + "ms per ping pong iteration!");
                 }
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 private void watchForChanges(Database db, Table tb) {
                     try {
                         VIterable<WatchChange> watchStream = InputChannels.asIterable(
-                                db.watch(baseContext, tbName, syncPrefix)
+                                db.watch(mBaseContext, TB_NAME, SYNC_PREFIX)
                         );
 
                         Log.d(TAG, "Starting watch");
@@ -324,11 +324,11 @@ public class MainActivity extends AppCompatActivity {
                             if (count == 0) {
                                 startTime = System.nanoTime();
                             }
-                            if (count == numTimes * 2) {
+                            if (count == NUM_TIMES * 2) {
                                 endTime = System.nanoTime();
                                 break;
                             }
-                            if ((count + 2) % 2 == peerID) {
+                            if ((count + 2) % 2 == mPeerID) {
                                 writeData(tb);
                             }
                         }
@@ -339,12 +339,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 private void writeData(Table tb) throws VException, TimeoutException {
-                    String actualKey = syncPrefix + "/" + count;
+                    String actualKey = SYNC_PREFIX + "/" + count;
                     Log.d(TAG, "I write " + count);
-                    syncWithTimeout(tb.put(baseContext, actualKey, count, Integer.class));
+                    syncWithTimeout(tb.put(mBaseContext, actualKey, count, Integer.class));
                 }
             };
-            testThread.start();
+            mTestThread.start();
         }
     }
 
@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.content_main);
 
         // Initialize Vanadium as soon as we can.
-        baseContext = V.init(getApplicationContext(), new Options()
+        mBaseContext = V.init(getApplicationContext(), new Options()
                 .set(OptionDefs.LOG_VLEVEL, 0)
                 .set(OptionDefs.LOG_VMODULE, "vsync*=2"));
 
