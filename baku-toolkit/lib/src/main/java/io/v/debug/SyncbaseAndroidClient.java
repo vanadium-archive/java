@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 import org.joda.time.Duration;
 
@@ -53,7 +54,7 @@ public class SyncbaseAndroidClient implements AutoCloseable {
                                        final IBinder iBinder) {
             final SyncbaseAndroidService.Binder binder = (SyncbaseAndroidService.Binder) iBinder;
             lastSubscription = binder.getObservable()
-                    .map(b -> new ServerClient(b.getServer(), Syncbase.newService(b.getName())))
+                    .map(b -> new ServerClient(b.getServer(), Syncbase.newService(b.getEndpoint())))
                     .subscribe(mObserver);
         }
 
@@ -92,6 +93,18 @@ public class SyncbaseAndroidClient implements AutoCloseable {
     }
 
     /**
+     * @deprecated Use {@link
+     *  #SyncbaseAndroidClient(Context, Observable, SyncbaseAndroidService.Options)}
+     */
+    public SyncbaseAndroidClient(final Context androidContext,
+                                 final Observable<Blessings> rxBlessings,
+                                 final boolean cleanStart, final Duration keepAlive) {
+        this(androidContext, rxBlessings, new SyncbaseAndroidService.Options()
+                .withCleanStart(cleanStart)
+                .withKeepAlive(keepAlive));
+    }
+
+    /**
      * Starts/connects to {@link SyncbaseAndroidService} and returns an {@code Observable} which
      * receives an {@code onNext} whenever the Android service client connects. Subscriptions share
      * a connection and initially receive the active instance if still connected.
@@ -100,8 +113,9 @@ public class SyncbaseAndroidClient implements AutoCloseable {
      *                    will not be started until blessings are available.
      *                    TODO(rosswang): this should either handle blessings changes or not care.
      */
-    public SyncbaseAndroidClient(final Context androidContext, final Observable<Blessings> rxBlessings,
-                                 final boolean cleanStart, final Duration keepAlive) {
+    public SyncbaseAndroidClient(final Context androidContext,
+                                 final @Nullable Observable<Blessings> rxBlessings,
+                                 final @Nullable SyncbaseAndroidService.Options options) {
         mAndroidContext = androidContext;
 
         /*
@@ -110,9 +124,9 @@ public class SyncbaseAndroidClient implements AutoCloseable {
         (through androidContext).
          */
         final Intent intent = new Intent(androidContext, SyncbaseAndroidService.class);
-
-        intent.putExtra(SyncbaseAndroidService.EXTRA_CLEAN_START, cleanStart);
-        intent.putExtra(SyncbaseAndroidService.EXTRA_KEEP_ALIVE, keepAlive);
+        if (options != null) {
+            intent.putExtra(SyncbaseAndroidService.EXTRA_OPTIONS, options);
+        }
 
         final ReplaySubject<ServerClient> rpl = ReplaySubject.createWithSize(1);
         mConnection = new SyncbaseServiceConnection(rpl);
@@ -129,8 +143,9 @@ public class SyncbaseAndroidClient implements AutoCloseable {
         mObservable = rpl.filter(s -> s != null);
     }
 
-    public SyncbaseAndroidClient(final Context androidContext, final Observable<Blessings> rxBlessings) {
-        this(androidContext, rxBlessings, false, null);
+    public SyncbaseAndroidClient(final Context androidContext,
+                                 final Observable<Blessings> rxBlessings) {
+        this(androidContext, rxBlessings, null);
     }
 
     @Override

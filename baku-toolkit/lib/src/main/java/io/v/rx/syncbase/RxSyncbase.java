@@ -4,8 +4,10 @@
 
 package io.v.rx.syncbase;
 
+import io.v.android.v23.V;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.context.VContext;
+import io.v.v23.rpc.Server;
 import io.v.v23.syncbase.Syncbase;
 import io.v.v23.syncbase.SyncbaseService;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,17 @@ import rx.Observable;
 public abstract class RxSyncbase {
     public static String syncgroupName(final String sgHost, final String sgSuffix) {
         return NamingUtil.join(sgHost, "%%sync", sgSuffix);
+    }
+
+    public static RxSyncbase fromObservable(final VContext vContext,
+                                            final Observable<SyncbaseService> sb) {
+        final Observable<SyncbaseService> replay = sb.replay(1).autoConnect();
+        return new RxSyncbase(vContext) {
+            @Override
+            public Observable<SyncbaseService> getRxClient() {
+                return replay;
+            }
+        };
     }
 
     /**
@@ -39,6 +52,14 @@ public abstract class RxSyncbase {
      */
     public static RxSyncbase fromSyncbaseAt(final VContext vContext, final String name) {
         return fromSyncbaseService(vContext, Syncbase.newService(name));
+    }
+
+    public static RxSyncbase fromServer(final VContext vContext, final Server server) {
+        return fromSyncbaseAt(vContext, "/" + server.getStatus().getEndpoints()[0]);
+    }
+
+    public static RxSyncbase fromServerContext(final VContext serverContext) {
+        return fromServer(serverContext, V.getServer(serverContext));
     }
 
     @Getter

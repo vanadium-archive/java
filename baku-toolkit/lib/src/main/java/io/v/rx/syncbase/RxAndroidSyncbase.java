@@ -5,9 +5,11 @@
 package io.v.rx.syncbase;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import io.v.baku.toolkit.VAndroidContextTrait;
 import io.v.debug.SyncbaseAndroidClient;
+import io.v.debug.SyncbaseAndroidService;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.Blessings;
@@ -39,13 +41,24 @@ public class RxAndroidSyncbase extends RxSyncbase implements AutoCloseable {
     }
 
     public RxAndroidSyncbase(final Context androidContext, final VContext ctx,
-                             final Observable<Blessings> rxBlessings) {
-        this(ctx, new SyncbaseAndroidClient(androidContext, rxBlessings));
+                             final @Nullable Observable<Blessings> rxBlessings,
+                             final @Nullable SyncbaseAndroidService.Options options) {
+        this(ctx, new SyncbaseAndroidClient(androidContext, rxBlessings, options));
+    }
+
+    public RxAndroidSyncbase(final Context androidContext, final VContext ctx,
+                             final @Nullable Observable<Blessings> rxBlessings) {
+        this(androidContext, ctx, rxBlessings, null);
+    }
+
+    public RxAndroidSyncbase(final VAndroidContextTrait trait,
+                             final @Nullable SyncbaseAndroidService.Options options) {
+        this(trait.getAndroidContext(), trait.getVContext(),
+                trait.getBlessingsProvider().getRxBlessings(), options);
     }
 
     public RxAndroidSyncbase(final VAndroidContextTrait trait) {
-        this(trait.getAndroidContext(), trait.getVContext(),
-                trait.getBlessingsProvider().getRxBlessings());
+        this(trait, null);
     }
 
     @Override
