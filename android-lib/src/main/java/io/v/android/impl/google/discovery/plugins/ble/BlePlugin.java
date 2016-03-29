@@ -74,7 +74,7 @@ public class BlePlugin implements Plugin {
     private final Context androidContext;
 
     // Set of Ble objects that will be interacted with to perform operations.
-    private BluetoothLeAdvertiser bluetoothLeAdvertise;
+    private BluetoothLeAdvertiser bluetoothLeAdvertiser;
     private BluetoothLeScanner bluetoothLeScanner;
     private BluetoothGattServer bluetoothGattServer;
 
@@ -105,7 +105,7 @@ public class BlePlugin implements Plugin {
             throw new IllegalStateException("No permission on BluetoothAdapter");
         }
 
-        bluetoothLeAdvertise = bluetoothAdapter.getBluetoothLeAdvertiser();
+        bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         BluetoothManager manager =
                 (BluetoothManager) androidContext.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -185,6 +185,10 @@ public class BlePlugin implements Plugin {
         }
     }
 
+    public void close() {
+        bluetoothGattServer.close();
+    }
+
     private long genStamp() {
         // We use 8-byte stamp to reflect the current services of the current device.
         //
@@ -196,7 +200,7 @@ public class BlePlugin implements Plugin {
 
     private void updateAdvertising() {
         if (advertiseCallback != null) {
-            bluetoothLeAdvertise.stopAdvertising(advertiseCallback);
+            bluetoothLeAdvertiser.stopAdvertising(advertiseCallback);
             advertiseCallback = null;
         }
         if (advertisements.size() == 0) {
@@ -223,7 +227,7 @@ public class BlePlugin implements Plugin {
                         Log.e(TAG, "failed to start advertising " + errorCode);
                     }
                 };
-        bluetoothLeAdvertise.startAdvertising(
+        bluetoothLeAdvertiser.startAdvertising(
                 settingsBuilder.build(), builder.build(), advertiseCallback);
     }
 

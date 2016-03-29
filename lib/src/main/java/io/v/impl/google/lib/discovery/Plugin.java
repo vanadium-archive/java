@@ -64,4 +64,11 @@ public interface Plugin {
      * @throws Exception    if scanning couldn't be started
      */
     void stopScan(ScanHandler handler) throws Exception;
+
+    /**
+     * Closes the plugin.
+     * <p>
+     * This will be called after all active tasks have been cancelled.
+     */
+    void close();
 }
