@@ -139,8 +139,6 @@ public final class TypeCompatibility {
     private static boolean isNumber(VdlType type) {
         switch (type.getKind()) {
             case BYTE:
-            case COMPLEX128:
-            case COMPLEX64:
             case FLOAT32:
             case FLOAT64:
             case INT16:

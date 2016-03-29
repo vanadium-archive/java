@@ -101,7 +101,7 @@ final class ConvertUtil {
     }
 
     /**
-     * Converts uint values to uint, int, float or complex values only.
+     * Converts uint values to uint, int or float values only.
      * This is used to check O(n) conversion rules instead of O(n^2) for n numeric types.
      */
     private static Object convertUint(long value, ConversionTarget target)
@@ -133,7 +133,7 @@ final class ConvertUtil {
     }
 
     /**
-     * Converts int values to int, float or complex values only.
+     * Converts int values to int or float values only.
      * This is used to check O(n) conversion rules instead of O(n^2) for n numeric types.
      */
     private static Object convertInt(long value, ConversionTarget target)
@@ -157,7 +157,6 @@ final class ConvertUtil {
             case INT64:
                 return ReflectUtil.createPrimitive(target, value, Long.TYPE);
             case FLOAT32:
-            case COMPLEX64:
                 if (ConvertUtil.canConvertIntToFloat(value, 32)) {
                     return convertDouble(value, target);
                 }
@@ -171,7 +170,7 @@ final class ConvertUtil {
     }
 
     /**
-     * Converts float values to float or complex values only.
+     * Converts float values to float values only.
      * This is used to check O(n) conversion rules instead of O(n^2) for n numeric types.
      */
     private static Object convertDouble(double value, ConversionTarget target)
@@ -181,36 +180,26 @@ final class ConvertUtil {
                 return ReflectUtil.createPrimitive(target, (float) value, Float.TYPE);
             case FLOAT64:
                 return ReflectUtil.createPrimitive(target, value, Double.TYPE);
-            default:
-                return convertComplex(value, 0, target);
         }
+        throw new ConversionException("Can't convert " + value + " to " + target.getTargetType());
     }
 
     /**
-     * Converts complex values to complex values only.
-     * This is used to check O(n) conversion rules instead of O(n^2) for n numeric types.
-     */
-    private static Object convertComplex(double real, double imag, ConversionTarget target)
-            throws ConversionException {
-        return ReflectUtil.createComplex(target, real, imag);
-    }
-
-    /**
-     * Converts from uint to number, one of uint, int, float or complex.
+     * Converts from uint to number, one of uint, int or float.
      */
     static Object convertFromUint(long value, ConversionTarget target) throws ConversionException {
         return convertUint(value, target);
     }
 
     /**
-     * Converts from byte to number, one of uint, int, float or complex.
+     * Converts from byte to number, one of uint, int or float.
      */
     static Object convertFromByte(byte value, ConversionTarget target) throws ConversionException {
         return convertUint(value & 0xffL, target);
     }
 
     /**
-     * Converts from int to number, one of uint, int, float or complex.
+     * Converts from int to number, one of uint, int or float.
      */
     static Object convertFromInt(long value, ConversionTarget target) throws ConversionException {
         if (canConvertIntToUint(value, 64)) {
@@ -221,7 +210,7 @@ final class ConvertUtil {
     }
 
     /**
-     * Converts from float to number, one of uint, int, float or complex.
+     * Converts from float to number, one of uint, int or float.
      */
     static Object convertFromDouble(double value, ConversionTarget target)
             throws ConversionException {
@@ -233,8 +222,6 @@ final class ConvertUtil {
                 break;
             case FLOAT32:
             case FLOAT64:
-            case COMPLEX128:
-            case COMPLEX64:
                 break;
             default:
                 if (canConvertFloatToInt(value, 64)) {
@@ -242,18 +229,6 @@ final class ConvertUtil {
                 }
         }
         return convertDouble(value, target);
-    }
-
-    /**
-     * Converts from complex to number, one of uint, int, float or complex.
-     */
-    static Object convertFromComplex(double real, double imag, ConversionTarget target)
-            throws ConversionException {
-        if (imag == 0) {
-            return convertFromDouble(real, target);
-        } else {
-            return convertComplex(real, imag, target);
-        }
     }
 
     /**

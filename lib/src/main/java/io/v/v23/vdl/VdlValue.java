@@ -111,10 +111,6 @@ public abstract class VdlValue implements Serializable {
                 return new VdlBool();
             case BYTE:
                 return new VdlByte();
-            case COMPLEX128:
-                return new VdlComplex128(0);
-            case COMPLEX64:
-                return new VdlComplex64(0);
             case ENUM:
                 return new VdlEnum(type, type.getLabels().get(0));
             case FLOAT32:

@@ -66,14 +66,6 @@ public class TypeTest extends TestCase {
     private static final class MyString extends VdlString {
         private static final long serialVersionUID = 1L;
     }
-    @GeneratedFromVdl(name = "MyComplex64")
-    private static final class MyComplex64 extends VdlComplex64 {
-        private static final long serialVersionUID = 1L;
-    }
-    @GeneratedFromVdl(name = "MyComplex128")
-    private static final class MyComplex128 extends VdlComplex128 {
-        private static final long serialVersionUID = 1L;
-    }
 
     @SuppressWarnings("unused")
     @GeneratedFromVdl(name = "MyUnion")
@@ -178,8 +170,6 @@ public class TypeTest extends TestCase {
         VdlType myFloat32 = Types.named("MyFloat32", Types.FLOAT32);
         VdlType myFloat64 = Types.named("MyFloat64", Types.FLOAT64);
         VdlType myString = Types.named("MyString", Types.STRING);
-        VdlType myComplex64 = Types.named("MyComplex64", Types.COMPLEX64);
-        VdlType myComplex128 = Types.named("MyComplex128", Types.COMPLEX128);
 
         VdlType myUnion = Types.named("MyUnion", Types.unionOf(new VdlField("A", myInt16),
                 new VdlField("B", Types.INT32), new VdlField("C", Types.INT64)));
@@ -210,8 +200,6 @@ public class TypeTest extends TestCase {
                 .put(myFloat32, MyFloat32.class)
                 .put(myFloat64, MyFloat64.class)
                 .put(myString, MyString.class)
-                .put(myComplex64, MyComplex64.class)
-                .put(myComplex128, MyComplex128.class)
                 .put(myUnion, MyUnion.class)
                 .put(myEnum, MyEnum.class)
                 .put(myArray12, MyArray12.class)

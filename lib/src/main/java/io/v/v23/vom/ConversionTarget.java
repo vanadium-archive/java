@@ -11,8 +11,6 @@ import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlBool;
 import io.v.v23.vdl.VdlByte;
-import io.v.v23.vdl.VdlComplex128;
-import io.v.v23.vdl.VdlComplex64;
 import io.v.v23.vdl.VdlEnum;
 import io.v.v23.vdl.VdlFloat32;
 import io.v.v23.vdl.VdlFloat64;
@@ -50,8 +48,6 @@ public class ConversionTarget {
             case ARRAY: return new TypeToken<VdlArray<VdlValue>>(){}.getType();
             case BOOL: return VdlBool.class;
             case BYTE: return VdlByte.class;
-            case COMPLEX128: return VdlComplex128.class;
-            case COMPLEX64: return VdlComplex64.class;
             case ENUM: return VdlEnum.class;
             case FLOAT32: return VdlFloat32.class;
             case FLOAT64: return VdlFloat64.class;

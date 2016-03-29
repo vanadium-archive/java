@@ -8,7 +8,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-        classpath 'io.v:gradle-plugin:1.4'
+        classpath 'io.v:gradle-plugin:1.6'
     }
 }
 
@@ -59,8 +59,11 @@ dependencies {
     }
 }
 
+def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+
 vdl {
     inputPaths += 'src/main/java'
+    vdlToolPath = 'vdl'
 }
 
 public static isDarwin() {
@@ -85,7 +88,6 @@ public static getOS() {
 
 class VanadiumEnvironment {
     File jiriRoot;
-    File jiriBin;
 
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
@@ -97,13 +99,6 @@ class VanadiumEnvironment {
         }
 
         result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
-        result.jiriBin = new File(result.jiriRoot, ['.jiri_root', 'scripts', 'jiri'].join(File.separator))
-        if (!result.jiriBin.exists() || !result.jiriBin.isFile() || !result.jiriBin.canExecute()) {
-            throw new InvalidUserDataException(
-                    result.jiriBin.toString() + " does not exist or is not an executable file. "
-                    + "Please follow the Vanadium installation instructions at "
-                    + "https://vanadium.github.io/installation/")
-        }
         return result
     }
 }
@@ -124,10 +119,9 @@ enum VanadiumSupportedArchitecture {
 // Returns a task that will build the Vanadium native library for the given architecture.
 def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
     def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
-    def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 
     def check = task("checkVanadiumAndroidEnvironment-${arch.goArch}", type: Exec) {
-        commandLine jiriBin, 'profile', 'list',
+        commandLine 'jiri', 'profile', 'list',
                 '--info', 'Target.InstallationDir', "--target=${arch.goArch}-android", 'v23:android'
         standardOutput = new ByteArrayOutputStream()
         doLast {
@@ -150,7 +144,7 @@ def buildVanadiumLib(VanadiumSupportedArchitecture arch) {
         // safe here.)
         environment "GOOS", "android"
         environment "GOARCH", "${arch.goArch}"
-        commandLine jiriBin, 'go', "--target=${arch.goArch}-android", 'install',
+        commandLine 'jiri', 'go', "--target=${arch.goArch}-android", 'install',
                 '-buildmode=c-shared', '-v', '-tags', 'android',
           '-installsuffix=shared', 'v.io/x/jni/main'
     }

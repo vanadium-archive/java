@@ -34,8 +34,6 @@ public final class BootstrapType {
                 .put(Types.INT64, Constants.WIRE_ID_INT_64)
                 .put(Types.FLOAT32, Constants.WIRE_ID_FLOAT_32)
                 .put(Types.FLOAT64, Constants.WIRE_ID_FLOAT_64)
-                .put(Types.COMPLEX64, Constants.WIRE_ID_COMPLEX_64)
-                .put(Types.COMPLEX128, Constants.WIRE_ID_COMPLEX_128)
                 .put(Types.TYPEOBJECT, Constants.WIRE_ID_TYPE_OBJECT)
                 .put(Types.ANY, Constants.WIRE_ID_ANY)
 

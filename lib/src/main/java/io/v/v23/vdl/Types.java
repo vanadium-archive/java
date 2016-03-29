@@ -101,16 +101,6 @@ public final class Types {
     public static final VdlType FLOAT64 = createPrimitiveType(Kind.FLOAT64);
 
     /**
-     * The {@code VdlType} object representing the VDL type complex64, it is unnamed.
-     */
-    public static final VdlType COMPLEX64 = createPrimitiveType(Kind.COMPLEX64);
-
-    /**
-     * The {@code VdlType} object representing the VDL type complex128, it is unnamed.
-     */
-    public static final VdlType COMPLEX128 = createPrimitiveType(Kind.COMPLEX128);
-
-    /**
      * The {@code VdlType} object representing the VDL type string, it is unnamed.
      */
     public static final VdlType STRING = createPrimitiveType(Kind.STRING);
@@ -138,8 +128,6 @@ public final class Types {
         typeCache.put(VdlInt64.class, INT64);
         typeCache.put(VdlFloat32.class, FLOAT32);
         typeCache.put(VdlFloat64.class, FLOAT64);
-        typeCache.put(VdlComplex64.class, COMPLEX64);
-        typeCache.put(VdlComplex128.class, COMPLEX128);
         typeCache.put(VdlString.class, STRING);
         typeCache.put(VdlTypeObject.class, TYPEOBJECT);
 
@@ -214,10 +202,6 @@ public final class Types {
                 return FLOAT32;
             case FLOAT64:
                 return FLOAT64;
-            case COMPLEX64:
-                return COMPLEX64;
-            case COMPLEX128:
-                return COMPLEX128;
             case STRING:
                 return STRING;
             case TYPEOBJECT:
@@ -384,10 +368,6 @@ public final class Types {
                 return Boolean.class;
             case BYTE:
                 return Byte.class;
-            case COMPLEX128:
-                return VdlComplex128.class;
-            case COMPLEX64:
-                return VdlComplex64.class;
             case FLOAT32:
                 return Float.class;
             case FLOAT64:

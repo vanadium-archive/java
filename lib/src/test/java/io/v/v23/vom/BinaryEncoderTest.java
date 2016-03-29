@@ -13,8 +13,6 @@ import junit.framework.TestCase;
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlArray;
-import io.v.v23.vdl.VdlComplex128;
-import io.v.v23.vdl.VdlComplex64;
 import io.v.v23.vdl.VdlEnum;
 import io.v.v23.vdl.VdlField;
 import io.v.v23.vdl.VdlOptional;
@@ -37,8 +35,6 @@ public class BinaryEncoderTest extends TestCase {
                     new VdlArray<Integer>(Types.arrayOf(4, Types.INT32), new Integer[]{0, 0, 0, 0}))
             .put(Types.BOOL, false)
             .put(Types.BYTE, (byte) 0)
-            .put(Types.COMPLEX128, new VdlComplex128(0, 0))
-            .put(Types.COMPLEX64, new VdlComplex64(0, 0))
             .put(Types.enumOf("A", "B", "C"), new VdlEnum(Types.enumOf("A", "B", "C"), "A"))
             .put(Types.FLOAT32, 0f)
             .put(Types.FLOAT64, 0.)

@@ -11,8 +11,6 @@ import io.v.v23.vdl.VdlAny;
 import io.v.v23.vdl.VdlArray;
 import io.v.v23.vdl.VdlBool;
 import io.v.v23.vdl.VdlByte;
-import io.v.v23.vdl.VdlComplex128;
-import io.v.v23.vdl.VdlComplex64;
 import io.v.v23.vdl.VdlEnum;
 import io.v.v23.vdl.VdlField;
 import io.v.v23.vdl.VdlFloat32;
@@ -192,8 +190,6 @@ public class BinaryEncoder {
             case INT64:
             case FLOAT32:
             case FLOAT64:
-            case COMPLEX64:
-            case COMPLEX128:
             case STRING:
                 return new WireType.NamedT(new WireNamed(
                         type.getName(), getTypeInternal(Types.primitiveTypeFromKind(type.getKind()), pending)));
@@ -286,9 +282,6 @@ public class BinaryEncoder {
                 }
             case BOOL:
                 return writeVdlBool(out, value);
-            case COMPLEX64:
-            case COMPLEX128:
-                return writeVdlComplex(out, value);
             case ENUM:
                 return writeVdlEnum(out, value);
             case FLOAT32:
@@ -461,24 +454,6 @@ public class BinaryEncoder {
                     + ", value " + value + ")");
         }
         return byteValue != 0;
-    }
-
-    /**
-     * Writes a VDL complex to output stream and returns true iff the value is non-zero.
-     */
-    private boolean writeVdlComplex(EncodingStream out, Object value) throws IOException {
-        if (value instanceof VdlComplex64) {
-            boolean isNonZero = BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getReal());
-            isNonZero |= BinaryUtil.encodeDouble(out, ((VdlComplex64) value).getImag());
-            return isNonZero;
-        } else if (value instanceof VdlComplex128) {
-            boolean isNonZero = BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getReal());
-            isNonZero |= BinaryUtil.encodeDouble(out, ((VdlComplex128) value).getImag());
-            return isNonZero;
-        } else {
-            throw new IOException("Unsupported VDL complex value (type " + value.getClass()
-                    + ", value " + value + ")");
-        }
     }
 
     /**

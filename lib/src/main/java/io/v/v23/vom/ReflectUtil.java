@@ -5,8 +5,6 @@
 package io.v.v23.vom;
 
 import io.v.v23.vdl.VdlArray;
-import io.v.v23.vdl.VdlComplex128;
-import io.v.v23.vdl.VdlComplex64;
 import io.v.v23.vdl.VdlEnum;
 import io.v.v23.vdl.VdlList;
 import io.v.v23.vdl.VdlMap;
@@ -54,32 +52,6 @@ final class ReflectUtil {
         } catch (Exception e) {
             throw new ConversionException(value, targetClass, e);
         }
-    }
-
-    /**
-     * Creates an instance of VDL complex. The target class should be inherited from
-     * {@code VdlValue}.
-     */
-    static VdlValue createComplex(ConversionTarget target, double real, double imag)
-            throws ConversionException {
-        Class<?> targetClass = target.getTargetClass();
-        try {
-            if (targetClass == VdlComplex64.class) {
-                return new VdlComplex64(target.getVdlType(), (float) real, (float) imag);
-            } else if (targetClass == VdlComplex128.class) {
-                return new VdlComplex128(target.getVdlType(), real, imag);
-            } else if (VdlComplex64.class.isAssignableFrom(targetClass)) {
-                return (VdlValue) targetClass.getConstructor(Float.TYPE, Float.TYPE)
-                        .newInstance((float) real, (float) imag);
-            } else if (VdlComplex128.class.isAssignableFrom(targetClass)) {
-                return (VdlValue) targetClass.getConstructor(Double.TYPE, Double.TYPE)
-                        .newInstance(real, imag);
-            }
-        } catch (Exception e) {
-            throw new ConversionException(
-                    new VdlComplex128(real, imag), targetClass, e);
-        }
-        throw new ConversionException(new VdlComplex128(real, imag), targetClass);
     }
 
     /**

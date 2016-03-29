@@ -217,9 +217,6 @@ public class BinaryDecoder {
                 return readVdlBool(target);
             case BYTE:
                 return readVdlByte(target);
-            case COMPLEX64:
-            case COMPLEX128:
-                return readVdlComplex(target);
             case ENUM:
                 return readVdlEnum(actualType, target);
             case FLOAT32:
@@ -373,11 +370,6 @@ public class BinaryDecoder {
             b = (byte)BinaryUtil.decodeUint(in);
         }
         return ConvertUtil.convertFromByte(b, target);
-    }
-
-    private Object readVdlComplex(ConversionTarget target) throws IOException, ConversionException {
-        return ConvertUtil.convertFromComplex(BinaryUtil.decodeDouble(in),
-                BinaryUtil.decodeDouble(in), target);
     }
 
     private Object readVdlEnum(VdlType actualType, ConversionTarget target) throws IOException,

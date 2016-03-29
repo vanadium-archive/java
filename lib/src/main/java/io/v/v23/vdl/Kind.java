@@ -19,8 +19,6 @@ public enum Kind {
     INT64,
     FLOAT32,
     FLOAT64,
-    COMPLEX64,
-    COMPLEX128,
     STRING,
     ENUM,
     TYPEOBJECT,

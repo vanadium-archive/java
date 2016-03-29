@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 
 import io.v.v23.vdl.Types;
 import io.v.v23.vdl.VdlByte;
-import io.v.v23.vdl.VdlComplex128;
-import io.v.v23.vdl.VdlComplex64;
 import io.v.v23.vdl.VdlFloat32;
 import io.v.v23.vdl.VdlFloat64;
 import io.v.v23.vdl.VdlInt16;
@@ -24,8 +22,6 @@ import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlUint64;
 import io.v.v23.vom.testdata.types.NArray2Uint64;
 import io.v.v23.vom.testdata.types.NByte;
-import io.v.v23.vom.testdata.types.NComplex128;
-import io.v.v23.vom.testdata.types.NComplex64;
 import io.v.v23.vom.testdata.types.NEnum;
 import io.v.v23.vom.testdata.types.NFloat32;
 import io.v.v23.vom.testdata.types.NFloat64;
@@ -77,85 +73,74 @@ public class ConvertUtilTest extends TestCase {
         {Long.TYPE, Long.class, VdlInt64.class, NInt64.class},
         {Float.TYPE, Float.class, VdlFloat32.class, NFloat32.class},
         {Double.TYPE, Double.class, VdlFloat64.class, NFloat64.class},
-        {NComplex64.class, VdlComplex64.class},
-        {NComplex128.class, VdlComplex128.class}
     };
 
     private static final NumericConversionTestCase[] numericTests = {
+        // TODO(bprosnitz) This test is really cryptic - it should probably use a list or set of types instead.
         // bytes
-        new NumericConversionTestCase((byte) 0,                                 "11111111111"),
-        new NumericConversionTestCase((byte) 0xf,                               "11111111111"),
-        new NumericConversionTestCase((byte) 0xff,                              "11111111111"),
+        new NumericConversionTestCase((byte) 0,                                 "111111111"),
+        new NumericConversionTestCase((byte) 0xf,                               "111111111"),
+        new NumericConversionTestCase((byte) 0xff,                              "111111111"),
         // uints
-        new NumericConversionTestCase(new VdlUint64(0L),                        "11111111111"),
-        new NumericConversionTestCase(new VdlUint64(0xfL),                      "11111111111"),
-        new NumericConversionTestCase(new VdlUint64(0xffL),                     "11111111111"),
-        new NumericConversionTestCase(new VdlUint64(0xfffL),                    "01111111111"),
-        new NumericConversionTestCase(new VdlUint64(0x7ffL),                    "01111111111"),
-        new NumericConversionTestCase(new VdlUint64(0xffffL),                   "01110111111"),
-        new NumericConversionTestCase(new VdlUint64(0xffffffL),                 "00110111111"),
-        new NumericConversionTestCase(new VdlUint64(0x1000000L),                "00110111111"),
-        new NumericConversionTestCase(new VdlUint64(0x1000001L),                "00110110101"),
-        new NumericConversionTestCase(new VdlUint64(0x7fffffffL),               "00110110101"),
-        new NumericConversionTestCase(new VdlUint64(0xffffffffL),               "00110010101"),
-        new NumericConversionTestCase(new VdlUint64(0xffffffffffffL),           "00010010101"),
-        new NumericConversionTestCase(new VdlUint64(0x20000000000000L),         "00010010101"),
-        new NumericConversionTestCase(new VdlUint64(0x20000000000001L),         "00010010000"),
-        new NumericConversionTestCase(new VdlUint64(0x7fffffffffffffffL),       "00010010000"),
-        new NumericConversionTestCase(new VdlUint64(0xffffffffffffffffL),       "00010000000"),
+        new NumericConversionTestCase(new VdlUint64(0L),                        "111111111"),
+        new NumericConversionTestCase(new VdlUint64(0xfL),                      "111111111"),
+        new NumericConversionTestCase(new VdlUint64(0xffL),                     "111111111"),
+        new NumericConversionTestCase(new VdlUint64(0xfffL),                    "011111111"),
+        new NumericConversionTestCase(new VdlUint64(0x7ffL),                    "011111111"),
+        new NumericConversionTestCase(new VdlUint64(0xffffL),                   "011101111"),
+        new NumericConversionTestCase(new VdlUint64(0xffffffL),                 "001101111"),
+        new NumericConversionTestCase(new VdlUint64(0x1000000L),                "001101111"),
+        new NumericConversionTestCase(new VdlUint64(0x1000001L),                "001101101"),
+        new NumericConversionTestCase(new VdlUint64(0x7fffffffL),               "001101101"),
+        new NumericConversionTestCase(new VdlUint64(0xffffffffL),               "001100101"),
+        new NumericConversionTestCase(new VdlUint64(0xffffffffffffL),           "000100101"),
+        new NumericConversionTestCase(new VdlUint64(0x20000000000000L),         "000100101"),
+        new NumericConversionTestCase(new VdlUint64(0x20000000000001L),         "000100100"),
+        new NumericConversionTestCase(new VdlUint64(0x7fffffffffffffffL),       "000100100"),
+        new NumericConversionTestCase(new VdlUint64(0xffffffffffffffffL),       "000100000"),
         // positive ints
-        new NumericConversionTestCase(0L,                                       "11111111111"),
-        new NumericConversionTestCase(0xfL,                                     "11111111111"),
-        new NumericConversionTestCase(0xffL,                                    "11111111111"),
-        new NumericConversionTestCase(0xfffL,                                   "01111111111"),
-        new NumericConversionTestCase(0x7ffL,                                   "01111111111"),
-        new NumericConversionTestCase(0xffffL,                                  "01110111111"),
-        new NumericConversionTestCase(0xffffffL,                                "00110111111"),
-        new NumericConversionTestCase(0x1000000L,                               "00110111111"),
-        new NumericConversionTestCase(0x1000001L,                               "00110110101"),
-        new NumericConversionTestCase(0x7fffffffL,                              "00110110101"),
-        new NumericConversionTestCase(0xffffffffL,                              "00110010101"),
-        new NumericConversionTestCase(0xffffffffffffL,                          "00010010101"),
-        new NumericConversionTestCase(0x20000000000000L,                        "00010010101"),
-        new NumericConversionTestCase(0x7fffffffffffffffL,                      "00010010000"),
+        new NumericConversionTestCase(0L,                                       "111111111"),
+        new NumericConversionTestCase(0xfL,                                     "111111111"),
+        new NumericConversionTestCase(0xffL,                                    "111111111"),
+        new NumericConversionTestCase(0xfffL,                                   "011111111"),
+        new NumericConversionTestCase(0x7ffL,                                   "011111111"),
+        new NumericConversionTestCase(0xffffL,                                  "011101111"),
+        new NumericConversionTestCase(0xffffffL,                                "001101111"),
+        new NumericConversionTestCase(0x1000000L,                               "001101111"),
+        new NumericConversionTestCase(0x1000001L,                               "001101101"),
+        new NumericConversionTestCase(0x7fffffffL,                              "001101101"),
+        new NumericConversionTestCase(0xffffffffL,                              "001100101"),
+        new NumericConversionTestCase(0xffffffffffffL,                          "000100101"),
+        new NumericConversionTestCase(0x20000000000000L,                        "000100101"),
+        new NumericConversionTestCase(0x7fffffffffffffffL,                      "000100100"),
         // negative ints
-        new NumericConversionTestCase(-1L,                                      "00001111111"),
-        new NumericConversionTestCase(-0x10L,                                   "00001111111"),
-        new NumericConversionTestCase(-0x80L,                                   "00001111111"),
-        new NumericConversionTestCase(-0x800L,                                  "00001111111"),
-        new NumericConversionTestCase(-0x8000L,                                 "00001111111"),
-        new NumericConversionTestCase(-0x800000L,                               "00000111111"),
-        new NumericConversionTestCase(-0x80000000L,                             "00000110101"),
-        new NumericConversionTestCase(-0x800000000000L,                         "00000010101"),
-        new NumericConversionTestCase(-0x20000000000000L,                       "00000010101"),
-        new NumericConversionTestCase(-0x8000000000000000L,                     "00000010000"),
+        new NumericConversionTestCase(-1L,                                      "000011111"),
+        new NumericConversionTestCase(-0x10L,                                   "000011111"),
+        new NumericConversionTestCase(-0x80L,                                   "000011111"),
+        new NumericConversionTestCase(-0x800L,                                  "000011111"),
+        new NumericConversionTestCase(-0x8000L,                                 "000011111"),
+        new NumericConversionTestCase(-0x800000L,                               "000001111"),
+        new NumericConversionTestCase(-0x80000000L,                             "000001101"),
+        new NumericConversionTestCase(-0x800000000000L,                         "000000101"),
+        new NumericConversionTestCase(-0x20000000000000L,                       "000000101"),
+        new NumericConversionTestCase(-0x8000000000000000L,                     "000000100"),
         // positive floats
-        new NumericConversionTestCase(1e0f,                                     "11111111111"),
-        new NumericConversionTestCase(1e2f,                                     "11111111111"),
-        new NumericConversionTestCase(1e4f,                                     "01111111111"),
-        new NumericConversionTestCase(1e8f,                                     "00110111111"),
-        new NumericConversionTestCase(1e16f,                                    "00010011111"),
-        new NumericConversionTestCase(1e19f,                                    "00010001111"),
-        new NumericConversionTestCase(1e20f,                                    "00000001111"),
-        new NumericConversionTestCase(1.1e0f,                                   "00000001111"),
+        new NumericConversionTestCase(1e0f,                                     "111111111"),
+        new NumericConversionTestCase(1e2f,                                     "111111111"),
+        new NumericConversionTestCase(1e4f,                                     "011111111"),
+        new NumericConversionTestCase(1e8f,                                     "001101111"),
+        new NumericConversionTestCase(1e16f,                                    "000100111"),
+        new NumericConversionTestCase(1e19f,                                    "000100011"),
+        new NumericConversionTestCase(1e20f,                                    "000000011"),
+        new NumericConversionTestCase(1.1e0f,                                   "000000011"),
         // negative doubles
-        new NumericConversionTestCase(-1e0f,                                    "00001111111"),
-        new NumericConversionTestCase(-1e2f,                                    "00001111111"),
-        new NumericConversionTestCase(-1e4f,                                    "00001111111"),
-        new NumericConversionTestCase(-1e8f,                                    "00000111111"),
-        new NumericConversionTestCase(-1e16f,                                   "00000011111"),
-        new NumericConversionTestCase(-1e20f,                                   "00000001111"),
-        new NumericConversionTestCase(-1.1e0f,                                  "00000001111"),
-        // complex values
-        new NumericConversionTestCase(new VdlComplex128(0f),                    "11111111111"),
-        new NumericConversionTestCase(new VdlComplex128(1e8f),                  "00110111111"),
-        new NumericConversionTestCase(new VdlComplex128(1e20f),                 "00000001111"),
-        new NumericConversionTestCase(new VdlComplex128(1.1e0f),                "00000001111"),
-        new NumericConversionTestCase(new VdlComplex128(-1f),                   "00001111111"),
-        new NumericConversionTestCase(new VdlComplex128(-1e8f),                 "00000111111"),
-        new NumericConversionTestCase(new VdlComplex128(-1e20f),                "00000001111"),
-        new NumericConversionTestCase(new VdlComplex128(-1.1e0f),               "00000001111"),
-        new NumericConversionTestCase(new VdlComplex128(0f, 1f),                "00000000011"),
+        new NumericConversionTestCase(-1e0f,                                    "000011111"),
+        new NumericConversionTestCase(-1e2f,                                    "000011111"),
+        new NumericConversionTestCase(-1e4f,                                    "000011111"),
+        new NumericConversionTestCase(-1e8f,                                    "000001111"),
+        new NumericConversionTestCase(-1e16f,                                   "000000111"),
+        new NumericConversionTestCase(-1e20f,                                   "000000011"),
+        new NumericConversionTestCase(-1.1e0f,                                  "000000011"),
     };
 
     private static final Type[][] bytesTypes = {
@@ -192,10 +177,6 @@ public class ConvertUtilTest extends TestCase {
                 return ConvertUtil.convertFromInt((Long) value, target);
             } else if (value instanceof Float) {
                 return ConvertUtil.convertFromDouble((Float) value, target);
-            } else if (value instanceof VdlComplex128) {
-                double real = ((VdlComplex128) value).getReal();
-                double imag = ((VdlComplex128) value).getImag();
-                return ConvertUtil.convertFromComplex(real, imag, target);
             } else {
                 throw new IllegalArgumentException("Unexpected value " + value);
             }
@@ -226,14 +207,6 @@ public class ConvertUtilTest extends TestCase {
         return BigDecimal.valueOf(value).multiply(BigDecimal.valueOf(2).pow(power));
     }
 
-    private BigDecimal normalizeComplex(VdlComplex128 value) {
-        BigDecimal result = normalizeDouble(value.getReal());
-        if (value.getImag() !=0 ) {
-            result = result.add(normalizeDouble(value.getImag()).multiply(BigDecimal.TEN.pow(100)));
-        }
-        return result;
-    }
-
     private BigDecimal normalize(Object value) {
         if (value instanceof Byte) {
             return normalizeUint(((Byte) value) & 0xffL);
@@ -262,14 +235,9 @@ public class ConvertUtilTest extends TestCase {
         } else if (value instanceof Double) {
             return normalizeDouble((Double) value);
         } else if (value instanceof VdlFloat32) {
-            return normalizeComplex(new VdlComplex128(((VdlFloat32) value).getValue()));
+            return normalizeDouble(((VdlFloat32)value).getValue());
         } else if (value instanceof VdlFloat64) {
-            return normalizeComplex(new VdlComplex128(((VdlFloat64) value).getValue()));
-        } else if (value instanceof VdlComplex64) {
-            return normalizeComplex(new VdlComplex128(((VdlComplex64) value).getReal(),
-                    ((VdlComplex64) value).getImag()));
-        } else if (value instanceof VdlComplex128) {
-            return normalizeComplex((VdlComplex128) value);
+            return normalizeDouble(((VdlFloat64)value).getValue());
         } else {
             throw new IllegalArgumentException("Unexpected value " + value);
         }

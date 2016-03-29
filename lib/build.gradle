@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'io.v:gradle-plugin:1.4'
+        classpath 'io.v:gradle-plugin:1.6'
     }
 }
 
@@ -78,13 +78,11 @@ def String getOsName() {
 }
 
 def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
-def jiriBin = VanadiumEnvironment.getVanadiumEnvironment().jiriBin.getAbsolutePath()
 
 sourceSets.main.java.srcDirs += 'generated-src/vdl'
 
 class VanadiumEnvironment {
     File jiriRoot;
-    File jiriBin;
 
     public static getVanadiumEnvironment() {
         VanadiumEnvironment result = new VanadiumEnvironment()
@@ -96,13 +94,6 @@ class VanadiumEnvironment {
         }
 
         result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
-        result.jiriBin = new File(result.jiriRoot, ['.jiri_root', 'scripts', 'jiri'].join(File.separator))
-        if (!result.jiriBin.exists() || !result.jiriBin.isFile() || !result.jiriBin.canExecute()) {
-            throw new InvalidUserDataException(
-                    result.jiriBin.toString() + " does not exist or is not an executable file. "
-                    + "Please follow the Vanadium installation instructions at "
-                    + "https://vanadium.github.io/installation/")
-        }
         return result
     }
 }
@@ -134,7 +125,7 @@ task goBuildVanadiumLib(type: Exec, dependsOn: checkVanadiumEnvironment) {
 
     // NOTE(spetrovic): we add the '-installsuffix=shared' flag because the build doesn't work
     // without it on linux/arm.  (There is some conflict with "regular", i.e., non-shared builds).
-    commandLine jiriBin, 'go', '--profiles=v23:java', 'install', '-buildmode=c-shared', '-v',
+    commandLine 'jiri', 'go', '--profiles=v23:java', 'install', '-buildmode=c-shared', '-v',
                 '-tags', 'java', '-installsuffix=shared', 'v.io/x/jni/main'
 }
 
@@ -333,7 +324,7 @@ vdl {
     inputPaths += [jiriRoot, 'release', 'go', 'src'].join(File.separator)
     vdlRootPath = [jiriRoot, 'release', 'go', 'src', 'v.io', 'v23', 'vdlroot'].join(File.separator)
     generateVdlRoot = true
-    vdlToolPath = [jiriRoot, 'release', 'go', 'bin', 'vdl'].join(File.separator)
+    vdlToolPath = 'vdl'
 }
 
 bintray {

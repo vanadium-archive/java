@@ -158,8 +158,6 @@ public final class BinaryUtil {
         switch (type.getKind()) {
             case ANY:
             case ARRAY:
-            case COMPLEX64:
-            case COMPLEX128:
             case LIST:
             case MAP:
             case OPTIONAL:
