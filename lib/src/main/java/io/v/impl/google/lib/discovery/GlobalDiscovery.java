@@ -16,7 +16,7 @@ import org.joda.time.Duration;
  * TODO(jhahn): This is an experimental work to see its feasibility and set
  * the long-term goal, and can be changed without notice.
  */
-class GlobalDiscovery {
+public class GlobalDiscovery {
     private static native Discovery nativeNewDiscovery(
             VContext ctx, String path, Duration mountTtl, Duration scanInterval) throws VException;
 
