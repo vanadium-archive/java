@@ -379,10 +379,11 @@ public class BinaryEncoder {
         expectClass(Kind.ARRAY, value, VdlArray.class);
         VdlArray<?> arrayValue = (VdlArray<?>) value;
         BinaryUtil.encodeUint(out, 0);
+        boolean isNonzero = false;
         for (Object elem : arrayValue) {
-            writeValue(out, elem, arrayValue.vdlType().getElem());
+            isNonzero = writeValue(out, elem, arrayValue.vdlType().getElem()) || isNonzero;
         }
-        return arrayValue.size() != 0;
+        return isNonzero;
     }
 
     /**
