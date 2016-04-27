@@ -199,13 +199,23 @@ public interface Namespace {
                                                      Options options);
 
     /**
+     * Sets the new caching policy, returning the previous one.
+     * <p>
+     * This is a non-blocking method.
+     *
+     * @param doCaching if {@code true}, this namespace will cache entries;  otherwise, it won't
+     */
+    boolean setCachingPolicy(boolean doCaching);
+
+    /**
      * Flushes resolution information cached for the given name. If anything was flushed it returns
      * {@code true}.
      * <p>
      * This is a non-blocking method.
      *
      * @param context a client context
-     * @param name a Vanadium name, see also <a href="https://vanadium.github.io/glossary.html#object-name">the
+     * @param name a Vanadium name, see also
+     *             <a href="https://vanadium.github.io/glossary.html#object-name">the
      *             Name entry</a> in the glossary
      * @return {@code true} iff resolution information for the name was successfully flushed
      */
@@ -257,6 +267,15 @@ public interface Namespace {
     void setRoots(List<String> roots) throws VException;
 
     /**
+     * Returns the currently configured roots.
+     * <p>
+     * An empty list is returned if no roots are configured.
+     * <p>
+     * This is a non-blocking method.
+     */
+    List<String> getRoots();
+
+    /**
      * A shortcut for {@link #setPermissions(VContext, String, Permissions, String, Options)} with a
      * {@code null} options parameter.
      */
@@ -289,6 +308,9 @@ public interface Namespace {
      *                a {@link VException} is thrown indicating that this call had no effect. If the
      *                version number is not specified, no version check is performed
      * @param options options to pass to the implementation as described above, or {@code null}
+     * @return        a new {@link ListenableFuture} that completes when the permissions have
+     *                been set
+     *
      */
     @CheckReturnValue
     ListenableFuture<Void> setPermissions(VContext context, String name, Permissions permissions,
@@ -320,9 +342,10 @@ public interface Namespace {
      * {@code context} gets canceled.
      *
      * @param context a client context
-     * @param name the name of the node
+     * @param name    the name of the node
      * @param options options to pass to the implementation as described above, or {@code null}
-     * @return a single-entry map from permissions version to permissions for the named object
+     * @return        a new {@link ListenableFuture} whose result is a single-entry map from
+     *                permissions version to permissions for the named object
      */
     @CheckReturnValue
     ListenableFuture<Map<String, Permissions>> getPermissions(VContext context, String name,

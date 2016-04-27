@@ -38,8 +38,7 @@ import io.v.v23.verror.VException;
  */
 public class VRuntimeImpl implements VRuntime {
     private static native VContext nativeInit() throws VException;
-    private static native ListenableFuture<Void> nativeShutdown(VContext context,
-                                                                Callback<Void> callback);
+    private static native void nativeShutdown(VContext context, Callback<Void> callback);
     private static native VContext nativeWithNewClient(VContext ctx, Options opts)
             throws VException;
     private static native Client nativeGetClient(VContext ctx) throws VException;

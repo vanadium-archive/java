@@ -45,9 +45,11 @@ public class NamespaceImpl implements Namespace {
                                                          Callback<MountEntry> callback);
     private static native void nativeResolve(long nativeRef, VContext context, String name,
                                              Options options, Callback<MountEntry> callback);
+    private static native boolean nativeSetCachingPolicy(long nativeRef, boolean doCaching);
     private static native boolean nativeFlushCacheEntry(long nativeRef, VContext context,
                                                         String name);
     private static native void nativeSetRoots(long nativeRef, List<String> roots) throws VException;
+    private static native List<String> nativeGetRoots(long nativeRef) throws VException;
     private static native void nativeSetPermissions(long nativeRef, VContext context, String name,
                                                     Permissions permissions, String version,
                                                     Options options, Callback<Void> callback);
@@ -126,6 +128,11 @@ public class NamespaceImpl implements Namespace {
     }
 
     @Override
+    public boolean setCachingPolicy(boolean doCaching) {
+        return nativeSetCachingPolicy(nativeRef, doCaching);
+    }
+
+    @Override
     public boolean flushCacheEntry(VContext ctx, String name) {
         return nativeFlushCacheEntry(nativeRef, ctx, name);
     }
@@ -147,6 +154,15 @@ public class NamespaceImpl implements Namespace {
     @Override
     public void setRoots(List<String> roots) throws VException {
         nativeSetRoots(nativeRef, roots);
+    }
+
+    @Override
+    public List<String> getRoots() {
+        try {
+            return nativeGetRoots(nativeRef);
+        } catch (VException e) {
+            throw new RuntimeException("Couldn't get roots.", e);
+        }
     }
 
     @Override
@@ -189,16 +205,16 @@ public class NamespaceImpl implements Namespace {
         if (this.getClass() != other.getClass()) {
             return false;
         }
-        return this.nativeRef == ((NamespaceImpl) other).nativeRef;
+        return nativeRef == ((NamespaceImpl) other).nativeRef;
     }
 
     @Override
     public int hashCode() {
-        return Long.valueOf(this.nativeRef).hashCode();
+        return Long.valueOf(nativeRef).hashCode();
     }
 
     @Override
     protected void finalize() {
-        nativeFinalize(this.nativeRef);
+        nativeFinalize(nativeRef);
     }
 }

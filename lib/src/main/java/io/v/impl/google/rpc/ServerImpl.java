@@ -4,6 +4,11 @@
 
 package io.v.impl.google.rpc;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
+import io.v.impl.google.ListenableFutureCallback;
+import io.v.v23.context.VContext;
+import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Server;
 import io.v.v23.rpc.ServerStatus;
 import io.v.v23.verror.VException;
@@ -14,6 +19,7 @@ public class ServerImpl implements Server {
     private native void nativeAddName(long nativeRef, String name) throws VException;
     private native void nativeRemoveName(long nativeRef, String name);
     private native ServerStatus nativeGetStatus(long nativeRef) throws VException;
+    private native void nativeAllPublished(long nativeRef, VContext ctx, Callback<Void> callback);
     private native void nativeFinalize(long nativeRef);
 
     private ServerImpl(long nativeRef) {
@@ -35,6 +41,12 @@ public class ServerImpl implements Server {
         } catch (VException e) {
             throw new RuntimeException("Couldn't get status", e);
         }
+    }
+    @Override
+    public ListenableFuture<Void> allPublished(VContext ctx) {
+        ListenableFutureCallback<Void> callback = new ListenableFutureCallback<>();
+        nativeAllPublished(nativeRef, ctx, callback);
+        return callback.getFuture(ctx);
     }
     // Implement java.lang.Object.
     @Override
