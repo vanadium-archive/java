@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.libs.inspectors;
+package io.v.android.inspectors;
 
 import android.util.Base64;
 import android.util.Log;

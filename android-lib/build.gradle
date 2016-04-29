@@ -7,28 +7,37 @@ buildscript {
 
     dependencies {
         classpath (
-                'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4',
+                'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6',
                 'com.android.tools.build:gradle:2.0.0',
                 // http://stackoverflow.com/questions/33881984/errorcause-com-android-sdklib-repository-fullrevision
                 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070',
-                'io.v:gradle-plugin:1.7'
+                'io.v:gradle-plugin:1.7',
+                'me.tatarka:gradle-retrolambda:3.2.4'
         )
     }
 }
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+/*
+You might have to download JDK8 and set JAVA8_HOME (or set the jdk to Java 8 via Project Structure).
+For detailed instructions, see https://github.com/evant/gradle-retrolambda
+ */
+apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'maven-publish'
-apply plugin: 'wrapper'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'io.v.vdl'
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
-def releaseVersion = '2.0'
+def releaseVersion = '2.1.0'
 
 android {
     buildToolsVersion '23.0.1'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     compileSdkVersion 23
 
     defaultConfig {
@@ -49,15 +58,20 @@ repositories {
 }
 
 dependencies {
+    // https://projectlombok.org/setup/android.html
+    // Follow Android Studio instructions at the bottom of the page to install the Lombok Plugin.
+    provided 'org.projectlombok:lombok:1.16.8'
     compile project(':lib')
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile "com.google.android.gms:play-services:8.4.0"
+    compile (
+            'com.android.support:support-v4:23.3.0',
+            'com.android.support:appcompat-v7:23.3.0',
+            'com.google.android.gms:play-services:8.4.0',
+            'io.reactivex:rxandroid:1.1.0',
+            'io.reactivex:rxjava:1.1.3',
+            'net.sourceforge.streamsupport:streamsupport:1.4.3'
+    )
+    testCompile 'com.google.truth:truth:0.28'
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'com.google.truth:truth:0.25'
-    // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
-    // should be fixed when http://git.io/vIXec is checked in and a release is made.
-    androidTestCompile 'com.android.support:appcompat-v7:23.3.0'
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
     }
@@ -236,10 +250,6 @@ publishing {
             }
         }
     }
-}
-
-wrapper {
-    gradleVersion = '2.4'
 }
 
 tasks.publishToMavenLocal.dependsOn(tasks.assemble)

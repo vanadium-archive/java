@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="clear_app_data">Clear app data</string>
+    <string name="debug">Debug</string>
+    <string name="inspect">Remote inspection</string>
+    <string name="kill_process">Kill process</string>
+    <string name="logging">Logging</string>
+    <string name="vlevel">V23 log verbosity</string>
+    <string name="vmodule">V23 module log verbosity</string>
+    <string name="reset">Reset</string>
+    <string name="restart">Restart app</string>
+
+    <!-- Remote inspection -->
+    <string name="inspect_email">E-mail to invite:</string>
+    <string name="inspect_invite">Invite</string>
+    <string name="inspect_enable">Enable</string>
+    <string name="inspect_disable">Disable</string>
+    <string name="inspect_email_subject">Please help me debug</string>
+
+    <!-- Errors -->
+    <string name="err_app_clear">Unable to clear app data</string>
+    <string name="err_inspect_setup">Unable to set up remote Vanadium inspection</string>
+    <string name="err_inspect_invite">Unable to invite remote Vanadium inspector</string>
+    <string name="err_inspect_email">Cannot send invitation. Install an e-mail app and retry.</string>
+    <string name="err_misc">Unknown error</string>
+    <string name="err_vinit_options">Invalid Vanadium options</string>
+</resources>

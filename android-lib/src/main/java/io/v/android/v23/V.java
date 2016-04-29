@@ -9,6 +9,7 @@ import android.content.Intent;
 
 import com.google.common.base.Preconditions;
 
+import io.v.android.UiThreadExecutor;
 import io.v.android.impl.google.services.gcm.GcmRegistrationService;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;

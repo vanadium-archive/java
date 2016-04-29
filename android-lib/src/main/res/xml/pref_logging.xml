@@ -1,0 +1,20 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+   <EditTextPreference
+        android:id="@+id/pref_vlevel"
+        android:key="io.v.v23.LOG_VLEVEL"
+        android:title="@string/vlevel"
+        android:selectAllOnFocus="true"
+        android:inputType="number"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:id="@+id/pref_vmodule"
+        android:key="io.v.v23.LOG_VMODULE"
+        android:title="@string/vmodule"
+        android:selectAllOnFocus="false"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+</PreferenceScreen>

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.android.v23;
+package io.v.android;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -16,7 +16,7 @@ public class UiThreadExecutor implements Executor {
     /**
      * Singleton instance of the UiThreadExecutor.
      */
-    public static UiThreadExecutor INSTANCE = new UiThreadExecutor();
+    public static final UiThreadExecutor INSTANCE = new UiThreadExecutor();
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 

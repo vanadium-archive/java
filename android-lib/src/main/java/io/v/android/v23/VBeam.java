@@ -36,8 +36,6 @@ import io.v.v23.verror.VException;
  * If the app is not installed on the destination phone, it will open in the Play store.
  */
 public class VBeam {
-    private final static String TAG = "VBeam";
-
     /**
      * A callback to be invoked when Beam has been inititaed to another device.
      */
