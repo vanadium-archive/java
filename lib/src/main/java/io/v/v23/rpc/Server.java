@@ -4,9 +4,6 @@
 
 package io.v.v23.rpc;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
-import io.v.v23.context.VContext;
 import io.v.v23.verror.VException;
 
 /**
@@ -28,23 +25,6 @@ public interface Server {
      * @param name name to be removed from the mount table
      */
     void removeName(String name);
-
-    /**
-     * Returns a new {@link ListenableFuture} that completes when the server has successfully
-     * published all of its endpoints.
-     * <p>
-     * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
-     * specified in {@code context} (see {@link io.v.v23.V#withExecutor}).
-     * <p>
-     * The returned future will fail with {@link java.util.concurrent.CancellationException} if
-     * {@code context} gets canceled.
-     *
-     * @param context a client context
-     * @return        a new listenable future that completes when the server has successfully
-     *                published all of its endpoints
-     *
-     */
-    ListenableFuture<Void> allPublished(VContext context);
 
     /**
      * Returns the current {@link ServerStatus} of the server.

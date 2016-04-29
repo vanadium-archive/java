@@ -64,7 +64,7 @@ public class V {
     // Initializes the Vanadium global state, i.e., state that needs to be cleaned up only
     // before the process is about to terminate.  This method is shared between Java and Android
     // implementations.
-    protected static void initGlobalShared() {
+    protected static VContext initGlobalShared(Options opts) {
         List<Throwable> errors = new ArrayList<Throwable>();
         try {
             // First, attempt to find the library in java.library.path.
@@ -119,11 +119,6 @@ public class V {
         } catch (VException e) {
             throw new RuntimeException("Couldn't register caveat validators", e);
         }
-    }
-
-    // Initializes the Vanadium global runtime.  This method is shared between Java and Android
-    // implementations.
-    protected static VContext initRuntime(Options opts) {
         // See if a runtime was provided as an option.
         if (opts.get(OptionDefs.RUNTIME) != null) {
             runtime = opts.get(OptionDefs.RUNTIME, VRuntime.class);
@@ -163,8 +158,7 @@ public class V {
                 return globalContext;
             }
             if (opts == null) opts = new Options();
-            initGlobalShared();
-            VContext ctx = initRuntime(opts);
+            VContext ctx = initGlobalShared(opts);
             ctx = initGlobalJava(ctx, opts);
             // Set the VException component name to this binary name.
             ctx = VException.contextWithComponentName(ctx, System.getProperty("program.name", ""));

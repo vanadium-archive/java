@@ -4,16 +4,12 @@
 
 package io.v.android.v23;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.preference.PreferenceManager;
-import android.util.Log;
+import android.content.Intent;
 
 import com.google.common.base.Preconditions;
 
 import io.v.android.impl.google.services.gcm.GcmRegistrationService;
-import io.v.android.impl.google.services.gcm.Util;
-import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
@@ -47,15 +43,15 @@ import java.security.interfaces.ECPublicKey;
  * </pre></blockquote><p>
  */
 public class V extends io.v.v23.V {
-    private static final String TAG = "Vanadium";
     private static native void nativeInitGlobalAndroid(Options opts) throws VException;
 
     private static volatile VContext globalContext;
 
     // Initializes the Vanadium Android-specific global state.
-    private static void initGlobalAndroid(Options opts) {
+    private static VContext initGlobalAndroid(VContext ctx, Options opts) {
         try {
             nativeInitGlobalAndroid(opts);
+            return V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
         } catch (VException e) {
             throw new RuntimeException("Couldn't initialize global Android state", e);
         }
@@ -72,12 +68,8 @@ public class V extends io.v.v23.V {
                 return globalContext;
             }
             if (opts == null) opts = new Options();
-            initGlobalShared();
-            initGlobalAndroid(opts);  // MUST be called before initRuntime()
-            VContext ctx = initRuntime(opts);
-            // Set the default executor to be the UT thread executor.
-            ctx = V.withExecutor(ctx, UiThreadExecutor.INSTANCE);
-
+            VContext ctx = initGlobalShared(opts);
+            ctx = initGlobalAndroid(ctx, opts);
             // Set the VException component name to the Android context package name.
             ctx = VException.contextWithComponentName(ctx, androidCtx.getPackageName());
             try {
@@ -87,26 +79,20 @@ public class V extends io.v.v23.V {
                 throw new RuntimeException("Couldn't setup Vanadium principal", e);
             }
             globalContext = ctx;
+            // Start the GCM registration service, which obtains the GCM token for the app
+            // (if the app is configured to use GCM).
+            // NOTE: this call may lead to a recursive call to V.init() (in a separate thread),
+            // so keep this code below the line where 'globalContext' is set, or we may run
+            // into an infinite recursion.
+            Intent intent = new Intent(androidCtx, GcmRegistrationService.class);
+            androidCtx.startService(intent);
             return ctx;
         }
     }
 
     // Initializes Vanadium state that's local to the invoking activity/service.
     private static VContext initAndroidLocal(VContext ctx, Context androidCtx, Options opts) {
-        ctx = ctx.withValue(new AndroidContextKey(), androidCtx);
-        if (Util.isServicePersistent(androidCtx)) {
-            // Set the new namespace, which will trigger the creation of a namespace that
-            // understands how to wakeup the service.
-            try {
-                ctx = V.withNewNamespace(
-                        ctx, V.getNamespace(ctx).getRoots().toArray(new String[]{}));
-            } catch (VException e) {
-                throw new RuntimeException(String.format(
-                        "Couldn't set namespace for persistent service %s: %s",
-                        androidCtx.getClass().getName(), e.toString()));
-            }
-        }
-        return ctx;
+        return ctx.withValue(new AndroidContextKey(), androidCtx);
     }
 
     /**
@@ -127,7 +113,7 @@ public class V extends io.v.v23.V {
      * <p>
      * If this option isn't provided, the default runtime implementation is used.
      *
-     * @param  androidCtx  Android context
+     * @param  androidCtx  Android application context
      * @param  opts        options for the default runtime
      * @return             base context
      */
@@ -149,28 +135,6 @@ public class V extends io.v.v23.V {
     @Deprecated
     public static VContext init() {
         throw new RuntimeException("Must call Android init with a context.");
-    }
-
-    /**
-     * Starts a <em>permanent</em> service, i.e., a service that can respond to Vanadium RPC
-     * requests even when it has been destroyed.
-     *
-     * @param androidCtx  Android context
-     * @param service     the service to start
-     */
-    public static void startPermanentService(Context androidCtx, ComponentName service) {
-        GcmRegistrationService.registerAndStartService(androidCtx, service);
-    }
-
-    /**
-     * Stops a <em>permanent</em> service, i.e., a service that can respond to Vanadium RPC
-     * requests even when it has been destroyed.
-     *
-     * @param androidCtx  Android context
-     * @param service     the service to stop
-     */
-    public static void stopPermanentService(Context androidCtx, ComponentName service) {
-        GcmRegistrationService.unregisterAndStopService(androidCtx, service);
     }
 
     private static VPrincipal createPrincipal(Context ctx) throws VException {
@@ -215,22 +179,6 @@ public class V extends io.v.v23.V {
         public int hashCode() {
             return 0;
         }
-    }
-
-    // Invoked from JNI code.
-    private static String getWakeupMountRoot(VContext ctx) {
-        Context androidCtx = getAndroidContext(ctx);
-        if (androidCtx == null || !Util.isServicePersistent(androidCtx)) {
-            // No wakeup.
-            return "";
-        }
-        String mtRoot = PreferenceManager.getDefaultSharedPreferences(androidCtx).getString(
-                GcmRegistrationService.WAKEUP_MOUNT_ROOT_PREF_KEY, "");
-        if (mtRoot.isEmpty()) {
-            Log.e(TAG, "Empty wakeup mount root.");
-            return "";
-        }
-        return NamingUtil.join(mtRoot, androidCtx.getClass().getName());
     }
 
     private V() {}

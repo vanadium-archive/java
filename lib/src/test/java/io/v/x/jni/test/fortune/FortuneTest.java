@@ -11,11 +11,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.common.util.concurrent.Uninterruptibles;
 
-import io.v.impl.google.namespace.NamespaceTestUtil;
 import io.v.v23.InputChannels;
 import io.v.v23.V;
 import io.v.v23.V23TestUtil;
-import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
 import io.v.v23.rpc.Client;
@@ -67,7 +65,6 @@ public class FortuneTest extends TestCase {
         ctx = V.init();
         ListenSpec.Address addr = new ListenSpec.Address("tcp", "127.0.0.1:0");
         ctx = V.withListenSpec(ctx, V.getListenSpec(ctx).withAddress(addr));
-        ctx = NamespaceTestUtil.withTestMountServer(ctx);
     }
 
     @Override
@@ -212,7 +209,6 @@ public class FortuneTest extends TestCase {
             public void onSuccess(String fortune) {
                 future.set(fortune);
             }
-
             @Override
             public void onFailure(Throwable t) {
                 future.setException(t);
@@ -445,20 +441,6 @@ public class FortuneTest extends TestCase {
         assertThat(status.getProxyErrors()).isEmpty();
         // TODO(suharshs,sjr): Add a test for proxy errors, and listenErrors
         // that actually is populated with errors.
-    }
-
-    public void testAllPublishedNoName() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "", server, null);
-        Server s = V.getServer(ctx);
-        VFutures.sync(s.allPublished(ctx), 2, TimeUnit.SECONDS);
-    }
-
-    public void testAllPublished() throws Exception {
-        FortuneServer server = new FortuneServerImpl();
-        ctx = V.withNewServer(ctx, "test", server, null);
-        Server s = V.getServer(ctx);
-        VFutures.sync(s.allPublished(ctx), 2, TimeUnit.SECONDS);
     }
 
     private static class TestInvoker implements Invoker {

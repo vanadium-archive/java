@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
+
 /**
  * The current status of the server.
  */
@@ -36,8 +37,7 @@ public class ServerStatus {
      * @param  proxyErrors      set of errors currently encountered from listening on proxies
      */
     public ServerStatus(ServerState state, boolean servesMountTable, PublisherEntry[] entries,
-                        String[] endpoints, Map<Address, VException> lnErrors,
-                        Map<String, VException> proxyErrors) {
+            String[] endpoints, Map<Address, VException> lnErrors, Map<String, VException> proxyErrors) {
         this.state = state;
         this.servesMountTable = servesMountTable;
         this.entries = entries == null ? new PublisherEntry[0] : Arrays.copyOf(entries, entries.length);
@@ -90,8 +90,8 @@ public class ServerStatus {
     }
 
     /**
-     * Returns the map of errors encountered when listening on proxies. The returned
-     * map is keyed by the name of the proxy specified in the {@link ListenSpec}.
+     * Returns the map of errors encountered when listening on the network. The returned
+     * map is keyed by {@link Address addresses} in the ListenSpec.
      */
     public Map<String,VException> getProxyErrors() {
        return new HashMap<>(proxyErrors);

@@ -4,6 +4,8 @@
 
 package io.v.android.impl.google.services.gcm;
 
+import android.content.Intent;
+
 import com.google.android.gms.iid.InstanceIDListenerService;
 
 /**
@@ -12,6 +14,8 @@ import com.google.android.gms.iid.InstanceIDListenerService;
 public class GcmTokenRefreshListenerService extends InstanceIDListenerService {
     @Override
     public void onTokenRefresh() {
-        GcmRegistrationService.refreshTokenAndRestartRegisteredServices(this);
+        Intent intent = new Intent(this, GcmRegistrationService.class);
+        intent.putExtra(GcmRegistrationService.EXTRA_RESTART_SERVICES, true);
+        startService(intent);
     }
 }
