@@ -2,13 +2,17 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url 'https://jitpack.io' }
     }
 
     dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-        classpath 'io.v:gradle-plugin:1.6'
+        classpath (
+                'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4',
+                'com.android.tools.build:gradle:2.0.0',
+                // http://stackoverflow.com/questions/33881984/errorcause-com-android-sdklib-repository-fullrevision
+                'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070',
+                'io.v:gradle-plugin:1.6'
+        )
     }
 }
 
@@ -46,14 +50,14 @@ repositories {
 
 dependencies {
     compile project(':lib')
-    compile 'com.android.support:support-v4:23.0.1'
-    compile 'com.android.support:appcompat-v7:23.0.1'
-    compile "com.google.android.gms:play-services:8.3.0"
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile "com.google.android.gms:play-services:8.4.0"
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.google.truth:truth:0.25'
     // This dependency exists only to work around an issue in the sdkmanager plugin v0.12.0. This
     // should be fixed when http://git.io/vIXec is checked in and a release is made.
-    androidTestCompile 'com.android.support:appcompat-v7:23.0.1'
+    androidTestCompile 'com.android.support:appcompat-v7:23.3.0'
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'junit'  // junit:junit-dep conflicts with junit:unit
     }
