@@ -14,6 +14,7 @@ import io.v.v23.services.syncbase.BatchHandle;
 import io.v.v23.services.syncbase.RowClient;
 import io.v.v23.services.syncbase.RowClientFactory;
 import io.v.v23.syncbase.util.Util;
+import io.v.v23.vdl.VdlAny;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -57,10 +58,10 @@ class RowImpl implements Row {
     @Override
     public ListenableFuture<Object> get(VContext ctx, final Type type) {
         return VFutures.withUserLandChecks(ctx, Futures.transform(client.get(ctx, this.batchHandle),
-                new AsyncFunction<byte[], Object>() {
+                new AsyncFunction<VdlAny, Object>() {
                     @Override
-                    public ListenableFuture<Object> apply(byte[] data) throws Exception {
-                        return Futures.immediateFuture(VomUtil.decode(data, type));
+                    public ListenableFuture<Object> apply(VdlAny vdlAny) throws Exception {
+                        return Futures.immediateFuture(VomUtil.decode(VomUtil.encode(vdlAny), type));
                     }
                 }));
     }
@@ -68,8 +69,7 @@ class RowImpl implements Row {
     @Override
     public ListenableFuture<Void> put(VContext ctx, Object value, Type type) {
         try {
-            byte[] data = VomUtil.encode(value, type);
-            return client.put(ctx, this.batchHandle, data);
+            return client.put(ctx, this.batchHandle, (VdlAny) VomUtil.decode(VomUtil.encode(value, type), VdlAny.class));
         } catch (VException e) {
             return VFutures.withUserLandChecks(ctx, Futures.<Void>immediateFailedFuture(e));
         }

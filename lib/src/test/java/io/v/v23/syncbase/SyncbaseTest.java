@@ -147,8 +147,8 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(collection.get(ctx, "row2", String.class))).isEqualTo("value2");
         assertThat(sync(InputChannels.asList(
                 collection.scan(ctx, RowRange.range("row1", "row3"))))).containsExactly(
-                new KeyValue("row1", VomUtil.encode("value1", String.class)),
-                new KeyValue("row2", VomUtil.encode("value2", String.class)));
+                new KeyValue("row1", (VdlAny) VomUtil.decode(VomUtil.encode("value1", String.class), VdlAny.class)),
+                new KeyValue("row2", (VdlAny) VomUtil.decode(VomUtil.encode("value2", String.class), VdlAny.class)));
         sync(collection.deleteRange(ctx, RowRange.range("row1", "row3")));
         assertThat(sync(collection.getRow("row1").exists(ctx))).isFalse();
         assertThat(sync(collection.getRow("row2").exists(ctx))).isFalse();
@@ -369,8 +369,8 @@ public class SyncbaseTest extends TestCase {
         // First try failed (wrote foo), second succeeded (bar commit succeeded).
         assertThat(sync(InputChannels.asList(collection.scan(ctx, RowRange.prefix("")))))
                 .containsExactly(
-                        new KeyValue("bar-2", VomUtil.encode("bar", String.class)),
-                        new KeyValue("foo-1", VomUtil.encode("foo", String.class)));
+                        new KeyValue("bar-2", (VdlAny) VomUtil.decode(VomUtil.encode("bar", String.class), VdlAny.class)),
+                        new KeyValue("foo-1", (VdlAny) VomUtil.decode(VomUtil.encode("foo", String.class), VdlAny.class)));
     }
 
     public void testRunInBatchReadOnly() throws Exception {
@@ -409,7 +409,7 @@ public class SyncbaseTest extends TestCase {
         // Single uncommitted iteration.
         assertThat(sync(InputChannels.asList(collection.scan(ctx, RowRange.prefix("")))))
                 .containsExactly(
-                        new KeyValue("foo", VomUtil.encode("oof", String.class)));
+                        new KeyValue("foo", (VdlAny) VomUtil.decode(VomUtil.encode("oof", String.class), VdlAny.class)));
     }
 
     public void testSyncgroup() throws Exception {
