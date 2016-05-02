@@ -48,6 +48,18 @@ organization. To do this:
 
 A member of the Vanadium organization will approve the request.
 
+Once your request has been approved, you need to add your API key to the Gradle
+configuration.
+
+* visit https://bintray.com/profile/edit (signing in if necessary)
+* generate an API key, copy it to $HOME/.gradle/gradle.properties. The file
+  should look like
+
+```
+bintrayUsername=yourGithubUsername
+bintrayApiKey=yourApiKey
+```
+
 ### Maven Central account
 
 You need to create a [Sonatype JIRA] account. To do this:
