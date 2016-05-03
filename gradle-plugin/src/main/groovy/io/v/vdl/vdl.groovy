@@ -146,6 +146,7 @@ class VdlPlugin implements Plugin<Project> {
             projectInputPaths.each({
                 from(it) {
                     include '**/*.vdl'
+                    include '**/vdl.config'
                     includeEmptyDirs = false
                 }
             })

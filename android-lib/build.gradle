@@ -11,7 +11,7 @@ buildscript {
                 'com.android.tools.build:gradle:2.0.0',
                 // http://stackoverflow.com/questions/33881984/errorcause-com-android-sdklib-repository-fullrevision
                 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070',
-                'io.v:gradle-plugin:1.6'
+                'io.v:gradle-plugin:1.7'
         )
     }
 }
