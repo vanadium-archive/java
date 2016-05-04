@@ -196,6 +196,25 @@ The Vanadium library will now be pushed out to Maven Central in a few minutes.
 Now go to the [Vanadium Android library Bintray] page and repeat the publishing
 steps.
 
+### Building and Running a local version of the libraries
+
+To use a local version of the android and java libraries you need to publish
+the libraries to the maven local [repository].
+
+* run the following commands:
+
+```sh
+cd $JIRI_ROOT/release/java
+./gradlew :lib:clean :lib:publishToMavenLocal
+./gradlew :android-lib:clean :android-lib:publishToMavenLocal
+```
+
+* you may now use your local libraries by specifying `mavenLocal()` in the
+  "alprojects" repositories clause of your project build.gradle file.
+* For Android Studio to pick up these changes you will need to run
+  "Build >> Clean project" in your IDE.
+
+[repository]: https://maven.apache.org/guides/introduction/introduction-to-repositories.html
 [core vanadium Java]: https://github.com/vanadium/java/tree/master/lib
 [Vanadium Android]: https://github.com/vanadium/java/tree/master/android-lib
 [Gradle plugin]: https://github.com/vanadium/java/tree/master/gradle-plugin
