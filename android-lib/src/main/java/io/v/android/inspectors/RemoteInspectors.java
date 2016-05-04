@@ -23,6 +23,9 @@ import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
+import io.v.v23.rpc.PublisherEntry;
+import io.v.v23.rpc.Server;
+import io.v.v23.rpc.ServerStatus;
 import io.v.v23.security.Blessings;
 import io.v.v23.security.Caveat;
 import io.v.v23.security.VPrincipal;
@@ -47,7 +50,6 @@ public class RemoteInspectors {
     private static final String TAG = "RemoteInspectors";
     private static final int BASE64_FLAGS = Base64.URL_SAFE | Base64.NO_WRAP;
     private VContext mCtx;
-    private String mMountedName;
 
     /**
      * Creates a secure network server to expose application state to invited remote users.
@@ -57,17 +59,21 @@ public class RemoteInspectors {
      */
     public RemoteInspectors(VContext ctx) throws VException {
         mCtx = ctx.withCancel();
-        try {
-            mMountedName = createMountedName(ctx);
-        } catch (NoSuchAlgorithmException e) {
-            throw new VException("Unable to create mounted name:" + e);
+        Server server = V.getServer(ctx);
+        if (server == null) {
+            String mountedName;
+            try {
+                mountedName = createMountedName(ctx);
+            } catch (NoSuchAlgorithmException e) {
+                throw new VException("Unable to create mounted name:" + e);
+            }
+            Log.i(TAG, "Application state should be inspectable via: " + mountedName);
+            mCtx = V.withNewServer(
+                    V.withListenSpec(mCtx, new ListenSpec("tcp", ":0").withProxy("proxy")),
+                    mountedName,
+                    new InspectedServer() {},
+                    VSecurity.newDefaultAuthorizer());
         }
-        Log.i(TAG, "Application state should be inspectable via: " + mMountedName);
-        mCtx = V.withNewServer(
-                V.withListenSpec(mCtx, new ListenSpec("tcp", ":0").withProxy("proxy")),
-                mMountedName,
-                new InspectedServer() {},
-                VSecurity.newDefaultAuthorizer());
     }
 
     /**
@@ -123,13 +129,18 @@ public class RemoteInspectors {
                 .append(" --blessings=").append(Base64.encodeToString(
                         VomUtil.encode(b, b.getClass()), BASE64_FLAGS))
                 .append(" ");
-        if (mMountedName.length() > 0) {
-            builder.append(mMountedName).append(" ");
+        return appendServerAddresses(builder).toString();
+    }
+
+    private StringBuilder appendServerAddresses(StringBuilder sb)  {
+        ServerStatus status = V.getServer(mCtx).getStatus();
+        for (PublisherEntry e : status.getPublisherStatus()) {
+            sb = sb.append(e.getName()).append(" ");
         }
-        for (Endpoint ep : V.getServer(mCtx).getStatus().getEndpoints()) {
-            builder.append(ep.name()).append(" ");
+        for (Endpoint ep : status.getEndpoints()) {
+            sb = sb.append(ep.name()).append(" ");
         }
-        return builder.toString();
+        return sb;
     }
 
     private static String createMountedName(VContext ctx) throws NoSuchAlgorithmException {
