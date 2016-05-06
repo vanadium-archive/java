@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath (
                 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6',
-                'com.android.tools.build:gradle:2.0.0',
+                'com.android.tools.build:gradle:2.1.0',
                 // http://stackoverflow.com/questions/33881984/errorcause-com-android-sdklib-repository-fullrevision
                 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070',
                 'io.v:gradle-plugin:1.7',
@@ -30,7 +30,7 @@ apply plugin: 'io.v.vdl'
 
 // You should change this after releasing a new version of the library. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/vanadium-android.
-def releaseVersion = '2.1.0'
+def releaseVersion = '2.1.2'
 
 android {
     buildToolsVersion '23.0.1'
