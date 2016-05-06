@@ -2,7 +2,6 @@
 <resources>
     <string name="clear_app_data">Clear app data</string>
     <string name="debug">Debug</string>
-    <string name="inspect">Remote inspection</string>
     <string name="kill_process">Kill process</string>
     <string name="logging">Logging</string>
     <string name="vlevel">V23 log verbosity</string>

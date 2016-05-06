@@ -26,41 +26,18 @@ import io.v.v23.android.R;
  * </ul>
  */
 public class DebugFragment extends Fragment {
-    public static final String
-            FRAGMENT_TAG = DebugFragment.class.getName(),
-            DEBUG_SHARED_PREFS = "VanadiumDebugOptions";
+    public static final String FRAGMENT_TAG = DebugFragment.class.getName();
 
     public static DebugFragment find(final FragmentManager mgr) {
         return (DebugFragment) mgr.findFragmentByTag(FRAGMENT_TAG);
     }
 
     private VAndroidContext<?> mVAndroidContext;
-    private RemoteInspection mRemoteInspection;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        createRemoteInspection();
-    }
-
-    /**
-     * @return whether or not a {@link RemoteInspection} was created.
-     */
-    private boolean createRemoteInspection() {
-        if (mRemoteInspection == null && mVAndroidContext != null) {
-            mRemoteInspection = new RemoteInspection(mVAndroidContext,
-                    getActivity().getSharedPreferences(DEBUG_SHARED_PREFS, Context.MODE_PRIVATE));
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // Don't use a stale one if we're later resurrected but unable to instantiate.
-        mRemoteInspection = null;
     }
 
     /**
@@ -70,19 +47,11 @@ public class DebugFragment extends Fragment {
      */
     public void setVAndroidContext(final VAndroidContext vAndroidContext) {
         mVAndroidContext = vAndroidContext;
-        if (isAdded() && createRemoteInspection()) { // significant short-circuit
-            getActivity().invalidateOptionsMenu();
-        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.debug, menu);
-
-        // Only allow remote inspection if we were able to instantiate the utility.
-        if (mRemoteInspection == null) {
-            menu.findItem(R.id.inspect).setVisible(false);
-        }
     }
 
     @Override
@@ -92,9 +61,6 @@ public class DebugFragment extends Fragment {
         if (id == R.id.clear_app_data) {
             Debug.clearAppData(getActivity(),
                     mVAndroidContext == null ? null : mVAndroidContext.getErrorReporter());
-            return true;
-        } else if (id == R.id.inspect) {
-            mRemoteInspection.showDialog();
             return true;
         } else if (id == R.id.kill_process) {
             Debug.killProcess(getActivity());
