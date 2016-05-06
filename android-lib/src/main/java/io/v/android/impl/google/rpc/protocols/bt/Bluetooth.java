@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -37,6 +38,7 @@ import io.v.v23.verror.VException;
  * the vanadium RPC service.
  */
 class Bluetooth {
+    private static final String TAG = "Bluetooth";
     private static final List<Integer> BLUETOOTH_PORTS = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9,
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 
@@ -65,6 +67,7 @@ class Bluetooth {
         for (int portNum : ports) {
             try {
                 BluetoothServerSocket socket = listenOnPort(portNum);
+                Log.d(TAG, String.format("listening on port %d", portNum));
                 return new Listener(executor, socket, String.format("%s/%d", macAddr, portNum));
             } catch (VException e) {
                 // OK, try the next one
