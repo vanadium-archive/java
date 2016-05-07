@@ -12,6 +12,7 @@ import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.services.syncbase.DatabaseClient;
 import io.v.v23.services.syncbase.DatabaseClientFactory;
+import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.syncbase.SyncgroupManagerClient;
 import io.v.v23.services.syncbase.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.SyncgroupSpec;
@@ -19,12 +20,12 @@ import io.v.v23.services.syncbase.SyncgroupSpec;
 import java.util.Map;
 
 class SyncgroupImpl implements Syncgroup {
-    private final String name;
+    private final Id id;
     private final String dbFullName;
     private final DatabaseClient dbClient;
 
-    SyncgroupImpl(String dbFullName, String name) {
-        this.name = name;
+    SyncgroupImpl(String dbFullName, Id id) {
+        this.id = id;
         this.dbFullName = dbFullName;
         this.dbClient = DatabaseClientFactory.getDatabaseClient(dbFullName);
     }
@@ -32,33 +33,33 @@ class SyncgroupImpl implements Syncgroup {
     @Override
     public ListenableFuture<Void> create(VContext ctx, SyncgroupSpec spec,
                                          SyncgroupMemberInfo info) {
-        return dbClient.createSyncgroup(ctx, name, spec, info);
+        return dbClient.createSyncgroup(ctx, id, spec, info);
     }
 
     @Override
-    public ListenableFuture<SyncgroupSpec> join(VContext ctx, SyncgroupMemberInfo info) {
-        return dbClient.joinSyncgroup(ctx, name, info);
+    public ListenableFuture<SyncgroupSpec> join(VContext ctx, String syncbaseName, String expectedSyncbaseBlessing, SyncgroupMemberInfo info) {
+        return dbClient.joinSyncgroup(ctx, syncbaseName, expectedSyncbaseBlessing, id, info);
     }
 
     @Override
     public ListenableFuture<Void> leave(VContext ctx) {
-        return dbClient.leaveSyncgroup(ctx, name);
+        return dbClient.leaveSyncgroup(ctx, id);
     }
 
     @Override
     public ListenableFuture<Void> destroy(VContext ctx) {
-        return dbClient.destroySyncgroup(ctx, name);
+        return dbClient.destroySyncgroup(ctx, id);
     }
 
     @Override
     public ListenableFuture<Void> eject(VContext ctx, String member) {
-        return dbClient.ejectFromSyncgroup(ctx, name, member);
+        return dbClient.ejectFromSyncgroup(ctx, id, member);
     }
 
     @Override
     public ListenableFuture<Map<String, SyncgroupSpec>> getSpec(VContext ctx) {
         return VFutures.withUserLandChecks(ctx,
-                Futures.transform(dbClient.getSyncgroupSpec(ctx, name), new Function<
+                Futures.transform(dbClient.getSyncgroupSpec(ctx, id), new Function<
                         SyncgroupManagerClient.GetSyncgroupSpecOut, Map<String, SyncgroupSpec>>() {
                     @Override
                     public Map<String, SyncgroupSpec> apply(
@@ -70,11 +71,11 @@ class SyncgroupImpl implements Syncgroup {
 
     @Override
     public ListenableFuture<Void> setSpec(VContext ctx, SyncgroupSpec spec, String version) {
-        return dbClient.setSyncgroupSpec(ctx, name, spec, version);
+        return dbClient.setSyncgroupSpec(ctx, id, spec, version);
     }
 
     @Override
     public ListenableFuture<Map<String, SyncgroupMemberInfo>> getMembers(VContext ctx) {
-        return dbClient.getSyncgroupMembers(ctx, name);
+        return dbClient.getSyncgroupMembers(ctx, id);
     }
 }

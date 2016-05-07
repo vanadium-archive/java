@@ -52,11 +52,13 @@ public interface Syncgroup {
      * {@code context} gets canceled.
      *
      * @param context Vanadium context
+     * @param remoteSyncbaseName the name of another syncbase that has the syncgroup we want to join
+     * @param expectedSyncbaseBlessing the blessing that the remote syncbase must have
      * @param info    joiner's membership information
      * @return a new {@link ListenableFuture} whose result is the syncgroup specification
      */
     @CheckReturnValue
-    ListenableFuture<SyncgroupSpec> join(VContext context, SyncgroupMemberInfo info);
+    ListenableFuture<SyncgroupSpec> join(VContext context, String remoteSyncbaseName, String expectedSyncbaseBlessing, SyncgroupMemberInfo info);
 
     /**
      * Leaves the syncgroup.  Previously synced data will continue to be available.  Requires:

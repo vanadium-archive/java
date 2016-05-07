@@ -203,13 +203,13 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
 
     @Override
-    public Syncgroup getSyncgroup(String name) {
-        return new SyncgroupImpl(fullName, name);
+    public Syncgroup getSyncgroup(Id sgId) {
+        return new SyncgroupImpl(fullName, sgId);
     }
 
     @Override
-    public ListenableFuture<List<String>> listSyncgroupNames(VContext ctx) {
-        return client.getSyncgroupNames(ctx);
+    public ListenableFuture<List<Id>> listSyncgroups(VContext ctx) {
+        return client.listSyncgroups(ctx);
     }
 
     @Override

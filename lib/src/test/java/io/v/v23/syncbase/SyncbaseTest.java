@@ -414,32 +414,32 @@ public class SyncbaseTest extends TestCase {
 
     public void testSyncgroup() throws Exception {
         Database db = createDatabase(createService());
-        String groupName = "test";
+        Id syncgroupId = new Id("blessing", "test");
 
         // "A" creates the group.
-        SyncgroupSpec spec = new SyncgroupSpec("test", allowAll,
+        SyncgroupSpec spec = new SyncgroupSpec("test", "", allowAll,
                 ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
                 ImmutableList.<String>of(), false);
         SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
         memberInfo.setSyncPriority((byte) 1);
-        Syncgroup group = db.getSyncgroup(groupName);
+        Syncgroup group = db.getSyncgroup(syncgroupId);
         {
             sync(group.create(ctx, spec, memberInfo));
-            assertThat(sync(db.listSyncgroupNames(ctx))).containsExactly(groupName);
+            assertThat(sync(db.listSyncgroups(ctx))).containsExactly(syncgroupId);
             assertThat(sync(group.getSpec(ctx)).values()).containsExactly(spec);
             assertThat(sync(group.getMembers(ctx)).values()).containsExactly(memberInfo);
-            assertThat(sync(group.join(ctx, memberInfo))).isEqualTo(spec);
+            assertThat(sync(group.join(ctx, serverEndpoint.name(), "", memberInfo))).isEqualTo(spec);
         }
         // TODO(spetrovic): test leave() and destroy().
 
-        SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", allowAll,
+        SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", "", allowAll,
                 ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
                 ImmutableList.<String>of(), false);
         assertThat(sync(group.getSpec(ctx)).keySet()).isNotEmpty();
         String version = sync(group.getSpec(ctx)).keySet().iterator().next();
         sync(group.setSpec(ctx, specRMW, version));
         assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specRMW);
-        SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", allowAll,
+        SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", "", allowAll,
                 ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
                 ImmutableList.<String>of(), false);
         sync(group.setSpec(ctx, specOverwrite, ""));

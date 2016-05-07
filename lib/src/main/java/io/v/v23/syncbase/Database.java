@@ -146,14 +146,14 @@ public interface Database extends DatabaseCore, AccessController {
                                     String prefix);
 
     /**
-     * Returns a handle to a database {@link Syncgroup} with the given full (i.e., object) name.
+     * Returns a handle to a database {@link Syncgroup} with the given Id.
      *
-     * @param name name of the synchronization group
+     * @param sgId Id of the synchronization group
      */
-    Syncgroup getSyncgroup(String name);
+    Syncgroup getSyncgroup(Id sgId);
 
     /**
-     * Returns a {@link ListenableFuture} whose result are the global names of all
+     * Returns a {@link ListenableFuture} whose result is the Id of all
      * {@link Syncgroup}s attached to this database.
      * <p>
      * The returned future is guaranteed to be executed on an {@link java.util.concurrent.Executor}
@@ -165,7 +165,7 @@ public interface Database extends DatabaseCore, AccessController {
      * @param context Vanadium context
      */
     @CheckReturnValue
-    ListenableFuture<List<String>> listSyncgroupNames(VContext context);
+    ListenableFuture<List<Id>> listSyncgroups(VContext context);
 
     /**
      * Opens a blob for writing.
