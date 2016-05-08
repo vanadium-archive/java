@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 import io.v.x.ref.lib.discovery.EncryptionAlgorithm;
 import io.v.x.ref.lib.discovery.EncryptionKey;
 import io.v.x.ref.lib.discovery.testdata.Constants;
-import io.v.x.ref.lib.discovery.testdata.PackAddressTest;
 import io.v.x.ref.lib.discovery.testdata.PackEncryptionKeysTest;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -22,18 +21,6 @@ import static com.google.common.truth.Truth.assertThat;
  * Tests for {@link EncodingUtil}.
  */
 public class EncodingUtilTest extends TestCase {
-    public void testPackAddresses() throws IOException {
-        for (PackAddressTest test : Constants.PACK_ADDRESS_TEST_DATA) {
-            assertThat(EncodingUtil.packAddresses(test.getIn())).isEqualTo(test.getPacked());
-        }
-    }
-
-    public void testUnpackAddresses() throws IOException {
-        for (PackAddressTest test : Constants.PACK_ADDRESS_TEST_DATA) {
-            assertThat(EncodingUtil.unpackAddresses(test.getPacked())).isEqualTo(test.getIn());
-        }
-    }
-
     public void testPackEncryptionKeys() throws IOException {
         for (PackEncryptionKeysTest test : Constants.PACK_ENCRYPTION_KEYS_TEST_DATA) {
             byte[] packed = EncodingUtil.packEncryptionKeys(test.getAlgo(), test.getKeys());
