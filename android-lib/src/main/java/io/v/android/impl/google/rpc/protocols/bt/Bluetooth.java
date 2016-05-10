@@ -26,7 +26,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Executor;
 
 import io.v.impl.google.rt.VRuntimeImpl;
-import io.v.v23.V;
+import io.v.android.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Callback;
 import io.v.v23.verror.VException;
@@ -43,14 +43,9 @@ class Bluetooth {
             10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 
     static Listener listen(VContext ctx, String btAddr) throws VException {
-        String macAddr = getMACAddress(btAddr);
+        String macAddr = getMACAddress(ctx, btAddr);
         int port = getPortNumber(btAddr);
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (!macAddr.equals(adapter.getAddress())) {
-            throw new VException("Illegal MAC address to listen on: no local device found with "
-                    + "MAC address: " + macAddr + " (local address is: " + adapter.getAddress()
-                    + " )");
-        }
         List<Integer> ports = null;
         if (port == 0) {  // listen on the first available port.
             ports = new ArrayList(BLUETOOTH_PORTS);
@@ -79,7 +74,7 @@ class Bluetooth {
 
     static void dial(VContext ctx, String btAddr, final Duration timeout,
                      final Callback<Stream> callback) throws VException {
-        final String macAddr = getMACAddress(btAddr);
+        final String macAddr = getMACAddress(ctx, btAddr);
         final int port = getPortNumber(btAddr);
         final Executor executor = VRuntimeImpl.getRuntimeExecutor(ctx);
         if (executor == null) {
@@ -151,7 +146,7 @@ class Bluetooth {
         }
     }
 
-    private static String getMACAddress(String btAddr) throws VException {
+    private static String getMACAddress(VContext ctx, String btAddr) throws VException {
         List<String> parts = Splitter.on("/").omitEmptyStrings().splitToList(btAddr);
         switch (parts.size()) {
             case 0:
@@ -159,7 +154,10 @@ class Bluetooth {
                         "Couldn't split bluetooth address \"%s\" using \"/\" separator: " +
                                 "got zero parts!", btAddr));
             case 1:
-                return BluetoothAdapter.getDefaultAdapter().getAddress();
+                // TODO(suharshs): Android has disallowed getting the local address.
+                // This is a remaining working hack that gets the local bluetooth address,
+                // just to get things working.
+                return android.provider.Settings.Secure.getString(V.getAndroidContext(ctx).getContentResolver(), "bluetooth_address");
             case 2:
                 String address = parts.get(0).toUpperCase();
                 if (!BluetoothAdapter.checkBluetoothAddress(address)) {
