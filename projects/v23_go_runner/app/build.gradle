@@ -5,11 +5,12 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.example.suharshs.v23gorunner"
+        applicationId "io.v.v23gorunner"
         minSdkVersion 22
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -25,4 +26,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile 'io.v:vanadium-android:+'
+    compile 'com.android.support:multidex:1.0.0'
+    if (new File('../../../../../experimental/projects/android-ble/build/outputs/aar/android-ble-release.aar').exists()) {
+        compile(name:'android-ble-release', ext:'aar')
+    }
 }

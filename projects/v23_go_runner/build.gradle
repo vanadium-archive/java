@@ -16,6 +16,9 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
+        flatDir {
+            dirs '../../../../../experimental/projects/android-ble/build/outputs/aar'
+        }
     }
 }
 
