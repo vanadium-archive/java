@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package com.example.suharshs.v23gorunner;
+package com.example.suharshs.vango;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,7 +17,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 
 import io.v.android.security.BlessingsManager;
-import io.v.android.util.V23GoRunner;
+import io.v.android.util.Vango;
 import io.v.android.v23.V;
 import io.v.v23.OptionDefs;
 import io.v.v23.Options;
@@ -54,7 +54,7 @@ public class RunKeyActivity extends AppCompatActivity {
                         AsyncTask.execute(new Runnable() {
                             @Override
                             public void run() {
-                                (new V23GoRunner()).run(ctx, key);
+                                (new Vango()).run(ctx, key);
                             }
                         });
                     }

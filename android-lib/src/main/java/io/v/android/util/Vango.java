@@ -7,13 +7,13 @@ package io.v.android.util;
 import io.v.v23.context.VContext;
 
 /**
- * V23GoRunner allows arbritrary Vanadium Go code to be run in an android
+ * Vango allows arbritrary Vanadium Go code to be run in an android
  * environment.
- * Users must edit the V23GoRunnerFuncs map in
- * https://vanadium.googlesource.com/release.go.x.jni/+/master/impl/google/services/v23_go_runner/funcs.go
+ * Users must edit the vangoFuncs map in
+ * https://vanadium.googlesource.com/release.go.x.jni/+/master/impl/google/services/vango/funcs.go
  * and rebuild android-lib.
  */
-public class V23GoRunner {
+public class Vango {
   private native void nativeGoContextCall(VContext context, String string);
 
   private VContext context;
@@ -22,7 +22,7 @@ public class V23GoRunner {
     nativeGoContextCall(context, string);
   }
 
-  public V23GoRunner() {
+  public Vango() {
     this.context = context;
   }
 }

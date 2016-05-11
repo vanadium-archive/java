@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "io.v.v23gorunner"
+        applicationId "io.v.vango"
         minSdkVersion 22
         targetSdkVersion 22
         versionCode 1

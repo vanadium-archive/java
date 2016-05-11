@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package com.example.suharshs.v23gorunner;
+package com.example.suharshs.vango;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
