@@ -9,6 +9,8 @@ import io.v.v23.services.syncbase.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.SyncgroupSpec;
 
 import javax.annotation.CheckReturnValue;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,12 +55,12 @@ public interface Syncgroup {
      *
      * @param context Vanadium context
      * @param remoteSyncbaseName the name of another syncbase that has the syncgroup we want to join
-     * @param expectedSyncbaseBlessing the blessing that the remote syncbase must have
+     * @param expectedSyncbaseBlessings the blessings that the remote syncbase must have
      * @param info    joiner's membership information
      * @return a new {@link ListenableFuture} whose result is the syncgroup specification
      */
     @CheckReturnValue
-    ListenableFuture<SyncgroupSpec> join(VContext context, String remoteSyncbaseName, String expectedSyncbaseBlessing, SyncgroupMemberInfo info);
+    ListenableFuture<SyncgroupSpec> join(VContext context, String remoteSyncbaseName, List<String> expectedSyncbaseBlessings, SyncgroupMemberInfo info);
 
     /**
      * Leaves the syncgroup.  Previously synced data will continue to be available.  Requires:

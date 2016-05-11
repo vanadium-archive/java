@@ -428,7 +428,7 @@ public class SyncbaseTest extends TestCase {
             assertThat(sync(db.listSyncgroups(ctx))).containsExactly(syncgroupId);
             assertThat(sync(group.getSpec(ctx)).values()).containsExactly(spec);
             assertThat(sync(group.getMembers(ctx)).values()).containsExactly(memberInfo);
-            assertThat(sync(group.join(ctx, serverEndpoint.name(), "", memberInfo))).isEqualTo(spec);
+            assertThat(sync(group.join(ctx, serverEndpoint.name(), null, memberInfo))).isEqualTo(spec);
         }
         // TODO(spetrovic): test leave() and destroy().
 

@@ -17,6 +17,7 @@ import io.v.v23.services.syncbase.SyncgroupManagerClient;
 import io.v.v23.services.syncbase.SyncgroupMemberInfo;
 import io.v.v23.services.syncbase.SyncgroupSpec;
 
+import java.util.List;
 import java.util.Map;
 
 class SyncgroupImpl implements Syncgroup {
@@ -37,8 +38,8 @@ class SyncgroupImpl implements Syncgroup {
     }
 
     @Override
-    public ListenableFuture<SyncgroupSpec> join(VContext ctx, String syncbaseName, String expectedSyncbaseBlessing, SyncgroupMemberInfo info) {
-        return dbClient.joinSyncgroup(ctx, syncbaseName, expectedSyncbaseBlessing, id, info);
+    public ListenableFuture<SyncgroupSpec> join(VContext ctx, String syncbaseName, List<String> expectedSyncbaseBlessings, SyncgroupMemberInfo info) {
+        return dbClient.joinSyncgroup(ctx, syncbaseName, expectedSyncbaseBlessings, id, info);
     }
 
     @Override
