@@ -92,7 +92,6 @@ public class VomUtil {
         return out.toByteArray();
     }
 
-
     /**
      * VOM-decodes the provided data using a new VOM-decoder.
      *

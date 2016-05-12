@@ -40,7 +40,6 @@ import io.v.v23.verror.NotImplementedException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -306,7 +305,7 @@ class DatabaseImpl implements Database, BatchDatabase {
             this.input = input;
             this.columnNames = new ArrayList<>(columnNames.size());
             for (int i = 0; i < columnNames.size(); ++i) {
-                Serializable elem = columnNames.get(i).getElem();
+                Object elem = columnNames.get(i).getElem();
                 if (elem instanceof String) {
                     this.columnNames.add((String) elem);
                 } else {

@@ -13,7 +13,6 @@ import io.v.v23.vdl.WireError;
 import io.v.v23.vdl.WireRetryCode;
 import io.v.v23.verror.VException.ActionCode;
 
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ public final class VExceptionVdlConverter extends Converter {
         assertInstanceOf(nativeValue, VException.class);
         VException e = (VException) nativeValue;
         List<VdlAny> paramVals = new ArrayList<VdlAny>();
-        Serializable[] params = e.getParams();
+        Object[] params = e.getParams();
         VdlType[] paramTypes = e.getParamTypes();
         for (int i = 0; i < params.length; ++i) {
             if (paramTypes[i] == null) {
@@ -62,7 +61,7 @@ public final class VExceptionVdlConverter extends Converter {
                 VException.ActionCode.fromValue(error.getRetryCode().ordinal()));
 
         List<VdlAny> paramVals = error.getParamList();
-        Serializable[] params = new Serializable[paramVals.size()];
+        Object[] params = new Object[paramVals.size()];
         VdlType[] paramTypes = new VdlType[paramVals.size()];
         for (int i = 0; i < paramVals.size(); ++i) {
             VdlAny paramVal = paramVals.get(i);

@@ -4,7 +4,6 @@
 
 package io.v.v23.vdl;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -21,16 +20,16 @@ public final class VdlAny extends VdlValue {
   */
   public static final io.v.v23.vdl.VdlType VDL_TYPE = io.v.v23.vdl.Types.ANY;
 
-  private final Serializable elem;
+  private final Object elem;
   private final VdlType elemType;
 
-  public VdlAny(VdlType vdlType, Serializable value) {
+  public VdlAny(VdlType vdlType, Object value) {
     super(Types.ANY);
     elem = value;
     elemType = vdlType;
   }
 
-  public VdlAny(Type type, Serializable value) {
+  public VdlAny(Type type, Object value) {
     this(Types.getVdlTypeFromReflect(type), value);
   }
 
@@ -42,7 +41,7 @@ public final class VdlAny extends VdlValue {
     this((VdlType) null, null);
   }
 
-  public Serializable getElem() {
+  public Object getElem() {
     return elem;
   }
 

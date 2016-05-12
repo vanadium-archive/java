@@ -12,7 +12,6 @@ import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.syncbase.KeyValue;
 
 import javax.annotation.CheckReturnValue;
-import java.lang.reflect.Type;
 
 /**
  * Interface for a database collection, i.e., a collection of {@link Row}s.
@@ -129,10 +128,10 @@ public interface Collection {
      *
      * @param context Vanadium context
      * @param key     the primary key for a row
-     * @param type    type of the value to be returned (needed for de-serialization)
+     * @param clazz   the Class to instantiate, populate during de-serialization, and return
      */
     @CheckReturnValue
-    ListenableFuture<Object> get(VContext context, String key, Type type);
+    <T> ListenableFuture<T> get(VContext context, String key, Class<T> clazz);
 
     /**
      * Writes the value to the collection under the provided primary key.
@@ -145,11 +144,10 @@ public interface Collection {
      *
      * @param context Vanadium context
      * @param key     primary key under which the value is to be written
-     * @param type    type of the value to be returned (needed for serialization)
      * @param value   value to be written
      */
     @CheckReturnValue
-    ListenableFuture<Void> put(VContext context, String key, Object value, Type type);
+    ListenableFuture<Void> put(VContext context, String key, Object value);
 
     /**
      * Deletes the value for the given primary key.

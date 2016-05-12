@@ -7,7 +7,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.v.v23.context.VContext;
 
 import javax.annotation.CheckReturnValue;
-import java.lang.reflect.Type;
 
 /**
  * A handle for a single row in a {@link Collection}.
@@ -64,9 +63,11 @@ public interface Row {
      * {@code context} gets canceled.
      *
      * @param context Vanadium context
+     * @param clazz   the Class to instantiate, populate during de-serialization, and return
+     * @return
      */
     @CheckReturnValue
-    ListenableFuture<Object> get(VContext context, Type type);
+    <T> ListenableFuture<T> get(VContext context, Class<T> clazz);
 
     /**
      * Writes the given value for this row.
@@ -81,5 +82,5 @@ public interface Row {
      * @param value   value to write
      */
     @CheckReturnValue
-    ListenableFuture<Void> put(VContext context, Object value, Type type);
+    ListenableFuture<Void> put(VContext context, Object value);
 }

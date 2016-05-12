@@ -41,7 +41,7 @@ class ServerRPCHelper {
                     public ListenableFuture<byte[][]> apply(VdlValue[] tags) throws Exception {
                         byte[][] vomTags = new byte[tags.length][];
                         for (int i = 0; i < tags.length; ++i) {
-                            vomTags[i] = VomUtil.encode(tags[i]);
+                            vomTags[i] = VomUtil.encode(tags[i], tags[i].vdlType());
                         }
                         return Futures.immediateFuture(vomTags);
                     }

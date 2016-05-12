@@ -15,10 +15,7 @@ import io.v.v23.services.syncbase.RowClient;
 import io.v.v23.services.syncbase.RowClientFactory;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.vdl.VdlAny;
-import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
-
-import java.lang.reflect.Type;
 
 class RowImpl implements Row {
     private final String fullName;
@@ -56,22 +53,20 @@ class RowImpl implements Row {
     }
 
     @Override
-    public ListenableFuture<Object> get(VContext ctx, final Type type) {
+    public <T> ListenableFuture<T> get(VContext ctx, final Class<T> clazz) {
         return VFutures.withUserLandChecks(ctx, Futures.transform(client.get(ctx, this.batchHandle),
-                new AsyncFunction<VdlAny, Object>() {
+                new AsyncFunction<VdlAny, T>() {
                     @Override
-                    public ListenableFuture<Object> apply(VdlAny vdlAny) throws Exception {
-                        return Futures.immediateFuture(VomUtil.decode(VomUtil.encode(vdlAny), type));
+                    public ListenableFuture<T> apply(VdlAny vdlAny) throws Exception {
+                        final byte[] encodedBytes = VomUtil.encode(vdlAny, VdlAny.VDL_TYPE);
+                        final Object decodedObject = VomUtil.decode(encodedBytes, clazz);
+                        return Futures.immediateFuture((T) decodedObject);
                     }
                 }));
     }
 
     @Override
-    public ListenableFuture<Void> put(VContext ctx, Object value, Type type) {
-        try {
-            return client.put(ctx, this.batchHandle, (VdlAny) VomUtil.decode(VomUtil.encode(value, type), VdlAny.class));
-        } catch (VException e) {
-            return VFutures.withUserLandChecks(ctx, Futures.<Void>immediateFailedFuture(e));
-        }
+    public ListenableFuture<Void> put(VContext ctx, Object value) {
+        return client.put(ctx, this.batchHandle, new VdlAny(value.getClass(), value));
     }
 }

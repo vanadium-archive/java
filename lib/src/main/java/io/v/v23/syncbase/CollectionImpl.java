@@ -17,8 +17,6 @@ import io.v.v23.services.syncbase.KeyValue;
 
 import io.v.v23.syncbase.util.Util;
 
-import java.lang.reflect.Type;
-
 class CollectionImpl implements Collection {
 
     private final String fullName;
@@ -74,13 +72,13 @@ class CollectionImpl implements Collection {
     }
 
     @Override
-    public ListenableFuture<Object> get(VContext ctx, String key, Type type) {
-        return getRow(key).get(ctx, type);
+    public <T>ListenableFuture<T> get(VContext ctx, String key, Class<T> clazz) {
+        return getRow(key).get(ctx, clazz);
     }
 
     @Override
-    public ListenableFuture<Void> put(VContext ctx, String key, Object value, Type type) {
-        return getRow(key).put(ctx, value, type);
+    public ListenableFuture<Void> put(VContext ctx, String key, Object value) {
+        return getRow(key).put(ctx, value);
     }
 
     @Override

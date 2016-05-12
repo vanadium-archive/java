@@ -25,7 +25,6 @@ import io.v.v23.vdl.VdlValue;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -203,7 +202,7 @@ public class BinaryDecoder {
         // Solve any/optional case.
         if (actualType.getKind() != Kind.ANY && actualType.getKind() != Kind.OPTIONAL) {
             if (target.getKind() == Kind.ANY) {
-                return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
+                return new VdlAny(actualType, readValue(actualType, Object.class));
             } else if (target.getKind() == Kind.OPTIONAL) {
                 Type elemType = ReflectUtil.getElementType(target.getTargetType(), 0);
                 return VdlOptional.of((VdlValue) readValue(actualType, elemType));
@@ -286,7 +285,7 @@ public class BinaryDecoder {
         }
         VdlType actualType = getType(new TypeId(typeId));
         if (target.getKind() == Kind.ANY) {
-            return new VdlAny(actualType, (Serializable) readValue(actualType, Object.class));
+            return new VdlAny(actualType, readValue(actualType, Object.class));
         } else {
             Type targetType = target.getTargetType();
             assertTypesCompatible(actualType, targetType);

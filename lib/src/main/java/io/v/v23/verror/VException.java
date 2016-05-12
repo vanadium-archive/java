@@ -326,7 +326,7 @@ public class VException extends Exception {
     }
 
     private final IDAction id;  // non-null
-    private final Serializable[] params;  // non-null
+    private final Object[] params;  // non-null
     private final VdlType[] paramTypes;  // non-null, same length as params
 
     /**
@@ -391,7 +391,7 @@ public class VException extends Exception {
                 opName, params, convertParamTypes(paramTypes)));
     }
 
-    VException(IDAction id, String msg, Serializable[] params, VdlType[] paramTypes) {
+    VException(IDAction id, String msg, Object[] params, VdlType[] paramTypes) {
         super(msg);
         this.id = id;
         this.params = params;
@@ -473,7 +473,7 @@ public class VException extends Exception {
         return this.id.hashCode();
     }
 
-    Serializable[] getParams() { return this.params; }
+    Object[] getParams() { return this.params; }
 
     VdlType[] getParamTypes() { return this.paramTypes; }
 }

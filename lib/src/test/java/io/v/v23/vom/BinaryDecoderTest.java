@@ -22,7 +22,6 @@ import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlValue;
 import io.v.v23.verror.VException;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +42,7 @@ public class BinaryDecoderTest extends TestCase {
     void decodeTest(Version version, List<io.v.v23.vom.testdata.types.TestCase> tests) throws Exception {
         for (io.v.v23.vom.testdata.types.TestCase test : tests) {
           byte[] bytes = TestUtil.hexStringToBytes(test.getHex());
-          Serializable targetVal = test.getValue();
+          Object targetVal = test.getValue();
           if (test.getValue().getElem() != null) {
             targetVal = test.getValue().getElem();
           }
@@ -86,7 +85,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeVException() throws Exception {
-        Serializable[] params = {
+        Object[] params = {
                 1,
                 "2",
                 ImmutableList.<String>of("3"),
@@ -110,7 +109,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeVExceptionBadParams() throws Exception {
-        Serializable[] params = {
+        Object[] params = {
                 ImmutableList.<String>of("3"),
                 ImmutableMap.<String, String>of("4", "")
         };
@@ -131,7 +130,7 @@ public class BinaryDecoderTest extends TestCase {
     }
 
     public void testDecodeEncodeVException() throws Exception {
-        Serializable[] params = {
+        Object[] params = {
                 1,
                 "2",
                 ImmutableList.<String>of("3"),
@@ -179,7 +178,7 @@ public class BinaryDecoderTest extends TestCase {
         }
 
         SubVException() {
-            super(ID_ACTION, "en", "test", "test", new Serializable[]{ 5 },
+            super(ID_ACTION, "en", "test", "test", new Object[]{ 5 },
                     new Type[]{ Integer.class });
         }
     }

@@ -6,6 +6,7 @@ package io.v.v23.syncbase;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.Futures;
@@ -20,6 +21,7 @@ import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.Caveat;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
@@ -48,6 +50,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.v23.VFutures.sync;
@@ -60,6 +63,8 @@ public class SyncbaseTest extends TestCase {
     private static final String COLLECTION_NAME = "collection";
     private static final Id COLLECTION_ID = new Id("v.io:u:sam", COLLECTION_NAME);
     private static final String ROW_NAME = "row/a#%b";  // symbols are okay
+    private static final String ROW_NAME2 = "row/a#%c";  // symbols are okay
+    private static final String ROW_NAME3 = "row/a#%d";  // symbols are okay
 
     private VContext ctx;
     private Permissions allowAll;
@@ -134,13 +139,13 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(db.listCollections(ctx))).containsExactly(COLLECTION_ID);
 
         assertThat(sync(collection.getRow("row1").exists(ctx))).isFalse();
-        sync(collection.put(ctx, "row1", "value1", String.class));
+        sync(collection.put(ctx, "row1", "value1"));
         assertThat(sync(collection.getRow("row1").exists(ctx))).isTrue();
         assertThat(sync(collection.get(ctx, "row1", String.class))).isEqualTo("value1");
         sync(collection.delete(ctx, "row1"));
         assertThat(sync(collection.getRow("row1").exists(ctx))).isFalse();
-        sync(collection.put(ctx, "row1", "value1", String.class));
-        sync(collection.put(ctx, "row2", "value2", String.class));
+        sync(collection.put(ctx, "row1", "value1"));
+        sync(collection.put(ctx, "row2", "value2"));
         assertThat(sync(collection.getRow("row1").exists(ctx))).isTrue();
         assertThat(sync(collection.getRow("row2").exists(ctx))).isTrue();
         assertThat(sync(collection.get(ctx, "row1", String.class))).isEqualTo("value1");
@@ -158,6 +163,55 @@ public class SyncbaseTest extends TestCase {
         assertThat(sync(db.listCollections(ctx))).isEmpty();
     }
 
+    public static class MyTestClass {
+        String foo;
+        Integer bar;
+        List<String> baz;
+
+        public MyTestClass() {
+            foo = null;
+            bar = null;
+            baz = Lists.newArrayList();
+        }
+
+        public MyTestClass(String inFoo, Integer inBar, String ... inBaz) {
+            foo = null;
+            bar = null;
+            baz = Lists.newArrayList();
+            for (String value : inBaz) {
+                baz.add(value);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof MyTestClass)) {
+                return false;
+            }
+
+            MyTestClass that = (MyTestClass) o;
+
+            if (foo != null ? !foo.equals(that.foo) : that.foo != null) {
+                return false;
+            }
+            if (bar != null ? !bar.equals(that.bar) : that.bar != null) {
+                return false;
+            }
+            return baz.equals(that.baz);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = foo != null ? foo.hashCode() : 0;
+            result = 31 * result + (bar != null ? bar.hashCode() : 0);
+            result = 31 * result + baz.hashCode();
+            return result;
+        }
+    }
+
     public void testRow() throws Exception {
         Collection collection = createCollection(createDatabase(createService()));
         Row row = collection.getRow(ROW_NAME);
@@ -167,16 +221,35 @@ public class SyncbaseTest extends TestCase {
                 NamingUtil.join(serverEndpoint.name(), Util.encodeId(DB_ID),
                         Util.encodeId(COLLECTION_ID), Util.encode(ROW_NAME)));
         assertThat(sync(row.exists(ctx))).isFalse();
-        sync(row.put(ctx, "value", String.class));
+        sync(row.put(ctx, "value"));
         assertThat(sync(row.exists(ctx))).isTrue();
         assertThat(sync(row.get(ctx, String.class))).isEqualTo("value");
         assertThat(sync(collection.get(ctx, ROW_NAME, String.class))).isEqualTo("value");
         sync(row.delete(ctx));
         assertThat(sync(row.exists(ctx))).isFalse();
-        sync(collection.put(ctx, ROW_NAME, "value", String.class));
+
+        // String
+        sync(collection.put(ctx, ROW_NAME, "value"));
         assertThat(sync(row.exists(ctx))).isTrue();
         assertThat(sync(row.get(ctx, String.class))).isEqualTo("value");
         assertThat(sync(collection.get(ctx, ROW_NAME, String.class))).isEqualTo("value");
+
+        // Integer
+        sync(collection.put(ctx, ROW_NAME3, 42));
+        assertThat(sync(collection.get(ctx, ROW_NAME3, Integer.class))).isEqualTo(42);
+
+        // Java POJO, MyTestClass
+        MyTestClass mtc = new MyTestClass("hello", 58501, "a", "b", "c");
+        sync(collection.put(ctx, ROW_NAME2, mtc));
+        assertThat(sync(collection.get(ctx, ROW_NAME2, MyTestClass.class))).isEqualTo(mtc);
+
+        // VDL-generated class, Caveat
+        Random random = new Random();
+        byte[] idBytes = new byte[16];
+        random.nextBytes(idBytes);
+        Caveat caveat = new Caveat(new io.v.v23.uniqueid.Id(idBytes), "voms".getBytes());
+        sync(collection.put(ctx, ROW_NAME2, caveat));
+        assertThat(sync(collection.get(ctx, ROW_NAME2, Caveat.class))).isEqualTo(caveat);
     }
 
     public void testDatabaseExec() throws Exception {
@@ -186,9 +259,9 @@ public class SyncbaseTest extends TestCase {
         Bar bar = new Bar(0.5f, "b");
         Baz baz = new Baz("John Doe", true);
 
-        sync(collection.put(ctx, "foo", foo, Foo.class));
-        sync(collection.put(ctx, "bar", bar, Bar.class));
-        sync(collection.put(ctx, "baz", baz, Baz.class));
+        sync(collection.put(ctx, "foo", foo));
+        sync(collection.put(ctx, "bar", bar));
+        sync(collection.put(ctx, "baz", baz));
 
         {
             DatabaseCore.QueryResults results = sync(db.exec(ctx,
@@ -228,9 +301,9 @@ public class SyncbaseTest extends TestCase {
         Baz baz = new Baz("John Doe", true);
         ResumeMarker marker = sync(db.getResumeMarker(ctx));
 
-        sync(collection.put(ctx, "foo", foo, Foo.class));
-        sync(collection.put(ctx, "bar", bar, Bar.class));
-        sync(collection.put(ctx, "baz", baz, Baz.class));
+        sync(collection.put(ctx, "foo", foo));
+        sync(collection.put(ctx, "bar", bar));
+        sync(collection.put(ctx, "baz", baz));
         sync(collection.getRow("baz").delete(ctx));
         ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
                 new WatchChange(COLLECTION_ID, "bar", ChangeType.PUT_CHANGE,
@@ -253,9 +326,9 @@ public class SyncbaseTest extends TestCase {
         Bar bar = new Bar(0.5f, "b");
         Baz baz = new Baz("John Doe", true);
 
-        sync(collection.put(ctx, "foo", foo, Foo.class));
-        sync(collection.put(ctx, "barfoo", foo, Foo.class));
-        sync(collection.put(ctx, "bar", bar, Bar.class));
+        sync(collection.put(ctx, "foo", foo));
+        sync(collection.put(ctx, "barfoo", foo));
+        sync(collection.put(ctx, "bar", bar));
 
         VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
@@ -268,7 +341,7 @@ public class SyncbaseTest extends TestCase {
                         new VdlAny(Foo.class, foo), null, false, false));
         checkWatch(it, expectedInitialChanges);
 
-        sync(collection.put(ctx, "baz", baz, Baz.class));
+        sync(collection.put(ctx, "baz", baz));
         sync(collection.getRow("baz").delete(ctx));
 
         ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
@@ -308,7 +381,7 @@ public class SyncbaseTest extends TestCase {
         BatchDatabase batchFoo = sync(db.beginBatch(ctx, null));
         Collection batchFooCollection = batchFoo.getCollection(COLLECTION_ID);
         assertThat(sync(batchFooCollection.exists(ctx))).isTrue();
-        sync(batchFooCollection.put(ctx, ROW_NAME, "foo", String.class));
+        sync(batchFooCollection.put(ctx, ROW_NAME, "foo"));
         // Assert that value is visible inside the batch but not outside.
         assertThat(sync(batchFooCollection.get(ctx, ROW_NAME, String.class))).isEqualTo("foo");
         assertThat(sync(collection.getRow(ROW_NAME).exists(ctx))).isFalse();
@@ -316,7 +389,7 @@ public class SyncbaseTest extends TestCase {
         BatchDatabase batchBar = sync(db.beginBatch(ctx, null));
         Collection batchBarCollection = batchBar.getCollection(COLLECTION_ID);
         assertThat(sync(batchBarCollection.exists(ctx))).isTrue();
-        sync(batchBarCollection.put(ctx, ROW_NAME, "foo", String.class));
+        sync(batchBarCollection.put(ctx, ROW_NAME, "foo"));
         // Assert that value is visible inside the batch but not outside.
         assertThat(sync(batchBarCollection.get(ctx, ROW_NAME, String.class))).isEqualTo("foo");
         assertThat(sync(collection.getRow(ROW_NAME).exists(ctx))).isFalse();
@@ -355,10 +428,10 @@ public class SyncbaseTest extends TestCase {
                     }
                     // If we need to fail the commit, write to foo in a separate concurrent batch.
                     if (retries < 2) {
-                        sync(d.getCollection(COLLECTION_ID).put(ctx, fooKey, "foo", String.class));
+                        sync(d.getCollection(COLLECTION_ID).put(ctx, fooKey, "foo"));
                     }
                     // Write to bar.
-                    sync(b.getCollection(COLLECTION_ID).put(ctx, barKey, "bar", String.class));
+                    sync(b.getCollection(COLLECTION_ID).put(ctx, barKey, "bar"));
                 } catch (VException e) {
                     return Futures.immediateFailedFuture(e);
                 }
@@ -376,7 +449,7 @@ public class SyncbaseTest extends TestCase {
     public void testRunInBatchReadOnly() throws Exception {
         final Database d = createDatabase(createService());
         Collection collection = createCollection(d);
-        sync(collection.put(ctx, "foo", "foo", String.class));
+        sync(collection.put(ctx, "foo", "foo"));
 
         sync(Batch.runInBatch(ctx, d, new BatchOptions("", true), new Batch.BatchOperation() {
             @Override
@@ -386,7 +459,7 @@ public class SyncbaseTest extends TestCase {
                     Object before = sync(b.getCollection(COLLECTION_ID).get(ctx, "foo", String.class));
                     // Write to foo in a separate concurrent batch. It should not cause a retry
                     // since readonly batches are not committed.
-                    sync(d.getCollection(COLLECTION_ID).put(ctx, "foo", "oof", String.class));
+                    sync(d.getCollection(COLLECTION_ID).put(ctx, "foo", "oof"));
                     // Read foo again. Batch should not see the changed value.
                     Object after = sync(b.getCollection(COLLECTION_ID).get(ctx, "foo", String.class));
                     if (!before.equals(after)) {
@@ -394,7 +467,7 @@ public class SyncbaseTest extends TestCase {
                     }
                     // Try writing to bar. This should fail since the batch is readonly.
                     try {
-                        sync(b.getCollection(COLLECTION_ID).put(ctx, "bar", "bar", String.class));
+                        sync(b.getCollection(COLLECTION_ID).put(ctx, "bar", "bar"));
                         throw new VException("Expected b.put() to fail with ReadOnlyBatchException");
                     } catch (ReadOnlyBatchException e) {
                         // ok
