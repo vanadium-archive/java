@@ -48,7 +48,7 @@ public class BinaryDecoder {
     private boolean binaryMagicByteRead;
     private Version version;
     private long[] typeIds;
-    private static Version[] allowedVersions = {Version.Version80, Version.Version81};
+    private static Version[] allowedVersions = {Constants.VERSION_80, Constants.VERSION_81};
 
     public BinaryDecoder(InputStream in) {
         this.in = new BufferedInputStream(in);
@@ -57,7 +57,16 @@ public class BinaryDecoder {
         this.binaryMagicByteRead = false;
     }
 
-    /**
+    private static Version versionFromByte(byte b) {
+        for (Version v : allowedVersions) {
+            if (v.getValue() == b) {
+                return v;
+            }
+        }
+        throw new RuntimeException("invalid version byte " + b);
+    }
+
+  /**
      * Decodes a VDL value. Returns an instance of provided {@code Type}.
      *
      * @param targetType the type of returned object
@@ -67,7 +76,7 @@ public class BinaryDecoder {
      */
     public Object decodeValue(Type targetType) throws IOException, ConversionException {
         if (!binaryMagicByteRead) {
-            version = Version.fromByte((byte)in.read());
+            version = versionFromByte((byte)in.read());
             binaryMagicByteRead = true;
         }
         VdlType actualType = decodeType();
@@ -108,14 +117,14 @@ public class BinaryDecoder {
 
     private Object readValueMessage(VdlType actualType, Type targetType) throws IOException,
             ConversionException {
-        if (version != Version.Version80 && (BinaryUtil.hasAny(actualType) || BinaryUtil.hasTypeObject(actualType))) {
+        if (version != Constants.VERSION_80 && (BinaryUtil.hasAny(actualType) || BinaryUtil.hasTypeObject(actualType))) {
             long len = BinaryUtil.decodeUint(in);
             typeIds = new long[(int)len];
             for (int i = 0; i < len; i++) {
                 typeIds[i] = BinaryUtil.decodeUint(in);
             }
         }
-        if (version != Version.Version80 && BinaryUtil.hasAny(actualType)) {
+        if (version != Constants.VERSION_80 && BinaryUtil.hasAny(actualType)) {
             long len = BinaryUtil.decodeUint(in);
             for (int i = 0; i < len; i++) {
                 BinaryUtil.decodeUint(in); // read anyMsgLen (ignore value -- it is unused)
@@ -223,7 +232,7 @@ public class BinaryDecoder {
             case FLOAT64:
                 return readVdlFloat(target);
             case INT8:
-                if (version == Version.Version80) {
+                if (version == Constants.VERSION_80) {
                     throw new RuntimeException("int8 is unsupported in VOM version 0x80");
                 }
                 // fallthrough
@@ -269,7 +278,7 @@ public class BinaryDecoder {
             return createNullValue(target);
         }
         long typeId;
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             typeId = BinaryUtil.decodeUint(in);
         } else {
             typeId = typeIds[(int)BinaryUtil.decodeUint(in)];
@@ -354,7 +363,7 @@ public class BinaryDecoder {
 
     private Object readVdlBool(ConversionTarget target) throws IOException, ConversionException {
         byte b;
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
            b = BinaryUtil.decodeBytes(in, 1)[0];
         } else {
            b = (byte)BinaryUtil.decodeUint(in);
@@ -364,7 +373,7 @@ public class BinaryDecoder {
 
     private Object readVdlByte(ConversionTarget target) throws IOException, ConversionException {
         byte b;
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             b = BinaryUtil.decodeBytes(in, 1)[0];
         } else {
             b = (byte)BinaryUtil.decodeUint(in);
@@ -604,7 +613,7 @@ public class BinaryDecoder {
 
     private Object readVdlTypeObject() throws IOException {
         long typeId;
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             typeId = BinaryUtil.decodeUint(in);
         } else {
             typeId = typeIds[(int)BinaryUtil.decodeUint(in)];

@@ -17,7 +17,6 @@ import io.v.v23.vdl.VdlType;
 import io.v.v23.vdl.VdlTypeObject;
 import io.v.v23.vdl.VdlUint32;
 import io.v.v23.vdl.VdlValue;
-import io.v.v23.vom.testdata.data80.Constants;
 import io.v.v23.vom.testdata.types.ConvertGroup;
 
 import java.lang.reflect.Type;
@@ -47,7 +46,7 @@ public class ConversionTest extends TestCase {
     }
 
     public void testConversion() throws Exception {
-        Version version = Version.DEFAULT_VERSION;
+        Version version = Constants.DEFAULT_VERSION;
         for (Map.Entry<VdlValue, Type> test : tests.entries()) {
             final byte[] encoded = TestUtil.hexStringToBytes(TestUtil.encode(version, test.getKey()));
             final Object decoded = TestUtil.decode(encoded, test.getValue());
@@ -55,7 +54,7 @@ public class ConversionTest extends TestCase {
             assertEquals(targetClass, decoded.getClass());
         }
 
-        for (List<ConvertGroup> test : Constants.CONVERT_TESTS.values()) {
+        for (List<ConvertGroup> test : io.v.v23.vom.testdata.data80.Constants.CONVERT_TESTS.values()) {
             for (int i = 0; i < test.size(); i++) {
                 ConvertGroup g = test.get(i);
                 for (VdlAny value : g.getValues()) {
@@ -87,7 +86,7 @@ public class ConversionTest extends TestCase {
 
     public void testTypeCompatibility() throws Exception {
         Map<VdlType, String> vdlTypes = new HashMap<VdlType, String>();
-        for (Map.Entry<String, List<VdlTypeObject>> testGroup : Constants.COMPAT_TESTS.entrySet()) {
+        for (Map.Entry<String, List<VdlTypeObject>> testGroup : io.v.v23.vom.testdata.data80.Constants.COMPAT_TESTS.entrySet()) {
             for (VdlTypeObject type : testGroup.getValue()) {
                 vdlTypes.put(type.getTypeObject(), testGroup.getKey());
             }

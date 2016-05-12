@@ -33,7 +33,7 @@ public class BinaryDecoderTypeRegistryTest {
     @Test
     public void testGuessType() throws Exception {
         VdlType vdlType = Types.named("v.io/v23/vom/testdata/types.NBool", Types.BOOL);
-        String encoded = TestUtil.encode(Version.DEFAULT_VERSION, new VdlBool(vdlType, true));
+        String encoded = TestUtil.encode(Constants.DEFAULT_VERSION, new VdlBool(vdlType, true));
         // Make sure that the class NBool is not loaded yet.
         try {
             Types.getReflectTypeForVdl(vdlType);

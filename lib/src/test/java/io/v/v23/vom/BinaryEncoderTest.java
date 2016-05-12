@@ -58,10 +58,10 @@ public class BinaryEncoderTest extends TestCase {
             .build();
 
     public void testVersion80Encode() throws Exception {
-        encodeTest(Version.Version80, io.v.v23.vom.testdata.data80.Constants.TESTS);
+        encodeTest(Constants.VERSION_80, io.v.v23.vom.testdata.data80.Constants.TESTS);
     }
     public void testVersion81Encode() throws Exception {
-        encodeTest(Version.Version81, io.v.v23.vom.testdata.data81.Constants.TESTS);
+        encodeTest(Constants.VERSION_81, io.v.v23.vom.testdata.data81.Constants.TESTS);
     }
 
     public void encodeTest(Version version, List<io.v.v23.vom.testdata.types.TestCase> tests) throws Exception {
@@ -81,8 +81,8 @@ public class BinaryEncoderTest extends TestCase {
 
     public void testZeroValue() throws Exception {
         for (Map.Entry<VdlType, Object> entry : zeroValues.entrySet()) {
-            assertEquals(TestUtil.encode(Version.DEFAULT_VERSION, entry.getKey(), entry.getValue()),
-                    TestUtil.encode(Version.DEFAULT_VERSION, entry.getKey(), null));
+            assertEquals(TestUtil.encode(Constants.DEFAULT_VERSION, entry.getKey(), entry.getValue()),
+                    TestUtil.encode(Constants.DEFAULT_VERSION, entry.getKey(), null));
         }
     }
 }

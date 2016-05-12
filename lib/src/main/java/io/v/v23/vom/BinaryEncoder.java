@@ -60,7 +60,7 @@ public class BinaryEncoder {
     private List<Long> anyLens;
 
     public BinaryEncoder(OutputStream out) {
-        this(out, Version.DEFAULT_VERSION);
+        this(out, Constants.DEFAULT_VERSION);
     }
 
     public BinaryEncoder(OutputStream out, Version version) {
@@ -83,7 +83,7 @@ public class BinaryEncoder {
     public void encodeValue(VdlType type, Object value) throws IOException {
         if (!binaryMagicByteWritten) {
             binaryMagicByteWritten = true;
-            out.write(version.asByte());
+            out.write(version.getValue());
         }
         valueBuffer.reset();
         typeIds = new ArrayList<Long>();
@@ -118,18 +118,18 @@ public class BinaryEncoder {
     private void writeMessage(ByteArrayOutputStream buffer, boolean hasAny, boolean hasTypeObject,
                               boolean typeIncomplete, long messageId, boolean encodeLength)
             throws IOException {
-        if (version != Version.Version80 && typeIncomplete) {
+        if (version != Constants.VERSION_80 && typeIncomplete) {
             out.write(Constants.WIRE_CTRL_TYPE_INCOMPLETE);
         }
         BinaryUtil.encodeInt(out, messageId);
-        if (version != Version.Version80 && (hasAny || hasTypeObject) && messageId > 0) {
+        if (version != Constants.VERSION_80 && (hasAny || hasTypeObject) && messageId > 0) {
             BinaryUtil.encodeUint(out, typeIds.size());
             for (Long id : typeIds) {
                 BinaryUtil.encodeUint(out, id);
             }
             typeIds = null;
         }
-        if (version != Version.Version80 && hasAny && messageId > 0) {
+        if (version != Constants.VERSION_80 && hasAny && messageId > 0) {
             BinaryUtil.encodeUint(out, anyLens.size());
             for (Long len : anyLens) {
                 BinaryUtil.encodeUint(out, len);
@@ -176,7 +176,7 @@ public class BinaryEncoder {
     private WireType convertToWireType(VdlType type, Set<VdlType> pending) throws IOException {
         switch (type.getKind()) {
             case INT8:
-                if (version == Version.Version80) {
+                if (version == Constants.VERSION_80) {
                     throw new RuntimeException("int8 not supported in VOM version 80");
                 }
                 // fallthrough
@@ -291,7 +291,7 @@ public class BinaryEncoder {
             case INT16:
             case INT32:
             case INT64:
-                if (type.getKind() == Kind.INT8 && version == Version.Version80) {
+                if (type.getKind() == Kind.INT8 && version == Constants.VERSION_80) {
                     throw new RuntimeException("int8 not supported in VOM version 80");
                 }
                 return writeVdlInt(out, value);
@@ -338,14 +338,14 @@ public class BinaryEncoder {
             writeTypeId(out, id);
             int anyLenIndex = -1;
             long startPos = -1;
-            if (version != Version.Version80) {
+            if (version != Constants.VERSION_80) {
                 anyLenIndex = anyLens.size();
                 BinaryUtil.encodeUint(out, anyLenIndex);
                 anyLens.add(0L);
                 startPos = out.getCount();
             }
             writeValue(out, elem, anyValue.getElemType());
-            if (version != Version.Version80) {
+            if (version != Constants.VERSION_80) {
                 long endPos = out.getCount();
                 anyLens.set(anyLenIndex, endPos - startPos);
             }
@@ -360,7 +360,7 @@ public class BinaryEncoder {
      * Writes the type id in a format suitable for the current VOM version.
      */
     public void writeTypeId(OutputStream out, long id) throws IOException {
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             BinaryUtil.encodeUint(out, id);
         } else {
             int index = typeIds.indexOf(id);
@@ -403,7 +403,7 @@ public class BinaryEncoder {
         if (val) {
             boolAsInt = 1;
         }
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             out.write(boolAsInt);
         } else {
             BinaryUtil.encodeUint(out, boolAsInt);
@@ -426,7 +426,7 @@ public class BinaryEncoder {
             throw new IOException("Unsupported VDL byte value (type " + value.getClass()
                     + ", value " + value + ")");
         }
-        if (version == Version.Version80) {
+        if (version == Constants.VERSION_80) {
             out.write(byteValue);
         } else {
             int fullValue = byteValue;
