@@ -62,8 +62,8 @@ public interface Discovery {
      * <p>
      * Examples:
      * <p><blockquote><pre>
-     *     v.InstanceName = "v.io/i"
-     *     v.InstanceName = "v.io/i" AND v.Attributes["a"] = "v"
+     *     v.InterfaceName = "v.io/i"
+     *     v.InterfaceName = "v.io/i" AND v.Attributes["a"] = "v"
      *     v.Attributes["a"] = "v1" OR v.Attributes["a"] = "v2"
      * </pre></blockquote><p>
      * You can find the {@code SyncQL} tutorial at:
