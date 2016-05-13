@@ -2,4 +2,5 @@
     <string name="app_name">VAnGo</string>
     <string name="key_placeholder">Enter your key here</string>
     <string name="button_run">Run</string>
+    <string name="button_inspect">Remote Inspect</string>
 </resources>
