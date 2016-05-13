@@ -82,6 +82,13 @@ def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolute
 vdl {
     inputPaths += 'src/main/java'
     vdlToolPath = 'vdl'
+    if (exec() {
+            commandLine "which", vdlToolPath
+            ignoreExitValue true
+        }.getExitValue() != 0) {
+        // If vdl is not found in the path, use the one in $JIRI_ROOT.
+        vdlToolPath = [jiriRoot, '.jiri_root', 'bin', 'vdl'].join(File.separator)
+    }
 }
 
 public static isDarwin() {
