@@ -31,6 +31,7 @@ import io.v.v23.verror.VException;
 public class RunKeyActivity extends AppCompatActivity {
     private static final String TAG = "RunKeyActivity";
     private static final String BLESSINGS_KEY = "blessings";
+    private static final String STARTED = "vangoFuncStarted";
 
     private RemoteInspectors mRemoteInspectors;
 
@@ -44,6 +45,10 @@ public class RunKeyActivity extends AppCompatActivity {
 
         TextView textView = (TextView)findViewById(R.id.text_run_key_status);
         textView.setText(String.format("Running go function keyed by '%s'", key));
+
+        if (savedInstanceState != null && savedInstanceState.getBoolean(STARTED)) {
+            return;
+        }
 
         final VContext ctx = V.init(this, new Options()
                 .set(OptionDefs.LOG_VLEVEL, 0)
@@ -71,6 +76,11 @@ public class RunKeyActivity extends AppCompatActivity {
                         Log.d(TAG, "Failed to get blessings", t);
                     }
                 });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(STARTED, true);
     }
 
 
