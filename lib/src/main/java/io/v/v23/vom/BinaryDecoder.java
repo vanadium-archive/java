@@ -589,15 +589,17 @@ public class BinaryDecoder {
         if (peekFlag() == Constants.WIRE_CTRL_NIL) {
             ByteStreams.skipFully(in, 1);
             return createNullValue(target);
-        } else {
-            Type type = target.getTargetType();
-            if (target.getKind() == Kind.OPTIONAL) {
-                type = ReflectUtil.getElementType(target.getTargetType(), 0);
-                return VdlOptional.of((VdlValue) readValue(actualType.getElem(), type));
-            } else {
-                return readValue(actualType.getElem(), type);
-            }
         }
+        Type type = target.getTargetType();
+        if (target.getKind() == Kind.OPTIONAL) {
+            type = ReflectUtil.getElementType(type, 0);
+            Object elem = readValue(actualType.getElem(), type);
+            if (elem instanceof VdlValue) {
+                return VdlOptional.of((VdlValue) elem);
+            }
+            return elem;
+        }
+        return readValue(actualType.getElem(), type);
     }
 
     private Object readVdlString(ConversionTarget target) throws IOException, ConversionException {

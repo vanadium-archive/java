@@ -15,9 +15,6 @@ local.properties
 .metadata/
 .recommenders/
 
-# vdl files
-/src
-
 # Generated source
 generated-src/
 android-lib/src/main/jniLibs/
