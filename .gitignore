@@ -18,6 +18,3 @@ local.properties
 # Generated source
 generated-src/
 android-lib/src/main/jniLibs/
-
-# Nested JIRI projects
-/syncbase
