@@ -20,10 +20,10 @@ public class Database {
     }
 
     public static native String BeginBatch(String name, BatchOptions options) throws VError;
-    public static native List<Id> ListCollections(String name, String batchHandler) throws VError;
-    public static native void Commit(String name, String batchHandler) throws VError;
-    public static native void Abort(String name, String batchHandler) throws VError;
-    public static native byte[] GetResumeMarker(String name, String batchHandler) throws VError;
+    public static native List<Id> ListCollections(String name, String batchHandle) throws VError;
+    public static native void Commit(String name, String batchHandle) throws VError;
+    public static native void Abort(String name, String batchHandle) throws VError;
+    public static native byte[] GetResumeMarker(String name, String batchHandle) throws VError;
 
     public class SyncgroupSpec {
         String description;
