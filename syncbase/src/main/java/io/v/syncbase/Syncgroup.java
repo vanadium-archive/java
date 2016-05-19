@@ -6,14 +6,14 @@ package io.v.syncbase;
 
 public class Syncgroup {
     public Id getId() {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public AccessList getAccessList() {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
-    public class UpdateAccessListOptions {
+    public static class UpdateAccessListOptions {
         // TODO(sadovsky): Fill this in.
     }
 
@@ -21,15 +21,15 @@ public class Syncgroup {
     // Setting opts.syncgroupOnly makes it so these methods only update the AccessList for the
     // syncgroup.
     public void addUsers(User[] users, AccessLevel level, UpdateAccessListOptions opts) {
-
+        throw new RuntimeException("Not implemented");
     }
 
     public void removeUsers(User[] users, UpdateAccessListOptions opts) {
-
+        throw new RuntimeException("Not implemented");
     }
 
     // Applies 'delta' to the AccessList. Note, NULL enum means "remove".
     public void updateAccessList(AccessList delta, UpdateAccessListOptions opts) {
-
+        throw new RuntimeException("Not implemented");
     }
 }

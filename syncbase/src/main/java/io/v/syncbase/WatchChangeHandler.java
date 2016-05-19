@@ -14,11 +14,14 @@ public abstract class WatchChangeHandler {
     // void onChangeBatch(Iterator<WatchChange> values, Iterator<WatchChange> changes)
 
     void onInitialState(Iterator<WatchChange> values) {
+
     }
 
     void onChangeBatch(Iterator<WatchChange> changes) {
+
     }
 
     void onError(Exception e) {
+
     }
 }

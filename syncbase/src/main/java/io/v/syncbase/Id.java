@@ -5,5 +5,18 @@
 package io.v.syncbase;
 
 public class Id {
-    // TODO(sadovsky): Fill this in.
+    // TODO(sadovsky): Fill this in further.
+    private String mBlessing;
+    private String mName;
+
+    // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
+
+    protected Id(io.v.v23.services.syncbase.Id id) {
+        mBlessing = id.getBlessing();
+        mName = id.getName();
+    }
+
+    protected io.v.v23.services.syncbase.Id toVId() {
+        return new io.v.v23.services.syncbase.Id(mBlessing, mName);
+    }
 }

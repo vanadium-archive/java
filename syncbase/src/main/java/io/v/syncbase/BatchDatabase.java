@@ -8,26 +8,26 @@ import java.util.Iterator;
 
 public class BatchDatabase implements DatabaseHandle {
     public Id getId() {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public Collection collection(String name, CollectionOptions opts) {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public Collection getCollection(Id id) {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public Iterator<Collection> getCollections() {
-        return null;
+        throw new RuntimeException("Not implemented");
     }
 
     public void commit() {
-
+        throw new RuntimeException("Not implemented");
     }
 
     public void abort() {
-
+        throw new RuntimeException("Not implemented");
     }
 }
