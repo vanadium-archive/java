@@ -4,11 +4,24 @@
 
 package io.v.syncbase;
 
+import io.v.v23.VFutures;
+import io.v.v23.verror.ExistException;
+import io.v.v23.verror.VException;
+
 public class Collection {
     private final io.v.v23.syncbase.Collection mCxImpl;
 
-    protected Collection(io.v.v23.syncbase.Collection cxImpl) {
-        // TODO(sadovsky): Add create-if-not-exists code.
+    protected Collection(io.v.v23.syncbase.Collection cxImpl, boolean createIfMissing) {
+        if (createIfMissing) {
+            try {
+                // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
+                VFutures.sync(cxImpl.create(Syncbase.getVContext(), null));
+            } catch (ExistException e) {
+                // Collection already exists.
+            } catch (VException e) {
+                throw new RuntimeException("Failed to create collection", e);
+            }
+        }
         mCxImpl = cxImpl;
     }
 

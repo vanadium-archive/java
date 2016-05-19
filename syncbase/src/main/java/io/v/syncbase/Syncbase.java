@@ -94,7 +94,7 @@ public class Syncbase {
         // Create database, if needed.
         io.v.v23.syncbase.Database d = s.getDatabase(getVContext(), DB_NAME, null);
         try {
-            VFutures.sync(d.create(getVContext(), null));
+            VFutures.sync(d.create(getVContext(), perms));
         } catch (ExistException e) {
             // Database already exists, presumably from a previous run of the app.
         } catch (VException e) {

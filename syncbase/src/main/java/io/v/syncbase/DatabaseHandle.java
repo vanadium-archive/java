@@ -10,7 +10,7 @@ public interface DatabaseHandle {
     Id getId();
 
     class CollectionOptions {
-        // TODO(sadovsky): Fill this in.
+        public boolean withoutSyncgroup;
     }
 
     Collection collection(String name, CollectionOptions opts);

@@ -5,7 +5,6 @@
 package io.v.syncbase;
 
 public class Id {
-    // TODO(sadovsky): Fill this in further.
     private String mBlessing;
     private String mName;
 

@@ -7,27 +7,36 @@ package io.v.syncbase;
 import java.util.Iterator;
 
 public class BatchDatabase implements DatabaseHandle {
+    private final io.v.v23.syncbase.BatchDatabase mBatchDbImpl;
+
+    protected BatchDatabase(io.v.v23.syncbase.BatchDatabase batchDbImpl) {
+        mBatchDbImpl = batchDbImpl;
+    }
+
     public Id getId() {
-        throw new RuntimeException("Not implemented");
+        return new Id(mBatchDbImpl.id());
     }
 
     public Collection collection(String name, CollectionOptions opts) {
-        throw new RuntimeException("Not implemented");
+        if (!opts.withoutSyncgroup) {
+            throw new RuntimeException("Cannot create syncgroup in a batch");
+        }
+        return new Collection(mBatchDbImpl.getCollection(new io.v.v23.services.syncbase.Id(Syncbase.getPersonalBlessingString(), name)), true);
     }
 
     public Collection getCollection(Id id) {
-        throw new RuntimeException("Not implemented");
+        return Database.getCollectionImpl(mBatchDbImpl, id);
     }
 
     public Iterator<Collection> getCollections() {
-        throw new RuntimeException("Not implemented");
+        return Database.getCollectionsImpl(mBatchDbImpl);
     }
 
     public void commit() {
-        throw new RuntimeException("Not implemented");
+        mBatchDbImpl.commit(Syncbase.getVContext());
     }
 
     public void abort() {
-        throw new RuntimeException("Not implemented");
+        mBatchDbImpl.abort(Syncbase.getVContext());
     }
 }

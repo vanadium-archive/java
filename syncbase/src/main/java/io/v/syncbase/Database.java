@@ -4,7 +4,13 @@
 
 package io.v.syncbase;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import io.v.v23.VFutures;
+import io.v.v23.syncbase.DatabaseCore;
+import io.v.v23.verror.VException;
 
 public class Database implements DatabaseHandle {
     private final io.v.v23.syncbase.Database mDbImpl;
@@ -18,17 +24,37 @@ public class Database implements DatabaseHandle {
     }
 
     public Collection collection(String name, CollectionOptions opts) {
-        return new Collection(mDbImpl.getCollection(new io.v.v23.services.syncbase.Id(Syncbase.getPersonalBlessingString(), name)));
+        // TODO(sadovsky): If !opts.withoutSyncgroup, create syncgroup and update userdata syncgroup.
+        return new Collection(mDbImpl.getCollection(new io.v.v23.services.syncbase.Id(Syncbase.getPersonalBlessingString(), name)), true);
+    }
+
+    protected static Collection getCollectionImpl(DatabaseCore vDb, Id id) {
+        // TODO(sadovsky): Consider throwing an exception if the collection does not already exist.
+        return new Collection(vDb.getCollection(id.toVId()), false);
     }
 
     public Collection getCollection(Id id) {
-        return new Collection(mDbImpl.getCollection(id.toVId()));
+        return getCollectionImpl(mDbImpl, id);
+    }
+
+    // Exposed as a static function so that the implementation can be shared between Database and
+    // BatchDatabase.
+    protected static Iterator<Collection> getCollectionsImpl(DatabaseCore vDb) {
+        List<io.v.v23.services.syncbase.Id> vIds;
+        try {
+            vIds = VFutures.sync(vDb.listCollections(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("listCollections failed", e);
+        }
+        ArrayList<Collection> cxs = new ArrayList<>(vIds.size());
+        for (io.v.v23.services.syncbase.Id vId : vIds) {
+            cxs.add(new Collection(vDb.getCollection(vId), false));
+        }
+        return cxs.iterator();
     }
 
     public Iterator<Collection> getCollections() {
-        // FIXME: Convert ListenableFuture<List<Id>> to Iterator<Collection>.
-        mDbImpl.listCollections(Syncbase.getVContext());
-        throw new RuntimeException("Not implemented");
+        return getCollectionsImpl(mDbImpl);
     }
 
     class SyncgroupOptions {

@@ -14,7 +14,7 @@ public class Syncgroup {
     }
 
     public static class UpdateAccessListOptions {
-        // TODO(sadovsky): Fill this in.
+        public boolean syncgroupOnly;
     }
 
     // The following methods update the AccessList for the syncgroup and its associated collections.
