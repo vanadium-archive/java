@@ -27,7 +27,6 @@ import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.BatchOptions;
 import io.v.v23.services.syncbase.BlobRef;
-import io.v.v23.services.syncbase.CollectionRow;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.syncbase.KeyValue;
 import io.v.v23.services.syncbase.ReadOnlyBatchException;
@@ -487,11 +486,12 @@ public class SyncbaseTest extends TestCase {
 
     public void testSyncgroup() throws Exception {
         Database db = createDatabase(createService());
+        Collection collection = createCollection(db);
         Id syncgroupId = new Id("blessing", "test");
 
         // "A" creates the group.
         SyncgroupSpec spec = new SyncgroupSpec("test", "", allowAll,
-                ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
+                ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
         memberInfo.setSyncPriority((byte) 1);
@@ -506,14 +506,15 @@ public class SyncbaseTest extends TestCase {
         // TODO(spetrovic): test leave() and destroy().
 
         SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", "", allowAll,
-                ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
+                ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         assertThat(sync(group.getSpec(ctx)).keySet()).isNotEmpty();
         String version = sync(group.getSpec(ctx)).keySet().iterator().next();
         sync(group.setSpec(ctx, specRMW, version));
         assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specRMW);
+
         SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", "", allowAll,
-                ImmutableList.of(new CollectionRow(COLLECTION_ID, "")),
+                ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         sync(group.setSpec(ctx, specOverwrite, ""));
         assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specOverwrite);
