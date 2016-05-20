@@ -42,6 +42,7 @@ dependencies {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+    delete "src/main/jniLibs/"
 }
 
 class VanadiumEnvironment {
