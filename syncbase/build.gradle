@@ -70,7 +70,12 @@ class VanadiumEnvironment {
 def addSyncbaseLib(Map args) {
     def abiName = args.abiName
     def goArch = args.goArch
-    def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+    def jiriRoot = ""
+    try {
+        jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+    } catch (InvalidUserDataException e) {
+        return
+    }
 
     def check = task("checkVanadiumAndroidEnvironment-${goArch}", type: Exec) {
         commandLine 'jiri', 'profile', 'list',
