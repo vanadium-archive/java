@@ -43,3 +43,66 @@ dependencies {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+class VanadiumEnvironment {
+    File jiriRoot;
+
+    public static getVanadiumEnvironment() {
+        VanadiumEnvironment result = new VanadiumEnvironment()
+
+        if (!System.getenv().containsKey('JIRI_ROOT')) {
+            throw new InvalidUserDataException("JIRI_ROOT is not set. "
+                    + "Please follow the Vanadium installation instructions at "
+                    + "https://vanadium.github.io/installation/")
+        }
+
+        result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
+        return result
+    }
+}
+
+def addSyncbaseLib(Map args) {
+    def abiName = args.abiName
+    def goArch = args.goArch
+    def jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
+
+    def check = task("checkVanadiumAndroidEnvironment-${goArch}", type: Exec) {
+        commandLine 'jiri', 'profile', 'list',
+                '--info=Target.InstallationDir',
+                "--target=${goArch}-android", 'v23:android'
+        standardOutput = new ByteArrayOutputStream()
+        doLast {
+            def androidOutputDir = new File(standardOutput.toString().trim())
+            if (!androidOutputDir.exists() || !androidOutputDir.isDirectory()) {
+                throw new InvalidUserDataException(
+                        androidOutputDir.toString() + " does not exist or is not a directory. "
+                                + "The android base profile is probably missing. Try running\n\n"
+                                + "jiri profile install --target=${goArch}-android v23:android\n\n"
+                                + "and then try build again."
+                )
+            }
+        }
+    }
+
+    def goBuild = task("buildSyncbaseLib-${goArch}", type: Exec, dependsOn: check) {
+        environment 'GOOS', 'android'
+        environment 'GOARCH', goArch
+        commandLine 'jiri', 'go', "--target=${goArch}-android", 'install',
+                '-buildmode=c-shared', '-v', '-tags', 'android',
+                'v.io/x/ref/services/syncbase/bridge/cgo'
+    }
+
+    // Copy the shared library to its ultimate destination.
+    def copyLib = task("copySyncbaseLib-${goArch}", type: Copy, dependsOn: goBuild) {
+        from jiriRoot + "/release/go/pkg/android_${goArch}_shared/v.io/x/ref/services/syncbase/bridge/"
+        into "src/main/jniLibs/${abiName}"
+        include 'cgo.a'
+        rename 'cgo.a', 'libsyncbase.so'
+    }
+
+    tasks.copySyncbaseLib.dependsOn(copyLib)
+}
+
+task(copySyncbaseLib)
+addSyncbaseLib abiName: 'x86_64', goArch: 'amd64'
+addSyncbaseLib abiName: 'armeabi-v7a', goArch: 'arm'
