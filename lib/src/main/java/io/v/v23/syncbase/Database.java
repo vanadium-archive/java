@@ -9,6 +9,7 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.BatchOptions;
 import io.v.v23.services.syncbase.BlobRef;
+import io.v.v23.services.syncbase.CollectionRowPattern;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.AccessController;
@@ -111,9 +112,11 @@ public interface Database extends DatabaseCore, AccessController {
     ListenableFuture<BatchDatabase> beginBatch(VContext context, BatchOptions opts);
 
     /**
-     * Allows a client to watch for updates to the database. For each watch request, the client will
-     * receive a reliable {@link InputChannel} of watch events since the provided
-     * {@link ResumeMarker} without re-ordering.
+     * Allows a client to watch for updates to the database. At least one pattern must be specified.
+     * For each watch request, the client will receive a reliable {@link InputChannel} of watch
+     * events since the provided {@link ResumeMarker} without re-ordering. Only rows matching at
+     * least one of the patterns are returned. Rows in collections with no Read access are also
+     * filtered out.
      * <p>
      * See {@link io.v.v23.services.watch.GlobWatcherClient} for a detailed explanation of the
      * watch behavior and additional {@link ResumeMarker} semantics.
@@ -122,28 +125,26 @@ public interface Database extends DatabaseCore, AccessController {
      * stop the watch operation and cause the channel to stop producing elements.  Note that to
      * avoid memory leaks, the caller should drain the channel after cancelling the context.
      *
-     * @param context      vanadium context
-     * @param collectionId Id of the collection to watch
-     * @param prefix       prefix of the rows to watch
+     * @param context      Vanadium context
      * @param resumeMarker {@link ResumeMarker} from which the changes will be monitored
+     * @param patterns     LIKE-style patterns used for filtering returned rows; only rows matching
+     * at least one pattern are returned
      * @return a (potentially-infinite) {@link InputChannel} of changes
      */
-    InputChannel<WatchChange> watch(VContext context, Id collectionId,
-                                    String prefix, ResumeMarker resumeMarker);
+    InputChannel<WatchChange> watch(VContext context, ResumeMarker resumeMarker, List<CollectionRowPattern> patterns);
 
     /**
      * Allows a client to watch for updates to the database. Same as
-     * {@link #watch(VContext, Id, String, ResumeMarker)} with an empty {@link ResumeMarker}:
-     * the first batch on the returned stream represents the initial state of the watched row set
-     * at the time of the call.
+     * {@link #watch(VContext, ResumeMarker, CollectionRowPattern[])} with an empty
+     * {@link ResumeMarker}: the first batch on the returned stream represents the initial state of
+     * the watched row set at the time of the call.
      *
-     * @param context      vanadium context
-     * @param collectionId Id of the collection to watch
-     * @param prefix       prefix of the rows to watch
+     * @param context  Vanadium context
+     * @param patterns LIKE-style patterns used for filtering returned rows; only rows matching at
+     * least one pattern are returned
      * @return a (potentially-infinite) {@link InputChannel} of changes
      */
-    InputChannel<WatchChange> watch(VContext context, Id collectionId,
-                                    String prefix);
+    InputChannel<WatchChange> watch(VContext context, List<CollectionRowPattern> patterns);
 
     /**
      * Returns a handle to a database {@link Syncgroup} with the given Id.

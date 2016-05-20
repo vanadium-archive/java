@@ -27,6 +27,7 @@ import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.BatchOptions;
 import io.v.v23.services.syncbase.BlobRef;
+import io.v.v23.services.syncbase.CollectionRowPattern;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.syncbase.KeyValue;
 import io.v.v23.services.syncbase.ReadOnlyBatchException;
@@ -302,18 +303,26 @@ public class SyncbaseTest extends TestCase {
 
         sync(collection.put(ctx, "foo", foo));
         sync(collection.put(ctx, "bar", bar));
-        sync(collection.put(ctx, "baz", baz));
-        sync(collection.getRow("baz").delete(ctx));
+        sync(collection.put(ctx, "ba%", baz));
+        sync(collection.getRow("ba%").delete(ctx));
+
         ImmutableList<WatchChange> expectedChanges = ImmutableList.of(
-                new WatchChange(COLLECTION_ID, "bar", ChangeType.PUT_CHANGE,
-                        new VdlAny(Bar.class, bar), null, false, false),
-                new WatchChange(COLLECTION_ID, "baz", ChangeType.PUT_CHANGE,
+                new WatchChange(COLLECTION_ID, "foo", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false),
+                new WatchChange(COLLECTION_ID, "ba%", ChangeType.PUT_CHANGE,
                         new VdlAny(Baz.class, baz), null, false, false),
-                new WatchChange(COLLECTION_ID, "baz", ChangeType.DELETE_CHANGE,
+                new WatchChange(COLLECTION_ID, "ba%", ChangeType.DELETE_CHANGE,
                         new VdlAny(), null, false, false));
+
         VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
-                db.watch(ctxC, COLLECTION_ID, "b", marker)).iterator();
+                // Watch two prefixes in the same call. The second filter matches only keys with
+                // the literal prefix 'ba%' - the '%' is not interpreted as a wildcard, so "bar"
+                // is not matched.
+                db.watch(ctxC, marker, ImmutableList.of(
+                    Util.rowPrefixPattern(COLLECTION_ID, "foo"),
+                    Util.rowPrefixPattern(COLLECTION_ID, "ba%"))))
+                .iterator();
         checkWatch(it, expectedChanges);
         ctxC.cancel();
     }
@@ -329,9 +338,10 @@ public class SyncbaseTest extends TestCase {
         sync(collection.put(ctx, "barfoo", foo));
         sync(collection.put(ctx, "bar", bar));
 
-        VContext ctxC = ctx.withCancel();
+        final VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it = InputChannels.asIterable(
-                db.watch(ctxC, COLLECTION_ID, "b")).iterator();
+                db.watch(ctxC, ImmutableList.of(Util.rowPrefixPattern(COLLECTION_ID, "b"))))
+                .iterator();
 
         ImmutableList<WatchChange> expectedInitialChanges = ImmutableList.of(
                 new WatchChange(COLLECTION_ID, "bar", ChangeType.PUT_CHANGE,
@@ -358,7 +368,8 @@ public class SyncbaseTest extends TestCase {
         createCollection(db);
 
         InputChannel<WatchChange> channel = db.watch(
-                ctxC, COLLECTION_ID, "b", sync(db.getResumeMarker(ctx)));
+                ctxC, sync(db.getResumeMarker(ctx)),
+                ImmutableList.of(Util.rowPrefixPattern(COLLECTION_ID, "b")));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -370,6 +381,93 @@ public class SyncbaseTest extends TestCase {
         } catch (CanceledException e) {
             // OK
         }
+    }
+
+    public void testDatabaseWatchFilters() throws Exception {
+        Database db = createDatabase(createService());
+
+        // Create and populate two collections.
+        Collection cxAFoo = db.getCollection(new Id("v.io:u:alice", "foo"));
+        sync(cxAFoo.create(ctx, allowAll));
+        Collection cxBFoo = db.getCollection(new Id("v.io:u:bob", "foobar"));
+        sync(cxBFoo.create(ctx, allowAll));
+        Collection collection = createCollection(db);
+        Foo foo = new Foo(42, "LUE");
+
+        sync(cxAFoo.put(ctx, "abc", foo));
+        sync(cxAFoo.put(ctx, "abcd", foo));
+        sync(cxAFoo.put(ctx, "bcd", foo));
+        sync(cxAFoo.put(ctx, "bc_", foo));
+
+        sync(cxBFoo.put(ctx, "abc", foo));
+        sync(cxBFoo.put(ctx, "bcd", foo));
+        sync(cxBFoo.put(ctx, "bc_", foo));
+        sync(cxBFoo.put(ctx, "bc_e", foo));
+
+        final VContext ctxC = ctx.withCancel();
+        Iterator<WatchChange> it1 = InputChannels.asIterable(
+                db.watch(ctxC, ImmutableList.of(
+                        new CollectionRowPattern("v.io:u:%", "foo", "abc%"),
+                        new CollectionRowPattern("v.io:u:%", "foo%",
+                                "%" + Util.escapePattern("c_")))))
+                .iterator();
+        Iterator<WatchChange> it2 = InputChannels.asIterable(
+                db.watch(ctxC, ImmutableList.of(
+                        Util.rowPrefixPattern(new Id("v.io:u:bob", "foobar"), "bc_"),
+                        new CollectionRowPattern("%:alice", "%", "%bcd"))))
+                .iterator();
+
+        ImmutableList<WatchChange> expectedInitialChanges1 = ImmutableList.of(
+                new WatchChange(cxAFoo.id(), "abc", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxAFoo.id(), "abcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxAFoo.id(), "bc_", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxBFoo.id(), "bc_", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false));
+        checkWatch(it1, expectedInitialChanges1);
+
+        ImmutableList<WatchChange> expectedInitialChanges2 = ImmutableList.of(
+                new WatchChange(cxAFoo.id(), "abcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxAFoo.id(), "bcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxBFoo.id(), "bc_", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, true),
+                new WatchChange(cxBFoo.id(), "bc_e", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false));
+        checkWatch(it2, expectedInitialChanges2);
+
+        // More changes to existing collections.
+        sync(cxAFoo.put(ctx, "abcd", foo));
+        sync(cxBFoo.getRow("bc_").delete(ctx));
+
+        // Create and populate another collection.
+        Collection cxAFoobar = db.getCollection(new Id("v.io:u:alice", "foobar"));
+        sync(cxAFoobar.create(ctx, allowAll));
+        sync(cxAFoobar.put(ctx, "abcd", foo));
+        sync(cxAFoobar.put(ctx, "abc_", foo));
+
+        ImmutableList<WatchChange> expectedChanges1 = ImmutableList.of(
+                new WatchChange(cxAFoo.id(), "abcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false),
+                new WatchChange(cxBFoo.id(), "bc_", ChangeType.DELETE_CHANGE,
+                        new VdlAny(), null, false, false),
+                new WatchChange(cxAFoobar.id(), "abc_", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false));
+        checkWatch(it1, expectedChanges1);
+
+        ImmutableList<WatchChange> expectedChanges2 = ImmutableList.of(
+                new WatchChange(cxAFoo.id(), "abcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false),
+                new WatchChange(cxBFoo.id(), "bc_", ChangeType.DELETE_CHANGE,
+                        new VdlAny(), null, false, false),
+                new WatchChange(cxAFoobar.id(), "abcd", ChangeType.PUT_CHANGE,
+                        new VdlAny(Foo.class, foo), null, false, false));
+        checkWatch(it2, expectedChanges2);
+
+        ctxC.cancel();
     }
 
     public void testBatch() throws Exception {

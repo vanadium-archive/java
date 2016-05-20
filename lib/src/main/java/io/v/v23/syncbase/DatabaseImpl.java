@@ -23,13 +23,13 @@ import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.BatchOptions;
 import io.v.v23.services.syncbase.BatchHandle;
 import io.v.v23.services.syncbase.BlobRef;
+import io.v.v23.services.syncbase.CollectionRowPattern;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.services.syncbase.DatabaseClient;
 import io.v.v23.services.syncbase.DatabaseClientFactory;
 import io.v.v23.services.syncbase.SchemaMetadata;
 import io.v.v23.services.syncbase.StoreChange;
 import io.v.v23.services.watch.Change;
-import io.v.v23.services.watch.GlobRequest;
 import io.v.v23.services.watch.ResumeMarker;
 import io.v.v23.syncbase.util.Util;
 import io.v.v23.vdl.ClientRecvStream;
@@ -177,11 +177,9 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
 
     @Override
-    public InputChannel<WatchChange> watch(VContext ctx, Id collectionId,
-                                           String prefix, ResumeMarker resumeMarker) {
-        return InputChannels.transform(ctx, client.watchGlob(ctx,
-                new GlobRequest(NamingUtil.join(Util.encodeId(collectionId), prefix + "*"),
-                        resumeMarker)),
+    public InputChannel<WatchChange> watch(VContext ctx, ResumeMarker resumeMarker,
+                                           List<CollectionRowPattern> patterns) {
+        return InputChannels.transform(ctx, client.watchPatterns(ctx, resumeMarker, patterns),
                 new InputChannels.TransformFunction<Change, WatchChange>() {
                     @Override
                     public WatchChange apply(Change change) throws VException {
@@ -191,9 +189,8 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
 
     @Override
-    public InputChannel<WatchChange> watch(VContext ctx, Id collectionId,
-                                           String prefix) {
-        return this.watch(ctx, collectionId, prefix, null);
+    public InputChannel<WatchChange> watch(VContext ctx, List<CollectionRowPattern> patterns) {
+        return this.watch(ctx, null, patterns);
     }
 
     @Override

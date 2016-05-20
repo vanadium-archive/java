@@ -16,6 +16,7 @@ import io.v.v23.V;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
+import io.v.v23.services.syncbase.CollectionRowPattern;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.verror.VException;
 
@@ -76,8 +77,8 @@ public class Util {
      * Applies the inverse of {@link Util#encodeId}. Throws exception if the given string is
      * not a valid encoded string.
      *
-     * @param s String to dencode.
-     * @return decoded string.
+     * @param s String to decode.
+     * @return Decoded string.
      * @throws IllegalArgumentException if {@code s} is truncated or malformed.
      */
     public static Id decodeId(String s) throws VException {
@@ -88,6 +89,37 @@ public class Util {
         }
         Id id = new Id(parts[0], parts[1]);
         return id;
+    }
+
+    /**
+     * Character used for escaping wildcards in LIKE-style patterns ('%', '_', and itself).
+     */
+    public static final char EscapeChar = '\\';
+
+    /**
+     * Escapes the given string for inclusion as a literal in a LIKE-style pattern.
+     * It inserts '\' before each '_', '%', and '\' in the string.
+     *
+     * @param s String to escape.
+     * @return String with all wildcards escaped.
+     */
+    public static String escapePattern(String s) {
+        // Replace each literal '\', '%', and '_' with a literal '\' plus the matched character.
+        return s.replaceAll("[\\\\%_]", "\\\\$0");
+    }
+
+    /**
+     * Returns a CollectionRowPattern matching a single key prefix in a single collection.
+     *
+     * @param cxId      Collection to match.
+     * @param keyPrefix Key prefix to match.
+     * @return CollectionRowPattern matching the specified prefix in the specified collection.
+     */
+    public static CollectionRowPattern rowPrefixPattern(Id cxId, String keyPrefix) {
+        return new CollectionRowPattern(
+            escapePattern(cxId.getBlessing()),
+            escapePattern(cxId.getName()),
+            escapePattern(keyPrefix) + "%");
     }
 
     /**
