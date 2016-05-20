@@ -4,52 +4,85 @@
 
 package io.v.syncbase;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import io.v.v23.VFutures;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
 public class Collection {
-    private final io.v.v23.syncbase.Collection mCxImpl;
+    private final Database mDatabase;
+    private final io.v.v23.syncbase.Collection mVCollection;
 
-    protected Collection(io.v.v23.syncbase.Collection cxImpl, boolean createIfMissing) {
+    protected Collection(Database database, io.v.v23.syncbase.Collection vCollection, boolean createIfMissing) {
         if (createIfMissing) {
             try {
-                // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
-                VFutures.sync(cxImpl.create(Syncbase.getVContext(), null));
+                VFutures.sync(vCollection.create(Syncbase.getVContext(), null));
             } catch (ExistException e) {
                 // Collection already exists.
             } catch (VException e) {
                 throw new RuntimeException("Failed to create collection", e);
             }
         }
-        mCxImpl = cxImpl;
+        mDatabase = database;
+        mVCollection = vCollection;
     }
 
     public Id getId() {
-        return new Id(mCxImpl.id());
+        return new Id(mVCollection.id());
     }
 
     // Shortcut for Database.getSyncgroup(c.getId()), helpful for the common case of one syncgroup
     // per collection.
     public Syncgroup getSyncgroup() {
-        throw new RuntimeException("Not implemented");
+        return mDatabase.getSyncgroup(getId());
     }
 
     // TODO(sadovsky): Maybe add scan API, if developers aren't satisfied with watch.
-    public <T> T get(String key) {
-        throw new RuntimeException("Not implemented");
+
+    // TODO(sadovsky): Revisit this API, which was copied from io.v.v23.syncbase. For example, would
+    // the signature "public <T> T get(String key)" be preferable?
+    public Object get(String key, Type type) {
+        try {
+            return VFutures.sync(mVCollection.getRow(key).get(Syncbase.getVContext(), type));
+        } catch (VException e) {
+            throw new RuntimeException("get failed: " + key, e);
+        }
     }
 
     public boolean exists(String key) {
-        throw new RuntimeException("Not implemented");
+        try {
+            return VFutures.sync(mVCollection.getRow(key).exists(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("exists failed: " + key, e);
+        }
+    }
+
+    // TODO(sadovsky): Only needed for the current (old) version of io.v.v23.syncbase, which does
+    // not include fredq's change to the put() API.
+    private static Type getType(Object object) {
+        Type superclassType = object.getClass().getGenericSuperclass();
+        if (!ParameterizedType.class.isAssignableFrom(superclassType.getClass())) {
+            return null;
+        }
+        return ((ParameterizedType) superclassType).getActualTypeArguments()[0];
     }
 
     public <T> void put(String key, T value) {
-        throw new RuntimeException("Not implemented");
+        try {
+            VFutures.sync(mVCollection.put(Syncbase.getVContext(), key, value, getType(value)));
+        } catch (VException e) {
+            throw new RuntimeException("put failed: " + key, e);
+        }
     }
 
     public void delete(String key) {
-        throw new RuntimeException("Not implemented");
+        try {
+            VFutures.sync(mVCollection.getRow(key).delete(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("delete failed: " + key, e);
+        }
     }
 
     // FOR ADVANCED USERS. The following methods manipulate the AccessList for this collection, but

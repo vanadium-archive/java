@@ -14,7 +14,6 @@ import java.io.File;
 import io.v.android.VAndroidContext;
 import io.v.android.v23.V;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
-import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -22,7 +21,6 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.SyncbaseService;
-import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
 public class Syncbase {
@@ -77,30 +75,17 @@ public class Syncbase {
             PROXY = "proxy",
             DEFAULT_BLESSING_STRING_PREFIX = "dev.v.io:o:608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com:",
             MOUNT_POINT = "/ns.dev.v.io:8101/tmp/todos/users/",
-            CLOUD_BLESSING = "dev.v.io:u:alexfandrianto@google.com";
+            CLOUD_BLESSING_STRING = "dev.v.io:u:alexfandrianto@google.com";
 
     private static Database startSyncbaseAndInitDatabase(VContext ctx) {
         SyncbaseService s;
-        Blessings personalBlessings = getPersonalBlessings();
-        if (personalBlessings == null) {
-            throw new RuntimeException("No blessings");
-        }
-        Permissions perms = permissionsFromBlessings(personalBlessings);
         try {
             s = io.v.v23.syncbase.Syncbase.newService(startSyncbase(ctx, sOpts.rootDir));
         } catch (SyncbaseServer.StartException e) {
             throw new RuntimeException("Failed to start Syncbase", e);
         }
         // Create database, if needed.
-        io.v.v23.syncbase.Database d = s.getDatabase(getVContext(), DB_NAME, null);
-        try {
-            VFutures.sync(d.create(getVContext(), perms));
-        } catch (ExistException e) {
-            // Database already exists, presumably from a previous run of the app.
-        } catch (VException e) {
-            throw new RuntimeException("Failed to create database", e);
-        }
-        return new Database(d);
+        return new Database(s.getDatabase(getVContext(), DB_NAME, null));
     }
 
     private static String startSyncbase(VContext vContext, String rootDir)
@@ -160,7 +145,7 @@ public class Syncbase {
         return getEmailFromBlessings(getPersonalBlessings());
     }
 
-    protected static Permissions permissionsFromBlessings(Blessings blessings) {
+    protected static Permissions defaultPerms() {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         io.v.v23.security.access.AccessList openAccessList =
                 new io.v.v23.security.access.AccessList(
@@ -170,8 +155,8 @@ public class Syncbase {
         io.v.v23.security.access.AccessList accessList =
                 new io.v.v23.security.access.AccessList(
                         ImmutableList.of(
-                                new BlessingPattern(blessings.toString()),
-                                new BlessingPattern(CLOUD_BLESSING)),
+                                new BlessingPattern(getPersonalBlessingString()),
+                                new BlessingPattern(CLOUD_BLESSING_STRING)),
                         ImmutableList.<String>of());
         return new Permissions(ImmutableMap.of(
                 Constants.RESOLVE.getValue(), openAccessList,

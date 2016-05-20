@@ -6,12 +6,12 @@ package io.v.syncbase;
 
 import java.util.Map;
 
-enum AccessLevel {
-    Read,
-    ReadWrite,
-    ReadWriteAdmin
-}
-
 public class AccessList {
+    public enum AccessLevel {
+        READ,
+        READ_WRITE,
+        READ_WRITE_ADMIN
+    }
+
     public Map<String, AccessLevel> users;
 }

@@ -5,8 +5,17 @@
 package io.v.syncbase;
 
 public class Syncgroup {
+    private final Id mId;
+    private final io.v.v23.syncbase.Syncgroup mVSyncgroup;
+
+    // Note, we take 'id' because io.v.v23.syncbase.Syncgroup is missing a 'getId' method.
+    protected Syncgroup(Id id, io.v.v23.syncbase.Syncgroup vSyncgroup) {
+        mId = id;
+        mVSyncgroup = vSyncgroup;
+    }
+
     public Id getId() {
-        throw new RuntimeException("Not implemented");
+        return mId;
     }
 
     public AccessList getAccessList() {
@@ -20,12 +29,20 @@ public class Syncgroup {
     // The following methods update the AccessList for the syncgroup and its associated collections.
     // Setting opts.syncgroupOnly makes it so these methods only update the AccessList for the
     // syncgroup.
-    public void addUsers(User[] users, AccessLevel level, UpdateAccessListOptions opts) {
-        throw new RuntimeException("Not implemented");
+    public void addUsers(User[] users, AccessList.AccessLevel level, UpdateAccessListOptions opts) {
+        AccessList delta = new AccessList();
+        for (User u: users) {
+            delta.users.put(u.getId(), level);
+        }
+        updateAccessList(delta, opts);
     }
 
     public void removeUsers(User[] users, UpdateAccessListOptions opts) {
-        throw new RuntimeException("Not implemented");
+        AccessList delta = new AccessList();
+        for (User u: users) {
+            delta.users.put(u.getId(), null);
+        }
+        updateAccessList(delta, opts);
     }
 
     // Applies 'delta' to the AccessList. Note, NULL enum means "remove".

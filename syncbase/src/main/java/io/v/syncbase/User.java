@@ -5,5 +5,8 @@
 package io.v.syncbase;
 
 public class User {
-    // TODO(sadovsky): Fill this in.
+    // TODO(sadovsky): Fill this in further.
+    public String getId() {
+        throw new RuntimeException("Not implemented");
+    }
 }

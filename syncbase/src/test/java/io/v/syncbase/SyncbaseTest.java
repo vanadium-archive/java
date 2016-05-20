@@ -10,7 +10,7 @@ public class SyncbaseTest {
     @Test
     public void createDatabase() {
         Syncbase.DatabaseOptions opts = new Syncbase.DatabaseOptions();
-        opts.mRootDir = "/tmp";
+        opts.rootDir = "/tmp";
         Syncbase.database(opts);
     }
 }

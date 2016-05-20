@@ -5,8 +5,8 @@
 package io.v.syncbase;
 
 public class Id {
-    private String mBlessing;
-    private String mName;
+    private final String mBlessing;
+    private final String mName;
 
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
 

@@ -4,18 +4,63 @@
 
 package io.v.syncbase;
 
-import io.v.v23.services.watch.Change;
+import com.google.common.collect.Lists;
+
+import java.util.List;
 
 public class WatchChange {
-    // TODO(sadovsky): Fill this in further.
+    public enum ChangeType {
+        PUT,
+        DELETE;
+    }
+
+    private final ChangeType mChangeType;
+    private final Id mCollectionId;
+    private final String mRowKey;
+    private final Object mValue;
+    private final byte[] mResumeMarker;
+    private final boolean mFromSync;
+    private final boolean mContinued;
 
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
 
-    protected WatchChange(Change c) {
-        throw new RuntimeException("Not implemented");
+    protected WatchChange(io.v.v23.syncbase.WatchChange c) {
+        mChangeType = c.getChangeType() == io.v.v23.syncbase.ChangeType.PUT_CHANGE ? ChangeType.PUT : ChangeType.DELETE;
+        mCollectionId = new Id(c.getCollectionId());
+        mRowKey = c.getRowName();
+        mValue = c.getValue();
+        List<Byte> bytes = Lists.newArrayList(c.getResumeMarker().iterator());
+        mResumeMarker = new byte[bytes.size()];
+        for (int i = 0; i < mResumeMarker.length; i++) mResumeMarker[i] = (byte) bytes.get(i);
+        mFromSync = c.isFromSync();
+        mContinued = c.isContinued();
     }
 
-    protected Change toVChange() {
-        throw new RuntimeException("Not implemented");
+    public ChangeType getChangeType() {
+        return mChangeType;
+    }
+
+    public Id getCollectionId() {
+        return mCollectionId;
+    }
+
+    public String getRowKey() {
+        return mRowKey;
+    }
+
+    public Object getValue() {
+        return mValue;
+    }
+
+    public byte[] getResumeMarker() {
+        return mResumeMarker;
+    }
+
+    public boolean isFromSync() {
+        return mFromSync;
+    }
+
+    public boolean isContinued() {
+        return mContinued;
     }
 }
