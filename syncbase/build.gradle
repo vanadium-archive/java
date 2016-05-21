@@ -34,8 +34,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     lintOptions {
         abortOnError false
+    }
+
+    testOptions {
+        unitTests.all {
+            systemProperty 'java.library.path', 'build/libs'
+        }
     }
 }
 
@@ -50,7 +57,8 @@ dependencies {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-    delete "src/main/jniLibs/"
+    delete 'src/main/jniLibs/'
+    delete 'build/libs/'
 }
 
 class VanadiumEnvironment {
@@ -60,9 +68,9 @@ class VanadiumEnvironment {
         VanadiumEnvironment result = new VanadiumEnvironment()
 
         if (!System.getenv().containsKey('JIRI_ROOT')) {
-            throw new InvalidUserDataException("JIRI_ROOT is not set. "
-                    + "Please follow the Vanadium installation instructions at "
-                    + "https://vanadium.github.io/installation/")
+            throw new InvalidUserDataException('JIRI_ROOT is not set. '
+                    + 'Please follow the Vanadium installation instructions at '
+                    + 'https://vanadium.github.io/installation/')
         }
 
         result.jiriRoot = new File(System.getenv()['JIRI_ROOT'])
@@ -71,52 +79,74 @@ class VanadiumEnvironment {
 }
 
 def addSyncbaseLib(Map args) {
-    def abiName = args.abiName
-    def goArch = args.goArch
-    def jiriRoot = ""
+    def nameSuffix = args.nameSuffix
+    def profile = args.profile
+    def tags = args.tags
+    def srcDir = args.srcDir
+    def targetDir = args.targetDir
+    def targetArg = (args.target != null) ? "--target=${args.target}" : ''
+    def libName = args.libName
+    def jiriRoot = ''
     try {
         jiriRoot = VanadiumEnvironment.getVanadiumEnvironment().jiriRoot.getAbsolutePath()
     } catch (InvalidUserDataException e) {
         return
     }
 
-    def check = task("checkVanadiumAndroidEnvironment-${goArch}", type: Exec) {
-        commandLine 'jiri', 'profile', 'list',
-                '--info=Target.InstallationDir',
-                "--target=${goArch}-android", 'v23:android'
+    def check = task("checkVanadiumEnvironment-${nameSuffix}", type: Exec) {
+        if (targetArg != '') {
+            commandLine 'jiri', 'profile', 'list', targetArg, profile
+        } else {
+            commandLine 'jiri', 'profile', 'list', profile
+        }
         standardOutput = new ByteArrayOutputStream()
         doLast {
-            def androidOutputDir = new File(standardOutput.toString().trim())
-            if (!androidOutputDir.exists() || !androidOutputDir.isDirectory()) {
+            if (standardOutput.toString() == '') {
                 throw new InvalidUserDataException(
-                        androidOutputDir.toString() + " does not exist or is not a directory. "
-                                + "The android base profile is probably missing. Try running\n\n"
-                                + "jiri profile install --target=${goArch}-android v23:android\n\n"
-                                + "and then building again."
+                        "A necessary profile/target is missing. Try running\n\n"
+                        + "  jiri profile install ${targetArg} ${profile}\n\n"
+                        + "and then building again."
                 )
             }
         }
     }
 
-    def goBuild = task("buildSyncbaseLib-${goArch}", type: Exec, dependsOn: check) {
-        environment 'GOOS', 'android'
-        environment 'GOARCH', goArch
-        commandLine 'jiri', 'go', "--target=${goArch}-android", 'install',
-                '-buildmode=c-shared', '-v', '-tags', 'android',
-                'v.io/x/ref/services/syncbase/bridge/cgo'
+    def goBuild = task("buildSyncbaseLib-${nameSuffix}", type: Exec, dependsOn: check) {
+        if (targetArg != '') {
+            commandLine 'jiri', 'go', targetArg, 'install', '-buildmode=c-shared', '-v', '-tags',
+                    tags, 'v.io/x/ref/services/syncbase/bridge/cgo'
+        } else {
+            commandLine 'jiri', 'go', "--profiles=${profile}", 'install', '-buildmode=c-shared',
+                    '-v', '-tags', tags, 'v.io/x/ref/services/syncbase/bridge/cgo'
+        }
     }
 
     // Copy the shared library to its ultimate destination.
-    def copyLib = task("copySyncbaseLib-${goArch}", type: Copy, dependsOn: goBuild) {
-        from jiriRoot + "/release/go/pkg/android_${goArch}_shared/v.io/x/ref/services/syncbase/bridge/"
-        into "src/main/jniLibs/${abiName}"
-        include 'cgo.a'
-        rename 'cgo.a', 'libsyncbase.so'
+    def copyLib = task("copySyncbaseLib-${nameSuffix}", type: Copy, dependsOn: goBuild) {
+        from "${jiriRoot}/release/go/pkg/${srcDir}/v.io/x/ref/services/syncbase/bridge"
+        into targetDir
+        rename 'cgo.a', libName
     }
 
     tasks.copySyncbaseLib.dependsOn(copyLib)
 }
 
 task(copySyncbaseLib)
-addSyncbaseLib abiName: 'x86_64', goArch: 'amd64'
-addSyncbaseLib abiName: 'armeabi-v7a', goArch: 'arm'
+addSyncbaseLib nameSuffix: 'android-amd64', target: 'amd64-android', profile: 'v23:android',
+        tags: 'android', srcDir: 'android_amd64_shared', targetDir: 'src/main/jniLibs/x86_64',
+        libName: 'libsyncbase.so'
+addSyncbaseLib nameSuffix: 'android-arm', target: 'arm-android', profile: 'v23:android',
+        tags: 'android', srcDir: 'android_arm_shared', targetDir: 'src/main/jniLibs/armeabi-v7a',
+        libName: 'libsyncbase.so'
+def os = System.properties['os.name'].toLowerCase()
+def arch = System.properties['os.arch'].toLowerCase()
+if (arch.contains('x86_64') || arch.contains('amd64')) {
+    if (os.contains('linux')) {
+        addSyncbaseLib nameSuffix: 'native', profile: 'v23:java', tags: 'java',
+                srcDir: 'linux_amd64_shared', targetDir: 'build/libs', libName: 'libsyncbase.so'
+    } else if (os.contains('os x')) {
+        addSyncbaseLib nameSuffix: 'native', profile: 'v23:java', tags: 'java',
+                srcDir: 'darwin_amd64', targetDir: 'build/libs', libName: 'libsyncbase.dylib'
+    }
+}
+tasks.preBuild.dependsOn(copySyncbaseLib)
