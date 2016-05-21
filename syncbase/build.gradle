@@ -89,7 +89,7 @@ def addSyncbaseLib(Map args) {
                         androidOutputDir.toString() + " does not exist or is not a directory. "
                                 + "The android base profile is probably missing. Try running\n\n"
                                 + "jiri profile install --target=${goArch}-android v23:android\n\n"
-                                + "and then try build again."
+                                + "and then building again."
                 )
             }
         }
