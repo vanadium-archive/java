@@ -8,6 +8,15 @@ public class Id {
     private final String mBlessing;
     private final String mName;
 
+    protected Id(String blessing, String name) {
+        mBlessing = blessing;
+        mName = name;
+    }
+
+    protected String getBlessing() {
+        return mBlessing;
+    }
+
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
 
     protected Id(io.v.v23.services.syncbase.Id id) {

@@ -9,61 +9,33 @@ import java.util.Iterator;
 import java.util.List;
 
 import io.v.v23.VFutures;
-import io.v.v23.syncbase.DatabaseCore;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
-public class Database implements DatabaseHandle {
+public class Database extends DatabaseHandle {
     private final io.v.v23.syncbase.Database mVDatabase;
 
-    protected Database(io.v.v23.syncbase.Database vDatabase) {
+    protected void createIfMissing() {
         try {
-            VFutures.sync(vDatabase.create(Syncbase.getVContext(), Syncbase.defaultPerms()));
+            VFutures.sync(mVDatabase.create(Syncbase.getVContext(), Syncbase.defaultPerms()));
         } catch (ExistException e) {
             // Database already exists, presumably from a previous run of the app.
         } catch (VException e) {
             throw new RuntimeException("Failed to create database", e);
         }
+    }
+
+    protected Database(io.v.v23.syncbase.Database vDatabase) {
+        super(vDatabase);
         mVDatabase = vDatabase;
     }
 
-    public Id getId() {
-        return new Id(mVDatabase.id());
-    }
-
     public Collection collection(String name, CollectionOptions opts) {
-        // TODO(sadovsky): If !opts.withoutSyncgroup, create syncgroup and update userdata syncgroup.
-        return new Collection(this, mVDatabase.getCollection(new io.v.v23.services.syncbase.Id(Syncbase.getPersonalBlessingString(), name)), true);
-    }
-
-    protected static Collection getCollectionImpl(Database database, DatabaseCore vDbCore, Id id) {
-        // TODO(sadovsky): Consider throwing an exception or returning null if the collection does
-        // not exist.
-        return new Collection(database, vDbCore.getCollection(id.toVId()), false);
-    }
-
-    public Collection getCollection(Id id) {
-        return getCollectionImpl(this, mVDatabase, id);
-    }
-
-    // Exposed as a static function so that the implementation can be shared between Database and
-    // BatchDatabase.
-    protected static Iterator<Collection> getCollectionsImpl(Database database, DatabaseCore vDbCore) {
-        List<io.v.v23.services.syncbase.Id> vIds;
-        try {
-            vIds = VFutures.sync(vDbCore.listCollections(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("listCollections failed", e);
-        }
-        ArrayList<Collection> cxs = new ArrayList<>(vIds.size());
-        for (io.v.v23.services.syncbase.Id vId : vIds) {
-            cxs.add(new Collection(database, vDbCore.getCollection(vId), false));
-        }
-        return cxs.iterator();
-    }
-
-    public Iterator<Collection> getCollections() {
-        return getCollectionsImpl(this, mVDatabase);
+        // TODO(sadovsky): If !opts.withoutSyncgroup, create syncgroup and update userdata
+        // syncgroup.
+        Collection res = getCollection(new Id(Syncbase.getPersonalBlessingString(), name));
+        res.createIfMissing();
+        return res;
     }
 
     public static class SyncgroupOptions {
@@ -72,22 +44,48 @@ public class Database implements DatabaseHandle {
 
     // FOR ADVANCED USERS. Creates syncgroup and adds it to the user's "userdata" collection, as
     // needed. Idempotent.
-    public Syncgroup syncgroup(String name, Collection[] collections, SyncgroupOptions opts) {
-        throw new RuntimeException("Not implemented");
+    public Syncgroup syncgroup(String name, List<Collection> collections, SyncgroupOptions opts) {
+        Id id = new Id(collections.get(0).getId().getBlessing(), name);
+        Syncgroup res = new Syncgroup(mVDatabase.getSyncgroup(id.toVId()), this, id);
+        res.createIfMissing(collections);
+        return res;
     }
+
+    public Syncgroup syncgroup(String name, List<Collection> collections) {
+        return syncgroup(name, collections, new SyncgroupOptions());
+    }
+
 
     public Syncgroup getSyncgroup(Id id) {
         // TODO(sadovsky): Consider throwing an exception or returning null if the syncgroup does
         // not exist.
-        return new Syncgroup(id, mVDatabase.getSyncgroup(id.toVId()));
+        return new Syncgroup(mVDatabase.getSyncgroup(id.toVId()), this, id);
     }
 
     public Iterator<Syncgroup> getSyncgroups() {
-        throw new RuntimeException("Not implemented");
+        List<io.v.v23.services.syncbase.Id> vIds;
+        try {
+            vIds = VFutures.sync(mVDatabase.listSyncgroups(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("listSyncgroups failed", e);
+        }
+        ArrayList<Syncgroup> sgs = new ArrayList<>(vIds.size());
+        for (io.v.v23.services.syncbase.Id vId : vIds) {
+            sgs.add(new Syncgroup(mVDatabase.getSyncgroup(vId), this, new Id(vId)));
+        }
+        return sgs.iterator();
     }
 
     public static class AddSyncgroupInviteHandlerOptions {
         // TODO(sadovsky): Fill this in.
+    }
+
+    public abstract class SyncgroupInviteHandler {
+        void onInvite(SyncgroupInvite invite) {
+        }
+
+        void onError(Exception e) {
+        }
     }
 
     // Notifies 'h' of any existing syncgroup invites, and of all subsequent new invites.
@@ -125,6 +123,14 @@ public class Database implements DatabaseHandle {
         }
     }
 
+    public interface BatchOperation {
+        void run(BatchDatabase db);
+    }
+
+    public void runInBatch(BatchOperation op, BatchOptions opts) {
+        throw new RuntimeException("Not implemented");
+    }
+
     public BatchDatabase beginBatch(BatchOptions opts) {
         io.v.v23.syncbase.BatchDatabase vBatchDatabase;
         try {
@@ -132,11 +138,27 @@ public class Database implements DatabaseHandle {
         } catch (VException e) {
             throw new RuntimeException("beginBatch failed", e);
         }
-        return new BatchDatabase(this, vBatchDatabase);
+        return new BatchDatabase(vBatchDatabase);
     }
 
     public static class AddWatchChangeHandlerOptions {
         public byte[] resumeMarker;
+    }
+
+    public abstract class WatchChangeHandler {
+        // TODO(sadovsky): Consider adopting Aaron's suggestion of combining onInitialState and
+        // onChangeBatch into a single method, to make things simpler for developers who don't want to
+        // apply deltas to their in-memory data structures:
+        // void onChangeBatch(Iterator<WatchChange> values, Iterator<WatchChange> changes)
+
+        void onInitialState(Iterator<WatchChange> values) {
+        }
+
+        void onChangeBatch(Iterator<WatchChange> changes) {
+        }
+
+        void onError(Exception e) {
+        }
     }
 
     // Notifies 'h' of initial state, and of all subsequent changes to this database.

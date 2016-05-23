@@ -71,11 +71,12 @@ public class Syncbase {
     }
 
     // TODO(sadovsky): Some of these constants should become fields in DatabaseOptions.
-    private static final String
+    protected static final String
             PROXY = "proxy",
             DEFAULT_BLESSING_STRING_PREFIX = "dev.v.io:o:608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com:",
             MOUNT_POINT = "/ns.dev.v.io:8101/tmp/todos/users/",
-            CLOUD_BLESSING_STRING = "dev.v.io:u:alexfandrianto@google.com";
+            CLOUD_BLESSING_STRING = "dev.v.io:u:alexfandrianto@google.com",
+            CLOUD_NAME = MOUNT_POINT + "cloud";
 
     private static Database startSyncbaseAndInitDatabase(VContext ctx) {
         SyncbaseService s;
@@ -85,7 +86,9 @@ public class Syncbase {
             throw new RuntimeException("Failed to start Syncbase", e);
         }
         // Create database, if needed.
-        return new Database(s.getDatabase(getVContext(), DB_NAME, null));
+        Database res = new Database(s.getDatabase(getVContext(), DB_NAME, null));
+        res.createIfMissing();
+        return res;
     }
 
     private static String startSyncbase(VContext vContext, String rootDir)
@@ -118,7 +121,7 @@ public class Syncbase {
         return getEmailFromBlessingString(blessings.toString());
     }
 
-    private static String getEmailFromBlessingPattern(BlessingPattern pattern) {
+    protected static String getEmailFromBlessingPattern(BlessingPattern pattern) {
         return getEmailFromBlessingString(pattern.toString());
     }
 
@@ -129,6 +132,10 @@ public class Syncbase {
 
     private static String getBlessingStringFromEmail(String email) {
         return DEFAULT_BLESSING_STRING_PREFIX + email;
+    }
+
+    protected static BlessingPattern getBlessingPatternFromEmail(String email) {
+        return new BlessingPattern(getBlessingStringFromEmail(email));
     }
 
     private static Blessings getPersonalBlessings() {
@@ -147,21 +154,23 @@ public class Syncbase {
 
     protected static Permissions defaultPerms() {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
-        io.v.v23.security.access.AccessList openAccessList =
+
+
+        io.v.v23.security.access.AccessList anyone =
                 new io.v.v23.security.access.AccessList(
                         ImmutableList.of(
                                 new BlessingPattern("...")),
                         ImmutableList.<String>of());
-        io.v.v23.security.access.AccessList accessList =
+        io.v.v23.security.access.AccessList selfAndCloud =
                 new io.v.v23.security.access.AccessList(
                         ImmutableList.of(
                                 new BlessingPattern(getPersonalBlessingString()),
                                 new BlessingPattern(CLOUD_BLESSING_STRING)),
                         ImmutableList.<String>of());
         return new Permissions(ImmutableMap.of(
-                Constants.RESOLVE.getValue(), openAccessList,
-                Constants.READ.getValue(), accessList,
-                Constants.WRITE.getValue(), accessList,
-                Constants.ADMIN.getValue(), accessList));
+                Constants.RESOLVE.getValue(), anyone,
+                Constants.READ.getValue(), selfAndCloud,
+                Constants.WRITE.getValue(), selfAndCloud,
+                Constants.ADMIN.getValue(), selfAndCloud));
     }
 }

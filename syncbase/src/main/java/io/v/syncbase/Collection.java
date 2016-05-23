@@ -4,29 +4,28 @@
 
 package io.v.syncbase;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import io.v.v23.VFutures;
+import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
 public class Collection {
-    private final Database mDatabase;
     private final io.v.v23.syncbase.Collection mVCollection;
+    private final DatabaseHandle mDatabaseHandle;
 
-    protected Collection(Database database, io.v.v23.syncbase.Collection vCollection, boolean createIfMissing) {
-        if (createIfMissing) {
-            try {
-                VFutures.sync(vCollection.create(Syncbase.getVContext(), null));
-            } catch (ExistException e) {
-                // Collection already exists.
-            } catch (VException e) {
-                throw new RuntimeException("Failed to create collection", e);
-            }
+    protected void createIfMissing() {
+        try {
+            VFutures.sync(mVCollection.create(Syncbase.getVContext(), Syncbase.defaultPerms()));
+        } catch (ExistException e) {
+            // Collection already exists.
+        } catch (VException e) {
+            throw new RuntimeException("Failed to create collection", e);
         }
-        mDatabase = database;
+    }
+
+    protected Collection(io.v.v23.syncbase.Collection vCollection, DatabaseHandle databaseHandle) {
         mVCollection = vCollection;
+        mDatabaseHandle = databaseHandle;
     }
 
     public Id getId() {
@@ -36,16 +35,18 @@ public class Collection {
     // Shortcut for Database.getSyncgroup(c.getId()), helpful for the common case of one syncgroup
     // per collection.
     public Syncgroup getSyncgroup() {
-        return mDatabase.getSyncgroup(getId());
+        if (mDatabaseHandle instanceof BatchDatabase) {
+            throw new RuntimeException("Must not call getSyncgroup within batch");
+        }
+        return ((Database) mDatabaseHandle).getSyncgroup(getId());
     }
 
     // TODO(sadovsky): Maybe add scan API, if developers aren't satisfied with watch.
 
-    // TODO(sadovsky): Revisit this API, which was copied from io.v.v23.syncbase. For example, would
-    // the signature "public <T> T get(String key)" be preferable?
-    public Object get(String key, Type type) {
+    // TODO(sadovsky): Revisit this API. Is the Class<T> argument necessary?
+    public <T> T get(String key, Class<T> cls) {
         try {
-            return VFutures.sync(mVCollection.getRow(key).get(Syncbase.getVContext(), type));
+            return VFutures.sync(mVCollection.getRow(key).get(Syncbase.getVContext(), cls));
         } catch (VException e) {
             throw new RuntimeException("get failed: " + key, e);
         }
@@ -59,19 +60,9 @@ public class Collection {
         }
     }
 
-    // TODO(sadovsky): Only needed for the current (old) version of io.v.v23.syncbase, which does
-    // not include fredq's change to the put() API.
-    private static Type getType(Object object) {
-        Type superclassType = object.getClass().getGenericSuperclass();
-        if (!ParameterizedType.class.isAssignableFrom(superclassType.getClass())) {
-            return null;
-        }
-        return ((ParameterizedType) superclassType).getActualTypeArguments()[0];
-    }
-
     public <T> void put(String key, T value) {
         try {
-            VFutures.sync(mVCollection.put(Syncbase.getVContext(), key, value, getType(value)));
+            VFutures.sync(mVCollection.put(Syncbase.getVContext(), key, value));
         } catch (VException e) {
             throw new RuntimeException("put failed: " + key, e);
         }
@@ -88,10 +79,38 @@ public class Collection {
     // FOR ADVANCED USERS. The following methods manipulate the AccessList for this collection, but
     // not for associated syncgroups.
     public AccessList getAccessList() {
-        throw new RuntimeException("Not implemented");
+        try {
+            return new AccessList(VFutures.sync(mVCollection.getPermissions(Syncbase.getVContext())));
+        } catch (VException e) {
+            throw new RuntimeException("getPermissions failed", e);
+        }
     }
 
-    public void updateAccessList(AccessList delta) {
-        throw new RuntimeException("Not implemented");
+    public void updateAccessList(final AccessList delta) {
+        // Create a batch if we're not already in a batch.
+        final Id id = this.getId();
+        Database.BatchOperation op = new Database.BatchOperation() {
+            @Override
+            public void run(BatchDatabase db) {
+                io.v.v23.syncbase.Collection vCx = db.getCollection(id).mVCollection;
+                Permissions perms;
+                try {
+                    perms = VFutures.sync(vCx.getPermissions(Syncbase.getVContext()));
+                } catch (VException e) {
+                    throw new RuntimeException("getPermissions failed", e);
+                }
+                AccessList.applyDelta(perms, delta);
+                try {
+                    VFutures.sync(vCx.setPermissions(Syncbase.getVContext(), perms));
+                } catch (VException e) {
+                    throw new RuntimeException("setPermissions failed", e);
+                }
+            }
+        };
+        if (mDatabaseHandle instanceof BatchDatabase) {
+            op.run((BatchDatabase) mDatabaseHandle);
+        } else {
+            ((Database) mDatabaseHandle).runInBatch(op, new Database.BatchOptions());
+        }
     }
 }
