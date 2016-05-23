@@ -18,6 +18,11 @@ import com.google.common.util.concurrent.Futures;
 
 import org.joda.time.Duration;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import io.v.android.inspectors.RemoteInspectors;
 import io.v.android.security.BlessingsManager;
 import io.v.android.util.Vango;
@@ -28,12 +33,20 @@ import io.v.v23.context.VContext;
 import io.v.v23.security.Blessings;
 import io.v.v23.verror.VException;
 
-public class RunKeyActivity extends AppCompatActivity {
-    private static final String TAG = "RunKeyActivity";
-    private static final String BLESSINGS_KEY = "blessings";
-    private static final String STARTED = "vangoFuncStarted";
+public class RunKeyActivity extends AppCompatActivity implements Vango.OutputWriter {
+    private static final String
+            TAG = "RunKeyActivity",
+            BLESSINGS_KEY = "blessings",
+            STARTED = "vangoFuncStarted",
+            OUTPUT_DATA = "vangoOutputData",
+            OUTPUT_NEXT = "vangoOutputNext";
 
     private RemoteInspectors mRemoteInspectors;
+
+    // State for Vango.OutputWriter implementation
+    private String[] mLines;
+    private int mNextLine;
+    private TextView mOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +59,15 @@ public class RunKeyActivity extends AppCompatActivity {
         TextView textView = (TextView)findViewById(R.id.text_run_key_status);
         textView.setText(String.format("Running go function keyed by '%s'", key));
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(STARTED)) {
-            return;
+        mOutput = (TextView)findViewById(R.id.text_run_key_output);
+
+        if (savedInstanceState != null) {
+            mLines = (String[])savedInstanceState.getCharSequenceArray(OUTPUT_DATA);
+            mNextLine = savedInstanceState.getInt(OUTPUT_NEXT);
+            write(null);  // force a redraw of the output TextView.
+            if (savedInstanceState.getBoolean(STARTED)) {
+                return;
+            }
         }
 
         final VContext ctx = V.init(this, new Options()
@@ -58,6 +78,10 @@ public class RunKeyActivity extends AppCompatActivity {
         } catch (VException e) {
             Log.e(TAG, "Failed to enable remote inspection: " + e.toString());
         }
+        synchronized (this) {
+            mLines = new String[10];
+            mNextLine = 0;
+        }
         Futures.addCallback(BlessingsManager.getBlessings(ctx, this, BLESSINGS_KEY, true),
                 new FutureCallback<Blessings>() {
                     @Override
@@ -66,7 +90,11 @@ public class RunKeyActivity extends AppCompatActivity {
                         AsyncTask.execute(new Runnable() {
                             @Override
                             public void run() {
-                                (new Vango()).run(ctx, key);
+                                try {
+                                    (new Vango()).run(ctx, key, RunKeyActivity.this);
+                                } catch (Exception e) {
+                                    write(e.toString());
+                                }
                             }
                         });
                     }
@@ -79,10 +107,37 @@ public class RunKeyActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean(STARTED, true);
+    public synchronized void write(String output) {
+        // write() might be called with strings that do not constitute a full line.
+        // If you see funny output, that might be the case, so fix that.
+        // But until seen in the wild, ignoring the problem for Vango is fine.
+        DateFormat fmt = new SimpleDateFormat("HH:mm:ss", Locale.US);
+        if (output != null) {
+            mLines[(mNextLine++) % mLines.length] = fmt.format(new Date()) + " " + output.trim();
+        }
+        StringBuilder b  = new StringBuilder();
+        for (int i = 0, idx = mNextLine % mLines.length; i < mLines.length; i++, idx++) {
+            String l = mLines[idx % mLines.length];
+            if (l == null) {
+                continue;
+            }
+            b = b.append(l).append("\n\n");
+        }
+        final String text = b.toString();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mOutput.setText(text);
+            }
+        });
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(STARTED, true);
+        savedInstanceState.putCharSequenceArray(OUTPUT_DATA, mLines);
+        savedInstanceState.putInt(OUTPUT_NEXT, mNextLine);
+    }
 
     /** Called when the user clicks the Remote Inspect button */
     public void runRemoteInspect(View view) {

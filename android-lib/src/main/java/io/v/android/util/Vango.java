@@ -7,22 +7,21 @@ package io.v.android.util;
 import io.v.v23.context.VContext;
 
 /**
- * Vango allows arbritrary Vanadium Go code to be run in an android
+ * Vango allows arbitrary Vanadium Go code to be run in an android
  * environment.
- * Users must edit the vangoFuncs map in
- * https://vanadium.googlesource.com/release.go.x.jni/+/master/impl/google/services/vango/funcs.go
- * and rebuild android-lib.
+ *
+ * See https://github.com/vanadium/java/blob/master/projects/vango/README.md for instructions
+ * on writing Go code and running the Android app.
  */
 public class Vango {
-  private native void nativeGoContextCall(VContext context, String string);
-
-  private VContext context;
-
-  public void run(VContext context, String string) {
-    nativeGoContextCall(context, string);
+  /* Interface used for the Go function to send data to be shown to the user back to Java */
+  public interface OutputWriter {
+    void write(String output);
   }
 
-  public Vango() {
-    this.context = context;
+  private native void nativeGoContextCall(VContext context, String key, OutputWriter output);
+
+  public void run(VContext context, String key, OutputWriter output) {
+    nativeGoContextCall(context, key, output);
   }
 }

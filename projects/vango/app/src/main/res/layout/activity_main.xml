@@ -21,7 +21,8 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/key_placeholder" />
+            android:hint="@string/key_placeholder"
+            android:text="all" />
         <Button
             android:background="#0097A7"
             android:layout_width="wrap_content"

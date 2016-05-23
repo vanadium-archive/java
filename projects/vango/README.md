@@ -12,11 +12,9 @@ code in the android application.
 
 ```sh
 cd $JIRI_ROOT/release/java
-./gradlew :lib:clean :lib:publishToMavenLocal
-./gradlew :android-lib:clean :android-lib:publishToMavenLocal
+jiri goext distclean
+./gradlew :lib:clean :android-lib:clean :lib:publishToMavenLocal :android-lib:publishToMavenLocal
 ```
-
-You may need to run `jiri goext distclean` for your changes to take effect.
 
 ## Running using Android Studio
 
@@ -31,7 +29,9 @@ You may need to run `jiri goext distclean` for your changes to take effect.
 
 1. Set the `ANDROID_HOME` environment variable
 
-2. ```sh
+2. Build, run and read logs
+
+```sh
 madb start
 madb exec logcat *:S vlog:*
 ```
