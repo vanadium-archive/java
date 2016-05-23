@@ -23,7 +23,14 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.verror.VException;
 
+/**
+ * Syncbase is a storage system for developers that makes it easy to synchronize app data between
+ * devices. It works even when devices are not connected to the Internet.
+ */
 public class Syncbase {
+    /**
+     * Options for opening a database.
+     */
     public static class DatabaseOptions {
         // TODO(sadovsky): Fill this in further.
         public String rootDir;
@@ -39,11 +46,13 @@ public class Syncbase {
             DIR_NAME = "syncbase",
             DB_NAME = "db";
 
-    // Starts Syncbase if needed; creates default database if needed; reads config (e.g. cloud
-    // syncbase name) from options struct; performs create-or-join for "userdata" syncgroup if
-    // needed; returns database handle.
-    // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying since
-    // create-or-join will no longer be necessary once syncgroup merge is supported.
+    /**
+     * Starts Syncbase if needed; creates default database if needed; performs create-or-join for
+     * "userdata" syncgroup if needed; returns database handle.
+     *
+     * @param opts options for database creation
+     * @return the database handle
+     */
     public static Database database(DatabaseOptions opts) {
         if (sDatabase != null) {
             // TODO(sadovsky): Check that opts matches original opts (sOpts)?
@@ -59,6 +68,8 @@ public class Syncbase {
             throw e;
         }
         // TODO(sadovsky): Add create-or-join of userdata syncgroup, and make this method async.
+        // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying
+        // since create-or-join will no longer be necessary once syncgroup merge is supported.
         return sDatabase;
     }
 
@@ -154,8 +165,6 @@ public class Syncbase {
 
     protected static Permissions defaultPerms() {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
-
-
         io.v.v23.security.access.AccessList anyone =
                 new io.v.v23.security.access.AccessList(
                         ImmutableList.of(

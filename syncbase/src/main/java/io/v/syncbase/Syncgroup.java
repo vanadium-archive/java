@@ -17,6 +17,9 @@ import io.v.v23.services.syncbase.SyncgroupSpec;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
+/**
+ * Represents a set of collections, synced amongst a set of users.
+ */
 public class Syncgroup {
     private final Database mDatabase;
     private final Id mId;
@@ -44,17 +47,24 @@ public class Syncgroup {
         }
     }
 
-    // Note, we take 'id' because io.v.v23.syncbase.Syncgroup is missing a 'getId' method.
+    // TODO(sadovsky): We take 'id' because io.v.v23.syncbase.Syncgroup is missing the 'getId'
+    // method. Drop the 'id' argument once we switch to io.v.syncbase.core.
     protected Syncgroup(io.v.v23.syncbase.Syncgroup vSyncgroup, Database database, Id id) {
         mVSyncgroup = vSyncgroup;
         mDatabase = database;
         mId = id;
     }
 
+    /**
+     * Returns the id of this syncgroup.
+     */
     public Id getId() {
         return mId;
     }
 
+    /**
+     * Returns the {@code AccessList} for this syncgroup.
+     */
     public AccessList getAccessList() {
         Map<String, SyncgroupSpec> versionedSpec;
         try {
@@ -65,13 +75,22 @@ public class Syncgroup {
         return new AccessList(versionedSpec.values().iterator().next().getPerms());
     }
 
+    /**
+     * FOR ADVANCED USERS. Configures the behavior of various {@code AccessList} manipulation
+     * methods below.
+     */
     public static class UpdateAccessListOptions {
+        /**
+         * If false (the default), the various {@code AccessList} manipulation methods update the
+         * {@code AccessList} for the syncgroup and its associated collections. If true, these
+         * methods only update the {@code AccessList} for the syncgroup.
+         */
         public boolean syncgroupOnly;
     }
 
-    // The following methods update the AccessList for the syncgroup and its associated collections.
-    // Setting opts.syncgroupOnly makes it so these methods only update the AccessList for the
-    // syncgroup.
+    /**
+     * FOR ADVANCED USERS. Adds the given users to the syncgroup, with the specified access level.
+     */
     public void addUsers(List<User> users, AccessList.AccessLevel level, UpdateAccessListOptions opts) {
         AccessList delta = new AccessList();
         for (User u : users) {
@@ -80,14 +99,23 @@ public class Syncgroup {
         updateAccessList(delta, opts);
     }
 
+    /**
+     * Adds the given users to the syncgroup, with the specified access level.
+     */
     public void addUsers(List<User> users, AccessList.AccessLevel level) {
         addUsers(users, level, new UpdateAccessListOptions());
     }
 
+    /**
+     * Adds the given user to the syncgroup, with the specified access level.
+     */
     public void addUser(User user, AccessList.AccessLevel level) {
         addUsers(Collections.singletonList(user), level);
     }
 
+    /**
+     * FOR ADVANCED USERS. Removes the given users from the syncgroup.
+     */
     public void removeUsers(List<User> users, UpdateAccessListOptions opts) {
         AccessList delta = new AccessList();
         for (User u : users) {
@@ -96,15 +124,23 @@ public class Syncgroup {
         updateAccessList(delta, opts);
     }
 
+    /**
+     * Removes the given users from the syncgroup.
+     */
     public void removeUsers(List<User> users) {
         removeUsers(users, new UpdateAccessListOptions());
     }
 
+    /**
+     * Removes the given user from the syncgroup.
+     */
     public void removeUser(User user) {
         removeUsers(Collections.singletonList(user));
     }
 
-    // Applies 'delta' to the AccessList. Note, NULL enum means "remove".
+    /**
+     * FOR ADVANCED USERS. Applies {@code delta} to the {@code AccessList}.
+     */
     public void updateAccessList(final AccessList delta, UpdateAccessListOptions opts) {
         // TODO(sadovsky): Make it so SyncgroupSpec can be updated as part of a batch?
         Map<String, SyncgroupSpec> versionedSpec;

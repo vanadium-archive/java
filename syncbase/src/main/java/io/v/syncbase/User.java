@@ -4,6 +4,9 @@
 
 package io.v.syncbase;
 
+/**
+ * Represents a user.
+ */
 public class User {
     // TODO(sadovsky): Fill this in further.
     public String getId() {

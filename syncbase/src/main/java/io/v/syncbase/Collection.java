@@ -9,6 +9,9 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
+/**
+ * Represents an ordered set of key-value pairs.
+ */
 public class Collection {
     private final io.v.v23.syncbase.Collection mVCollection;
     private final DatabaseHandle mDatabaseHandle;
@@ -28,12 +31,17 @@ public class Collection {
         mDatabaseHandle = databaseHandle;
     }
 
+    /**
+     * Returns the id of this collection.
+     */
     public Id getId() {
         return new Id(mVCollection.id());
     }
 
-    // Shortcut for Database.getSyncgroup(c.getId()), helpful for the common case of one syncgroup
-    // per collection.
+    /**
+     * Shortcut for {@code Database.getSyncgroup(collection.getId())}, helpful for the common case
+     * of one syncgroup per collection.
+     */
     public Syncgroup getSyncgroup() {
         if (mDatabaseHandle instanceof BatchDatabase) {
             throw new RuntimeException("Must not call getSyncgroup within batch");
@@ -43,7 +51,13 @@ public class Collection {
 
     // TODO(sadovsky): Maybe add scan API, if developers aren't satisfied with watch.
 
-    // TODO(sadovsky): Revisit this API. Is the Class<T> argument necessary?
+    // TODO(sadovsky): Revisit the get API:
+    // - Is the Class<T> argument necessary?
+    // - Does it throw an exception if there is no value for the given key?
+
+    /**
+     * Returns the value associated with {@code key}.
+     */
     public <T> T get(String key, Class<T> cls) {
         try {
             return VFutures.sync(mVCollection.getRow(key).get(Syncbase.getVContext(), cls));
@@ -52,6 +66,9 @@ public class Collection {
         }
     }
 
+    /**
+     * Returns true if there is a value associated with {@code key}.
+     */
     public boolean exists(String key) {
         try {
             return VFutures.sync(mVCollection.getRow(key).exists(Syncbase.getVContext()));
@@ -60,6 +77,9 @@ public class Collection {
         }
     }
 
+    /**
+     * Puts {@code value} for {@code key}, overwriting any existing value. Idempotent.
+     */
     public <T> void put(String key, T value) {
         try {
             VFutures.sync(mVCollection.put(Syncbase.getVContext(), key, value));
@@ -68,6 +88,9 @@ public class Collection {
         }
     }
 
+    /**
+     * Deletes the value associated with {@code key}. Idempotent.
+     */
     public void delete(String key) {
         try {
             VFutures.sync(mVCollection.getRow(key).delete(Syncbase.getVContext()));
@@ -76,8 +99,10 @@ public class Collection {
         }
     }
 
-    // FOR ADVANCED USERS. The following methods manipulate the AccessList for this collection, but
-    // not for associated syncgroups.
+    /**
+     * FOR ADVANCED USERS. Returns the {@code AccessList} for this collection. Users should
+     * typically manipulate access lists via {@code collection.getSyncgroup()}.
+     */
     public AccessList getAccessList() {
         try {
             return new AccessList(VFutures.sync(mVCollection.getPermissions(Syncbase.getVContext())));
@@ -86,8 +111,11 @@ public class Collection {
         }
     }
 
+    /**
+     * FOR ADVANCED USERS. Updates the {@code AccessList} for this collection. Users should
+     * typically manipulate access lists via {@code collection.getSyncgroup()}.
+     */
     public void updateAccessList(final AccessList delta) {
-        // Create a batch if we're not already in a batch.
         final Id id = this.getId();
         Database.BatchOperation op = new Database.BatchOperation() {
             @Override
@@ -107,6 +135,7 @@ public class Collection {
                 }
             }
         };
+        // Create a batch if we're not already in a batch.
         if (mDatabaseHandle instanceof BatchDatabase) {
             op.run((BatchDatabase) mDatabaseHandle);
         } else {

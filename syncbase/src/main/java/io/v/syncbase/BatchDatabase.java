@@ -4,6 +4,13 @@
 
 package io.v.syncbase;
 
+import io.v.v23.VFutures;
+import io.v.v23.verror.VException;
+
+/**
+ * Provides a way to perform a set of operations atomically on a database. See
+ * {@code Database.beginBatch} for concurrency semantics.
+ */
 public class BatchDatabase extends DatabaseHandle {
     private final io.v.v23.syncbase.BatchDatabase mVBatchDatabase;
 
@@ -12,6 +19,7 @@ public class BatchDatabase extends DatabaseHandle {
         mVBatchDatabase = vBatchDatabase;
     }
 
+    @Override
     public Collection collection(String name, CollectionOptions opts) {
         if (!opts.withoutSyncgroup) {
             throw new RuntimeException("Cannot create syncgroup in a batch");
@@ -21,11 +29,29 @@ public class BatchDatabase extends DatabaseHandle {
         return res;
     }
 
+    /**
+     * Persists the pending changes to Syncbase. If the batch is read-only, {@code commit} will
+     * throw {@code ConcurrentBatchException}; abort should be used instead.
+     */
     public void commit() {
-        mVBatchDatabase.commit(Syncbase.getVContext());
+        // TODO(sadovsky): Throw ConcurrentBatchException where appropriate.
+        try {
+            VFutures.sync(mVBatchDatabase.commit(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("commit failed", e);
+        }
     }
 
+    /**
+     * Notifies Syncbase that any pending changes can be discarded. Calling {@code abort} is not
+     * strictly required, but may allow Syncbase to release locks or other resources sooner than if
+     * {@code abort} was not called.
+     */
     public void abort() {
-        mVBatchDatabase.abort(Syncbase.getVContext());
+        try {
+            VFutures.sync(mVBatchDatabase.abort(Syncbase.getVContext()));
+        } catch (VException e) {
+            throw new RuntimeException("abort failed", e);
+        }
     }
 }

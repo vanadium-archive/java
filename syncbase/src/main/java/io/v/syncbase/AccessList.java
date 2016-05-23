@@ -13,6 +13,10 @@ import io.v.v23.security.BlessingPattern;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 
+/**
+ * Specifies access levels for a set of users. Each user has an associated access level: read-only,
+ * read-write, or read-write-admin.
+ */
 public class AccessList {
     public enum AccessLevel {
         READ,
@@ -28,19 +32,27 @@ public class AccessList {
         }
         Set<String> res = new HashSet<>();
         for (BlessingPattern bp : accessList.getIn()) {
+            // TODO(sadovsky): Ignore cloud peer's blessing pattern?
             res.add(Syncbase.getEmailFromBlessingPattern(bp));
         }
         return res;
     }
 
+    /**
+     * Creates an empty access list.
+     */
     public AccessList() {
         this.users = new HashMap<>();
     }
 
     protected AccessList(Permissions perms) {
+        Set<String> resolvers = vAccessListToUserIds(perms.get(Constants.RESOLVE.getValue()));
         Set<String> readers = vAccessListToUserIds(perms.get(Constants.READ.getValue()));
         Set<String> writers = vAccessListToUserIds(perms.get(Constants.WRITE.getValue()));
         Set<String> admins = vAccessListToUserIds(perms.get(Constants.ADMIN.getValue()));
+        if (!readers.containsAll(writers)) {
+            throw new RuntimeException("Some readers are not resolvers: " + readers + ", " + resolvers);
+        }
         if (!readers.containsAll(writers)) {
             throw new RuntimeException("Some writers are not readers: " + writers + ", " + readers);
         }
@@ -68,6 +80,9 @@ public class AccessList {
         accessList.getIn().remove(bp);
     }
 
+    /**
+     * Applies delta to perms, modifying perms in place.
+     */
     protected static void applyDelta(Permissions perms, AccessList delta) {
         for (String userId : delta.users.keySet()) {
             AccessLevel level = delta.users.get(userId);
@@ -77,27 +92,27 @@ public class AccessList {
                 removeFromVAccessList(perms.get(Constants.READ.getValue()), bp);
                 removeFromVAccessList(perms.get(Constants.WRITE.getValue()), bp);
                 removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
-            } else {
-                switch (level) {
-                    case READ:
-                        addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                        removeFromVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                        removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
-                        break;
-                    case READ_WRITE:
-                        addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                        removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
-                        break;
-                    case READ_WRITE_ADMIN:
-                        addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                        addToVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
-                        break;
-                }
+                continue;
+            }
+            switch (level) {
+                case READ:
+                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
+                    removeFromVAccessList(perms.get(Constants.WRITE.getValue()), bp);
+                    removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    break;
+                case READ_WRITE:
+                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
+                    removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    break;
+                case READ_WRITE_ADMIN:
+                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
+                    addToVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    break;
             }
         }
     }

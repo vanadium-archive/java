@@ -4,6 +4,9 @@
 
 package io.v.syncbase;
 
+/**
+ * Uniquely identifies a database, collection, or syncgroup.
+ */
 public class Id {
     private final String mBlessing;
     private final String mName;
