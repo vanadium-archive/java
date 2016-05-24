@@ -120,8 +120,7 @@ class Bluetooth {
                     }
                     // There is no way currently to retrieve the local port number for the
                     // connection, but that's probably OK.
-                    String localAddr = String.format("%s/%d",
-                            BluetoothAdapter.getDefaultAdapter().getAddress(), 0);
+                    String localAddr = String.format("%s/%d", localMACAddress(ctx), 0);
                     String remoteAddr = String.format("%s/%d", macAddr, port);
                     callback.onSuccess(new Stream(executor, socket, localAddr, remoteAddr));
                 } catch (Exception e) {
@@ -146,6 +145,14 @@ class Bluetooth {
         }
     }
 
+    private static String localMACAddress(VContext ctx) {
+        // TODO(suharshs): Android has disallowed getting the local address.
+        // This is a remaining working hack that gets the local bluetooth address,
+        // just to get things working.
+        return android.provider.Settings.Secure.getString(
+            V.getAndroidContext(ctx).getContentResolver(), "bluetooth_address");
+    }
+
     private static String getMACAddress(VContext ctx, String btAddr) throws VException {
         List<String> parts = Splitter.on("/").omitEmptyStrings().splitToList(btAddr);
         switch (parts.size()) {
@@ -154,10 +161,7 @@ class Bluetooth {
                         "Couldn't split bluetooth address \"%s\" using \"/\" separator: " +
                                 "got zero parts!", btAddr));
             case 1:
-                // TODO(suharshs): Android has disallowed getting the local address.
-                // This is a remaining working hack that gets the local bluetooth address,
-                // just to get things working.
-                return android.provider.Settings.Secure.getString(V.getAndroidContext(ctx).getContentResolver(), "bluetooth_address");
+                return localMACAddress(ctx);
             case 2:
                 String address = parts.get(0).toUpperCase();
                 if (!BluetoothAdapter.checkBluetoothAddress(address)) {
