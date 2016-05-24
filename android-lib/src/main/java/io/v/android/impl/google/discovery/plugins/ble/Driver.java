@@ -79,7 +79,7 @@ public class Driver implements GattReader.Handler {
     private final class BluetoothAdapterStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+            if (!intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 return;
             }
             switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
