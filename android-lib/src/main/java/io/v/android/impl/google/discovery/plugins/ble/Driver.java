@@ -74,11 +74,12 @@ public class Driver implements GattReader.Handler {
     private Map<Pair<BluetoothDevice, UUID>, Integer> mScanSeens;
 
     private boolean mEnabled;
+    private int mOnServiceReadCallbacks;
 
     private final class BluetoothAdapterStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() != BluetoothAdapter.ACTION_STATE_CHANGED) {
+            if (intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 return;
             }
             switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
@@ -324,9 +325,7 @@ public class Driver implements GattReader.Handler {
                         UUID uuid = scanRecord.getServiceUuids().get(0).getUuid();
                         Pair<BluetoothDevice, UUID> seen = Pair.create(result.getDevice(), uuid);
                         synchronized (Driver.this) {
-                            if (mEnabled
-                                    && mScanSeens.put(seen, Integer.valueOf(result.getRssi()))
-                                            == null) {
+                            if (mEnabled && mScanSeens.put(seen, result.getRssi()) == null) {
                                 mGattReader.readService(result.getDevice(), uuid);
                             }
                         }
@@ -378,6 +377,7 @@ public class Driver implements GattReader.Handler {
         characteristics = builder.build();
 
         synchronized (this) {
+            mOnServiceReadCallbacks++;
             if (mScanHandler == null) {
                 return;
             }
@@ -386,7 +386,7 @@ public class Driver implements GattReader.Handler {
                 return;
             }
             mScanHandler.onDiscovered(
-                    service.getUuid().toString(), characteristics, rssi.intValue());
+                    service.getUuid().toString(), characteristics, rssi);
         }
     }
 
@@ -395,30 +395,37 @@ public class Driver implements GattReader.Handler {
         mScanSeens.remove(Pair.create(device, uuid));
     }
 
-    public String debugString() {
-        // TODO(jhahn): Implement a useful debug string.
-        String status;
+    public synchronized String debugString() {
         if (mBluetoothAdapter == null) {
-            status = "Not available";
-        } else {
-            switch (mBluetoothAdapter.getState()) {
-                case BluetoothAdapter.STATE_ON:
-                    status = "On";
-                    break;
-                case BluetoothAdapter.STATE_TURNING_ON:
-                    status = "Turning on";
-                    break;
-                case BluetoothAdapter.STATE_OFF:
-                    status = "Off";
-                    break;
-                case BluetoothAdapter.STATE_TURNING_OFF:
-                    status = "Turning off";
-                    break;
-                default:
-                    status = "Unknown";
-                    break;
-            }
+            return "Not available";
         }
-        return "BluetoothAdapter: " + status;
+        StringBuilder b = new StringBuilder().append("BluetoothAdapter: ");
+        switch (mBluetoothAdapter.getState()) {
+            case BluetoothAdapter.STATE_ON:
+                b.append("ON");
+                break;
+            case BluetoothAdapter.STATE_TURNING_ON:
+                b.append("Turning on");
+                break;
+            case BluetoothAdapter.STATE_OFF:
+                b.append("OFF");
+                break;
+            case BluetoothAdapter.STATE_TURNING_OFF:
+                b.append("Turning off");
+                break;
+            default:
+                b.append("Unknown state");
+                break;
+        }
+        b.append("\n");
+        b.append("ENABLED: ").append(mEnabled).append("\n");
+        if (mGattServices.size() > 0) {
+            b.append("ADVERTISING ").append(mGattServices.size()).append(" services\n");
+        }
+        if (mScanCallback != null) {
+            b.append("SCANNING\n");
+        }
+        b.append("OnServiceReadCallbacks: ").append(mOnServiceReadCallbacks).append("\n");
+        return b.toString();
     }
 }
