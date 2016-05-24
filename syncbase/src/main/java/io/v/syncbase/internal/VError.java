@@ -9,4 +9,9 @@ public class VError extends Exception {
     long actionCode;
     String message;
     String stack;
+
+    public String toString() {
+        return String.format("{\n  id: \"%s\"\n  actionCode: %d\n  message: \"%s\"\n  stack: \"%s\"}",
+                id, actionCode, message, stack);
+    }
 }
