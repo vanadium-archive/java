@@ -91,7 +91,7 @@ public class Syncgroup {
     /**
      * FOR ADVANCED USERS. Adds the given users to the syncgroup, with the specified access level.
      */
-    public void addUsers(List<User> users, AccessList.AccessLevel level, UpdateAccessListOptions opts) {
+    public void inviteUsers(List<User> users, AccessList.AccessLevel level, UpdateAccessListOptions opts) {
         AccessList delta = new AccessList();
         for (User u : users) {
             delta.users.put(u.getId(), level);
@@ -102,21 +102,21 @@ public class Syncgroup {
     /**
      * Adds the given users to the syncgroup, with the specified access level.
      */
-    public void addUsers(List<User> users, AccessList.AccessLevel level) {
-        addUsers(users, level, new UpdateAccessListOptions());
+    public void inviteUsers(List<User> users, AccessList.AccessLevel level) {
+        inviteUsers(users, level, new UpdateAccessListOptions());
     }
 
     /**
      * Adds the given user to the syncgroup, with the specified access level.
      */
-    public void addUser(User user, AccessList.AccessLevel level) {
-        addUsers(Collections.singletonList(user), level);
+    public void inviteUser(User user, AccessList.AccessLevel level) {
+        inviteUsers(Collections.singletonList(user), level);
     }
 
     /**
      * FOR ADVANCED USERS. Removes the given users from the syncgroup.
      */
-    public void removeUsers(List<User> users, UpdateAccessListOptions opts) {
+    public void ejectUsers(List<User> users, UpdateAccessListOptions opts) {
         AccessList delta = new AccessList();
         for (User u : users) {
             delta.users.put(u.getId(), null);
@@ -127,15 +127,15 @@ public class Syncgroup {
     /**
      * Removes the given users from the syncgroup.
      */
-    public void removeUsers(List<User> users) {
-        removeUsers(users, new UpdateAccessListOptions());
+    public void ejectUsers(List<User> users) {
+        ejectUsers(users, new UpdateAccessListOptions());
     }
 
     /**
      * Removes the given user from the syncgroup.
      */
-    public void removeUser(User user) {
-        removeUsers(Collections.singletonList(user));
+    public void ejectUser(User user) {
+        ejectUsers(Collections.singletonList(user));
     }
 
     /**

@@ -20,6 +20,10 @@ public class Id {
         return mBlessing;
     }
 
+    protected String getName() {
+        return mName;
+    }
+
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
 
     protected Id(io.v.v23.services.syncbase.Id id) {

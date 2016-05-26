@@ -8,5 +8,5 @@ package io.v.syncbase;
  * Represents an invitation to join a syncgroup.
  */
 public class SyncgroupInvite {
-    // TODO(sadovsky): Fill this in.
+    // FIXME(sadovsky): Fill this in.
 }

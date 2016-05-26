@@ -34,6 +34,8 @@ public class Syncbase {
     public static class DatabaseOptions {
         // TODO(sadovsky): Fill this in further.
         public String rootDir;
+        // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
+        public boolean disableUserdata;
         // TODO(sadovsky): Drop this once we switch from io.v.v23.syncbase to io.v.syncbase.core.
         public VAndroidContext vAndroidContext;
     }
@@ -41,10 +43,14 @@ public class Syncbase {
     private static DatabaseOptions sOpts;
     private static Database sDatabase;
 
-    private static final String
+    // TODO(sadovsky): Maybe select values for DB_NAME and USERDATA_SYNCGROUP_NAME that are less
+    // likely to collide with developer-specified names.
+
+    protected static final String
             TAG = "syncbase",
             DIR_NAME = "syncbase",
-            DB_NAME = "db";
+            DB_NAME = "db",
+            USERDATA_SYNCGROUP_NAME = "userdata";
 
     /**
      * Starts Syncbase if needed; creates default database if needed; performs create-or-join for
@@ -67,7 +73,7 @@ public class Syncbase {
             ctx.cancel();
             throw e;
         }
-        // TODO(sadovsky): Add create-or-join of userdata syncgroup, and make this method async.
+        // FIXME(sadovsky): Add create-or-join of userdata syncgroup, and make this method async.
         // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying
         // since create-or-join will no longer be necessary once syncgroup merge is supported.
         return sDatabase;

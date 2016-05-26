@@ -53,7 +53,7 @@ public class Collection {
 
     // TODO(sadovsky): Revisit the get API:
     // - Is the Class<T> argument necessary?
-    // - Does it throw an exception if there is no value for the given key?
+    // - What does it do if there is no value for the given key?
 
     /**
      * Returns the value associated with {@code key}.
