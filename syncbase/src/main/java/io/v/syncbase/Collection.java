@@ -11,6 +11,7 @@ import io.v.v23.verror.VException;
 
 /**
  * Represents an ordered set of key-value pairs.
+ * To get a Collection handle, call {@code Database.collection}.
  */
 public class Collection {
     private final io.v.v23.syncbase.Collection mVCollection;

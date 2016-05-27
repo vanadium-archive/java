@@ -19,11 +19,19 @@ import io.v.v23.verror.VException;
 
 /**
  * Represents a set of collections, synced amongst a set of users.
+ * To get a Syncgroup handle, call {@code Database.syncgroup}.
  */
 public class Syncgroup {
     private final Database mDatabase;
     private final Id mId;
     private final io.v.v23.syncbase.Syncgroup mVSyncgroup;
+
+    protected static SyncgroupMemberInfo newSyncgroupMemberInfo() {
+        SyncgroupMemberInfo info = new SyncgroupMemberInfo();
+        // TODO(sadovsky): Still have no idea how to set sync priority.
+        info.setSyncPriority((byte) 3);
+        return info;
+    }
 
     protected void createIfMissing(List<Collection> collections) {
         ArrayList<io.v.v23.services.syncbase.Id> cxVIds = new ArrayList<>(collections.size());
@@ -33,11 +41,8 @@ public class Syncgroup {
         SyncgroupSpec spec = new SyncgroupSpec(
                 "", Syncbase.CLOUD_NAME, Syncbase.defaultPerms(), cxVIds,
                 ImmutableList.of(Syncbase.MOUNT_POINT), false);
-        SyncgroupMemberInfo info = new SyncgroupMemberInfo();
-        // TODO(sadovsky): Still have no idea how to set sync priority.
-        info.setSyncPriority((byte) 3);
         try {
-            VFutures.sync(mVSyncgroup.create(Syncbase.getVContext(), spec, info));
+            VFutures.sync(mVSyncgroup.create(Syncbase.getVContext(), spec, newSyncgroupMemberInfo()));
         } catch (ExistException e) {
             // Syncgroup already exists.
             // TODO(sadovsky): Verify that the existing syncgroup has the specified configuration,

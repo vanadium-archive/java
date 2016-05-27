@@ -16,6 +16,8 @@ public class Id {
         mName = name;
     }
 
+    // TODO(sadovsky): Add encode and decode methods.
+
     protected String getBlessing() {
         return mBlessing;
     }

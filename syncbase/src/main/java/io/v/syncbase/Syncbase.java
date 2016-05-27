@@ -4,6 +4,7 @@
 
 package io.v.syncbase;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.common.collect.ImmutableList;
@@ -23,6 +24,17 @@ import io.v.v23.security.access.Permissions;
 import io.v.v23.syncbase.SyncbaseService;
 import io.v.v23.verror.VException;
 
+// FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
+// decide which error types to surface to clients, and define specific Exception subclasses for
+// those.
+
+/**
+ * The "userdata" collection is a per-user collection (and associated syncgroup) for data that
+ * should automatically get synced across a given user's devices. It has the following schema:
+ * - /syncgroups/{encodedSyncgroupId} -> null
+ * - /ignoredInvites/{encodedSyncgroupId} -> null
+ */
+
 /**
  * Syncbase is a storage system for developers that makes it easy to synchronize app data between
  * devices. It works even when devices are not connected to the Internet.
@@ -35,7 +47,7 @@ public class Syncbase {
         // TODO(sadovsky): Fill this in further.
         public String rootDir;
         // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
-        public boolean disableUserdata;
+        public boolean disableUserdataSyncgroup;
         // TODO(sadovsky): Drop this once we switch from io.v.v23.syncbase to io.v.syncbase.core.
         public VAndroidContext vAndroidContext;
     }
@@ -52,31 +64,67 @@ public class Syncbase {
             DB_NAME = "db",
             USERDATA_SYNCGROUP_NAME = "userdata";
 
+    protected static void enqueue(final Runnable r) {
+        new Handler().post(r);
+    }
+
+    public static abstract class DatabaseCallback {
+        public void onSuccess(Database db) {
+        }
+
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Starts Syncbase if needed; creates default database if needed; performs create-or-join for
-     * "userdata" syncgroup if needed; returns database handle.
+     * "userdata" syncgroup if needed. The passed callback is called on the current thread.
      *
      * @param opts options for database creation
-     * @return the database handle
+     * @param cb   the callback to call with the database handle
      */
-    public static Database database(DatabaseOptions opts) {
+    public static void database(final DatabaseCallback cb, DatabaseOptions opts) {
+        // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying
+        // since create-or-join will no longer be necessary once syncgroup merge is supported.
         if (sDatabase != null) {
             // TODO(sadovsky): Check that opts matches original opts (sOpts)?
-            return sDatabase;
+            Syncbase.enqueue(new Runnable() {
+                @Override
+                public void run() {
+                    cb.onSuccess(sDatabase);
+                }
+            });
         }
         sOpts = opts;
         // TODO(sadovsky): Call ctx.cancel in sDatabase destructor?
         VContext ctx = getVContext().withCancel();
         try {
             sDatabase = startSyncbaseAndInitDatabase(ctx);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             ctx.cancel();
-            throw e;
+            Syncbase.enqueue(new Runnable() {
+                @Override
+                public void run() {
+                    cb.onError(e);
+                }
+            });
         }
-        // FIXME(sadovsky): Add create-or-join of userdata syncgroup, and make this method async.
-        // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying
-        // since create-or-join will no longer be necessary once syncgroup merge is supported.
-        return sDatabase;
+        if (sOpts.disableUserdataSyncgroup) {
+            Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
+            cxOpts.withoutSyncgroup = true;
+            sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
+            Syncbase.enqueue(new Runnable() {
+                @Override
+                public void run() {
+                    cb.onSuccess(sDatabase);
+                }
+            });
+        } else {
+            // FIXME(sadovsky): Implement create-or-join (and watch) of userdata syncgroup. For the
+            // new JNI API, we'll need to add Go code for this, since Java can't make RPCs.
+            cb.onError(new RuntimeException("Synced userdata collection is not yet supported"));
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

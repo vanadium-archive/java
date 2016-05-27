@@ -32,7 +32,7 @@ public abstract class DatabaseHandle {
     /**
      * Options for collection creation.
      */
-    class CollectionOptions {
+    public static class CollectionOptions {
         public boolean withoutSyncgroup;
     }
 

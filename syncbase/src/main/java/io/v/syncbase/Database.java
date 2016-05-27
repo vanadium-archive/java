@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,21 +23,22 @@ import io.v.v23.InputChannelCallback;
 import io.v.v23.InputChannels;
 import io.v.v23.VFutures;
 import io.v.v23.services.syncbase.CollectionRowPattern;
+import io.v.v23.services.syncbase.SyncgroupSpec;
+import io.v.v23.syncbase.Batch;
 import io.v.v23.verror.ExistException;
 import io.v.v23.verror.VException;
 
 /**
  * A set of collections and syncgroups.
+ * To get a Database handle, call {@code Syncbase.database}.
  */
 public class Database extends DatabaseHandle {
     private final io.v.v23.syncbase.Database mVDatabase;
 
-    private interface CancelFunc {
-        void run();
-    }
-
-    private Map<SyncgroupInviteHandler, CancelFunc> mSyncgroupInviteHandlers;
-    private Map<WatchChangeHandler, CancelFunc> mWatchChangeHandlers;
+    private final Object mSyncgroupInviteHandlersMu = new Object();
+    private final Object mWatchChangeHandlersMu = new Object();
+    private Map<SyncgroupInviteHandler, Runnable> mSyncgroupInviteHandlers = new HashMap<>();
+    private Map<WatchChangeHandler, Runnable> mWatchChangeHandlers = new HashMap<>();
 
     protected void createIfMissing() {
         try {
@@ -51,8 +53,6 @@ public class Database extends DatabaseHandle {
     protected Database(io.v.v23.syncbase.Database vDatabase) {
         super(vDatabase);
         mVDatabase = vDatabase;
-        mSyncgroupInviteHandlers = new HashMap<>();
-        mWatchChangeHandlers = new HashMap<>();
     }
 
     @Override
@@ -142,36 +142,43 @@ public class Database extends DatabaseHandle {
     /**
      * Handles discovered syncgroup invites.
      */
-    public abstract class SyncgroupInviteHandler {
+    public static abstract class SyncgroupInviteHandler {
         /**
          * Called when a syncgroup invitation is discovered. Clients typically handle invites by
          * calling {@code acceptSyncgroupInvite} or {@code ignoreSyncgroupInvite}.
          */
-        void onInvite(SyncgroupInvite invite) {
+        public void onInvite(SyncgroupInvite invite) {
         }
 
         /**
          * Called when an error occurs while scanning for syncgroup invitations. Once
          * {@code onError} is called, no other methods will be called on this handler.
          */
-        void onError(Throwable e) {
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
         }
     }
+
+    // TODO(sadovsky): Document which thread the handler methods are called on.
 
     /**
      * Notifies {@code h} of any existing syncgroup invites, and of all subsequent new invites.
      */
     public void addSyncgroupInviteHandler(SyncgroupInviteHandler h, AddSyncgroupInviteHandlerOptions opts) {
-        throw new RuntimeException("Not implemented");
+        synchronized (mSyncgroupInviteHandlersMu) {
+            throw new RuntimeException("Not implemented");
+        }
     }
 
     /**
      * Makes it so {@code h} stops receiving notifications.
      */
     public void removeSyncgroupInviteHandler(SyncgroupInviteHandler h) {
-        CancelFunc cancel = mSyncgroupInviteHandlers.remove(h);
-        if (cancel != null) {
-            cancel.run();
+        synchronized (mSyncgroupInviteHandlersMu) {
+            Runnable cancel = mSyncgroupInviteHandlers.remove(h);
+            if (cancel != null) {
+                cancel.run();
+            }
         }
     }
 
@@ -179,30 +186,53 @@ public class Database extends DatabaseHandle {
      * Makes it so all syncgroup invite handlers stop receiving notifications.
      */
     public void removeAllSyncgroupInviteHandlers() {
-        for (CancelFunc cancel : mSyncgroupInviteHandlers.values()) {
-            cancel.run();
+        synchronized (mSyncgroupInviteHandlersMu) {
+            for (Runnable cancel : mSyncgroupInviteHandlers.values()) {
+                cancel.run();
+            }
+            mSyncgroupInviteHandlers.clear();
         }
-        mSyncgroupInviteHandlers.clear();
+    }
+
+    public static abstract class AcceptSyncgroupInviteCallback {
+        public void onSuccess(Syncgroup sg) {
+        }
+
+        public void onFailure(Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Joins the syncgroup associated with the given invite and adds it to the user's "userdata"
-     * collection, as needed.
+     * collection, as needed. The passed callback is called on the current thread.
      *
-     * @param invite the invite
-     * @return a handle for the joined syncgroup
+     * @param invite the syncgroup invite
+     * @param cb     the callback to call with the syncgroup handle
      */
-    public Syncgroup acceptSyncgroupInvite(SyncgroupInvite invite) {
+    public void acceptSyncgroupInvite(SyncgroupInvite invite, final AcceptSyncgroupInviteCallback cb) {
         // TODO(sadovsky): Should we add "accept" and "ignore" methods to the SyncgroupInvite class,
         // or should we treat it as a POJO (with no reference to Database)?
-        // TODO(sadovsky): Make this method async.
-        throw new RuntimeException("Not implemented");
+        io.v.v23.syncbase.Syncgroup vSyncgroup = mVDatabase.getSyncgroup(invite.getId().toVId());
+        final Syncgroup syncgroup = new Syncgroup(vSyncgroup, this, invite.getId());
+        ListenableFuture<SyncgroupSpec> future = vSyncgroup.join(Syncbase.getVContext(), invite.getRemoteSyncbaseName(), invite.getExpectedSyncbaseBlessings(), Syncgroup.newSyncgroupMemberInfo());
+        Futures.addCallback(future, new FutureCallback<SyncgroupSpec>() {
+            @Override
+            public void onSuccess(@Nullable SyncgroupSpec result) {
+                cb.onSuccess(syncgroup);
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                cb.onFailure(e);
+            }
+        });
     }
 
     /**
      * Records that the user has ignored this invite, such that it's never surfaced again.
      *
-     * @param invite the invite
+     * @param invite the syncgroup invite
      */
     public void ignoreSyncgroupInvite(SyncgroupInvite invite) {
         // Note: This will be one of the last things we implement.
@@ -238,15 +268,32 @@ public class Database extends DatabaseHandle {
      * @param op   the operation to run
      * @param opts options for this batch
      */
-    public void runInBatch(BatchOperation op, BatchOptions opts) {
-        throw new RuntimeException("Not implemented");
+    public void runInBatch(final BatchOperation op, BatchOptions opts) {
+        ListenableFuture<Void> future = Batch.runInBatch(Syncbase.getVContext(), mVDatabase, opts.toVBatchOptions(), new Batch.BatchOperation() {
+            @Override
+            public ListenableFuture<Void> run(io.v.v23.syncbase.BatchDatabase vBatchDatabase) {
+                final SettableFuture<Void> res = SettableFuture.create();
+                try {
+                    op.run(new BatchDatabase(vBatchDatabase));
+                    res.set(null);
+                } catch (Exception e) {
+                    res.setException(e);
+                }
+                return res;
+            }
+        });
+        try {
+            VFutures.sync(future);
+        } catch (VException e) {
+            throw new RuntimeException("runInBatch failed", e);
+        }
     }
 
     /**
      * Creates a new batch. Instead of calling this function directly, clients are encouraged to use
      * the {@code runInBatch} helper function, which detects "concurrent batch" errors and handles
      * retries internally.
-     * <p>
+     * <p/>
      * Default concurrency semantics:
      * <ul>
      * <li>Reads (e.g. gets, scans) inside a batch operate over a consistent snapshot taken during
@@ -257,10 +304,10 @@ public class Database extends DatabaseHandle {
      * <li>Other methods will never fail with error {@code ConcurrentBatchException}, even if it is
      * known that {@code commit} will fail with this error.</li>
      * </ul>
-     * <p>
+     * <p/>
      * Once a batch has been committed or aborted, subsequent method calls will fail with no
      * effect.
-     * <p>
+     * <p/>
      * Concurrency semantics can be configured using BatchOptions.
      *
      * @param opts options for this batch
@@ -286,7 +333,7 @@ public class Database extends DatabaseHandle {
     /**
      * Handles observed changes to the database.
      */
-    public abstract class WatchChangeHandler {
+    public static abstract class WatchChangeHandler {
         // TODO(sadovsky): Consider adopting Aaron's suggestion of combining onInitialState and
         // onChangeBatch into a single method, to make things simpler for developers who don't want
         // to apply deltas to their in-memory data structures:
@@ -296,23 +343,26 @@ public class Database extends DatabaseHandle {
          * Called once, when a watch change handler is added, to provide the initial state of the
          * values being watched.
          */
-        void onInitialState(Iterator<WatchChange> values) {
+        public void onInitialState(Iterator<WatchChange> values) {
         }
 
         /**
          * Called whenever a batch of changes is committed to the database. Individual puts/deletes
          * surface as a single-change batch.
          */
-        void onChangeBatch(Iterator<WatchChange> changes) {
+        public void onChangeBatch(Iterator<WatchChange> changes) {
         }
 
         /**
          * Called when an error occurs while watching for changes. Once {@code onError} is called,
          * no other methods will be called on this handler.
          */
-        void onError(Throwable e) {
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
         }
     }
+
+    // TODO(sadovsky): Document which thread the handler methods are called on.
 
     /**
      * Notifies {@code h} of initial state, and of all subsequent changes to this database.
@@ -357,18 +407,29 @@ public class Database extends DatabaseHandle {
 
             @Override
             public void onFailure(Throwable e) {
+                // TODO(sadovsky): Make sure cancellations are surfaced as such (or ignored).
                 h.onError(e);
             }
         });
+        synchronized (mWatchChangeHandlersMu) {
+            mWatchChangeHandlers.put(h, new Runnable() {
+                @Override
+                public void run() {
+                    throw new RuntimeException("Not implemented");
+                }
+            });
+        }
     }
 
     /**
      * Makes it so {@code h} stops receiving notifications.
      */
     public void removeWatchChangeHandler(WatchChangeHandler h) {
-        CancelFunc cancel = mWatchChangeHandlers.remove(h);
-        if (cancel != null) {
-            cancel.run();
+        synchronized (mWatchChangeHandlersMu) {
+            Runnable cancel = mWatchChangeHandlers.remove(h);
+            if (cancel != null) {
+                cancel.run();
+            }
         }
     }
 
@@ -376,9 +437,11 @@ public class Database extends DatabaseHandle {
      * Makes it so all watch change handlers stop receiving notifications.
      */
     public void removeAllWatchChangeHandlers() {
-        for (CancelFunc cancel : mWatchChangeHandlers.values()) {
-            cancel.run();
+        synchronized (mWatchChangeHandlersMu) {
+            for (Runnable cancel : mWatchChangeHandlers.values()) {
+                cancel.run();
+            }
+            mWatchChangeHandlers.clear();
         }
-        mWatchChangeHandlers.clear();
     }
 }
