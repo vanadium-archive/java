@@ -3,7 +3,11 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath (
+                'com.android.tools.build:gradle:2.1.0',
+                'com.github.dcendents:android-maven-gradle-plugin:1.3',
+                'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        )
     }
 }
 
@@ -13,7 +17,82 @@ allprojects {
     }
 }
 
+// You should update this after releasing a new version of the Syncbase API. See the
+// list of published versions at https://repo1.maven.org/maven2/io/v/syncbase
+version = '0.1.1'
+group = 'io.v'
+
+def siteUrl = 'https://github.com/vanadium/java'
+def gitUrl = 'https://github.com/vanadium/java.git'
+def pkgDesc = 'Storage system with peer-to-peer, secure, offline data synchronization'
+
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+archivesBaseName = 'syncbase'
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+
+                name 'Syncbase'
+                description pkgDesc
+                url siteUrl
+
+                licenses {
+                    license {
+                        name 'New BSD License'
+                        url 'https://github.com/vanadium/java/blob/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    url siteUrl
+                }
+                developers {
+                    developer {
+                        id 'vanadium'
+                        name 'The Vanadium Contributors'
+                        email 'vanadium-discuss@v.io'
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.bintrayUpload.dependsOn(tasks.install)
+
+bintray {
+    // These properties can be obtained after obtaining a bintray account and should be specified in
+    // $HOME/.gradle/gradle.properties. See the instructions in RELEASING.md to set this up.
+    user = project.properties.bintrayUsername
+    key = project.properties.bintrayApiKey
+
+    configurations = ['archives']
+
+    pkg {
+        desc = pkgDesc
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        repo = group
+        name = archivesBaseName
+        licenses = ['BSD New']
+        userOrg = 'vanadium'
+        publish = true
+
+        version {
+            name = project.version
+            gpg {
+                sign = true
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -22,8 +101,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
