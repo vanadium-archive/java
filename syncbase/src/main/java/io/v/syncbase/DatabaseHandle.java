@@ -25,7 +25,7 @@ public abstract class DatabaseHandle {
     /**
      * Returns the id of this database.
      */
-    Id getId() {
+    public Id getId() {
         return new Id(mVDatabaseCore.id());
     }
 
@@ -47,19 +47,19 @@ public abstract class DatabaseHandle {
      * @param opts options for collection creation
      * @return the collection handle
      */
-    abstract Collection collection(String name, CollectionOptions opts);
+    public abstract Collection collection(String name, CollectionOptions opts);
 
     /**
      * Calls {@code collection(name, opts)} with default {@code CollectionOptions}.
      */
-    Collection collection(String name) {
+    public Collection collection(String name) {
         return collection(name, new CollectionOptions());
     }
 
     /**
      * Returns the collection with the given id.
      */
-    Collection getCollection(Id id) {
+    public Collection getCollection(Id id) {
         // TODO(sadovsky): Consider throwing an exception or returning null if the collection does
         // not exist.
         return new Collection(mVDatabaseCore.getCollection(id.toVId()), this);
@@ -68,7 +68,7 @@ public abstract class DatabaseHandle {
     /**
      * Returns an iterator over all collections in the database.
      */
-    Iterator<Collection> getCollections() {
+    public Iterator<Collection> getCollections() {
         List<io.v.v23.services.syncbase.Id> vIds;
         try {
             vIds = VFutures.sync(mVDatabaseCore.listCollections(Syncbase.getVContext()));
