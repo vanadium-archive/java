@@ -7,8 +7,6 @@ package io.v.android.inspectors;
 import android.util.Base64;
 import android.util.Log;
 
-import com.google.common.collect.ImmutableList;
-
 import org.joda.time.DateTime;
 import org.joda.time.ReadableDuration;
 
@@ -17,6 +15,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.v.android.v23.V;
@@ -30,6 +29,7 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.Caveat;
 import io.v.v23.security.VPrincipal;
 import io.v.v23.security.VSecurity;
+import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Tag;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
@@ -42,22 +42,51 @@ import io.v.v23.vom.VomUtil;
  * <p>When a remote user is invited via the {@link #invite(String, ReadableDuration)} method, a
  * principal and blessing is generated that is suitable for use by the
  * <a href="https://godoc.org/v.io/x/ref/services/debug/debug">{@code debug browse}</a> command.
- * The blessing allows only for debug access and thus does not grant the remote user any access to
- * change application state (techinically, does not allow them to invoke any method not tagged with
- * {@link io.v.v23.security.access.Constants#DEBUG}).
+ *
+ * By default (if no tags are provided to the constructor), the remote user will not be able
+ * to invoke any methods that involve reading or writing of application data, instead they
+ * will be limited to methods that provide debugging metadata only. To enable remote users
+ * to invoke read and/or write methods, provide
+ * {@link io.v.v23.security.access.Constants#READ} and/or
+ * {@link io.v.v23.security.access.Constants#WRITE} to the constructor.
  */
 public class RemoteInspectors {
     private static final String TAG = "RemoteInspectors";
     private static final int BASE64_FLAGS = Base64.URL_SAFE | Base64.NO_WRAP;
     private VContext mCtx;
+    private List<Tag> mTags;
 
     /**
      * Creates a secure network server to expose application state to invited remote users.
      *
      * @param ctx the Vanadium context of the application whose state is to be exposed
+     * @params tags The set of method tags that determine which methods an invited user can invoke.
+     * The {@link io.v.v23.security.access.Constants#DEBUG} and
+     * {@link io.v.v23.security.access.Constants#RESOLVE} tags are always included, whether the
+     * caller includes it in tags or not.
      * @throws VException
      */
-    public RemoteInspectors(VContext ctx) throws VException {
+    public RemoteInspectors(VContext ctx, Tag... tags) throws VException {
+        // Enhance tags to ensure that it always has DEBUG and RESOLVE.
+        mTags = new ArrayList<>(tags.length + 2);
+        boolean hasDebug = false;
+        boolean hasResolve = false;
+        for (Tag t : tags) {
+            if (t.equals(Constants.DEBUG)) {
+                hasDebug = true;
+            }
+            if (t.equals(Constants.RESOLVE)) {
+                hasResolve = true;
+            }
+            mTags.add(t);
+        }
+        if (!hasDebug) {
+            mTags.add(Constants.DEBUG);
+        }
+        if (!hasResolve) {
+            mTags.add(Constants.RESOLVE);
+        }
+
         mCtx = ctx.withCancel();
         Server server = V.getServer(ctx);
         if (server == null) {
@@ -91,14 +120,8 @@ public class RemoteInspectors {
             throw new VException("RemoteInspectors.stop already called");
         }
 
-        // In sync with the "debug delegate" command in
-        // v.io/x/ref/services/debug/debug/browse.go
-        List<Tag> tags = ImmutableList.of(
-                io.v.v23.security.access.Constants.DEBUG,
-                io.v.v23.security.access.Constants.RESOLVE);
-
         Caveat debugOnly = VSecurity.newCaveat(
-                io.v.v23.security.access.Constants.ACCESS_TAG_CAVEAT, tags);
+                io.v.v23.security.access.Constants.ACCESS_TAG_CAVEAT, mTags);
         Caveat expiration = VSecurity.newExpiryCaveat(DateTime.now().plus(duration));
 
         String privateKey;
