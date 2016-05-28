@@ -11,19 +11,41 @@ public class Id {
     private final String mBlessing;
     private final String mName;
 
-    protected Id(String blessing, String name) {
+    public Id(String blessing, String name) {
         mBlessing = blessing;
         mName = name;
     }
 
     // TODO(sadovsky): Add encode and decode methods.
 
-    protected String getBlessing() {
+    public String getBlessing() {
         return mBlessing;
     }
 
-    protected String getName() {
+    public String getName() {
         return mName;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Id && other != null) {
+            Id otherId = (Id)other;
+            return mBlessing.equals(otherId.getBlessing()) && mName.equals(otherId.getName());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        // Note: Copied from VDL.
+        int result = 1;
+        int prime = 31;
+
+        result = prime * result + (mBlessing == null ? 0 : mBlessing.hashCode());
+
+        result = prime * result + (mName == null ? 0 : mName.hashCode());
+
+        return result;
     }
 
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
