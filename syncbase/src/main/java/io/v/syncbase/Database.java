@@ -372,7 +372,7 @@ public class Database extends DatabaseHandle {
         // constructed using some sort of query builder API.
         // TODO(sadovsky): Support specifying resumeMarker. Note, watch-from-resumeMarker may be
         // problematic in that we don't track the governing ACL for changes in the watch log.
-        if (opts.resumeMarker.length != 0) {
+        if (opts.resumeMarker != null && opts.resumeMarker.length != 0) {
             throw new RuntimeException("Specifying resumeMarker is not yet supported");
         }
         InputChannel<io.v.v23.syncbase.WatchChange> ic = mVDatabase.watch(Syncbase.getVContext(), ImmutableList.of(new CollectionRowPattern("%", "%", "%")));
