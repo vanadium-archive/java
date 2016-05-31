@@ -11,14 +11,26 @@ public class Id {
     private final String mBlessing;
     private final String mName;
 
-    public Id(String blessing, String name) {
+    protected Id(String blessing, String name) {
         mBlessing = blessing;
         mName = name;
     }
 
-    // TODO(sadovsky): Add encode and decode methods.
+    // TODO(sadovsky): Replace encode and decode method implementations with calls to Cgo.
+    private static final String SEPARATOR = ",";
+    public static Id decode(String encodedId) {
+        String[] parts = encodedId.split(SEPARATOR);
+        if (parts.length != 2) {
+            throw new RuntimeException("Invalid encoded id: " + encodedId);
+        }
+        return new Id(parts[0], parts[1]);
+    }
 
-    public String getBlessing() {
+    public String encode() {
+        return mBlessing + SEPARATOR + mName;
+    }
+
+    protected String getBlessing() {
         return mBlessing;
     }
 
