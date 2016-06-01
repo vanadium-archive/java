@@ -53,4 +53,29 @@ public class Database {
     public static native VersionedSyncgroupSpec GetSyncgroupSpec(String name, Id syncgroupId) throws VError;
     public static native void SetSyncgroupSpec(String name, Id syncgroupId, VersionedSyncgroupSpec spec) throws VError;
     public static native List<SyncgroupMemberInfo> GetSyncgroupMembers(String name, Id syncgroupId) throws VError;
+
+    public static class CollectionRowPattern {
+        String collectionBlessing;
+        String collectionName;
+        String rowKey;
+    }
+
+    public enum ChangeType { PUT, DELETE }
+
+    public static class WatchChange {
+        Id collection;
+        String row;
+        ChangeType changeType;
+        byte[] value;
+        String resumeMarker;
+        boolean fromSync;
+        boolean continued;
+    }
+
+    public interface WatchPatternsCallbacks {
+        void onChange(WatchChange watchChange);
+        void onError(VError vError);
+    }
+
+    public static native void WatchPatterns(String name, String resumeMarker, List<CollectionRowPattern> patterns, WatchPatternsCallbacks callbacks) throws VError;
 }

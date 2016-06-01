@@ -13,7 +13,7 @@ public class Collection {
     public static native boolean Exists(String name, String batchHandle) throws VError;
     public static native void DeleteRange(String name, String batchHandle, byte[] start, byte[] limit) throws VError;
 
-    public class KeyValue {
+    public static class KeyValue {
         String key;
         byte[] value;
     }
