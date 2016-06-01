@@ -149,6 +149,11 @@ public class DatabaseTest {
             Database.SyncgroupSpec spec = new Database.SyncgroupSpec();
             spec.collections = Arrays.asList(collectionId);
             Database.CreateSyncgroup(dbName, sgId, spec, new Database.SyncgroupMemberInfo());
+            List<Id> syncgroups = Database.ListSyncgroups(dbName);
+            assertEquals(1, syncgroups.size());
+            Id actual = syncgroups.get(0);
+            assertEquals(sgId.blessing, actual.blessing);
+            assertEquals(sgId.name, actual.name);
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());
