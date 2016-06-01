@@ -71,7 +71,7 @@ class GattServer extends BluetoothGattServerCallback {
     public void onMtuChanged(BluetoothDevice device, int mtu) {
         super.onMtuChanged(device, mtu);
 
-        mMtus.put(device, new Integer(mtu));
+        mMtus.put(device, mtu);
     }
 
     @Override
@@ -86,16 +86,27 @@ class GattServer extends BluetoothGattServerCallback {
         if (offset >= data.length) {
             data = null;
         } else {
-            int mtu = DEFAULT_MTU;
-            if (mMtus.containsKey(device)) {
-                mtu = mMtus.get(device).intValue();
+            // MTU exchange is not allowed on a BR/EDR physical link. Send all requested data in that link.
+            int deviceType = device.getType();
+            if (deviceType == BluetoothDevice.DEVICE_TYPE_CLASSIC
+                    || deviceType == BluetoothDevice.DEVICE_TYPE_DUAL) {
+                if (offset > 0) {
+                    data = Arrays.copyOfRange(data, offset, data.length);
+                }
+            } else {
+                int mtu = DEFAULT_MTU;
+                if (mMtus.containsKey(device)) {
+                    mtu = mMtus.get(device);
+                }
+                // We can send data up to MTU - 1 bytes.
+                int to = offset + mtu - 1;
+                if (to > data.length) {
+                    to = data.length;
+                }
+                if (offset > 0 || to < data.length) {
+                    data = Arrays.copyOfRange(data, offset, to);
+                }
             }
-            // We can send data up to MTU - 1 bytes.
-            int to = offset + mtu - 1;
-            if (to > data.length) {
-                to = data.length;
-            }
-            data = Arrays.copyOfRange(data, offset, to);
         }
         mBluetoothGattServer.sendResponse(
                 device, requestId, BluetoothGatt.GATT_SUCCESS, offset, data);

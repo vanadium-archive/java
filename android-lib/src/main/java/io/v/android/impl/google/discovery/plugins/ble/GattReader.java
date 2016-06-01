@@ -11,17 +11,16 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
-import android.util.Pair;
 
 import com.google.common.collect.Queues;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A reader that reads Vanadium Gatt services from remote Gatt servers.
@@ -31,9 +30,9 @@ class GattReader extends BluetoothGattCallback {
 
     // A handler that will get called when a GATT service is read.
     interface Handler {
-        void onServiceRead(BluetoothDevice device, BluetoothGattService service);
+        void onGattRead(BluetoothDevice device, BluetoothGattService service);
 
-        void onServiceReadFailed(BluetoothDevice device, UUID uuid);
+        void onGattReadFailed(BluetoothDevice device);
     }
 
     // TODO(jhahn): What's the maximum MTU size in Android?
@@ -48,36 +47,48 @@ class GattReader extends BluetoothGattCallback {
 
     private final Context mContext;
 
-    private final ExecutorService mExecutor;
-    private final Timer mTimer;
+    private final ScheduledThreadPoolExecutor mExecutor;
+
+    private final Set<UUID> mScanUuids;
     private final Handler mHandler;
 
-    private final ArrayDeque<Pair<BluetoothDevice, UUID>> mPendingReads;
+    private final ArrayDeque<BluetoothDevice> mPendingReads;
 
-    private Pair<BluetoothDevice, UUID> mCurrentRead;
+    private final Runnable mCancelTask;
+
+    private BluetoothDevice mCurrentDevice;
     private BluetoothGatt mCurrentGatt;
-    private TimerTask mCurrentGattTimeout;
+    private ScheduledFuture mCurrentGattTimeout;
     private BluetoothGattService mCurrentService;
+    private Iterator<BluetoothGattService> mCurrentServiceIterator;
     private Iterator<BluetoothGattCharacteristic> mCurrentCharacteristicIterator;
 
-    GattReader(Context context, Handler handler) {
+    GattReader(Context context, Set<UUID> scanUuids, Handler handler) {
         mContext = context;
-        mExecutor = Executors.newSingleThreadExecutor();
-        mTimer = new Timer();
+        mExecutor = new ScheduledThreadPoolExecutor(1);
+        mScanUuids = scanUuids;
         mHandler = handler;
         mPendingReads = Queues.newArrayDeque();
+        mCancelTask =
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(TAG, "gatt operation timed out: " + mCurrentDevice);
+                        cancelAndMaybeReadNextDevice();
+                    }
+                };
     }
 
     /**
      * Reads a specified service from a remote device as well as their characteristics.
      * <p/>
-     * This is an asynchronous operation. Once service read is completed, the onServiceRead() or
+     * This is an asynchronous operation. Once service read is completed, the onGattRead() or
      * onServiceReadFailed() callback is triggered.
      */
-    synchronized void readService(BluetoothDevice device, UUID uuid) {
-        mPendingReads.add(Pair.create(device, uuid));
-        if (mCurrentRead == null) {
-            maybeReadNextService();
+    synchronized void readDevice(BluetoothDevice device) {
+        mPendingReads.add(device);
+        if (mCurrentDevice == null) {
+            maybeReadNextDevice();
         }
     }
 
@@ -86,69 +97,54 @@ class GattReader extends BluetoothGattCallback {
      */
     synchronized void close() {
         if (mCurrentGatt != null) {
-            mCurrentGatt.disconnect();
+            mCurrentGatt.close();
         }
-        mTimer.cancel();
+        mExecutor.shutdown();
         mPendingReads.clear();
     }
 
-    private synchronized void maybeReadNextService() {
+    private synchronized void maybeReadNextDevice() {
         mCurrentGatt = null;
         mCurrentGattTimeout = null;
         mCurrentService = null;
+        mCurrentServiceIterator = null;
         mCurrentCharacteristicIterator = null;
 
-        mCurrentRead = mPendingReads.poll();
-        if (mCurrentRead == null) {
+        mCurrentDevice = mPendingReads.poll();
+        if (mCurrentDevice == null) {
             return;
         }
-        mCurrentGatt = mCurrentRead.first.connectGatt(mContext, false, this);
+
+        mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
         mCurrentGattTimeout =
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        Log.e(TAG, "gatt operation timed out: " + mCurrentRead.first);
-                        cancelAndMaybeReadNextService();
-                    }
-                };
-        mTimer.schedule(mCurrentGattTimeout, GATT_TIMEOUT_MS);
+                mExecutor.schedule(mCancelTask, GATT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
-    private synchronized void finishAndMaybeReadNextService() {
-        mCurrentGattTimeout.cancel();
+    private synchronized void finishAndMaybeReadNextDevice() {
+        mCurrentGattTimeout.cancel(false);
         mCurrentGatt.disconnect();
 
-        final BluetoothDevice currentDevice = mCurrentRead.first;
-        final BluetoothGattService currentService = mCurrentService;
+        maybeReadNextDevice();
+    }
+
+    private synchronized void cancelAndMaybeReadNextDevice() {
+        mCurrentGattTimeout.cancel(false);
+        mCurrentGatt.close();
+
+        final BluetoothDevice device = mCurrentDevice;
         mExecutor.submit(
                 new Runnable() {
                     @Override
                     public void run() {
-                        mHandler.onServiceRead(currentDevice, currentService);
+                        mHandler.onGattReadFailed(device);
                     }
                 });
-        maybeReadNextService();
-    }
-
-    private synchronized void cancelAndMaybeReadNextService() {
-        mCurrentGattTimeout.cancel();
-        mCurrentGatt.disconnect();
-
-        final Pair<BluetoothDevice, UUID> currentRead = mCurrentRead;
-        mExecutor.submit(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        mHandler.onServiceReadFailed(currentRead.first, currentRead.second);
-                    }
-                });
-        maybeReadNextService();
+        maybeReadNextDevice();
     }
 
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         super.onConnectionStateChange(gatt, status, newState);
-
         if (newState != BluetoothGatt.STATE_CONNECTED) {
             // Connection is disconnected. Release it.
             gatt.close();
@@ -156,84 +152,118 @@ class GattReader extends BluetoothGattCallback {
         }
 
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            Log.e(TAG, "connectGatt failed: " + mCurrentRead.first + " , status: " + status);
-            cancelAndMaybeReadNextService();
+            Log.e(TAG, "connectGatt failed: " + mCurrentDevice + " , status: " + status);
+            cancelAndMaybeReadNextDevice();
             return;
         }
 
-        if (!gatt.requestMtu(MTU)) {
-            Log.e(TAG, "requestMtu failed: " + mCurrentRead.first);
-
-            // Try to discover services although requesting MTU fails.
+        // MTU exchange is not allowed on a BR/EDR physical link.
+        // (Bluetooth Core Specification Volume 3, Part G, 4.3.1)
+        //
+        // There is no way to get the actual link type. So we use the device type for it.
+        // It is not clear whether DEVICE_TYPE_DUAL is on a BR/EDR physical link, but
+        // it is safe to not exchange MTU for that type too.
+        int deviceType = mCurrentDevice.getType();
+        if (deviceType != BluetoothDevice.DEVICE_TYPE_CLASSIC
+                && deviceType != BluetoothDevice.DEVICE_TYPE_DUAL) {
+            if (!gatt.requestMtu(MTU)) {
+                Log.e(TAG, "requestMtu failed: " + mCurrentDevice);
+                cancelAndMaybeReadNextDevice();
+            }
+        } else {
             if (!gatt.discoverServices()) {
-                Log.e(TAG, "discoverServices failed: " + mCurrentRead.first);
-                cancelAndMaybeReadNextService();
+                Log.e(TAG, "discoverServices failed: " + mCurrentDevice);
+                cancelAndMaybeReadNextDevice();
             }
         }
     }
 
     @Override
-    public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+    public synchronized void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
         super.onMtuChanged(gatt, mtu, status);
 
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            Log.w(TAG, "requestMtu failed: " + mCurrentRead.first + ", status: " + status);
+            Log.w(TAG, "requestMtu failed: " + mCurrentDevice + ", status: " + status);
+            cancelAndMaybeReadNextDevice();
+            return;
         }
 
         if (!gatt.discoverServices()) {
-            Log.e(TAG, "discoverServices failed: " + mCurrentRead.first);
-            cancelAndMaybeReadNextService();
+            Log.e(TAG, "discoverServices failed: " + mCurrentDevice);
+            cancelAndMaybeReadNextDevice();
         }
     }
 
     @Override
-    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+    public synchronized void onServicesDiscovered(BluetoothGatt gatt, int status) {
         super.onServicesDiscovered(gatt, status);
 
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            Log.e(TAG, "discoverServices failed: " + mCurrentRead.first + ", status: " + status);
-            cancelAndMaybeReadNextService();
+            Log.e(TAG, "discoverServices failed: " + mCurrentDevice + ", status: " + status);
+            cancelAndMaybeReadNextDevice();
             return;
         }
 
-        mCurrentService = gatt.getService(mCurrentRead.second);
-        if (mCurrentService == null) {
-            Log.e(
-                    TAG,
-                    "service not found: " + mCurrentRead.first + ", uuid: " + mCurrentRead.second);
-            cancelAndMaybeReadNextService();
+        mCurrentServiceIterator = gatt.getServices().iterator();
+        maybeReadNextService();
+    }
+
+    private void maybeReadNextService() {
+        while (mCurrentServiceIterator.hasNext()) {
+            mCurrentService = mCurrentServiceIterator.next();
+            if (mScanUuids.isEmpty() || mScanUuids.contains(mCurrentService.getUuid())) {
+                // Reset the timer.
+                if (!mCurrentGattTimeout.cancel(false)) {
+                    // Already cancelled.
+                    return;
+                }
+                mCurrentGattTimeout =
+                        mExecutor.schedule(mCancelTask, GATT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+                mCurrentCharacteristicIterator = mCurrentService.getCharacteristics().iterator();
+                maybeReadNextCharacteristic();
+                return;
+            }
+        }
+
+        // All services have been read. Finish the current device read.
+        finishAndMaybeReadNextDevice();
+    }
+
+    @Override
+    public synchronized void onCharacteristicRead(
+            BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicRead(gatt, characteristic, status);
+
+        if (status != BluetoothGatt.GATT_SUCCESS) {
+            Log.e(TAG, "readCharacteristic failed: " + mCurrentDevice + ", status: " + status);
+            cancelAndMaybeReadNextDevice();
             return;
         }
 
-        mCurrentCharacteristicIterator = mCurrentService.getCharacteristics().iterator();
         maybeReadNextCharacteristic();
     }
 
     private void maybeReadNextCharacteristic() {
         if (!mCurrentCharacteristicIterator.hasNext()) {
-            // All characteristics have been read. Finish the current read.
-            finishAndMaybeReadNextService();
+            // All characteristics have been read. Finish the current service read.
+            final BluetoothDevice device = mCurrentDevice;
+            final BluetoothGattService service = mCurrentService;
+            mExecutor.submit(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            mHandler.onGattRead(device, service);
+                        }
+                    });
+            maybeReadNextService();
             return;
         }
 
         BluetoothGattCharacteristic characteristic = mCurrentCharacteristicIterator.next();
         if (!mCurrentGatt.readCharacteristic(characteristic)) {
-            Log.e(TAG, "readCharacteristic failed: " + mCurrentRead.first);
-            cancelAndMaybeReadNextService();
+            Log.e(TAG, "readCharacteristic failed: " + mCurrentDevice);
+            cancelAndMaybeReadNextDevice();
         }
-    }
-
-    @Override
-    public void onCharacteristicRead(
-            BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-        super.onCharacteristicRead(gatt, characteristic, status);
-
-        if (status != BluetoothGatt.GATT_SUCCESS) {
-            Log.e(TAG, "readCharacteristic failed: " + mCurrentRead.first + ", status: " + status);
-            cancelAndMaybeReadNextService();
-            return;
-        }
-
-        maybeReadNextCharacteristic();
     }
 }
