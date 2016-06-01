@@ -4,15 +4,15 @@
 
 package io.v.syncbase;
 
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import io.v.android.VAndroidContext;
 import io.v.android.v23.V;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.context.VContext;
@@ -49,7 +49,7 @@ public class Syncbase {
         // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
         public boolean disableUserdataSyncgroup;
         // TODO(sadovsky): Drop this once we switch from io.v.v23.syncbase to io.v.syncbase.core.
-        public VAndroidContext vAndroidContext;
+        public VContext vContext;
     }
 
     private static DatabaseOptions sOpts;
@@ -65,7 +65,15 @@ public class Syncbase {
             USERDATA_SYNCGROUP_NAME = "userdata";
 
     protected static void enqueue(final Runnable r) {
-        new Handler().post(r);
+        // Note, we use Timer rather than Handler because the latter must be mocked out for tests,
+        // which is rather annoying.
+        //new Handler().post(r);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                r.run();
+            }
+        }, 0);
     }
 
     public static abstract class DatabaseCallback {
@@ -95,6 +103,7 @@ public class Syncbase {
                     cb.onSuccess(sDatabase);
                 }
             });
+            return;
         }
         sOpts = opts;
         // TODO(sadovsky): Call ctx.cancel in sDatabase destructor?
@@ -109,6 +118,7 @@ public class Syncbase {
                     cb.onError(e);
                 }
             });
+            return;
         }
         if (sOpts.disableUserdataSyncgroup) {
             Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
@@ -132,7 +142,7 @@ public class Syncbase {
     // io.v.syncbase.core. Note, much of this code was copied from the Todos app.
 
     protected static VContext getVContext() {
-        return sOpts.vAndroidContext.getVContext();
+        return sOpts.vContext;
     }
 
     // TODO(sadovsky): Some of these constants should become fields in DatabaseOptions.

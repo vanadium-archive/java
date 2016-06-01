@@ -18,6 +18,7 @@ public class Id {
 
     // TODO(sadovsky): Replace encode and decode method implementations with calls to Cgo.
     private static final String SEPARATOR = ",";
+
     public static Id decode(String encodedId) {
         String[] parts = encodedId.split(SEPARATOR);
         if (parts.length != 2) {
@@ -41,7 +42,7 @@ public class Id {
     @Override
     public boolean equals(Object other) {
         if (other instanceof Id && other != null) {
-            Id otherId = (Id)other;
+            Id otherId = (Id) other;
             return mBlessing.equals(otherId.getBlessing()) && mName.equals(otherId.getName());
         }
         return false;
