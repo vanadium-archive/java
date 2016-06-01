@@ -14,7 +14,7 @@ public class Database {
     public static native void Destroy(String name) throws VError;
     public static native boolean Exists(String name) throws VError;
 
-    public class BatchOptions {
+    public static class BatchOptions {
         String hint;
         boolean readOnly;
     }
@@ -25,20 +25,21 @@ public class Database {
     public static native void Abort(String name, String batchHandle) throws VError;
     public static native byte[] GetResumeMarker(String name, String batchHandle) throws VError;
 
-    public class SyncgroupSpec {
+    public static class SyncgroupSpec {
         String description;
+        String publishSyncbaseName;
         Permissions permissions;
         List<Id> collections;
         List<String> mountTables;
         boolean isPrivate;
     }
 
-    public class VersionedSyncgroupSpec {
+    public static class VersionedSyncgroupSpec {
         String version;
         SyncgroupSpec syncgroupSpec;
     }
 
-    public class SyncgroupMemberInfo {
+    public static class SyncgroupMemberInfo {
         int syncPriority;
         int blobDevType;
     }

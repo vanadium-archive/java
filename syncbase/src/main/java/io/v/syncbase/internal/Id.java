@@ -18,9 +18,10 @@ public class Id {
         this.name = name;
     }
 
-    // TODO(razvanm): Switch to v23_syncbase_EncodeId.
-    // Reference: https://github.com/vanadium/go.v23/blob/master/syncbase/util/util.go
-    public String toString() {
-        return blessing + "," + name;
+    // TODO(razvanm): Add a constructor that takes an encoded ID. This requires first extending the
+    // C API from services/syncbase/bridge/cgo/impl.go.
+
+    public String encode() {
+        return Util.EncodeId(this);
     }
 }
