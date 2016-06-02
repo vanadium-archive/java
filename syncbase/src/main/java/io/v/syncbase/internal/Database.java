@@ -77,5 +77,5 @@ public class Database {
         void onError(VError vError);
     }
 
-    public static native void WatchPatterns(String name, String resumeMarker, List<CollectionRowPattern> patterns, WatchPatternsCallbacks callbacks) throws VError;
+    public static native void WatchPatterns(String name, byte[] resumeMarker, List<CollectionRowPattern> patterns, WatchPatternsCallbacks callbacks) throws VError;
 }
