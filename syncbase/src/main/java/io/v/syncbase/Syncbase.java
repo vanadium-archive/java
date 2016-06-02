@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,25 +45,44 @@ public class Syncbase {
      * Options for opening a database.
      */
     public static class DatabaseOptions {
-        // TODO(sadovsky): Fill this in further.
+        // Where data should be persisted.
         public String rootDir;
+        // TODO(sadovsky): Figure out what this should default to.
+        public List<String> mountPoints = ImmutableList.of("/ns.dev.v.io:8101/tmp/todos/users/");
+        // TODO(sadovsky): Figure out how developers should specify this.
+        public String adminUserId = "alexfandrianto@google.com";
+        // TODO(sadovsky): Figure out how developers should specify this.
+        public String defaultBlessingStringPrefix = "dev.v.io:o:608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com:";
+        // FOR ADVANCED USERS. If true, syncgroups will not be published to the cloud peer.
+        public boolean disableSyncgroupPublishing;
         // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
         public boolean disableUserdataSyncgroup;
         // TODO(sadovsky): Drop this once we switch from io.v.v23.syncbase to io.v.syncbase.core.
         public VContext vContext;
+
+        protected String getPublishSyncbaseName() {
+            if (disableSyncgroupPublishing) {
+                return null;
+            }
+            return mountPoints.get(0) + "cloud";
+        }
+
+        protected String getCloudBlessingString() {
+            return "dev.v.io:u:" + adminUserId;
+        }
     }
 
-    private static DatabaseOptions sOpts;
+    protected static DatabaseOptions sOpts;
     private static Database sDatabase;
 
-    // TODO(sadovsky): Maybe select values for DB_NAME and USERDATA_SYNCGROUP_NAME that are less
-    // likely to collide with developer-specified names.
+    // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
+    // developer-specified names.
 
     protected static final String
             TAG = "syncbase",
             DIR_NAME = "syncbase",
             DB_NAME = "db",
-            USERDATA_SYNCGROUP_NAME = "userdata";
+            USERDATA_SYNCGROUP_NAME = "userdata__";
 
     protected static void enqueue(final Runnable r) {
         // Note, we use Timer rather than Handler because the latter must be mocked out for tests,
@@ -145,14 +165,6 @@ public class Syncbase {
         return sOpts.vContext;
     }
 
-    // TODO(sadovsky): Some of these constants should become fields in DatabaseOptions.
-    protected static final String
-            PROXY = "proxy",
-            DEFAULT_BLESSING_STRING_PREFIX = "dev.v.io:o:608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com:",
-            MOUNT_POINT = "/ns.dev.v.io:8101/tmp/todos/users/",
-            CLOUD_BLESSING_STRING = "dev.v.io:u:alexfandrianto@google.com",
-            CLOUD_NAME = MOUNT_POINT + "cloud";
-
     private static Database startSyncbaseAndInitDatabase(VContext ctx) {
         SyncbaseService s;
         try {
@@ -169,7 +181,8 @@ public class Syncbase {
     private static String startSyncbase(VContext vContext, String rootDir)
             throws SyncbaseServer.StartException {
         try {
-            vContext = V.withListenSpec(vContext, V.getListenSpec(vContext).withProxy(PROXY));
+            // TODO(sadovsky): Make proxy configurable?
+            vContext = V.withListenSpec(vContext, V.getListenSpec(vContext).withProxy("proxy"));
         } catch (VException e) {
             Log.w(TAG, "Failed to set up Vanadium proxy", e);
         }
@@ -206,7 +219,7 @@ public class Syncbase {
     }
 
     private static String getBlessingStringFromEmail(String email) {
-        return DEFAULT_BLESSING_STRING_PREFIX + email;
+        return sOpts.defaultBlessingStringPrefix + email;
     }
 
     protected static BlessingPattern getBlessingPatternFromEmail(String email) {
@@ -238,7 +251,7 @@ public class Syncbase {
                 new io.v.v23.security.access.AccessList(
                         ImmutableList.of(
                                 new BlessingPattern(getPersonalBlessingString()),
-                                new BlessingPattern(CLOUD_BLESSING_STRING)),
+                                new BlessingPattern(sOpts.getCloudBlessingString())),
                         ImmutableList.<String>of());
         return new Permissions(ImmutableMap.of(
                 Constants.RESOLVE.getValue(), anyone,

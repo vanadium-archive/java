@@ -7,6 +7,7 @@ package io.v.syncbase;
 import io.v.v23.VFutures;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.verror.ExistException;
+import io.v.v23.verror.NoExistException;
 import io.v.v23.verror.VException;
 
 /**
@@ -50,11 +51,13 @@ public class Collection {
         return ((Database) mDatabaseHandle).getSyncgroup(getId());
     }
 
+    // TODO(sadovsky): Add deleteRange API.
     // TODO(sadovsky): Maybe add scan API, if developers aren't satisfied with watch.
 
     // TODO(sadovsky): Revisit the get API:
     // - Is the Class<T> argument necessary?
-    // - What does it do if there is no value for the given key?
+    // - Should we take the target Object as an argument, to avoid allocations?
+    // - What should it do if there is no value for the given key? (Currently, it returns null.)
 
     /**
      * Returns the value associated with {@code key}.
@@ -62,6 +65,8 @@ public class Collection {
     public <T> T get(String key, Class<T> cls) {
         try {
             return VFutures.sync(mVCollection.getRow(key).get(Syncbase.getVContext(), cls));
+        } catch (NoExistException e) {
+            return null;
         } catch (VException e) {
             throw new RuntimeException("get failed: " + key, e);
         }

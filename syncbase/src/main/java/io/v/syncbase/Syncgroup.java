@@ -4,8 +4,6 @@
 
 package io.v.syncbase;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +37,8 @@ public class Syncgroup {
             cxVIds.add(cx.getId().toVId());
         }
         SyncgroupSpec spec = new SyncgroupSpec(
-                "", Syncbase.CLOUD_NAME, Syncbase.defaultPerms(), cxVIds,
-                ImmutableList.of(Syncbase.MOUNT_POINT), false);
+                "", Syncbase.sOpts.getPublishSyncbaseName(), Syncbase.defaultPerms(), cxVIds,
+                Syncbase.sOpts.mountPoints, false);
         try {
             VFutures.sync(mVSyncgroup.create(Syncbase.getVContext(), spec, newSyncgroupMemberInfo()));
         } catch (ExistException e) {
@@ -162,6 +160,8 @@ public class Syncgroup {
         } catch (VException e) {
             throw new RuntimeException("setSpec failed", e);
         }
+        // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
+        // after spec.getCollections() but before db.getCollection().
         final List<io.v.v23.services.syncbase.Id> cxVIds = spec.getCollections();
         mDatabase.runInBatch(new Database.BatchOperation() {
             @Override

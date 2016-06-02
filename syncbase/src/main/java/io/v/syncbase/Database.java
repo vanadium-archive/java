@@ -111,7 +111,8 @@ public class Database extends DatabaseHandle {
      */
     public Syncgroup getSyncgroup(Id id) {
         // TODO(sadovsky): Consider throwing an exception or returning null if the syncgroup does
-        // not exist.
+        // not exist. But note, a syncgroup can get destroyed via sync after a client obtains a
+        // handle for it, so perhaps we should instead add an 'exists' method.
         return new Syncgroup(mVDatabase.getSyncgroup(id.toVId()), this, id);
     }
 

@@ -61,7 +61,8 @@ public abstract class DatabaseHandle {
      */
     public Collection getCollection(Id id) {
         // TODO(sadovsky): Consider throwing an exception or returning null if the collection does
-        // not exist.
+        // not exist. But note, a collection can get destroyed via sync after a client obtains a
+        // handle for it, so perhaps we should instead add an 'exists' method.
         return new Collection(mVDatabaseCore.getCollection(id.toVId()), this);
     }
 

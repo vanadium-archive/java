@@ -41,7 +41,7 @@ public class Id {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Id && other != null) {
+        if (other instanceof Id) {
             Id otherId = (Id) other;
             return mBlessing.equals(otherId.getBlessing()) && mName.equals(otherId.getName());
         }
@@ -59,6 +59,11 @@ public class Id {
         result = prime * result + (mName == null ? 0 : mName.hashCode());
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Id(" + encode() + ")";
     }
 
     // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
