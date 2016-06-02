@@ -16,12 +16,16 @@ import io.v.v23.V;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
 import io.v.v23.naming.GlobReply;
+import io.v.v23.security.access.AccessList;
+import io.v.v23.security.access.Permissions;
+import io.v.v23.security.access.Tag;
 import io.v.v23.services.syncbase.CollectionRowPattern;
 import io.v.v23.services.syncbase.Id;
 import io.v.v23.verror.VException;
 
 import java.io.UnsupportedEncodingException;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -244,6 +248,23 @@ public class Util {
         // NOTE(sadovsky): For now, we use a blessing string that will be easy to
         // find-replace when we actually implement this method.
         return "v.io:u:sam";
+    }
+
+    /**
+     * Returns a filtered copy of the given permissions, only including the tags specified.
+     */
+    public static Permissions filterPermissionsByTags(Permissions perms, Iterable<Tag> tags) {
+        Permissions filtered = new Permissions();
+        for (Tag tag: tags) {
+            String tagStr = tag.getValue();
+            AccessList acl = perms.get(tagStr);
+            if (acl != null) {
+                AccessList aclCopy = new AccessList(new ArrayList<>(acl.getIn()),
+                        new ArrayList<>(acl.getNotIn()));
+                filtered.put(tagStr, aclCopy);
+            }
+        }
+        return filtered;
     }
 
     /**
