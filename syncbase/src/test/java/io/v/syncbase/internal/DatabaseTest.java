@@ -174,4 +174,21 @@ public class DatabaseTest {
             fail(vError.toString());
         }
     }
+
+    @Test
+    public void destroySyncgroup() {
+        Id dbId = new Id("idp:a:angrybirds", "destroy_syncgroup");
+        String dbName = dbId.encode();
+        Id sgId = new Id("idp:u:alice", "syncgroup");
+        // TODO(razvanm): We'll have to update this after the destroy lands.
+        boolean exceptionThrown = false;
+        try {
+            Database.Create(dbName, null);
+            Database.DestroySyncgroup(dbName, sgId);
+        } catch (VError vError) {
+            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
 }
