@@ -323,7 +323,13 @@ public class Driver implements BluetoothScanner.Handler, GattReader.Handler {
 
     private synchronized void startScanning() {
         mScanSeens = new HashMap<>();
-        mGattReader = new GattReader(mContext, mScanUuids, this);
+        mGattReader =
+                new GattReader(
+                        mContext,
+                        mScanUuids,
+                        mScanBaseUuid.getUuid(),
+                        mScanMaskUuid.getUuid(),
+                        this);
         synchronized (Driver.class) {
             if (sClassicScanEnabled) {
                 // Note that BluetoothLeScan will be started when BluetoothScan finishes.
