@@ -5,6 +5,7 @@
 package io.v.syncbase.internal;
 
 import java.util.List;
+import java.util.Map;
 
 public class Database {
     public static native VersionedPermissions GetPermissions(String name) throws VError;
@@ -46,13 +47,13 @@ public class Database {
 
     public static native List<Id> ListSyncgroups(String name) throws VError;
     public static native void CreateSyncgroup(String name, Id syncgroupId, SyncgroupSpec spec, SyncgroupMemberInfo info) throws VError;
-    public static native SyncgroupSpec JoinSyncgroup(String name, Id syncgroupId, SyncgroupMemberInfo info) throws VError;
+    public static native SyncgroupSpec JoinSyncgroup(String name, String remoteSyncbaseName, List<String> expectedSyncbaseBlessings, Id syncgroupId, SyncgroupMemberInfo info) throws VError;
     public static native void LeaveSyncgroup(String name, Id syncgroupId) throws VError;
     public static native void DestroySyncgroup(String name, Id syncgroupId) throws VError;
     public static native void EjectFromSyncgroup(String name, Id syncgroupId, String member) throws VError;
     public static native VersionedSyncgroupSpec GetSyncgroupSpec(String name, Id syncgroupId) throws VError;
     public static native void SetSyncgroupSpec(String name, Id syncgroupId, VersionedSyncgroupSpec spec) throws VError;
-    public static native List<SyncgroupMemberInfo> GetSyncgroupMembers(String name, Id syncgroupId) throws VError;
+    public static native Map<String, SyncgroupMemberInfo> GetSyncgroupMembers(String name, Id syncgroupId) throws VError;
 
     public static class CollectionRowPattern {
         String collectionBlessing;

@@ -7,8 +7,10 @@ package io.v.syncbase.internal;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -148,12 +150,36 @@ public class DatabaseTest {
             Database.Commit(dbName, batchHandle);
             Database.SyncgroupSpec spec = new Database.SyncgroupSpec();
             spec.collections = Arrays.asList(collectionId);
-            Database.CreateSyncgroup(dbName, sgId, spec, new Database.SyncgroupMemberInfo());
+            Database.SyncgroupMemberInfo info = new Database.SyncgroupMemberInfo();
+            // TODO(razvanm): Pick some meaningful values.
+            info.syncPriority = 1;
+            info.blobDevType = 2;
+            Database.CreateSyncgroup(dbName, sgId, spec, info);
             List<Id> syncgroups = Database.ListSyncgroups(dbName);
             assertEquals(1, syncgroups.size());
             Id actual = syncgroups.get(0);
             assertEquals(sgId.blessing, actual.blessing);
             assertEquals(sgId.name, actual.name);
+
+            Database.VersionedSyncgroupSpec verSpec = Database.GetSyncgroupSpec(dbName, sgId);
+            assertNotNull(verSpec.version);
+            assertTrue(verSpec.version.length() > 0);
+            assertNotNull(verSpec.syncgroupSpec);
+            assertEquals(1, verSpec.syncgroupSpec.collections.size());
+            actual = syncgroups.get(0);
+            assertEquals(sgId.blessing, actual.blessing);
+            assertEquals(sgId.name, actual.name);
+
+            verSpec.syncgroupSpec.description = "Dummy description";
+            Database.SetSyncgroupSpec(dbName, sgId, verSpec);
+            assertEquals(verSpec.syncgroupSpec.description, Database.GetSyncgroupSpec(dbName, sgId).syncgroupSpec.description);
+
+            Map<String, Database.SyncgroupMemberInfo> members = Database.GetSyncgroupMembers(dbName, sgId);
+            assertNotNull(members);
+            assertEquals(1, members.size());
+            assertTrue(members.keySet().iterator().next().length() > 0);
+            assertEquals(info.syncPriority, members.values().iterator().next().syncPriority);
+            assertEquals(info.blobDevType, members.values().iterator().next().blobDevType);
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());
@@ -186,6 +212,57 @@ public class DatabaseTest {
             Database.Create(dbName, null);
             Database.DestroySyncgroup(dbName, sgId);
         } catch (VError vError) {
+            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void joinSyncgroup() {
+        Id dbId = new Id("idp:a:angrybirds", "join_syncgroup");
+        String dbName = dbId.encode();
+        Id sgId = new Id("idp:u:alice", "syncgroup");
+        boolean exceptionThrown = false;
+        try {
+            Database.SyncgroupSpec spec = Database.JoinSyncgroup(
+                    dbName, "", new ArrayList<String>(), sgId, new Database.SyncgroupMemberInfo());
+        } catch (VError vError) {
+            assertEquals("v.io/v23/verror.NoExist", vError.id);
+            assertNotNull(vError.message);
+            assertNotNull(vError.stack);
+            assertEquals(0, vError.actionCode);
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void leaveSyncgroup() {
+        Id dbId = new Id("idp:a:angrybirds", "leave_syncgroups");
+        String dbName = dbId.encode();
+        Id sgId = new Id("idp:u:alice", "syncgroup");
+        boolean exceptionThrown = false;
+        try {
+            Database.Create(dbName, null);
+            Database.LeaveSyncgroup(dbName, sgId);
+        }  catch (VError vError) {
+            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void ejectFromSyncgroup() {
+        Id dbId = new Id("idp:a:angrybirds", "eject_from_syncgroup");
+        String dbName = dbId.encode();
+        Id sgId = new Id("idp:u:alice", "syncgroup");
+        boolean exceptionThrown = false;
+        try {
+            Database.Create(dbName, null);
+            Database.EjectFromSyncgroup(dbName, sgId, "");
+        }  catch (VError vError) {
             assertEquals("v.io/v23/verror.NotImplemented", vError.id);
             exceptionThrown = true;
         }
