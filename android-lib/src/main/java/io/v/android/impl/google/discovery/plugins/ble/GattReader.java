@@ -116,7 +116,15 @@ class GattReader extends BluetoothGattCallback {
             return;
         }
 
-        mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
+        if ((mCurrentDevice.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC
+                        || mCurrentDevice.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mCurrentGatt =
+                    mCurrentDevice.connectGatt(
+                            mContext, false, this, BluetoothDevice.TRANSPORT_BREDR);
+        } else {
+            mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
+        }
         mCurrentGattConnectionTimeout =
                 mExecutor.schedule(
                         new Runnable() {
