@@ -4,10 +4,15 @@
 
 package io.v.v23.syncbase;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.InputChannel;
 import io.v.v23.context.VContext;
+import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.access.AccessList;
+import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.syncbase.BatchHandle;
 import io.v.v23.services.syncbase.CollectionClient;
@@ -43,6 +48,16 @@ class CollectionImpl implements Collection {
 
     @Override
     public ListenableFuture<Void> create(VContext ctx, Permissions perms) {
+        if (perms == null) {
+            // Default to giving full permissions to the creator.
+            String blessing = Util.UserBlessingFromContext(ctx);
+            AccessList acl = new AccessList(
+                ImmutableList.of(new BlessingPattern(blessing)), ImmutableList.<String>of());
+            perms = new Permissions(ImmutableMap.of(
+                Constants.READ.getValue(), acl,
+                Constants.WRITE.getValue(), acl,
+                Constants.ADMIN.getValue(), acl));
+        }
         return client.create(ctx, this.batchHandle, perms);
     }
 

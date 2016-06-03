@@ -21,7 +21,10 @@ import io.v.v23.naming.Endpoint;
 import io.v.v23.rpc.ListenSpec;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.Blessings;
 import io.v.v23.security.Caveat;
+import io.v.v23.security.VPrincipal;
+import io.v.v23.security.VSecurity;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
@@ -59,42 +62,67 @@ import static io.v.v23.VFutures.sync;
  * Client-server syncbase tests.
  */
 public class SyncbaseTest extends TestCase {
-    private static final Id DB_ID = new Id("v.io:a:xyz", "db");
+    private static final Id DB_ID = new Id("jroot:o:coffee", "db");
     private static final String COLLECTION_NAME = "collection";
-    private static final Id COLLECTION_ID = new Id("v.io:u:sam", COLLECTION_NAME);
+    private static final Id COLLECTION_ID = new Id("jroot:o:coffee:bean", COLLECTION_NAME);
     private static final String ROW_NAME = "row/a#%b";  // symbols are okay
     private static final String ROW_NAME2 = "row/a#%c";  // symbols are okay
     private static final String ROW_NAME3 = "row/a#%d";  // symbols are okay
 
+    private VContext rootCtx;
     private VContext ctx;
-    private Permissions allowAll;
+    private Permissions allowAllDb;
+    private Permissions allowAllCx;
+    private Permissions allowAllSg;
     private Endpoint serverEndpoint;
 
     @Override
     protected void setUp() throws Exception {
-        ctx = V.init();
-        ctx = V.withListenSpec(ctx, V.getListenSpec(ctx).withAddress(
+        rootCtx = V.init();
+        VPrincipal rootPrincipal = VSecurity.newPrincipal();
+        Blessings blessings = rootPrincipal.blessSelf("jroot");
+        rootPrincipal.blessingStore().setDefaultBlessings(blessings);
+        rootPrincipal.blessingStore().set(blessings, new BlessingPattern("..."));
+        rootPrincipal.roots().add(rootPrincipal.publicKey(), new BlessingPattern("jroot"));
+        rootCtx = V.withPrincipal(rootCtx, rootPrincipal);
+        // Note, the client should bless the server. This doesn't currently happen, but it doesn't
+        // affect any of the Java tests. A workaround used in Go tests is manually blessing the
+        // server with the same extension as the client, or adding the server blessing to all ACLs.
+        VContext serverCtx = forkContext(rootCtx, "r:server");
+        serverCtx = V.withListenSpec(serverCtx, V.getListenSpec(serverCtx).withAddress(
                 new ListenSpec.Address("tcp", "localhost:0")));
         AccessList acl = new AccessList(
-                ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
-        allowAll = new Permissions(ImmutableMap.of(
+                ImmutableList.of(
+                    new BlessingPattern("jroot:o:coffee:bean"),
+                    new BlessingPattern("jroot:u")),
+                ImmutableList.<String>of());
+        allowAllDb = new Permissions(ImmutableMap.of(
+                Constants.RESOLVE.getValue(), acl,
                 Constants.READ.getValue(), acl,
                 Constants.WRITE.getValue(), acl,
                 Constants.ADMIN.getValue(), acl));
+        allowAllCx = new Permissions(ImmutableMap.of(
+                Constants.READ.getValue(), acl,
+                Constants.WRITE.getValue(), acl,
+                Constants.ADMIN.getValue(), acl));
+        allowAllSg = new Permissions(ImmutableMap.of(
+                Constants.READ.getValue(), acl,
+                Constants.ADMIN.getValue(), acl));
         String tmpDir = Files.createTempDir().getAbsolutePath();
-        ctx = SyncbaseServer.withNewServer(ctx, new SyncbaseServer.Params()
-                .withPermissions(allowAll)
+        serverCtx = SyncbaseServer.withNewServer(serverCtx, new SyncbaseServer.Params()
+                .withPermissions(allowAllDb)
                 .withStorageRootDir(tmpDir));
-        Server server = V.getServer(ctx);
+        Server server = V.getServer(serverCtx);
         assertThat(server).isNotNull();
         Endpoint[] endpoints = server.getStatus().getEndpoints();
         assertThat(endpoints).isNotEmpty();
         serverEndpoint = endpoints[0];
+        ctx = forkContext(rootCtx, "o:coffee:bean:phone");
     }
 
     @Override
     protected void tearDown() throws Exception {
-        ctx.cancel();
+        rootCtx.cancel();
     }
 
     public void testService() throws Exception {
@@ -114,7 +142,7 @@ public class SyncbaseTest extends TestCase {
                 NamingUtil.join(serverEndpoint.name(), Util.encodeId(DB_ID)));
         assertThat(sync(db.exists(ctx))).isFalse();
         assertThat(sync(service.listDatabases(ctx))).isEmpty();
-        sync(db.create(ctx, allowAll));
+        sync(db.create(ctx, allowAllDb));
         assertThat(sync(db.exists(ctx))).isTrue();
         assertThat(sync(service.listDatabases(ctx))).containsExactly(db.id());
         assertThat(sync(db.listCollections(ctx))).isEmpty();
@@ -134,7 +162,7 @@ public class SyncbaseTest extends TestCase {
                         Util.encodeId(COLLECTION_ID)));
         assertThat(sync(collection.exists(ctx))).isFalse();
         assertThat(sync(db.listCollections(ctx))).isEmpty();
-        sync(collection.create(ctx, allowAll));
+        sync(collection.create(ctx, allowAllCx));
         assertThat(sync(collection.exists(ctx))).isTrue();
         assertThat(sync(db.listCollections(ctx))).containsExactly(COLLECTION_ID);
 
@@ -387,10 +415,10 @@ public class SyncbaseTest extends TestCase {
         Database db = createDatabase(createService());
 
         // Create and populate two collections.
-        Collection cxAFoo = db.getCollection(new Id("v.io:u:alice", "foo"));
-        sync(cxAFoo.create(ctx, allowAll));
-        Collection cxBFoo = db.getCollection(new Id("v.io:u:bob", "foobar"));
-        sync(cxBFoo.create(ctx, allowAll));
+        Collection cxAFoo = db.getCollection(new Id("jroot:u:alice", "foo"));
+        sync(cxAFoo.create(forkContext(rootCtx, "u:alice"), allowAllCx));
+        Collection cxBFoo = db.getCollection(new Id("jroot:u:bob", "foobar"));
+        sync(cxBFoo.create(forkContext(rootCtx, "u:bob"), allowAllCx));
         Collection collection = createCollection(db);
         Foo foo = new Foo(42, "LUE");
 
@@ -407,13 +435,13 @@ public class SyncbaseTest extends TestCase {
         final VContext ctxC = ctx.withCancel();
         Iterator<WatchChange> it1 = InputChannels.asIterable(
                 db.watch(ctxC, ImmutableList.of(
-                        new CollectionRowPattern("v.io:u:%", "foo", "abc%"),
-                        new CollectionRowPattern("v.io:u:%", "foo%",
+                        new CollectionRowPattern("jroot:u:%", "foo", "abc%"),
+                        new CollectionRowPattern("jroot:u:%", "foo%",
                                 "%" + Util.escapePattern("c_")))))
                 .iterator();
         Iterator<WatchChange> it2 = InputChannels.asIterable(
                 db.watch(ctxC, ImmutableList.of(
-                        Util.rowPrefixPattern(new Id("v.io:u:bob", "foobar"), "bc_"),
+                        Util.rowPrefixPattern(new Id("jroot:u:bob", "foobar"), "bc_"),
                         new CollectionRowPattern("%:alice", "%", "%bcd"))))
                 .iterator();
 
@@ -444,8 +472,8 @@ public class SyncbaseTest extends TestCase {
         sync(cxBFoo.getRow("bc_").delete(ctx));
 
         // Create and populate another collection.
-        Collection cxAFoobar = db.getCollection(new Id("v.io:u:alice", "foobar"));
-        sync(cxAFoobar.create(ctx, allowAll));
+        Collection cxAFoobar = db.getCollection(new Id("jroot:u:alice", "foobar"));
+        sync(cxAFoobar.create(forkContext(rootCtx, "u:alice"), allowAllCx));
         sync(cxAFoobar.put(ctx, "abcd", foo));
         sync(cxAFoobar.put(ctx, "abc_", foo));
 
@@ -585,10 +613,10 @@ public class SyncbaseTest extends TestCase {
     public void testSyncgroup() throws Exception {
         Database db = createDatabase(createService());
         Collection collection = createCollection(db);
-        Id syncgroupId = new Id("blessing", "test");
+        Id syncgroupId = new Id(COLLECTION_ID.getBlessing(), "test");
 
         // "A" creates the group.
-        SyncgroupSpec spec = new SyncgroupSpec("test", "", allowAll,
+        SyncgroupSpec spec = new SyncgroupSpec("test", "", allowAllSg,
                 ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
@@ -603,7 +631,7 @@ public class SyncbaseTest extends TestCase {
         }
         // TODO(spetrovic): test leave() and destroy().
 
-        SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", "", allowAll,
+        SyncgroupSpec specRMW = new SyncgroupSpec("testRMW", "", allowAllSg,
                 ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         assertThat(sync(group.getSpec(ctx)).keySet()).isNotEmpty();
@@ -611,7 +639,7 @@ public class SyncbaseTest extends TestCase {
         sync(group.setSpec(ctx, specRMW, version));
         assertThat(sync(group.getSpec(ctx)).values()).containsExactly(specRMW);
 
-        SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", "", allowAll,
+        SyncgroupSpec specOverwrite = new SyncgroupSpec("testOverwrite", "", allowAllSg,
                 ImmutableList.of(COLLECTION_ID),
                 ImmutableList.<String>of(), false);
         sync(group.setSpec(ctx, specOverwrite, ""));
@@ -811,6 +839,18 @@ public class SyncbaseTest extends TestCase {
     }
 
 
+    private VContext forkContext(VContext rootCtx, String extension) throws VException {
+        VPrincipal rootPrincipal = V.getPrincipal(rootCtx);
+        VPrincipal principal = VSecurity.newPrincipal();
+        Blessings blessings = rootPrincipal.bless(principal.publicKey(),
+                rootPrincipal.blessingStore().defaultBlessings(), extension,
+                VSecurity.newUnconstrainedUseCaveat());
+        principal.blessingStore().setDefaultBlessings(blessings);
+        principal.blessingStore().set(blessings, new BlessingPattern("..."));
+        principal.roots().add(rootPrincipal.publicKey(), new BlessingPattern("jroot"));
+        return V.withPrincipal(rootCtx, principal);
+    }
+
     private SyncbaseService createService() throws Exception {
         return Syncbase.newService(serverEndpoint.name());
     }
@@ -818,13 +858,13 @@ public class SyncbaseTest extends TestCase {
 
     private Database createDatabase(SyncbaseService service) throws Exception {
         Database db = service.getDatabase(DB_ID, null);
-        sync(db.create(ctx, allowAll));
+        sync(db.create(ctx, allowAllDb));
         return db;
     }
 
     private Collection createCollection(Database db) throws Exception {
         Collection collection = db.getCollection(COLLECTION_ID);
-        sync(collection.create(ctx, allowAll));
+        sync(collection.create(ctx, allowAllCx));
         return collection;
     }
 

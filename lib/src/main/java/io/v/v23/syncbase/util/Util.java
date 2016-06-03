@@ -236,8 +236,11 @@ public class Util {
      * Returns the app blessing obtained from the context.
      */
     public static String AppBlessingFromContext(VContext ctx) {
-        // NOTE(sadovsky): For now, we use a blessing string that will be easy to
-        // find-replace when we actually implement this method.
+        // TODO(ivanpi,sadovsky): Hook up the Go implementation through the new
+        // Cgo bridge. For now, Java clients must provide explicit id blessings
+        // and perms.
+        // TODO(ivanpi): Add id blessing and perms inference tests when this is
+        // fixed.
         return "v.io:a:xyz";
     }
 
@@ -245,8 +248,11 @@ public class Util {
      * Returns the user blessing obtained from the context.
      */
     public static String UserBlessingFromContext(VContext ctx) {
-        // NOTE(sadovsky): For now, we use a blessing string that will be easy to
-        // find-replace when we actually implement this method.
+        // TODO(ivanpi,sadovsky): Hook up the Go implementation through the new
+        // Cgo bridge. For now, Java clients must provide explicit id blessings
+        // and perms.
+        // TODO(ivanpi): Add id blessing and perms inference tests when this is
+        // fixed.
         return "v.io:u:sam";
     }
 

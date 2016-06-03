@@ -18,6 +18,9 @@ import io.v.v23.InputChannel;
 import io.v.v23.InputChannels;
 import io.v.v23.VFutures;
 import io.v.v23.context.VContext;
+import io.v.v23.security.BlessingPattern;
+import io.v.v23.security.access.AccessList;
+import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
 import io.v.v23.services.permissions.ObjectClient;
 import io.v.v23.services.syncbase.BatchOptions;
@@ -154,6 +157,17 @@ class DatabaseImpl implements Database, BatchDatabase {
         VdlOptional metadataOpt = schema != null
                 ? VdlOptional.of(schema.getMetadata())
                 : new VdlOptional<SchemaMetadata>(Types.optionalOf(SchemaMetadata.VDL_TYPE));
+        if (perms == null) {
+            // Default to giving full permissions to the creator.
+            String blessing = Util.UserBlessingFromContext(ctx);
+            AccessList acl = new AccessList(
+                ImmutableList.of(new BlessingPattern(blessing)), ImmutableList.<String>of());
+            perms = new Permissions(ImmutableMap.of(
+                Constants.RESOLVE.getValue(), acl,
+                Constants.READ.getValue(), acl,
+                Constants.WRITE.getValue(), acl,
+                Constants.ADMIN.getValue(), acl));
+        }
         return client.create(ctx, metadataOpt, perms);
     }
 
