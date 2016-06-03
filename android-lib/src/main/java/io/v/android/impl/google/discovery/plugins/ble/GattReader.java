@@ -169,15 +169,15 @@ class GattReader extends BluetoothGattCallback {
             return;
         }
 
-        // Reset the connection timer.
-        if (!mCurrentGattConnectionTimeout.cancel(false)) {
-            // Already cancelled.
-            return;
-        }
-
         if (status != BluetoothGatt.GATT_SUCCESS || newState != BluetoothGatt.STATE_CONNECTED) {
             Log.e(TAG, "connection failed: " + mCurrentDevice + " , status: " + status);
             cancelAndMaybeReadNextDevice();
+            return;
+        }
+
+        // Reset the connection timer.
+        if (!mCurrentGattConnectionTimeout.cancel(false)) {
+            // Already cancelled.
             return;
         }
 
