@@ -4,8 +4,10 @@
 
 package io.v.android.v23;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.common.base.Preconditions;
 
@@ -21,6 +23,7 @@ import io.v.v23.security.VSecurity;
 import io.v.v23.security.VSigner;
 import io.v.v23.verror.VException;
 
+import java.io.File;
 import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 
@@ -147,12 +150,30 @@ public class V extends io.v.v23.V {
             // Generate a new private key.
             keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
         }
-        VSigner signer =
-                VSecurity.newSigner(
+        VSigner signer;
+        VPrincipal principal;
+        try {
+            signer = VSecurity.newSigner(
                         keyEntry.getPrivateKey(),
                         (ECPublicKey) keyEntry.getCertificate().getPublicKey());
-        VPrincipal principal =
-                VSecurity.newPersistentPrincipal(signer, ctx.getFilesDir().getAbsolutePath());
+            principal = VSecurity.newPersistentPrincipal(signer, ctx.getFilesDir().getAbsolutePath());
+        } catch (VException e) {
+            // If the signature verification fails, it could be that we have old/corrupt
+            // information in the key store or data in internal storage is old. So, we
+            // delete the old private key associated with the unique package name, delete
+            // the internal storage data, and try again.
+            Log.w("V", "Retrying principal initialization due to: ", e);
+            KeyStoreUtil.deleteKeyStorePrivateKey(ctx.getPackageName());
+            keyEntry = KeyStoreUtil.genKeyStorePrivateKey(ctx, ctx.getPackageName());
+            // Delete all files in internal storage.
+            File dir = ctx.getFilesDir();
+            for (File file: dir.listFiles()) file.delete();
+            signer = VSecurity.newSigner(
+                        keyEntry.getPrivateKey(),
+                        (ECPublicKey) keyEntry.getCertificate().getPublicKey());
+            principal = VSecurity.newPersistentPrincipal(signer, ctx.getFilesDir().getAbsolutePath());
+        }
+
         // Make sure we have at least one (i.e., self-signed) blessing in the store.
         BlessingStore store = principal.blessingStore();
         if (store.peerBlessings().isEmpty()) {

@@ -110,5 +110,29 @@ public class KeyStoreUtil {
         }
     }
 
+    /**
+     * Deletes the private key from the Android KeyStore.
+     * Throws an exception on an error.
+     *
+     * @param  alias           alias of the key in the KeyStore.
+     * @throws VException      if the key could not be deleted.
+    */
+    public static void deleteKeyStorePrivateKey(String alias)
+            throws VException {
+        try {
+            final KeyStore keyStore = KeyStore.getInstance(KEYSTORE);
+            keyStore.load(null);
+            keyStore.deleteEntry(alias);
+        } catch (KeyStoreException e) {
+            throw new VException("KeyStore not initialized: " + e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            throw new VException("KeyStore doesn't support the algorithm: " + e.getMessage());
+        } catch (IOException e) {
+            throw new VException("Error loading keystore: " + e.getMessage());
+        } catch (CertificateException e) {
+            throw new VException("Error loading keystore certificates: " + e.getMessage());
+        }
+    }
+
     private KeyStoreUtil() {}
 }
