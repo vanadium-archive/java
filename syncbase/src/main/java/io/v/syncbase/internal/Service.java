@@ -11,4 +11,5 @@ public class Service {
     public static native void SetPermissions(VersionedPermissions permissions) throws VError;
 
     public static native List<Id> ListDatabases() throws Error;
+    public static native void Login(String oAuthProvider, String oAuthToken) throws VError;
 }

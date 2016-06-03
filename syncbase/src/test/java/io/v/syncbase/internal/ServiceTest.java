@@ -41,4 +41,20 @@ public class ServiceTest {
             fail(vError.toString());
         }
     }
+
+    @Test
+    public void login() {
+        boolean exceptionThrown = false;
+        try {
+            Service.Login("dummy-provider", "");
+        } catch (VError vError) {
+            assertEquals("v.io/v23/verror.Unknown", vError.id);
+            assertNotNull(vError.message);
+            assertTrue(vError.message.contains("dummy-provider"));
+            assertNotNull(vError.stack);
+            assertEquals(0, vError.actionCode);
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
 }
