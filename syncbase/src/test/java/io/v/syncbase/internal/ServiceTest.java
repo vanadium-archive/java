@@ -7,7 +7,10 @@ package io.v.syncbase.internal;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ServiceTest {
     @Before
@@ -18,5 +21,24 @@ public class ServiceTest {
     @Test
     public void listDatabases() {
         assertTrue(Service.ListDatabases().isEmpty());
+    }
+
+    @Test
+    public void getPermissions() {
+        VersionedPermissions versionedPermissions1 = Service.GetPermissions();
+        assertNotNull(versionedPermissions1);
+        assertTrue(versionedPermissions1.version.length() > 0);
+        String json = new String(versionedPermissions1.permissions.json);
+        assertTrue(json.contains("Admin"));
+
+        try {
+            Service.SetPermissions(versionedPermissions1);
+            VersionedPermissions versionedPermissions2 = Service.GetPermissions();
+            assertEquals("1", versionedPermissions2.version);
+            assertEquals(json, new String(versionedPermissions2.permissions.json));
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
     }
 }

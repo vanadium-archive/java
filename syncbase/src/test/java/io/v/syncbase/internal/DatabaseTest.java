@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -76,6 +77,28 @@ public class DatabaseTest {
             Database.Create(dbName, null);
             // Exists should succeed now.
             assertTrue(Database.Exists(dbName));
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
+    }
+
+    @Test
+    public void permissions() {
+        Id dbId = new Id("idp:a:angrybirds", "permissions_db");
+        String dbName = dbId.encode();
+        try {
+            Database.Create(dbName, null);
+            VersionedPermissions versionedPermissions1 = Database.GetPermissions(dbName);
+            assertNotNull(versionedPermissions1);
+            assertTrue(versionedPermissions1.version.length() > 0);
+            String json = new String(versionedPermissions1.permissions.json);
+            assertTrue(json.contains("Admin"));
+
+            Database.SetPermissions(dbName, versionedPermissions1);
+            VersionedPermissions versionedPermissions2 = Database.GetPermissions(dbName);
+            assertNotEquals(versionedPermissions1.version, versionedPermissions2.version);
+            assertEquals(json, new String(versionedPermissions2.permissions.json));
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());

@@ -92,6 +92,31 @@ public class CollectionTest {
     }
 
     @Test
+    public void permissions() {
+        Id dbId = new Id("idp:a:angrybirds", "permissions_collection");
+        String dbName = dbId.encode();
+        Id collectionId = new Id("idp:u:alice", "collection");
+        String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
+        try {
+            Database.Create(dbName, null);
+            String batchHandle = Database.BeginBatch(dbId.encode(), null);
+            Collection.Create(collectionName, batchHandle, null);
+            Permissions permissions = Collection.GetPermissions(collectionName, batchHandle);
+            assertNotNull(permissions);
+            String json = new String(permissions.json);
+            assertTrue(json.contains("Admin"));
+            Database.Commit(dbName, batchHandle);
+
+            batchHandle = Database.BeginBatch(dbId.encode(), null);
+            Collection.SetPermissions(collectionName, batchHandle, permissions);
+            Database.Commit(dbName, batchHandle);
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
+    }
+
+    @Test
     public void deleteRangeCollection() {
         Id dbId = new Id("idp:a:angrybirds", "delete_range_collection");
         String dbName = dbId.encode();
