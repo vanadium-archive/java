@@ -10,9 +10,11 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
+import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -25,17 +27,17 @@ public class CollectionTest {
     @Test
     public void createCollection() {
         Id dbId = new Id("idp:a:angrybirds", "create_collection");
-        Id collectionId1 = new Id("idp:u:alice", "collection1");
-        Id collectionId2 = new Id("idp:u:alice", "collection2");
+        Id collectionId1 = new Id("...", "collection1");
+        Id collectionId2 = new Id("...", "collection2");
         try {
-            Database.Create(dbId.encode(), null);
+            Database.Create(dbId.encode(), anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
 
             String name1 = Util.NamingJoin(Arrays.asList(dbId.encode(), collectionId1.encode()));
-            Collection.Create(name1, batchHandle, null);
+            Collection.Create(name1, batchHandle, anyCollectionPermissions());
 
             String name2 = Util.NamingJoin(Arrays.asList(dbId.encode(), collectionId2.encode()));
-            Collection.Create(name2, batchHandle, null);
+            Collection.Create(name2, batchHandle, anyCollectionPermissions());
 
             List<Id> collections = Database.ListCollections(dbId.encode(), batchHandle);
             assertNotNull(collections);
@@ -52,12 +54,12 @@ public class CollectionTest {
     public void destroyCollection() {
         Id dbId = new Id("idp:a:angrybirds", "destroy_collection");
         String dbName = dbId.encode();
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Commit(dbName, batchHandle);
             batchHandle = Database.BeginBatch(dbName, null);
             Collection.Destroy(collectionName, batchHandle);
@@ -71,14 +73,14 @@ public class CollectionTest {
     public void existsCollection() {
         Id dbId = new Id("idp:a:angrybirds", "exists_collection");
         String dbName = dbId.encode();
-        Id collectionId1 = new Id("idp:u:alice", "collection1");
+        Id collectionId1 = new Id("...", "collection1");
         String collectionName1 = Util.NamingJoin(Arrays.asList(dbName, collectionId1.encode()));
-        Id collectionId2 = new Id("idp:u:alice", "collection2");
+        Id collectionId2 = new Id("...", "collection2");
         String collectionName2 = Util.NamingJoin(Arrays.asList(dbName, collectionId2.encode()));
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName1, batchHandle, null);
+            Collection.Create(collectionName1, batchHandle, anyCollectionPermissions());
             // We have not committed the batch yet so Exists should fail.
             assertFalse(Collection.Exists(collectionName1, batchHandle));
             Database.Commit(dbName, batchHandle);
@@ -95,12 +97,12 @@ public class CollectionTest {
     public void permissions() {
         Id dbId = new Id("idp:a:angrybirds", "permissions_collection");
         String dbName = dbId.encode();
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Permissions permissions = Collection.GetPermissions(collectionName, batchHandle);
             assertNotNull(permissions);
             String json = new String(permissions.json);
@@ -120,15 +122,15 @@ public class CollectionTest {
     public void deleteRangeCollection() {
         Id dbId = new Id("idp:a:angrybirds", "delete_range_collection");
         String dbName = dbId.encode();
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         String keyName = Util.NamingJoin(Arrays.asList(collectionName, "key"));
         // Reference: release/go/src/v.io/v23/vom/testdata/data81/vomdata.vdl
         byte[] vomValue = {(byte)0x81, 0x06, 0x03, 'a', 'b', 'c'};
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Row.Put(keyName, batchHandle, vomValue);
             Database.Commit(dbName, batchHandle);
 

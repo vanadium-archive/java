@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
+import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,15 +26,15 @@ public class RowTest {
     public void allTest() {
         Id dbId = new Id("idp:a:angrybirds", "collection");
         String dbName = dbId.encode();
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         String keyName = Util.NamingJoin(Arrays.asList(collectionName, "key"));
         // Reference: release/go/src/v.io/v23/vom/testdata/data81/vomdata.vdl
         byte[] vomValue = {(byte)0x81, 0x06, 0x03, 'a', 'b', 'c'};
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Row.Put(keyName, batchHandle, vomValue);
             byte[] r = Row.Get(keyName, batchHandle);
             assertArrayEquals(vomValue, r);

@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
+import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
+import static io.v.syncbase.internal.TestConstants.anySyncgroupPermissions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -32,7 +35,7 @@ public class DatabaseTest {
 
         // The instance is empty so creating of a database should succeed.
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());
@@ -41,7 +44,7 @@ public class DatabaseTest {
         // Creating the same database should raise an exception.
         boolean exceptionThrown = false;
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
         } catch (VError vError) {
             assertEquals("v.io/v23/verror.Exist", vError.id);
             assertNotNull(vError.message);
@@ -58,7 +61,7 @@ public class DatabaseTest {
         String dbName = dbId.encode();
         try {
             // The instance is empty so creating of a database should succeed.
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             Database.Destroy(dbName);
         } catch (VError vError) {
             vError.printStackTrace();
@@ -74,7 +77,7 @@ public class DatabaseTest {
             // We have not created the database yet so Exists should fail.
             assertFalse(Database.Exists(dbName));
             // The instance is empty so creating of a database should succeed.
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             // Exists should succeed now.
             assertTrue(Database.Exists(dbName));
         } catch (VError vError) {
@@ -88,7 +91,7 @@ public class DatabaseTest {
         Id dbId = new Id("idp:a:angrybirds", "permissions_db");
         String dbName = dbId.encode();
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             VersionedPermissions versionedPermissions1 = Database.GetPermissions(dbName);
             assertNotNull(versionedPermissions1);
             assertTrue(versionedPermissions1.version.length() > 0);
@@ -109,16 +112,16 @@ public class DatabaseTest {
     public void abortDatabase() {
         Id dbId = new Id("idp:a:angrybirds", "abort_db");
         String dbName = dbId.encode();
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Abort(dbName, batchHandle);
             batchHandle = Database.BeginBatch(dbName, null);
             // This should work because we Abort the previous batch.
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Commit(dbName, batchHandle);
         } catch (VError vError) {
             vError.printStackTrace();
@@ -131,7 +134,7 @@ public class DatabaseTest {
         Id dbId = new Id("idp:a:angrybirds", "list_db");
         String dbName = dbId.encode();
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
             assertNotNull(batchHandle);
             List<Id> collections = Database.ListCollections(dbName, batchHandle);
@@ -148,7 +151,7 @@ public class DatabaseTest {
         Id dbId = new Id("idp:a:angrybirds", "get_resume_marker");
         String dbName = dbId.encode();
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
             byte[] marker = Database.GetResumeMarker(dbName, batchHandle);
             assertNotNull(marker);
@@ -163,16 +166,17 @@ public class DatabaseTest {
     public void createSyncgroup() {
         Id dbId = new Id("idp:a:angrybirds", "create_syncgroups");
         String dbName = dbId.encode();
-        Id sgId = new Id("idp:u:alice", "syncgroup");
-        Id collectionId = new Id("idp:u:alice", "collection");
+        Id sgId = new Id("...", "syncgroup");
+        Id collectionId = new Id("...", "collection");
         String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Commit(dbName, batchHandle);
             Database.SyncgroupSpec spec = new Database.SyncgroupSpec();
             spec.collections = Arrays.asList(collectionId);
+            spec.permissions = anySyncgroupPermissions();
             Database.SyncgroupMemberInfo info = new Database.SyncgroupMemberInfo();
             // TODO(razvanm): Pick some meaningful values.
             info.syncPriority = 1;
@@ -189,6 +193,10 @@ public class DatabaseTest {
             assertTrue(verSpec.version.length() > 0);
             assertNotNull(verSpec.syncgroupSpec);
             assertEquals(1, verSpec.syncgroupSpec.collections.size());
+            // The trim is used to remove a new line.
+            assertEquals(
+                    new String(spec.permissions.json),
+                    new String(verSpec.syncgroupSpec.permissions.json).trim());
             actual = syncgroups.get(0);
             assertEquals(sgId.blessing, actual.blessing);
             assertEquals(sgId.name, actual.name);
@@ -214,7 +222,7 @@ public class DatabaseTest {
         Id dbId = new Id("idp:a:angrybirds", "list_syncgroups");
         String dbName = dbId.encode();
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             List<Id> syncgroups = Database.ListSyncgroups(dbName);
             assertNotNull(syncgroups);
             assertEquals(0, syncgroups.size());
@@ -232,7 +240,7 @@ public class DatabaseTest {
         // TODO(razvanm): We'll have to update this after the destroy lands.
         boolean exceptionThrown = false;
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             Database.DestroySyncgroup(dbName, sgId);
         } catch (VError vError) {
             assertEquals("v.io/v23/verror.NotImplemented", vError.id);
@@ -267,7 +275,7 @@ public class DatabaseTest {
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             Database.LeaveSyncgroup(dbName, sgId);
         }  catch (VError vError) {
             assertEquals("v.io/v23/verror.NotImplemented", vError.id);
@@ -283,7 +291,7 @@ public class DatabaseTest {
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
-            Database.Create(dbName, null);
+            Database.Create(dbName, anyDbPermissions());
             Database.EjectFromSyncgroup(dbName, sgId, "");
         }  catch (VError vError) {
             assertEquals("v.io/v23/verror.NotImplemented", vError.id);
