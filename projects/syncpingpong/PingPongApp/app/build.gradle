@@ -3,9 +3,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // We are going to define a custom VDL service. The Vanadium
-        // Gradle plugin makes that easier, so let's use that.
-        classpath 'io.v:gradle-plugin:0.1'
         // Use the Android SDK manager, which will automatically download
         // the required Android SDK.
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
@@ -17,8 +14,6 @@ buildscript {
 apply plugin: 'android-sdk-manager'
 // It's an Android application.
 apply plugin: 'com.android.application'
-// It's going to use VDL.
-apply plugin: 'io.v.vdl'
 
 repositories {
     mavenCentral()
@@ -58,10 +53,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
-    compile 'io.v:vanadium-android:1.11+'
-}
-
-vdl {
-    // This is where the VDL tool will look for VDL definitions.
-    inputPaths += 'src/main/java'
+    compile 'io.v:vanadium-android:2.1.9'
 }

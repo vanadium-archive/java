@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.v.android.libs.security.BlessingsManager;
+import io.v.android.security.BlessingsManager;
 import io.v.android.v23.V;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.InputChannels;
@@ -37,31 +37,28 @@ import io.v.v23.security.Blessings;
 import io.v.v23.security.access.AccessList;
 import io.v.v23.security.access.Constants;
 import io.v.v23.security.access.Permissions;
-import io.v.v23.services.syncbase.nosql.SyncgroupMemberInfo;
-import io.v.v23.services.syncbase.nosql.SyncgroupSpec;
-import io.v.v23.services.syncbase.nosql.TableRow;
+import io.v.v23.services.syncbase.Id;
+import io.v.v23.services.syncbase.SyncgroupMemberInfo;
+import io.v.v23.services.syncbase.SyncgroupSpec;
 import io.v.v23.syncbase.Syncbase;
-import io.v.v23.syncbase.SyncbaseApp;
 import io.v.v23.syncbase.SyncbaseService;
-import io.v.v23.syncbase.nosql.Database;
-import io.v.v23.syncbase.nosql.Syncgroup;
-import io.v.v23.syncbase.nosql.Table;
-import io.v.v23.syncbase.nosql.WatchChange;
+import io.v.v23.syncbase.Database;
+import io.v.v23.syncbase.Syncgroup;
+import io.v.v23.syncbase.Collection;
+import io.v.v23.syncbase.WatchChange;
+import io.v.v23.syncbase.util.Util;
 import io.v.v23.verror.VException;
-import io.v.v23.vom.VomUtil;
 
 import static io.v.v23.VFutures.sync;
 
 public class MainActivity extends AppCompatActivity {
     // Syncgroup-related names for where the mounttable is and the syncgroup name's suffix.
     public static final String MT_PREFIX = "/ns.dev.v.io:8101/tmp/benchmark/pingpong/";
-    public static final String SG_SUFFIX = "/s0/%%sync/sg";
+    public static final String SG_SUFFIX = "_sg";
 
-    // Syncbase-related names for the app/db/tb hierarchy and where to write data.
-    public static final String APP_NAME = "app";
+    // Syncbase-related names for the db/cx hierarchy and where to write data.
     public static final String DB_NAME = "db";
-    public static final String TB_NAME = "table";
-    public static final String SYNC_PREFIX = "prefix";
+    public static final String CX_NAME = "cx";
 
     // Allow each asynchronous operation to take at most this amount of time.
     private static final long TEST_TIMEOUT = 5;
@@ -107,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getSyncgroupName(String testID) {
-        return MT_PREFIX + testID + SG_SUFFIX;
+        return testID + SG_SUFFIX;
     }
 
     // Helper to show default text before the test starts.
@@ -147,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 ((Button) findViewById(R.id.useproxybutton)).setText(R.string.using_proxy);
 
             } catch (final VException e) {
-                Log.d(TAG, e.toString());
+                Log.e(TAG, "Use proxy failed", e);
             }
         }
     }
@@ -198,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                         testPingPong();
                     } catch (ExecutionException | InterruptedException | TimeoutException |
                             VException e) {
-                        Log.d(TAG, e.toString());
+                        Log.e(TAG, "Ping pong test failed", e);
                         mBaseContext.cancel();
                     }
                 }
@@ -232,23 +229,25 @@ public class MainActivity extends AppCompatActivity {
                     SyncbaseService service = Syncbase.newService(
                             "/" + syncbaseServer.getStatus().getEndpoints()[0]);
 
-                    SyncbaseApp app = service.getApp(APP_NAME);
-                    final Database db = app.getNoSqlDatabase(DB_NAME, null);
-                    final Table tb = db.getTable(TB_NAME);
-                    Log.d(TAG, "app exists?");
-                    if (!syncWithTimeout(app.exists(mBaseContext))) {
-                        Log.d(TAG, "app create");
-                        syncWithTimeout(app.create(mBaseContext, openPermissions()));
-                    }
+                    // Note: In order for the two apps to find each other, the collection and
+                    // syncgroup both use "..." as the blessing portion of the id. This must match
+                    // or else watch and syncgroup join will not work, and "..." is the simplest
+                    // string they can have in common.
+                    final Database db = service.getDatabase(mBaseContext, DB_NAME, null);
+                    final Collection cx = db.getCollection(new Id("...", CX_NAME));
                     Log.d(TAG, "db exists?");
                     if (!syncWithTimeout(db.exists(mBaseContext))) {
                         Log.d(TAG, "db create");
-                        syncWithTimeout(db.create(mBaseContext, openPermissions()));
+                        syncWithTimeout(db.create(mBaseContext,
+                                Util.filterPermissionsByTags(openPermissions(),
+                                        io.v.v23.services.syncbase.Constants.ALL_DATABASE_TAGS)));
                     }
-                    Log.d(TAG, "tb exists?");
-                    if (!syncWithTimeout(tb.exists(mBaseContext))) {
-                        Log.d(TAG, "tb create");
-                        syncWithTimeout(tb.create(mBaseContext, openPermissions()));
+                    Log.d(TAG, "cx exists?");
+                    if (!syncWithTimeout(cx.exists(mBaseContext))) {
+                        Log.d(TAG, "cx create");
+                        syncWithTimeout(cx.create(mBaseContext,
+                                Util.filterPermissionsByTags(openPermissions(),
+                                        io.v.v23.services.syncbase.Constants.ALL_COLLECTION_TAGS)));
                     }
 
                     Log.d(TAG, "I am peer " + mPeerID);
@@ -257,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
                     // If you're peer 0, you should create the syncgroup. Otherwise, join it.
                     String sgName = getSyncgroupName(TEST_ID);
                     String mtPointName = MT_PREFIX + "/" + TEST_ID;
-                    Syncgroup group = db.getSyncgroup(sgName);
+                    Syncgroup group = db.getSyncgroup(new Id("...", sgName));
 
                     SyncgroupMemberInfo memberInfo = new SyncgroupMemberInfo();
                     memberInfo.setSyncPriority((byte) 3);
@@ -265,15 +264,20 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "Creating Syncgroup" + sgName);
                         helpUpdateText("Creating Syncgroup");
 
+                        Permissions sgPerms = Util.filterPermissionsByTags(openPermissions(),
+                                io.v.v23.services.syncbase.Constants.ALL_SYNCGROUP_TAGS);
+
                         SyncgroupSpec spec = new SyncgroupSpec(
-                                TEST_ID, openPermissions(),
-                                ImmutableList.of(new TableRow(TB_NAME, SYNC_PREFIX)),
+                                TEST_ID, null, sgPerms,
+                                ImmutableList.of(cx.id()),
                                 ImmutableList.of(mtPointName), false);
                         syncWithTimeout(group.create(mBaseContext, spec, memberInfo));
                     } else {
                         Log.d(TAG, "Joining Syncgroup" + sgName);
                         helpUpdateText("Joining Syncgroup");
-                        syncWithTimeout(group.join(mBaseContext, memberInfo));
+                        // Join at s0 or via the neighborhood.
+                        syncWithTimeout(group.join(mBaseContext, getMountPoint(TEST_ID, 0),
+                                null, memberInfo));
                     }
 
                     // Now that we've all joined the syncgroup...
@@ -283,13 +287,12 @@ public class MainActivity extends AppCompatActivity {
 
                     // 0 will send to 1, and 1 responds via watch.
                     if (mPeerID == 0) {
-                        writeData(tb);
+                        writeData(cx);
                     }
 
-                    watchForChanges(db, tb);
+                    watchForChanges(db, cx);
 
                     Log.d(TAG, "We finished!");
-                    helpUpdateText("We finished!");
                     double delta = (endTime - startTime) / (NUM_TIMES * 1000000.);
                     Log.d(TAG, "Average Time: " + delta + " ms per ping pong iteration\n");
                     helpUpdateText("Average Time: " + delta + "ms per ping pong iteration!");
@@ -306,17 +309,18 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
 
-                private void watchForChanges(Database db, Table tb) {
+                private void watchForChanges(Database db, Collection cx) {
                     try {
                         VIterable<WatchChange> watchStream = InputChannels.asIterable(
-                                db.watch(mBaseContext, TB_NAME, SYNC_PREFIX)
+                                db.watch(mBaseContext, ImmutableList.of(
+                                        Util.rowPrefixPattern(cx.id(), "")))
                         );
 
                         Log.d(TAG, "Starting watch");
                         // 0 will send to 1, and vice versa.
                         for (final WatchChange wc : watchStream) {
                             String key = wc.getRowName();
-                            String value = VomUtil.bytesToHexString(wc.getVomValue());
+                            Integer value = (Integer)wc.getValue();
                             Log.d(TAG, "Watch: " + key + " " + value);
                             helpUpdateText("Watch: " + key + " " + value);
                             count++;
@@ -329,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                             if ((count + 2) % 2 == mPeerID) {
-                                writeData(tb);
+                                writeData(cx);
                             }
                         }
                         Log.d(TAG, "Exiting watch");
@@ -338,10 +342,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                private void writeData(Table tb) throws VException, TimeoutException {
-                    String actualKey = SYNC_PREFIX + "/" + count;
+                private void writeData(Collection cx) throws VException, TimeoutException {
+                    String actualKey = "" + count;
                     Log.d(TAG, "I write " + count);
-                    syncWithTimeout(tb.put(mBaseContext, actualKey, count, Integer.class));
+                    syncWithTimeout(cx.put(mBaseContext, actualKey, count));
                 }
             };
             mTestThread.start();
