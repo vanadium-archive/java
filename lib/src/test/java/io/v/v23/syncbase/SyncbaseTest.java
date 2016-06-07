@@ -11,6 +11,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
 import io.v.v23.InputChannel;
@@ -54,6 +55,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.v.v23.VFutures.sync;
@@ -398,12 +400,15 @@ public class SyncbaseTest extends TestCase {
         InputChannel<WatchChange> channel = db.watch(
                 ctxC, sync(db.getResumeMarker(ctx)),
                 ImmutableList.of(Util.rowPrefixPattern(COLLECTION_ID, "b")));
+        final SettableFuture<Void> wait = SettableFuture.create();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 ctxC.cancel();
+                wait.set(null);
             }
         }).start();
+        wait.get(1, TimeUnit.SECONDS);
         try {
             sync(InputChannels.asList(channel));
         } catch (CanceledException e) {
