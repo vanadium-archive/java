@@ -63,6 +63,7 @@ public class PermissionsAuthorizerTest {
             AccessList acl = new AccessList(
                     ImmutableList.of(new BlessingPattern("...")), ImmutableList.<String>of());
             Permissions allowAll = new Permissions(ImmutableMap.of(
+                    io.v.v23.security.access.Constants.RESOLVE.getValue(), acl,
                     io.v.v23.security.access.Constants.READ.getValue(), acl,
                     io.v.v23.security.access.Constants.WRITE.getValue(), acl,
                     io.v.v23.security.access.Constants.ADMIN.getValue(), acl));
@@ -94,10 +95,10 @@ public class PermissionsAuthorizerTest {
             }
 
             AUTHORIZER = PermissionsAuthorizer.create(new Permissions(ImmutableMap.of(
-                    "Read", new AccessList(
+                    io.v.v23.security.access.Constants.READ.getValue(), new AccessList(
                             ImmutableList.of(new BlessingPattern("<grp:" + groupNameReaders + ">")),
                             null),
-                    "Write", new AccessList(
+                    io.v.v23.security.access.Constants.WRITE.getValue(), new AccessList(
                             ImmutableList.of(new BlessingPattern("<grp:" + groupNameWriters + ">")),
                             null))), Access.typicalTagType());
         } catch (VException e) {
@@ -122,7 +123,7 @@ public class PermissionsAuthorizerTest {
         return Arrays.asList(new Object[][]{
                 {"get", io.v.v23.security.access.Constants.READ,
                         ImmutableList.of("root:alice"), true},
-                {"get", io.v.v23.security.access.Constants.WRITE,
+                {"put", io.v.v23.security.access.Constants.WRITE,
                         ImmutableList.of("root:alice"), true},
                 {"get", io.v.v23.security.access.Constants.READ,
                         ImmutableList.of("root:bob"), true},
