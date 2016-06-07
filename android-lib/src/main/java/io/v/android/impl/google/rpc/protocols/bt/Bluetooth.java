@@ -105,6 +105,7 @@ class Bluetooth {
                             try {
                                 socket.connect();
                             } catch (IOException e) {
+                                socket.close();
                                 callback.onFailure(
                                         new VException("Couldn't connect: " + e.getMessage()));
                             } finally {
@@ -247,6 +248,10 @@ class Bluetooth {
                                 callback.onSuccess(
                                         new Stream(executor, socket, localAddress, remoteAddress));
                             } catch (IOException e) {
+                                try {
+                                    serverSocket.close();
+                                } catch (IOException ioe) {
+                                }
                                 callback.onFailure(new VException(e.getMessage()));
                             }
                         }
@@ -290,6 +295,10 @@ class Bluetooth {
                                 callback.onSuccess(
                                         num == buf.length ? buf : Arrays.copyOf(buf, num));
                             } catch (IOException e) {
+                                try {
+                                    socket.close();
+                                } catch (IOException ioe) {
+                                }
                                 callback.onFailure(new VException(e.getMessage()));
                             }
                         }
@@ -305,6 +314,10 @@ class Bluetooth {
                                 socket.getOutputStream().write(data);
                                 callback.onSuccess(null);
                             } catch (IOException e) {
+                                try {
+                                    socket.close();
+                                } catch (IOException ioe) {
+                                }
                                 callback.onFailure(new VException(e.getMessage()));
                             }
                         }
