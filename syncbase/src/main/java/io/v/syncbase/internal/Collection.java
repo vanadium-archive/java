@@ -19,8 +19,8 @@ public class Collection {
     }
 
     public interface ScanCallbacks {
-        void onValue(KeyValue keyValue);
-        void onDone();
+        void onKeyValue(KeyValue keyValue);
+        void onDone(VError vError);
     }
 
     public static native void Scan(String name, String batchHandle, byte[] start, byte[] limit, ScanCallbacks callbacks) throws VError;

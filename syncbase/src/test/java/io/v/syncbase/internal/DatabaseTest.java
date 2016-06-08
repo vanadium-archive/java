@@ -4,6 +4,8 @@
 
 package io.v.syncbase.internal;
 
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
@@ -298,5 +303,89 @@ public class DatabaseTest {
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void watchPattersEmptyPattern() {
+        Id dbId = new Id("idp:a:angrybirds", "watch_patterns_empty");
+        String dbName = dbId.encode();
+        final SettableFuture<Void> done = SettableFuture.create();
+        try {
+            Database.Create(dbName, anyDbPermissions());
+            String batchHandle = Database.BeginBatch(dbName, null);
+            byte[] marker = Database.GetResumeMarker(dbName, batchHandle);
+            List<Database.CollectionRowPattern> patterns =
+                    Arrays.asList(new Database.CollectionRowPattern());
+            Database.WatchPatterns(dbName, marker, patterns, new Database.WatchPatternsCallbacks() {
+                @Override
+                public void onChange(Database.WatchChange watchChange) {
+                    fail("Unexpected onChange: " + watchChange);
+                }
+
+                @Override
+                public void onError(VError vError) {
+                    assertEquals("v.io/v23/verror.BadArg", vError.id);
+                    done.set(null);
+                }
+            });
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
+        try {
+            done.get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException | TimeoutException | ExecutionException e) {
+            fail("Timeout waiting for onError");
+        }
+    }
+
+    @Test
+    public void watchPatterns() {
+        Id dbId = new Id("idp:a:angrybirds", "watch_patterns");
+        String dbName = dbId.encode();
+        Id collectionId = new Id("...", "collection");
+        String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
+        String keyName = Util.NamingJoin(Arrays.asList(collectionName, "key"));
+        // Reference: release/go/src/v.io/v23/vom/testdata/data81/vomdata.vdl
+        byte[] vomValue = {(byte)0x81, 0x06, 0x03, 'a', 'b', 'c'};
+        final SettableFuture<Void> done = SettableFuture.create();
+        try {
+            Database.Create(dbName, anyDbPermissions());
+            String batchHandle = Database.BeginBatch(dbName, null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
+            Database.CollectionRowPattern pattern = new Database.CollectionRowPattern();
+            pattern.collectionBlessing = collectionId.blessing;
+            pattern.collectionName = collectionId.name;
+            List<Database.CollectionRowPattern> patterns = Arrays.asList(pattern);
+            Database.WatchPatterns(dbName, new byte[]{}, patterns,
+                    new Database.WatchPatternsCallbacks() {
+                @Override
+                public void onChange(Database.WatchChange watchChange) {
+                    // TODO(razvanm): Really check the answer once the onChange starts working.
+                    fail("Unexpected onChange: " + watchChange);
+                }
+
+                @Override
+                public void onError(VError vError) {
+                    System.err.print(vError);
+                    done.set(null);
+                }
+            });
+            Database.Commit(dbName, batchHandle);
+
+            batchHandle = Database.BeginBatch(dbName, null);
+            Row.Put(keyName, batchHandle, vomValue);
+            Database.Commit(dbName, batchHandle);
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
+        try {
+            done.get(10, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException|ExecutionException e) {
+            fail("Timeout waiting for onError");
+        } catch (TimeoutException e) {
+            // TODO(razvanm): Remove this after the onChange starts working.
+        }
     }
 }

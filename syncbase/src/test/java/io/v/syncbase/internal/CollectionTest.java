@@ -4,14 +4,18 @@
 
 package io.v.syncbase.internal;
 
+import com.google.common.util.concurrent.SettableFuture;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -141,6 +145,46 @@ public class CollectionTest {
 
             batchHandle = Database.BeginBatch(dbName, null);
             assertFalse(Row.Exists(keyName, batchHandle));
+        } catch (VError vError) {
+            vError.printStackTrace();
+            fail(vError.toString());
+        }
+    }
+
+    @Test
+    public void scan() throws Exception {
+        Id dbId = new Id("idp:a:angrybirds", "scan_collection");
+        String dbName = dbId.encode();
+        Id collectionId = new Id("...", "collection");
+        String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
+        final String keyName = Util.NamingJoin(Arrays.asList(collectionName, "key"));
+        // Reference: release/go/src/v.io/v23/vom/testdata/data81/vomdata.vdl
+        final byte[] vomValue = {(byte)0x81, 0x06, 0x03, 'a', 'b', 'c'};
+        try {
+            Database.Create(dbName, anyDbPermissions());
+            String batchHandle = Database.BeginBatch(dbId.encode(), null);
+            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
+            Row.Put(keyName, batchHandle, vomValue);
+            Database.Commit(dbName, batchHandle);
+
+            batchHandle = Database.BeginBatch(dbName, null);
+            assertTrue(Row.Exists(keyName, batchHandle));
+            final SettableFuture<Void> done = SettableFuture.create();
+            Collection.Scan(collectionName, batchHandle, new byte[]{}, new byte[]{},
+                    new Collection.ScanCallbacks() {
+                @Override
+                public void onKeyValue(Collection.KeyValue keyValue) {
+                    assertEquals("key", keyValue.key);
+                    assertArrayEquals(vomValue, keyValue.value);
+                }
+
+                @Override
+                public void onDone(VError vError) {
+                    assertEquals(null, vError);
+                    done.set(null);
+                }
+            });
+            done.get(1, TimeUnit.SECONDS);
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());
