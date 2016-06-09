@@ -7,6 +7,7 @@ package io.v.v23;
 import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -54,6 +55,7 @@ public class VFuturesTest {
      * When the context times out while a Vanadium server is handling the request, we expect a
      * {@link TimeoutException}.
      */
+    @Ignore
     @Test(expected = TimeoutException.class)
     public void testTimeout() throws Exception {
         // Make the server hang forever; never count down
