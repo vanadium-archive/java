@@ -147,6 +147,18 @@ public interface Database extends DatabaseCore, AccessController {
     InputChannel<WatchChange> watch(VContext context, List<CollectionRowPattern> patterns);
 
     /**
+    * Allows a client to listen for invitations to new syncgroups.
+    *
+    * @param context Vanadium context
+    * @param handler The invitation handler called when an invitation is received.
+    */
+    void listenForInvites(VContext context, Database.InviteHandler handler) throws VException;
+
+    public interface InviteHandler {
+        void handleInvite(Invite invite);
+    }
+
+    /**
      * Returns a handle to a database {@link Syncgroup} with the given Id.
      *
      * @param sgId Id of the synchronization group

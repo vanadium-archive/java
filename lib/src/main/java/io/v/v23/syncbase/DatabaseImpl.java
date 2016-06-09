@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 
 class DatabaseImpl implements Database, BatchDatabase {
+    private native void nativeListenForInvites(VContext ctx, Database.InviteHandler handler)
+        throws VException;
 
     private final String parentFullName;
     private final String fullName;
@@ -213,6 +215,11 @@ class DatabaseImpl implements Database, BatchDatabase {
     }
 
     @Override
+    public void listenForInvites(VContext context, Database.InviteHandler handler) throws VException {
+        nativeListenForInvites(context, handler);
+    }
+
+    @Override
     public Syncgroup getSyncgroup(Id sgId) {
         return new SyncgroupImpl(fullName, sgId);
     }
@@ -336,4 +343,5 @@ class DatabaseImpl implements Database, BatchDatabase {
             return columnNames;
         }
     }
+
 }
