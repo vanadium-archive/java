@@ -79,4 +79,9 @@ public interface Update {
      * The returned advertisement may not include all attachments.
      */
     Advertisement getAdvertisement();
+
+    /**
+     * Timestamp returns the time when advertising began for the corresponding Advertisement.
+     */
+    long getTimestampNs();
 }

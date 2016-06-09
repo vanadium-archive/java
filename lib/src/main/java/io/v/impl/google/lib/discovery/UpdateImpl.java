@@ -31,6 +31,7 @@ class UpdateImpl implements Update {
 
     private boolean lost;
     private Advertisement ad;
+    private long timestampNs;
 
     private native void nativeAttachment(
             long nativeRef, VContext ctx, String name, ListenableFutureCallback<byte[]> callback)
@@ -38,10 +39,11 @@ class UpdateImpl implements Update {
 
     private native void nativeFinalize(long nativeRef);
 
-    private UpdateImpl(long nativeRef, boolean lost, Advertisement ad) {
+    private UpdateImpl(long nativeRef, boolean lost, Advertisement ad, long timestampNs) {
         this.nativeRef = nativeRef;
         this.lost = lost;
         this.ad = ad;
+        this.timestampNs = timestampNs;
     }
 
     @Override
@@ -124,6 +126,11 @@ class UpdateImpl implements Update {
                                         return Arrays.copyOf(data, data.length);
                                     }
                                 })));
+    }
+
+    @Override
+    public long getTimestampNs() {
+        return timestampNs;
     }
 
     @Override
