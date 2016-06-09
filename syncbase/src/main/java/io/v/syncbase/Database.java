@@ -172,6 +172,14 @@ public class Database extends DatabaseHandle {
     }
 
     /**
+     * Calls {@code addSyncgroupInviteHandler(h, opts)} with default
+     * {@code AddSyncgroupInviteHandlerOptions}.
+     */
+    public void addSyncgroupInviteHandler(SyncgroupInviteHandler h) {
+        addSyncgroupInviteHandler(h, new AddSyncgroupInviteHandlerOptions());
+    }
+
+    /**
      * Makes it so {@code h} stops receiving notifications.
      */
     public void removeSyncgroupInviteHandler(SyncgroupInviteHandler h) {
@@ -294,7 +302,7 @@ public class Database extends DatabaseHandle {
      * Creates a new batch. Instead of calling this function directly, clients are encouraged to use
      * the {@code runInBatch} helper function, which detects "concurrent batch" errors and handles
      * retries internally.
-     * <p/>
+     * <p>
      * Default concurrency semantics:
      * <ul>
      * <li>Reads (e.g. gets, scans) inside a batch operate over a consistent snapshot taken during
@@ -305,10 +313,10 @@ public class Database extends DatabaseHandle {
      * <li>Other methods will never fail with error {@code ConcurrentBatchException}, even if it is
      * known that {@code commit} will fail with this error.</li>
      * </ul>
-     * <p/>
+     * <p>
      * Once a batch has been committed or aborted, subsequent method calls will fail with no
      * effect.
-     * <p/>
+     * <p>
      * Concurrency semantics can be configured using BatchOptions.
      *
      * @param opts options for this batch
@@ -420,6 +428,14 @@ public class Database extends DatabaseHandle {
                 }
             });
         }
+    }
+
+    /**
+     * Calls {@code addWatchChangeHandler(h, opts)} with default
+     * {@code AddWatchChangeHandlerOptions}.
+     */
+    public void addWatchChangeHandler(WatchChangeHandler h) {
+        addWatchChangeHandler(h, new AddWatchChangeHandlerOptions());
     }
 
     /**
