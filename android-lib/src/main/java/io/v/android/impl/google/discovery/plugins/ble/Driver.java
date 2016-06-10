@@ -397,7 +397,7 @@ public class Driver implements BluetoothScanner.Handler, GattReader.Handler {
             mLeScanner.stopScan(mLeScanCallback);
             mLeScanCallback = null;
         }
-        mGattReader.close();
+        mGattReader.close(true);
         mGattReader = null;
         mScanSeens = null;
     }
@@ -414,11 +414,10 @@ public class Driver implements BluetoothScanner.Handler, GattReader.Handler {
         mClassicScanner.close();
         mClassicScanner = null;
         if (mScanHandler != null) {
-            mGattReader.close();
-            mGattReader = null;
-
             // mLeScanner is invalidated when BluetoothAdapter is turned off.
-            // We don't need to stop any active scan.
+            // We don't need to stop any active scan or Gatt read.
+            mGattReader.close(false);
+            mGattReader = null;
             mLeScanner = null;
             mLeScanCallback = null;
             mScanSeens = null;

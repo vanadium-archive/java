@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.google.common.collect.Queues;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Set;
@@ -73,6 +74,7 @@ class GattReader extends BluetoothGattCallback {
     GattReader(Context context, Set<UUID> uuids, UUID baseUuid, UUID maskUuid, Handler handler) {
         mContext = context;
         mExecutor = new ScheduledThreadPoolExecutor(1);
+        mExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         mScanUuids = uuids;
         mScanBaseUuid = baseUuid;
         mScanMaskUuid = maskUuid;
@@ -96,12 +98,22 @@ class GattReader extends BluetoothGattCallback {
     /**
      * Closes the Gatt reader cancelling the current read and deleting all pending requests.
      */
-    synchronized void close() {
+    synchronized void close(boolean graceful) {
+        mPendingReads.clear();
+        if (graceful) {
+            // Wait until the current read finishes to avoid messing up the Bluetooth stack.
+            while (mCurrentDevice != null) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+        mExecutor.shutdown();
         if (mCurrentGatt != null) {
             mCurrentGatt.close();
         }
-        mExecutor.shutdown();
-        mPendingReads.clear();
     }
 
     private synchronized void maybeReadNextDevice() {
@@ -113,18 +125,11 @@ class GattReader extends BluetoothGattCallback {
 
         mCurrentDevice = mPendingReads.poll();
         if (mCurrentDevice == null) {
+            notifyAll();
             return;
         }
 
-        if ((mCurrentDevice.getType() == BluetoothDevice.DEVICE_TYPE_CLASSIC
-                        || mCurrentDevice.getType() == BluetoothDevice.DEVICE_TYPE_DUAL)
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mCurrentGatt =
-                    mCurrentDevice.connectGatt(
-                            mContext, false, this, BluetoothDevice.TRANSPORT_BREDR);
-        } else {
-            mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
-        }
+        mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
         mCurrentGattConnectionTimeout =
                 mExecutor.schedule(
                         new Runnable() {
@@ -147,6 +152,15 @@ class GattReader extends BluetoothGattCallback {
 
     private synchronized void cancelAndMaybeReadNextDevice() {
         mCurrentGattConnectionTimeout.cancel(false);
+        // Try to refresh the failed Gatt.
+        try {
+            Method method = mCurrentGatt.getClass().getMethod("refresh", new Class[0]);
+            if (method != null) {
+                method.invoke(mCurrentGatt, new Object[0]);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "An exception occured while refreshing device");
+        }
         mCurrentGatt.close();
 
         final BluetoothDevice device = mCurrentDevice;
@@ -179,6 +193,11 @@ class GattReader extends BluetoothGattCallback {
         if (!mCurrentGattConnectionTimeout.cancel(false)) {
             // Already cancelled.
             return;
+        }
+
+        // TODO(jhahn): Do we really need this?
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
         }
 
         // MTU exchange is not allowed on a BR/EDR physical link.
