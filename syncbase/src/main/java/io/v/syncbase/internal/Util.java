@@ -6,6 +6,8 @@ package io.v.syncbase.internal;
 
 import java.util.List;
 
+import io.v.syncbase.core.Id;
+
 public class Util {
     public static native String Encode(String s);
     public static native String EncodeId(Id id);

@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import io.v.syncbase.core.Id;
+
 import static org.junit.Assert.assertEquals;
 
 public class UtilTest {

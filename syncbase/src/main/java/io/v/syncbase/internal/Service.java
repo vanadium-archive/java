@@ -6,6 +6,10 @@ package io.v.syncbase.internal;
 
 import java.util.List;
 
+import io.v.syncbase.core.Id;
+import io.v.syncbase.core.VError;
+import io.v.syncbase.core.VersionedPermissions;
+
 public class Service {
     public static native VersionedPermissions GetPermissions();
     public static native void SetPermissions(VersionedPermissions permissions) throws VError;

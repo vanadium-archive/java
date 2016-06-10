@@ -4,6 +4,8 @@
 
 package io.v.syncbase.internal;
 
+import io.v.syncbase.core.VError;
+
 public class Blessings {
     public static native String DebugString();
     public static native String AppBlessingFromContext() throws VError;

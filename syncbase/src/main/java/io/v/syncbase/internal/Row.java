@@ -4,6 +4,8 @@
 
 package io.v.syncbase.internal;
 
+import io.v.syncbase.core.VError;
+
 public class Row {
     public static native boolean Exists(String name, String batchHandle) throws VError;
     public static native byte[] Get(String name, String batchHandle) throws VError;

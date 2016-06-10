@@ -17,9 +17,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
-import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
-import static io.v.syncbase.internal.TestConstants.anySyncgroupPermissions;
+import io.v.syncbase.core.CollectionRowPattern;
+import io.v.syncbase.core.Id;
+import io.v.syncbase.core.SyncgroupMemberInfo;
+import io.v.syncbase.core.SyncgroupSpec;
+import io.v.syncbase.core.VError;
+import io.v.syncbase.core.VersionedPermissions;
+import io.v.syncbase.core.VersionedSyncgroupSpec;
+import io.v.syncbase.core.WatchChange;
+
+import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
+import static io.v.syncbase.core.TestConstants.anyDbPermissions;
+import static io.v.syncbase.core.TestConstants.anySyncgroupPermissions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -179,10 +188,10 @@ public class DatabaseTest {
             String batchHandle = Database.BeginBatch(dbId.encode(), null);
             Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Commit(dbName, batchHandle);
-            Database.SyncgroupSpec spec = new Database.SyncgroupSpec();
+            SyncgroupSpec spec = new SyncgroupSpec();
             spec.collections = Arrays.asList(collectionId);
             spec.permissions = anySyncgroupPermissions();
-            Database.SyncgroupMemberInfo info = new Database.SyncgroupMemberInfo();
+            SyncgroupMemberInfo info = new SyncgroupMemberInfo();
             // TODO(razvanm): Pick some meaningful values.
             info.syncPriority = 1;
             info.blobDevType = 2;
@@ -193,7 +202,7 @@ public class DatabaseTest {
             assertEquals(sgId.blessing, actual.blessing);
             assertEquals(sgId.name, actual.name);
 
-            Database.VersionedSyncgroupSpec verSpec = Database.GetSyncgroupSpec(dbName, sgId);
+            VersionedSyncgroupSpec verSpec = Database.GetSyncgroupSpec(dbName, sgId);
             assertNotNull(verSpec.version);
             assertTrue(verSpec.version.length() > 0);
             assertNotNull(verSpec.syncgroupSpec);
@@ -210,7 +219,7 @@ public class DatabaseTest {
             Database.SetSyncgroupSpec(dbName, sgId, verSpec);
             assertEquals(verSpec.syncgroupSpec.description, Database.GetSyncgroupSpec(dbName, sgId).syncgroupSpec.description);
 
-            Map<String, Database.SyncgroupMemberInfo> members = Database.GetSyncgroupMembers(dbName, sgId);
+            Map<String, SyncgroupMemberInfo> members = Database.GetSyncgroupMembers(dbName, sgId);
             assertNotNull(members);
             assertEquals(1, members.size());
             assertTrue(members.keySet().iterator().next().length() > 0);
@@ -261,8 +270,8 @@ public class DatabaseTest {
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
-            Database.SyncgroupSpec spec = Database.JoinSyncgroup(
-                    dbName, "", new ArrayList<String>(), sgId, new Database.SyncgroupMemberInfo());
+            SyncgroupSpec spec = Database.JoinSyncgroup(
+                    dbName, "", new ArrayList<String>(), sgId, new SyncgroupMemberInfo());
         } catch (VError vError) {
             assertEquals("v.io/v23/verror.NoExist", vError.id);
             assertNotNull(vError.message);
@@ -314,11 +323,10 @@ public class DatabaseTest {
             Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
             byte[] marker = Database.GetResumeMarker(dbName, batchHandle);
-            List<Database.CollectionRowPattern> patterns =
-                    Arrays.asList(new Database.CollectionRowPattern());
+            List<CollectionRowPattern> patterns = Arrays.asList(new CollectionRowPattern());
             Database.WatchPatterns(dbName, marker, patterns, new Database.WatchPatternsCallbacks() {
                 @Override
-                public void onChange(Database.WatchChange watchChange) {
+                public void onChange(WatchChange watchChange) {
                     fail("Unexpected onChange: " + watchChange);
                 }
 
@@ -353,14 +361,14 @@ public class DatabaseTest {
             Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
             Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
-            Database.CollectionRowPattern pattern = new Database.CollectionRowPattern();
+            CollectionRowPattern pattern = new CollectionRowPattern();
             pattern.collectionBlessing = collectionId.blessing;
             pattern.collectionName = collectionId.name;
-            List<Database.CollectionRowPattern> patterns = Arrays.asList(pattern);
+            List<CollectionRowPattern> patterns = Arrays.asList(pattern);
             Database.WatchPatterns(dbName, new byte[]{}, patterns,
                     new Database.WatchPatternsCallbacks() {
                 @Override
-                public void onChange(Database.WatchChange watchChange) {
+                public void onChange(WatchChange watchChange) {
                     // TODO(razvanm): Really check the answer once the onChange starts working.
                     fail("Unexpected onChange: " + watchChange);
                 }

@@ -13,8 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static io.v.syncbase.internal.TestConstants.anyCollectionPermissions;
-import static io.v.syncbase.internal.TestConstants.anyDbPermissions;
+import io.v.syncbase.core.Id;
+import io.v.syncbase.core.KeyValue;
+import io.v.syncbase.core.Permissions;
+import io.v.syncbase.core.VError;
+
+import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
+import static io.v.syncbase.core.TestConstants.anyDbPermissions;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -173,7 +178,7 @@ public class CollectionTest {
             Collection.Scan(collectionName, batchHandle, new byte[]{}, new byte[]{},
                     new Collection.ScanCallbacks() {
                 @Override
-                public void onKeyValue(Collection.KeyValue keyValue) {
+                public void onKeyValue(KeyValue keyValue) {
                     assertEquals("key", keyValue.key);
                     assertArrayEquals(vomValue, keyValue.value);
                 }

@@ -2,11 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.syncbase.internal;
+package io.v.syncbase.core;
+
+import io.v.syncbase.internal.Util;
 
 public class Id {
-    String blessing;
-    String name;
+    public String blessing;
+    public String name;
 
     public Id() {
         // This empty constructor makes the JNI code a little bit simpler by making this class

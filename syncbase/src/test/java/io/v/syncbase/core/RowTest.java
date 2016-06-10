@@ -2,15 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package io.v.syncbase.internal;
+package io.v.syncbase.core;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
-
-import io.v.syncbase.core.Id;
-import io.v.syncbase.core.VError;
 
 import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.core.TestConstants.anyDbPermissions;
@@ -26,24 +21,23 @@ public class RowTest {
     }
 
     @Test
-    public void allTest() {
-        Id dbId = new Id("idp:a:angrybirds", "collection");
-        String dbName = dbId.encode();
+    public void all() {
+        Id dbId = new Id("idp:a:angrybirds", "core_collection");
         Id collectionId = new Id("...", "collection");
-        String collectionName = Util.NamingJoin(Arrays.asList(dbName, collectionId.encode()));
-        String keyName = Util.NamingJoin(Arrays.asList(collectionName, "key"));
+        String key = "key";
         // Reference: release/go/src/v.io/v23/vom/testdata/data81/vomdata.vdl
         byte[] vomValue = {(byte)0x81, 0x06, 0x03, 'a', 'b', 'c'};
         try {
-            Database.Create(dbName, anyDbPermissions());
-            String batchHandle = Database.BeginBatch(dbId.encode(), null);
-            Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
-            Row.Put(keyName, batchHandle, vomValue);
-            byte[] r = Row.Get(keyName, batchHandle);
-            assertArrayEquals(vomValue, r);
-            assertTrue(Row.Exists(keyName, batchHandle));
-            Row.Delete(keyName, batchHandle);
-            assertFalse(Row.Exists(keyName, batchHandle));
+            Database db = Service.database(dbId);
+            db.create(anyDbPermissions());
+            Collection collection = db.collection(collectionId);
+            collection.create(anyCollectionPermissions());
+            Row row = collection.row(key);
+            row.put(vomValue);
+            assertArrayEquals(vomValue, row.get());
+            assertTrue(row.exists());
+            row.delete();
+            assertFalse(row.exists());
         } catch (VError vError) {
             vError.printStackTrace();
             fail(vError.toString());

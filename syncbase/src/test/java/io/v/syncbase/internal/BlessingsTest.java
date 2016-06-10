@@ -7,6 +7,8 @@ package io.v.syncbase.internal;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.v.syncbase.core.VError;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
