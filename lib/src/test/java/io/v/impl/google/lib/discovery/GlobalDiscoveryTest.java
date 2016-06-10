@@ -40,6 +40,7 @@ public class GlobalDiscoveryTest extends TestCase {
         Discovery d1 = GlobalDiscovery.newDiscovery(ctx, testPath);
 
         Advertisement ad = new Advertisement();
+        ad.setInterfaceName("foo/bar/baz");
         ad.setAddresses(Arrays.asList("/h1:123/x"));
 
         VContext advCtx = ctx.withCancel();
