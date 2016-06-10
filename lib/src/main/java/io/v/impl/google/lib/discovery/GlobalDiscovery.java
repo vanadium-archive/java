@@ -22,7 +22,7 @@ public class GlobalDiscovery {
 
     /**
      * Returns a new global {@link Discovery} instance that uses the Vanadium namespace
-     * under {@link path} with default mount ttl (120s) and scan interval (90s).
+     * under {@code path} with default mount ttl (120s) and scan interval (90s).
      *
      * @param  ctx        current context
      * @param  path       a namespace path to use for global discovery
@@ -34,11 +34,11 @@ public class GlobalDiscovery {
 
     /**
      * Returns a new global {@link Discovery} instance that uses the Vanadium
-     * namespace under {@link path}.
+     * namespace under {@code path}.
      *
      * @param  ctx          current context
      * @param  path         a namespace path to use for global discovery
-     * @param  mountTTL     the duration for which the advertisement lives in a mounttable
+     * @param  mountTtl     the duration for which the advertisement lives in a mounttable
      *                      after advertising is cancelled
      * @param  scanInterval the duration to scan a mounttable periodically
      * @throws VException   if a new discovery instance cannot be created

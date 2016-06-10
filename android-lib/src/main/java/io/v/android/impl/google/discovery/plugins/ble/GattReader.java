@@ -129,6 +129,44 @@ class GattReader extends BluetoothGattCallback {
             return;
         }
 
+        // This is called from Bluetooth callbacks. It seems to be more reliable to
+        // call Bluetooth APIs in a new thread although it is not clear why this helps.
+        mExecutor.submit(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        connectGatt();
+                    }
+                });
+    }
+
+    private synchronized void finishAndMaybeReadNextDevice() {
+        mCurrentGattConnectionTimeout.cancel(false);
+        mCurrentGatt.close();
+
+        maybeReadNextDevice();
+    }
+
+    private synchronized void cancelAndMaybeReadNextDevice() {
+        mCurrentGattConnectionTimeout.cancel(false);
+        mCurrentGatt.close();
+
+        final BluetoothDevice device = mCurrentDevice;
+        mExecutor.submit(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.onGattReadFailed(device);
+                    }
+                });
+        maybeReadNextDevice();
+    }
+
+    private synchronized void connectGatt() {
+        if (mCurrentDevice == null) {
+            return;
+        }
+
         mCurrentGatt = mCurrentDevice.connectGatt(mContext, false, this);
         mCurrentGattConnectionTimeout =
                 mExecutor.schedule(
@@ -141,37 +179,6 @@ class GattReader extends BluetoothGattCallback {
                         },
                         GATT_TIMEOUT_MS,
                         TimeUnit.MILLISECONDS);
-    }
-
-    private synchronized void finishAndMaybeReadNextDevice() {
-        mCurrentGattConnectionTimeout.cancel(false);
-        mCurrentGatt.close();
-
-        maybeReadNextDevice();
-    }
-
-    private synchronized void cancelAndMaybeReadNextDevice() {
-        mCurrentGattConnectionTimeout.cancel(false);
-        // Try to refresh the failed Gatt.
-        try {
-            Method method = mCurrentGatt.getClass().getMethod("refresh", new Class[0]);
-            if (method != null) {
-                method.invoke(mCurrentGatt, new Object[0]);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "An exception occured while refreshing device");
-        }
-        mCurrentGatt.close();
-
-        final BluetoothDevice device = mCurrentDevice;
-        mExecutor.submit(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        mHandler.onGattReadFailed(device);
-                    }
-                });
-        maybeReadNextDevice();
     }
 
     @Override
@@ -193,11 +200,6 @@ class GattReader extends BluetoothGattCallback {
         if (!mCurrentGattConnectionTimeout.cancel(false)) {
             // Already cancelled.
             return;
-        }
-
-        // TODO(jhahn): Do we really need this?
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
         }
 
         // MTU exchange is not allowed on a BR/EDR physical link.
