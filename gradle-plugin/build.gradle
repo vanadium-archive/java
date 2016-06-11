@@ -1,6 +1,6 @@
 // You should change this after releasing a new version of the gradle plugin. See the
 // list of published versions at https://repo1.maven.org/maven2/io/v/gradle-plugin.
-def releaseVersion = '1.8'
+def releaseVersion = '1.9'
 
 buildscript {
     repositories {

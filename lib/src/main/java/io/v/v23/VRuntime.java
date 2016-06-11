@@ -7,6 +7,7 @@ package io.v.v23;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
+import io.v.v23.options.RpcServerOptions;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.ListenSpec;
@@ -88,7 +89,14 @@ public interface VRuntime {
      * @throws VException      if a new server cannot be created
      */
     VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
-                     Options opts) throws VException;
+                           RpcServerOptions opts) throws VException;
+
+    /**
+     * @deprecated Use
+     *  {@link #withNewServer(VContext, String, Object, Authorizer, RpcServerOptions)}.
+     */
+    VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
+                           Options opts) throws VException;
 
     /**
      * Creates a new {@link Server} instance to serve a dispatcher and attaches
@@ -122,6 +130,12 @@ public interface VRuntime {
      * @param  opts            server options
      * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
+     */
+    VContext withNewServer(VContext ctx, String name, Dispatcher dispatcher,
+                           RpcServerOptions opts) throws VException;
+
+    /**
+     * @deprecated Use {@link #withNewServer(VContext, String, Dispatcher, RpcServerOptions)}
      */
     VContext withNewServer(VContext ctx, String name, Dispatcher dispatcher,
                            Options opts) throws VException;

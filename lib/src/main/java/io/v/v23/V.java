@@ -20,6 +20,7 @@ import io.v.impl.google.rt.VRuntimeImpl;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
+import io.v.v23.options.RpcServerOptions;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
 import io.v.v23.rpc.ListenSpec;
@@ -279,7 +280,7 @@ public class V {
      */
     public static VContext withNewServer(VContext ctx, String name, Object object,
                                          Authorizer authorizer) throws VException {
-        return withNewServer(ctx, name, object, authorizer, null);
+        return withNewServer(ctx, name, object, authorizer, (RpcServerOptions) null);
     }
 
     /**
@@ -304,12 +305,22 @@ public class V {
      * @return                 a child context to which the new server is attached
      * @throws VException      if a new server cannot be created
      */
-    public static VContext withNewServer(VContext ctx, String name, Object object,
-                                         Authorizer authorizer, Options opts) throws VException {
+    public static VContext withNewServer(
+            VContext ctx, String name, Object object, Authorizer authorizer, RpcServerOptions opts)
+            throws VException {
         if (opts == null) {
-            opts = new Options();
+            opts = new RpcServerOptions();
         }
         return getRuntime(ctx).withNewServer(ctx, name, object, authorizer, opts);
+    }
+
+    /**
+     * @deprecated Use
+     *  {@link #withNewServer(VContext, String, Object, Authorizer, RpcServerOptions)} instead.
+     */
+    public static VContext withNewServer(VContext ctx, String name, Object object,
+                                         Authorizer authorizer, Options opts) throws VException {
+        return withNewServer(ctx, name, object, authorizer, RpcServerOptions.migrateOptions(opts));
     }
 
     /**
@@ -340,7 +351,7 @@ public class V {
      */
     public static VContext withNewServer(VContext ctx, String name,
                                          Dispatcher dispatcher) throws VException {
-        return withNewServer(ctx, name, dispatcher, (Options) null);
+        return withNewServer(ctx, name, dispatcher, (RpcServerOptions) null);
     }
 
     /**
@@ -365,11 +376,19 @@ public class V {
      * @throws VException      if a new server cannot be created
      */
     public static VContext withNewServer(VContext ctx, String name, Dispatcher dispatcher,
-                                         Options opts) throws VException {
+                                         RpcServerOptions opts) throws VException {
         if (opts == null) {
-            opts = new Options();
+            opts = new RpcServerOptions();
         }
         return getRuntime(ctx).withNewServer(ctx, name, dispatcher, opts);
+    }
+
+    /**
+     * @deprecated Use {@link #withNewServer(VContext, String, Dispatcher, RpcServerOptions)}
+     */
+    public static VContext withNewServer(VContext ctx, String name, Dispatcher dispatcher,
+                                         Options opts) throws VException {
+        return withNewServer(ctx, name, dispatcher, RpcServerOptions.migrateOptions(opts));
     }
 
     /**

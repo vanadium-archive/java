@@ -8,18 +8,16 @@ import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import org.joda.time.Duration;
-
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import io.v.impl.google.ListenableFutureCallback;
-import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.VRuntime;
 import io.v.v23.context.VContext;
 import io.v.v23.discovery.Discovery;
 import io.v.v23.namespace.Namespace;
+import io.v.v23.options.RpcServerOptions;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.Dispatcher;
@@ -45,7 +43,7 @@ public class VRuntimeImpl implements VRuntime {
     private static native Client nativeGetClient(VContext ctx) throws VException;
     private static native VContext nativeWithNewServer(VContext ctx, String name,
                                                        Dispatcher dispatcher,
-                                                       Duration lameDuckTimeout) throws VException;
+                                                       RpcServerOptions opts) throws VException;
     private static native VContext nativeWithPrincipal(VContext ctx, VPrincipal principal)
             throws VException;
     private static native VPrincipal nativeGetPrincipal(VContext ctx) throws VException;
@@ -58,8 +56,10 @@ public class VRuntimeImpl implements VRuntime {
 
     private static native Discovery nativeNewDiscovery(VContext ctx) throws VException;
 
-    // Attaches a server to the given context.  Used by this class and other classes
-    // that natively create a server.
+    /**
+     * Attaches a server to the given context. Used by this class and other classes that natively
+     * create a server. Invoked from JNI.
+     */
     private static VContext withServer(VContext ctx, Server server) {
         return ctx.withValue(new ServerKey(), server);
     }
@@ -106,14 +106,27 @@ public class VRuntimeImpl implements VRuntime {
             throw new RuntimeException("Couldn't get client", e);
         }
     }
+
+    @Deprecated
     @Override
     public VContext withNewServer(VContext ctx, String name, Dispatcher disp, Options opts)
             throws VException {
-        return nativeWithNewServer(ctx, name, disp, lameDuckTimeoutFromOptions(opts));
+        return withNewServer(ctx, name, disp, RpcServerOptions.migrateOptions(opts));
     }
+    @Override
+    public VContext withNewServer(VContext ctx, String name, Dispatcher disp, RpcServerOptions opts)
+            throws VException {
+        return nativeWithNewServer(ctx, name, disp, opts);
+    }
+    // Deprecated in interface.
     @Override
     public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
                                   Options opts) throws VException {
+        return withNewServer(ctx, name, object, authorizer, RpcServerOptions.migrateOptions(opts));
+    }
+    @Override
+    public VContext withNewServer(VContext ctx, String name, Object object, Authorizer authorizer,
+                                  RpcServerOptions opts) throws VException {
         if (object == null) {
             throw new VException("newServer called with a null object");
         }
@@ -194,17 +207,5 @@ public class VRuntimeImpl implements VRuntime {
         public int hashCode() {
             return 0;
         }
-    }
-
-    private static Duration lameDuckTimeoutFromOptions(Options opts) {
-        if (!opts.has(OptionDefs.SERVER_LAME_DUCK_TIMEOUT)) {
-            return Duration.standardSeconds(0);
-        }
-        Object timeout = opts.get(OptionDefs.SERVER_LAME_DUCK_TIMEOUT);
-        if (!(timeout instanceof Duration)) {
-            throw new RuntimeException("SERVER_LAME_DUCK_TIMEOUT option if specified must " +
-                        "contain an object of type org.joda.time.Duration");
-        }
-        return (Duration) timeout;
     }
 }

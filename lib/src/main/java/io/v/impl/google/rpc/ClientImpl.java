@@ -7,14 +7,12 @@ package io.v.impl.google.rpc;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import io.v.impl.google.ListenableFutureCallback;
-import io.v.v23.OptionDefs;
 import io.v.v23.Options;
 import io.v.v23.context.VContext;
+import io.v.v23.options.RpcOptions;
 import io.v.v23.rpc.Callback;
 import io.v.v23.rpc.Client;
 import io.v.v23.rpc.ClientCall;
-import io.v.v23.security.Authorizer;
-import io.v.v23.security.VSecurity;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
 
@@ -29,8 +27,7 @@ public class ClientImpl implements Client {
 
     private native void nativeStartCall(long nativeRef, VContext context,
                                         String name, String method, byte[][] vomArgs,
-                                        Authorizer nameResolutionAuthorizer,
-                                        Authorizer serverAuthorizer,
+                                        RpcOptions opts,
                                         Callback<ClientCall> callback);
     private native void nativeClose(long nativeRef);
     private native void nativeFinalize(long nativeRef);
@@ -39,50 +36,36 @@ public class ClientImpl implements Client {
         this.nativeRef = nativeRef;
     }
 
-    private boolean shouldSkipServerAuth(Options opts) {
-        return !opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION)
-                    ? false
-                    : opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class);
-    }
-
-    private Authorizer nameResolutionAuthorizer(Options opts) {
-        if (opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION) &&
-                opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class))
-            return VSecurity.newAllowEveryoneAuthorizer();
-
-        return !opts.has(OptionDefs.NAME_RESOLUTION_AUTHORIZER)
-                ? null
-                : opts.get(OptionDefs.NAME_RESOLUTION_AUTHORIZER, Authorizer.class);
-    }
-
-    private Authorizer serverAuthorizer(Options opts) {
-        if (opts.has(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION) &&
-                opts.get(OptionDefs.SKIP_SERVER_ENDPOINT_AUTHORIZATION, Boolean.class))
-            return VSecurity.newAllowEveryoneAuthorizer();
-
-        return !opts.has(OptionDefs.SERVER_AUTHORIZER)
-                ? null
-                : opts.get(OptionDefs.SERVER_AUTHORIZER, Authorizer.class);
-    }
-
     // Implement io.v.v23.rpc.Client.
     @Override
     public ListenableFuture<ClientCall> startCall(
             VContext ctx, String name, String method, Object[] args, Type[] argTypes) {
-        return startCall(ctx, name, method, args, argTypes, null);
+        return startCall(ctx, name, method, args, argTypes, (RpcOptions)null);
     }
+
+    @Deprecated
     @Override
     public ListenableFuture<ClientCall> startCall(VContext ctx, String name, String method,
                                                   Object[] args, Type[] argTypes, Options opts) {
-        ListenableFutureCallback<ClientCall> callback = new ListenableFutureCallback<>();
         if (opts == null) {
             opts = new Options();
+        }
+
+        return startCall(ctx, name, method, args, argTypes, RpcOptions.migrateOptions(opts));
+    }
+
+    @Override
+    public ListenableFuture<ClientCall> startCall(VContext ctx, String name, String method,
+                                                  Object[] args, Type[] argTypes,
+                                                  RpcOptions opts) {
+        ListenableFutureCallback<ClientCall> callback = new ListenableFutureCallback<>();
+        if (opts == null) {
+            opts = new RpcOptions();
         }
         try {
             checkStartCallArgs(name, method, args, argTypes);
             nativeStartCall(nativeRef, ctx, name, getMethodName(method),
-                    getEncodedVomArgs(args, argTypes),
-                    nameResolutionAuthorizer(opts), serverAuthorizer(opts), callback);
+                    getEncodedVomArgs(args, argTypes), opts, callback);
         } catch (VException e) {
             callback.onFailure(e);
         }

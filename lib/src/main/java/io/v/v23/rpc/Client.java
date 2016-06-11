@@ -5,18 +5,28 @@
 package io.v.v23.rpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.v.v23.Options;
-import io.v.v23.context.VContext;
 
 import java.lang.reflect.Type;
 
 import javax.annotation.CheckReturnValue;
+
+import io.v.v23.Options;
+import io.v.v23.context.VContext;
+import io.v.v23.options.RpcOptions;
 
 /**
  * The interface for making RPC calls.  There may be multiple outstanding calls associated with a
  * single client, and a client may be used by multiple threads concurrently.
  */
 public interface Client {
+    /**
+     * @deprecated Use {@link #startCall(VContext, String, String, Object[], Type[], RpcOptions)}
+     *  instead, which uses a strongly-typed {@link RpcOptions} object that supports more features.
+     */
+    @CheckReturnValue
+    ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
+                                           Object[] args, Type[] argTypes, Options opts);
+
     /**
      * Starts an asynchronous call of the method on the server instance identified by name with the
      * given input args (of any arity) and provided options.
@@ -44,7 +54,7 @@ public interface Client {
      */
     @CheckReturnValue
     ListenableFuture<ClientCall> startCall(VContext context, String name, String method,
-                                           Object[] args, Type[] argTypes, Options opts);
+                                           Object[] args, Type[] argTypes, RpcOptions opts);
 
     /**
      * A shortcut for {@link #startCall(VContext, String, String, Object[], Type[], Options)} with
