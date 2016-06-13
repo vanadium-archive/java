@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.v.android.v23.V;
 import io.v.impl.google.services.syncbase.SyncbaseServer;
+import io.v.v23.V;
 import io.v.v23.context.VContext;
 import io.v.v23.rpc.Server;
 import io.v.v23.security.BlessingPattern;
@@ -108,6 +108,7 @@ public class Syncbase {
     /**
      * Starts Syncbase if needed; creates default database if needed; performs create-or-join for
      * "userdata" syncgroup if needed. The passed callback is called on the current thread.
+     * Fails if the user is not logged in.
      *
      * @param opts options for database creation
      * @param cb   the callback to call with the database handle
@@ -155,6 +156,85 @@ public class Syncbase {
             // new JNI API, we'll need to add Go code for this, since Java can't make RPCs.
             cb.onError(new RuntimeException("Synced userdata collection is not yet supported"));
         }
+    }
+
+    /**
+     * Returns true iff the user is currently logged in.
+     */
+    public static boolean isLoggedIn() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Returns the currently logged in user.
+     */
+    public static User getLoggedInUser() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Logs in the user associated with the given OAuth token and provider.
+     *
+     * A mapping of providers and OAuth token scopes are listed below:
+     * google: https://www.googleapis.com/auth/userinfo.email
+     *
+     * Note: Unlisted providers are unsupported.
+     *
+     * @param authToken The OAuth token for the user to be logged in.
+     * @param provider  The provider of the OAuth token.
+     */
+    public static void login(String authToken, String provider) {
+        if (!provider.equals("google")) {
+            throw new RuntimeException("Unsupported provider: " + provider);
+        }
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Scans the neighborhood for nearby users.
+     *
+     * @param cb The callback to call when a User is found or lost.
+     */
+    public static void scanNeighborhoodForUsers(ScanNeighborhoodForUsersCallback cb) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public static abstract class ScanNeighborhoodForUsersCallback {
+        public abstract void onFound(User user);
+        public abstract void onLost(User user);
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Advertises the logged in user's presence to those around them.
+     */
+    public static void advertiseLoggedInUserInNeighborhood() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Advertises the logged in user's presence to a limited set of users who must be around them.
+     *
+     * @param usersWhoCanSee The set of users who are allowed to find this user.
+     */
+    public static void advertiseLoggedInUserInNeighborhood(Iterable<User> usersWhoCanSee) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Stops advertising the presence of the logged in user so that they can no longer be found.
+     */
+    public static void stopAdvertisingLoggedInUserInNeighborhood() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Returns true iff this person appears in the neighborhood.
+     */
+    public static boolean isAdvertisingLoggedInUserInNeighborhood() {
+        throw new RuntimeException("Not implemented");
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
