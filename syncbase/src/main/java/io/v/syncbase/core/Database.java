@@ -38,7 +38,7 @@ public class Database extends DatabaseHandle {
     }
 
     public Syncgroup syncgroup(String name) throws VError {
-        return syncgroup(new Id(io.v.syncbase.internal.Blessings.AppBlessingFromContext(), name));
+        return syncgroup(new Id(io.v.syncbase.internal.Blessings.UserBlessingFromContext(), name));
     }
 
     public Syncgroup syncgroup(Id id) {

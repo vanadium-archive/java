@@ -20,7 +20,7 @@ public class DatabaseHandle {
     }
 
     public Collection collection(String name) throws VError {
-        return collection(new Id(io.v.syncbase.internal.Blessings.AppBlessingFromContext(), name));
+        return collection(new Id(io.v.syncbase.internal.Blessings.UserBlessingFromContext(), name));
     }
 
     public Collection collection(Id id) {
