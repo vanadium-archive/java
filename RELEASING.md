@@ -214,6 +214,31 @@ cd $JIRI_ROOT/release/java
 * For Android Studio to pick up these changes you will need to run
   "Build >> Clean project" in your IDE.
 
+## Syncbase Library
+
+To release a new version of the high-level syncbase API, follow the above steps,
+except to upload to bintray, run:
+
+```
+cd $JIRI_ROOT/release/java/syncbase
+./gradlew clean bintrayUpload
+```
+
+And to use a local version of the library, run:
+
+```
+cd $JIRI_ROOT/release/java/syncbase
+./gradlew clean install
+```
+
+### Syncbase Tutorials
+
+When releasing a new version of the Syncbase library, be sure to also update
+the Syncbase tutorials in the website repo.
+
+Refer to the `upgrade-syncbase-android` build rule in the [website Makefile]'s
+for instructions.
+
 [repository]: https://maven.apache.org/guides/introduction/introduction-to-repositories.html
 [core vanadium Java]: https://github.com/vanadium/java/tree/master/lib
 [Vanadium Android]: https://github.com/vanadium/java/tree/master/android-lib
@@ -229,3 +254,4 @@ cd $JIRI_ROOT/release/java
 [Vanadium library Bintray]: https://bintray.com/vanadium/io.v/vanadium/view
 [Vanadium Android library Bintray]: https://bintray.com/vanadium/io.v/vanadium-android/view
 [Maven Central page]: https://repo1.maven.org/maven2/io/v/gradle-plugin/
+[website Makefile]: https://github.com/vanadium/website/blob/master/Makefile#L471
