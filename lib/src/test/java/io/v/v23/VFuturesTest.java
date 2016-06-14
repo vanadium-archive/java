@@ -52,8 +52,8 @@ public class VFuturesTest {
     }
 
     /**
-     * When the context times out while a Vanadium server is handling the request, we expect a
-     * {@link TimeoutException}.
+     * When the context times out while a Vanadium server is handling the request, we expect either
+     * a {@link TimeoutException} or a {@link CanceledException}.
      */
     @Test
     public void testTimeout() throws Exception {
