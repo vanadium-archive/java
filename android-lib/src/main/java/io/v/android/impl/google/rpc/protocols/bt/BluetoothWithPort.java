@@ -33,7 +33,7 @@ import io.v.v23.verror.VException;
  * Used as a helper class for native code which sets up and registers the bluetooth protocol with
  * the vanadium RPC service.
  */
-class Bluetooth {
+class BluetoothWithPort {
     private static final String TAG = "Bluetooth";
 
     static Listener listen(VContext ctx, String btAddr) throws Exception {
@@ -273,6 +273,4 @@ class Bluetooth {
             return this.remoteAddress;
         }
     }
-
-    private Bluetooth() {}
 }
