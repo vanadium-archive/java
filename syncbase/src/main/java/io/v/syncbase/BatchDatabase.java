@@ -4,19 +4,18 @@
 
 package io.v.syncbase;
 
-import io.v.v23.VFutures;
-import io.v.v23.verror.VException;
+import io.v.syncbase.core.VError;
 
 /**
  * Provides a way to perform a set of operations atomically on a database. See
  * {@code Database.beginBatch} for concurrency semantics.
  */
 public class BatchDatabase extends DatabaseHandle {
-    private final io.v.v23.syncbase.BatchDatabase mVBatchDatabase;
+    protected io.v.syncbase.core.BatchDatabase mCoreBatchDatabase;
 
-    protected BatchDatabase(io.v.v23.syncbase.BatchDatabase vBatchDatabase) {
-        super(vBatchDatabase);
-        mVBatchDatabase = vBatchDatabase;
+    protected BatchDatabase(io.v.syncbase.core.BatchDatabase coreBatchDatabase) {
+        super(coreBatchDatabase);
+        mCoreBatchDatabase = coreBatchDatabase;
     }
 
     @Override
@@ -33,13 +32,9 @@ public class BatchDatabase extends DatabaseHandle {
      * Persists the pending changes to Syncbase. If the batch is read-only, {@code commit} will
      * throw {@code ConcurrentBatchException}; abort should be used instead.
      */
-    public void commit() {
+    public void commit() throws VError {
         // TODO(sadovsky): Throw ConcurrentBatchException where appropriate.
-        try {
-            VFutures.sync(mVBatchDatabase.commit(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("commit failed", e);
-        }
+        mCoreBatchDatabase.commit();
     }
 
     /**
@@ -47,11 +42,7 @@ public class BatchDatabase extends DatabaseHandle {
      * strictly required, but may allow Syncbase to release locks or other resources sooner than if
      * {@code abort} was not called.
      */
-    public void abort() {
-        try {
-            VFutures.sync(mVBatchDatabase.abort(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("abort failed", e);
-        }
+    public void abort() throws VError {
+        mCoreBatchDatabase.abort();
     }
 }

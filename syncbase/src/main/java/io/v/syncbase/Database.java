@@ -5,10 +5,6 @@
 package io.v.syncbase;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,47 +12,40 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
-import io.v.v23.InputChannel;
-import io.v.v23.InputChannelCallback;
-import io.v.v23.InputChannels;
-import io.v.v23.VFutures;
-import io.v.v23.services.syncbase.CollectionRowPattern;
-import io.v.v23.services.syncbase.SyncgroupSpec;
-import io.v.v23.syncbase.Batch;
-import io.v.v23.verror.ExistException;
-import io.v.v23.verror.VException;
+import io.v.syncbase.core.CollectionRowPattern;
+import io.v.syncbase.core.SyncgroupMemberInfo;
+import io.v.syncbase.core.VError;
 
 /**
  * A set of collections and syncgroups.
  * To get a Database handle, call {@code Syncbase.database}.
  */
 public class Database extends DatabaseHandle {
-    private final io.v.v23.syncbase.Database mVDatabase;
+    private final io.v.syncbase.core.Database mCoreDatabase;
 
     private final Object mSyncgroupInviteHandlersMu = new Object();
     private final Object mWatchChangeHandlersMu = new Object();
     private Map<SyncgroupInviteHandler, Runnable> mSyncgroupInviteHandlers = new HashMap<>();
     private Map<WatchChangeHandler, Runnable> mWatchChangeHandlers = new HashMap<>();
 
-    protected void createIfMissing() {
+    protected Database(io.v.syncbase.core.Database coreDatabase) {
+        super(coreDatabase);
+        mCoreDatabase = coreDatabase;
+    }
+
+    protected void createIfMissing() throws VError {
         try {
-            VFutures.sync(mVDatabase.create(Syncbase.getVContext(), Syncbase.defaultPerms()));
-        } catch (ExistException e) {
-            // Database already exists, presumably from a previous run of the app.
-        } catch (VException e) {
-            throw new RuntimeException("Failed to create database", e);
+            mCoreDatabase.create(Syncbase.defaultDatabasePerms());
+        } catch (VError vError) {
+            if (vError.id.equals(VError.EXIST)) {
+                return;
+            }
+            throw vError;
         }
     }
 
-    protected Database(io.v.v23.syncbase.Database vDatabase) {
-        super(vDatabase);
-        mVDatabase = vDatabase;
-    }
-
     @Override
-    public Collection collection(String name, CollectionOptions opts) {
+    public Collection collection(String name, CollectionOptions opts) throws VError {
         Collection res = getCollection(new Id(Syncbase.getPersonalBlessingString(), name));
         res.createIfMissing();
         // TODO(sadovsky): Unwind collection creation on syncgroup creation failure? It would be
@@ -84,25 +73,26 @@ public class Database extends DatabaseHandle {
      * @param opts        options for syncgroup creation
      * @return the syncgroup
      */
-    public Syncgroup syncgroup(String name, List<Collection> collections, SyncgroupOptions opts) {
+    public Syncgroup syncgroup(String name, List<Collection> collections, SyncgroupOptions opts)
+            throws VError {
         if (collections.isEmpty()) {
             throw new RuntimeException("No collections specified");
         }
         Id id = new Id(collections.get(0).getId().getBlessing(), name);
-        for (Collection cx : collections) {
-            if (!cx.getId().getBlessing().equals(id.getBlessing())) {
+        for (Collection collection : collections) {
+            if (!collection.getId().getBlessing().equals(id.getBlessing())) {
                 throw new RuntimeException("Collections must all have the same creator");
             }
         }
-        Syncgroup res = new Syncgroup(mVDatabase.getSyncgroup(id.toVId()), this, id);
-        res.createIfMissing(collections);
-        return res;
+        Syncgroup syncgroup = new Syncgroup(mCoreDatabase.syncgroup(id.toCoreId()), this);
+        syncgroup.createIfMissing(collections);
+        return syncgroup;
     }
 
     /**
      * Calls {@code syncgroup(name, collections, opts)} with default {@code SyncgroupOptions}.
      */
-    public Syncgroup syncgroup(String name, List<Collection> collections) {
+    public Syncgroup syncgroup(String name, List<Collection> collections) throws VError {
         return syncgroup(name, collections, new SyncgroupOptions());
     }
 
@@ -113,24 +103,18 @@ public class Database extends DatabaseHandle {
         // TODO(sadovsky): Consider throwing an exception or returning null if the syncgroup does
         // not exist. But note, a syncgroup can get destroyed via sync after a client obtains a
         // handle for it, so perhaps we should instead add an 'exists' method.
-        return new Syncgroup(mVDatabase.getSyncgroup(id.toVId()), this, id);
+        return new Syncgroup(mCoreDatabase.syncgroup(id.toCoreId()), this);
     }
 
     /**
      * Returns an iterator over all syncgroups in the database.
      */
-    public Iterator<Syncgroup> getSyncgroups() {
-        List<io.v.v23.services.syncbase.Id> vIds;
-        try {
-            vIds = VFutures.sync(mVDatabase.listSyncgroups(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("listSyncgroups failed", e);
+    public Iterator<Syncgroup> getSyncgroups() throws VError {
+        ArrayList<Syncgroup> syncgroups = new ArrayList<>();
+        for (io.v.syncbase.core.Id id : mCoreDatabase.listSyncgroups()) {
+            syncgroups.add(getSyncgroup(new Id(id)));
         }
-        ArrayList<Syncgroup> sgs = new ArrayList<>(vIds.size());
-        for (io.v.v23.services.syncbase.Id vId : vIds) {
-            sgs.add(new Syncgroup(mVDatabase.getSyncgroup(vId), this, new Id(vId)));
-        }
-        return sgs.iterator();
+        return syncgroups.iterator();
     }
 
     /**
@@ -219,23 +203,27 @@ public class Database extends DatabaseHandle {
      * @param invite the syncgroup invite
      * @param cb     the callback to call with the syncgroup handle
      */
-    public void acceptSyncgroupInvite(SyncgroupInvite invite, final AcceptSyncgroupInviteCallback cb) {
+    public void acceptSyncgroupInvite(final SyncgroupInvite invite,
+                                      final AcceptSyncgroupInviteCallback cb) {
         // TODO(sadovsky): Should we add "accept" and "ignore" methods to the SyncgroupInvite class,
         // or should we treat it as a POJO (with no reference to Database)?
-        io.v.v23.syncbase.Syncgroup vSyncgroup = mVDatabase.getSyncgroup(invite.getId().toVId());
-        final Syncgroup syncgroup = new Syncgroup(vSyncgroup, this, invite.getId());
-        ListenableFuture<SyncgroupSpec> future = vSyncgroup.join(Syncbase.getVContext(), invite.getRemoteSyncbaseName(), invite.getExpectedSyncbaseBlessings(), Syncgroup.newSyncgroupMemberInfo());
-        Futures.addCallback(future, new FutureCallback<SyncgroupSpec>() {
+        final io.v.syncbase.core.Syncgroup coreSyncgroup =
+                mCoreDatabase.syncgroup(invite.getId().toCoreId());
+        final Database database = this;
+        // TODO(razvanm): Figure out if we should use an AsyncTask or something else.
+        new Thread(new Runnable() {
             @Override
-            public void onSuccess(@Nullable SyncgroupSpec result) {
-                cb.onSuccess(syncgroup);
+            public void run() {
+                try {
+                    coreSyncgroup.join(invite.getRemoteSyncbaseName(),
+                            invite.getExpectedSyncbaseBlessings(), new SyncgroupMemberInfo());
+                } catch (VError vError) {
+                    cb.onFailure(vError);
+                    return;
+                }
+                cb.onSuccess(new Syncgroup(coreSyncgroup, database));
             }
-
-            @Override
-            public void onFailure(Throwable e) {
-                cb.onFailure(e);
-            }
-        });
+        }).start();
     }
 
     /**
@@ -256,10 +244,11 @@ public class Database extends DatabaseHandle {
     public static class BatchOptions {
         public boolean readOnly;
 
-        protected io.v.v23.services.syncbase.BatchOptions toVBatchOptions() {
-            io.v.v23.services.syncbase.BatchOptions res = new io.v.v23.services.syncbase.BatchOptions();
-            res.setReadOnly(true);
-            return res;
+        public io.v.syncbase.core.BatchOptions toCore() {
+            io.v.syncbase.core.BatchOptions coreBatchOptions =
+                    new io.v.syncbase.core.BatchOptions();
+            coreBatchOptions.readOnly = readOnly;
+            return coreBatchOptions;
         }
     }
 
@@ -277,32 +266,20 @@ public class Database extends DatabaseHandle {
      * @param op   the operation to run
      * @param opts options for this batch
      */
-    public void runInBatch(final BatchOperation op, BatchOptions opts) {
-        ListenableFuture<Void> future = Batch.runInBatch(Syncbase.getVContext(), mVDatabase, opts.toVBatchOptions(), new Batch.BatchOperation() {
+    public void runInBatch(final BatchOperation op, BatchOptions opts) throws VError {
+        mCoreDatabase.runInBatch(new io.v.syncbase.core.Database.BatchOperation() {
             @Override
-            public ListenableFuture<Void> run(io.v.v23.syncbase.BatchDatabase vBatchDatabase) {
-                final SettableFuture<Void> res = SettableFuture.create();
-                try {
-                    op.run(new BatchDatabase(vBatchDatabase));
-                    res.set(null);
-                } catch (Exception e) {
-                    res.setException(e);
-                }
-                return res;
+            public void run(io.v.syncbase.core.BatchDatabase batchDatabase) {
+                op.run(new BatchDatabase(batchDatabase));
             }
-        });
-        try {
-            VFutures.sync(future);
-        } catch (VException e) {
-            throw new RuntimeException("runInBatch failed", e);
-        }
+        }, opts.toCore());
     }
 
     /**
      * Creates a new batch. Instead of calling this function directly, clients are encouraged to use
      * the {@code runInBatch} helper function, which detects "concurrent batch" errors and handles
      * retries internally.
-     * <p>
+     * <p/>
      * Default concurrency semantics:
      * <ul>
      * <li>Reads (e.g. gets, scans) inside a batch operate over a consistent snapshot taken during
@@ -313,23 +290,17 @@ public class Database extends DatabaseHandle {
      * <li>Other methods will never fail with error {@code ConcurrentBatchException}, even if it is
      * known that {@code commit} will fail with this error.</li>
      * </ul>
-     * <p>
+     * <p/>
      * Once a batch has been committed or aborted, subsequent method calls will fail with no
      * effect.
-     * <p>
+     * <p/>
      * Concurrency semantics can be configured using BatchOptions.
      *
      * @param opts options for this batch
      * @return the batch handle
      */
-    public BatchDatabase beginBatch(BatchOptions opts) {
-        io.v.v23.syncbase.BatchDatabase vBatchDatabase;
-        try {
-            vBatchDatabase = VFutures.sync(mVDatabase.beginBatch(Syncbase.getVContext(), opts.toVBatchOptions()));
-        } catch (VException e) {
-            throw new RuntimeException("beginBatch failed", e);
-        }
-        return new BatchDatabase(vBatchDatabase);
+    public BatchDatabase beginBatch(BatchOptions opts) throws VError {
+        return new BatchDatabase(mCoreDatabase.beginBatch(opts.toCore()));
     }
 
     /**
@@ -384,42 +355,37 @@ public class Database extends DatabaseHandle {
         if (opts.resumeMarker != null && opts.resumeMarker.length != 0) {
             throw new RuntimeException("Specifying resumeMarker is not yet supported");
         }
-        InputChannel<io.v.v23.syncbase.WatchChange> ic = mVDatabase.watch(Syncbase.getVContext(), ImmutableList.of(new CollectionRowPattern("%", "%", "%")));
-        ListenableFuture<Void> future = InputChannels.withCallback(ic, new InputChannelCallback<io.v.v23.syncbase.WatchChange>() {
-            private boolean mGotFirstBatch = false;
-            private List<WatchChange> mBatch = new ArrayList<>();
 
-            @Override
-            public ListenableFuture<Void> onNext(io.v.v23.syncbase.WatchChange vChange) {
-                WatchChange change = new WatchChange(vChange);
-                // Ignore changes to userdata collection.
-                if (change.getCollectionId().getName().equals(Syncbase.USERDATA_SYNCGROUP_NAME)) {
-                    return null;
-                }
-                mBatch.add(change);
-                if (!change.isContinued()) {
-                    if (!mGotFirstBatch) {
-                        mGotFirstBatch = true;
-                        h.onInitialState(mBatch.iterator());
-                    } else {
-                        h.onChangeBatch(mBatch.iterator());
+        mCoreDatabase.watch(null, ImmutableList.of(new CollectionRowPattern("%", "%", "%")),
+                new io.v.syncbase.core.Database.WatchPatternsCallbacks() {
+                    private boolean mGotFirstBatch = false;
+                    private List<WatchChange> mBatch = new ArrayList<>();
+
+                    @Override
+                    public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
+                        // Ignore changes to userdata collection.
+                        if (coreWatchChange.collection.name.equals(Syncbase.USERDATA_SYNCGROUP_NAME)) {
+                            return;
+                        }
+                        mBatch.add(new WatchChange(coreWatchChange));
+                        if (!coreWatchChange.continued) {
+                            if (!mGotFirstBatch) {
+                                mGotFirstBatch = true;
+                                h.onInitialState(mBatch.iterator());
+                            } else {
+                                h.onChangeBatch(mBatch.iterator());
+                            }
+                            mBatch.clear();
+                        }
                     }
-                    mBatch.clear();
-                }
-                return null;
-            }
-        });
-        Futures.addCallback(future, new FutureCallback<Void>() {
-            @Override
-            public void onSuccess(@Nullable Void result) {
-            }
 
-            @Override
-            public void onFailure(Throwable e) {
-                // TODO(sadovsky): Make sure cancellations are surfaced as such (or ignored).
-                h.onError(e);
-            }
-        });
+                    @Override
+                    public void onError(VError vError) {
+                        // TODO(sadovsky): Make sure cancellations are surfaced as such (or ignored).
+                        h.onError(vError);
+                    }
+                });
+
         synchronized (mWatchChangeHandlersMu) {
             mWatchChangeHandlers.put(h, new Runnable() {
                 @Override

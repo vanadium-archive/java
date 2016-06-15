@@ -6,27 +6,25 @@ package io.v.syncbase;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-import io.v.v23.VFutures;
-import io.v.v23.syncbase.DatabaseCore;
-import io.v.v23.verror.VException;
+import io.v.syncbase.core.VError;
+
 
 /**
  * Represents a handle to a database, possibly in a batch.
  */
 public abstract class DatabaseHandle {
-    protected DatabaseCore mVDatabaseCore;
+    protected io.v.syncbase.core.DatabaseHandle mCoreDatabaseHandle;
 
-    protected DatabaseHandle(DatabaseCore vDatabaseCore) {
-        mVDatabaseCore = vDatabaseCore;
+    protected DatabaseHandle(io.v.syncbase.core.DatabaseHandle coreDatabaseHandle) {
+        mCoreDatabaseHandle = coreDatabaseHandle;
     }
 
     /**
      * Returns the id of this database.
      */
     public Id getId() {
-        return new Id(mVDatabaseCore.id());
+        return new Id(mCoreDatabaseHandle.id());
     }
 
     /**
@@ -47,12 +45,12 @@ public abstract class DatabaseHandle {
      * @param opts options for collection creation
      * @return the collection handle
      */
-    public abstract Collection collection(String name, CollectionOptions opts);
+    public abstract Collection collection(String name, CollectionOptions opts) throws VError;
 
     /**
      * Calls {@code collection(name, opts)} with default {@code CollectionOptions}.
      */
-    public Collection collection(String name) {
+    public Collection collection(String name) throws VError {
         return collection(name, new CollectionOptions());
     }
 
@@ -63,23 +61,17 @@ public abstract class DatabaseHandle {
         // TODO(sadovsky): Consider throwing an exception or returning null if the collection does
         // not exist. But note, a collection can get destroyed via sync after a client obtains a
         // handle for it, so perhaps we should instead add an 'exists' method.
-        return new Collection(mVDatabaseCore.getCollection(id.toVId()), this);
+        return new Collection(mCoreDatabaseHandle.collection(id.toCoreId()), this);
     }
 
     /**
      * Returns an iterator over all collections in the database.
      */
-    public Iterator<Collection> getCollections() {
-        List<io.v.v23.services.syncbase.Id> vIds;
-        try {
-            vIds = VFutures.sync(mVDatabaseCore.listCollections(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("listCollections failed", e);
+    public Iterator<Collection> getCollections() throws VError {
+        ArrayList<Collection> collections = new ArrayList<>();
+        for (io.v.syncbase.core.Id id : mCoreDatabaseHandle.listCollections()) {
+            collections.add(getCollection(new Id(id)));
         }
-        ArrayList<Collection> cxs = new ArrayList<>(vIds.size());
-        for (io.v.v23.services.syncbase.Id vId : vIds) {
-            cxs.add(new Collection(mVDatabaseCore.getCollection(vId), this));
-        }
-        return cxs.iterator();
+        return collections.iterator();
     }
 }

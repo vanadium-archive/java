@@ -8,12 +8,14 @@ package io.v.syncbase;
  * Uniquely identifies a database, collection, or syncgroup.
  */
 public class Id {
-    private final String mBlessing;
-    private final String mName;
+    private io.v.syncbase.core.Id mId;
+
+    protected Id(io.v.syncbase.core.Id id) {
+        mId = id;
+    }
 
     protected Id(String blessing, String name) {
-        mBlessing = blessing;
-        mName = name;
+        mId = new io.v.syncbase.core.Id(blessing, name);
     }
 
     // TODO(sadovsky): Replace encode and decode method implementations with calls to Cgo.
@@ -28,22 +30,26 @@ public class Id {
     }
 
     public String encode() {
-        return mBlessing + SEPARATOR + mName;
+        return mId.encode();
+    }
+
+    protected io.v.syncbase.core.Id toCoreId() {
+        return mId;
     }
 
     protected String getBlessing() {
-        return mBlessing;
+        return mId.blessing;
     }
 
     public String getName() {
-        return mName;
+        return mId.name;
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof Id) {
             Id otherId = (Id) other;
-            return mBlessing.equals(otherId.getBlessing()) && mName.equals(otherId.getName());
+            return mId.blessing.equals(otherId.getBlessing()) && mId.name.equals(otherId.getName());
         }
         return false;
     }
@@ -54,9 +60,9 @@ public class Id {
         int result = 1;
         int prime = 31;
 
-        result = prime * result + (mBlessing == null ? 0 : mBlessing.hashCode());
+        result = prime * result + (mId.blessing == null ? 0 : mId.blessing.hashCode());
 
-        result = prime * result + (mName == null ? 0 : mName.hashCode());
+        result = prime * result + (mId.name == null ? 0 : mId.name.hashCode());
 
         return result;
     }
@@ -64,16 +70,5 @@ public class Id {
     @Override
     public String toString() {
         return "Id(" + encode() + ")";
-    }
-
-    // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
-
-    protected Id(io.v.v23.services.syncbase.Id id) {
-        mBlessing = id.getBlessing();
-        mName = id.getName();
-    }
-
-    protected io.v.v23.services.syncbase.Id toVId() {
-        return new io.v.v23.services.syncbase.Id(mBlessing, mName);
     }
 }

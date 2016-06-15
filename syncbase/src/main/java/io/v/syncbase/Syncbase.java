@@ -4,26 +4,17 @@
 
 package io.v.syncbase;
 
-import android.util.Log;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.v.impl.google.services.syncbase.SyncbaseServer;
-import io.v.v23.V;
-import io.v.v23.context.VContext;
-import io.v.v23.rpc.Server;
-import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.Blessings;
-import io.v.v23.security.access.Constants;
-import io.v.v23.security.access.Permissions;
-import io.v.v23.syncbase.SyncbaseService;
-import io.v.v23.verror.VException;
+import io.v.syncbase.core.Permissions;
+import io.v.syncbase.core.Service;
+import io.v.syncbase.core.VError;
 
 // FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
 // decide which error types to surface to clients, and define specific Exception subclasses for
@@ -57,8 +48,6 @@ public class Syncbase {
         public boolean disableSyncgroupPublishing;
         // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
         public boolean disableUserdataSyncgroup;
-        // TODO(sadovsky): Drop this once we switch from io.v.v23.syncbase to io.v.syncbase.core.
-        public VContext vContext;
 
         protected String getPublishSyncbaseName() {
             if (disableSyncgroupPublishing) {
@@ -74,6 +63,7 @@ public class Syncbase {
 
     protected static DatabaseOptions sOpts;
     private static Database sDatabase;
+    private static Map sSelfAndCloud;
 
     // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
     // developer-specified names.
@@ -127,24 +117,34 @@ public class Syncbase {
             return;
         }
         sOpts = opts;
-        // TODO(sadovsky): Call ctx.cancel in sDatabase destructor?
-        VContext ctx = getVContext().withCancel();
+        sSelfAndCloud = ImmutableMap.of(
+                Permissions.IN, ImmutableList.of(getPersonalBlessingString(),
+                        sOpts.getCloudBlessingString()));
+        // TODO(razvanm): Surface Cgo function to shut down syncbase.
         try {
-            sDatabase = startSyncbaseAndInitDatabase(ctx);
-        } catch (final Exception e) {
-            ctx.cancel();
-            Syncbase.enqueue(new Runnable() {
+            // TODO(razvanm): Use just the name after Blessings.AppBlessingFromContext starts
+            // working.
+            sDatabase = new Database(Service.database(new io.v.syncbase.core.Id("...", DB_NAME)));
+            sDatabase.createIfMissing();
+        } catch (final VError vError) {
+            enqueue(new Runnable() {
                 @Override
                 public void run() {
-                    cb.onError(e);
+                    cb.onError(vError);
                 }
             });
             return;
         }
+
         if (sOpts.disableUserdataSyncgroup) {
             Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
             cxOpts.withoutSyncgroup = true;
-            sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
+            try {
+                sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
+            } catch (VError vError) {
+                cb.onError(vError);
+                return;
+            }
             Syncbase.enqueue(new Runnable() {
                 @Override
                 public void run() {
@@ -174,10 +174,10 @@ public class Syncbase {
 
     /**
      * Logs in the user associated with the given OAuth token and provider.
-     *
+     * <p/>
      * A mapping of providers and OAuth token scopes are listed below:
      * google: https://www.googleapis.com/auth/userinfo.email
-     *
+     * <p/>
      * Note: Unlisted providers are unsupported.
      *
      * @param authToken The OAuth token for the user to be logged in.
@@ -201,7 +201,9 @@ public class Syncbase {
 
     public static abstract class ScanNeighborhoodForUsersCallback {
         public abstract void onFound(User user);
+
         public abstract void onLost(User user);
+
         public void onError(Throwable e) {
             throw new RuntimeException(e);
         }
@@ -237,106 +239,43 @@ public class Syncbase {
         throw new RuntimeException("Not implemented");
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO(sadovsky): Remove much of the code below once we switch from io.v.v23.syncbase to
-    // io.v.syncbase.core. Note, much of this code was copied from the Todos app.
-
-    protected static VContext getVContext() {
-        return sOpts.vContext;
+    protected static String getBlessingStringFromEmail(String email) {
+        return sOpts.defaultBlessingStringPrefix + email;
     }
 
-    private static Database startSyncbaseAndInitDatabase(VContext ctx) {
-        SyncbaseService s;
-        try {
-            s = io.v.v23.syncbase.Syncbase.newService(startSyncbase(ctx, sOpts.rootDir));
-        } catch (SyncbaseServer.StartException e) {
-            throw new RuntimeException("Failed to start Syncbase", e);
-        }
-        // Create database, if needed.
-        Database res = new Database(s.getDatabase(getVContext(), DB_NAME, null));
-        res.createIfMissing();
-        return res;
-    }
-
-    private static String startSyncbase(VContext vContext, String rootDir)
-            throws SyncbaseServer.StartException {
-        try {
-            // TODO(sadovsky): Make proxy configurable?
-            vContext = V.withListenSpec(vContext, V.getListenSpec(vContext).withProxy("proxy"));
-        } catch (VException e) {
-            Log.w(TAG, "Failed to set up Vanadium proxy", e);
-        }
-        File dir = new File(rootDir, DIR_NAME);
-        dir.mkdirs();
-        SyncbaseServer.Params params = new SyncbaseServer.Params()
-                .withStorageRootDir(dir.getAbsolutePath());
-        VContext serverContext = SyncbaseServer.withNewServer(vContext, params);
-        Server server = V.getServer(serverContext);
-        String name = server.getStatus().getEndpoints()[0].name();
-        Log.i(TAG, "Started Syncbase: " + name);
-        return name;
-    }
-
-    private static void checkHasOneBlessing(Blessings blessings) {
-        int n = blessings.getCertificateChains().size();
-        if (n != 1) {
-            throw new RuntimeException("Expected one blessing, got " + n);
-        }
-    }
-
-    private static String getEmailFromBlessings(Blessings blessings) {
-        checkHasOneBlessing(blessings);
-        return getEmailFromBlessingString(blessings.toString());
-    }
-
-    protected static String getEmailFromBlessingPattern(BlessingPattern pattern) {
-        return getEmailFromBlessingString(pattern.toString());
-    }
-
-    private static String getEmailFromBlessingString(String blessingStr) {
+    protected static String getEmailFromBlessingPattern(String blessingStr) {
         String[] parts = blessingStr.split(":");
         return parts[parts.length - 1];
     }
 
-    private static String getBlessingStringFromEmail(String email) {
-        return sOpts.defaultBlessingStringPrefix + email;
-    }
-
-    protected static BlessingPattern getBlessingPatternFromEmail(String email) {
-        return new BlessingPattern(getBlessingStringFromEmail(email));
-    }
-
-    private static Blessings getPersonalBlessings() {
-        return V.getPrincipal(getVContext()).blessingStore().defaultBlessings();
-    }
-
     protected static String getPersonalBlessingString() {
-        Blessings blessings = getPersonalBlessings();
-        checkHasOneBlessing(blessings);
-        return blessings.toString();
+        // TODO(razvanm): Switch to Blessings.UserBlessingFromContext() after the lower level
+        // starts working.
+        return "...";
     }
 
-    private static String getPersonalEmail() {
-        return getEmailFromBlessings(getPersonalBlessings());
-    }
-
-    protected static Permissions defaultPerms() {
+    protected static Permissions defaultDatabasePerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
-        io.v.v23.security.access.AccessList anyone =
-                new io.v.v23.security.access.AccessList(
-                        ImmutableList.of(
-                                new BlessingPattern("...")),
-                        ImmutableList.<String>of());
-        io.v.v23.security.access.AccessList selfAndCloud =
-                new io.v.v23.security.access.AccessList(
-                        ImmutableList.of(
-                                new BlessingPattern(getPersonalBlessingString()),
-                                new BlessingPattern(sOpts.getCloudBlessingString())),
-                        ImmutableList.<String>of());
+        Map anyone = ImmutableMap.of(Permissions.IN, ImmutableList.of("..."));
         return new Permissions(ImmutableMap.of(
-                Constants.RESOLVE.getValue(), anyone,
-                Constants.READ.getValue(), selfAndCloud,
-                Constants.WRITE.getValue(), selfAndCloud,
-                Constants.ADMIN.getValue(), selfAndCloud));
+                Permissions.Tags.RESOLVE, anyone,
+                Permissions.Tags.READ, sSelfAndCloud,
+                Permissions.Tags.WRITE, sSelfAndCloud,
+                Permissions.Tags.ADMIN, sSelfAndCloud));
+    }
+
+    protected static Permissions defaultCollectionPerms() throws VError {
+        // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
+        return new Permissions(ImmutableMap.of(
+                Permissions.Tags.READ, sSelfAndCloud,
+                Permissions.Tags.WRITE, sSelfAndCloud,
+                Permissions.Tags.ADMIN, sSelfAndCloud));
+    }
+
+    protected static Permissions defaultSyncgroupPerms() throws VError {
+        // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
+        return new Permissions(ImmutableMap.of(
+                Permissions.Tags.READ, sSelfAndCloud,
+                Permissions.Tags.ADMIN, sSelfAndCloud));
     }
 }

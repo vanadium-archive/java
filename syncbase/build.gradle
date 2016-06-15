@@ -131,8 +131,11 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'io.v:vanadium-android:2.1.7'
+    testCompile 'com.google.truth:truth:0.28'
     testCompile 'junit:junit:4.12'
-    testCompile group: 'com.google.truth', name: 'truth', version: '0.28'
+    // We need to overwrite org.json because it's mocked by default. For some reason setting
+    // the unitTests.returnDefaultValues doesn't help in this case.
+    testCompile 'org.json:org.json:2.0'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
 }

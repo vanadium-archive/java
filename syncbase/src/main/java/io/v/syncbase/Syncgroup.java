@@ -7,13 +7,12 @@ package io.v.syncbase;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import io.v.v23.VFutures;
-import io.v.v23.services.syncbase.SyncgroupMemberInfo;
-import io.v.v23.services.syncbase.SyncgroupSpec;
-import io.v.v23.verror.ExistException;
-import io.v.v23.verror.VException;
+import io.v.syncbase.core.Permissions;
+import io.v.syncbase.core.SyncgroupMemberInfo;
+import io.v.syncbase.core.SyncgroupSpec;
+import io.v.syncbase.core.VError;
+import io.v.syncbase.core.VersionedSyncgroupSpec;
 
 /**
  * Represents a set of collections, synced amongst a set of users.
@@ -21,61 +20,52 @@ import io.v.v23.verror.VException;
  */
 public class Syncgroup {
     private final Database mDatabase;
-    private final Id mId;
-    private final io.v.v23.syncbase.Syncgroup mVSyncgroup;
+    private final io.v.syncbase.core.Syncgroup mCoreSyncgroup;
 
-    protected static SyncgroupMemberInfo newSyncgroupMemberInfo() {
-        SyncgroupMemberInfo info = new SyncgroupMemberInfo();
-        // TODO(sadovsky): Still have no idea how to set sync priority.
-        info.setSyncPriority((byte) 3);
-        return info;
-    }
-
-    protected void createIfMissing(List<Collection> collections) {
-        ArrayList<io.v.v23.services.syncbase.Id> cxVIds = new ArrayList<>(collections.size());
-        for (Collection cx : collections) {
-            cxVIds.add(cx.getId().toVId());
-        }
-        SyncgroupSpec spec = new SyncgroupSpec(
-                "", Syncbase.sOpts.getPublishSyncbaseName(), Syncbase.defaultPerms(), cxVIds,
-                Syncbase.sOpts.mountPoints, false);
-        try {
-            VFutures.sync(mVSyncgroup.create(Syncbase.getVContext(), spec, newSyncgroupMemberInfo()));
-        } catch (ExistException e) {
-            // Syncgroup already exists.
-            // TODO(sadovsky): Verify that the existing syncgroup has the specified configuration,
-            // e.g. the specified collections?
-        } catch (VException e) {
-            throw new RuntimeException("Failed to create collection", e);
-        }
-    }
-
-    // TODO(sadovsky): We take 'id' because io.v.v23.syncbase.Syncgroup is missing the 'getId'
-    // method. Drop the 'id' argument once we switch to io.v.syncbase.core.
-    protected Syncgroup(io.v.v23.syncbase.Syncgroup vSyncgroup, Database database, Id id) {
-        mVSyncgroup = vSyncgroup;
+    protected Syncgroup(io.v.syncbase.core.Syncgroup coreSyncgroup, Database database) {
+        mCoreSyncgroup = coreSyncgroup;
         mDatabase = database;
-        mId = id;
+    }
+
+    protected void createIfMissing(List<Collection> collections) throws VError {
+        ArrayList<io.v.syncbase.core.Id> ids = new ArrayList<>();
+        for (Collection cx : collections) {
+            ids.add(cx.getId().toCoreId());
+        }
+
+        SyncgroupSpec spec = new SyncgroupSpec();
+        spec.publishSyncbaseName = Syncbase.sOpts.getPublishSyncbaseName();
+        spec.permissions = Syncbase.defaultSyncgroupPerms();
+        spec.collections = ids;
+        spec.mountTables = Syncbase.sOpts.mountPoints;
+        spec.isPrivate = false;
+
+        try {
+            // TODO(razvanm): Figure out to what value we should set the sync priority in the
+            // SyncgroupMemberInfo.
+            mCoreSyncgroup.create(spec, new SyncgroupMemberInfo());
+        } catch (VError vError) {
+            if (vError.id.equals(VError.NO_EXIST)) {
+                // Syncgroup already exists.
+                // TODO(sadovsky): Verify that the existing syncgroup has the specified
+                // configuration, e.g., the specified collections?
+            }
+            throw vError;
+        }
     }
 
     /**
      * Returns the id of this syncgroup.
      */
     public Id getId() {
-        return mId;
+        return new Id(mCoreSyncgroup.getId());
     }
 
     /**
      * Returns the {@code AccessList} for this syncgroup.
      */
-    public AccessList getAccessList() {
-        Map<String, SyncgroupSpec> versionedSpec;
-        try {
-            versionedSpec = VFutures.sync(mVSyncgroup.getSpec(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("getSpec failed", e);
-        }
-        return new AccessList(versionedSpec.values().iterator().next().getPerms());
+    public AccessList getAccessList() throws VError {
+        return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
     }
 
     /**
@@ -94,10 +84,11 @@ public class Syncgroup {
     /**
      * FOR ADVANCED USERS. Adds the given users to the syncgroup, with the specified access level.
      */
-    public void inviteUsers(List<User> users, AccessList.AccessLevel level, UpdateAccessListOptions opts) {
+    public void inviteUsers(List<User> users, AccessList.AccessLevel level,
+                            UpdateAccessListOptions opts) throws VError {
         AccessList delta = new AccessList();
         for (User u : users) {
-            delta.users.put(u.getId(), level);
+            delta.users.put(u.getAlias(), level);
         }
         updateAccessList(delta, opts);
     }
@@ -105,24 +96,24 @@ public class Syncgroup {
     /**
      * Adds the given users to the syncgroup, with the specified access level.
      */
-    public void inviteUsers(List<User> users, AccessList.AccessLevel level) {
+    public void inviteUsers(List<User> users, AccessList.AccessLevel level) throws VError {
         inviteUsers(users, level, new UpdateAccessListOptions());
     }
 
     /**
      * Adds the given user to the syncgroup, with the specified access level.
      */
-    public void inviteUser(User user, AccessList.AccessLevel level) {
+    public void inviteUser(User user, AccessList.AccessLevel level) throws VError {
         inviteUsers(Collections.singletonList(user), level);
     }
 
     /**
      * FOR ADVANCED USERS. Removes the given users from the syncgroup.
      */
-    public void ejectUsers(List<User> users, UpdateAccessListOptions opts) {
+    public void ejectUsers(List<User> users, UpdateAccessListOptions opts) throws VError {
         AccessList delta = new AccessList();
         for (User u : users) {
-            delta.users.put(u.getId(), null);
+            delta.users.put(u.getAlias(), null);
         }
         updateAccessList(delta, opts);
     }
@@ -130,44 +121,46 @@ public class Syncgroup {
     /**
      * Removes the given users from the syncgroup.
      */
-    public void ejectUsers(List<User> users) {
+    public void ejectUsers(List<User> users) throws VError {
         ejectUsers(users, new UpdateAccessListOptions());
     }
 
     /**
      * Removes the given user from the syncgroup.
      */
-    public void ejectUser(User user) {
+    public void ejectUser(User user) throws VError {
         ejectUsers(Collections.singletonList(user));
     }
 
     /**
      * FOR ADVANCED USERS. Applies {@code delta} to the {@code AccessList}.
      */
-    public void updateAccessList(final AccessList delta, UpdateAccessListOptions opts) {
+    public void updateAccessList(final AccessList delta, UpdateAccessListOptions opts)
+            throws VError {
         // TODO(sadovsky): Make it so SyncgroupSpec can be updated as part of a batch?
-        Map<String, SyncgroupSpec> versionedSpec;
+        VersionedSyncgroupSpec versionedSyncgroupSpec;
         try {
-            versionedSpec = VFutures.sync(mVSyncgroup.getSpec(Syncbase.getVContext()));
-        } catch (VException e) {
-            throw new RuntimeException("getSpec failed", e);
+            versionedSyncgroupSpec = mCoreSyncgroup.getSpec();
+        } catch (VError vError) {
+            throw new RuntimeException("getSpec failed", vError);
         }
-        String version = versionedSpec.keySet().iterator().next();
-        SyncgroupSpec spec = versionedSpec.values().iterator().next();
-        AccessList.applyDelta(spec.getPerms(), delta);
-        try {
-            VFutures.sync(mVSyncgroup.setSpec(Syncbase.getVContext(), spec, version));
-        } catch (VException e) {
-            throw new RuntimeException("setSpec failed", e);
-        }
+        Permissions newPermissions = AccessList.applyDelta(
+                versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
+        versionedSyncgroupSpec.syncgroupSpec.permissions = newPermissions;
+        mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
         // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
-        // after spec.getCollections() but before db.getCollection().
-        final List<io.v.v23.services.syncbase.Id> cxVIds = spec.getCollections();
+        // after getSpec() but before db.getCollection().
+        final List<io.v.syncbase.core.Id> collectionsIds =
+                versionedSyncgroupSpec.syncgroupSpec.collections;
         mDatabase.runInBatch(new Database.BatchOperation() {
             @Override
             public void run(BatchDatabase db) {
-                for (io.v.v23.services.syncbase.Id vId : cxVIds) {
-                    db.getCollection(new Id(vId)).updateAccessList(delta);
+                for (io.v.syncbase.core.Id id : collectionsIds) {
+                    try {
+                        db.getCollection(new Id(id)).updateAccessList(delta);
+                    } catch (VError vError) {
+                        throw new RuntimeException("getCollection failed", vError);
+                    }
                 }
             }
         }, new Database.BatchOptions());

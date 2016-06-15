@@ -4,17 +4,13 @@
 
 package io.v.syncbase;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
-
 /**
  * Describes a change to a database.
  */
 public class WatchChange {
     public enum ChangeType {
         PUT,
-        DELETE;
+        DELETE
     }
 
     private final ChangeType mChangeType;
@@ -24,6 +20,17 @@ public class WatchChange {
     private final byte[] mResumeMarker;
     private final boolean mFromSync;
     private final boolean mContinued;
+
+    protected WatchChange(io.v.syncbase.core.WatchChange change) {
+        mChangeType = change.changeType == io.v.syncbase.core.WatchChange.ChangeType.PUT ?
+                ChangeType.PUT : ChangeType.DELETE;
+        mCollectionId = new Id(change.collection);
+        mRowKey = change.row;
+        mValue = change.value;
+        mResumeMarker = change.resumeMarker.getBytes();
+        mFromSync = change.fromSync;
+        mContinued = change.continued;
+    }
 
     public ChangeType getChangeType() {
         return mChangeType;
@@ -51,19 +58,5 @@ public class WatchChange {
 
     public boolean isContinued() {
         return mContinued;
-    }
-
-    // TODO(sadovsky): Eliminate the code below once we've switched to io.v.syncbase.core.
-
-    protected WatchChange(io.v.v23.syncbase.WatchChange c) {
-        mChangeType = c.getChangeType() == io.v.v23.syncbase.ChangeType.PUT_CHANGE ? ChangeType.PUT : ChangeType.DELETE;
-        mCollectionId = new Id(c.getCollectionId());
-        mRowKey = c.getRowName();
-        mValue = c.getValue();
-        List<Byte> bytes = Lists.newArrayList(c.getResumeMarker().iterator());
-        mResumeMarker = new byte[bytes.size()];
-        for (int i = 0; i < mResumeMarker.length; i++) mResumeMarker[i] = (byte) bytes.get(i);
-        mFromSync = c.isFromSync();
-        mContinued = c.isContinued();
     }
 }

@@ -16,6 +16,10 @@ public class Syncgroup {
         this.id = id;
     }
 
+    public Id getId() {
+        return id;
+    }
+
     public void create(SyncgroupSpec spec, SyncgroupMemberInfo info) throws VError {
         io.v.syncbase.internal.Database.CreateSyncgroup(dbFullName, id, spec, info);
     }
@@ -47,7 +51,7 @@ public class Syncgroup {
         io.v.syncbase.internal.Database.SetSyncgroupSpec(dbFullName, id, spec);
     }
 
-    public Map<String,SyncgroupMemberInfo> getMembers() throws VError {
+    public Map<String, SyncgroupMemberInfo> getMembers() throws VError {
         return io.v.syncbase.internal.Database.GetSyncgroupMembers(dbFullName, id);
     }
 }

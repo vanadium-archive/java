@@ -9,9 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import io.v.v23.security.BlessingPattern;
-import io.v.v23.security.access.Constants;
-import io.v.v23.security.access.Permissions;
+import io.v.syncbase.core.Permissions;
 
 /**
  * Specifies access levels for a set of users. Each user has an associated access level: read-only,
@@ -26,14 +24,15 @@ public class AccessList {
 
     public Map<String, AccessLevel> users;
 
-    private static Set<String> vAccessListToUserIds(io.v.v23.security.access.AccessList accessList) {
-        if (!accessList.getNotIn().isEmpty()) {
+    private static Set<String> parsedAccessListToUserIds(Map<String, Set<String>> accessList) {
+        Set<String> res = new HashSet<>();
+        if (accessList.containsKey(Permissions.NOT_IN) &&
+                !accessList.get(Permissions.NOT_IN).isEmpty()) {
             throw new RuntimeException("Non-empty not-in section: " + accessList);
         }
-        Set<String> res = new HashSet<>();
-        for (BlessingPattern bp : accessList.getIn()) {
+        for (String blessingPattern : accessList.get(Permissions.IN)) {
             // TODO(sadovsky): Ignore cloud peer's blessing pattern?
-            res.add(Syncbase.getEmailFromBlessingPattern(bp));
+            res.add(Syncbase.getEmailFromBlessingPattern(blessingPattern));
         }
         return res;
     }
@@ -45,11 +44,13 @@ public class AccessList {
         this.users = new HashMap<>();
     }
 
-    protected AccessList(Permissions perms) {
-        Set<String> resolvers = vAccessListToUserIds(perms.get(Constants.RESOLVE.getValue()));
-        Set<String> readers = vAccessListToUserIds(perms.get(Constants.READ.getValue()));
-        Set<String> writers = vAccessListToUserIds(perms.get(Constants.WRITE.getValue()));
-        Set<String> admins = vAccessListToUserIds(perms.get(Constants.ADMIN.getValue()));
+    protected AccessList(Permissions corePermissions) {
+        Map<String, Map<String, Set<String>>> parsedPermissions = corePermissions.parse();
+        Set<String> resolvers = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.RESOLVE));
+        Set<String> readers = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.READ));
+        Set<String> writers = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.WRITE));
+        Set<String> admins = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.ADMIN));
+
         if (!readers.containsAll(writers)) {
             throw new RuntimeException("Some readers are not resolvers: " + readers + ", " + resolvers);
         }
@@ -70,50 +71,52 @@ public class AccessList {
         }
     }
 
-    private static void addToVAccessList(io.v.v23.security.access.AccessList accessList, BlessingPattern bp) {
-        if (!accessList.getIn().contains(bp)) {
-            accessList.getIn().add(bp);
+    private static void addToVAccessList(Map<String, Set<String>> accessList, String blessing) {
+        if (!accessList.get(Permissions.IN).contains(blessing)) {
+            accessList.get(Permissions.IN).add(blessing);
         }
     }
 
-    private static void removeFromVAccessList(io.v.v23.security.access.AccessList accessList, BlessingPattern bp) {
-        accessList.getIn().remove(bp);
+    private static void removeFromVAccessList(Map<String, Set<String>> accessList, String blessing) {
+        accessList.get(Permissions.IN).remove(blessing);
     }
 
     /**
-     * Applies delta to perms, modifying perms in place.
+     * Computes a new Permissions object based on delta.
      */
-    protected static void applyDelta(Permissions perms, AccessList delta) {
+    protected static Permissions applyDelta(Permissions corePermissions, AccessList delta) {
+        Map<String, Map<String, Set<String>>> parsedPermissions = corePermissions.parse();
         for (String userId : delta.users.keySet()) {
             AccessLevel level = delta.users.get(userId);
-            BlessingPattern bp = Syncbase.getBlessingPatternFromEmail(userId);
+            String blessing = Syncbase.getBlessingStringFromEmail(userId);
             if (level == null) {
-                removeFromVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                removeFromVAccessList(perms.get(Constants.READ.getValue()), bp);
-                removeFromVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                removeFromVAccessList(parsedPermissions.get(Permissions.Tags.RESOLVE), blessing);
+                removeFromVAccessList(parsedPermissions.get(Permissions.Tags.READ), blessing);
+                removeFromVAccessList(parsedPermissions.get(Permissions.Tags.WRITE), blessing);
+                removeFromVAccessList(parsedPermissions.get(Permissions.Tags.ADMIN), blessing);
                 continue;
             }
             switch (level) {
                 case READ:
-                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                    removeFromVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                    removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.RESOLVE), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.READ), blessing);
+                    removeFromVAccessList(parsedPermissions.get(Permissions.Tags.WRITE), blessing);
+                    removeFromVAccessList(parsedPermissions.get(Permissions.Tags.ADMIN), blessing);
                     break;
                 case READ_WRITE:
-                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                    removeFromVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.RESOLVE), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.READ), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.WRITE), blessing);
+                    removeFromVAccessList(parsedPermissions.get(Permissions.Tags.ADMIN), blessing);
                     break;
                 case READ_WRITE_ADMIN:
-                    addToVAccessList(perms.get(Constants.RESOLVE.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.READ.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.WRITE.getValue()), bp);
-                    addToVAccessList(perms.get(Constants.ADMIN.getValue()), bp);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.RESOLVE), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.READ), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.WRITE), blessing);
+                    addToVAccessList(parsedPermissions.get(Permissions.Tags.ADMIN), blessing);
                     break;
             }
         }
+        return new Permissions(parsedPermissions);
     }
 }
