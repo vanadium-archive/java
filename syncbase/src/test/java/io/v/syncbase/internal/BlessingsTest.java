@@ -4,8 +4,13 @@
 
 package io.v.syncbase.internal;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.IOException;
 
 import io.v.syncbase.core.VError;
 
@@ -15,9 +20,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class BlessingsTest {
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         System.loadLibrary("syncbase");
+        Service.Init(folder.newFolder().getAbsolutePath());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        Service.Shutdown();
     }
 
     @Test

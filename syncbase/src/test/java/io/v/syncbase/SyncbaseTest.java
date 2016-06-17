@@ -7,6 +7,7 @@ package io.v.syncbase;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.SettableFuture;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +37,11 @@ public class SyncbaseTest {
     @Before
     public void setUp() throws Exception {
         System.loadLibrary("syncbase");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        Syncbase.shutdown();
     }
 
     private Syncbase.DatabaseOptions newDatabaseOptions() {

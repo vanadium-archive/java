@@ -7,6 +7,7 @@ package io.v.syncbase;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -38,8 +39,8 @@ public class Syncbase {
     public static class DatabaseOptions {
         // Where data should be persisted.
         public String rootDir;
-        // TODO(sadovsky): Figure out what this should default to.
-        public List<String> mountPoints = ImmutableList.of("/ns.dev.v.io:8101/tmp/todos/users/");
+        // We use an empty mountPoints to avoid talking to the global mounttabled.
+        public List<String> mountPoints = new ArrayList<>();
         // TODO(sadovsky): Figure out how developers should specify this.
         public String adminUserId = "alexfandrianto@google.com";
         // TODO(sadovsky): Figure out how developers should specify this.
@@ -120,6 +121,7 @@ public class Syncbase {
         sSelfAndCloud = ImmutableMap.of(
                 Permissions.IN, ImmutableList.of(getPersonalBlessingString(),
                         sOpts.getCloudBlessingString()));
+        io.v.syncbase.internal.Service.Init(sOpts.rootDir);
         // TODO(razvanm): Surface Cgo function to shut down syncbase.
         try {
             // TODO(razvanm): Use just the name after Blessings.AppBlessingFromContext starts
@@ -156,6 +158,14 @@ public class Syncbase {
             // new JNI API, we'll need to add Go code for this, since Java can't make RPCs.
             cb.onError(new RuntimeException("Synced userdata collection is not yet supported"));
         }
+    }
+
+    public static void shutdown() {
+        if (sDatabase == null) {
+            return;
+        }
+        io.v.syncbase.internal.Service.Shutdown();
+        sDatabase = null;
     }
 
     /**

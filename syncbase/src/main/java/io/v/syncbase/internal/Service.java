@@ -11,6 +11,9 @@ import io.v.syncbase.core.VError;
 import io.v.syncbase.core.VersionedPermissions;
 
 public class Service {
+    public static native void Init(String rootDir);
+    public static native void Shutdown();
+
     public static native VersionedPermissions GetPermissions();
     public static native void SetPermissions(VersionedPermissions permissions) throws VError;
 
