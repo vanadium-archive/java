@@ -12,6 +12,7 @@ import io.v.syncbase.core.VersionedPermissions;
 
 public class Service {
     public static native void Init(String rootDir);
+    public static native void Serve() throws VError;
     public static native void Shutdown();
 
     public static native VersionedPermissions GetPermissions();
@@ -19,4 +20,5 @@ public class Service {
 
     public static native List<Id> ListDatabases() throws Error;
     public static native void Login(String oAuthProvider, String oAuthToken) throws VError;
+    public static native boolean IsLoggedIn();
 }

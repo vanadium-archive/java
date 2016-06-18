@@ -6,13 +6,12 @@ package io.v.syncbase.internal;
 
 import com.google.common.util.concurrent.SettableFuture;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import io.v.syncbase.Syncbase;
 import io.v.syncbase.core.CollectionRowPattern;
 import io.v.syncbase.core.Id;
 import io.v.syncbase.core.SyncgroupMemberInfo;
@@ -42,17 +40,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class DatabaseTest {
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeClass
+    public static void setUp() throws Exception {
         System.loadLibrary("syncbase");
         Service.Init(folder.newFolder().getAbsolutePath());
+        Service.Serve();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         Service.Shutdown();
     }
 

@@ -4,35 +4,32 @@
 
 package io.v.syncbase.core;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
-
 import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.core.TestConstants.anyDbPermissions;
-import static io.v.syncbase.internal.Service.Init;
-import static io.v.syncbase.internal.Service.Shutdown;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class RowTest {
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder folder = new TemporaryFolder();
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeClass
+    public static void setUp() throws Exception {
         System.loadLibrary("syncbase");
         io.v.syncbase.internal.Service.Init(folder.newFolder().getAbsolutePath());
+        io.v.syncbase.internal.Service.Serve();
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         io.v.syncbase.internal.Service.Shutdown();
     }
 

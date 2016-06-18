@@ -13,7 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -37,42 +36,35 @@ public class SyncbaseTest {
     @Before
     public void setUp() throws Exception {
         System.loadLibrary("syncbase");
+        Syncbase.Options opts = new Syncbase.Options();
+        opts.rootDir = folder.newFolder().getAbsolutePath();
+        opts.disableUserdataSyncgroup = true;
+        opts.disableSyncgroupPublishing = true;
+        Syncbase.init(opts);
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         Syncbase.shutdown();
     }
 
-    private Syncbase.DatabaseOptions newDatabaseOptions() {
-        Syncbase.DatabaseOptions opts = new Syncbase.DatabaseOptions();
-        // Use a fresh rootDir for each test run.
-        try {
-            opts.rootDir = folder.newFolder().getAbsolutePath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        opts.disableUserdataSyncgroup = true;
-        opts.disableSyncgroupPublishing = true;
-        return opts;
-    }
-
     private Database createDatabase() throws Exception {
-        final SettableFuture<Database> future = SettableFuture.create();
+        final SettableFuture<Void> future = SettableFuture.create();
 
-        Syncbase.database(new Syncbase.DatabaseCallback() {
+        Syncbase.login("", "google", new Syncbase.LoginCallback() {
             @Override
-            public void onSuccess(Database db) {
-                future.set(db);
+            public void onSuccess() {
+                future.set(null);
             }
 
             @Override
             public void onError(Throwable e) {
                 future.setException(e);
             }
-        }, newDatabaseOptions());
+        });
 
-        return future.get(5, TimeUnit.SECONDS);
+        future.get(5, TimeUnit.SECONDS);
+        return Syncbase.database();
     }
 
     private static Iterable<Id> getCollectionIds(Database db) throws VError {
@@ -99,6 +91,7 @@ public class SyncbaseTest {
     @Test
     public void testCreateAndGetCollections() throws Exception {
         Database db = createDatabase();
+        assertNotNull(db);
         DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions();
         opts.withoutSyncgroup = true;
         Collection cxA = db.collection("a", opts);

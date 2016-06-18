@@ -36,7 +36,7 @@ public class Syncbase {
     /**
      * Options for opening a database.
      */
-    public static class DatabaseOptions {
+    public static class Options {
         // Where data should be persisted.
         public String rootDir;
         // We use an empty mountPoints to avoid talking to the global mounttabled.
@@ -62,7 +62,7 @@ public class Syncbase {
         }
     }
 
-    protected static DatabaseOptions sOpts;
+    protected static Options sOpts;
     private static Database sDatabase;
     private static Map sSelfAndCloud;
 
@@ -87,83 +87,44 @@ public class Syncbase {
         }, 0);
     }
 
-    public static abstract class DatabaseCallback {
-        public void onSuccess(Database db) {
-        }
-
-        public void onError(Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
-     * Starts Syncbase if needed; creates default database if needed; performs create-or-join for
-     * "userdata" syncgroup if needed. The passed callback is called on the current thread.
-     * Fails if the user is not logged in.
+     * Sets the initial options. If the user is already logged in, Syncbase will be started.
      *
-     * @param opts options for database creation
-     * @param cb   the callback to call with the database handle
+     * @param opts
      */
-    public static void database(final DatabaseCallback cb, DatabaseOptions opts) {
-        // TODO(sadovsky): The create-or-join forces this method to be async, which is annoying
-        // since create-or-join will no longer be necessary once syncgroup merge is supported.
-        if (sDatabase != null) {
-            // TODO(sadovsky): Check that opts matches original opts (sOpts)?
-            Syncbase.enqueue(new Runnable() {
-                @Override
-                public void run() {
-                    cb.onSuccess(sDatabase);
-                }
-            });
-            return;
-        }
+    public static void init(Options opts) throws VError {
         sOpts = opts;
         sSelfAndCloud = ImmutableMap.of(
                 Permissions.IN, ImmutableList.of(getPersonalBlessingString(),
                         sOpts.getCloudBlessingString()));
         io.v.syncbase.internal.Service.Init(sOpts.rootDir);
-        // TODO(razvanm): Surface Cgo function to shut down syncbase.
-        try {
-            // TODO(razvanm): Use just the name after Blessings.AppBlessingFromContext starts
-            // working.
-            sDatabase = new Database(Service.database(new io.v.syncbase.core.Id("...", DB_NAME)));
-            sDatabase.createIfMissing();
-        } catch (final VError vError) {
-            enqueue(new Runnable() {
-                @Override
-                public void run() {
-                    cb.onError(vError);
-                }
-            });
-            return;
-        }
-
-        if (sOpts.disableUserdataSyncgroup) {
-            Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
-            cxOpts.withoutSyncgroup = true;
-            try {
-                sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
-            } catch (VError vError) {
-                cb.onError(vError);
-                return;
-            }
-            Syncbase.enqueue(new Runnable() {
-                @Override
-                public void run() {
-                    cb.onSuccess(sDatabase);
-                }
-            });
-        } else {
-            // FIXME(sadovsky): Implement create-or-join (and watch) of userdata syncgroup. For the
-            // new JNI API, we'll need to add Go code for this, since Java can't make RPCs.
-            cb.onError(new RuntimeException("Synced userdata collection is not yet supported"));
+        if (isLoggedIn()) {
+            io.v.syncbase.internal.Service.Serve();
         }
     }
 
-    public static void shutdown() {
-        if (sDatabase == null) {
-            return;
+    /**
+     * Returns a Database object. Return null if the user is not currently logged in.
+     */
+    public static Database database() throws VError {
+        // TODO(razvanm): Uncomment the above after the login is properly wired up.
+//        if (!isLoggedIn()) {
+//            return null;
+//        }
+        if (sDatabase != null) {
+            // TODO(sadovsky): Check that opts matches original opts (sOpts)?
+            return sDatabase;
         }
+        // TODO(razvanm): Use just the name after Blessings.AppBlessingFromContext starts
+        // working.
+        sDatabase = new Database(Service.database(new io.v.syncbase.core.Id("...", DB_NAME)));
+        return sDatabase;
+    }
+
+    /**
+     * Close the database and stop Syncbase.
+     */
+    public static void shutdown() {
         io.v.syncbase.internal.Service.Shutdown();
         sDatabase = null;
     }
@@ -172,7 +133,7 @@ public class Syncbase {
      * Returns true iff the user is currently logged in.
      */
     public static boolean isLoggedIn() {
-        throw new RuntimeException("Not implemented");
+        return io.v.syncbase.internal.Service.IsLoggedIn();
     }
 
     /**
@@ -182,8 +143,20 @@ public class Syncbase {
         throw new RuntimeException("Not implemented");
     }
 
+    public static abstract class LoginCallback {
+        public void onSuccess() {
+        }
+
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
-     * Logs in the user associated with the given OAuth token and provider.
+     * Logs in the user associated with the given OAuth token and provider and starts Syncbase;
+     * creates default database if needed; performs create-or-join for "userdata" syncgroup if
+     * needed. The passed callback is called on the current thread.
+     *
      * <p/>
      * A mapping of providers and OAuth token scopes are listed below:
      * google: https://www.googleapis.com/auth/userinfo.email
@@ -192,12 +165,45 @@ public class Syncbase {
      *
      * @param authToken The OAuth token for the user to be logged in.
      * @param provider  The provider of the OAuth token.
+     * @param cb        The callback to call when the login was done.
      */
-    public static void login(String authToken, String provider) {
+    public static void login(final String authToken, final String provider, final LoginCallback cb) {
         if (!provider.equals("google")) {
             throw new RuntimeException("Unsupported provider: " + provider);
         }
-        throw new RuntimeException("Not implemented");
+
+        Syncbase.enqueue(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // TODO(razvanm): Replace the call to Serve() with a call to
+                    // io.v.syncbase.internal.Service.Login() after we come up with a way to keep
+                    // the tests happy.
+                    io.v.syncbase.internal.Service.Serve();
+                    sDatabase = database();
+                    sDatabase.createIfMissing();
+                    if (sOpts.disableUserdataSyncgroup) {
+                        Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
+                        cxOpts.withoutSyncgroup = true;
+                        sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
+                        Syncbase.enqueue(new Runnable() {
+                            @Override
+                            public void run() {
+                                cb.onSuccess();
+                            }
+                        });
+                    } else {
+                        // FIXME(sadovsky): Implement create-or-join (and watch) of userdata
+                        // syncgroup. For the new JNI API, we'll need to add Go code for this,
+                        // since Java can't make RPCs.
+                        cb.onError(new RuntimeException(
+                                "Synced userdata collection is not yet supported"));
+                    }
+                } catch (VError vError) {
+                    cb.onError(vError);
+                }
+            }
+        });
     }
 
     /**
