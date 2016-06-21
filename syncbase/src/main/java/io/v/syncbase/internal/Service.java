@@ -11,7 +11,7 @@ import io.v.syncbase.core.VError;
 import io.v.syncbase.core.VersionedPermissions;
 
 public class Service {
-    public static native void Init(String rootDir);
+    public static native void Init(String rootDir, boolean testLogin);
     public static native void Serve() throws VError;
     public static native void Shutdown();
 

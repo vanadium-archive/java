@@ -49,6 +49,9 @@ public class Syncbase {
         public boolean disableSyncgroupPublishing;
         // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
         public boolean disableUserdataSyncgroup;
+        // FOR TESTING. If true, the app name is set to 'app', the user name is set to 'user' and
+        // the arguments to login() are ignored.
+        public boolean testLogin;
 
         protected String getPublishSyncbaseName() {
             if (disableSyncgroupPublishing) {
@@ -97,7 +100,7 @@ public class Syncbase {
         sSelfAndCloud = ImmutableMap.of(
                 Permissions.IN, ImmutableList.of(getPersonalBlessingString(),
                         sOpts.getCloudBlessingString()));
-        io.v.syncbase.internal.Service.Init(sOpts.rootDir);
+        io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
         if (isLoggedIn()) {
             io.v.syncbase.internal.Service.Serve();
         }
@@ -107,10 +110,9 @@ public class Syncbase {
      * Returns a Database object. Return null if the user is not currently logged in.
      */
     public static Database database() throws VError {
-        // TODO(razvanm): Uncomment the above after the login is properly wired up.
-//        if (!isLoggedIn()) {
-//            return null;
-//        }
+        if (!isLoggedIn()) {
+            return null;
+        }
         if (sDatabase != null) {
             // TODO(sadovsky): Check that opts matches original opts (sOpts)?
             return sDatabase;
@@ -168,7 +170,7 @@ public class Syncbase {
      * @param cb        The callback to call when the login was done.
      */
     public static void login(final String authToken, final String provider, final LoginCallback cb) {
-        if (!provider.equals("google")) {
+        if (!(provider.equals(User.PROVIDER_GOOGLE) || provider.equals(User.PROVIDER_NONE))) {
             throw new RuntimeException("Unsupported provider: " + provider);
         }
 
@@ -176,10 +178,7 @@ public class Syncbase {
             @Override
             public void run() {
                 try {
-                    // TODO(razvanm): Replace the call to Serve() with a call to
-                    // io.v.syncbase.internal.Service.Login() after we come up with a way to keep
-                    // the tests happy.
-                    io.v.syncbase.internal.Service.Serve();
+                    io.v.syncbase.internal.Service.Login(provider, authToken);
                     sDatabase = database();
                     sDatabase.createIfMissing();
                     if (sOpts.disableUserdataSyncgroup) {

@@ -40,6 +40,7 @@ public class SyncbaseTest {
         opts.rootDir = folder.newFolder().getAbsolutePath();
         opts.disableUserdataSyncgroup = true;
         opts.disableSyncgroupPublishing = true;
+        opts.testLogin = true;
         Syncbase.init(opts);
     }
 
@@ -51,7 +52,7 @@ public class SyncbaseTest {
     private Database createDatabase() throws Exception {
         final SettableFuture<Void> future = SettableFuture.create();
 
-        Syncbase.login("", "google", new Syncbase.LoginCallback() {
+        Syncbase.login("", "", new Syncbase.LoginCallback() {
             @Override
             public void onSuccess() {
                 future.set(null);

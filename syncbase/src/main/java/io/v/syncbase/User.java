@@ -9,6 +9,7 @@ package io.v.syncbase;
  */
 public class User {
     public static final String PROVIDER_GOOGLE = "google";
+    public static final String PROVIDER_NONE = "";
 
     private String mAlias;
     private String mProvider;

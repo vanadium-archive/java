@@ -46,8 +46,8 @@ public class DatabaseTest {
     @BeforeClass
     public static void setUp() throws Exception {
         System.loadLibrary("syncbase");
-        Service.Init(folder.newFolder().getAbsolutePath());
-        Service.Serve();
+        Service.Init(folder.newFolder().getAbsolutePath(), true);
+        Service.Login("", "");
     }
 
     @AfterClass
