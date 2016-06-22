@@ -32,6 +32,11 @@ public abstract class DatabaseHandle {
      */
     public static class CollectionOptions {
         public boolean withoutSyncgroup;
+
+        public CollectionOptions setWithoutSyncgroup(boolean value) {
+            withoutSyncgroup = value;
+            return this;
+        }
     }
 
     /**

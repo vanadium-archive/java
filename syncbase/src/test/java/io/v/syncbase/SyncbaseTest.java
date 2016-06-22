@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SyncbaseTest {
     @Rule
@@ -174,11 +175,63 @@ public class SyncbaseTest {
 
     @Test
     public void testWatch() throws Exception {
-        // TODO(sadovsky): Implement.
+        Database db = createDatabase();
+        final SettableFuture<Void> waitOnInitialState = SettableFuture.create();
+        final SettableFuture<Void> waitOnChangeBatch = SettableFuture.create();
+        Collection collection = db.collection("c");
+        collection.put("foo", 1);
+        db.addWatchChangeHandler(new Database.WatchChangeHandler() {
+            @Override
+            public void onInitialState(Iterator<WatchChange> values) {
+                assertTrue(values.hasNext());
+                WatchChange watchChange = (WatchChange)values.next();
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                // TODO(razvanm): Uncomment after the POJO start working.
+                //assertEquals(1, watchChange.getValue());
+                assertFalse(values.hasNext());
+                waitOnInitialState.set(null);
+            }
+
+            @Override
+            public void onChangeBatch(Iterator<WatchChange> changes) {
+                assertTrue(changes.hasNext());
+                WatchChange watchChange = (WatchChange)changes.next();
+                assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
+                // TODO(razvanm): Uncomment after the POJO start working.
+                //assertEquals(1, watchChange.getValue());
+                assertFalse(changes.hasNext());
+                waitOnChangeBatch.set(null);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                VError vError = (VError)e;
+                assertEquals("v.io/v23/verror.Unknown", vError.id);
+                assertEquals("context canceled", vError.message);
+                assertEquals(0, vError.actionCode);
+            }
+        });
+        waitOnInitialState.get(1, TimeUnit.SECONDS);
+        collection.delete("foo");
+        waitOnChangeBatch.get(1, TimeUnit.SECONDS);
     }
 
     @Test
     public void testRunInBatch() throws Exception {
-        // TODO(sadovsky): Implement.
+        Database db = createDatabase();
+        db.runInBatch(new Database.BatchOperation() {
+            @Override
+            public void run(BatchDatabase db) {
+                try {
+                    DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions()
+                            .setWithoutSyncgroup(true);
+                    db.collection("c", opts).put("foo", 10);
+                } catch (VError vError) {
+                    vError.printStackTrace();
+                    fail(vError.toString());
+                }
+            }
+        }, new Database.BatchOptions());
+        assertEquals(db.collection("c").get("foo", Integer.class), Integer.valueOf(10));
     }
 }
