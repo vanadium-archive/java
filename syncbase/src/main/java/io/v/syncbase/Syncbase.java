@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.internal.Blessings;
 
 // FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
 // decide which error types to surface to clients, and define specific Exception subclasses for
@@ -67,7 +68,6 @@ public class Syncbase {
 
     protected static Options sOpts;
     private static Database sDatabase;
-    private static Map sSelfAndCloud;
 
     // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
     // developer-specified names.
@@ -90,6 +90,11 @@ public class Syncbase {
         }, 0);
     }
 
+    private static Map selfAndCloud() throws VError {
+        return ImmutableMap.of(Permissions.IN,
+                ImmutableList.of(getPersonalBlessingString(), sOpts.getCloudBlessingString()));
+    }
+
     /**
      * Sets the initial options. If the user is already logged in, Syncbase will be started.
      *
@@ -97,9 +102,6 @@ public class Syncbase {
      */
     public static void init(Options opts) throws VError {
         sOpts = opts;
-        sSelfAndCloud = ImmutableMap.of(
-                Permissions.IN, ImmutableList.of(getPersonalBlessingString(),
-                        sOpts.getCloudBlessingString()));
         io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
         if (isLoggedIn()) {
             io.v.syncbase.internal.Service.Serve();
@@ -117,9 +119,7 @@ public class Syncbase {
             // TODO(sadovsky): Check that opts matches original opts (sOpts)?
             return sDatabase;
         }
-        // TODO(razvanm): Use just the name after Blessings.AppBlessingFromContext starts
-        // working.
-        sDatabase = new Database(Service.database(new io.v.syncbase.core.Id("...", DB_NAME)));
+        sDatabase = new Database(Service.database(DB_NAME));
         return sDatabase;
     }
 
@@ -263,34 +263,35 @@ public class Syncbase {
         return parts[parts.length - 1];
     }
 
-    protected static String getPersonalBlessingString() {
-        // TODO(razvanm): Switch to Blessings.UserBlessingFromContext() after the lower level
-        // starts working.
-        return "...";
+    protected static String getPersonalBlessingString() throws VError {
+        return Blessings.UserBlessingFromContext().toString();
     }
 
     protected static Permissions defaultDatabasePerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map anyone = ImmutableMap.of(Permissions.IN, ImmutableList.of("..."));
+        Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(
                 Permissions.Tags.RESOLVE, anyone,
-                Permissions.Tags.READ, sSelfAndCloud,
-                Permissions.Tags.WRITE, sSelfAndCloud,
-                Permissions.Tags.ADMIN, sSelfAndCloud));
+                Permissions.Tags.READ, selfAndCloud,
+                Permissions.Tags.WRITE, selfAndCloud,
+                Permissions.Tags.ADMIN, selfAndCloud));
     }
 
     protected static Permissions defaultCollectionPerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
+        Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(
-                Permissions.Tags.READ, sSelfAndCloud,
-                Permissions.Tags.WRITE, sSelfAndCloud,
-                Permissions.Tags.ADMIN, sSelfAndCloud));
+                Permissions.Tags.READ, selfAndCloud,
+                Permissions.Tags.WRITE, selfAndCloud,
+                Permissions.Tags.ADMIN, selfAndCloud));
     }
 
     protected static Permissions defaultSyncgroupPerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
+        Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(
-                Permissions.Tags.READ, sSelfAndCloud,
-                Permissions.Tags.ADMIN, sSelfAndCloud));
+                Permissions.Tags.READ, selfAndCloud,
+                Permissions.Tags.ADMIN, selfAndCloud));
     }
 }

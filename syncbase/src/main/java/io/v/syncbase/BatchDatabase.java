@@ -19,7 +19,7 @@ public class BatchDatabase extends DatabaseHandle {
     }
 
     @Override
-    public Collection collection(String name, CollectionOptions opts) {
+    public Collection collection(String name, CollectionOptions opts) throws VError {
         if (!opts.withoutSyncgroup) {
             throw new RuntimeException("Cannot create syncgroup in a batch");
         }
