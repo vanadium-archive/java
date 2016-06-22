@@ -23,7 +23,6 @@ import io.v.syncbase.Syncbase;
 public class InitTestInstrumented {
     @Test
     public void init() throws Exception {
-        System.loadLibrary("syncbase");
         Syncbase.Options opts = new Syncbase.Options();
         opts.rootDir = InstrumentationRegistry.getContext()
                 .getDir("syncbase", Context.MODE_PRIVATE).getAbsolutePath();

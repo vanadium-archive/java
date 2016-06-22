@@ -36,7 +36,6 @@ public class SyncbaseTest {
     // -Djava.library.path=/Users/sadovsky/vanadium/release/java/syncbase/build/libs
     @Before
     public void setUp() throws Exception {
-        System.loadLibrary("syncbase");
         Syncbase.Options opts = new Syncbase.Options();
         opts.rootDir = folder.newFolder().getAbsolutePath();
         opts.disableUserdataSyncgroup = true;

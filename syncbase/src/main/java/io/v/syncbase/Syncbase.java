@@ -101,6 +101,7 @@ public class Syncbase {
      * @param opts
      */
     public static void init(Options opts) throws VError {
+        System.loadLibrary("syncbase");
         sOpts = opts;
         io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
         if (isLoggedIn()) {
