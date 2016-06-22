@@ -199,6 +199,14 @@ class DatabaseImpl implements Database, BatchDatabase {
                 new InputChannels.TransformFunction<Change, WatchChange>() {
                     @Override
                     public WatchChange apply(Change change) throws VException {
+                        if (change.getState()
+                                == io.v.v23.services.watch.Constants.INITIAL_STATE_SKIPPED) {
+                            return null;
+                        }
+                        if (!change.getName().contains("/")) {
+                            // TODO(ivanpi): Pipe collection and initial changes through.
+                            return null;
+                        }
                         return convertToWatchChange(change);
                     }
                 });
