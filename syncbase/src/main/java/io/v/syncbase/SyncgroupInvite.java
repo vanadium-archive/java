@@ -4,6 +4,7 @@
 
 package io.v.syncbase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,24 +12,31 @@ import java.util.List;
  */
 public class SyncgroupInvite {
     private Id mId;
-    private String mRemoteSyncbaseName;
-    private List<String> mExpectedSyncbaseBlessings;
+    private List<String> mInviterBlessingNames;
 
-    protected SyncgroupInvite(Id id, String remoteSyncbaseName, List<String> expectedSyncbaseBlessings) {
+    protected SyncgroupInvite(Id id, List<String> inviterBlessingNames) {
         mId = id;
-        mRemoteSyncbaseName = remoteSyncbaseName;
-        mExpectedSyncbaseBlessings = expectedSyncbaseBlessings;
+        mInviterBlessingNames = inviterBlessingNames;
     }
 
     public Id getId() {
         return mId;
     }
 
-    public String getRemoteSyncbaseName() {
-        return mRemoteSyncbaseName;
+    public User getSyncgroupCreator() {
+        return new User(Syncbase.getAliasFromBlessingPattern(mId.getBlessing()));
     }
 
-    public List<String> getExpectedSyncbaseBlessings() {
-        return mExpectedSyncbaseBlessings;
+    public User getInviter() {
+        if (mInviterBlessingNames.size() == 0) {
+            return null;
+        }
+        // TODO(alexfandrianto): This will normally work because inviter blessing names should be
+        // just a single name. However, this will probably not work if it's the cloud's blessing.
+        return new User(Syncbase.getAliasFromBlessingPattern(mInviterBlessingNames.get(0)));
+    }
+
+    protected List<String> getInviterBlessingNames() {
+        return new ArrayList<>(mInviterBlessingNames);
     }
 }

@@ -45,10 +45,11 @@ public class Syncgroup {
             // SyncgroupMemberInfo.
             mCoreSyncgroup.create(spec, new SyncgroupMemberInfo());
         } catch (VError vError) {
-            if (vError.id.equals(VError.NO_EXIST)) {
+            if (vError.id.equals(VError.EXIST)) {
                 // Syncgroup already exists.
                 // TODO(sadovsky): Verify that the existing syncgroup has the specified
-                // configuration, e.g., the specified collections?
+                // configuration, e.g., the specified collections? instead of returning early.
+                return;
             }
             throw vError;
         }

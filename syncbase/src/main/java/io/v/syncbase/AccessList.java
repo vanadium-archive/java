@@ -32,7 +32,7 @@ public class AccessList {
         }
         for (String blessingPattern : accessList.get(Permissions.IN)) {
             // TODO(sadovsky): Ignore cloud peer's blessing pattern?
-            res.add(Syncbase.getEmailFromBlessingPattern(blessingPattern));
+            res.add(Syncbase.getAliasFromBlessingPattern(blessingPattern));
         }
         return res;
     }
@@ -88,7 +88,7 @@ public class AccessList {
         Map<String, Map<String, Set<String>>> parsedPermissions = corePermissions.parse();
         for (String userId : delta.users.keySet()) {
             AccessLevel level = delta.users.get(userId);
-            String blessing = Syncbase.getBlessingStringFromEmail(userId);
+            String blessing = Syncbase.getBlessingStringFromAlias(userId);
             if (level == null) {
                 removeFromVAccessList(parsedPermissions.get(Permissions.Tags.RESOLVE), blessing);
                 removeFromVAccessList(parsedPermissions.get(Permissions.Tags.READ), blessing);

@@ -10,6 +10,7 @@ import java.util.Map;
 import io.v.syncbase.core.BatchOptions;
 import io.v.syncbase.core.CollectionRowPattern;
 import io.v.syncbase.core.Id;
+import io.v.syncbase.core.SyncgroupInvite;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.SyncgroupMemberInfo;
 import io.v.syncbase.core.SyncgroupSpec;
@@ -48,4 +49,11 @@ public class Database {
     }
 
     public static native void WatchPatterns(String name, byte[] resumeMarker, List<CollectionRowPattern> patterns, WatchPatternsCallbacks callbacks) throws VError;
+
+    public interface SyncgroupInvitesCallbacks {
+        void onInvite(SyncgroupInvite invite);
+    }
+
+    public static native long SyncgroupInvitesNewScan(String name, SyncgroupInvitesCallbacks callbacks) throws VError;
+    public static native void SyncgroupInvitesStopScan(long id);
 }

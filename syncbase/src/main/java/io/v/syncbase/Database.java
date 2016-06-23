@@ -25,7 +25,7 @@ public class Database extends DatabaseHandle {
 
     private final Object mSyncgroupInviteHandlersMu = new Object();
     private final Object mWatchChangeHandlersMu = new Object();
-    private Map<SyncgroupInviteHandler, Runnable> mSyncgroupInviteHandlers = new HashMap<>();
+    private final Map<SyncgroupInviteHandler, Long> mSyncgroupInviteHandlers = new HashMap<>();
     private Map<WatchChangeHandler, Runnable> mWatchChangeHandlers = new HashMap<>();
 
     protected Database(io.v.syncbase.core.Database coreDatabase) {
@@ -149,9 +149,22 @@ public class Database extends DatabaseHandle {
     /**
      * Notifies {@code h} of any existing syncgroup invites, and of all subsequent new invites.
      */
-    public void addSyncgroupInviteHandler(SyncgroupInviteHandler h, AddSyncgroupInviteHandlerOptions opts) {
+    public void addSyncgroupInviteHandler(final SyncgroupInviteHandler h, AddSyncgroupInviteHandlerOptions opts) {
         synchronized (mSyncgroupInviteHandlersMu) {
-            throw new RuntimeException("Not implemented");
+            try {
+                long scanId = io.v.syncbase.internal.Database.SyncgroupInvitesNewScan(
+                        getId().encode(),
+                        new io.v.syncbase.internal.Database.SyncgroupInvitesCallbacks() {
+
+                    @Override
+                    public void onInvite(io.v.syncbase.core.SyncgroupInvite invite) {
+                        h.onInvite(new SyncgroupInvite(new Id(invite.syncgroup), invite.blessingNames));
+                    }
+                });
+                mSyncgroupInviteHandlers.put(h, scanId);
+            } catch (VError vError) {
+                h.onError(vError);
+            }
         }
     }
 
@@ -168,9 +181,9 @@ public class Database extends DatabaseHandle {
      */
     public void removeSyncgroupInviteHandler(SyncgroupInviteHandler h) {
         synchronized (mSyncgroupInviteHandlersMu) {
-            Runnable cancel = mSyncgroupInviteHandlers.remove(h);
-            if (cancel != null) {
-                cancel.run();
+            Long scanId = mSyncgroupInviteHandlers.remove(h);
+            if (scanId != null) {
+                io.v.syncbase.internal.Database.SyncgroupInvitesStopScan(scanId);
             }
         }
     }
@@ -180,8 +193,8 @@ public class Database extends DatabaseHandle {
      */
     public void removeAllSyncgroupInviteHandlers() {
         synchronized (mSyncgroupInviteHandlersMu) {
-            for (Runnable cancel : mSyncgroupInviteHandlers.values()) {
-                cancel.run();
+            for (Long scanId : mSyncgroupInviteHandlers.values()) {
+                io.v.syncbase.internal.Database.SyncgroupInvitesStopScan(scanId);
             }
             mSyncgroupInviteHandlers.clear();
         }
@@ -215,8 +228,12 @@ public class Database extends DatabaseHandle {
             @Override
             public void run() {
                 try {
-                    coreSyncgroup.join(invite.getRemoteSyncbaseName(),
-                            invite.getExpectedSyncbaseBlessings(), new SyncgroupMemberInfo());
+                    String publishName = Syncbase.sOpts.getPublishSyncbaseName(); // ok if null
+                    List<String> expectedBlessings = invite.getInviterBlessingNames();
+                    if (Syncbase.sOpts.getCloudBlessingString() != null) {
+                        expectedBlessings.add(Syncbase.sOpts.getCloudBlessingString());
+                    }
+                    coreSyncgroup.join(publishName, expectedBlessings, new SyncgroupMemberInfo());
                 } catch (VError vError) {
                     cb.onFailure(vError);
                     return;

@@ -8,14 +8,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.v.syncbase.core.NeighborhoodPeer;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.internal.Neighborhood;
 import io.v.syncbase.internal.Blessings;
 
 // FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
@@ -68,6 +71,8 @@ public class Syncbase {
 
     protected static Options sOpts;
     private static Database sDatabase;
+    private static final Object sScanMappingMu = new Object();
+    private static final Map<ScanNeighborhoodForUsersCallback, Long> sScanMapping = new HashMap<>();
 
     // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
     // developer-specified names.
@@ -211,8 +216,50 @@ public class Syncbase {
      *
      * @param cb The callback to call when a User is found or lost.
      */
-    public static void scanNeighborhoodForUsers(ScanNeighborhoodForUsersCallback cb) {
-        throw new RuntimeException("Not implemented");
+    public static void addScanForUsersInNeighborhood(final ScanNeighborhoodForUsersCallback cb) {
+        synchronized (sScanMappingMu) {
+            try {
+                long scanId = Neighborhood.NewScan(new Neighborhood.NeighborhoodScanCallbacks() {
+                    @Override
+                    public void onPeer(NeighborhoodPeer peer) {
+                        if (peer.isLost) {
+                            cb.onLost(new User(getAliasFromBlessingPattern(peer.blessings)));
+                        } else {
+                            cb.onFound(new User(getAliasFromBlessingPattern(peer.blessings)));
+                        }
+                    }
+                });
+                sScanMapping.put(cb, scanId);
+            } catch (VError vError) {
+                cb.onError(vError);
+            }
+        }
+    }
+
+    /**
+     * Removes this callback from receiving new neighborhood scan updates.
+     *
+     * @param cb The original callback passed to a started scan.
+     */
+    public static void removeScanForUsersInNeighborhood(ScanNeighborhoodForUsersCallback cb) {
+        synchronized (sScanMappingMu) {
+            Long scanId = sScanMapping.remove(cb);
+            if (scanId != null) {
+                Neighborhood.StopScan(scanId);
+            }
+        }
+    }
+
+    /**
+     * Stops all existing scanning callbacks from receiving new neighborhood scan updates.
+     */
+    public static void removeAllScansForUsersInNeighborhood() {
+        synchronized (sScanMappingMu) {
+            for (Long scanId : sScanMapping.values()) {
+                Neighborhood.StopScan(scanId);
+            }
+            sScanMapping.clear();
+        }
     }
 
     public static abstract class ScanNeighborhoodForUsersCallback {
@@ -228,8 +275,8 @@ public class Syncbase {
     /**
      * Advertises the logged in user's presence to those around them.
      */
-    public static void advertiseLoggedInUserInNeighborhood() {
-        throw new RuntimeException("Not implemented");
+    public static void advertiseLoggedInUserInNeighborhood() throws VError {
+        Neighborhood.StartAdvertising(new ArrayList<String>());
     }
 
     /**
@@ -237,29 +284,33 @@ public class Syncbase {
      *
      * @param usersWhoCanSee The set of users who are allowed to find this user.
      */
-    public static void advertiseLoggedInUserInNeighborhood(Iterable<User> usersWhoCanSee) {
-        throw new RuntimeException("Not implemented");
+    public static void advertiseLoggedInUserInNeighborhood(Iterable<User> usersWhoCanSee) throws VError {
+        List<String> visibility = new ArrayList<String>();
+        for (User user : usersWhoCanSee) {
+            visibility.add(Syncbase.getBlessingStringFromAlias(user.getAlias()));
+        }
+        Neighborhood.StartAdvertising(visibility);
     }
 
     /**
      * Stops advertising the presence of the logged in user so that they can no longer be found.
      */
     public static void stopAdvertisingLoggedInUserInNeighborhood() {
-        throw new RuntimeException("Not implemented");
+        Neighborhood.StopAdvertising();
     }
 
     /**
      * Returns true iff this person appears in the neighborhood.
      */
     public static boolean isAdvertisingLoggedInUserInNeighborhood() {
-        throw new RuntimeException("Not implemented");
+        return Neighborhood.IsAdvertising();
     }
 
-    protected static String getBlessingStringFromEmail(String email) {
-        return sOpts.defaultBlessingStringPrefix + email;
+    protected static String getBlessingStringFromAlias(String alias) {
+        return sOpts.defaultBlessingStringPrefix + alias;
     }
 
-    protected static String getEmailFromBlessingPattern(String blessingStr) {
+    protected static String getAliasFromBlessingPattern(String blessingStr) {
         String[] parts = blessingStr.split(":");
         return parts[parts.length - 1];
     }
