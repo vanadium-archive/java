@@ -382,15 +382,14 @@ public class DatabaseTest {
                     new Database.WatchPatternsCallbacks() {
                 @Override
                 public void onChange(WatchChange watchChange) {
-                    // TODO(razvanm): Really check the answer once the onChange starts working.
-                    fail("Unexpected onChange: " + watchChange);
+                    done.set(null);
                 }
 
                 @Override
                 public void onError(VError vError) {
-                    System.err.print(vError);
-                    done.set(null);
-                }
+                    assertEquals("v.io/v23/verror.Unknown", vError.id);
+                    assertEquals("context canceled", vError.message);
+                    assertEquals(0, vError.actionCode);                }
             });
             Database.Commit(dbName, batchHandle);
 
@@ -402,11 +401,9 @@ public class DatabaseTest {
             fail(vError.toString());
         }
         try {
-            done.get(10, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException|ExecutionException e) {
-            fail("Timeout waiting for onError");
-        } catch (TimeoutException e) {
-            // TODO(razvanm): Remove this after the onChange starts working.
+            done.get(1, TimeUnit.SECONDS);
+        } catch (InterruptedException|ExecutionException|TimeoutException e) {
+            fail("Timeout waiting for onChange");
         }
     }
 }

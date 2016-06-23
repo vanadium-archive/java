@@ -5,8 +5,10 @@
 package io.v.syncbase.core;
 
 public class WatchChange {
+    public enum EntityType { ROOT, COLLECTION, ROW }
     public enum ChangeType { PUT, DELETE }
 
+    public EntityType entityType;
     public Id collection;
     public String row;
     public ChangeType changeType;

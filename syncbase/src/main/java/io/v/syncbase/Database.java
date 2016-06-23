@@ -363,10 +363,7 @@ public class Database extends DatabaseHandle {
 
                     @Override
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
-                        // Ignore changes to userdata collection.
-                        if (coreWatchChange.collection.name.equals(Syncbase.USERDATA_SYNCGROUP_NAME)) {
-                            return;
-                        }
+                        // TODO(razvanm): Ignore changes to userdata collection.
                         mBatch.add(new WatchChange(coreWatchChange));
                         if (!coreWatchChange.continued) {
                             if (!mGotFirstBatch) {

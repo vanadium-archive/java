@@ -8,11 +8,18 @@ package io.v.syncbase;
  * Describes a change to a database.
  */
 public class WatchChange {
+    public enum EntityType {
+        ROOT,
+        COLLECTION,
+        ROW
+    }
+
     public enum ChangeType {
         PUT,
         DELETE
     }
 
+    private final EntityType mEntityType;
     private final ChangeType mChangeType;
     private final Id mCollectionId;
     private final String mRowKey;
@@ -22,14 +29,34 @@ public class WatchChange {
     private final boolean mContinued;
 
     protected WatchChange(io.v.syncbase.core.WatchChange change) {
-        mChangeType = change.changeType == io.v.syncbase.core.WatchChange.ChangeType.PUT ?
-                ChangeType.PUT : ChangeType.DELETE;
+        if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.ROOT) {
+            mEntityType = EntityType.ROOT;
+        } else if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.COLLECTION) {
+            mEntityType = EntityType.COLLECTION;
+        } else if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.ROW) {
+            mEntityType = EntityType.ROW;
+        } else {
+            // TODO(razvanm): Throw an exception after https://v.io/c/23420 is submitted.
+            throw new RuntimeException("Unknown EntityType: " + change.entityType);
+        }
+        if (change.changeType == io.v.syncbase.core.WatchChange.ChangeType.PUT) {
+            mChangeType = ChangeType.PUT;
+        } else if (change.changeType == io.v.syncbase.core.WatchChange.ChangeType.DELETE) {
+            mChangeType = ChangeType.DELETE;
+        } else {
+            // TODO(razvanm): Throw an SyncbaseException after https://v.io/c/23420 is submitted.
+            throw new RuntimeException("Unknown ChangeType: " + change.changeType);
+        }
         mCollectionId = new Id(change.collection);
         mRowKey = change.row;
         mValue = change.value;
         mResumeMarker = change.resumeMarker.getBytes();
         mFromSync = change.fromSync;
         mContinued = change.continued;
+    }
+
+    public EntityType getEntityType() {
+        return mEntityType;
     }
 
     public ChangeType getChangeType() {

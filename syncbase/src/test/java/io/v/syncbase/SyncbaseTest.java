@@ -182,11 +182,32 @@ public class SyncbaseTest {
         db.addWatchChangeHandler(new Database.WatchChangeHandler() {
             @Override
             public void onInitialState(Iterator<WatchChange> values) {
+                // TODO(razvanm): Check the entire contents of each change.
+                // 1st change: the root entity.
                 assertTrue(values.hasNext());
                 WatchChange watchChange = (WatchChange)values.next();
+                assertEquals(WatchChange.EntityType.ROOT, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                // 2nd change: the collection entity for the "c" collection.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange)values.next();
+                assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertEquals("c", watchChange.getCollectionId().getName());
+                // 3nd change: the row for the "foo" key.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange)values.next();
+                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertEquals("c", watchChange.getCollectionId().getName());
+                assertEquals("foo", watchChange.getRowKey());
                 // TODO(razvanm): Uncomment after the POJO start working.
                 //assertEquals(1, watchChange.getValue());
+                // 4nd change: the collection entity for the userdata collection.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange)values.next();
+                assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 assertFalse(values.hasNext());
                 waitOnInitialState.set(null);
             }
