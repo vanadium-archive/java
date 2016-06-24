@@ -7,7 +7,6 @@ package io.v.syncbase.core;
 import java.util.Arrays;
 
 import io.v.syncbase.internal.Util;
-import io.v.v23.syncbase.RowRange;
 
 public class Collection {
     private final String batchHandle;
@@ -62,10 +61,5 @@ public class Collection {
         io.v.syncbase.internal.Collection.DeleteRange(fullName, batchHandle, start, limit);
     }
 
-    public interface ScanCallbacks {
-        void onValue(KeyValue keyValue);
-        void onDone(VError vError);
-    }
-
-    public void scan(RowRange range, ScanCallbacks scanCallbacks) {}
+    // TODO(razvanm): Expose scan.
 }
