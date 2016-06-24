@@ -7,8 +7,7 @@ package io.v.syncbase.core;
 import java.util.List;
 
 public class Database extends DatabaseHandle {
-
-    protected Database(Id id) {
+    Database(Id id) {
         super(id);
     }
 

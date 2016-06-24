@@ -24,11 +24,14 @@ public class AccessList {
 
     public Map<String, AccessLevel> users;
 
+    /**
+     * @throws IllegalArgumentException if accessList is not valid
+     */
     private static Set<String> parsedAccessListToUserIds(Map<String, Set<String>> accessList) {
         Set<String> res = new HashSet<>();
         if (accessList.containsKey(Permissions.NOT_IN) &&
                 !accessList.get(Permissions.NOT_IN).isEmpty()) {
-            throw new RuntimeException("Non-empty not-in section: " + accessList);
+            throw new IllegalArgumentException("Non-empty not-in section: " + accessList);
         }
         for (String blessingPattern : accessList.get(Permissions.IN)) {
             // TODO(sadovsky): Ignore cloud peer's blessing pattern?
@@ -44,7 +47,10 @@ public class AccessList {
         this.users = new HashMap<>();
     }
 
-    protected AccessList(Permissions corePermissions) {
+    /**
+     * @throws IllegalArgumentException if corePermissions are not valid
+     */
+    AccessList(Permissions corePermissions) {
         Map<String, Map<String, Set<String>>> parsedPermissions = corePermissions.parse();
         Set<String> resolvers = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.RESOLVE));
         Set<String> readers = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.READ));
@@ -52,13 +58,13 @@ public class AccessList {
         Set<String> admins = parsedAccessListToUserIds(parsedPermissions.get(Permissions.Tags.ADMIN));
 
         if (!readers.containsAll(writers)) {
-            throw new RuntimeException("Some readers are not resolvers: " + readers + ", " + resolvers);
+            throw new IllegalArgumentException("Some readers are not resolvers: " + readers + ", " + resolvers);
         }
         if (!readers.containsAll(writers)) {
-            throw new RuntimeException("Some writers are not readers: " + writers + ", " + readers);
+            throw new IllegalArgumentException("Some writers are not readers: " + writers + ", " + readers);
         }
         if (!writers.containsAll(admins)) {
-            throw new RuntimeException("Some admins are not writers: " + admins + ", " + writers);
+            throw new IllegalArgumentException("Some admins are not writers: " + admins + ", " + writers);
         }
         for (String userId : readers) {
             users.put(userId, AccessLevel.READ);
@@ -84,7 +90,7 @@ public class AccessList {
     /**
      * Computes a new Permissions object based on delta.
      */
-    protected static Permissions applyDelta(Permissions corePermissions, AccessList delta) {
+    static Permissions applyDelta(Permissions corePermissions, AccessList delta) {
         Map<String, Map<String, Set<String>>> parsedPermissions = corePermissions.parse();
         for (String userId : delta.users.keySet()) {
             AccessLevel level = delta.users.get(userId);

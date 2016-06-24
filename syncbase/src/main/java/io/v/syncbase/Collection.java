@@ -18,13 +18,13 @@ public class Collection {
     private final DatabaseHandle mDatabaseHandle;
     private final Id mId;
 
-    protected Collection(io.v.syncbase.core.Collection coreCollection, DatabaseHandle databaseHandle) {
+    Collection(io.v.syncbase.core.Collection coreCollection, DatabaseHandle databaseHandle) {
         mCoreCollection = coreCollection;
         mDatabaseHandle = databaseHandle;
         mId = new Id(coreCollection.id());
     }
 
-    protected void createIfMissing() {
+    void createIfMissing() {
         try {
             mCoreCollection.create(Syncbase.defaultCollectionPerms());
         } catch (VError vError) {
@@ -45,10 +45,11 @@ public class Collection {
     /**
      * Shortcut for {@code Database.getSyncgroup(collection.getId())}, helpful for the common case
      * of one syncgroup per collection.
+     * @throws IllegalArgumentException if this is collection on a batch database.
      */
     public Syncgroup getSyncgroup() {
         if (mDatabaseHandle instanceof BatchDatabase) {
-            throw new RuntimeException("Must not call getSyncgroup within batch");
+            throw new IllegalArgumentException("Must not call getSyncgroup within batch");
         }
         return ((Database) mDatabaseHandle).getSyncgroup(getId());
     }

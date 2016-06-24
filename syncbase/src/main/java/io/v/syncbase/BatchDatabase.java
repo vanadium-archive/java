@@ -11,17 +11,20 @@ import io.v.syncbase.core.VError;
  * {@code Database.beginBatch} for concurrency semantics.
  */
 public class BatchDatabase extends DatabaseHandle {
-    protected io.v.syncbase.core.BatchDatabase mCoreBatchDatabase;
+    private final io.v.syncbase.core.BatchDatabase mCoreBatchDatabase;
 
-    protected BatchDatabase(io.v.syncbase.core.BatchDatabase coreBatchDatabase) {
+    BatchDatabase(io.v.syncbase.core.BatchDatabase coreBatchDatabase) {
         super(coreBatchDatabase);
         mCoreBatchDatabase = coreBatchDatabase;
     }
 
+    /**
+     * @throws IllegalArgumentException if opts.withoutSyncgroup not false
+     */
     @Override
     public Collection collection(String name, CollectionOptions opts) throws VError {
         if (!opts.withoutSyncgroup) {
-            throw new RuntimeException("Cannot create syncgroup in a batch");
+            throw new IllegalArgumentException("Cannot create syncgroup in a batch");
         }
         Collection res = getCollection(new Id(Syncbase.getPersonalBlessingString(), name));
         res.createIfMissing();

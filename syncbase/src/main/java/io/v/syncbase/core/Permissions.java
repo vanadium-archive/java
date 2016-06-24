@@ -53,7 +53,7 @@ public class Permissions {
      * }
      * </pre>
      *
-     * @return
+     * @return map describing the permissions
      */
     public Map<String, Map<String, Set<String>>> parse() {
         Map<String, Map<String, Set<String>>> permissions = new HashMap<>();
@@ -66,7 +66,7 @@ public class Permissions {
             }
         } catch (JSONException e) {
             // TODO(razvanm): Should we do something else? Logging?
-            throw new RuntimeException("Permissions parsing failure", e);
+            throw new IllegalArgumentException("Permissions parsing failure", e);
         }
 
         return permissions;

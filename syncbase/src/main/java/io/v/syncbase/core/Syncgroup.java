@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Syncgroup {
-    private String dbFullName;
-    private Id id;
+    private final String dbFullName;
+    private final Id id;
 
-    protected Syncgroup(Database database, Id id) {
+    Syncgroup(Database database, Id id) {
         dbFullName = database.fullName;
         this.id = id;
     }

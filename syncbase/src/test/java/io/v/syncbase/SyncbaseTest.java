@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 public class SyncbaseTest {
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    public final TemporaryFolder folder = new TemporaryFolder();
 
     // To run these tests from Android Studio, add the following VM option to the default JUnit
     // build configuration, via Run > Edit Configurations... > Defaults > JUnit > VM options:
@@ -185,7 +185,7 @@ public class SyncbaseTest {
                 // TODO(razvanm): Check the entire contents of each change.
                 // 1st change: the root entity.
                 assertTrue(values.hasNext());
-                WatchChange watchChange = (WatchChange)values.next();
+                WatchChange watchChange = values.next();
                 assertEquals(WatchChange.EntityType.ROOT, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 // 2nd change: the collection entity for the "c" collection.
@@ -215,7 +215,7 @@ public class SyncbaseTest {
             @Override
             public void onChangeBatch(Iterator<WatchChange> changes) {
                 assertTrue(changes.hasNext());
-                WatchChange watchChange = (WatchChange)changes.next();
+                WatchChange watchChange = changes.next();
                 assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
                 // TODO(razvanm): Uncomment after the POJO start working.
                 //assertEquals(1, watchChange.getValue());

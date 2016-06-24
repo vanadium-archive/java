@@ -28,7 +28,7 @@ public class WatchChange {
     private final boolean mFromSync;
     private final boolean mContinued;
 
-    protected WatchChange(io.v.syncbase.core.WatchChange change) {
+    WatchChange(io.v.syncbase.core.WatchChange change) {
         if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.ROOT) {
             mEntityType = EntityType.ROOT;
         } else if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.COLLECTION) {

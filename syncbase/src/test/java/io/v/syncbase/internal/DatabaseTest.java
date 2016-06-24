@@ -32,6 +32,7 @@ import io.v.syncbase.core.WatchChange;
 import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.core.TestConstants.anyDbPermissions;
 import static io.v.syncbase.core.TestConstants.anySyncgroupPermissions;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -41,7 +42,7 @@ import static org.junit.Assert.fail;
 
 public class DatabaseTest {
     @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    public static final TemporaryFolder folder = new TemporaryFolder();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -202,7 +203,7 @@ public class DatabaseTest {
             Collection.Create(collectionName, batchHandle, anyCollectionPermissions());
             Database.Commit(dbName, batchHandle);
             SyncgroupSpec spec = new SyncgroupSpec();
-            spec.collections = Arrays.asList(collectionId);
+            spec.collections = singletonList(collectionId);
             spec.permissions = anySyncgroupPermissions();
             SyncgroupMemberInfo info = new SyncgroupMemberInfo();
             // TODO(razvanm): Pick some meaningful values.
@@ -283,7 +284,7 @@ public class DatabaseTest {
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
-            SyncgroupSpec spec = Database.JoinSyncgroup(
+            Database.JoinSyncgroup(
                     dbName, "", new ArrayList<String>(), sgId, new SyncgroupMemberInfo());
         } catch (VError vError) {
             assertEquals("v.io/v23/verror.NoExist", vError.id);
@@ -336,7 +337,7 @@ public class DatabaseTest {
             Database.Create(dbName, anyDbPermissions());
             String batchHandle = Database.BeginBatch(dbName, null);
             byte[] marker = Database.GetResumeMarker(dbName, batchHandle);
-            List<CollectionRowPattern> patterns = Arrays.asList(new CollectionRowPattern());
+            List<CollectionRowPattern> patterns = singletonList(new CollectionRowPattern());
             Database.WatchPatterns(dbName, marker, patterns, new Database.WatchPatternsCallbacks() {
                 @Override
                 public void onChange(WatchChange watchChange) {
@@ -377,7 +378,7 @@ public class DatabaseTest {
             CollectionRowPattern pattern = new CollectionRowPattern();
             pattern.collectionBlessing = collectionId.blessing;
             pattern.collectionName = collectionId.name;
-            List<CollectionRowPattern> patterns = Arrays.asList(pattern);
+            List<CollectionRowPattern> patterns = singletonList(pattern);
             Database.WatchPatterns(dbName, new byte[]{}, patterns,
                     new Database.WatchPatternsCallbacks() {
                 @Override
@@ -403,7 +404,7 @@ public class DatabaseTest {
         try {
             done.get(1, TimeUnit.SECONDS);
         } catch (InterruptedException|ExecutionException|TimeoutException e) {
-            fail("Timeout waiting for onChange");
+            fail("Timeout waiting for onChange: " + e);
         }
     }
 }

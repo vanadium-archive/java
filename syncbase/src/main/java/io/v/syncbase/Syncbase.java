@@ -57,19 +57,19 @@ public class Syncbase {
         // the arguments to login() are ignored.
         public boolean testLogin;
 
-        protected String getPublishSyncbaseName() {
+        String getPublishSyncbaseName() {
             if (disableSyncgroupPublishing) {
                 return null;
             }
             return mountPoints.get(0) + "cloud";
         }
 
-        protected String getCloudBlessingString() {
+        String getCloudBlessingString() {
             return "dev.v.io:u:" + adminUserId;
         }
     }
 
-    protected static Options sOpts;
+    static Options sOpts;
     private static Database sDatabase;
     private static final Object sScanMappingMu = new Object();
     private static final Map<ScanNeighborhoodForUsersCallback, Long> sScanMapping = new HashMap<>();
@@ -77,13 +77,13 @@ public class Syncbase {
     // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
     // developer-specified names.
 
-    protected static final String
+    static final String
             TAG = "syncbase",
             DIR_NAME = "syncbase",
             DB_NAME = "db",
             USERDATA_SYNCGROUP_NAME = "userdata__";
 
-    protected static void enqueue(final Runnable r) {
+    private static void enqueue(final Runnable r) {
         // Note, we use Timer rather than Handler because the latter must be mocked out for tests,
         // which is rather annoying.
         //new Handler().post(r);
@@ -103,7 +103,7 @@ public class Syncbase {
     /**
      * Sets the initial options. If the user is already logged in, Syncbase will be started.
      *
-     * @param opts
+     * @param opts initial options
      */
     public static void init(Options opts) throws VError {
         System.loadLibrary("syncbase");
@@ -148,7 +148,7 @@ public class Syncbase {
      * Returns the currently logged in user.
      */
     public static User getLoggedInUser() {
-        throw new RuntimeException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     public static abstract class LoginCallback {
@@ -174,10 +174,11 @@ public class Syncbase {
      * @param authToken The OAuth token for the user to be logged in.
      * @param provider  The provider of the OAuth token.
      * @param cb        The callback to call when the login was done.
+     * @throws IllegalArgumentException if provider is not one of those listed above
      */
     public static void login(final String authToken, final String provider, final LoginCallback cb) {
         if (!(provider.equals(User.PROVIDER_GOOGLE) || provider.equals(User.PROVIDER_NONE))) {
-            throw new RuntimeException("Unsupported provider: " + provider);
+            throw new IllegalArgumentException("Unsupported provider: " + provider);
         }
 
         Syncbase.enqueue(new Runnable() {
@@ -186,6 +187,10 @@ public class Syncbase {
                 try {
                     io.v.syncbase.internal.Service.Login(provider, authToken);
                     sDatabase = database();
+                    if (sDatabase==null) {
+                        cb.onError(new IllegalStateException("not logged in"));
+                        return;
+                    }
                     sDatabase.createIfMissing();
                     if (sOpts.disableUserdataSyncgroup) {
                         Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
@@ -201,7 +206,7 @@ public class Syncbase {
                         // FIXME(sadovsky): Implement create-or-join (and watch) of userdata
                         // syncgroup. For the new JNI API, we'll need to add Go code for this,
                         // since Java can't make RPCs.
-                        cb.onError(new RuntimeException(
+                        cb.onError(new UnsupportedOperationException(
                                 "Synced userdata collection is not yet supported"));
                     }
                 } catch (VError vError) {
@@ -315,11 +320,11 @@ public class Syncbase {
         return parts[parts.length - 1];
     }
 
-    protected static String getPersonalBlessingString() throws VError {
-        return Blessings.UserBlessingFromContext().toString();
+    static String getPersonalBlessingString() throws VError {
+        return Blessings.UserBlessingFromContext();
     }
 
-    protected static Permissions defaultDatabasePerms() throws VError {
+    static Permissions defaultDatabasePerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map anyone = ImmutableMap.of(Permissions.IN, ImmutableList.of("..."));
         Map selfAndCloud = selfAndCloud();
@@ -330,7 +335,7 @@ public class Syncbase {
                 Permissions.Tags.ADMIN, selfAndCloud));
     }
 
-    protected static Permissions defaultCollectionPerms() throws VError {
+    static Permissions defaultCollectionPerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(
@@ -339,7 +344,7 @@ public class Syncbase {
                 Permissions.Tags.ADMIN, selfAndCloud));
     }
 
-    protected static Permissions defaultSyncgroupPerms() throws VError {
+    static Permissions defaultSyncgroupPerms() throws VError {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(

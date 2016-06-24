@@ -4,6 +4,8 @@
 
 package io.v.syncbase.core;
 
+import java.util.Arrays;
+
 import io.v.v23.verror.VException;
 
 public class VError extends Exception {
@@ -16,14 +18,15 @@ public class VError extends Exception {
     public String message;
     public String stack;
 
-    public VError() {
+    /** Called in JNI */
+    private VError() {
     }
 
     public VError(VException e) {
         this.id = e.getID();
         this.actionCode = e.getAction().getValue();
         this.message = e.getMessage();
-        this.stack = e.getStackTrace().toString();
+        this.stack = Arrays.toString(e.getStackTrace());
     }
 
     public String toString() {

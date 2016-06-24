@@ -7,10 +7,10 @@ package io.v.syncbase.core;
 import java.util.List;
 
 public class DatabaseHandle {
-    protected Id id;
-    protected String fullName;
+    final Id id;
+    final String fullName;
 
-    protected DatabaseHandle(Id id) {
+    DatabaseHandle(Id id) {
         this.id = id;
         fullName = id.encode();
     }

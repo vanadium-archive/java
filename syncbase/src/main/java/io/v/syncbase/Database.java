@@ -26,14 +26,14 @@ public class Database extends DatabaseHandle {
     private final Object mSyncgroupInviteHandlersMu = new Object();
     private final Object mWatchChangeHandlersMu = new Object();
     private final Map<SyncgroupInviteHandler, Long> mSyncgroupInviteHandlers = new HashMap<>();
-    private Map<WatchChangeHandler, Runnable> mWatchChangeHandlers = new HashMap<>();
+    private final Map<WatchChangeHandler, Runnable> mWatchChangeHandlers = new HashMap<>();
 
-    protected Database(io.v.syncbase.core.Database coreDatabase) {
+    Database(io.v.syncbase.core.Database coreDatabase) {
         super(coreDatabase);
         mCoreDatabase = coreDatabase;
     }
 
-    protected void createIfMissing() throws VError {
+    void createIfMissing() throws VError {
         try {
             mCoreDatabase.create(Syncbase.defaultDatabasePerms());
         } catch (VError vError) {
@@ -71,17 +71,18 @@ public class Database extends DatabaseHandle {
      * @param name        name of the syncgroup
      * @param collections collections in the syncgroup
      * @param opts        options for syncgroup creation
+     * @throws IllegalArgumentException if no collections or collections don't all have same creator
      * @return the syncgroup
      */
     public Syncgroup syncgroup(String name, List<Collection> collections, SyncgroupOptions opts)
             throws VError {
         if (collections.isEmpty()) {
-            throw new RuntimeException("No collections specified");
+            throw new IllegalArgumentException("No collections specified");
         }
         Id id = new Id(collections.get(0).getId().getBlessing(), name);
         for (Collection collection : collections) {
             if (!collection.getId().getBlessing().equals(id.getBlessing())) {
-                throw new RuntimeException("Collections must all have the same creator");
+                throw new IllegalArgumentException("Collections must all have the same creator");
             }
         }
         Syncgroup syncgroup = new Syncgroup(mCoreDatabase.syncgroup(id.toCoreId()), this);
@@ -252,7 +253,7 @@ public class Database extends DatabaseHandle {
         // Note: This will be one of the last things we implement.
         // TODO(sadovsky): Maybe document how to read/write rejection metadata in the userdata
         // collection, for advanced users.
-        throw new RuntimeException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /**
@@ -370,13 +371,13 @@ public class Database extends DatabaseHandle {
         // TODO(sadovsky): Support specifying resumeMarker. Note, watch-from-resumeMarker may be
         // problematic in that we don't track the governing ACL for changes in the watch log.
         if (opts.resumeMarker != null && opts.resumeMarker.length != 0) {
-            throw new RuntimeException("Specifying resumeMarker is not yet supported");
+            throw new UnsupportedOperationException("Specifying resumeMarker is not yet supported");
         }
 
         mCoreDatabase.watch(null, ImmutableList.of(new CollectionRowPattern("%", "%", "%")),
                 new io.v.syncbase.core.Database.WatchPatternsCallbacks() {
                     private boolean mGotFirstBatch = false;
-                    private List<WatchChange> mBatch = new ArrayList<>();
+                    private final List<WatchChange> mBatch = new ArrayList<>();
 
                     @Override
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
@@ -404,7 +405,7 @@ public class Database extends DatabaseHandle {
             mWatchChangeHandlers.put(h, new Runnable() {
                 @Override
                 public void run() {
-                    throw new RuntimeException("Not implemented");
+                    throw new UnsupportedOperationException("Not implemented");
                 }
             });
         }

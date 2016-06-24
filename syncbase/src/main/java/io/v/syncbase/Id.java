@@ -8,23 +8,26 @@ package io.v.syncbase;
  * Uniquely identifies a database, collection, or syncgroup.
  */
 public class Id {
-    private io.v.syncbase.core.Id mId;
+    private final io.v.syncbase.core.Id mId;
 
-    protected Id(io.v.syncbase.core.Id id) {
+    Id(io.v.syncbase.core.Id id) {
         mId = id;
     }
 
-    protected Id(String blessing, String name) {
+    Id(String blessing, String name) {
         mId = new io.v.syncbase.core.Id(blessing, name);
     }
 
     // TODO(sadovsky): Replace encode and decode method implementations with calls to Cgo.
     private static final String SEPARATOR = ",";
 
+    /**
+     * @throws IllegalArgumentException if invalid encodedId
+     */
     public static Id decode(String encodedId) {
         String[] parts = encodedId.split(SEPARATOR);
         if (parts.length != 2) {
-            throw new RuntimeException("Invalid encoded id: " + encodedId);
+            throw new IllegalArgumentException("Invalid encoded id: " + encodedId);
         }
         return new Id(parts[0], parts[1]);
     }
@@ -33,11 +36,11 @@ public class Id {
         return mId.encode();
     }
 
-    protected io.v.syncbase.core.Id toCoreId() {
+    io.v.syncbase.core.Id toCoreId() {
         return mId;
     }
 
-    protected String getBlessing() {
+    String getBlessing() {
         return mId.blessing;
     }
 

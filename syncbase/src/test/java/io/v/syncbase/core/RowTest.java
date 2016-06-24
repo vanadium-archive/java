@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 
 public class RowTest {
     @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    public static final TemporaryFolder folder = new TemporaryFolder();
 
     @BeforeClass
     public static void setUp() throws Exception {

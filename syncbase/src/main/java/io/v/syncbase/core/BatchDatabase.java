@@ -7,9 +7,9 @@ package io.v.syncbase.core;
 import java.util.List;
 
 public class BatchDatabase extends DatabaseHandle {
-    protected String batchHandle;
+    private final String batchHandle;
 
-    protected BatchDatabase(Id id, String batchHandle) {
+    BatchDatabase(Id id, String batchHandle) {
         super(id);
         this.batchHandle = batchHandle;
     }

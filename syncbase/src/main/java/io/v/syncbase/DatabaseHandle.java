@@ -14,9 +14,9 @@ import io.v.syncbase.core.VError;
  * Represents a handle to a database, possibly in a batch.
  */
 public abstract class DatabaseHandle {
-    protected io.v.syncbase.core.DatabaseHandle mCoreDatabaseHandle;
+    private final io.v.syncbase.core.DatabaseHandle mCoreDatabaseHandle;
 
-    protected DatabaseHandle(io.v.syncbase.core.DatabaseHandle coreDatabaseHandle) {
+    DatabaseHandle(io.v.syncbase.core.DatabaseHandle coreDatabaseHandle) {
         mCoreDatabaseHandle = coreDatabaseHandle;
     }
 

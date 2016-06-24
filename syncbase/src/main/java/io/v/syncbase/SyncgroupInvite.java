@@ -11,8 +11,8 @@ import java.util.List;
  * Represents an invitation to join a syncgroup.
  */
 public class SyncgroupInvite {
-    private Id mId;
-    private List<String> mInviterBlessingNames;
+    private final Id mId;
+    private final List<String> mInviterBlessingNames;
 
     protected SyncgroupInvite(Id id, List<String> inviterBlessingNames) {
         mId = id;

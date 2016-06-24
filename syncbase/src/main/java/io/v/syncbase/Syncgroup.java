@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.SyncgroupMemberInfo;
 import io.v.syncbase.core.SyncgroupSpec;
 import io.v.syncbase.core.VError;
@@ -22,12 +21,12 @@ public class Syncgroup {
     private final Database mDatabase;
     private final io.v.syncbase.core.Syncgroup mCoreSyncgroup;
 
-    protected Syncgroup(io.v.syncbase.core.Syncgroup coreSyncgroup, Database database) {
+    Syncgroup(io.v.syncbase.core.Syncgroup coreSyncgroup, Database database) {
         mCoreSyncgroup = coreSyncgroup;
         mDatabase = database;
     }
 
-    protected void createIfMissing(List<Collection> collections) throws VError {
+    void createIfMissing(List<Collection> collections) throws VError {
         ArrayList<io.v.syncbase.core.Id> ids = new ArrayList<>();
         for (Collection cx : collections) {
             ids.add(cx.getId().toCoreId());
@@ -145,9 +144,8 @@ public class Syncgroup {
         } catch (VError vError) {
             throw new RuntimeException("getSpec failed", vError);
         }
-        Permissions newPermissions = AccessList.applyDelta(
+        versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDelta(
                 versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
-        versionedSyncgroupSpec.syncgroupSpec.permissions = newPermissions;
         mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
         // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
         // after getSpec() but before db.getCollection().

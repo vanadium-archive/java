@@ -10,11 +10,11 @@ import io.v.syncbase.internal.Util;
 import io.v.v23.syncbase.RowRange;
 
 public class Collection {
-    protected String batchHandle;
-    private Id id;
-    protected String fullName;
+    private final String batchHandle;
+    private final Id id;
+    private final String fullName;
 
-    protected Collection(String parentFullName, Id id, String batchHandle) {
+    Collection(String parentFullName, Id id, String batchHandle) {
         this.batchHandle = batchHandle;
         this.id = id;
         this.fullName = Util.NamingJoin(Arrays.asList(parentFullName, id.encode()));

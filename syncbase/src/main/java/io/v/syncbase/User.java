@@ -11,8 +11,8 @@ public class User {
     public static final String PROVIDER_GOOGLE = "google";
     public static final String PROVIDER_NONE = "";
 
-    private String mAlias;
-    private String mProvider;
+    private final String mAlias;
+    private final String mProvider;
 
     public User(String alias) {
         mAlias = alias;

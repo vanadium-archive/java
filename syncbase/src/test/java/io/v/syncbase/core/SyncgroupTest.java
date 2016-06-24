@@ -11,13 +11,13 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static io.v.syncbase.core.TestConstants.anyCollectionPermissions;
 import static io.v.syncbase.core.TestConstants.anyDbPermissions;
 import static io.v.syncbase.core.TestConstants.anySyncgroupPermissions;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 
 public class SyncgroupTest {
     @ClassRule
-    public static TemporaryFolder folder = new TemporaryFolder();
+    public static final TemporaryFolder folder = new TemporaryFolder();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -49,7 +49,7 @@ public class SyncgroupTest {
             db.create(anyDbPermissions());
             db.collection(collectionId).create(anyCollectionPermissions());
             SyncgroupSpec spec = new SyncgroupSpec();
-            spec.collections = Arrays.asList(collectionId);
+            spec.collections = singletonList(collectionId);
             spec.permissions = anySyncgroupPermissions();
             SyncgroupMemberInfo info = new SyncgroupMemberInfo();
             // TODO(razvanm): Pick some meaningful values.
@@ -133,7 +133,6 @@ public class SyncgroupTest {
     @Test
     public void leave() {
         Id dbId = new Id("idp:a:angrybirds", "core_leave_syncgroups");
-        String dbName = dbId.encode();
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
@@ -150,7 +149,6 @@ public class SyncgroupTest {
     @Test
     public void eject() {
         Id dbId = new Id("idp:a:angrybirds", "core_eject_from_syncgroup");
-        String dbName = dbId.encode();
         Id sgId = new Id("idp:u:alice", "syncgroup");
         boolean exceptionThrown = false;
         try {
