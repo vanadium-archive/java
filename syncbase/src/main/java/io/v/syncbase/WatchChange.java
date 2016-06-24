@@ -4,6 +4,10 @@
 
 package io.v.syncbase;
 
+import io.v.syncbase.core.VError;
+import io.v.v23.verror.VException;
+import io.v.v23.vom.VomUtil;
+
 /**
  * Describes a change to a database.
  */
@@ -23,7 +27,7 @@ public class WatchChange {
     private final ChangeType mChangeType;
     private final Id mCollectionId;
     private final String mRowKey;
-    private final Object mValue;
+    private final byte[] mValue;
     private final byte[] mResumeMarker;
     private final boolean mFromSync;
     private final boolean mContinued;
@@ -71,8 +75,12 @@ public class WatchChange {
         return mRowKey;
     }
 
-    public Object getValue() {
-        return mValue;
+    public <T> T getValue(Class<T> cls) throws VError {
+        try {
+            return (T) VomUtil.decode(mValue, cls);
+        } catch (VException e) {
+            throw new VError(e);
+        }
     }
 
     public byte[] getResumeMarker() {
