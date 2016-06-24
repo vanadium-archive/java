@@ -13,8 +13,7 @@ public class WatchChange {
     public String row;
     public ChangeType changeType;
     public byte[] value;
-    // TODO(razvanm): Switch to byte[].
-    public String resumeMarker;
+    public byte[] resumeMarker;
     public boolean fromSync;
     public boolean continued;
 }

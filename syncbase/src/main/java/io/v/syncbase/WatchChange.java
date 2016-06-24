@@ -50,7 +50,7 @@ public class WatchChange {
         mCollectionId = new Id(change.collection);
         mRowKey = change.row;
         mValue = change.value;
-        mResumeMarker = change.resumeMarker.getBytes();
+        mResumeMarker = change.resumeMarker;
         mFromSync = change.fromSync;
         mContinued = change.continued;
     }
