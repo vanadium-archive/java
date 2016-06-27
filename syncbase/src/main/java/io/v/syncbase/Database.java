@@ -87,6 +87,10 @@ public class Database extends DatabaseHandle {
         }
         Syncgroup syncgroup = new Syncgroup(mCoreDatabase.syncgroup(id.toCoreId()), this);
         syncgroup.createIfMissing(collections);
+        // Remember this syncgroup in the userdata collection. The value doesn't matter, but since
+        // VOM won't accept null, use a boolean.
+        // Note: We may eventually want to use the value to deal with rejected invitations.
+        Syncbase.sUserdataCollection.put(id.encode(), true);
         return syncgroup;
     }
 

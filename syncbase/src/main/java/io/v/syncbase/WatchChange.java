@@ -94,4 +94,11 @@ public class WatchChange {
     public boolean isContinued() {
         return mContinued;
     }
+
+    public String toString() {
+        return String.format("{\n  entityType: \"%s\"\n  changeType: \"%s\"\n" +
+                "  collectionId: %s\n  rowKey: \"%s\"\n  fromSync: %s\n" +
+                "  continued: %s\n}",
+                mEntityType, mChangeType, mCollectionId, mRowKey, mFromSync, mContinued);
+    }
 }

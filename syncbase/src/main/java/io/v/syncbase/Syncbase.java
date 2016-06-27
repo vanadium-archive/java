@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -18,8 +19,8 @@ import io.v.syncbase.core.NeighborhoodPeer;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
 import io.v.syncbase.core.VError;
-import io.v.syncbase.internal.Neighborhood;
 import io.v.syncbase.internal.Blessings;
+import io.v.syncbase.internal.Neighborhood;
 
 // FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
 // decide which error types to surface to clients, and define specific Exception subclasses for
@@ -71,6 +72,7 @@ public class Syncbase {
 
     static Options sOpts;
     private static Database sDatabase;
+    static Collection sUserdataCollection;
     private static final Object sScanMappingMu = new Object();
     private static final Map<ScanNeighborhoodForUsersCallback, Long> sScanMapping = new HashMap<>();
 
@@ -192,28 +194,53 @@ public class Syncbase {
                         return;
                     }
                     sDatabase.createIfMissing();
-                    if (sOpts.disableUserdataSyncgroup) {
-                        Database.CollectionOptions cxOpts = new DatabaseHandle.CollectionOptions();
-                        cxOpts.withoutSyncgroup = true;
-                        sDatabase.collection(USERDATA_SYNCGROUP_NAME, cxOpts);
-                        Syncbase.enqueue(new Runnable() {
+                    sUserdataCollection = sDatabase.collection(
+                            USERDATA_SYNCGROUP_NAME,
+                            new DatabaseHandle.CollectionOptions().setWithoutSyncgroup(true));
+                    if (!sOpts.disableUserdataSyncgroup) {
+                        Syncgroup syncgroup = sUserdataCollection.getSyncgroup();
+                        // TODO(razvanm): First we need to try to join, then we need to try to
+                        // create the syncgroup.
+                        syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
+                        sDatabase.addWatchChangeHandler(new UserdataWatchHandler());
+                    }
+                    Syncbase.enqueue(new Runnable() {
                             @Override
                             public void run() {
                                 cb.onSuccess();
                             }
                         });
-                    } else {
-                        // FIXME(sadovsky): Implement create-or-join (and watch) of userdata
-                        // syncgroup. For the new JNI API, we'll need to add Go code for this,
-                        // since Java can't make RPCs.
-                        cb.onError(new UnsupportedOperationException(
-                                "Synced userdata collection is not yet supported"));
-                    }
                 } catch (VError vError) {
                     cb.onError(vError);
                 }
             }
         });
+    }
+
+    private static class UserdataWatchHandler extends Database.WatchChangeHandler {
+        @Override
+        public void onInitialState(Iterator<WatchChange> values) {
+            onWatchChange(values);
+        }
+
+        @Override
+        public void onChangeBatch(Iterator<WatchChange> changes) {
+            onWatchChange(changes);
+        }
+
+        private void onWatchChange(Iterator<WatchChange> changes) {
+            WatchChange watchChange = changes.next();
+            if (watchChange.getCollectionId().getName().equals(USERDATA_SYNCGROUP_NAME) &&
+                    watchChange.getEntityType() == WatchChange.EntityType.ROW &&
+                    watchChange.getChangeType() == WatchChange.ChangeType.PUT) {
+                try {
+                    sDatabase.getSyncgroup(Id.decode(watchChange.getRowKey())).join();
+                } catch (VError vError) {
+                    vError.printStackTrace();
+                    System.err.println(vError.toString());
+                }
+            }
+        }
     }
 
     /**

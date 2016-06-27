@@ -4,6 +4,8 @@
 
 package io.v.syncbase;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +54,12 @@ public class Syncgroup {
             }
             throw vError;
         }
+    }
+
+    protected void join() throws VError {
+        // TODO(razvanm): Find a way to restrict the remote blessing. Cloud is one thing the remote
+        // blessings should include.
+        mCoreSyncgroup.join("", ImmutableList.of("..."), new SyncgroupMemberInfo());
     }
 
     /**
