@@ -27,8 +27,7 @@ public class Permissions {
 
     public byte[] json;
 
-    public Permissions() {
-    }
+    public Permissions() {} // Needed for JNI. Avoid using this directly.
 
     public Permissions(byte[] json) {
         this.json = json;
@@ -69,7 +68,22 @@ public class Permissions {
             throw new IllegalArgumentException("Permissions parsing failure", e);
         }
 
+        // Initialize all the parts we missed out on.
+        initializeAccessList(permissions, Tags.ADMIN);
+        initializeAccessList(permissions, Tags.WRITE);
+        initializeAccessList(permissions, Tags.READ);
+        initializeAccessList(permissions, Tags.RESOLVE);
+
         return permissions;
+    }
+
+    private static void initializeAccessList(Map<String, Map<String, Set<String>>> permissions, String tag) {
+        if (permissions.get(tag) == null) {
+            permissions.put(tag, new HashMap<String, Set<String>>());
+        }
+        if (permissions.get(tag).get(IN) == null) {
+            permissions.get(tag).put(IN, new HashSet<String>());
+        }
     }
 
     private static Map<String, Set<String>> parseAccessList(JSONObject jsonObject)
@@ -77,7 +91,11 @@ public class Permissions {
         Map<String, Set<String>> accessList = new HashMap<>();
         for (Iterator<String> iter = jsonObject.keys(); iter.hasNext(); ) {
             String type = iter.next();
-            accessList.put(type, parseBlessingPatternList(jsonObject.getJSONArray(type)));
+            if (type.equals(NOT_IN)) {
+                // Skip. getJSONArray will fail since type's corresponding value is often null.
+            } else {
+                accessList.put(type, parseBlessingPatternList(jsonObject.getJSONArray(type)));
+            }
         }
         return accessList;
     }

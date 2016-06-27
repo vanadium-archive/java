@@ -18,11 +18,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.VError;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -190,13 +192,13 @@ public class SyncbaseTest {
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 // 2nd change: the collection entity for the "c" collection.
                 assertTrue(values.hasNext());
-                watchChange = (WatchChange)values.next();
+                watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 assertEquals("c", watchChange.getCollectionId().getName());
                 // 3nd change: the row for the "foo" key.
                 assertTrue(values.hasNext());
-                watchChange = (WatchChange)values.next();
+                watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 assertEquals("c", watchChange.getCollectionId().getName());
@@ -205,7 +207,7 @@ public class SyncbaseTest {
                 //assertEquals(1, watchChange.getValue());
                 // 4nd change: the collection entity for the userdata collection.
                 assertTrue(values.hasNext());
-                watchChange = (WatchChange)values.next();
+                watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 assertFalse(values.hasNext());
@@ -225,7 +227,7 @@ public class SyncbaseTest {
 
             @Override
             public void onError(Throwable e) {
-                VError vError = (VError)e;
+                VError vError = (VError) e;
                 assertEquals("v.io/v23/verror.Unknown", vError.id);
                 assertEquals("context canceled", vError.message);
                 assertEquals(0, vError.actionCode);
@@ -253,5 +255,82 @@ public class SyncbaseTest {
             }
         }, new Database.BatchOptions());
         assertEquals(db.collection("c").get("foo", Integer.class), Integer.valueOf(10));
+    }
+
+    @Test
+    public void testSyncgroupInviteUsers() throws Exception {
+        Database db = createDatabase();
+        Collection collection = db.collection("c");
+        Syncgroup sg = collection.getSyncgroup();
+
+        User alice = new User("alice");
+        User bob = new User("bob");
+        User carol = new User("carol");
+
+        // First let us confirm that alice, bob, and carol have no access at all.
+        AccessList acl0 = sg.getAccessList();
+        assertNull(acl0.getAccessLevelForUser(alice));
+        assertNull(acl0.getAccessLevelForUser(bob));
+        assertNull(acl0.getAccessLevelForUser(carol));
+
+        // Alice can read now.
+        sg.inviteUser(new User("alice"), AccessList.AccessLevel.READ);
+        AccessList acl1 = sg.getAccessList();
+        assertEquals(acl1.getAccessLevelForUser(alice), AccessList.AccessLevel.READ);
+        assertNull(acl1.getAccessLevelForUser(bob));
+        assertNull(acl1.getAccessLevelForUser(carol));
+
+        // Bob can both read and write now.
+        sg.inviteUser(new User("bob"), AccessList.AccessLevel.READ_WRITE);
+        AccessList acl2 = sg.getAccessList();
+        assertEquals(acl2.getAccessLevelForUser(alice), AccessList.AccessLevel.READ);
+        assertEquals(acl2.getAccessLevelForUser(bob), AccessList.AccessLevel.READ_WRITE);
+        assertNull(acl2.getAccessLevelForUser(carol));
+
+        // Alice and Carol get full access now. (Tests overwrite and multiple invites.)
+        sg.inviteUsers(ImmutableList.of(new User("alice"), new User("carol")),
+                AccessList.AccessLevel.READ_WRITE_ADMIN);
+        AccessList acl3 = sg.getAccessList();
+        assertEquals(acl3.getAccessLevelForUser(alice), AccessList.AccessLevel.READ_WRITE_ADMIN);
+        assertEquals(acl3.getAccessLevelForUser(bob), AccessList.AccessLevel.READ_WRITE);
+        assertEquals(acl3.getAccessLevelForUser(carol), AccessList.AccessLevel.READ_WRITE_ADMIN);
+    }
+
+    @Test
+    public void testAccessListParsing() throws Exception {
+        // TODO(alexfandrianto): Test the test constants. They have "...", so we can't do it yet.
+
+        // Let's give some arbitrary permissions to alice and bob.
+        Permissions aliceBobAdmins = new Permissions(("{\"Admin\":{\"In\":[\"dev.v" +
+                ".io:o:app:alice\",\"dev.v.io:o:app:bob\"]},\"Write\":{\"In\":[\"dev.v" +
+                ".io:o:app:alice\",\"dev.v.io:o:app:bob\"]},\"Read\":{\"In\":[\"dev.v" +
+                ".io:o:app:alice\",\"dev.v.io:o:app:bob\"]}}").getBytes());
+        new AccessList(aliceBobAdmins);
+
+        // NOT OK: Admin + !writer
+        try {
+            Permissions aliceBobAdminsButAliceNotWriter = new Permissions(
+                    ("{\"Admin\":{\"In\":[\"dev.v.io:o:app:alice\",\"dev.v.io:o:app:bob\"]}," +
+                            "\"Write\":{\"In\":[\"dev.v.io:o:app:bob\"]},\"Read\":{\"In\":[\"dev" +
+                            ".v.io:o:app:alice\",\"dev.v.io:o:app:bob\"]}}")
+                            .getBytes());
+            new AccessList(aliceBobAdminsButAliceNotWriter);
+            fail("Should have errored because Alice is an admin but not a writer.");
+        } catch (IllegalArgumentException e) {
+            // This is supposed to fail.
+        }
+
+        // NOT OK: Admin + Writer + !Reader
+        try {
+            Permissions aliceBobWritersButAliceNotReader = new Permissions(
+                    ("{\"Admin\":{\"In\":[\"dev.v.io:o:app:bob\"]}," +
+                            "\"Write\":{\"In\":[\"dev.v.io:o:app:alice\",\"dev.v" +
+                            ".io:o:app:bob\"]}," +
+                            "\"Read\":{\"In\":[\"dev.v.io:o:app:bob\"]}}").getBytes());
+            new AccessList(aliceBobWritersButAliceNotReader);
+            fail("Should have errored because Alice is a writer but not a reader.");
+        } catch (IllegalArgumentException e) {
+            // This is supposed to fail.
+        }
     }
 }

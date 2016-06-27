@@ -122,7 +122,7 @@ public class Collection {
             public void run(BatchDatabase db) {
                 io.v.syncbase.core.Collection coreCollection = db.getCollection(id).mCoreCollection;
                 try {
-                    Permissions newPermissions = AccessList.applyDelta(
+                    Permissions newPermissions = AccessList.applyDeltaForCollection(
                             coreCollection.getPermissions(), delta);
                     coreCollection.setPermissions(newPermissions);
                 } catch (VError vError) {

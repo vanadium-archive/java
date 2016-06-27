@@ -63,9 +63,19 @@ public class Syncgroup {
 
     /**
      * Returns the {@code AccessList} for this syncgroup.
+     * Throws if the current user is not an admin of the syncgroup or its collection.
      */
     public AccessList getAccessList() throws VError {
-        return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
+        // TODO(alexfandrianto): Rework for advanced users.
+        // We will not ask for the syncgroup spec. Instead, we will rely on the collection of this
+        // syncgroup to have the correct permissions. There is an issue with not being able to
+        // determine READ vs READ_WRITE from just the syncgroup spec because the write tag is only
+        // available on the collection. This workaround will assume only a single collection per
+        // syncgroup, which is why it might not succeed for advanced users.
+        Id cId = new Id(mCoreSyncgroup.getSpec().syncgroupSpec.collections.get(0));
+        return mDatabase.getCollection(cId).getAccessList();
+
+        // return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
     }
 
     /**
@@ -88,7 +98,7 @@ public class Syncgroup {
                             UpdateAccessListOptions opts) throws VError {
         AccessList delta = new AccessList();
         for (User u : users) {
-            delta.users.put(u.getAlias(), level);
+            delta.setAccessLevel(u, level);
         }
         updateAccessList(delta, opts);
     }
@@ -113,7 +123,7 @@ public class Syncgroup {
     public void ejectUsers(List<User> users, UpdateAccessListOptions opts) throws VError {
         AccessList delta = new AccessList();
         for (User u : users) {
-            delta.users.put(u.getAlias(), null);
+            delta.removeAccessLevel(u);
         }
         updateAccessList(delta, opts);
     }
@@ -144,7 +154,7 @@ public class Syncgroup {
         } catch (VError vError) {
             throw new RuntimeException("getSpec failed", vError);
         }
-        versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDelta(
+        versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDeltaForSyncgroup(
                 versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
         mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
         // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed

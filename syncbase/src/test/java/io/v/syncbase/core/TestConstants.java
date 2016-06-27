@@ -6,21 +6,15 @@ package io.v.syncbase.core;
 
 public class TestConstants {
     public static Permissions anyDbPermissions() {
-        Permissions permissions = new Permissions();
-        permissions.json = "{\"Admin\":{\"In\":[\"...\"]},\"Write\":{\"In\":[\"...\"]},\"Read\":{\"In\":[\"...\"]},\"Resolve\":{\"In\":[\"...\"]}}".getBytes();
-        return permissions;
+        return new Permissions("{\"Admin\":{\"In\":[\"...\"]},\"Write\":{\"In\":[\"...\"]},\"Read\":{\"In\":[\"...\"]},\"Resolve\":{\"In\":[\"...\"]}}".getBytes());
+
     }
 
     public static Permissions anyCollectionPermissions() {
-        Permissions permissions = new Permissions();
-        permissions.json = "{\"Admin\":{\"In\":[\"...\"]},\"Write\":{\"In\":[\"...\"]},\"Read\":{\"In\":[\"...\"]}}".getBytes();
-        return permissions;
+        return new Permissions("{\"Admin\":{\"In\":[\"...\"]},\"Write\":{\"In\":[\"...\"]},\"Read\":{\"In\":[\"...\"]}}".getBytes());
     }
 
     public static Permissions anySyncgroupPermissions() {
-        Permissions permissions = new Permissions();
-        // The '"NotIn":null' are present to make easier the comparison with what Syncbase returns.
-        permissions.json = "{\"Admin\":{\"In\":[\"...\"],\"NotIn\":null},\"Read\":{\"In\":[\"...\"],\"NotIn\":null}}".getBytes();
-        return permissions;
+        return new Permissions("{\"Admin\":{\"In\":[\"...\"],\"NotIn\":null},\"Read\":{\"In\":[\"...\"],\"NotIn\":null}}".getBytes());
     }
 }
