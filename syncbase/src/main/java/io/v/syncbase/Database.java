@@ -5,12 +5,14 @@
 package io.v.syncbase;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import io.v.syncbase.core.CollectionRowPattern;
 import io.v.syncbase.core.SyncgroupMemberInfo;
@@ -162,8 +164,22 @@ public class Database extends DatabaseHandle {
                         new io.v.syncbase.internal.Database.SyncgroupInvitesCallbacks() {
 
                     @Override
-                    public void onInvite(io.v.syncbase.core.SyncgroupInvite invite) {
-                        h.onInvite(new SyncgroupInvite(new Id(invite.syncgroup), invite.blessingNames));
+                    public void onInvite(final io.v.syncbase.core.SyncgroupInvite invite) {
+                        final SettableFuture<Boolean> setFuture = SettableFuture.create();
+                        Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                h.onInvite(new SyncgroupInvite(new Id(invite.syncgroup),
+                                        invite.blessingNames));
+                                setFuture.set(true);
+                            }
+                        });
+                        try {
+                            setFuture.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                            System.err.println(e.toString());
+                        }
                     }
                 });
                 mSyncgroupInviteHandlers.put(h, scanId);
@@ -388,11 +404,32 @@ public class Database extends DatabaseHandle {
                         // TODO(razvanm): Ignore changes to userdata collection.
                         mBatch.add(new WatchChange(coreWatchChange));
                         if (!coreWatchChange.continued) {
+                            final SettableFuture<Boolean> setFuture = SettableFuture.create();
                             if (!mGotFirstBatch) {
                                 mGotFirstBatch = true;
-                                h.onInitialState(mBatch.iterator());
+                                final List<WatchChange> cpBatch = mBatch;
+                                Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        h.onInitialState(cpBatch.iterator());
+                                        setFuture.set(true);
+                                    }
+                                });
                             } else {
-                                h.onChangeBatch(mBatch.iterator());
+                                final List<WatchChange> cpBatch = mBatch;
+                                Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        h.onChangeBatch(cpBatch.iterator());
+                                        setFuture.set(true);
+                                    }
+                                });
+                            }
+                            try {
+                                setFuture.get();
+                            } catch (InterruptedException | ExecutionException e) {
+                                e.printStackTrace();
+                                System.err.println(e.toString());
                             }
                             mBatch.clear();
                         }

@@ -6,18 +6,21 @@ package io.v.syncbase;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import io.v.syncbase.android.LoginFragment;
 import io.v.syncbase.core.NeighborhoodPeer;
@@ -47,6 +50,8 @@ public class Syncbase {
      * Options for opening a database.
      */
     public static class Options {
+        // The executor used to execute callbacks.
+        public Executor callbackExecutor = UiThreadExecutor.INSTANCE;
         // Where data should be persisted.
         public String rootDir;
         // We use an empty mountPoints to avoid talking to the global mounttabled.
@@ -75,6 +80,24 @@ public class Syncbase {
         }
     }
 
+    /**
+     * Executor that executes all of its commands on the Android UI thread.
+     */
+    private static class UiThreadExecutor implements Executor {
+        /**
+         * Singleton instance of the UiThreadExecutor.
+         */
+        public static final UiThreadExecutor INSTANCE = new UiThreadExecutor();
+
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public void execute(Runnable runnable) {
+            handler.post(runnable);
+        }
+        private UiThreadExecutor() {}
+    }
+
     static Options sOpts;
     private static Database sDatabase;
     static Collection sUserdataCollection;
@@ -89,18 +112,6 @@ public class Syncbase {
             DIR_NAME = "syncbase",
             DB_NAME = "db",
             USERDATA_SYNCGROUP_NAME = "userdata__";
-
-    private static void enqueue(final Runnable r) {
-        // Note, we use Timer rather than Handler because the latter must be mocked out for tests,
-        // which is rather annoying.
-        //new Handler().post(r);
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                r.run();
-            }
-        }, 0);
-    }
 
     private static Map selfAndCloud() throws VError {
         return ImmutableMap.of(Permissions.IN,
@@ -209,7 +220,7 @@ public class Syncbase {
             throw new IllegalArgumentException("Unsupported provider: " + provider);
         }
 
-        Syncbase.enqueue(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -230,17 +241,17 @@ public class Syncbase {
                         syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
                         sDatabase.addWatchChangeHandler(new UserdataWatchHandler());
                     }
-                    Syncbase.enqueue(new Runnable() {
-                            @Override
-                            public void run() {
-                                cb.onSuccess();
-                            }
-                        });
+                    sOpts.callbackExecutor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            cb.onSuccess();
+                        }
+                    });
                 } catch (VError vError) {
                     cb.onError(vError);
                 }
             }
-        });
+        }).start();
     }
 
     private static class UserdataWatchHandler extends Database.WatchChangeHandler {
@@ -279,11 +290,25 @@ public class Syncbase {
             try {
                 long scanId = Neighborhood.NewScan(new Neighborhood.NeighborhoodScanCallbacks() {
                     @Override
-                    public void onPeer(NeighborhoodPeer peer) {
-                        if (peer.isLost) {
-                            cb.onLost(new User(getAliasFromBlessingPattern(peer.blessings)));
-                        } else {
-                            cb.onFound(new User(getAliasFromBlessingPattern(peer.blessings)));
+                    public void onPeer(final NeighborhoodPeer peer) {
+                        final SettableFuture<Boolean> setFuture = SettableFuture.create();
+                        Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                User u = new User(getAliasFromBlessingPattern(peer.blessings));
+                                if (peer.isLost) {
+                                    cb.onLost(u);
+                                } else {
+                                    cb.onFound(u);
+                                }
+                                setFuture.set(true);
+                            }
+                        });
+                        try {
+                            setFuture.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                            System.err.println(e.toString());
                         }
                     }
                 });

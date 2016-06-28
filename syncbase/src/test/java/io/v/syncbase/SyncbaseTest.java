@@ -16,6 +16,7 @@ import org.junit.rules.TemporaryFolder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.v.syncbase.core.Permissions;
@@ -43,6 +44,8 @@ public class SyncbaseTest {
         opts.disableUserdataSyncgroup = true;
         opts.disableSyncgroupPublishing = true;
         opts.testLogin = true;
+        // Unlike Android apps, the test doesn't have a looper/handler, so use a different executor.
+        opts.callbackExecutor = Executors.newCachedThreadPool();
         Syncbase.init(opts);
     }
 
