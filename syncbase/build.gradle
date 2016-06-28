@@ -19,7 +19,7 @@ allprojects {
 
 // You should update this after releasing a new version of the Syncbase API. See the
 // list of published versions at: https://repo1.maven.org/maven2/io/v/syncbase
-version = '0.1.5'
+version = '0.1.6'
 group = 'io.v'
 
 def siteUrl = 'https://github.com/vanadium/java/syncbase'
