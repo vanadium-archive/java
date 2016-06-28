@@ -1,3 +1,9 @@
-<manifest package="io.v.syncbase">
-
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="io.v.v23.android" >
+    <!-- Request the USE_CREDENTIALS permission for Android login if targeting version <= 22.
+         See: https://developer.android.com/reference/android/accounts/AccountManager.html -->
+    <uses-permission
+        android:name="android.permission.USE_CREDENTIALS"
+        android:maxSdkVersion="22" />
 </manifest>

@@ -4,6 +4,9 @@
 
 package io.v.syncbase;
 
+import android.app.Activity;
+import android.app.FragmentTransaction;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -14,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
+import io.v.syncbase.android.LoginFragment;
 import io.v.syncbase.core.NeighborhoodPeer;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
@@ -160,6 +165,27 @@ public class Syncbase {
         public void onError(Throwable e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Logs in the user on Android.
+     * The user selects an account through an account picker flow and is logged into Syncbase.
+     * Note: This default account flow is currently restricted to Google accounts.
+     *
+     * @param activity The Android activity where login will occur.
+     * @param cb       The callback to call when the login was done.
+     */
+    public static void loginAndroid(Activity activity, final LoginCallback cb) {
+        FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
+        LoginFragment fragment = new LoginFragment();
+        fragment.setTokenReceiver(new LoginFragment.TokenReceiver() {
+            @Override
+            public void receiveToken(String token) {
+                Syncbase.login(token, User.PROVIDER_GOOGLE, cb);
+            }
+        });
+        transaction.add(fragment, UUID.randomUUID().toString());
+        transaction.commit();  // This will invoke the fragment's onCreate() immediately.
     }
 
     /**
