@@ -314,6 +314,17 @@ public class Database extends DatabaseHandle {
     }
 
     /**
+     * Runs the given operation in a batch, managing retries and commit/abort. Writable batches are
+     * committed, retrying if commit fails due to a concurrent batch. Read-only batches are aborted.
+     * Uses the default BatchOptions.
+     *
+     * @param op   the operation to run
+     */
+    public void runInBatch(final BatchOperation op) throws VError {
+        runInBatch(op, new BatchOptions());
+    }
+
+    /**
      * Creates a new batch. Instead of calling this function directly, clients are encouraged to use
      * the {@code runInBatch} helper function, which detects "concurrent batch" errors and handles
      * retries internally.

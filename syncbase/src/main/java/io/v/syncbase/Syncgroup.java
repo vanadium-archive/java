@@ -180,6 +180,6 @@ public class Syncgroup {
                     }
                 }
             }
-        }, new Database.BatchOptions());
+        });
     }
 }

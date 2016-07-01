@@ -134,7 +134,7 @@ public class Collection {
         if (mDatabaseHandle instanceof BatchDatabase) {
             op.run((BatchDatabase) mDatabaseHandle);
         } else {
-            ((Database) mDatabaseHandle).runInBatch(op, new Database.BatchOptions());
+            ((Database) mDatabaseHandle).runInBatch(op);
         }
     }
 }

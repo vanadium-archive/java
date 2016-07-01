@@ -256,7 +256,7 @@ public class SyncbaseTest {
                     fail(vError.toString());
                 }
             }
-        }, new Database.BatchOptions());
+        });
         assertEquals(db.collection("c").get("foo", Integer.class), Integer.valueOf(10));
     }
 
