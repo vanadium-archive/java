@@ -13,7 +13,6 @@ import io.v.v23.vom.VomUtil;
  */
 public class WatchChange {
     public enum EntityType {
-        ROOT,
         COLLECTION,
         ROW
     }
@@ -33,9 +32,7 @@ public class WatchChange {
     private final boolean mContinued;
 
     WatchChange(io.v.syncbase.core.WatchChange change) {
-        if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.ROOT) {
-            mEntityType = EntityType.ROOT;
-        } else if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.COLLECTION) {
+        if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.COLLECTION) {
             mEntityType = EntityType.COLLECTION;
         } else if (change.entityType == io.v.syncbase.core.WatchChange.EntityType.ROW) {
             mEntityType = EntityType.ROW;

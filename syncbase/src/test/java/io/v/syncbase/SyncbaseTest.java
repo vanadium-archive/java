@@ -188,18 +188,13 @@ public class SyncbaseTest {
             @Override
             public void onInitialState(Iterator<WatchChange> values) {
                 // TODO(razvanm): Check the entire contents of each change.
-                // 1st change: the root entity.
+                // 1st change: the collection entity for the "c" collection.
                 assertTrue(values.hasNext());
-                WatchChange watchChange = values.next();
-                assertEquals(WatchChange.EntityType.ROOT, watchChange.getEntityType());
-                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                // 2nd change: the collection entity for the "c" collection.
-                assertTrue(values.hasNext());
-                watchChange = (WatchChange) values.next();
+                WatchChange watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
                 assertEquals("c", watchChange.getCollectionId().getName());
-                // 3nd change: the row for the "foo" key.
+                // 2nd change: the row for the "foo" key.
                 assertTrue(values.hasNext());
                 watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
@@ -208,12 +203,18 @@ public class SyncbaseTest {
                 assertEquals("foo", watchChange.getRowKey());
                 // TODO(razvanm): Uncomment after the POJO start working.
                 //assertEquals(1, watchChange.getValue());
-                // 4nd change: the collection entity for the userdata collection.
+                // 3rd change: the collection entity for the userdata collection.
                 assertTrue(values.hasNext());
                 watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                assertFalse(values.hasNext());
+                // 4th change: the userdata collection has a row for "c"'s syncgroup.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertEquals("userdata__", watchChange.getCollectionId().getName());
+                assertTrue(watchChange.getRowKey().endsWith("c"));
                 waitOnInitialState.set(null);
             }
 

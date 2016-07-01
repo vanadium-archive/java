@@ -413,7 +413,10 @@ public class Database extends DatabaseHandle {
                     @Override
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
                         // TODO(razvanm): Ignore changes to userdata collection.
-                        mBatch.add(new WatchChange(coreWatchChange));
+                        if (coreWatchChange.entityType !=
+                                io.v.syncbase.core.WatchChange.EntityType.ROOT) {
+                            mBatch.add(new WatchChange(coreWatchChange));
+                        }
                         if (!coreWatchChange.continued) {
                             final SettableFuture<Boolean> setFuture = SettableFuture.create();
                             if (!mGotFirstBatch) {
