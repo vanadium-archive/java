@@ -408,7 +408,7 @@ public class SyncbaseTest extends TestCase {
                 wait.set(null);
             }
         }).start();
-        wait.get(1, TimeUnit.SECONDS);
+        wait.get(3, TimeUnit.SECONDS);
         try {
             sync(InputChannels.asList(channel));
         } catch (CanceledException e) {
