@@ -144,21 +144,18 @@ public class Database extends DatabaseHandle {
     /**
      * Handles discovered syncgroup invites.
      */
-    public static abstract class SyncgroupInviteHandler {
+    public interface SyncgroupInviteHandler {
         /**
          * Called when a syncgroup invitation is discovered. Clients typically handle invites by
          * calling {@code acceptSyncgroupInvite} or {@code ignoreSyncgroupInvite}.
          */
-        public void onInvite(SyncgroupInvite invite) {
-        }
+        void onInvite(SyncgroupInvite invite);
 
         /**
          * Called when an error occurs while scanning for syncgroup invitations. Once
          * {@code onError} is called, no other methods will be called on this handler.
          */
-        public void onError(Throwable e) {
-            throw new RuntimeException(e);
-        }
+        void onError(Throwable e);
     }
 
     // TODO(sadovsky): Document which thread the handler methods are called on.
@@ -231,13 +228,9 @@ public class Database extends DatabaseHandle {
         }
     }
 
-    public static abstract class AcceptSyncgroupInviteCallback {
-        public void onSuccess(Syncgroup sg) {
-        }
-
-        public void onFailure(Throwable e) {
-            throw new RuntimeException(e);
-        }
+    public interface AcceptSyncgroupInviteCallback {
+         void onSuccess(Syncgroup sg);
+         void onFailure(Throwable e);
     }
 
     /**
@@ -389,7 +382,7 @@ public class Database extends DatabaseHandle {
     /**
      * Handles observed changes to the database.
      */
-    public static abstract class WatchChangeHandler {
+    public interface WatchChangeHandler {
         // TODO(sadovsky): Consider adopting Aaron's suggestion of combining onInitialState and
         // onChangeBatch into a single method, to make things simpler for developers who don't want
         // to apply deltas to their in-memory data structures:
@@ -399,23 +392,19 @@ public class Database extends DatabaseHandle {
          * Called once, when a watch change handler is added, to provide the initial state of the
          * values being watched.
          */
-        public void onInitialState(Iterator<WatchChange> values) {
-        }
+        void onInitialState(Iterator<WatchChange> values);
 
         /**
          * Called whenever a batch of changes is committed to the database. Individual puts/deletes
          * surface as a single-change batch.
          */
-        public void onChangeBatch(Iterator<WatchChange> changes) {
-        }
+        void onChangeBatch(Iterator<WatchChange> changes);
 
         /**
          * Called when an error occurs while watching for changes. Once {@code onError} is called,
          * no other methods will be called on this handler.
          */
-        public void onError(Throwable e) {
-            throw new RuntimeException(e);
-        }
+        void onError(Throwable e);
     }
 
     // TODO(sadovsky): Document which thread the handler methods are called on.

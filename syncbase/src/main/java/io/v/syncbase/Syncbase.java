@@ -189,13 +189,9 @@ public class Syncbase {
         throw new UnsupportedOperationException("Not implemented");
     }
 
-    public static abstract class LoginCallback {
-        public void onSuccess() {
-        }
-
-        public void onError(Throwable e) {
-            throw new RuntimeException(e);
-        }
+    public interface LoginCallback {
+        void onSuccess();
+        void onError(Throwable e);
     }
 
     /**
@@ -274,7 +270,7 @@ public class Syncbase {
         }).start();
     }
 
-    private static class UserdataWatchHandler extends Database.WatchChangeHandler {
+    private static class UserdataWatchHandler implements Database.WatchChangeHandler {
         @Override
         public void onInitialState(Iterator<WatchChange> values) {
             onWatchChange(values);
@@ -283,6 +279,11 @@ public class Syncbase {
         @Override
         public void onChangeBatch(Iterator<WatchChange> changes) {
             onWatchChange(changes);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            throw new RuntimeException(e);
         }
 
         private void onWatchChange(Iterator<WatchChange> changes) {
@@ -365,14 +366,10 @@ public class Syncbase {
         }
     }
 
-    public static abstract class ScanNeighborhoodForUsersCallback {
-        public abstract void onFound(User user);
-
-        public abstract void onLost(User user);
-
-        public void onError(Throwable e) {
-            throw new RuntimeException(e);
-        }
+    public interface ScanNeighborhoodForUsersCallback {
+        void onFound(User user);
+        void onLost(User user);
+        void onError(Throwable e);
     }
 
     /**
