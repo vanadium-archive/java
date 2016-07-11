@@ -5,6 +5,9 @@
 package io.v.syncbase;
 
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 /**
  * Provides a way to perform a set of operations atomically on a database. See
@@ -19,10 +22,10 @@ public class BatchDatabase extends DatabaseHandle {
     }
 
     /**
-     * @throws IllegalArgumentException if opts.withoutSyncgroup not false
+     * @throws IllegalArgumentException if opts.withoutSyncgroup false
      */
     @Override
-    public Collection collection(String name, CollectionOptions opts) throws VError {
+    public Collection collection(String name, CollectionOptions opts) throws SyncbaseException {
         if (!opts.withoutSyncgroup) {
             throw new IllegalArgumentException("Cannot create syncgroup in a batch");
         }
@@ -35,9 +38,15 @@ public class BatchDatabase extends DatabaseHandle {
      * Persists the pending changes to Syncbase. If the batch is read-only, {@code commit} will
      * throw {@code ConcurrentBatchException}; abort should be used instead.
      */
-    public void commit() throws VError {
-        // TODO(sadovsky): Throw ConcurrentBatchException where appropriate.
-        mCoreBatchDatabase.commit();
+    public void commit() throws SyncbaseException {
+        try {
+
+            // TODO(sadovsky): Throw ConcurrentBatchException where appropriate.
+            mCoreBatchDatabase.commit();
+
+        } catch (VError e) {
+            chainThrow("committing batch", e);
+        }
     }
 
     /**
@@ -45,7 +54,13 @@ public class BatchDatabase extends DatabaseHandle {
      * strictly required, but may allow Syncbase to release locks or other resources sooner than if
      * {@code abort} was not called.
      */
-    public void abort() throws VError {
-        mCoreBatchDatabase.abort();
+    public void abort() throws SyncbaseException {
+        try {
+
+            mCoreBatchDatabase.abort();
+
+        } catch (VError e) {
+            chainThrow("aborting batch", e);
+        }
     }
 }

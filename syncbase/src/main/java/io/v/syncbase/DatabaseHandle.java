@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 
 /**
@@ -50,12 +53,13 @@ public abstract class DatabaseHandle {
      * @param opts options for collection creation
      * @return the collection handle
      */
-    public abstract Collection collection(String name, CollectionOptions opts) throws VError;
+    public abstract Collection collection(String name, CollectionOptions opts)
+            throws SyncbaseException;
 
     /**
      * Calls {@code collection(name, opts)} with default {@code CollectionOptions}.
      */
-    public Collection collection(String name) throws VError {
+    public Collection collection(String name) throws SyncbaseException {
         return collection(name, new CollectionOptions());
     }
 
@@ -72,11 +76,18 @@ public abstract class DatabaseHandle {
     /**
      * Returns an iterator over all collections in the database.
      */
-    public Iterator<Collection> getCollections() throws VError {
-        ArrayList<Collection> collections = new ArrayList<>();
-        for (io.v.syncbase.core.Id id : mCoreDatabaseHandle.listCollections()) {
-            collections.add(getCollection(new Id(id)));
+    public Iterator<Collection> getCollections() throws SyncbaseException {
+        try {
+
+            ArrayList<Collection> collections = new ArrayList<>();
+            for (io.v.syncbase.core.Id id : mCoreDatabaseHandle.listCollections()) {
+                collections.add(getCollection(new Id(id)));
+            }
+            return collections.iterator();
+
+        } catch (VError e) {
+            chainThrow("getting collections in database", mCoreDatabaseHandle.id(), e);
+            throw new AssertionError("never happens");
         }
-        return collections.iterator();
     }
 }

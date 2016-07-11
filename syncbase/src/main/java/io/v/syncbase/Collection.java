@@ -6,8 +6,11 @@ package io.v.syncbase;
 
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
 import io.v.v23.verror.VException;
 import io.v.v23.vom.VomUtil;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 /**
  * Represents an ordered set of key-value pairs.
@@ -24,14 +27,14 @@ public class Collection {
         mId = new Id(coreCollection.id());
     }
 
-    void createIfMissing() {
+    void createIfMissing() throws SyncbaseException {
         try {
             mCoreCollection.create(Syncbase.defaultCollectionPerms());
         } catch (VError vError) {
             if (vError.id.equals(VError.EXIST)) {
                 return;
             }
-            throw new RuntimeException("Failed to create collection", vError);
+            chainThrow("creating collection", vError);
         }
     }
 
@@ -65,68 +68,94 @@ public class Collection {
     /**
      * Returns the value associated with {@code key}.
      */
-    public <T> T get(String key, Class<T> cls) throws VError {
+    public <T> T get(String key, Class<T> cls) throws SyncbaseException {
         try {
             return (T) VomUtil.decode(mCoreCollection.get(key), cls);
         } catch (VError vError) {
             if (vError.id.equals(VError.NO_EXIST)) {
                 return null;
             }
-            throw vError;
+            chainThrow("getting value from collection", mId, vError);
         } catch (VException e) {
-            throw new VError(e);
+            chainThrow("decoding value retrieved from collection", mId, e);
         }
+        throw new AssertionError("never happens");
     }
 
     /**
      * Returns true if there is a value associated with {@code key}.
      */
-    public boolean exists(String key) throws VError {
-        return mCoreCollection.row(key).exists();
+    public boolean exists(String key) throws SyncbaseException {
+        try {
+
+            return mCoreCollection.row(key).exists();
+
+        } catch (VError e) {
+            chainThrow("checking if value exists in collection", mId, e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**
      * Puts {@code value} for {@code key}, overwriting any existing value. Idempotent.
      */
-    public <T> void put(String key, T value) throws VError {
+    public <T> void put(String key, T value) throws SyncbaseException {
         try {
+
             mCoreCollection.put(key, VomUtil.encode(value, value.getClass()));
+
+        } catch (VError e) {
+            chainThrow("putting value into collection", mId, e);
         } catch (VException e) {
-            throw new VError(e);
+            chainThrow("putting value into collection", mId, e);
         }
     }
 
     /**
      * Deletes the value associated with {@code key}. Idempotent.
      */
-    public void delete(String key) throws VError {
-        mCoreCollection.delete(key);
+    public void delete(String key) throws SyncbaseException {
+        try {
+
+            mCoreCollection.delete(key);
+
+        } catch (VError e) {
+            chainThrow("deleting collection", mId, e);
+        }
     }
 
     /**
      * FOR ADVANCED USERS. Returns the {@code AccessList} for this collection. Users should
      * typically manipulate access lists via {@code collection.getSyncgroup()}.
      */
-    public AccessList getAccessList() throws VError {
-        return new AccessList(mCoreCollection.getPermissions());
+    public AccessList getAccessList() throws SyncbaseException {
+        try {
+
+            return new AccessList(mCoreCollection.getPermissions());
+
+        } catch (VError e) {
+            chainThrow("getting access list of collection", mId, e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**
      * FOR ADVANCED USERS. Updates the {@code AccessList} for this collection. Users should
      * typically manipulate access lists via {@code collection.getSyncgroup()}.
      */
-    public void updateAccessList(final AccessList delta) throws VError {
+    public void updateAccessList(final AccessList delta) throws SyncbaseException {
         final Id id = this.getId();
         Database.BatchOperation op = new Database.BatchOperation() {
             @Override
-            public void run(BatchDatabase db) {
-                io.v.syncbase.core.Collection coreCollection = db.getCollection(id).mCoreCollection;
+            public void run(BatchDatabase db) throws SyncbaseException {
+                io.v.syncbase.core.Collection coreCollection = db.getCollection(id)
+                        .mCoreCollection;
                 try {
                     Permissions newPermissions = AccessList.applyDeltaForCollection(
                             coreCollection.getPermissions(), delta);
                     coreCollection.setPermissions(newPermissions);
                 } catch (VError vError) {
-                    throw new RuntimeException("updateAccessList failed", vError);
+                    chainThrow("setting permissions in collection", id, vError);
                 }
             }
         };

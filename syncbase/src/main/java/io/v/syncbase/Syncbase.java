@@ -27,8 +27,11 @@ import io.v.syncbase.core.NeighborhoodPeer;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
 import io.v.syncbase.internal.Blessings;
 import io.v.syncbase.internal.Neighborhood;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 // FIXME(sadovsky): Currently, various methods throw RuntimeException on any error. We need to
 // decide which error types to surface to clients, and define specific Exception subclasses for
@@ -44,6 +47,10 @@ import io.v.syncbase.internal.Neighborhood;
 /**
  * Syncbase is a storage system for developers that makes it easy to synchronize app data between
  * devices. It works even when devices are not connected to the Internet.
+ *
+ * <p>Methods of classes in this package may throw an exception that is a subclass of
+ * SyncbaseException.  See details of those subclasses to determine whether there are conditions
+ * the calling code should handle.</p>
  */
 public class Syncbase {
     /**
@@ -113,7 +120,7 @@ public class Syncbase {
             DB_NAME = "db",
             USERDATA_SYNCGROUP_NAME = "userdata__";
 
-    private static Map selfAndCloud() throws VError {
+    private static Map selfAndCloud() throws SyncbaseException {
         return ImmutableMap.of(Permissions.IN,
                 ImmutableList.of(getPersonalBlessingString(), sOpts.getCloudBlessingString()));
     }
@@ -123,28 +130,41 @@ public class Syncbase {
      *
      * @param opts initial options
      */
-    public static void init(Options opts) throws VError {
-        System.loadLibrary("syncbase");
-        sOpts = opts;
-        io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
-        if (isLoggedIn()) {
-            io.v.syncbase.internal.Service.Serve();
+    public static void init(Options opts) throws SyncbaseException {
+        try {
+
+            System.loadLibrary("syncbase");
+            sOpts = opts;
+            io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
+            if (isLoggedIn()) {
+                io.v.syncbase.internal.Service.Serve();
+            }
+
+        } catch (VError e) {
+            chainThrow("initializing Syncbase", e);
         }
     }
 
     /**
      * Returns a Database object. Return null if the user is not currently logged in.
      */
-    public static Database database() throws VError {
-        if (!isLoggedIn()) {
-            return null;
-        }
-        if (sDatabase != null) {
-            // TODO(sadovsky): Check that opts matches original opts (sOpts)?
+    public static Database database() throws SyncbaseException {
+        try {
+
+            if (!isLoggedIn()) {
+                return null;
+            }
+            if (sDatabase != null) {
+                // TODO(sadovsky): Check that opts matches original opts (sOpts)?
+                return sDatabase;
+            }
+            sDatabase = new Database(Service.database(DB_NAME));
             return sDatabase;
+
+        } catch (VError e) {
+            chainThrow("getting the database", e);
+            throw new AssertionError("never happens");
         }
-        sDatabase = new Database(Service.database(DB_NAME));
-        return sDatabase;
     }
 
     /**
@@ -247,8 +267,8 @@ public class Syncbase {
                             cb.onSuccess();
                         }
                     });
-                } catch (VError vError) {
-                    cb.onError(vError);
+                } catch (Throwable e) {
+                    cb.onError(e);
                 }
             }
         }).start();
@@ -398,11 +418,18 @@ public class Syncbase {
         return parts[parts.length - 1];
     }
 
-    static String getPersonalBlessingString() throws VError {
-        return Blessings.UserBlessingFromContext();
+    static String getPersonalBlessingString() throws SyncbaseException {
+        try {
+
+            return Blessings.UserBlessingFromContext();
+
+        } catch(VError e) {
+            chainThrow("getting certificates from context", e);
+            throw new AssertionError("never happens");
+        }
     }
 
-    static Permissions defaultDatabasePerms() throws VError {
+    static Permissions defaultDatabasePerms() throws SyncbaseException {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map anyone = ImmutableMap.of(Permissions.IN, ImmutableList.of("..."));
         Map selfAndCloud = selfAndCloud();
@@ -413,7 +440,7 @@ public class Syncbase {
                 Permissions.Tags.ADMIN, selfAndCloud));
     }
 
-    static Permissions defaultCollectionPerms() throws VError {
+    static Permissions defaultCollectionPerms() throws SyncbaseException {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(
@@ -422,7 +449,7 @@ public class Syncbase {
                 Permissions.Tags.ADMIN, selfAndCloud));
     }
 
-    static Permissions defaultSyncgroupPerms() throws VError {
+    static Permissions defaultSyncgroupPerms() throws SyncbaseException {
         // TODO(sadovsky): Revisit these default perms, which were copied from the Todos app.
         Map selfAndCloud = selfAndCloud();
         return new Permissions(ImmutableMap.of(

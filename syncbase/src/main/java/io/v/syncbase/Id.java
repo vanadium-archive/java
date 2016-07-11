@@ -27,7 +27,7 @@ public class Id {
     public static Id decode(String encodedId) {
         String[] parts = encodedId.split(SEPARATOR);
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid encoded id: " + encodedId);
+            throw new IllegalArgumentException("Invalid encoded ID: \"" + encodedId + "\"");
         }
         return new Id(parts[0], parts[1]);
     }

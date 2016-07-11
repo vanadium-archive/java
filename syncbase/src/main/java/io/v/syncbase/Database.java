@@ -17,6 +17,9 @@ import java.util.concurrent.ExecutionException;
 import io.v.syncbase.core.CollectionRowPattern;
 import io.v.syncbase.core.SyncgroupMemberInfo;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 /**
  * A set of collections and syncgroups.
@@ -35,19 +38,19 @@ public class Database extends DatabaseHandle {
         mCoreDatabase = coreDatabase;
     }
 
-    void createIfMissing() throws VError {
+    void createIfMissing() throws SyncbaseException {
         try {
             mCoreDatabase.create(Syncbase.defaultDatabasePerms());
         } catch (VError vError) {
             if (vError.id.equals(VError.EXIST)) {
                 return;
             }
-            throw vError;
+            chainThrow("creating database", vError);
         }
     }
 
     @Override
-    public Collection collection(String name, CollectionOptions opts) throws VError {
+    public Collection collection(String name, CollectionOptions opts) throws SyncbaseException {
         Collection res = getCollection(new Id(Syncbase.getPersonalBlessingString(), name));
         res.createIfMissing();
         // TODO(sadovsky): Unwind collection creation on syncgroup creation failure? It would be
@@ -77,7 +80,7 @@ public class Database extends DatabaseHandle {
      * @return the syncgroup
      */
     public Syncgroup syncgroup(String name, List<Collection> collections, SyncgroupOptions opts)
-            throws VError {
+            throws SyncbaseException {
         if (collections.isEmpty()) {
             throw new IllegalArgumentException("No collections specified");
         }
@@ -99,7 +102,7 @@ public class Database extends DatabaseHandle {
     /**
      * Calls {@code syncgroup(name, collections, opts)} with default {@code SyncgroupOptions}.
      */
-    public Syncgroup syncgroup(String name, List<Collection> collections) throws VError {
+    public Syncgroup syncgroup(String name, List<Collection> collections) throws SyncbaseException {
         return syncgroup(name, collections, new SyncgroupOptions());
     }
 
@@ -116,12 +119,19 @@ public class Database extends DatabaseHandle {
     /**
      * Returns an iterator over all syncgroups in the database.
      */
-    public Iterator<Syncgroup> getSyncgroups() throws VError {
-        ArrayList<Syncgroup> syncgroups = new ArrayList<>();
-        for (io.v.syncbase.core.Id id : mCoreDatabase.listSyncgroups()) {
-            syncgroups.add(getSyncgroup(new Id(id)));
+    public Iterator<Syncgroup> getSyncgroups() throws SyncbaseException {
+        try {
+
+            ArrayList<Syncgroup> syncgroups = new ArrayList<>();
+            for (io.v.syncbase.core.Id id : mCoreDatabase.listSyncgroups()) {
+                syncgroups.add(getSyncgroup(new Id(id)));
+            }
+            return syncgroups.iterator();
+
+        } catch (VError e) {
+            chainThrow("getting syncgroups of database", mCoreDatabase.id(), e);
+            throw new AssertionError("never happens");
         }
-        return syncgroups.iterator();
     }
 
     /**
@@ -294,7 +304,7 @@ public class Database extends DatabaseHandle {
      * Designed for use in {@code runInBatch}.
      */
     public interface BatchOperation {
-        void run(BatchDatabase db);
+        void run(BatchDatabase db) throws SyncbaseException;
     }
 
     /**
@@ -304,13 +314,23 @@ public class Database extends DatabaseHandle {
      * @param op   the operation to run
      * @param opts options for this batch
      */
-    public void runInBatch(final BatchOperation op, BatchOptions opts) throws VError {
-        mCoreDatabase.runInBatch(new io.v.syncbase.core.Database.BatchOperation() {
-            @Override
-            public void run(io.v.syncbase.core.BatchDatabase batchDatabase) {
-                op.run(new BatchDatabase(batchDatabase));
-            }
-        }, opts.toCore());
+    public void runInBatch(final BatchOperation op, BatchOptions opts) throws SyncbaseException {
+        try {
+
+            mCoreDatabase.runInBatch(new io.v.syncbase.core.Database.BatchOperation() {
+                @Override
+                public void run(io.v.syncbase.core.BatchDatabase batchDatabase) {
+                    try {
+                        op.run(new BatchDatabase(batchDatabase));
+                    } catch (SyncbaseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, opts.toCore());
+
+        } catch (VError e) {
+            chainThrow("running batch operation in database", mCoreDatabase.id(), e);
+        }
     }
 
     /**
@@ -320,7 +340,7 @@ public class Database extends DatabaseHandle {
      *
      * @param op   the operation to run
      */
-    public void runInBatch(final BatchOperation op) throws VError {
+    public void runInBatch(final BatchOperation op) throws SyncbaseException {
         runInBatch(op, new BatchOptions());
     }
 
@@ -348,8 +368,15 @@ public class Database extends DatabaseHandle {
      * @param opts options for this batch
      * @return the batch handle
      */
-    public BatchDatabase beginBatch(BatchOptions opts) throws VError {
-        return new BatchDatabase(mCoreDatabase.beginBatch(opts.toCore()));
+    public BatchDatabase beginBatch(BatchOptions opts) throws SyncbaseException {
+        try {
+
+            return new BatchDatabase(mCoreDatabase.beginBatch(opts.toCore()));
+
+        } catch (VError e) {
+            chainThrow("creating batch in database", mCoreDatabase.id(), e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**

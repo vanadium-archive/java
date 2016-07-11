@@ -14,6 +14,9 @@ import io.v.syncbase.core.SyncgroupMemberInfo;
 import io.v.syncbase.core.SyncgroupSpec;
 import io.v.syncbase.core.VError;
 import io.v.syncbase.core.VersionedSyncgroupSpec;
+import io.v.syncbase.exception.SyncbaseException;
+
+import static io.v.syncbase.exception.Exceptions.chainThrow;
 
 /**
  * Represents a set of collections, synced amongst a set of users.
@@ -28,7 +31,7 @@ public class Syncgroup {
         mDatabase = database;
     }
 
-    void createIfMissing(List<Collection> collections) throws VError {
+    void createIfMissing(List<Collection> collections) throws SyncbaseException {
         ArrayList<io.v.syncbase.core.Id> ids = new ArrayList<>();
         for (Collection cx : collections) {
             ids.add(cx.getId().toCoreId());
@@ -52,7 +55,7 @@ public class Syncgroup {
                 // configuration, e.g., the specified collections? instead of returning early.
                 return;
             }
-            throw vError;
+            chainThrow("creating syncgroup for collections", vError);
         }
     }
 
@@ -73,17 +76,24 @@ public class Syncgroup {
      * Returns the {@code AccessList} for this syncgroup.
      * Throws if the current user is not an admin of the syncgroup or its collection.
      */
-    public AccessList getAccessList() throws VError {
+    public AccessList getAccessList() throws SyncbaseException {
         // TODO(alexfandrianto): Rework for advanced users.
         // We will not ask for the syncgroup spec. Instead, we will rely on the collection of this
         // syncgroup to have the correct permissions. There is an issue with not being able to
         // determine READ vs READ_WRITE from just the syncgroup spec because the write tag is only
         // available on the collection. This workaround will assume only a single collection per
         // syncgroup, which is why it might not succeed for advanced users.
-        Id cId = new Id(mCoreSyncgroup.getSpec().syncgroupSpec.collections.get(0));
-        return mDatabase.getCollection(cId).getAccessList();
+        try {
 
-        // return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
+            Id cId = new Id(mCoreSyncgroup.getSpec().syncgroupSpec.collections.get(0));
+            return mDatabase.getCollection(cId).getAccessList();
+
+            // return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
+
+        } catch (VError e) {
+            chainThrow("getting access list of syncgroup", getId(), e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**
@@ -103,7 +113,7 @@ public class Syncgroup {
      * FOR ADVANCED USERS. Adds the given users to the syncgroup, with the specified access level.
      */
     public void inviteUsers(List<User> users, AccessList.AccessLevel level,
-                            UpdateAccessListOptions opts) throws VError {
+                            UpdateAccessListOptions opts) throws SyncbaseException {
         AccessList delta = new AccessList();
         for (User u : users) {
             delta.setAccessLevel(u, level);
@@ -114,21 +124,22 @@ public class Syncgroup {
     /**
      * Adds the given users to the syncgroup, with the specified access level.
      */
-    public void inviteUsers(List<User> users, AccessList.AccessLevel level) throws VError {
+    public void inviteUsers(List<User> users, AccessList.AccessLevel level)
+            throws SyncbaseException {
         inviteUsers(users, level, new UpdateAccessListOptions());
     }
 
     /**
      * Adds the given user to the syncgroup, with the specified access level.
      */
-    public void inviteUser(User user, AccessList.AccessLevel level) throws VError {
+    public void inviteUser(User user, AccessList.AccessLevel level) throws SyncbaseException {
         inviteUsers(Collections.singletonList(user), level);
     }
 
     /**
      * FOR ADVANCED USERS. Removes the given users from the syncgroup.
      */
-    public void ejectUsers(List<User> users, UpdateAccessListOptions opts) throws VError {
+    public void ejectUsers(List<User> users, UpdateAccessListOptions opts) throws SyncbaseException {
         AccessList delta = new AccessList();
         for (User u : users) {
             delta.removeAccessLevel(u);
@@ -139,14 +150,14 @@ public class Syncgroup {
     /**
      * Removes the given users from the syncgroup.
      */
-    public void ejectUsers(List<User> users) throws VError {
+    public void ejectUsers(List<User> users) throws SyncbaseException {
         ejectUsers(users, new UpdateAccessListOptions());
     }
 
     /**
      * Removes the given user from the syncgroup.
      */
-    public void ejectUser(User user) throws VError {
+    public void ejectUser(User user) throws SyncbaseException {
         ejectUsers(Collections.singletonList(user));
     }
 
@@ -154,32 +165,29 @@ public class Syncgroup {
      * FOR ADVANCED USERS. Applies {@code delta} to the {@code AccessList}.
      */
     public void updateAccessList(final AccessList delta, UpdateAccessListOptions opts)
-            throws VError {
-        // TODO(sadovsky): Make it so SyncgroupSpec can be updated as part of a batch?
-        VersionedSyncgroupSpec versionedSyncgroupSpec;
+            throws SyncbaseException {
         try {
-            versionedSyncgroupSpec = mCoreSyncgroup.getSpec();
-        } catch (VError vError) {
-            throw new RuntimeException("getSpec failed", vError);
-        }
-        versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDeltaForSyncgroup(
-                versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
-        mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
-        // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
-        // after getSpec() but before db.getCollection().
-        final List<io.v.syncbase.core.Id> collectionsIds =
-                versionedSyncgroupSpec.syncgroupSpec.collections;
-        mDatabase.runInBatch(new Database.BatchOperation() {
-            @Override
-            public void run(BatchDatabase db) {
-                for (io.v.syncbase.core.Id id : collectionsIds) {
-                    try {
+
+            // TODO(sadovsky): Make it so SyncgroupSpec can be updated as part of a batch?
+            VersionedSyncgroupSpec versionedSyncgroupSpec = mCoreSyncgroup.getSpec();
+            versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDeltaForSyncgroup(
+                    versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
+            mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
+            // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
+            // after getSpec() but before db.getCollection().
+            final List<io.v.syncbase.core.Id> collectionsIds =
+                    versionedSyncgroupSpec.syncgroupSpec.collections;
+            mDatabase.runInBatch(new Database.BatchOperation() {
+                @Override
+                public void run(BatchDatabase db) throws SyncbaseException {
+                    for (io.v.syncbase.core.Id id : collectionsIds) {
                         db.getCollection(new Id(id)).updateAccessList(delta);
-                    } catch (VError vError) {
-                        throw new RuntimeException("getCollection failed", vError);
                     }
                 }
-            }
-        });
+            });
+
+        } catch (VError e) {
+            chainThrow("updating access list of syncgroup", getId(), e);
+        }
     }
 }

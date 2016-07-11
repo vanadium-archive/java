@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.util.ArrayList;
@@ -21,32 +22,29 @@ import java.util.concurrent.TimeUnit;
 
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.VError;
+import io.v.syncbase.exception.SyncbaseException;
 
 import static com.google.common.truth.Truth.assertThat;
+import static io.v.syncbase.TestUtil.createDatabase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class SyncbaseTest {
     @Rule
     public final TemporaryFolder folder = new TemporaryFolder();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     // To run these tests from Android Studio, add the following VM option to the default JUnit
     // build configuration, via Run > Edit Configurations... > Defaults > JUnit > VM options:
     // -Djava.library.path=/Users/sadovsky/vanadium/release/java/syncbase/build/libs
     @Before
     public void setUp() throws Exception {
-        Syncbase.Options opts = new Syncbase.Options();
-        opts.rootDir = folder.newFolder().getAbsolutePath();
-        opts.disableUserdataSyncgroup = true;
-        opts.disableSyncgroupPublishing = true;
-        opts.testLogin = true;
-        // Unlike Android apps, the test doesn't have a looper/handler, so use a different executor.
-        opts.callbackExecutor = Executors.newCachedThreadPool();
-        Syncbase.init(opts);
+        TestUtil.setUpSyncbase(folder.newFolder());
     }
 
     @After
@@ -54,26 +52,7 @@ public class SyncbaseTest {
         Syncbase.shutdown();
     }
 
-    private Database createDatabase() throws Exception {
-        final SettableFuture<Void> future = SettableFuture.create();
-
-        Syncbase.login("", "", new Syncbase.LoginCallback() {
-            @Override
-            public void onSuccess() {
-                future.set(null);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                future.setException(e);
-            }
-        });
-
-        future.get(5, TimeUnit.SECONDS);
-        return Syncbase.database();
-    }
-
-    private static Iterable<Id> getCollectionIds(Database db) throws VError {
+    private static Iterable<Id> getCollectionIds(Database db) throws SyncbaseException {
         List<Id> res = new ArrayList<>();
         for (Iterator<Collection> it = db.getCollections(); it.hasNext(); ) {
             res.add(it.next().getId());
@@ -81,7 +60,7 @@ public class SyncbaseTest {
         return res;
     }
 
-    private static Iterable<Id> getSyncgroupIds(Database db) throws VError {
+    private static Iterable<Id> getSyncgroupIds(Database db) throws SyncbaseException {
         List<Id> res = new ArrayList<>();
         for (Iterator<Syncgroup> it = db.getSyncgroups(); it.hasNext(); ) {
             res.add(it.next().getId());
@@ -252,9 +231,9 @@ public class SyncbaseTest {
                     DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions()
                             .setWithoutSyncgroup(true);
                     db.collection("c", opts).put("foo", 10);
-                } catch (VError vError) {
-                    vError.printStackTrace();
-                    fail(vError.toString());
+                } catch (SyncbaseException e) {
+                    e.printStackTrace();
+                    fail(e.toString());
                 }
             }
         });
@@ -336,5 +315,21 @@ public class SyncbaseTest {
         } catch (IllegalArgumentException e) {
             // This is supposed to fail.
         }
+    }
+
+    @Test
+    public void unsupportedAuthenticationProvider() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Unsupported provider: bogusProvider");
+
+        Syncbase.login("", "bogusProvider", new Syncbase.LoginCallback() {
+            @Override
+            public void onSuccess() {
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+        });
     }
 }
