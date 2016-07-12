@@ -393,6 +393,7 @@ public class Database extends DatabaseHandle {
      */
     public static class AddWatchChangeHandlerOptions {
         public byte[] resumeMarker;
+        boolean showUserdataCollectionRow;
     }
 
     /**
@@ -428,7 +429,7 @@ public class Database extends DatabaseHandle {
     /**
      * Notifies {@code h} of initial state, and of all subsequent changes to this database.
      */
-    public void addWatchChangeHandler(final WatchChangeHandler h, AddWatchChangeHandlerOptions opts) {
+    public void addWatchChangeHandler(final WatchChangeHandler h, final AddWatchChangeHandlerOptions opts) {
         // Note: Eventually we'll add a watch variant that takes a query, where the query can be
         // constructed using some sort of query builder API.
         // TODO(sadovsky): Support specifying resumeMarker. Note, watch-from-resumeMarker may be
@@ -451,7 +452,7 @@ public class Database extends DatabaseHandle {
                                         io.v.syncbase.core.WatchChange.EntityType.ROW &&
                                 coreWatchChange.collection.name.equals(Syncbase.USERDATA_NAME) &&
                                 coreWatchChange.row.startsWith(Syncbase.USERDATA_COLLECTION_PREFIX);
-                        if (!isRoot && !isUserdataCollectionRow) {
+                        if (!isRoot && (opts.showUserdataCollectionRow || !isUserdataCollectionRow)) {
                             mBatch.add(new WatchChange(coreWatchChange));
                         }
                         if (!coreWatchChange.continued) {

@@ -266,7 +266,10 @@ public class Syncbase {
                         } catch(VError e) {
                             syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
                         }
-                        sDatabase.addWatchChangeHandler(new UserdataWatchHandler());
+                        Database.AddWatchChangeHandlerOptions opts = new Database
+                                .AddWatchChangeHandlerOptions();
+                        opts.showUserdataCollectionRow = true;
+                        sDatabase.addWatchChangeHandler(new UserdataWatchHandler(), opts);
                     }
                     sOpts.callbackExecutor.execute(new Runnable() {
                         @Override
@@ -298,18 +301,20 @@ public class Syncbase {
         }
 
         private void onWatchChange(Iterator<WatchChange> changes) {
-            WatchChange watchChange = changes.next();
-            if (watchChange.getCollectionId().getName().equals(USERDATA_NAME) &&
-                    watchChange.getEntityType() == WatchChange.EntityType.ROW &&
-                    watchChange.getChangeType() == WatchChange.ChangeType.PUT &&
-                    watchChange.getRowKey().startsWith(USERDATA_COLLECTION_PREFIX)) {
-                try {
-                    String encodedId = watchChange.getRowKey().
-                            substring(Syncbase.USERDATA_COLLECTION_PREFIX.length());
-                    sDatabase.getSyncgroup(Id.decode(encodedId)).join();
-                } catch (VError vError) {
-                    vError.printStackTrace();
-                    System.err.println(vError.toString());
+            while (changes.hasNext()) {
+                WatchChange watchChange = changes.next();
+                if (watchChange.getCollectionId().getName().equals(USERDATA_NAME) &&
+                        watchChange.getEntityType() == WatchChange.EntityType.ROW &&
+                        watchChange.getChangeType() == WatchChange.ChangeType.PUT &&
+                        watchChange.getRowKey().startsWith(USERDATA_COLLECTION_PREFIX)) {
+                    try {
+                        String encodedId = watchChange.getRowKey().
+                                substring(Syncbase.USERDATA_COLLECTION_PREFIX.length());
+                        sDatabase.getSyncgroup(Id.decode(encodedId)).join();
+                    } catch (VError vError) {
+                        vError.printStackTrace();
+                        System.err.println(vError.toString());
+                    }
                 }
             }
         }
