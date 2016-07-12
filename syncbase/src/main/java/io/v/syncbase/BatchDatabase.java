@@ -4,6 +4,8 @@
 
 package io.v.syncbase;
 
+import java.util.UUID;
+
 import io.v.syncbase.core.VError;
 import io.v.syncbase.exception.SyncbaseException;
 
@@ -25,7 +27,8 @@ public class BatchDatabase extends DatabaseHandle {
      * @throws IllegalArgumentException if opts.withoutSyncgroup false
      */
     @Override
-    public Collection collection(String name, CollectionOptions opts) throws SyncbaseException {
+    public Collection createCollection(CollectionOptions opts) throws SyncbaseException {
+        String name = opts.prefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
         if (!opts.withoutSyncgroup) {
             throw new IllegalArgumentException("Cannot create syncgroup in a batch");
         }

@@ -44,7 +44,7 @@ public class BatchDatabaseTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot create syncgroup in a batch");
 
-        batch.collection("aCollection", new CollectionOptions());
+        batch.createCollection(new CollectionOptions());
     }
 
 }

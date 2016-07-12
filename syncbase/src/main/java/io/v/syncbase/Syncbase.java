@@ -117,8 +117,11 @@ public class Syncbase {
     static final String
             TAG = "syncbase",
             DIR_NAME = "syncbase",
-            DB_NAME = "db",
-            USERDATA_SYNCGROUP_NAME = "userdata__";
+            DB_NAME = "db";
+
+    public static final String
+            USERDATA_NAME = "userdata__",
+            USERDATA_COLLECTION_PREFIX = "__collections/";
 
     private static Map selfAndCloud() throws SyncbaseException {
         return ImmutableMap.of(Permissions.IN,
@@ -150,7 +153,6 @@ public class Syncbase {
      */
     public static Database database() throws SyncbaseException {
         try {
-
             if (!isLoggedIn()) {
                 return null;
             }
@@ -186,7 +188,11 @@ public class Syncbase {
      * Returns the currently logged in user.
      */
     public static User getLoggedInUser() {
-        throw new UnsupportedOperationException("Not implemented");
+        try {
+            return new User(getAliasFromBlessingPattern(getPersonalBlessingString()));
+        } catch (SyncbaseException e) {
+            return null;
+        }
     }
 
     public interface LoginCallback {
@@ -247,14 +253,19 @@ public class Syncbase {
                         return;
                     }
                     sDatabase.createIfMissing();
-                    sUserdataCollection = sDatabase.collection(
-                            USERDATA_SYNCGROUP_NAME,
+                    sUserdataCollection = sDatabase.createNamedCollection(
+                            USERDATA_NAME,
                             new DatabaseHandle.CollectionOptions().setWithoutSyncgroup(true));
                     if (!sOpts.disableUserdataSyncgroup) {
                         Syncgroup syncgroup = sUserdataCollection.getSyncgroup();
-                        // TODO(razvanm): First we need to try to join, then we need to try to
-                        // create the syncgroup.
-                        syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
+                        // Join-Or-Create pattern. If join fails, create the syncgroup instead.
+                        // Note: Syncgroup merge does not exist yet, so this may potentially lead
+                        // to split-brain syncgroups. This is exacerbated by lack of cloud instance.
+                        try {
+                            syncgroup.join();
+                        } catch(VError e) {
+                            syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
+                        }
                         sDatabase.addWatchChangeHandler(new UserdataWatchHandler());
                     }
                     sOpts.callbackExecutor.execute(new Runnable() {
@@ -288,17 +299,24 @@ public class Syncbase {
 
         private void onWatchChange(Iterator<WatchChange> changes) {
             WatchChange watchChange = changes.next();
-            if (watchChange.getCollectionId().getName().equals(USERDATA_SYNCGROUP_NAME) &&
+            if (watchChange.getCollectionId().getName().equals(USERDATA_NAME) &&
                     watchChange.getEntityType() == WatchChange.EntityType.ROW &&
-                    watchChange.getChangeType() == WatchChange.ChangeType.PUT) {
+                    watchChange.getChangeType() == WatchChange.ChangeType.PUT &&
+                    watchChange.getRowKey().startsWith(USERDATA_COLLECTION_PREFIX)) {
                 try {
-                    sDatabase.getSyncgroup(Id.decode(watchChange.getRowKey())).join();
+                    String encodedId = watchChange.getRowKey().
+                            substring(Syncbase.USERDATA_COLLECTION_PREFIX.length());
+                    sDatabase.getSyncgroup(Id.decode(encodedId)).join();
                 } catch (VError vError) {
                     vError.printStackTrace();
                     System.err.println(vError.toString());
                 }
             }
         }
+    }
+
+    static void addToUserdata(Id id) throws SyncbaseException {
+        sUserdataCollection.put(Syncbase.USERDATA_COLLECTION_PREFIX + id.encode(), true);
     }
 
     /**

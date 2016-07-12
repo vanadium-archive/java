@@ -19,6 +19,8 @@ import static io.v.syncbase.exception.Exceptions.chainThrow;
 public abstract class DatabaseHandle {
     private final io.v.syncbase.core.DatabaseHandle mCoreDatabaseHandle;
 
+    protected static final String DEFAULT_COLLECTION_PREFIX = "cx";
+
     DatabaseHandle(io.v.syncbase.core.DatabaseHandle coreDatabaseHandle) {
         mCoreDatabaseHandle = coreDatabaseHandle;
     }
@@ -35,32 +37,38 @@ public abstract class DatabaseHandle {
      */
     public static class CollectionOptions {
         public boolean withoutSyncgroup;
+        public String prefix = DEFAULT_COLLECTION_PREFIX;
 
         public CollectionOptions setWithoutSyncgroup(boolean value) {
             withoutSyncgroup = value;
             return this;
         }
+
+        public CollectionOptions setPrefix(String value) {
+            prefix = value;
+            return this;
+        }
     }
 
     /**
-     * Creates a collection and an associated syncgroup, as needed. Idempotent. The id of the new
-     * collection will include the creator's user id and the given collection name. Upon creation,
-     * both the collection and syncgroup are {@code READ_WRITE} for the creator. Setting
-     * {@code opts.withoutSyncgroup} prevents syncgroup creation. May only be called within a batch
-     * if {@code opts.withoutSyncgroup} is set.
+     * Creates a new collection and an associated syncgroup.
+     * The id of the collection will include the creator's user id and its name will be a UUID.
+     * Upon creation, both the collection and syncgroup are {@code READ_WRITE} for the creator.
+     * Setting {@code opts.withoutSyncgroup} prevents syncgroup creation.
+     * Setting {@code opts.prefix} will assign a UUID name starting with that prefix.
+     * May only be called within a batch if {@code opts.withoutSyncgroup} is set.
      *
-     * @param name name of the collection
      * @param opts options for collection creation
      * @return the collection handle
      */
-    public abstract Collection collection(String name, CollectionOptions opts)
+    public abstract Collection createCollection(CollectionOptions opts)
             throws SyncbaseException;
 
     /**
      * Calls {@code collection(name, opts)} with default {@code CollectionOptions}.
      */
-    public Collection collection(String name) throws SyncbaseException {
-        return collection(name, new CollectionOptions());
+    public Collection createCollection() throws SyncbaseException {
+        return createCollection(new CollectionOptions());
     }
 
     /**

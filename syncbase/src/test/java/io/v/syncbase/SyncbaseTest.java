@@ -60,6 +60,21 @@ public class SyncbaseTest {
         return res;
     }
 
+    private static boolean idsMatch(Iterable<Id> ids, String blessing, List<String> prefixes) {
+        int i = 0;
+        for (Id id : ids) {
+            if (!idMatch(id, blessing, prefixes.get(i))) {
+                return false;
+            }
+            i++;
+        }
+        return prefixes.size() == i; // Every id matches, and all prefixes were used.
+    }
+
+    private static boolean idMatch(Id id, String blessing, String prefix) {
+        return id.getName().startsWith(prefix) && id.getBlessing().equals(blessing);
+    }
+
     private static Iterable<Id> getSyncgroupIds(Database db) throws SyncbaseException {
         List<Id> res = new ArrayList<>();
         for (Iterator<Syncgroup> it = db.getSyncgroups(); it.hasNext(); ) {
@@ -77,35 +92,35 @@ public class SyncbaseTest {
     public void testCreateAndGetCollections() throws Exception {
         Database db = createDatabase();
         assertNotNull(db);
-        DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions();
-        opts.withoutSyncgroup = true;
-        Collection cxA = db.collection("a", opts);
+        DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions().
+                setWithoutSyncgroup(true).setPrefix("a");
+
+        Collection cxA = db.createCollection(opts);
         assertNotNull(cxA);
-        // TODO(sadovsky): Should we omit the userdata collection?
-        assertThat(getCollectionIds(db)).containsExactly(
-                new Id(Syncbase.getPersonalBlessingString(), "a"),
-                new Id(Syncbase.getPersonalBlessingString(), "userdata__"));
-        db.collection("b", opts);
-        assertThat(getCollectionIds(db)).containsExactly(
-                new Id(Syncbase.getPersonalBlessingString(), "a"),
-                new Id(Syncbase.getPersonalBlessingString(), "b"),
-                new Id(Syncbase.getPersonalBlessingString(), "userdata__"));
-        // Note, createDatabase() sets disableSyncgroupPublishing to true, so db.collection(name) is
-        // a purely local operation.
-        db.collection("c");
-        assertThat(getCollectionIds(db)).containsExactly(
-                new Id(Syncbase.getPersonalBlessingString(), "a"),
-                new Id(Syncbase.getPersonalBlessingString(), "b"),
-                new Id(Syncbase.getPersonalBlessingString(), "c"),
-                new Id(Syncbase.getPersonalBlessingString(), "userdata__"));
-        Collection secondCxA = db.collection("a", opts);
-        assertEquals(cxA.getId(), secondCxA.getId());
+        assertTrue(idsMatch(getCollectionIds(db), Syncbase.getPersonalBlessingString(),
+                ImmutableList.of("a", Syncbase.USERDATA_NAME)));
+
+        db.createCollection(opts.setPrefix("b"));
+        assertTrue(idsMatch(getCollectionIds(db), Syncbase.getPersonalBlessingString(),
+                ImmutableList.of("a", "b", Syncbase.USERDATA_NAME)));
+
+        // Note, createDatabase() sets disableSyncgroupPublishing to true, so
+        // db.createCollection(opts) is still a purely local operation.
+        opts = new DatabaseHandle.CollectionOptions();
+        db.createCollection(opts.setPrefix("c"));
+        assertTrue(idsMatch(getCollectionIds(db), Syncbase.getPersonalBlessingString(),
+                ImmutableList.of("a", "b", "c", Syncbase.USERDATA_NAME)));
+
+        Collection secondCxA = db.createCollection(opts.setPrefix("a"));
+        assertFalse(cxA.getId().equals(secondCxA.getId()));
+        assertTrue(idsMatch(getCollectionIds(db), Syncbase.getPersonalBlessingString(),
+                ImmutableList.of("a", "a", "b", "c", Syncbase.USERDATA_NAME)));
     }
 
     @Test
     public void testRowCrudMethods() throws Exception {
         Database db = createDatabase();
-        Collection cx = db.collection("cx");
+        Collection cx = db.createCollection();
         assertNotNull(cx);
         assertFalse(cx.exists("foo"));
         assertEquals(cx.get("foo", String.class), null);
@@ -141,17 +156,17 @@ public class SyncbaseTest {
         Database db = createDatabase();
         DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions();
         opts.withoutSyncgroup = true;
-        Collection cxA = db.collection("a", opts);
-        Collection cxB = db.collection("b", opts);
-        Collection cxC = db.collection("c");
+        Collection cxA = db.createCollection(opts.setPrefix("a"));
+        Collection cxB = db.createCollection(opts.setPrefix("b"));
+        Collection cxC = db.createCollection(opts.setWithoutSyncgroup(false).setPrefix("c"));
         assertNotNull(cxA);
         // Note, there's no userdata syncgroup since we set disableUserdataSyncgroup to true.
-        assertThat(getSyncgroupIds(db)).containsExactly(
-                new Id(Syncbase.getPersonalBlessingString(), "c"));
+        assertTrue(idsMatch(getSyncgroupIds(db), Syncbase.getPersonalBlessingString(),
+                ImmutableList.of("c")));
         db.syncgroup("sg1", ImmutableList.of(cxA));
         db.syncgroup("sg2", ImmutableList.of(cxA, cxB, cxC));
         assertThat(getSyncgroupIds(db)).containsExactly(
-                new Id(Syncbase.getPersonalBlessingString(), "c"),
+                new Id(Syncbase.getPersonalBlessingString(), cxC.getSyncgroup().getId().getName()),
                 new Id(Syncbase.getPersonalBlessingString(), "sg1"),
                 new Id(Syncbase.getPersonalBlessingString(), "sg2"));
     }
@@ -161,8 +176,9 @@ public class SyncbaseTest {
         Database db = createDatabase();
         final SettableFuture<Void> waitOnInitialState = SettableFuture.create();
         final SettableFuture<Void> waitOnChangeBatch = SettableFuture.create();
-        Collection collection = db.collection("c");
+        Collection collection = db.createCollection();
         collection.put("foo", 1);
+        final String collectionName = collection.getId().getName();
         db.addWatchChangeHandler(new Database.WatchChangeHandler() {
             @Override
             public void onInitialState(Iterator<WatchChange> values) {
@@ -172,13 +188,13 @@ public class SyncbaseTest {
                 WatchChange watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                assertEquals("c", watchChange.getCollectionId().getName());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
                 // 2nd change: the row for the "foo" key.
                 assertTrue(values.hasNext());
                 watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                assertEquals("c", watchChange.getCollectionId().getName());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
                 assertEquals("foo", watchChange.getRowKey());
                 // TODO(razvanm): Uncomment after the POJO start working.
                 //assertEquals(1, watchChange.getValue());
@@ -187,13 +203,9 @@ public class SyncbaseTest {
                 watchChange = (WatchChange) values.next();
                 assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
                 assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                // 4th change: the userdata collection has a row for "c"'s syncgroup.
-                assertTrue(values.hasNext());
-                watchChange = (WatchChange) values.next();
-                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
-                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
-                assertEquals("userdata__", watchChange.getCollectionId().getName());
-                assertTrue(watchChange.getRowKey().endsWith("c"));
+                assertTrue(watchChange.getCollectionId().getName().equals(Syncbase.USERDATA_NAME));
+                // No more changes.
+                assertFalse(values.hasNext());
                 waitOnInitialState.set(null);
             }
 
@@ -202,6 +214,7 @@ public class SyncbaseTest {
                 assertTrue(changes.hasNext());
                 WatchChange watchChange = changes.next();
                 assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().startsWith("c"));
                 // TODO(razvanm): Uncomment after the POJO start working.
                 //assertEquals(1, watchChange.getValue());
                 assertFalse(changes.hasNext());
@@ -224,26 +237,36 @@ public class SyncbaseTest {
     @Test
     public void testRunInBatch() throws Exception {
         Database db = createDatabase();
-        db.runInBatch(new Database.BatchOperation() {
+
+        // We need a box class to store the id of the created collection since we want to refer to
+        // it after the batch is over.
+        class TestOperation implements Database.BatchOperation {
+            private Id id;
+
             @Override
             public void run(BatchDatabase db) {
                 try {
                     DatabaseHandle.CollectionOptions opts = new DatabaseHandle.CollectionOptions()
                             .setWithoutSyncgroup(true);
-                    db.collection("c", opts).put("foo", 10);
+                    Collection c = db.createCollection(opts);
+                    c.put("foo", 10);
+                    id = c.getId();
                 } catch (SyncbaseException e) {
                     e.printStackTrace();
                     fail(e.toString());
                 }
             }
-        });
-        assertEquals(db.collection("c").get("foo", Integer.class), Integer.valueOf(10));
+        }
+
+        TestOperation op = new TestOperation();
+        db.runInBatch(op);
+        assertEquals(db.getCollection(op.id).get("foo", Integer.class), Integer.valueOf(10));
     }
 
     @Test
     public void testSyncgroupInviteUsers() throws Exception {
         Database db = createDatabase();
-        Collection collection = db.collection("c");
+        Collection collection = db.createCollection();
         Syncgroup sg = collection.getSyncgroup();
 
         User alice = new User("alice");

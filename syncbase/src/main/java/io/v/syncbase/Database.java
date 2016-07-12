@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import io.v.syncbase.core.CollectionRowPattern;
@@ -50,7 +51,12 @@ public class Database extends DatabaseHandle {
     }
 
     @Override
-    public Collection collection(String name, CollectionOptions opts) throws SyncbaseException {
+    public Collection createCollection(CollectionOptions opts) throws SyncbaseException {
+        String name = opts.prefix + "_" + UUID.randomUUID().toString().replaceAll("-", "");
+        return createNamedCollection(name, opts);
+    }
+
+    Collection createNamedCollection(String name, CollectionOptions opts) throws SyncbaseException {
         Collection res = getCollection(new Id(Syncbase.getPersonalBlessingString(), name));
         res.createIfMissing();
         // TODO(sadovsky): Unwind collection creation on syncgroup creation failure? It would be
@@ -59,6 +65,15 @@ public class Database extends DatabaseHandle {
             syncgroup(name, ImmutableList.of(res), new SyncgroupOptions());
         }
         return res;
+    }
+
+
+    /**
+     * Returns a reference to the userdata collection. Returns null if the user is not currently
+     * logged in.
+     */
+    public Collection getUserdataCollection() throws SyncbaseException {
+        return getCollection(new Id(Syncbase.getPersonalBlessingString(), Syncbase.USERDATA_NAME));
     }
 
     /**
@@ -95,7 +110,7 @@ public class Database extends DatabaseHandle {
         // Remember this syncgroup in the userdata collection. The value doesn't matter, but since
         // VOM won't accept null, use a boolean.
         // Note: We may eventually want to use the value to deal with rejected invitations.
-        Syncbase.sUserdataCollection.put(id.encode(), true);
+        Syncbase.addToUserdata(id);
         return syncgroup;
     }
 
@@ -258,8 +273,9 @@ public class Database extends DatabaseHandle {
                         expectedBlessings.add(Syncbase.sOpts.getCloudBlessingString());
                     }
                     coreSyncgroup.join(publishName, expectedBlessings, new SyncgroupMemberInfo());
-                } catch (VError vError) {
-                    cb.onFailure(vError);
+                    Syncbase.addToUserdata(invite.getId());
+                } catch (VError | SyncbaseException e) {
+                    cb.onFailure(e);
                     return;
                 }
                 cb.onSuccess(new Syncgroup(coreSyncgroup, database));
@@ -428,9 +444,14 @@ public class Database extends DatabaseHandle {
 
                     @Override
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
-                        // TODO(razvanm): Ignore changes to userdata collection.
-                        if (coreWatchChange.entityType !=
-                                io.v.syncbase.core.WatchChange.EntityType.ROOT) {
+                        boolean isRoot = coreWatchChange.entityType ==
+                                io.v.syncbase.core.WatchChange.EntityType.ROOT;
+                        boolean isUserdataCollectionRow =
+                                coreWatchChange.entityType ==
+                                        io.v.syncbase.core.WatchChange.EntityType.ROW &&
+                                coreWatchChange.collection.name.equals(Syncbase.USERDATA_NAME) &&
+                                coreWatchChange.row.startsWith(Syncbase.USERDATA_COLLECTION_PREFIX);
+                        if (!isRoot && !isUserdataCollectionRow) {
                             mBatch.add(new WatchChange(coreWatchChange));
                         }
                         if (!coreWatchChange.continued) {

@@ -50,7 +50,7 @@ public class CollectionTest {
         thrown.expectMessage("invalid name");
 
         // Create with invalid name
-        Syncbase.database().collection("name with spaces", new CollectionOptions());
+        Syncbase.database().createNamedCollection("name with spaces", new CollectionOptions());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class CollectionTest {
         BatchDatabase batch = Syncbase.database().beginBatch(new Database.BatchOptions());
 
         // Create collection without a syncgroup
-        Collection collection = batch.collection("collectionName",
+        Collection collection = batch.createCollection(
                 new CollectionOptions().setWithoutSyncgroup(true));
 
         thrown.expect(IllegalArgumentException.class);
