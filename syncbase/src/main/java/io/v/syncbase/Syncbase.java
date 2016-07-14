@@ -135,7 +135,6 @@ public class Syncbase {
      */
     public static void init(Options opts) throws SyncbaseException {
         try {
-
             System.loadLibrary("syncbase");
             sOpts = opts;
             io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
@@ -202,13 +201,18 @@ public class Syncbase {
 
     /**
      * Logs in the user on Android.
-     * The user selects an account through an account picker flow and is logged into Syncbase.
+     * If the user is already logged in, it runs the callback immediately. Otherwise, the user
+     * selects an account through an account picker flow and is logged into Syncbase.
      * Note: This default account flow is currently restricted to Google accounts.
      *
      * @param activity The Android activity where login will occur.
      * @param cb       The callback to call when the login was done.
      */
     public static void loginAndroid(Activity activity, final LoginCallback cb) {
+        if (isLoggedIn()) {
+            cb.onSuccess();
+            return;
+        }
         FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
         LoginFragment fragment = new LoginFragment();
         fragment.setTokenReceiver(new LoginFragment.TokenReceiver() {
