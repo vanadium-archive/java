@@ -267,8 +267,8 @@ public class Syncbase {
                             syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
                         }
                         Database.AddWatchChangeHandlerOptions opts = new Database
-                                .AddWatchChangeHandlerOptions();
-                        opts.showUserdataCollectionRow = true;
+                                .AddWatchChangeHandlerOptions.Builder().
+                                setShowUserdataCollectionRow(true).build();
                         sDatabase.addWatchChangeHandler(new UserdataWatchHandler(), opts);
                     }
                     sOpts.callbackExecutor.execute(new Runnable() {

@@ -215,8 +215,8 @@ public class SyncbaseTest {
                 WatchChange watchChange = changes.next();
                 assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
                 assertTrue(watchChange.getCollectionId().getName().startsWith("c"));
-                // TODO(razvanm): Uncomment after the POJO start working.
-                //assertEquals(1, watchChange.getValue());
+                assertEquals("foo", watchChange.getRowKey());
+
                 assertFalse(changes.hasNext());
                 waitOnChangeBatch.set(null);
             }
@@ -231,6 +231,140 @@ public class SyncbaseTest {
         });
         waitOnInitialState.get(1, TimeUnit.SECONDS);
         collection.delete("foo");
+        waitOnChangeBatch.get(1, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testWatchSpecificCollection() throws Exception {
+        Database db = createDatabase();
+        final SettableFuture<Void> waitOnInitialState = SettableFuture.create();
+        final SettableFuture<Void> waitOnChangeBatch = SettableFuture.create();
+        Collection collection = db.createCollection();
+        collection.put("foo", 1);
+        // Note: For ease of test writing, "gar" is a key lexicographically after "foo".
+        collection.put("gar", 2);
+        final String collectionName = collection.getId().getName();
+        Database.AddWatchChangeHandlerOptions opts = new Database.AddWatchChangeHandlerOptions.
+                Builder().setCollectionId(collection.getId()).build();
+        db.addWatchChangeHandler(new Database.WatchChangeHandler() {
+            @Override
+            public void onInitialState(Iterator<WatchChange> values) {
+                // TODO(razvanm): Check the entire contents of each change.
+                // 1st change: the collection entity for the "c" collection.
+                assertTrue(values.hasNext());
+                WatchChange watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
+                // 2nd change: the row for the "foo" key.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
+                assertEquals("foo", watchChange.getRowKey());
+                // TODO(razvanm): Uncomment after the POJO start working.
+                //assertEquals(1, watchChange.getValue());
+                // 3rd change: the row for the "gar" key.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
+                assertEquals("gar", watchChange.getRowKey());
+                // TODO(razvanm): Uncomment after the POJO start working.
+                //assertEquals(2, watchChange.getValue());
+
+                // No more changes.
+                assertFalse(values.hasNext());
+                waitOnInitialState.set(null);
+            }
+
+            @Override
+            public void onChangeBatch(Iterator<WatchChange> changes) {
+                assertTrue(changes.hasNext());
+                WatchChange watchChange = changes.next();
+                assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().startsWith("c"));
+                assertEquals("foo", watchChange.getRowKey());
+
+                assertFalse(changes.hasNext());
+                waitOnChangeBatch.set(null);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                VError vError = (VError) e;
+                assertEquals("v.io/v23/verror.Unknown", vError.id);
+                assertEquals("context canceled", vError.message);
+                assertEquals(0, vError.actionCode);
+            }
+        }, opts);
+        waitOnInitialState.get(1, TimeUnit.SECONDS);
+        collection.delete("foo");
+        waitOnChangeBatch.get(1, TimeUnit.SECONDS);
+    }
+
+
+    @Test
+    public void testWatchSpecificCollectionWithRowPrefix() throws Exception {
+        Database db = createDatabase();
+        final SettableFuture<Void> waitOnInitialState = SettableFuture.create();
+        final SettableFuture<Void> waitOnChangeBatch = SettableFuture.create();
+        Collection collection = db.createCollection();
+        collection.put("foo", 1);
+        collection.put("bar", 1); // not seen, due to filter
+        final String collectionName = collection.getId().getName();
+        Database.AddWatchChangeHandlerOptions opts = new Database.AddWatchChangeHandlerOptions.
+                Builder().setCollectionId(collection.getId()).setRowKeyPrefix("f").build();
+        db.addWatchChangeHandler(new Database.WatchChangeHandler() {
+            @Override
+            public void onInitialState(Iterator<WatchChange> values) {
+                // TODO(razvanm): Check the entire contents of each change.
+                // 1st change: the collection entity for the "c" collection.
+                assertTrue(values.hasNext());
+                WatchChange watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.COLLECTION, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
+                // 2nd change: the row for the "foo" key.
+                assertTrue(values.hasNext());
+                watchChange = (WatchChange) values.next();
+                assertEquals(WatchChange.EntityType.ROW, watchChange.getEntityType());
+                assertEquals(WatchChange.ChangeType.PUT, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().equals(collectionName));
+                assertEquals("foo", watchChange.getRowKey());
+                // TODO(razvanm): Uncomment after the POJO start working.
+                //assertEquals(1, watchChange.getValue());
+
+                // No more changes.
+                assertFalse(values.hasNext());
+                waitOnInitialState.set(null);
+            }
+
+            @Override
+            public void onChangeBatch(Iterator<WatchChange> changes) {
+                assertTrue(changes.hasNext());
+                WatchChange watchChange = changes.next();
+                assertEquals(WatchChange.ChangeType.DELETE, watchChange.getChangeType());
+                assertTrue(watchChange.getCollectionId().getName().startsWith("c"));
+                assertEquals("foo", watchChange.getRowKey());
+
+                assertFalse(changes.hasNext());
+                waitOnChangeBatch.set(null);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                VError vError = (VError) e;
+                assertEquals("v.io/v23/verror.Unknown", vError.id);
+                assertEquals("context canceled", vError.message);
+                assertEquals(0, vError.actionCode);
+            }
+        }, opts);
+        waitOnInitialState.get(1, TimeUnit.SECONDS);
+        collection.delete("foo");
+        collection.delete("bar"); // not noticed due to filter.
         waitOnChangeBatch.get(1, TimeUnit.SECONDS);
     }
 

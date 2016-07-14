@@ -392,8 +392,72 @@ public class Database extends DatabaseHandle {
      * Options for {@code addWatchChangeHandler}.
      */
     public static class AddWatchChangeHandlerOptions {
-        public byte[] resumeMarker;
-        boolean showUserdataCollectionRow;
+        final byte[] resumeMarker;
+        final String name;
+        final String blessing;
+        final String row;
+        final boolean showUserdataCollectionRow;
+
+        AddWatchChangeHandlerOptions(Builder builder) {
+            resumeMarker = builder.resumeMarker;
+            name = builder.name;
+            blessing = builder.blessing;
+            row = builder.row;
+            showUserdataCollectionRow = builder.showUserdataCollectionRow;
+        }
+
+        CollectionRowPattern getCollectionRowPattern() {
+            return new CollectionRowPattern(blessing, name, row);
+        }
+
+        public static class Builder {
+            private byte[] resumeMarker;
+            private String name = WILDCARD;
+            private String blessing = WILDCARD;
+            private String row = WILDCARD;
+            private boolean showUserdataCollectionRow;
+
+            private static final String WILDCARD = "%";
+
+            public Builder setResumeMarker(byte[] resumeMarker) {
+                this.resumeMarker = resumeMarker;
+                return this;
+            }
+
+            public Builder setCollectionNamePrefix(String prefix) {
+                // TODO(alexfandrianto): Unsafe. The prefix was not escaped. Incorrect if it has a
+                // trailing backslash.
+                name = prefix + WILDCARD;
+                return this;
+            }
+
+            public Builder setCollectionId(Id id) {
+                name = id.getName();
+                blessing = id.getBlessing();
+                return this;
+            }
+
+            public Builder setRowKeyPrefix(String prefix) {
+                // TODO(alexfandrianto): Unsafe. The prefix was not escaped. Incorrect if it has a
+                // trailing backslash.
+                row = prefix + WILDCARD;
+                return this;
+            }
+
+            public Builder setRowKey(String rowKey) {
+                row = rowKey;
+                return this;
+            }
+
+            Builder setShowUserdataCollectionRow(boolean shouldShow) {
+                showUserdataCollectionRow = shouldShow;
+                return this;
+            }
+
+            public AddWatchChangeHandlerOptions build() {
+                return new AddWatchChangeHandlerOptions(this);
+            }
+        }
     }
 
     /**
@@ -438,7 +502,7 @@ public class Database extends DatabaseHandle {
             throw new UnsupportedOperationException("Specifying resumeMarker is not yet supported");
         }
 
-        mCoreDatabase.watch(null, ImmutableList.of(new CollectionRowPattern("%", "%", "%")),
+        mCoreDatabase.watch(null, ImmutableList.of(opts.getCollectionRowPattern()),
                 new io.v.syncbase.core.Database.WatchPatternsCallbacks() {
                     private boolean mGotFirstBatch = false;
                     private final List<WatchChange> mBatch = new ArrayList<>();
@@ -509,7 +573,7 @@ public class Database extends DatabaseHandle {
      * {@code AddWatchChangeHandlerOptions}.
      */
     public void addWatchChangeHandler(WatchChangeHandler h) {
-        addWatchChangeHandler(h, new AddWatchChangeHandlerOptions());
+        addWatchChangeHandler(h, new AddWatchChangeHandlerOptions.Builder().build());
     }
 
     /**
