@@ -7,7 +7,6 @@ package io.v.syncbase.exception;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CancellationException;
 
-import io.v.syncbase.Id;
 import io.v.syncbase.core.VError;
 import io.v.v23.verror.VException;
 import io.v.v23.verror.VException.ActionCode;
@@ -119,28 +118,54 @@ public final class Exceptions {
         chainThrow("while " + javaMessage + " got error " + goMessage, v23ErrorId, action, cause);
     }
 
+    /**
+     * Throw an exception that wraps a low-level exception.
+     *
+     * @param javaMessage gives context from where the low-level exception was caught
+     * @param cause       the low-level exception, possibly originating in native code
+     * @throws SyncbaseException always
+     */
     public static void chainThrow(String javaMessage, VError cause) throws SyncbaseException {
         ActionCode action = fromValue((int) cause.actionCode);
         chainThrow(javaMessage, cause.message, cause.id, action, cause);
     }
 
+    /**
+     * Throw an exception that wraps a low-level exception.
+     *
+     * @param javaMessage gives context from where the low-level exception was caught
+     * @param cause       the low-level exception, possibly originating in native code
+     * @throws SyncbaseException always
+     */
     public static void chainThrow(String javaMessage, VException cause) throws SyncbaseException {
         chainThrow(javaMessage, cause.getMessage(), cause.getID(), cause.getAction(),
                 cause);
     }
 
-    public static void chainThrow(String doing, Id where, VError cause) throws SyncbaseException {
-        chainThrow(doing + " " + where.getName(), cause);
+    /**
+     * Throw an exception that wraps a low-level exception.
+     *
+     * @param doing what the high-level code was doing when the exception was caught
+     * @param name  a Vanadoum name, i.e the name field of an Id object
+     * @param cause the low-level exception, possibly originating in native code
+     * @throws SyncbaseException always
+     */
+    public static void chainThrow(String doing, String name, VError cause) throws
+            SyncbaseException {
+        chainThrow(doing + " " + name, cause);
     }
 
-    public static void chainThrow(String doing, Id where, VException cause) throws
+    /**
+     * Throw an exception that wraps a low-level exception.
+     *
+     * @param doing what the high-level code was doing when the exception was caught
+     * @param name  a Vanadoum name, i.e the name field of an Id object
+     * @param cause the low-level exception, possibly originating in native code
+     * @throws SyncbaseException always
+     */
+    public static void chainThrow(String doing, String name, VException cause) throws
             SyncbaseException {
-        chainThrow(doing + " " + where.getName(), cause);
-    }
-
-    public static void chainThrow(String doing, io.v.syncbase.core.Id where, VError cause) throws
-            SyncbaseException {
-        chainThrow(doing + " " + where.name, cause);
+        chainThrow(doing + " " + name, cause);
     }
 
     private static <T extends Exception> T withCause(T e, Exception cause) {

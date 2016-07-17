@@ -78,7 +78,8 @@ public class WatchChange {
         try {
             return (T) VomUtil.decode(mValue, cls);
         } catch (VException e) {
-            chainThrow("getting value from a WatchChange of collection",  mCollectionId, e);
+            chainThrow(
+                    "getting value from a WatchChange of collection",  mCollectionId.getName(), e);
             throw new AssertionError("never happens");
         }
     }

@@ -144,7 +144,7 @@ public class Database extends DatabaseHandle {
             return syncgroups.iterator();
 
         } catch (VError e) {
-            chainThrow("getting syncgroups of database", mCoreDatabase.id(), e);
+            chainThrow("getting syncgroups of database", mCoreDatabase.id().name, e);
             throw new AssertionError("never happens");
         }
     }
@@ -338,7 +338,7 @@ public class Database extends DatabaseHandle {
             }, opts.toCore());
 
         } catch (VError e) {
-            chainThrow("running batch operation in database", mCoreDatabase.id(), e);
+            chainThrow("running batch operation in database", mCoreDatabase.id().name, e);
         }
     }
 
@@ -383,7 +383,7 @@ public class Database extends DatabaseHandle {
             return new BatchDatabase(mCoreDatabase.beginBatch(opts.toCore()));
 
         } catch (VError e) {
-            chainThrow("creating batch in database", mCoreDatabase.id(), e);
+            chainThrow("creating batch in database", mCoreDatabase.id().name, e);
             throw new AssertionError("never happens");
         }
     }

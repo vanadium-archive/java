@@ -75,9 +75,9 @@ public class Collection {
             if (vError.id.equals(VError.NO_EXIST)) {
                 return null;
             }
-            chainThrow("getting value from collection", mId, vError);
+            chainThrow("getting value from collection", mId.getName(), vError);
         } catch (VException e) {
-            chainThrow("decoding value retrieved from collection", mId, e);
+            chainThrow("decoding value retrieved from collection", mId.getName(), e);
         }
         throw new AssertionError("never happens");
     }
@@ -91,7 +91,7 @@ public class Collection {
             return mCoreCollection.row(key).exists();
 
         } catch (VError e) {
-            chainThrow("checking if value exists in collection", mId, e);
+            chainThrow("checking if value exists in collection", mId.getName(), e);
             throw new AssertionError("never happens");
         }
     }
@@ -105,9 +105,9 @@ public class Collection {
             mCoreCollection.put(key, VomUtil.encode(value, value.getClass()));
 
         } catch (VError e) {
-            chainThrow("putting value into collection", mId, e);
+            chainThrow("putting value into collection", mId.getName(), e);
         } catch (VException e) {
-            chainThrow("putting value into collection", mId, e);
+            chainThrow("putting value into collection", mId.getName(), e);
         }
     }
 
@@ -120,7 +120,7 @@ public class Collection {
             mCoreCollection.delete(key);
 
         } catch (VError e) {
-            chainThrow("deleting collection", mId, e);
+            chainThrow("deleting collection", mId.getName(), e);
         }
     }
 
@@ -134,7 +134,7 @@ public class Collection {
             return new AccessList(mCoreCollection.getPermissions());
 
         } catch (VError e) {
-            chainThrow("getting access list of collection", mId, e);
+            chainThrow("getting access list of collection", mId.getName(), e);
             throw new AssertionError("never happens");
         }
     }
@@ -155,7 +155,7 @@ public class Collection {
                             coreCollection.getPermissions(), delta);
                     coreCollection.setPermissions(newPermissions);
                 } catch (VError vError) {
-                    chainThrow("setting permissions in collection", id, vError);
+                    chainThrow("setting permissions in collection", id.getName(), vError);
                 }
             }
         };

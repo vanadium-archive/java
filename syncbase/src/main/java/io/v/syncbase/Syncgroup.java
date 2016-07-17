@@ -91,7 +91,7 @@ public class Syncgroup {
             // return new AccessList(mCoreSyncgroup.getSpec().syncgroupSpec.permissions);
 
         } catch (VError e) {
-            chainThrow("getting access list of syncgroup", getId(), e);
+            chainThrow("getting access list of syncgroup", getId().getName(), e);
             throw new AssertionError("never happens");
         }
     }
@@ -187,7 +187,7 @@ public class Syncgroup {
             });
 
         } catch (VError e) {
-            chainThrow("updating access list of syncgroup", getId(), e);
+            chainThrow("updating access list of syncgroup", getId().getName(), e);
         }
     }
 }

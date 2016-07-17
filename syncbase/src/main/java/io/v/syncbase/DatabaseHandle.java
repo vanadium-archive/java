@@ -94,7 +94,7 @@ public abstract class DatabaseHandle {
             return collections.iterator();
 
         } catch (VError e) {
-            chainThrow("getting collections in database", mCoreDatabaseHandle.id(), e);
+            chainThrow("getting collections in database", mCoreDatabaseHandle.id().name, e);
             throw new AssertionError("never happens");
         }
     }
