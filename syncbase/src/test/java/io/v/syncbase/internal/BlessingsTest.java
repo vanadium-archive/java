@@ -24,7 +24,7 @@ public class BlessingsTest {
     @BeforeClass
     public static void setUp() throws Exception {
         System.loadLibrary("syncbase");
-        Service.Init(folder.newFolder().getAbsolutePath(), true);
+        Service.Init(folder.newFolder().getAbsolutePath(), true, 0);
         Service.Login("", "");
     }
 

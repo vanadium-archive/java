@@ -57,33 +57,136 @@ public class Syncbase {
      * Options for opening a database.
      */
     public static class Options {
-        // The executor used to execute callbacks.
-        public Executor callbackExecutor = UiThreadExecutor.INSTANCE;
-        // Where data should be persisted.
-        public String rootDir;
-        // We use an empty mountPoints to avoid talking to the global mounttabled.
-        public List<String> mountPoints = new ArrayList<>();
-        // TODO(sadovsky): Figure out how developers should specify this.
-        public String adminUserId = "alexfandrianto@google.com";
-        // TODO(sadovsky): Figure out how developers should specify this.
-        public String defaultBlessingStringPrefix = "dev.v.io:o:608941808256-43vtfndets79kf5hac8ieujto8837660.apps.googleusercontent.com:";
-        // FOR ADVANCED USERS. If true, syncgroups will not be published to the cloud peer.
-        public boolean disableSyncgroupPublishing;
-        // FOR ADVANCED USERS. If true, the user's data will not be synced across their devices.
-        public boolean disableUserdataSyncgroup;
-        // FOR TESTING. If true, the app name is set to 'app', the user name is set to 'user' and
-        // the arguments to login() are ignored.
-        public boolean testLogin;
+        final Executor mCallbackExecutor;
+        final String mRootDir;
+        final List<String> mMountPoints;
+        final boolean mDisableSyncgroupPublishing;
+        final boolean mDisableUserdataSyncgroup;
+        final boolean mTestLogin;
+        final int mLogLevel;
 
-        String getPublishSyncbaseName() {
-            if (disableSyncgroupPublishing) {
-                return null;
-            }
-            return mountPoints.get(0) + "cloud";
+        final String mCloudName;
+        final String mCloudAdmin;
+
+        Options(Options.Builder builder) {
+            mCallbackExecutor = builder.mExecutor;
+            mRootDir = builder.mRootDir;
+            mMountPoints = builder.mMountPoints;
+            mDisableSyncgroupPublishing = !builder.mUsesCloud;
+            mDisableUserdataSyncgroup = !builder.mUsesCloud;
+            mTestLogin = builder.mTestLogin;
+            mLogLevel = builder.mLogLevel;
+
+            mCloudName = builder.mCloudName;
+            mCloudAdmin = builder.mCloudAdmin;
         }
 
-        String getCloudBlessingString() {
-            return "dev.v.io:u:" + adminUserId;
+        /**
+         * Builds options used to create an app that needs a cloud for initial bootstrapping and
+         * increased data availability. Apps that use a cloud will automatically synchronize data
+         * across all of the same user's devices. To allocate a cloud instance of Syncbase, visit
+         * https://sb-allocator.v.io/home
+         *
+         * @param rootDir Directory to store data.
+         * @param cloudName Name of the cloud. See https://sb-allocator.v.io/home
+         * @param cloudAdmin The cloud's blessing patterns. See https://sb-allocator.v.io/home
+         */
+        public static Options.Builder cloudBuilder(String rootDir, String cloudName, String cloudAdmin) {
+            return new Options.Builder(rootDir, cloudName, cloudAdmin);
+        }
+        /**
+         * Builds options used to create an app that primarily runs offline.
+         *
+         * @param rootDir Directory to store data.
+         */
+        public static Options.Builder offlineBuilder(String rootDir) {
+            return new Options.Builder(rootDir);
+        }
+
+        public static class Builder {
+            private final boolean mUsesCloud;
+            private final String mRootDir;
+            private final String mCloudName;
+            private final String mCloudAdmin;
+
+            private Executor mExecutor = UiThreadExecutor.INSTANCE;
+            private final List<String> mMountPoints = new ArrayList<>();
+            private boolean mTestLogin;
+            private int mLogLevel;
+
+            Builder(String rootDir, String cloudName, String cloudAdmin) {
+                mUsesCloud = true;
+                this.mRootDir = rootDir;
+                this.mCloudName = cloudName;
+                this.mCloudAdmin = cloudAdmin;
+            }
+
+            Builder(String rootDir) {
+                mUsesCloud = false;
+                mRootDir = rootDir;
+                mCloudName = null;
+                mCloudAdmin = null;
+            }
+
+            /**
+             * Sets the executor where callbacks will run (e.g., watch, invite, login, etc.).
+             * The default executor is the UI Thread.
+             *
+             * @param executor Callback executor
+             */
+            public Builder setExecutor(Executor executor) {
+                mExecutor = executor;
+                return this;
+            }
+
+            /**
+             * Used for tests. The app name is set to 'app', the user name is set to 'user' and the
+             * arguments to login() are ignored.
+             */
+            public Builder withTestLogin() {
+                mTestLogin = true;
+                return this;
+            }
+
+            /**
+             * Sets a single location for Syncbase peers to meet if internet is available.
+             *
+             * @param mountPoint Location to meet for syncing purposes
+             */
+            public Builder setMountPoint(String mountPoint) {
+                mMountPoints.clear();
+                mMountPoints.add(mountPoint);
+                return this;
+            }
+
+            /**
+             * Sets a list of locations for Syncbase peers to meet if internet is available.
+             *
+             * @param mountPoints Locations to meet for syncing purposes
+             */
+            public Builder setMountPoints(java.util.Collection<String> mountPoints) {
+                mMountPoints.clear();
+                mMountPoints.addAll(mountPoints);
+                return this;
+            }
+
+            /**
+             * Used for debugging. Defaults to 0 (no logging). When >0, Syncbase logs will be sent
+             * to stdout, with higher log levels logging more data.
+             *
+             * @param logLevel Syncbase log level
+             */
+            public Builder setLogLevel(int logLevel) {
+                mLogLevel = logLevel;
+                return this;
+            }
+
+            /**
+             * Builds the Syncbase Options.
+             */
+            public Options build() {
+                return new Options(this);
+            }
         }
     }
 
@@ -107,9 +210,9 @@ public class Syncbase {
 
     static Options sOpts;
     private static Database sDatabase;
-    static Collection sUserdataCollection;
     private static final Object sScanMappingMu = new Object();
     private static final Map<ScanNeighborhoodForUsersCallback, Long> sScanMapping = new HashMap<>();
+    private static String sAppBlessing;
 
     // TODO(sadovsky): Maybe set DB_NAME to "db__" so that it is less likely to collide with
     // developer-specified names.
@@ -124,8 +227,10 @@ public class Syncbase {
             USERDATA_COLLECTION_PREFIX = "__collections/";
 
     private static Map selfAndCloud() throws SyncbaseException {
-        return ImmutableMap.of(Permissions.IN,
-                ImmutableList.of(getPersonalBlessingString(), sOpts.getCloudBlessingString()));
+        List<String> inList = sOpts.mCloudAdmin == null
+                ? ImmutableList.of(getPersonalBlessingString())
+                : ImmutableList.of(getPersonalBlessingString(), sOpts.mCloudAdmin);
+        return ImmutableMap.of(Permissions.IN, inList);
     }
 
     /**
@@ -137,7 +242,7 @@ public class Syncbase {
         try {
             System.loadLibrary("syncbase");
             sOpts = opts;
-            io.v.syncbase.internal.Service.Init(sOpts.rootDir, sOpts.testLogin);
+            io.v.syncbase.internal.Service.Init(sOpts.mRootDir, sOpts.mTestLogin, sOpts.mLogLevel);
             if (isLoggedIn()) {
                 io.v.syncbase.internal.Service.Serve();
             }
@@ -155,10 +260,16 @@ public class Syncbase {
             if (!isLoggedIn()) {
                 return null;
             }
+            if (sAppBlessing == null) {
+                // Set the app blessing at this stage for later use.
+                // Should not error because the user is logged in.
+                sAppBlessing = io.v.syncbase.internal.Blessings.AppBlessingFromContext();
+            }
             if (sDatabase != null) {
                 // TODO(sadovsky): Check that opts matches original opts (sOpts)?
                 return sDatabase;
             }
+
             sDatabase = new Database(Service.database(DB_NAME));
             return sDatabase;
 
@@ -201,8 +312,9 @@ public class Syncbase {
 
     /**
      * Logs in the user on Android.
-     * If the user is already logged in, it runs the callback immediately. Otherwise, the user
-     * selects an account through an account picker flow and is logged into Syncbase.
+     * If the user is already logged in, it runs the success callback on the executor. Otherwise,
+     * the user selects an account through an account picker flow and is logged into Syncbase. The
+     * callback's success or failure cases are called accordingly.
      * Note: This default account flow is currently restricted to Google accounts.
      *
      * @param activity The Android activity where login will occur.
@@ -210,7 +322,12 @@ public class Syncbase {
      */
     public static void loginAndroid(Activity activity, final LoginCallback cb) {
         if (isLoggedIn()) {
-            cb.onSuccess();
+            sOpts.mCallbackExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    cb.onSuccess();
+                }
+            });
             return;
         }
         FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
@@ -257,25 +374,25 @@ public class Syncbase {
                         return;
                     }
                     sDatabase.createIfMissing();
-                    sUserdataCollection = sDatabase.createNamedCollection(
+                    Collection userdata = sDatabase.createNamedCollection(
                             USERDATA_NAME,
                             new DatabaseHandle.CollectionOptions().setWithoutSyncgroup(true));
-                    if (!sOpts.disableUserdataSyncgroup) {
-                        Syncgroup syncgroup = sUserdataCollection.getSyncgroup();
+                    if (!sOpts.mDisableUserdataSyncgroup) {
+                        Syncgroup syncgroup = userdata.getSyncgroup();
                         // Join-Or-Create pattern. If join fails, create the syncgroup instead.
                         // Note: Syncgroup merge does not exist yet, so this may potentially lead
                         // to split-brain syncgroups. This is exacerbated by lack of cloud instance.
                         try {
                             syncgroup.join();
                         } catch(VError e) {
-                            syncgroup.createIfMissing(ImmutableList.of(sUserdataCollection));
+                            syncgroup.createIfMissing(ImmutableList.of(userdata));
                         }
                         Database.AddWatchChangeHandlerOptions opts = new Database
                                 .AddWatchChangeHandlerOptions.Builder().
                                 setShowUserdataCollectionRow(true).build();
                         sDatabase.addWatchChangeHandler(new UserdataWatchHandler(), opts);
                     }
-                    sOpts.callbackExecutor.execute(new Runnable() {
+                    sOpts.mCallbackExecutor.execute(new Runnable() {
                         @Override
                         public void run() {
                             cb.onSuccess();
@@ -325,7 +442,8 @@ public class Syncbase {
     }
 
     static void addToUserdata(Id id) throws SyncbaseException {
-        sUserdataCollection.put(Syncbase.USERDATA_COLLECTION_PREFIX + id.encode(), true);
+        sDatabase.getUserdataCollection().
+                put(Syncbase.USERDATA_COLLECTION_PREFIX + id.encode(), true);
     }
 
     /**
@@ -340,7 +458,7 @@ public class Syncbase {
                     @Override
                     public void onPeer(final NeighborhoodPeer peer) {
                         final SettableFuture<Boolean> setFuture = SettableFuture.create();
-                        Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                        Syncbase.sOpts.mCallbackExecutor.execute(new Runnable() {
                             @Override
                             public void run() {
                                 User u = new User(getAliasFromBlessingPattern(peer.blessings));
@@ -434,7 +552,7 @@ public class Syncbase {
     }
 
     protected static String getBlessingStringFromAlias(String alias) {
-        return sOpts.defaultBlessingStringPrefix + alias;
+        return sAppBlessing + ":" + alias;
     }
 
     protected static String getAliasFromBlessingPattern(String blessingStr) {

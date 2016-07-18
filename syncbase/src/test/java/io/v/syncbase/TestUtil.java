@@ -41,12 +41,8 @@ class TestUtil {
 
     static void setUpSyncbase(File folder) throws SyncbaseException, ExecutionException,
             InterruptedException {
-        Syncbase.Options opts = new Syncbase.Options();
-        opts.rootDir = folder.getAbsolutePath();
-        opts.disableUserdataSyncgroup = true;
-        opts.disableSyncgroupPublishing = true;
-        opts.testLogin = true;
-        opts.callbackExecutor = sameThreadExecutor;
+        Syncbase.Options opts = Syncbase.Options.offlineBuilder(folder.getAbsolutePath()).
+                withTestLogin().setExecutor(sameThreadExecutor).build();
         Syncbase.init(opts);
     }
 

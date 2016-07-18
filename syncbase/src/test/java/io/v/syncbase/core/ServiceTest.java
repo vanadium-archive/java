@@ -23,7 +23,7 @@ public class ServiceTest {
     @BeforeClass
     public static void setUp() throws Exception {
         System.loadLibrary("syncbase");
-        io.v.syncbase.internal.Service.Init(folder.newFolder().getAbsolutePath(), true);
+        io.v.syncbase.internal.Service.Init(folder.newFolder().getAbsolutePath(), true, 0);
         io.v.syncbase.internal.Service.Login("", "");
     }
 

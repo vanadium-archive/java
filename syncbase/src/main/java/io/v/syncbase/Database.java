@@ -188,7 +188,7 @@ public class Database extends DatabaseHandle {
                     @Override
                     public void onInvite(final io.v.syncbase.core.SyncgroupInvite invite) {
                         final SettableFuture<Boolean> setFuture = SettableFuture.create();
-                        Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                        Syncbase.sOpts.mCallbackExecutor.execute(new Runnable() {
                             @Override
                             public void run() {
                                 h.onInvite(new SyncgroupInvite(new Id(invite.syncgroup),
@@ -267,10 +267,10 @@ public class Database extends DatabaseHandle {
             @Override
             public void run() {
                 try {
-                    String publishName = Syncbase.sOpts.getPublishSyncbaseName(); // ok if null
+                    String publishName = Syncbase.sOpts.mCloudName; // ok if null
                     List<String> expectedBlessings = invite.getInviterBlessingNames();
-                    if (Syncbase.sOpts.getCloudBlessingString() != null) {
-                        expectedBlessings.add(Syncbase.sOpts.getCloudBlessingString());
+                    if (Syncbase.sOpts.mCloudAdmin != null) {
+                        expectedBlessings.add(Syncbase.sOpts.mCloudAdmin);
                     }
                     coreSyncgroup.join(publishName, expectedBlessings, new SyncgroupMemberInfo());
                     Syncbase.addToUserdata(invite.getId());
@@ -524,7 +524,7 @@ public class Database extends DatabaseHandle {
                             if (!mGotFirstBatch) {
                                 mGotFirstBatch = true;
                                 final List<WatchChange> cpBatch = mBatch;
-                                Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                                Syncbase.sOpts.mCallbackExecutor.execute(new Runnable() {
                                     @Override
                                     public void run() {
                                         h.onInitialState(cpBatch.iterator());
@@ -533,7 +533,7 @@ public class Database extends DatabaseHandle {
                                 });
                             } else {
                                 final List<WatchChange> cpBatch = mBatch;
-                                Syncbase.sOpts.callbackExecutor.execute(new Runnable() {
+                                Syncbase.sOpts.mCallbackExecutor.execute(new Runnable() {
                                     @Override
                                     public void run() {
                                         h.onChangeBatch(cpBatch.iterator());

@@ -17,7 +17,6 @@ import org.junit.rules.TemporaryFolder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import io.v.syncbase.core.Permissions;

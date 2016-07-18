@@ -38,10 +38,10 @@ public class Syncgroup {
         }
 
         SyncgroupSpec spec = new SyncgroupSpec();
-        spec.publishSyncbaseName = Syncbase.sOpts.getPublishSyncbaseName();
+        spec.publishSyncbaseName = Syncbase.sOpts.mCloudName;
         spec.permissions = Syncbase.defaultSyncgroupPerms();
         spec.collections = ids;
-        spec.mountTables = Syncbase.sOpts.mountPoints;
+        spec.mountTables = Syncbase.sOpts.mMountPoints;
         spec.isPrivate = false;
 
         try {
@@ -62,7 +62,8 @@ public class Syncgroup {
     protected void join() throws VError {
         // TODO(razvanm): Find a way to restrict the remote blessing. Cloud is one thing the remote
         // blessings should include.
-        mCoreSyncgroup.join("", ImmutableList.of("..."), new SyncgroupMemberInfo());
+        mCoreSyncgroup.join(Syncbase.sOpts.mCloudName, ImmutableList.of("..."),
+                new SyncgroupMemberInfo());
     }
 
     /**

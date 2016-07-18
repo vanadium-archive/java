@@ -27,24 +27,21 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DiceRoller";
     private static final String RESULT_KEY = "result";
 
+    private static final String CLOUD_NAME =
+            "/(dev.v.io:r:vprod:service:mounttabled)@ns.dev.v.io:8101/sb/syncbased-24204641";
+    private static final String CLOUD_ADMIN = "dev.v.io:r:allocator:us:x:syncbased-24204641";
+    private static final String MOUNT_POINT = "/ns.dev.v.io:8101/tmp/diceroller/users";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         try {
-            Syncbase.Options options = new Syncbase.Options();
-            List<String> mountpoints = new ArrayList<>();
-            mountpoints.add("/ns.dev.v.io:8101/tmp/diceroller/users");
-            options.mountPoints = mountpoints;
-
-            // TODO(alexfandrianto): Write an Android helper in HLAPI to determine this location.
-            // https://github.com/vanadium/issues/issues/1384
-            options.rootDir = getDir("syncbase", Context.MODE_PRIVATE).getAbsolutePath();
-
-            // TODO(alexfandrianto): Disabled until we set up a cloud.
-            // https://github.com/vanadium/issues/issues/1357
-            options.disableSyncgroupPublishing = true;
+            String rootDir = getDir("syncbase", Context.MODE_PRIVATE).getAbsolutePath();
+            Syncbase.Options options =
+                    Syncbase.Options.cloudBuilder(rootDir, CLOUD_NAME, CLOUD_ADMIN)
+                            .setMountPoint(MOUNT_POINT).build();
             Syncbase.init(options);
         } catch (SyncbaseException e) {
             Log.e(TAG, e.toString());
