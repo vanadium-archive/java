@@ -23,13 +23,10 @@ import io.v.syncbase.Syncbase;
 public class InitTestInstrumented {
     @Test
     public void init() throws Exception {
-        Syncbase.Options opts = new Syncbase.Options();
-        opts.rootDir = InstrumentationRegistry.getContext()
-                .getDir("syncbase", Context.MODE_PRIVATE).getAbsolutePath();
-        opts.disableUserdataSyncgroup = true;
-        opts.disableSyncgroupPublishing = true;
-        opts.testLogin = true;
-        Syncbase.init(opts);
+        Syncbase.Options.Builder builder = Syncbase.Options.offlineBuilder(
+                InstrumentationRegistry.getContext().getDir(
+                        "syncbase", Context.MODE_PRIVATE).getAbsolutePath()).withTestLogin();
+        Syncbase.init(builder.build());
 
         final SettableFuture<Void> future = SettableFuture.create();
 
