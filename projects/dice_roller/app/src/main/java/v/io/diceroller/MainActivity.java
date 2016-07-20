@@ -4,7 +4,6 @@
 
 package v.io.diceroller;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,15 +11,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import io.v.syncbase.Collection;
 import io.v.syncbase.Database;
 import io.v.syncbase.Syncbase;
 import io.v.syncbase.WatchChange;
+import io.v.syncbase.android.SyncbaseAndroid;
 import io.v.syncbase.exception.SyncbaseException;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,16 +36,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-            String rootDir = getDir("syncbase", Context.MODE_PRIVATE).getAbsolutePath();
-            Syncbase.Options options =
-                    Syncbase.Options.cloudBuilder(rootDir, CLOUD_NAME, CLOUD_ADMIN)
-                            .setMountPoint(MOUNT_POINT).build();
+            Syncbase.Options options = Syncbase.Options.cloudBuilder(
+                    SyncbaseAndroid.defaultRootDir(this), CLOUD_NAME, CLOUD_ADMIN)
+                    .setMountPoint(MOUNT_POINT)
+                    .build();
             Syncbase.init(options);
         } catch (SyncbaseException e) {
             Log.e(TAG, e.toString());
         }
 
-        Syncbase.loginAndroid(this, new LoginCallback());
+        SyncbaseAndroid.login(this, new LoginCallback());
     }
 
     @Override

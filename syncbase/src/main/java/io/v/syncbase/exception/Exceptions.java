@@ -94,6 +94,7 @@ public final class Exceptions {
             case "v.io/v23/services/syncbase.InferAppBlessingFailed":
             case "v.io/v23/services/syncbase.InferUserBlessingFailed":
             case "v.io/v23/services/syncbase.InferDefaultPermsFailed":
+            case "v.io/v23/syncbase/util.FoundNoConventionalBlessings":
                 throw new SyncbaseSecurityException(fullMessage, cause);
 
             default:

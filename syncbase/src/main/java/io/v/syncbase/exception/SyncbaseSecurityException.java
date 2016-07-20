@@ -7,7 +7,8 @@ package io.v.syncbase.exception;
 /**
  * Thrown in response to various inconsistencies in permissions, or unsupported authentication
  * provider, or Vanadium errors: NoAccess, NotTrusted, NoExistOrNoAccess, UnauthorizedCreateId,
- * InferAppBlessingFailed, InferUserBlessingFailed, or InferDefaultPermsFailed.
+ * InferAppBlessingFailed, InferUserBlessingFailed, InferDefaultPermsFailed, or
+ * FoundNoConventionalBlessings.
  */
 public class SyncbaseSecurityException extends SyncbaseException {
     SyncbaseSecurityException(String message, Exception cause) {

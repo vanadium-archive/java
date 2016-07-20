@@ -4,8 +4,6 @@
 
 package io.v.syncbase;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -18,11 +16,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-import io.v.syncbase.android.LoginFragment;
 import io.v.syncbase.core.NeighborhoodPeer;
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.Service;
@@ -45,14 +41,16 @@ import static io.v.syncbase.exception.Exceptions.chainThrow;
  */
 
 /**
- * Syncbase is a storage system for developers that makes it easy to synchronize app data between
- * devices. It works even when devices are not connected to the Internet.
+ * A storage system for developers that makes it easy to synchronize app data between devices.
+ * It works even when devices are not connected to the Internet.
  *
  * <p>Methods of classes in this package may throw an exception that is a subclass of
  * SyncbaseException.  See details of those subclasses to determine whether there are conditions
  * the calling code should handle.</p>
  */
 public class Syncbase {
+    private Syncbase() {}
+
     /**
      * Options for opening a database.
      */
@@ -69,7 +67,8 @@ public class Syncbase {
         final String mCloudAdmin;
 
         Options(Options.Builder builder) {
-            mCallbackExecutor = builder.mExecutor;
+            mCallbackExecutor = builder.mExecutor != null
+                    ? builder.mExecutor : UiThreadExecutor.INSTANCE;
             mRootDir = builder.mRootDir;
             mMountPoints = builder.mMountPoints;
             mDisableSyncgroupPublishing = !builder.mUsesCloud;
@@ -109,7 +108,7 @@ public class Syncbase {
             private final String mCloudName;
             private final String mCloudAdmin;
 
-            private Executor mExecutor = UiThreadExecutor.INSTANCE;
+            private Executor mExecutor;
             private final List<String> mMountPoints = new ArrayList<>();
             private boolean mTestLogin;
             private int mLogLevel;
@@ -253,6 +252,13 @@ public class Syncbase {
     }
 
     /**
+     * Runs the callback on the callback executor.
+     */
+    public static void executeCallback(Runnable runnable) {
+        sOpts.mCallbackExecutor.execute(runnable);
+    }
+
+    /**
      * Returns a Database object. Return null if the user is not currently logged in.
      */
     public static Database database() throws SyncbaseException {
@@ -308,38 +314,6 @@ public class Syncbase {
     public interface LoginCallback {
         void onSuccess();
         void onError(Throwable e);
-    }
-
-    /**
-     * Logs in the user on Android.
-     * If the user is already logged in, it runs the success callback on the executor. Otherwise,
-     * the user selects an account through an account picker flow and is logged into Syncbase. The
-     * callback's success or failure cases are called accordingly.
-     * Note: This default account flow is currently restricted to Google accounts.
-     *
-     * @param activity The Android activity where login will occur.
-     * @param cb       The callback to call when the login was done.
-     */
-    public static void loginAndroid(Activity activity, final LoginCallback cb) {
-        if (isLoggedIn()) {
-            sOpts.mCallbackExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    cb.onSuccess();
-                }
-            });
-            return;
-        }
-        FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
-        LoginFragment fragment = new LoginFragment();
-        fragment.setTokenReceiver(new LoginFragment.TokenReceiver() {
-            @Override
-            public void receiveToken(String token) {
-                Syncbase.login(token, User.PROVIDER_GOOGLE, cb);
-            }
-        });
-        transaction.add(fragment, UUID.randomUUID().toString());
-        transaction.commit();  // This will invoke the fragment's onCreate() immediately.
     }
 
     /**
@@ -520,8 +494,13 @@ public class Syncbase {
     /**
      * Advertises the logged in user's presence to those around them.
      */
-    public static void advertiseLoggedInUserInNeighborhood() throws VError {
-        Neighborhood.StartAdvertising(new ArrayList<String>());
+    public static void advertiseLoggedInUserInNeighborhood() throws SyncbaseException {
+        try {
+            Neighborhood.StartAdvertising(new ArrayList<String>());
+        } catch(VError e) {
+            chainThrow("advertising user in neighborhood", e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**
@@ -529,12 +508,17 @@ public class Syncbase {
      *
      * @param usersWhoCanSee The set of users who are allowed to find this user.
      */
-    public static void advertiseLoggedInUserInNeighborhood(Iterable<User> usersWhoCanSee) throws VError {
+    public static void advertiseLoggedInUserInNeighborhood(Iterable<User> usersWhoCanSee) throws SyncbaseException {
         List<String> visibility = new ArrayList<String>();
         for (User user : usersWhoCanSee) {
             visibility.add(Syncbase.getBlessingStringFromAlias(user.getAlias()));
         }
-        Neighborhood.StartAdvertising(visibility);
+        try {
+            Neighborhood.StartAdvertising(visibility);
+        } catch(VError e) {
+            chainThrow("advertising user in neighborhood", e);
+            throw new AssertionError("never happens");
+        }
     }
 
     /**
@@ -562,9 +546,7 @@ public class Syncbase {
 
     static String getPersonalBlessingString() throws SyncbaseException {
         try {
-
             return Blessings.UserBlessingFromContext();
-
         } catch(VError e) {
             chainThrow("getting certificates from context", e);
             throw new AssertionError("never happens");

@@ -17,7 +17,9 @@ import org.junit.rules.TemporaryFolder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import io.v.syncbase.core.Permissions;
 import io.v.syncbase.core.VError;
@@ -487,5 +489,87 @@ public class SyncbaseTest {
             public void onError(Throwable e) {
             }
         });
+    }
+
+    @Test
+    public void testAdvertiseInNeighborhood() throws Exception {
+        TestUtil.createDatabase(); // This is meant to force the test login.
+
+        assertFalse(Syncbase.isAdvertisingLoggedInUserInNeighborhood());
+        Syncbase.advertiseLoggedInUserInNeighborhood();
+        assertTrue(Syncbase.isAdvertisingLoggedInUserInNeighborhood());
+        Syncbase.stopAdvertisingLoggedInUserInNeighborhood();
+        assertFalse(Syncbase.isAdvertisingLoggedInUserInNeighborhood());
+    }
+
+    @Test
+    public void testAdvertiseInNeighborhoodNotLoggedIn() {
+        try {
+            Syncbase.advertiseLoggedInUserInNeighborhood();
+            fail("should throw because the user isn't logged in");
+        } catch (SyncbaseException e) {
+            // We expect the advertise attempt to throw.
+        }
+    }
+
+    @Test
+    public void testScanInNeighborhood() throws Exception {
+        TestUtil.createDatabase(); // This is meant to force the test login.
+
+        Syncbase.ScanNeighborhoodForUsersCallback cb =
+                new Syncbase.ScanNeighborhoodForUsersCallback() {
+            @Override
+            public void onFound(User user) {}
+
+            @Override
+            public void onLost(User user) {}
+
+            @Override
+            public void onError(Throwable e) {
+                fail("should not throw an error");
+            }
+        };
+        // Test that this doesn't error. A more thorough test would check that the callback fires,
+        // but that would require multiple devices, so it has not been done here.
+        Syncbase.removeAllScansForUsersInNeighborhood();
+        Syncbase.addScanForUsersInNeighborhood(cb);
+        Syncbase.removeScanForUsersInNeighborhood(cb);
+        Syncbase.removeAllScansForUsersInNeighborhood();
+
+        try {
+            SettableFuture.create().get(1, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            // It's okay for this to time out. We just need to ensure the error callback has
+            // time to be called.
+        }
+    }
+
+    @Test
+    public void testScanInNeighborhoodNotLoggedIn() {
+        final SettableFuture<Boolean> errored = SettableFuture.create();
+        Syncbase.ScanNeighborhoodForUsersCallback cb =
+                new Syncbase.ScanNeighborhoodForUsersCallback() {
+                    @Override
+                    public void onFound(User user) {}
+
+                    @Override
+                    public void onLost(User user) {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // This is expected to be called.
+                        assertNotNull("should error", e);
+                        errored.set(true);
+                    }
+                };
+        // Force an error because the user was not logged in.
+        Syncbase.addScanForUsersInNeighborhood(cb);
+
+        // Give the callback time to be called.
+        try {
+            assertTrue(errored.get(1, TimeUnit.SECONDS));
+        } catch (InterruptedException | TimeoutException | ExecutionException e) {
+            fail("should have been able to get successfully");
+        }
     }
 }
