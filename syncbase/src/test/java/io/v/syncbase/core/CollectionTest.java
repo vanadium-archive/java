@@ -90,8 +90,13 @@ public class CollectionTest {
             BatchDatabase batchDb = db.beginBatch(null);
             Collection collection1 = batchDb.collection(collectionId1);
             collection1.create(anyCollectionPermissions());
+
             // We have not committed the batch yet so exists() should fail.
-            assertFalse(collection1.exists());
+            assertFalse(db.collection(collectionId1).exists());
+
+            // But from the point of view of the batch, collection1 does exist.
+            assertTrue(collection1.exists());
+
             batchDb.commit();
             assertTrue(db.collection(collectionId1).exists());
             assertFalse(db.collection(collectionId2).exists());

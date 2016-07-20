@@ -271,7 +271,7 @@ public class DatabaseTest {
             Database.Create(dbName, anyDbPermissions());
             Database.DestroySyncgroup(dbName, sgId);
         } catch (VError vError) {
-            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            assertEquals("v.io/v23/verror.NoExist", vError.id);
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
@@ -322,7 +322,7 @@ public class DatabaseTest {
             Database.Create(dbName, anyDbPermissions());
             Database.EjectFromSyncgroup(dbName, sgId, "");
         }  catch (VError vError) {
-            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            assertEquals("v.io/v23/verror.NoExist", vError.id);
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);

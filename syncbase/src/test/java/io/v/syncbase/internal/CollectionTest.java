@@ -101,10 +101,15 @@ public class CollectionTest {
         String collectionName2 = Util.NamingJoin(Arrays.asList(dbName, collectionId2.encode()));
         try {
             Database.Create(dbName, anyDbPermissions());
-            String batchHandle = Database.BeginBatch(dbId.encode(), null);
+            String batchHandle = Database.BeginBatch(dbName, null);
             Collection.Create(collectionName1, batchHandle, anyCollectionPermissions());
-            // We have not committed the batch yet so Exists should fail.
-            assertFalse(Collection.Exists(collectionName1, batchHandle));
+
+            // We have not committed the batch yet so exists() should fail.
+            assertFalse(Collection.Exists(collectionName1, Database.BeginBatch(dbName, null)));
+
+            // But from the point of view of the batch, collection1 does exist.
+            assertTrue(Collection.Exists(collectionName1, batchHandle));
+
             Database.Commit(dbName, batchHandle);
             batchHandle = Database.BeginBatch(dbName, null);
             assertTrue(Collection.Exists(collectionName1, batchHandle));

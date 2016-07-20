@@ -106,7 +106,7 @@ public class SyncgroupTest {
             db.create(anyDbPermissions());
             db.syncgroup(sgId).destroy();
         } catch (VError vError) {
-            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            assertEquals("v.io/v23/verror.NoExist", vError.id);
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
@@ -156,7 +156,7 @@ public class SyncgroupTest {
             db.create(anyDbPermissions());
             db.syncgroup(sgId).eject("");
         }  catch (VError vError) {
-            assertEquals("v.io/v23/verror.NotImplemented", vError.id);
+            assertEquals("v.io/v23/verror.NoExist", vError.id);
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
