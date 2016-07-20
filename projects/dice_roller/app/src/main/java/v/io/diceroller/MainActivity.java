@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DiceRoller";
     private static final String RESULT_KEY = "result";
 
+    // Note: You can replace CLOUD_NAME and CLOUD_ADMIN with your cloud syncbase
+    // name and blessing from https://sb-allocator.v.io
     private static final String CLOUD_NAME =
             "/(dev.v.io:r:vprod:service:mounttabled)@ns.dev.v.io:8101/sb/syncbased-24204641";
     private static final String CLOUD_ADMIN = "dev.v.io:r:allocator:us:x:syncbased-24204641";
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                     .build();
             Syncbase.init(options);
         } catch (SyncbaseException e) {
-            Log.e(TAG, e.toString());
+            Log.e(TAG, "Syncbase failed to initialize", e);
         }
 
         SyncbaseAndroid.login(this, new LoginCallback());
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private class LoginCallback implements Syncbase.LoginCallback {
         @Override
         public void onSuccess() {
-            Log.i(TAG, "LoginCallback: onSuccess");
+            Log.i(TAG, "Syncbase is ready");
 
             try {
                 final Collection userdata = Syncbase.database().getUserdataCollection();
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             } catch (SyncbaseException e) {
-                Log.e(TAG, e.toString());
+                Log.e(TAG, "Syncbased failed to login", e);
             }
         }
 
