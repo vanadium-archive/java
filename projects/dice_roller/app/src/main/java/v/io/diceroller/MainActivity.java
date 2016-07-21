@@ -65,22 +65,25 @@ public class MainActivity extends AppCompatActivity {
                 final Collection userdata = Syncbase.database().getUserdataCollection();
 
                 // On dice roll, put a random number into the userdata collection under RESULT_KEY.
-                final Button button = (Button) findViewById(R.id.buttonRoll);
+                final View button = findViewById(R.id.buttonRoll);
                 if (button == null) {
                     Log.e(TAG, "Resource not found: " + R.id.buttonRoll);
-                } else {
-                    button.setEnabled(true);
-                    button.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            int randomNumber = new Random().nextInt(6) + 1;
-                            try {
-                                userdata.put(RESULT_KEY, randomNumber);
-                            } catch (SyncbaseException e) {
-                                Log.e(TAG, e.toString());
-                            }
-                        }
-                    });
+                    return;
                 }
+                button.setEnabled(true);
+                button.setOnClickListener(new View.OnClickListener() {
+                    private Random random = new Random();
+
+                    @Override
+                    public void onClick(View v) {
+                        int randomNumber = random.nextInt(6) + 1;
+                        try {
+                            userdata.put(RESULT_KEY, randomNumber);
+                        } catch (SyncbaseException e) {
+                            Log.e(TAG, "put error", e);
+                        }
+                    }
+                });
 
                 Syncbase.database().addWatchChangeHandler(new Database.WatchChangeHandler() {
                     @Override
@@ -95,13 +98,13 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, "onError: " + e.toString());
+                        Log.e(TAG, "watch error", e);
                     }
 
                     private void onChange(Iterator<WatchChange> changes) {
                         while (changes.hasNext()) {
                             WatchChange watchChange = changes.next();
-                            Log.i(TAG, watchChange.toString());
+                            Log.i(TAG, "Received watch change: " + watchChange);
                             if (watchChange.getCollectionId().getName().equals(
                                     Syncbase.USERDATA_NAME) &&
                                     watchChange.getEntityType() == WatchChange.EntityType.ROW &&
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                                 try {
                                     updateResult(watchChange.getValue(Integer.class));
                                 } catch (SyncbaseException e) {
-                                    Log.e(TAG, e.toString());
+                                    Log.e(TAG, "watch change error", e);
                                 }
                             }
                         }
@@ -123,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onError(Throwable e) {
-            Log.e(TAG, "LoginCallback: onError: " + e.toString());
+            Log.e(TAG, "LoginCallback: onError", e);
         }
     }
 
