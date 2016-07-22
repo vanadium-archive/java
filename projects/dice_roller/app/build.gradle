@@ -21,11 +21,6 @@ android {
                 abiFilters "armeabi-v7a"
             }
         }
-        debug {
-            ndk {
-                abiFilters "armeabi-v7a"
-            }
-        }
     }
 }
 
