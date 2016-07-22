@@ -60,8 +60,7 @@ public class Syncgroup {
     }
 
     protected void join() throws VError {
-        // TODO(razvanm): Find a way to restrict the remote blessing. Cloud is one thing the remote
-        // blessings should include.
+        // TODO(razvanm): Find a way to restrict the remote blessing.
         mCoreSyncgroup.join(Syncbase.sOpts.mCloudName, ImmutableList.of("..."),
                 new SyncgroupMemberInfo());
     }
