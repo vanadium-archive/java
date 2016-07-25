@@ -36,8 +36,8 @@ import static io.v.syncbase.exception.Exceptions.chainThrow;
 /**
  * The "userdata" collection is a per-user collection (and associated syncgroup) for data that
  * should automatically get synced across a given user's devices. It has the following schema:
- * - /syncgroups/{encodedSyncgroupId} -> null
- * - /ignoredInvites/{encodedSyncgroupId} -> null
+ * - internal__/syncgroups/{encodedSyncgroupId} -> null
+ * - internal__/ignoredInvites/{encodedSyncgroupId} -> null
  */
 
 /**
@@ -219,11 +219,11 @@ public class Syncbase {
     static final String
             TAG = "syncbase",
             DIR_NAME = "syncbase",
-            DB_NAME = "db";
+            DB_NAME = "db",
+            USERDATA_INTERNAL_PREFIX = "internal__/",
+            USERDATA_INTERNAL_SYNCGROUP_PREFIX = USERDATA_INTERNAL_PREFIX + "syncgroups";
 
-    public static final String
-            USERDATA_NAME = "userdata__",
-            USERDATA_COLLECTION_PREFIX = "__collections/";
+    public static final String USERDATA_NAME = "userdata__";
 
     private static Map selfAndCloud() throws SyncbaseException {
         List<String> inList = sOpts.mCloudAdmin == null
@@ -401,10 +401,10 @@ public class Syncbase {
                 if (watchChange.getCollectionId().getName().equals(USERDATA_NAME) &&
                         watchChange.getEntityType() == WatchChange.EntityType.ROW &&
                         watchChange.getChangeType() == WatchChange.ChangeType.PUT &&
-                        watchChange.getRowKey().startsWith(USERDATA_COLLECTION_PREFIX)) {
+                        watchChange.getRowKey().startsWith(USERDATA_INTERNAL_SYNCGROUP_PREFIX)) {
                     try {
                         String encodedId = watchChange.getRowKey().
-                                substring(Syncbase.USERDATA_COLLECTION_PREFIX.length());
+                                substring(Syncbase.USERDATA_INTERNAL_SYNCGROUP_PREFIX.length());
                         sDatabase.getSyncgroup(Id.decode(encodedId)).join();
                     } catch (VError vError) {
                         vError.printStackTrace();
@@ -417,7 +417,7 @@ public class Syncbase {
 
     static void addToUserdata(Id id) throws SyncbaseException {
         sDatabase.getUserdataCollection().
-                put(Syncbase.USERDATA_COLLECTION_PREFIX + id.encode(), true);
+                put(Syncbase.USERDATA_INTERNAL_SYNCGROUP_PREFIX + id.encode(), true);
     }
 
     /**

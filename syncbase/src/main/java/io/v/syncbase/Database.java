@@ -396,14 +396,14 @@ public class Database extends DatabaseHandle {
         final String name;
         final String blessing;
         final String row;
-        final boolean showUserdataCollectionRow;
+        final boolean showUserdataInternalRow;
 
         AddWatchChangeHandlerOptions(Builder builder) {
             resumeMarker = builder.resumeMarker;
             name = builder.name;
             blessing = builder.blessing;
             row = builder.row;
-            showUserdataCollectionRow = builder.showUserdataCollectionRow;
+            showUserdataInternalRow = builder.showUserdataCollectionRow;
         }
 
         CollectionRowPattern getCollectionRowPattern() {
@@ -425,33 +425,35 @@ public class Database extends DatabaseHandle {
             }
 
             public Builder setCollectionNamePrefix(String prefix) {
-                // TODO(alexfandrianto): Unsafe. The prefix was not escaped. Incorrect if it has a
-                // trailing backslash.
-                name = prefix + WILDCARD;
+                name = escapePattern(prefix) + WILDCARD;
                 return this;
             }
 
             public Builder setCollectionId(Id id) {
-                name = id.getName();
-                blessing = id.getBlessing();
+                name = escapePattern(id.getName());
+                blessing = escapePattern(id.getBlessing());
                 return this;
             }
 
             public Builder setRowKeyPrefix(String prefix) {
-                // TODO(alexfandrianto): Unsafe. The prefix was not escaped. Incorrect if it has a
-                // trailing backslash.
-                row = prefix + WILDCARD;
+                row = escapePattern(prefix) + WILDCARD;
                 return this;
             }
 
             public Builder setRowKey(String rowKey) {
-                row = rowKey;
+                row = escapePattern(rowKey);
                 return this;
             }
 
             Builder setShowUserdataCollectionRow(boolean shouldShow) {
                 showUserdataCollectionRow = shouldShow;
                 return this;
+            }
+
+            private String escapePattern(String s) {
+                // Replace '\', '%', and '_' literals with a '\\', '\%', and '\_' respectively.
+                // The reason is that we use SQL LIKE syntax in Go.
+                return s.replaceAll("[\\\\%_]", "\\\\$0");
             }
 
             public AddWatchChangeHandlerOptions build() {
@@ -511,12 +513,12 @@ public class Database extends DatabaseHandle {
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
                         boolean isRoot = coreWatchChange.entityType ==
                                 io.v.syncbase.core.WatchChange.EntityType.ROOT;
-                        boolean isUserdataCollectionRow =
+                        boolean isUserdataInternalRow =
                                 coreWatchChange.entityType ==
                                         io.v.syncbase.core.WatchChange.EntityType.ROW &&
                                 coreWatchChange.collection.name.equals(Syncbase.USERDATA_NAME) &&
-                                coreWatchChange.row.startsWith(Syncbase.USERDATA_COLLECTION_PREFIX);
-                        if (!isRoot && (opts.showUserdataCollectionRow || !isUserdataCollectionRow)) {
+                                coreWatchChange.row.startsWith(Syncbase.USERDATA_INTERNAL_PREFIX);
+                        if (!isRoot && (opts.showUserdataInternalRow || !isUserdataInternalRow)) {
                             mBatch.add(new WatchChange(coreWatchChange));
                         }
                         if (!coreWatchChange.continued) {

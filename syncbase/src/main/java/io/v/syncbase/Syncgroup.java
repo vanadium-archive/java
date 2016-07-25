@@ -167,25 +167,25 @@ public class Syncgroup {
     public void updateAccessList(final AccessList delta, UpdateAccessListOptions opts)
             throws SyncbaseException {
         try {
-
             // TODO(sadovsky): Make it so SyncgroupSpec can be updated as part of a batch?
             VersionedSyncgroupSpec versionedSyncgroupSpec = mCoreSyncgroup.getSpec();
             versionedSyncgroupSpec.syncgroupSpec.permissions = AccessList.applyDeltaForSyncgroup(
                     versionedSyncgroupSpec.syncgroupSpec.permissions, delta);
             mCoreSyncgroup.setSpec(versionedSyncgroupSpec);
-            // TODO(sadovsky): There's a race here - it's possible for a collection to get destroyed
-            // after getSpec() but before db.getCollection().
-            final List<io.v.syncbase.core.Id> collectionsIds =
-                    versionedSyncgroupSpec.syncgroupSpec.collections;
-            mDatabase.runInBatch(new Database.BatchOperation() {
-                @Override
-                public void run(BatchDatabase db) throws SyncbaseException {
-                    for (io.v.syncbase.core.Id id : collectionsIds) {
-                        db.getCollection(new Id(id)).updateAccessList(delta);
+            if (!opts.syncgroupOnly) {
+                // TODO(sadovsky): There's a race here - it's possible for a collection to get
+                // destroyed after getSpec() but before db.getCollection().
+                final List<io.v.syncbase.core.Id> collectionsIds =
+                        versionedSyncgroupSpec.syncgroupSpec.collections;
+                mDatabase.runInBatch(new Database.BatchOperation() {
+                    @Override
+                    public void run(BatchDatabase db) throws SyncbaseException {
+                        for (io.v.syncbase.core.Id id : collectionsIds) {
+                            db.getCollection(new Id(id)).updateAccessList(delta);
+                        }
                     }
-                }
-            });
-
+                });
+            }
         } catch (VError e) {
             chainThrow("updating access list of syncgroup", getId().getName(), e);
         }
