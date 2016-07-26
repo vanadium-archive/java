@@ -5,9 +5,6 @@
 package io.v.v23.syncbase.util;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.v.impl.google.naming.NamingUtil;
 import io.v.v23.InputChannel;
@@ -173,20 +170,14 @@ public class Util {
             VContext context, String parentFullName) {
         InputChannel<GlobReply> input =
                 V.getNamespace(context).glob(context, NamingUtil.join(parentFullName, "*"));
-        return VFutures.withUserLandChecks(context,
-                Futures.transform(InputChannels.asList(InputChannels.transform(context, input,
+        return VFutures.withUserLandChecks(context, InputChannels.asList(
+                InputChannels.transform(context, input,
                         new InputChannels.TransformFunction<GlobReply, Id>() {
                             @Override
                             public Id apply(GlobReply from) throws VException {
                                 return idFromGlobReply(from);
                             }
-                        })), new Function<List<Id>, List<Id>>() {
-                    @Override
-                    public List<Id> apply(List<Id> input) {
-                        return Ordering.from(new IdComparator())
-                                .immutableSortedCopy(input);
-                    }
-                }));
+                        })));
     }
 
     private static Id idFromGlobReply(GlobReply reply) throws VException {
