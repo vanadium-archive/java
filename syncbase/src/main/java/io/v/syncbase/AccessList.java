@@ -48,10 +48,19 @@ public class AccessList {
         this.users = new HashMap<>();
     }
 
+    /**
+     * Gets the user's access level.
+     */
     public AccessLevel getAccessLevelForUser(User user) {
         return users.get(user.getAlias());
     }
 
+    /**
+     * Changes the user's access level and returns their previous access level.
+     *
+     * @param user The user whose access level is changing.
+     * @param newLevel The user's new access level.
+     */
     public AccessLevel setAccessLevel(User user, AccessLevel newLevel) {
         if (newLevel == null) {
             return removeAccessLevel(user);
@@ -61,8 +70,28 @@ public class AccessList {
         return oldLevel;
     }
 
+    /**
+     * Removes access from the given user.
+     */
     public AccessLevel removeAccessLevel(User user) {
         return users.remove(user);
+    }
+
+    /**
+     * Obtains the users that match the given access level.
+     * Filters out the cloud, which always has READ_WRITE_ADMIN access.
+     */
+    public java.util.Collection<User> getByAccessLevel(AccessLevel level) {
+        Set<User> matchingUsers = new HashSet<>();
+        for (Map.Entry<String, AccessLevel> entry : users.entrySet()) {
+            String alias = entry.getKey();
+            boolean isCloud = Syncbase.sOpts.mCloudAdmin != null &&
+                    alias.equals(Syncbase.getAliasFromBlessingPattern(Syncbase.sOpts.mCloudAdmin));
+            if (!isCloud && entry.getValue().equals(level)) {
+                matchingUsers.add(new User(alias));
+            }
+        }
+        return matchingUsers;
     }
 
     /**

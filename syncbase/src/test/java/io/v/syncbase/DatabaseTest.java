@@ -53,66 +53,66 @@ public class DatabaseTest {
         // Wildcard and prefix tests.
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                         .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "%");
-        assertEquals(opts.row, "%");
+        assertEquals("%", opts.blessing);
+        assertEquals("%", opts.name);
+        assertEquals("%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                         .setCollectionId(new Id("a", "b"))
                         .build();
-        assertEquals(opts.blessing, "a");
-        assertEquals(opts.name, "b");
-        assertEquals(opts.row, "%");
+        assertEquals("a", opts.blessing);
+        assertEquals("b", opts.name);
+        assertEquals("%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setCollectionNamePrefix("c")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "c%");
-        assertEquals(opts.row, "%");
+        assertEquals("%", opts.blessing);
+        assertEquals("c%", opts.name);
+        assertEquals("%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setRowKey("d")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "%");
-        assertEquals(opts.row, "d");
+        assertEquals("%", opts.blessing);
+        assertEquals("%", opts.name);
+        assertEquals("d", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setRowKeyPrefix("e")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "%");
-        assertEquals(opts.row, "e%");
+        assertEquals("%", opts.blessing);
+        assertEquals("%", opts.name);
+        assertEquals("e%", opts.row);
 
         // Escaping tests. %, _ and \ are special characters.
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setCollectionId(new Id("%", "_"))
                 .build();
-        assertEquals(opts.blessing, "\\%");
-        assertEquals(opts.name, "\\_");
-        assertEquals(opts.row, "%");
+        assertEquals("\\%", opts.blessing);
+        assertEquals("\\_", opts.name);
+        assertEquals("%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setCollectionNamePrefix("\\")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "\\\\%");
-        assertEquals(opts.row, "%");
+        assertEquals("%", opts.blessing);
+        assertEquals("\\\\%", opts.name);
+        assertEquals("%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setRowKey("%%")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "%");
-        assertEquals(opts.row, "\\%\\%");
+        assertEquals("%", opts.blessing);
+        assertEquals("%", opts.name);
+        assertEquals("\\%\\%", opts.row);
 
         opts = new Database.AddWatchChangeHandlerOptions.Builder()
                 .setRowKeyPrefix("_\\_")
                 .build();
-        assertEquals(opts.blessing, "%");
-        assertEquals(opts.name, "%");
-        assertEquals(opts.row, "\\_\\\\\\_%");
+        assertEquals("%", opts.blessing);
+        assertEquals("%", opts.name);
+        assertEquals("\\_\\\\\\_%", opts.row);
     }
 
 }

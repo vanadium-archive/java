@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.v.syncbase.core.CollectionRowPattern;
 import io.v.syncbase.core.SyncgroupMemberInfo;
@@ -504,6 +505,8 @@ public class Database extends DatabaseHandle {
             throw new UnsupportedOperationException("Specifying resumeMarker is not yet supported");
         }
 
+        final AtomicBoolean canceled = new AtomicBoolean(false);
+
         mCoreDatabase.watch(null, ImmutableList.of(opts.getCollectionRowPattern()),
                 new io.v.syncbase.core.Database.WatchPatternsCallbacks() {
                     private boolean mGotFirstBatch = false;
@@ -511,6 +514,10 @@ public class Database extends DatabaseHandle {
 
                     @Override
                     public void onChange(io.v.syncbase.core.WatchChange coreWatchChange) {
+                        if (canceled.get()) {
+                            return;
+                        }
+
                         boolean isRoot = coreWatchChange.entityType ==
                                 io.v.syncbase.core.WatchChange.EntityType.ROOT;
                         boolean isUserdataInternalRow =
@@ -564,7 +571,8 @@ public class Database extends DatabaseHandle {
             mWatchChangeHandlers.put(h, new Runnable() {
                 @Override
                 public void run() {
-                    throw new UnsupportedOperationException("Not implemented");
+                    // TODO(alexfandrianto): Implement properly. AtomicBoolean is only a patch.
+                    canceled.set(true);
                 }
             });
         }

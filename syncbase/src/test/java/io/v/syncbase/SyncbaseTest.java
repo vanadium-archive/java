@@ -124,18 +124,18 @@ public class SyncbaseTest {
         Collection cx = db.createCollection();
         assertNotNull(cx);
         assertFalse(cx.exists("foo"));
-        assertEquals(cx.get("foo", String.class), null);
+        assertEquals(null, cx.get("foo", String.class));
         cx.put("foo", "bar");
         assertTrue(cx.exists("foo"));
-        assertEquals(cx.get("foo", String.class), "bar");
+        assertEquals("bar", cx.get("foo", String.class));
         cx.put("foo", "baz");
         assertTrue(cx.exists("foo"));
-        assertEquals(cx.get("foo", String.class), "baz");
+        assertEquals("baz", cx.get("foo", String.class));
         cx.delete("foo");
         assertFalse(cx.exists("foo"));
-        assertEquals(cx.get("foo", String.class), null);
+        assertEquals(null, cx.get("foo", String.class));
         cx.put("foo", 5);
-        assertEquals(cx.get("foo", Integer.class), Integer.valueOf(5));
+        assertEquals(Integer.valueOf(5), cx.get("foo", Integer.class));
 
         // TODO(razvanm): Figure out a way to get the POJOs to work.
 //        // This time, with a POJO.
@@ -395,7 +395,7 @@ public class SyncbaseTest {
 
         TestOperation op = new TestOperation();
         db.runInBatch(op);
-        assertEquals(db.getCollection(op.id).get("foo", Integer.class), Integer.valueOf(10));
+        assertEquals(Integer.valueOf(10), db.getCollection(op.id).get("foo", Integer.class));
     }
 
     @Test
@@ -413,6 +413,10 @@ public class SyncbaseTest {
         assertNull(acl0.getAccessLevelForUser(alice));
         assertNull(acl0.getAccessLevelForUser(bob));
         assertNull(acl0.getAccessLevelForUser(carol));
+        assertEquals(0, acl0.getByAccessLevel(AccessList.AccessLevel.READ).size());
+        assertEquals(0, acl0.getByAccessLevel(AccessList.AccessLevel.READ_WRITE).size());
+        // Note: This is 1 because the creator of the collection starts with RWA access.
+        assertEquals(1, acl0.getByAccessLevel(AccessList.AccessLevel.READ_WRITE_ADMIN).size());
 
         // Alice can read now.
         sg.inviteUser(new User("alice"), AccessList.AccessLevel.READ);
@@ -420,6 +424,9 @@ public class SyncbaseTest {
         assertEquals(acl1.getAccessLevelForUser(alice), AccessList.AccessLevel.READ);
         assertNull(acl1.getAccessLevelForUser(bob));
         assertNull(acl1.getAccessLevelForUser(carol));
+        assertEquals(1, acl1.getByAccessLevel(AccessList.AccessLevel.READ).size());
+        assertEquals(0, acl1.getByAccessLevel(AccessList.AccessLevel.READ_WRITE).size());
+        assertEquals(1, acl1.getByAccessLevel(AccessList.AccessLevel.READ_WRITE_ADMIN).size());
 
         // Bob can both read and write now.
         sg.inviteUser(new User("bob"), AccessList.AccessLevel.READ_WRITE);
@@ -427,6 +434,9 @@ public class SyncbaseTest {
         assertEquals(acl2.getAccessLevelForUser(alice), AccessList.AccessLevel.READ);
         assertEquals(acl2.getAccessLevelForUser(bob), AccessList.AccessLevel.READ_WRITE);
         assertNull(acl2.getAccessLevelForUser(carol));
+        assertEquals(1, acl2.getByAccessLevel(AccessList.AccessLevel.READ).size());
+        assertEquals(1, acl2.getByAccessLevel(AccessList.AccessLevel.READ_WRITE).size());
+        assertEquals(1, acl2.getByAccessLevel(AccessList.AccessLevel.READ_WRITE_ADMIN).size());
 
         // Alice and Carol get full access now. (Tests overwrite and multiple invites.)
         sg.inviteUsers(ImmutableList.of(new User("alice"), new User("carol")),
@@ -435,6 +445,9 @@ public class SyncbaseTest {
         assertEquals(acl3.getAccessLevelForUser(alice), AccessList.AccessLevel.READ_WRITE_ADMIN);
         assertEquals(acl3.getAccessLevelForUser(bob), AccessList.AccessLevel.READ_WRITE);
         assertEquals(acl3.getAccessLevelForUser(carol), AccessList.AccessLevel.READ_WRITE_ADMIN);
+        assertEquals(0, acl3.getByAccessLevel(AccessList.AccessLevel.READ).size());
+        assertEquals(1, acl3.getByAccessLevel(AccessList.AccessLevel.READ_WRITE).size());
+        assertEquals(3, acl3.getByAccessLevel(AccessList.AccessLevel.READ_WRITE_ADMIN).size());
     }
 
     @Test
