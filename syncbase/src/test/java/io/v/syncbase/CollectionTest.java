@@ -50,7 +50,7 @@ public class CollectionTest {
         thrown.expectMessage("invalid name");
 
         // Create with invalid name
-        Syncbase.database().createNamedCollection("name with spaces", new CollectionOptions());
+        Syncbase.database().createNamedCollection("control\0char", new CollectionOptions());
     }
 
     @Test
